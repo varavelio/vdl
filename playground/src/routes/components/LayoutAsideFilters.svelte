@@ -72,78 +72,93 @@
   }
 </script>
 
-<div class="flex w-full justify-center space-x-1 px-4 py-2">
+<div
+  class={{
+    "desk:justify-center not-desk:pl-8 mx-auto flex w-full justify-start gap-2 px-2 pb-2": true,
+    "flex-wrap": !storeUi.store.asideSearchOpen,
+    "flex-nowrap": storeUi.store.asideSearchOpen,
+  }}
+>
   <Tooltip content="Reset filters to default" placement="bottom">
-    <button class="btn btn-sm btn-square group" onclick={resetFilters}>
-      <Funnel class="size-4 group-hover:hidden" />
-      <FunnelX class="hidden size-4 group-hover:inline" />
+    <button
+      class="btn btn-xs border-base-content/20 btn-square group"
+      onclick={resetFilters}
+    >
+      <Funnel class="size-3 group-hover:hidden" />
+      <FunnelX class="hidden size-3 group-hover:inline" />
     </button>
   </Tooltip>
 
   {#if storeUi.store.asideSearchOpen}
     <input
       type="text"
-      class="input input-sm flex-grow"
+      class="input input-xs flex-grow"
       placeholder="Search..."
       bind:this={searchInput}
       bind:value={storeUi.store.asideSearchQuery}
     />
 
     <Tooltip content={searchTooltip} placement="bottom">
-      <button class={["btn btn-sm btn-square relative"]} onclick={closeSearch}>
-        <X class="size-4" />
+      <button
+        class={["btn btn-xs border-base-content/20 btn-square relative"]}
+        onclick={closeSearch}
+      >
+        <X class="size-3" />
       </button>
     </Tooltip>
   {/if}
 
   {#if !storeUi.store.asideSearchOpen}
     <Tooltip content={searchTooltip} placement="bottom">
-      <button class={["btn btn-sm btn-square relative"]} onclick={openSearch}>
-        <Search class="size-4" />
+      <button
+        class={["btn btn-xs border-base-content/20 btn-square relative"]}
+        onclick={openSearch}
+      >
+        <Search class="size-3" />
       </button>
     </Tooltip>
     <Tooltip content={docsTooltip} placement="bottom">
       <button
         class={[
-          "btn btn-sm btn-square relative",
+          "btn btn-xs border-base-content/20 btn-square relative",
           storeUi.store.asideHideDocs && "toggle-disabled",
         ]}
         onclick={toggleDocs}
       >
-        <BookOpenText class="size-4" />
+        <BookOpenText class="size-3" />
       </button>
     </Tooltip>
     <Tooltip content={typesTooltip} placement="bottom">
       <button
         class={[
-          "btn btn-sm btn-square relative",
+          "btn btn-xs border-base-content/20 btn-square relative",
           storeUi.store.asideHideTypes && "toggle-disabled",
         ]}
         onclick={toggleTypes}
       >
-        <Type class="size-4" />
+        <Type class="size-3" />
       </button>
     </Tooltip>
     <Tooltip content={procsTooltip} placement="bottom">
       <button
         class={[
-          "btn btn-sm btn-square relative",
+          "btn btn-xs border-base-content/20 btn-square relative",
           storeUi.store.asideHideProcs && "toggle-disabled",
         ]}
         onclick={toggleProcs}
       >
-        <ArrowLeftRight class="size-4" />
+        <ArrowLeftRight class="size-3" />
       </button>
     </Tooltip>
     <Tooltip content={streamsTooltip} placement="bottom">
       <button
         class={[
-          "btn btn-sm btn-square relative",
+          "btn btn-xs border-base-content/20 btn-square relative",
           storeUi.store.asideHideStreams && "toggle-disabled",
         ]}
         onclick={toggleStreams}
       >
-        <CornerRightDown class="size-4" />
+        <CornerRightDown class="size-3" />
       </button>
     </Tooltip>
   {/if}

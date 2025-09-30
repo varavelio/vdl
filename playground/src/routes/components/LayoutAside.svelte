@@ -31,7 +31,7 @@
   let isHome = $derived(page.url.hash === "" || page.url.hash === "#/");
 
   const defaultSize = 280;
-  const minSize = 180;
+  const minSize = 210;
   const maxSize = 600;
   let isResizing = $state(false);
 
@@ -72,25 +72,25 @@
     style={asideStyle}
     class={[
       "bg-base-100 relative h-[100dvh] flex-none scroll-p-[130px]",
-      " overflow-x-hidden overflow-y-auto ",
+      "overflow-x-hidden overflow-y-auto",
     ]}
   >
     <header class="bg-base-100 sticky top-0 z-10 w-full shadow-xs">
       {#if !storeUi.store.isMobile}
         <a
-          class="sticky top-0 z-10 flex h-[72px] w-full items-end p-4 shadow-xs"
+          class="sticky top-0 z-10 flex h-[72px] w-full items-end p-4"
           href="https://uforpc.uforg.dev"
           target="_blank"
         >
           <Tooltip content={versionWithPrefix} placement="right">
-            <Logo class="mx-auto h-full" />
+            <Logo class="mx-auto w-[180px]" />
           </Tooltip>
         </a>
       {/if}
 
       {#if storeUi.store.isMobile}
         <div class="flex items-center justify-between p-4">
-          <Logo class="w-[180px]" />
+          <Logo class="mx-3 w-[180px]" />
 
           <button
             class="btn btn-ghost btn-square btn-sm"
