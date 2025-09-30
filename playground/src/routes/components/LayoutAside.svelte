@@ -29,15 +29,50 @@
   });
 
   let isHome = $derived(page.url.hash === "" || page.url.hash === "#/");
+
+  const defaultSize = 280;
+  const minSize = 180;
+  const maxSize = 600;
+  let isResizing = $state(false);
+
+  function startResize(e: MouseEvent) {
+    isResizing = true;
+    e.preventDefault();
+  }
+
+  function stopResize() {
+    isResizing = false;
+  }
+
+  function resize(e: MouseEvent) {
+    if (!isResizing) return;
+    const newWidth = e.clientX;
+    if (newWidth >= minSize && newWidth <= maxSize) {
+      storeUi.store.asideWidth = newWidth;
+    }
+  }
+
+  function handleDoubleClick() {
+    storeUi.store.asideWidth = defaultSize;
+  }
+
+  let asideStyle = $derived.by(() => {
+    if (storeUi.store.isMobile) {
+      return `width: 100%; max-width: ${defaultSize}px;`;
+    }
+
+    return `width: ${storeUi.store.asideWidth}px;`;
+  });
 </script>
 
 {#snippet aside()}
   <aside
     use:dimensionschangeAction
     ondimensionschange={(e) => (storeUi.store.aside = e.detail)}
+    style={asideStyle}
     class={[
-      "bg-base-100 h-[100dvh] w-full max-w-[280px] flex-none scroll-p-[130px]",
-      "overflow-x-hidden overflow-y-auto",
+      "bg-base-100 relative h-[100dvh] flex-none scroll-p-[130px]",
+      " overflow-x-hidden overflow-y-auto ",
     ]}
   >
     <header class="bg-base-100 sticky top-0 z-10 w-full shadow-xs">
@@ -90,7 +125,22 @@
       {/each}
     </nav>
   </aside>
+
+  {#if !storeUi.store.isMobile}
+    <button
+      aria-label="Resize"
+      class={[
+        "group border-base-content/20 fixed top-0 z-40 h-[100dvh] w-[6px] cursor-col-resize border-l",
+        "hover:bg-primary/20 hover:border-l-0",
+      ]}
+      style="left: {storeUi.store.asideWidth - 2}px;"
+      onmousedown={startResize}
+      ondblclick={handleDoubleClick}
+    ></button>
+  {/if}
 {/snippet}
+
+<svelte:window onmousemove={resize} onmouseup={stopResize} />
 
 {#if !storeUi.store.isMobile}
   {@render aside()}

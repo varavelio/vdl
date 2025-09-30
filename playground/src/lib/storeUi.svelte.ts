@@ -54,6 +54,7 @@ export type Theme = "light" | "dark";
 export interface StoreUi {
   isMobile: boolean;
   theme: Theme;
+  asideWidth: number;
   inputFormTab: "form" | "json";
   historyTab: "input" | "output";
   codeSnippetsTab: "sdk" | "curl";
@@ -136,6 +137,7 @@ const storeUiDefault: StoreUi = {
   codeSnippetsSdkDartPackageName: "uforpc",
   codeSnippetsSdkGolangPackageName: "uforpc",
   asideOpen: false,
+  asideWidth: 280,
   asideSearchOpen: false,
   asideSearchQuery: "",
   asideHideDocs: false,
@@ -159,6 +161,7 @@ const storeUiKeysToPersist: StoreUiKey[] = [
   "codeSnippetsSdkStep",
   "codeSnippetsSdkDartPackageName",
   "codeSnippetsSdkGolangPackageName",
+  "asideWidth",
   "asideSearchOpen",
   "asideSearchQuery",
   "asideHideDocs",

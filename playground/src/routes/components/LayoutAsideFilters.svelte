@@ -72,7 +72,7 @@
   }
 </script>
 
-<div class="flex w-full justify-between px-4 py-2">
+<div class="flex w-full justify-center space-x-1 px-4 py-2">
   <Tooltip content="Reset filters to default" placement="bottom">
     <button class="btn btn-sm btn-square group" onclick={resetFilters}>
       <Funnel class="size-4 group-hover:hidden" />
