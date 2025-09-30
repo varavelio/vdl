@@ -1,12 +1,10 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { Home, X } from "@lucide/svelte";
+  import { House, X } from "@lucide/svelte";
   import { onMount } from "svelte";
 
-  import { getMarkdownTitle } from "$lib/helpers/getMarkdownTitle";
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { dimensionschangeAction, storeUi } from "$lib/storeUi.svelte";
-  import type { Schema } from "$lib/urpcTypes";
   import { versionWithPrefix } from "$lib/version";
 
   import Logo from "$lib/components/Logo.svelte";
@@ -14,7 +12,7 @@
   import Tooltip from "$lib/components/Tooltip.svelte";
 
   import LayoutAsideFilters from "./LayoutAsideFilters.svelte";
-  import LayoutAsideItem from "./LayoutAsideItem.svelte";
+  import LayoutAsideItemWrapper from "./LayoutAsideItemWrapper.svelte";
 
   // if has hash anchor navigate to it
   onMount(async () => {
@@ -31,37 +29,6 @@
   });
 
   let isHome = $derived(page.url.hash === "" || page.url.hash === "#/");
-
-  function getNodeName(node: Schema["nodes"][number]) {
-    if (node.kind === "type") return node.name;
-    if (node.kind === "proc") return node.name;
-    if (node.kind === "stream") return node.name;
-    if (node.kind === "doc") return getMarkdownTitle(node.content);
-    return "unknown";
-  }
-
-  function shouldShowNode(
-    kind: string,
-    node: Schema["nodes"][number],
-  ): boolean {
-    if (node.kind !== kind) return false;
-
-    if (storeUi.store.asideSearchOpen) {
-      if (storeUi.store.asideSearchQuery === "") return true;
-
-      // Do the search
-      const name = getNodeName(node).toLowerCase();
-      const query = storeUi.store.asideSearchQuery.toLowerCase();
-      return name.includes(query);
-    }
-
-    if (node.kind === "doc") return !storeUi.store.asideHideDocs;
-    if (node.kind === "type") return !storeUi.store.asideHideTypes;
-    if (node.kind === "proc") return !storeUi.store.asideHideProcs;
-    if (node.kind === "stream") return !storeUi.store.asideHideStreams;
-
-    return false;
-  }
 </script>
 
 {#snippet aside()}
@@ -113,13 +80,13 @@
             { "bg-blue-500/20": isHome },
           ]}
         >
-          <Home class="size-4" />
+          <House class="size-4" />
           <span>Home</span>
         </a>
       </Tooltip>
 
       {#each storeSettings.store.jsonSchema.nodes as node}
-        {#if shouldShowNode("doc", node)}
+        <!-- {#if shouldShowNode("doc", node)}
           <LayoutAsideItem {node} />
         {/if}
         {#if shouldShowNode("type", node)}
@@ -130,7 +97,8 @@
         {/if}
         {#if shouldShowNode("stream", node)}
           <LayoutAsideItem {node} />
-        {/if}
+        {/if} -->
+        <LayoutAsideItemWrapper {node} />
       {/each}
     </nav>
   </aside>
