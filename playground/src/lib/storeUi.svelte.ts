@@ -55,6 +55,7 @@ export interface StoreUi {
   isMobile: boolean;
   theme: Theme;
   inputFormTab: "form" | "json";
+  historyTab: "input" | "output";
   codeSnippetsTab: "sdk" | "curl";
   codeSnippetsCurlLang: string;
   codeSnippetsSdkLang: CodegenGenerator;
@@ -127,6 +128,7 @@ const storeUiDefault: StoreUi = {
   isMobile: false,
   theme: "dark",
   inputFormTab: "form",
+  historyTab: "input",
   codeSnippetsTab: "curl",
   codeSnippetsCurlLang: "Curl",
   codeSnippetsSdkLang: "typescript-client",
@@ -150,6 +152,7 @@ const storeUiDefault: StoreUi = {
 const storeUiKeysToPersist: StoreUiKey[] = [
   "theme",
   "inputFormTab",
+  "historyTab",
   "codeSnippetsTab",
   "codeSnippetsCurlLang",
   "codeSnippetsSdkLang",
