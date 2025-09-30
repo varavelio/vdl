@@ -86,18 +86,6 @@
       </Tooltip>
 
       {#each storeSettings.store.jsonSchema.nodes as node}
-        <!-- {#if shouldShowNode("doc", node)}
-          <LayoutAsideItem {node} />
-        {/if}
-        {#if shouldShowNode("type", node)}
-          <LayoutAsideItem {node} />
-        {/if}
-        {#if shouldShowNode("proc", node)}
-          <LayoutAsideItem {node} />
-        {/if}
-        {#if shouldShowNode("stream", node)}
-          <LayoutAsideItem {node} />
-        {/if} -->
         <LayoutAsideItemWrapper {node} />
       {/each}
     </nav>
