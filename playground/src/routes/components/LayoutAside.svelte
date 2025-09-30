@@ -31,7 +31,7 @@
   let isHome = $derived(page.url.hash === "" || page.url.hash === "#/");
 
   const defaultSize = 280;
-  const minSize = 210;
+  const minSize = 225;
   const maxSize = 600;
   let isResizing = $state(false);
 
@@ -131,7 +131,7 @@
       aria-label="Resize"
       class={[
         "group border-base-content/20 fixed top-0 z-40 h-[100dvh] w-[6px] cursor-col-resize border-l",
-        "hover:bg-primary/20 hover:border-l-0",
+        "hover:bg-primary/50 hover:border-l-0",
       ]}
       style="left: {storeUi.store.asideWidth - 2}px;"
       onmousedown={startResize}
