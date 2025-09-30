@@ -338,7 +338,10 @@
 
 <label class="fieldset mb-4">
   <legend class="fieldset-legend">Language</legend>
-  <select class="select w-full" bind:value={storeUi.store.codeSnippetsCurlLang}>
+  <select
+    class="select w-full appearance-none"
+    bind:value={storeUi.store.codeSnippetsCurlLang}
+  >
     {#each langGroups as langGroup}
       {#if langGroup.langs.length > 1}
         <optgroup label={langGroup.group}>
