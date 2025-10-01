@@ -2,9 +2,96 @@ package transform
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
+	"github.com/uforg/uforpc/urpc/internal/urpc/formatter"
+	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
 )
+
+// ExtractTypeStr extracts a specific type declaration from the URPC schema by name.
+// It takes a URPC schema as a string and returns only the extracted type as a formatted string.
+func ExtractTypeStr(filename, content, typeName string) (string, error) {
+	if strings.TrimSpace(content) == "" {
+		return "", fmt.Errorf("empty schema content")
+	}
+
+	schema, err := parser.ParserInstance.ParseString(filename, content)
+	if err != nil {
+		return "", fmt.Errorf("error parsing URPC: %w", err)
+	}
+
+	typeDecl, err := ExtractType(schema, typeName)
+	if err != nil {
+		return "", err
+	}
+
+	// Create a minimal schema with just the version and extracted type
+	extractedSchema := &ast.Schema{
+		Children: []*ast.SchemaChild{
+			{Version: &ast.Version{Number: 1}},
+			{Type: typeDecl},
+		},
+	}
+
+	return formatter.FormatSchema(extractedSchema), nil
+}
+
+// ExtractProcStr extracts a specific proc declaration from the URPC schema by name.
+// It takes a URPC schema as a string and returns only the extracted proc as a formatted string.
+func ExtractProcStr(filename, content, procName string) (string, error) {
+	if strings.TrimSpace(content) == "" {
+		return "", fmt.Errorf("empty schema content")
+	}
+
+	schema, err := parser.ParserInstance.ParseString(filename, content)
+	if err != nil {
+		return "", fmt.Errorf("error parsing URPC: %w", err)
+	}
+
+	procDecl, err := ExtractProc(schema, procName)
+	if err != nil {
+		return "", err
+	}
+
+	// Create a minimal schema with just the version and extracted proc
+	extractedSchema := &ast.Schema{
+		Children: []*ast.SchemaChild{
+			{Version: &ast.Version{Number: 1}},
+			{Proc: procDecl},
+		},
+	}
+
+	return formatter.FormatSchema(extractedSchema), nil
+}
+
+// ExtractStreamStr extracts a specific stream declaration from the URPC schema by name.
+// It takes a URPC schema as a string and returns only the extracted stream as a formatted string.
+func ExtractStreamStr(filename, content, streamName string) (string, error) {
+	if strings.TrimSpace(content) == "" {
+		return "", fmt.Errorf("empty schema content")
+	}
+
+	schema, err := parser.ParserInstance.ParseString(filename, content)
+	if err != nil {
+		return "", fmt.Errorf("error parsing URPC: %w", err)
+	}
+
+	streamDecl, err := ExtractStream(schema, streamName)
+	if err != nil {
+		return "", err
+	}
+
+	// Create a minimal schema with just the version and extracted stream
+	extractedSchema := &ast.Schema{
+		Children: []*ast.SchemaChild{
+			{Version: &ast.Version{Number: 1}},
+			{Stream: streamDecl},
+		},
+	}
+
+	return formatter.FormatSchema(extractedSchema), nil
+}
 
 // ExtractType extracts a specific type declaration from the schema by name.
 // Returns only the type declaration, without dependencies or additional nodes.

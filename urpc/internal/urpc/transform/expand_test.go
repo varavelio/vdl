@@ -321,3 +321,90 @@ func extractFieldsFromObject(obj *ast.FieldTypeObject) []*ast.Field {
 func contains(slice []string, item string) bool {
 	return slices.Contains(slice, item)
 }
+
+func TestExpandTypesStr(t *testing.T) {
+	require := require.New(t)
+
+	input := `
+		version 1
+
+		type User {
+			id: string
+			name: string
+		}
+
+		type Post {
+			title: string
+			author: User
+		}
+
+		proc GetPost {
+			input {
+				postId: string
+			}
+
+			output {
+				post: Post
+			}
+		}
+	`
+
+	result, err := ExpandTypesStr("test.urpc", input)
+	require.NoError(err, "failed to expand types from string")
+	require.NotEmpty(result, "result should not be empty")
+
+	// Verify that User type reference was expanded in Post
+	require.Contains(result, "type Post", "should contain Post type")
+	require.Contains(result, "author:", "should contain author field")
+
+	// Verify that Post type reference was expanded in proc output
+	require.Contains(result, "proc GetPost", "should contain GetPost proc")
+	require.Contains(result, "title:", "should contain expanded Post fields in proc")
+}
+
+func TestExpandTypesStr_EmptyInput(t *testing.T) {
+	require := require.New(t)
+
+	result, err := ExpandTypesStr("test.urpc", "")
+	require.NoError(err, "empty input should not error")
+	require.Empty(result, "result should be empty for empty input")
+}
+
+func TestExpandTypesStr_InvalidInput(t *testing.T) {
+	require := require.New(t)
+
+	input := `invalid urpc syntax`
+
+	_, err := ExpandTypesStr("test.urpc", input)
+	require.Error(err, "should error on invalid input")
+	require.Contains(err.Error(), "parsing", "error should mention parsing")
+}
+
+func TestExpandTypesStr_PreservesDocstrings(t *testing.T) {
+	require := require.New(t)
+
+	input := `
+		version 1
+
+		""" User type """
+		type User {
+			""" User ID """
+			id: string
+		}
+
+		""" Post type """
+		type Post {
+			""" Post author """
+			author: User
+		}
+	`
+
+	result, err := ExpandTypesStr("test.urpc", input)
+	require.NoError(err, "failed to expand types")
+
+	// Verify docstrings are preserved
+	require.Contains(result, `""" User type """`, "should preserve User type docstring")
+	require.Contains(result, `""" Post type """`, "should preserve Post type docstring")
+	require.Contains(result, `""" User ID """`, "should preserve field docstring")
+	require.Contains(result, `""" Post author """`, "should preserve author field docstring")
+}

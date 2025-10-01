@@ -1,8 +1,30 @@
 package transform
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
+	"github.com/uforg/uforpc/urpc/internal/urpc/formatter"
+	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
 )
+
+// ExpandTypesStr expands all custom type references in the URPC schema to inline objects.
+// It takes a URPC schema as a string and returns the expanded schema as a formatted string.
+func ExpandTypesStr(filename, content string) (string, error) {
+	if strings.TrimSpace(content) == "" {
+		return "", nil
+	}
+
+	schema, err := parser.ParserInstance.ParseString(filename, content)
+	if err != nil {
+		return "", fmt.Errorf("error parsing URPC: %w", err)
+	}
+
+	expanded := ExpandTypes(schema)
+
+	return formatter.FormatSchema(expanded), nil
+}
 
 // ExpandTypes returns a new schema with all custom type references expanded to inline objects.
 // It traverses procs, streams, and type declarations, replacing references to custom types
