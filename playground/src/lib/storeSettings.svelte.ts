@@ -6,7 +6,7 @@ import { getCurrentHost } from "./helpers/getCurrentHost.ts";
 import { getMarkdownTitle } from "./helpers/getMarkdownTitle.ts";
 import { markdownToText } from "./helpers/markdownToText.ts";
 import { slugify } from "./helpers/slugify.ts";
-import { transpileUrpcToJson } from "./urpc.ts";
+import { cmdExpandTypes, transpileUrpcToJson } from "./urpc.ts";
 import type { Schema } from "./urpcTypes.ts";
 
 export const primitiveTypes = ["string", "int", "float", "bool", "datetime"];
@@ -55,6 +55,7 @@ export interface StoreSettings {
   baseUrl: string;
   headers: Header[];
   urpcSchema: string;
+  urpcSchemaExpanded: string;
   jsonSchema: Schema;
 }
 
@@ -110,6 +111,7 @@ async function storeSettingsGetInitialValue(): Promise<StoreSettings> {
     baseUrl,
     headers,
     urpcSchema: "version 1",
+    urpcSchemaExpanded: "version 1",
     jsonSchema: { version: 1, nodes: [] },
   };
 }
@@ -277,6 +279,8 @@ const indexSearchItems = async () => {
  * updates the `urpcSchema` store with the fetched content. If the fetch fails,
  * an error is logged to the console.
  *
+ * It also expands the types in the fetched schema and updates the `urpcSchemaExpanded` store.
+ *
  * @param url The URL from which to fetch the URPC schema.
  * @throws Logs an error to the console if the fetch operation fails.
  */
@@ -288,7 +292,7 @@ export const loadUrpcSchemaFromUrl = async (url: string) => {
   }
 
   const sch = await response.text();
-  storeSettings.store.urpcSchema = sch;
+  await loadUrpcSchemaFromString(sch);
 };
 
 /**
@@ -297,10 +301,13 @@ export const loadUrpcSchemaFromUrl = async (url: string) => {
  * This function directly sets the `urpcSchema` store to the provided schema string,
  * allowing for immediate updates to the schema without fetching from a URL.
  *
+ * It also expands the types in the provided schema and updates the `urpcSchemaExpanded` store.
+ *
  * @param sch The URPC schema string to be loaded into the store.
  */
-export const loadUrpcSchemaFromString = (sch: string) => {
+export const loadUrpcSchemaFromString = async (sch: string) => {
   storeSettings.store.urpcSchema = sch;
+  storeSettings.store.urpcSchemaExpanded = await cmdExpandTypes(sch);
 };
 
 /**
@@ -326,9 +333,11 @@ export const loadJsonSchemaFromUrpcSchemaUrl = async (url: string) => {
  * It's useful for processing schemas that are already available as strings without needing
  * to fetch from a URL.
  *
+ * It also expands the types in the provided schema and updates the `urpcSchemaExpanded` store.
+ *
  * @param sch The URPC schema string to load and transpile.
  */
 export const loadJsonSchemaFromUrpcSchemaString = async (sch: string) => {
-  loadUrpcSchemaFromString(sch);
+  await loadUrpcSchemaFromString(sch);
   await loadJsonSchemaFromCurrentUrpcSchema();
 };
