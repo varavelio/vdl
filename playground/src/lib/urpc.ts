@@ -153,10 +153,74 @@ async function cmdCodegen(
   return JSON.parse(json) as CmdCodegenOutput;
 }
 
+/**
+ * Expand all type references in an URPC schema
+ *
+ * @param input The URPC schema to expand
+ * @returns The expanded URPC schema with all type references inlined
+ */
+async function cmdExpandTypes(input: string): Promise<string> {
+  await waitUntilInitialized();
+  // biome-ignore lint/suspicious/noExplicitAny: it's a global function
+  return (window as any).cmdExpandTypes(input);
+}
+
+/**
+ * Extract a specific type declaration from an URPC schema
+ *
+ * @param input The URPC schema content
+ * @param typeName The name of the type to extract
+ * @returns The extracted type declaration as an URPC schema string
+ */
+async function cmdExtractType(
+  input: string,
+  typeName: string,
+): Promise<string> {
+  await waitUntilInitialized();
+  // biome-ignore lint/suspicious/noExplicitAny: it's a global function
+  return (window as any).cmdExtractType(input, typeName);
+}
+
+/**
+ * Extract a specific proc declaration from an URPC schema
+ *
+ * @param input The URPC schema content
+ * @param procName The name of the proc to extract
+ * @returns The extracted proc declaration as an URPC schema string
+ */
+async function cmdExtractProc(
+  input: string,
+  procName: string,
+): Promise<string> {
+  await waitUntilInitialized();
+  // biome-ignore lint/suspicious/noExplicitAny: it's a global function
+  return (window as any).cmdExtractProc(input, procName);
+}
+
+/**
+ * Extract a specific stream declaration from an URPC schema
+ *
+ * @param input The URPC schema content
+ * @param streamName The name of the stream to extract
+ * @returns The extracted stream declaration as an URPC schema string
+ */
+async function cmdExtractStream(
+  input: string,
+  streamName: string,
+): Promise<string> {
+  await waitUntilInitialized();
+  // biome-ignore lint/suspicious/noExplicitAny: it's a global function
+  return (window as any).cmdExtractStream(input, streamName);
+}
+
 export {
   cmdFmt,
   cmdTranspile,
   cmdCodegen,
+  cmdExpandTypes,
+  cmdExtractType,
+  cmdExtractProc,
+  cmdExtractStream,
   initWasm,
   isInitialized,
   transpileUrpcToJson,
