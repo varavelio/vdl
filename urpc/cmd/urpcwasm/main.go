@@ -8,9 +8,13 @@ import (
 )
 
 var wrappers map[string]js.Func = map[string]js.Func{
-	"cmdFmt":       cmdFmtWrapper(),
-	"cmdTranspile": cmdTranspileWrapper(),
-	"cmdCodegen":   cmdCodegenWrapper(),
+	"cmdFmt":           cmdFmtWrapper(),
+	"cmdTranspile":     cmdTranspileWrapper(),
+	"cmdCodegen":       cmdCodegenWrapper(),
+	"cmdExpandTypes":   cmdExpandTypesWrapper(),
+	"cmdExtractType":   cmdExtractTypeWrapper(),
+	"cmdExtractProc":   cmdExtractProcWrapper(),
+	"cmdExtractStream": cmdExtractStreamWrapper(),
 }
 
 func main() {
