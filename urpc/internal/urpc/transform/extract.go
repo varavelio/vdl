@@ -29,7 +29,6 @@ func ExtractTypeStr(filename, content, typeName string) (string, error) {
 	// Create a minimal schema with just the version and extracted type
 	extractedSchema := &ast.Schema{
 		Children: []*ast.SchemaChild{
-			{Version: &ast.Version{Number: 1}},
 			{Type: typeDecl},
 		},
 	}
@@ -57,7 +56,6 @@ func ExtractProcStr(filename, content, procName string) (string, error) {
 	// Create a minimal schema with just the version and extracted proc
 	extractedSchema := &ast.Schema{
 		Children: []*ast.SchemaChild{
-			{Version: &ast.Version{Number: 1}},
 			{Proc: procDecl},
 		},
 	}
@@ -85,7 +83,6 @@ func ExtractStreamStr(filename, content, streamName string) (string, error) {
 	// Create a minimal schema with just the version and extracted stream
 	extractedSchema := &ast.Schema{
 		Children: []*ast.SchemaChild{
-			{Version: &ast.Version{Number: 1}},
 			{Stream: streamDecl},
 		},
 	}
