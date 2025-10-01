@@ -63,6 +63,7 @@ export interface StoreUi {
   codeSnippetsSdkStep: "download" | "setup" | "usage" | "";
   codeSnippetsSdkDartPackageName: string;
   codeSnippetsSdkGolangPackageName: string;
+  schemaViewMode: "compact" | "expanded";
   asideOpen: boolean;
   asideSearchOpen: boolean;
   asideSearchQuery: string;
@@ -136,6 +137,7 @@ const storeUiDefault: StoreUi = {
   codeSnippetsSdkStep: "download",
   codeSnippetsSdkDartPackageName: "uforpc",
   codeSnippetsSdkGolangPackageName: "uforpc",
+  schemaViewMode: "expanded",
   asideOpen: false,
   asideWidth: 280,
   asideSearchOpen: false,
@@ -161,6 +163,7 @@ const storeUiKeysToPersist: StoreUiKey[] = [
   "codeSnippetsSdkStep",
   "codeSnippetsSdkDartPackageName",
   "codeSnippetsSdkGolangPackageName",
+  "schemaViewMode",
   "asideWidth",
   "asideSearchOpen",
   "asideSearchQuery",

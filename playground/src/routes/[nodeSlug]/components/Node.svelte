@@ -2,21 +2,19 @@
   import { TriangleAlert } from "@lucide/svelte";
 
   import { deleteMarkdownHeadings } from "$lib/helpers/deleteMarkdownHeadings";
-  import { extractNodeFromSchema } from "$lib/helpers/extractNodeFromSchema";
   import { getMarkdownTitle } from "$lib/helpers/getMarkdownTitle";
   import { markdownToHtml } from "$lib/helpers/markdownToHtml";
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
 
   import BottomSpace from "$lib/components/BottomSpace.svelte";
-  import Code from "$lib/components/Code.svelte";
-  import H2 from "$lib/components/H2.svelte";
 
   import type { StoreNodeInstance } from "../storeNode.svelte";
 
   import NodeQueryProc from "./NodeQuery/QueryProc.svelte";
   import NodeQueryStream from "./NodeQuery/QueryStream.svelte";
   import Snippets from "./NodeQuery/Snippets/Snippets.svelte";
+  import Schema from "./Schema.svelte";
 
   interface Props {
     node: (typeof storeSettings.store.jsonSchema.nodes)[number];
@@ -61,17 +59,6 @@
         documentation = await markdownToHtml(deleteMarkdownHeadings(node.doc));
       }
     })();
-  });
-
-  let urpcSchema = $state("");
-  $effect(() => {
-    if (node.kind === "doc") return;
-    const extracted = extractNodeFromSchema(
-      storeSettings.store.urpcSchema,
-      node.kind,
-      name,
-    );
-    if (extracted) urpcSchema = extracted;
   });
 
   let isProcOrStream = $derived(node.kind === "proc" || node.kind === "stream");
@@ -126,17 +113,7 @@
       </div>
     {/if}
 
-    {#if urpcSchema !== ""}
-      <div
-        class={{
-          "space-y-4": true,
-          "max-w-5xl": !isProcOrStream,
-        }}
-      >
-        <H2>Schema</H2>
-        <Code lang="urpc" code={urpcSchema} />
-      </div>
-    {/if}
+    <Schema {node} />
 
     {#if storeUi.store.isMobile || !isProcOrStream}
       <BottomSpace />
