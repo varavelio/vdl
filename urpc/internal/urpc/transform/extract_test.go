@@ -41,13 +41,20 @@ func TestExtractType(t *testing.T) {
 			}
 		}
 
-		""" Comment type """
-		type Comment {
-			id: string
-			text: string
-			author: User
-		}
-	`
+	""" Comment type """
+	type Comment {
+		id: string
+		text: string
+		author: User
+	}
+
+	""" Legacy type - do not use """
+	deprecated("Use NewProfile instead")
+	type OldProfile {
+		userId: string
+		bio: string
+	}
+`
 
 	schema, err := parser.ParserInstance.ParseString("test.urpc", input)
 	require.NoError(err, "failed to parse input schema")
@@ -154,6 +161,37 @@ func TestExtractType(t *testing.T) {
 		require.Error(err, "expected error for non-existent type")
 		require.Contains(err.Error(), "not found", "error message should indicate type was not found")
 	})
+
+	t.Run("ExtractDeprecatedType", func(t *testing.T) {
+		expected := `
+			version 1
+
+			""" Legacy type - do not use """
+			deprecated("Use NewProfile instead")
+			type OldProfile {
+				userId: string
+				bio: string
+			}
+		`
+
+		typeDecl, err := ExtractType(schema, "OldProfile")
+		require.NoError(err, "failed to extract OldProfile type")
+		require.NotNil(typeDecl.Deprecated, "deprecated field should not be nil")
+		require.NotNil(typeDecl.Deprecated.Message, "deprecated message should not be nil")
+		require.Equal("Use NewProfile instead", *typeDecl.Deprecated.Message, "deprecated message should match")
+
+		extractedSchema := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{Version: &ast.Version{Number: 1}},
+				{Type: typeDecl},
+			},
+		}
+
+		gotStr := formatter.FormatSchema(extractedSchema)
+		expectedStr, err := formatter.Format("", expected)
+		require.NoError(err, "failed to format expected schema")
+		require.Equal(expectedStr, gotStr, "extracted OldProfile type does not match expected")
+	})
 }
 
 func TestExtractProc(t *testing.T) {
@@ -199,17 +237,28 @@ func TestExtractProc(t *testing.T) {
 			}
 		}
 
-		""" Delete user """
-		proc DeleteUser {
-			input {
-				userId: string
-			}
-
-			output {
-				success: bool
-			}
+	""" Delete user """
+	proc DeleteUser {
+		input {
+			userId: string
 		}
-	`
+
+		output {
+			success: bool
+		}
+	}
+
+	deprecated
+	proc LegacyGetUser {
+		input {
+			id: string
+		}
+
+		output {
+			user: User
+		}
+	}
+`
 
 	schema, err := parser.ParserInstance.ParseString("test.urpc", input)
 	require.NoError(err, "failed to parse input schema")
@@ -325,6 +374,39 @@ func TestExtractProc(t *testing.T) {
 		require.Error(err, "expected error for non-existent proc")
 		require.Contains(err.Error(), "not found", "error message should indicate proc was not found")
 	})
+
+	t.Run("ExtractDeprecatedProc", func(t *testing.T) {
+		expected := `
+			version 1
+
+			deprecated
+			proc LegacyGetUser {
+				input {
+					id: string
+				}
+
+				output {
+					user: User
+				}
+			}
+		`
+
+		procDecl, err := ExtractProc(schema, "LegacyGetUser")
+		require.NoError(err, "failed to extract LegacyGetUser proc")
+		require.NotNil(procDecl.Deprecated, "deprecated field should not be nil")
+
+		extractedSchema := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{Version: &ast.Version{Number: 1}},
+				{Proc: procDecl},
+			},
+		}
+
+		gotStr := formatter.FormatSchema(extractedSchema)
+		expectedStr, err := formatter.Format("", expected)
+		require.NoError(err, "failed to format expected schema")
+		require.Equal(expectedStr, gotStr, "extracted LegacyGetUser proc does not match expected")
+	})
 }
 
 func TestExtractStream(t *testing.T) {
@@ -371,14 +453,25 @@ func TestExtractStream(t *testing.T) {
 			}
 		}
 
-		""" Log stream """
-		stream LogStream {
-			output {
-				level: string
-				message: string
-			}
+	""" Log stream """
+	stream LogStream {
+		output {
+			level: string
+			message: string
 		}
-	`
+	}
+
+	deprecated("Replaced by ChatStream v2")
+	stream OldChatStream {
+		input {
+			roomId: string
+		}
+
+		output {
+			msg: string
+		}
+	}
+`
 
 	schema, err := parser.ParserInstance.ParseString("test.urpc", input)
 	require.NoError(err, "failed to parse input schema")
@@ -491,5 +584,40 @@ func TestExtractStream(t *testing.T) {
 		_, err := ExtractStream(schema, "NonExistent")
 		require.Error(err, "expected error for non-existent stream")
 		require.Contains(err.Error(), "not found", "error message should indicate stream was not found")
+	})
+
+	t.Run("ExtractDeprecatedStream", func(t *testing.T) {
+		expected := `
+			version 1
+
+			deprecated("Replaced by ChatStream v2")
+			stream OldChatStream {
+				input {
+					roomId: string
+				}
+
+				output {
+					msg: string
+				}
+			}
+		`
+
+		streamDecl, err := ExtractStream(schema, "OldChatStream")
+		require.NoError(err, "failed to extract OldChatStream")
+		require.NotNil(streamDecl.Deprecated, "deprecated field should not be nil")
+		require.NotNil(streamDecl.Deprecated.Message, "deprecated message should not be nil")
+		require.Equal("Replaced by ChatStream v2", *streamDecl.Deprecated.Message, "deprecated message should match")
+
+		extractedSchema := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{Version: &ast.Version{Number: 1}},
+				{Stream: streamDecl},
+			},
+		}
+
+		gotStr := formatter.FormatSchema(extractedSchema)
+		expectedStr, err := formatter.Format("", expected)
+		require.NoError(err, "failed to format expected schema")
+		require.Equal(expectedStr, gotStr, "extracted OldChatStream does not match expected")
 	})
 }
