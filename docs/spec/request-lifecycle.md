@@ -3,7 +3,7 @@ title: Request Lifecycle
 description: Lifecycle of a single request in UFO RPC
 ---
 
-This document outlines the end-to-end data flow for both procedure calls and stream subscriptions in UFO RPC. It details the process from the client's initial request to the server's final response, including URL structure, JSON payloads, and error handling. This specification is language-agnostic and applies to all official UFO RPC code generators.
+This document outlines the end-to-end data flow for both procedure calls and stream subscriptions in UFO RPC. It details the process from the client's initial request to the server's final response, including URL structure, JSON payloads, and error handling. This specification is language-agnostic and applies to all official UFO RPC code generators. You can even implement your own server or client if you need it.
 
 ---
 
@@ -20,9 +20,9 @@ The developer uses the generated client to call a procedure (e.g., `CreateUser`)
 The client sends an HTTP `POST` request to the server.
 
 - **Method:** `POST`
-- **URL Structure:** The URL is formed by appending the procedure name to the base URL.
-  - Format: `<baseURL>/<ProcedureName>`
-  - Example: `https://api.example.com/urpc/CreateUser`
+- **URL Structure:** The URL is formed by appending the RPC service name and procedure name to the base URL.
+  - Format: `<baseURL>/<RPCName>/<ProcedureName>`
+  - Example: `https://api.example.com/urpc/Users/CreateUser`
 - **Headers:**
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -38,11 +38,11 @@ The client sends an HTTP `POST` request to the server.
 
 The server receives the request and performs the following steps:
 
-1.  **Routing:** It maps the URL path (`/CreateUser`) to the corresponding procedure handler.
+1.  **Routing:** It maps the URL path (`/Users/CreateUser`) to the corresponding RPC service and procedure handler.
 2.  **Deserialization & Validation:** It decodes the JSON body and performs built-in validation (e.g., checking for required fields). If this fails, it immediately responds with a validation error.
 3.  **Handler Execution:** The server invokes the user-defined business logic for the procedure, passing the validated input.
 
-> **Note:** UFO RPC provides a hook system that allows developers to run custom code at various points in the lifecycle for tasks like authentication, custom input validation, logging, metrics, etc.
+> **Note:** UFO RPC provides a hook system (middlewares) that allows developers to run custom code at various points in the lifecycle for tasks like authentication, custom input validation, logging, metrics, etc.
 
 ### 4. Server Response
 
@@ -109,8 +109,8 @@ The developer subscribes to a stream (e.g., `NewMessage`) using the generated cl
 The client initiates the connection with a single HTTP `POST` request.
 
 - **Method:** `POST`
-- **URL Structure:** `<baseURL>/<StreamName>`
-  - Example: `https://api.example.com/urpc/NewMessage`
+- **URL Structure:** `<baseURL>/<RPCName>/<StreamName>`
+  - Example: `https://api.example.com/urpc/Chat/NewMessage`
 - **Headers:**
   - `Accept: text/event-stream`
   - `Content-Type: application/json`
@@ -134,7 +134,7 @@ The server receives the request and establishes the persistent connection.
       - `Connection: keep-alive`
 3.  **Handler Execution:** The server invokes the user-defined stream handler, providing it with an `emit` function.
 
-> **Note:** Just like with procedures, a hook system is available for streams to run custom code for authentication, validation, logging, and other cross-cutting concerns.
+> **Note:** Just like with procedures, a hook system (middlewares) is available for streams to run custom code for authentication, validation, logging, and other cross-cutting concerns.
 
 ### 4. Event Emission
 
@@ -159,15 +159,29 @@ The server-side handler logic can now call the `emit` function at any time to pu
 
   ```
 
-### 5. Client Handling (Event Loop)
+### 5. Keep-Alive (Ping Events)
+
+To prevent the connection from being closed by proxies, load balancers, or network timeouts, the server periodically sends **ping events**. These are SSE comment lines that carry no data.
+
+- **Format:** `: ping\n\n`
+- **Interval:** Configurable on the server (default: every 30 seconds).
+- **Client Behavior:** The client library must automatically discard these events. In the generated clients, they are not delivered to the application code and are automatically discarded.
+
+```
+: ping
+
+```
+
+### 6. Client Handling (Event Loop)
 
 The client library maintains the open connection and listens for incoming events.
 
 1.  **Event Parsing:** As data arrives, the client parses the SSE `data:` payload.
-2.  **Deserialization:** It decodes the JSON from the data field.
-3.  **Delivery:** It delivers the content of the `output` or `error` field to the application code, typically through a channel or callback.
+2.  **Ping Filtering:** SSE comment lines (starting with `:`) are automatically discarded.
+3.  **Deserialization:** It decodes the JSON from the data field.
+4.  **Delivery:** It delivers the content of the `output` or `error` field to the application code, typically through a channel or callback.
 
-### 6. Stream Termination
+### 7. Stream Termination
 
 The connection can be closed in several ways:
 
@@ -175,4 +189,4 @@ The connection can be closed in several ways:
 - **Server-side:** The stream handler function returns, signaling the end of the stream.
 - **Network Error:** The connection is lost.
 
-**Resilience:** If the connection is lost unexpectedly, the client automatically attempts to reconnect with exponential backoff, re-submitting the initial request.
+**Resilience:** If the connection is lost unexpectedly, the client automatically attempts to reconnect with exponential backoff, re-submitting the initial request (this behavior is configurable in the generated clients).
