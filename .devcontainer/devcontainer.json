@@ -12,59 +12,23 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "zoma.vscode-auto-open-workspace",
         "uforg.urpc",
         "golang.go",
-        "mhutchie.git-graph",
-        "mutantdino.resourcemonitor",
-        "Compile-TomaszKasperczyk.copy-to-llm",
-        "donjayamanne.githistory",
-        "ryu1kn.partial-diff",
-        "tamasfe.even-better-toml",
         "svelte.svelte-vscode",
         "bradlc.vscode-tailwindcss",
         "Chanzhaoyu.svelte-5-snippets",
         "esbenp.prettier-vscode",
         "vitest.explorer",
         "biomejs.biome",
-        "Dart-Code.dart-code",
-        "astro-build.astro-vscode",
-        "unifiedjs.vscode-mdx"
+        "Dart-Code.dart-code"
       ],
       "settings": {
-        "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
         "urpc.enable": false,
+        "files.eol": "\n",
         "editor.formatOnSave": true,
         "editor.foldingStrategy": "indentation",
-        "files.eol": "\n",
-        "[json]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[jsonc]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[typescript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[javascript]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[css]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
         "css.validate": false,
-        "[html]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[markdown]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[yaml]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[svelte]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
         "svelte.enable-ts-plugin": true,
         "[go]": {
           "editor.defaultFormatter": "golang.go"
