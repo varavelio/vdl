@@ -405,7 +405,7 @@ rpc <RPCName> {
 
 ### RPC Merging Across Files
 
-To facilitate large-scale project organization, UFO RPC supports **RPC merging**. If the same `rpc` block name is declared in multiple files (for example, via imports), the compiler will automatically merge their contents into a single, unified service.
+To facilitate large-scale project organization, UFO RPC supports **RPC merging**. If the same `rpc` block name is declared in multiple files (for example, via includes), the compiler will automatically merge their contents into a single, unified service.
 
 This allows you to split a large service definition across multiple files by domain or feature:
 
@@ -725,7 +725,7 @@ Deprecated elements will:
 
 ## Complete Example
 
-The following example demonstrates a comprehensive schema that uses all the features of the UFO IDL, including imports, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
+The following example demonstrates a comprehensive schema that uses all the features of the UFO IDL, including includes, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
 
 ```ufo
 include "./foo.ufo"
