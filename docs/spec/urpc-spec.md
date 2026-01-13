@@ -1,19 +1,19 @@
 ---
-title: UFO-RPC DSL Specification
-description: Full specification of the UFO RPC (URPC) DSL language
+title: UFO RPC IDL Specification
+description: Full specification of the UFO RPC Interface Definition Language
 ---
 
 ## Overview
 
-The UFO DSL is a domain-specific language designed to define RPC services, schemas and contracts with strong typing. It provides a declarative syntax for defining data structures and procedures that UFO RPC can interpret and generate code for.
+UFO is a modern **IDL (Interface Definition Language)** designed for Schema-First development. It provides a declarative syntax for defining RPC services, data structures, and contracts with strong typing that UFO RPC can interpret and generate code for.
 
 The primary goal of URPC is to offer an intuitive, human-readable format that ensures the best possible developer experience (DX) while maintaining type safety.
 
-This DSL is a source of truth for your projects from which you can generate type safe code for multiple programming languages.
+This IDL serves as the single source of truth for your projects, from which you can generate type-safe code for multiple programming languages.
 
 ## UFO Syntax
 
-This is the syntax for the DSL.
+This is the syntax for the IDL.
 
 ```ufo
 import "./foo.ufo"
@@ -36,7 +36,7 @@ type <CustomTypeName> {
 const <ConstantName> = <Value>
 
 """ <Enum documentation> """
-enum <EnumName>[: <EnumType>] {
+enum <EnumName> {
   <EnumMember>[ = <EnumValue>]
   <EnumMember>[ = <EnumValue>]
 }
@@ -76,11 +76,23 @@ rpc <RPCName> {
 }
 ```
 
+## Naming Conventions
+
+UFO RPC enforces consistent naming conventions to ensure code generated across all target languages is idiomatic and predictable. The built-in formatter will automatically apply these styles to your schema.
+
+| Element                                         | Convention         | Example                  |
+| :---------------------------------------------- | :----------------- | :----------------------- |
+| Types, Enums, RPC services, Procedures, Streams | `PascalCase`       | `UserProfile`, `GetUser` |
+| Fields (in types, input, and output blocks)     | `camelCase`        | `userId`, `createdAt`    |
+| Constants                                       | `UPPER_SNAKE_CASE` | `MAX_PAGE_SIZE`          |
+| Patterns                                        | `PascalCase`       | `UserEventSubject`       |
+| Enum Members                                    | `PascalCase`       | `Pending`, `InProgress`  |
+
+> **Note:** The formatter will automatically correct casing when you run it on your `.ufo` files, so you can focus on the logic while the tooling ensures consistency.
+
 ## Imports
 
-To maintain clean and maintainable projects, UFO RPC allows you to split your schemas into multiple files.
-
-This modular approach helps you organize your types and procedures by domain, making them easier to navigate and reuse across different schemas.
+To maintain clean and maintainable projects, UFO RPC allows you to split your schemas into multiple files. This modular approach helps you organize your types and procedures by domain, making them easier to navigate and reuse across different schemas.
 
 ### How to use Imports
 
@@ -116,9 +128,9 @@ Data types are the core components of your schema. They define the precise struc
 
 ### Primitive Types
 
-The UFO DSL provides several built-in primitive types that map directly to standard JSON types while maintaining strong typing.
+The UFO IDL provides several built-in primitive types that map directly to standard JSON types while maintaining strong typing.
 
-| DSL Type   | JSON Equivalent | Description                                 |
+| Type       | JSON Equivalent | Description                                 |
 | :--------- | :-------------- | :------------------------------------------ |
 | `string`   | string          | UTF-8 encoded text string.                  |
 | `int`      | integer         | 64-bit signed integer.                      |
@@ -239,110 +251,280 @@ type Product {
 }
 ```
 
-## Defining Procedures
+## Constants
 
-Procedures are the main building block of your API. They define the procedures
-(AKA functions) that can be implemented on the server and called from the
-client.
+Constants allow you to define fixed values that can be referenced throughout your schema and in the generated code. They are useful for configuration values, limits, or any other static data that should be shared across your application.
 
 ```ufo
 """
-<Procedure documentation>
+Optional documentation for the constant.
 """
-proc <ProcedureName> {
-  input {
-    """ <Field documentation> """
-    <field>[?]: <PrimitiveType> | <CustomType>
-  }
+const <ConstantName> = <Value>
+```
 
-  output {
-    """ <Field documentation> """
-    <field>[?]: <PrimitiveType> | <CustomType>
+Constants support the following value types:
+
+- **Strings:** `const API_VERSION = "v1"`
+- **Integers:** `const MAX_PAGE_SIZE = 100`
+- **Floats:** `const DEFAULT_TAX_RATE = 0.21`
+- **Booleans:** `const FEATURE_FLAG_ENABLED = true`
+
+```ufo
+""" The maximum number of items allowed per request. """
+const MAX_ITEMS = 50
+
+""" The current API version string. """
+const VERSION = "2.1.0"
+```
+
+## Enumerations
+
+Enums define a set of named, discrete values. They are ideal for representing a fixed list of options, such as statuses, categories, or modes. UFO RPC supports two types of enums: **string enums** and **integer enums**.
+
+```ufo
+"""
+Optional documentation for the enum.
+"""
+enum <EnumName> {
+  <Member1>
+  <Member2>
+}
+```
+
+### Enum Type Inference
+
+The type of an enum is inferred from the **first member's value**:
+
+- If the first member has no explicit value or is assigned a string, the enum is a **string enum**.
+- If the first member is assigned an integer, the enum is an **integer enum**.
+
+All members within an enum must be of the same type. Mixing string and integer values in a single enum will result in a compiler error.
+
+### String Enums
+
+String enums are the default. If no value is assigned, the member name itself is used as the value. You can also assign explicit string values.
+
+```ufo
+// Implicit values (member name is used as the value)
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+// Explicit string values
+enum HttpMethod {
+  Get = "GET"
+  Post = "POST"
+  Put = "PUT"
+  Delete = "DELETE"
+}
+```
+
+### Integer Enums
+
+If the first member is assigned an integer value, the enum becomes an integer enum. **All members must have explicit integer values**; there is no auto-increment behavior.
+
+```ufo
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 10
+}
+```
+
+## Patterns
+
+Patterns are template strings that generate helper functions for constructing dynamic string values at runtime. They are particularly useful for defining message queue topics, cache keys, routing paths, or any other string that requires interpolation.
+
+```ufo
+"""
+Optional documentation for the pattern.
+"""
+pattern <PatternName> = "<template_string>"
+```
+
+### Syntax
+
+A pattern template uses `{placeholder}` syntax for dynamic segments. Each placeholder becomes a `string` parameter in the generated function.
+
+```ufo
+""" Generates a NATS subject for user-specific events. """
+pattern UserEventSubject = "events.users.{userId}.{eventType}"
+
+""" Generates a Redis cache key for a session. """
+pattern SessionCacheKey = "cache:session:{sessionId}"
+```
+
+### Generated Code
+
+The compiler transforms each pattern into a function that accepts the placeholders as arguments and returns the constructed string. For example, the `UserEventSubject` pattern above would generate something similar to:
+
+```typescript
+// TypeScript
+function UserEventSubject(userId: string, eventType: string): string {
+  return `events.users.${userId}.${eventType}`;
+}
+```
+
+```go
+// Go
+func UserEventSubject(userId string, eventType string) string {
+  return "events.users." + userId + "." + eventType
+}
+```
+
+This makes patterns a powerful tool for ensuring consistency across your codebase when working with message brokers like NATS, Kafka, or RabbitMQ, or when defining structured cache keys for Redis or Memcached.
+
+## RPC Services
+
+An `rpc` block acts as a logical container for your API's communication endpoints. It allows you to group related **Procedures** and **Streams** under a single named service, providing better organization and a clearer structure for your generated clients and server implementation.
+
+```ufo
+"""
+Optional documentation for the entire service.
+"""
+rpc <RPCName> {
+  // Procedure and Stream definitions go here
+}
+```
+
+### RPC Merging Across Files
+
+To facilitate large-scale project organization, UFO RPC supports **RPC merging**. If the same `rpc` block name is declared in multiple files (for example, via imports), the compiler will automatically merge their contents into a single, unified service.
+
+This allows you to split a large service definition across multiple files by domain or feature:
+
+```ufo
+// users_procs.ufo
+rpc Users {
+  proc GetUser { ... }
+  proc CreateUser { ... }
+}
+
+// users_streams.ufo
+rpc Users {
+  stream UserStatusUpdates { ... }
+}
+
+// main.ufo
+import "./users_procs.ufo"
+import "./users_streams.ufo"
+
+// The "Users" RPC now contains GetUser, CreateUser, and UserStatusUpdates.
+```
+
+> **Important:** While RPC blocks are merged, duplicate procedure or stream names within the same RPC will cause a compiler error. Each endpoint name must be unique within its service.
+
+### Procedures (`proc`)
+
+Procedures are the standard way to define request-response interactions. They represent discrete actions that a client can trigger on the server. They must be defined inside an `rpc` block.
+
+```ufo
+rpc <RPCName> {
+  """
+  Describes the purpose of this procedure.
+  """
+  proc <ProcedureName> {
+    input {
+      """ Field-level documentation. """
+      <field>: <Type>
+    }
+
+    output {
+      """ Field-level documentation. """
+      <field>: <Type>
+    }
   }
 }
 ```
 
-### Procedure documentation
+### Streams (`stream`)
 
-You can add documentation to your procedures to help the developer understand
-how to use them, they can include Markdown syntax that will be rendered in the
-generated documentation.
-
-### Procedure input
-
-The input of a procedure defines the parameters that are sent to the server for
-processing.
-
-The fields inside the `input` block can also have their own documentation. It's
-recommended to be concise and use single line descriptions.
-
-### Procedure output
-
-The output defines the structure of the response data.
-
-The fields inside the `output` block can also have their own documentation. It's
-recommended to be concise and use single line descriptions.
-
-## Defining Streams
-
-Streams allow server-to-client real-time communication using Server-Sent Events
-(SSE). They enable unidirectional data flow from the server to subscribed
-clients.
+Streams enable real-time, unidirectional communication from the server to the client using Server-Sent Events (SSE). They are designed for scenarios where the server needs to push updates as they happen. They must be defined inside an `rpc` block.
 
 ```ufo
-"""
-<Stream documentation>
-"""
-stream <StreamName> {
-  input {
-    """ <Field documentation> """
-    <field>[?]: <PrimitiveType> | <CustomType>
-  }
+rpc <RPCName> {
+  """
+  Describes the nature of the events being streamed.
+  """
+  stream <StreamName> {
+    input {
+      """ Subscription parameters. """
+      <field>: <Type>
+    }
 
-  output {
-    """ <Field documentation> """
-    <field>[?]: <PrimitiveType> | <CustomType>
+    output {
+      """ Event data structure. """
+      <field>: <Type>
+    }
   }
 }
 ```
 
-### Stream documentation
+### Input and Output Blocks
 
-You can add documentation to your streams to help developers understand their
-purpose and usage. Documentation can include Markdown syntax.
+The `input` and `output` blocks in procedures and streams behave exactly like **inline types**. This means they support all the same features, including field documentation and **destructuring** with the `...` operator.
 
-### Stream input
-
-The input section defines the parameters required to establish a stream
-subscription. These parameters determine what data the client wants to receive.
-
-The fields inside the `input` block can also have their own documentation. It's
-recommended to be concise and use single line descriptions.
-
-### Stream output
-
-The output section defines the structure of events that will be emitted through
-the stream. Each event sent to the client will conform to this structure.
-
-The fields inside the `output` block can also have their own documentation. It's
-recommended to be concise and use single line descriptions.
-
-### Example
+This is particularly useful for sharing common request or response fields across multiple endpoints:
 
 ```ufo
-"""
-Stream of new messages in a specific chat room
-"""
-stream NewMessage {
-  input {
-    chatId: string
+type PaginationParams {
+  page: int
+  limit: int
+}
+
+type PaginatedResponse {
+  totalItems: int
+  totalPages: int
+}
+
+rpc Articles {
+  proc ListArticles {
+    input {
+      ...PaginationParams
+      filterByAuthor?: string
+    }
+
+    output {
+      ...PaginatedResponse
+      items: Article[]
+    }
+  }
+}
+```
+
+### Service Example
+
+Grouping related functionality makes your schema easier to maintain:
+
+```ufo
+rpc Messaging {
+  """ Sends a new message to a specific channel. """
+  proc SendMessage {
+    input {
+      channelId: string
+      text: string
+    }
+    output {
+      messageId: string
+      sentAt: datetime
+    }
   }
 
-  output {
-    id: string
-    message: string
-    userId: string
-    timestamp: datetime
+  """ Real-time feed of messages for a channel. """
+  stream NewMessages {
+    input {
+      channelId: string
+    }
+    output {
+      sender: string
+      text: string
+      timestamp: datetime
+    }
   }
 }
 ```
@@ -351,44 +533,53 @@ stream NewMessage {
 
 ### Docstrings
 
-Docstrings can be used in two ways: associated with specific elements (types,
-procedures, streams or fields) or as standalone documentation.
+Docstrings can be used in two ways: associated with specific elements or as standalone documentation.
 
-1.  Associated docstrings: These are placed immediately before a type, procedure,
-    stream or field definition and provide specific documentation for that element.
+**1. Associated Docstrings**
 
-    ```ufo
-    """
-    This is documentation for MyType.
-    """
-    type MyType {
-      """ This is documentation for myField. """
-      myField: string
-    }
-    ```
+These are placed immediately before an element definition and provide specific documentation for that element. Associated docstrings can be used with: `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, and individual fields.
 
-2.  Standalone docstrings: These provide general documentation for the schema and
-    are not associated with any specific element. To create a standalone
-    docstring, ensure there is at least one blank line between the docstring and
-    any following element.
+```ufo
+"""
+This is documentation for MyType.
+"""
+type MyType {
+  """ This is documentation for myField. """
+  myField: string
+}
+```
 
-    ```ufo
-    """
-    This is general documentation for the entire schema.
-    It can include multiple paragraphs and Markdown formatting.
-    """
+**2. Standalone Docstrings**
 
-    // At least one blank line here
+These provide general documentation for the schema (or an RPC block) and are not associated with any specific element. To create a standalone docstring, ensure there is at least one blank line between the docstring and any following element.
 
-    type MyType {
-      // ...
-    }
-    ```
+Standalone docstrings can be placed at the schema level (outside of any block) or inside an `rpc` block. When inside an RPC, they become part of that service's documentation, which is useful for adding section headers or contextual notes for a group of endpoints.
 
-#### Multi-line Docstrings and Indentation
+```ufo
+"""
+# Welcome
+This is general documentation for the entire schema.
+"""
 
-Docstrings support Markdown syntax, allowing you to format your documentation
-with headings, lists, code blocks, and more.
+type MyType {
+  // ...
+}
+
+rpc MyService {
+  """
+  # User Management
+  The following procedures handle user lifecycle operations.
+  """
+
+  proc CreateUser { ... }
+  proc DeleteUser { ... }
+  proc CreateSession { ... }
+}
+```
+
+### Multi-line Docstrings and Indentation
+
+Docstrings support Markdown syntax, allowing you to format your documentation with headings, lists, code blocks, and more.
 
 Since docstrings can contain Markdown, whitespace is significant for formatting constructs like lists or code blocks. To prevent conflicts with URPC's own syntax indentation, UFO RPC automatically normalizes multi-line docstrings.
 
@@ -427,85 +618,85 @@ Remember to keep your documentation up to date with your schema changes.
 
 ### External Documentation Files
 
-For extensive documentation, you can reference external Markdown files:
+For extensive documentation, you can reference external Markdown files instead of writing content inline. When a docstring contains only a valid path to a `.md` file, the compiler will read the content of that file and use it as the documentation.
+
+**Important:** External file paths must always be **relative to the `.ufo` file** that references them. If the specified file does not exist, the compiler will raise an error.
 
 ```ufo
-version 1
-
-// Standalone documentation
+// Standalone documentation from external files
 """ ./docs/welcome.md """
 """ ./docs/authentication.md """
 
-// Associated documentation
-""" ./docs/myproc.md """
-proc MyProc {
-  // ...
+rpc Users {
+  // Associated documentation from an external file
+  """ ./docs/create-user.md """
+  proc CreateUser {
+    // ...
+  }
 }
 ```
 
-When a docstring contains only a valid path to a Markdown file, the content of
-that file will be used as documentation. This approach helps maintain clean and
-focused schema files while allowing for detailed documentation in separate
-files.
-
-Remember to keep external documentation files up to date with your schema
-changes.
+This approach helps maintain clean and focused schema files while allowing for detailed, long-form documentation in separate files. Remember to keep external documentation files up to date with your schema changes.
 
 ## Deprecation
 
-URPC provides a mechanism to mark types, procedures, and streams as deprecated,
-indicating they should no longer be used in new code and may be removed in
-future versions.
+URPC provides a mechanism to mark elements as deprecated, signaling to API consumers that a feature should no longer be used in new code and may be removed in a future version. This applies to `type`, `rpc`, `proc`, `stream`, `enum`, `const`, and `pattern` definitions.
 
 ### Basic Deprecation
 
-To mark an element as deprecated without a specific message, use the
-`deprecated` keyword before the element definition:
+To mark an element as deprecated without a specific message, use the `deprecated` keyword directly before its definition:
 
 ```ufo
-deprecated type MyType {
-  // type definition
+deprecated type LegacyUser {
+  // ...
 }
 
-deprecated proc MyProc {
-  // procedure definition
+deprecated rpc OldService {
+  // ...
 }
 
-deprecated stream MyStream {
-  // stream definition
+deprecated enum OldStatus {
+  // ...
+}
+
+deprecated const OLD_LIMIT = 100
+
+deprecated pattern OldQueueName = "legacy.{id}"
+
+rpc MyService {
+  deprecated proc FetchData {
+    // ...
+  }
+
+  deprecated stream OldStream {
+    // ...
+  }
 }
 ```
 
 ### Deprecation with Message
 
-To provide additional information about the deprecation, include a message in
-parentheses:
+To provide additional context, such as a migration path or a removal timeline, include a message in parentheses:
 
 ```ufo
-deprecated("Replaced by ImprovedType")
-type MyType {
-  // type definition
+deprecated("Use UserV2 instead")
+type LegacyUser {
+  // ...
 }
 
-deprecated("This procedure will be removed in v2.0")
-proc MyProc {
-  // procedure definition
-}
-
-deprecated("Use NewMessageStream instead")
-stream MyStream {
-  // stream definition
+deprecated("This service will be removed in v3.0. Migrate to NewService.")
+rpc OldService {
+  // ...
 }
 ```
 
 ### Placement
 
-The `deprecated` keyword must be placed between any docstring and the element
-definition (type, proc, or stream):
+The `deprecated` keyword must be placed between any associated docstring and the element definition:
 
 ```ufo
 """
-Documentation for MyType
+Original documentation for the type.
 """
 deprecated("Use NewType instead")
 type MyType {
@@ -517,124 +708,235 @@ type MyType {
 
 Deprecated elements will:
 
-- Be displayed with special styling in the playground to discourage their use
-- Generate warning comments in the output code to discourage their use
-- Not change their behavior in the generated code, it's just a warning
+- Be visually flagged in the generated playground and documentation.
+- Generate warning comments in the output code to alert developers.
+- Continue to function normally in the generated code; deprecation is purely informational.
 
 ## Complete Example
 
-```ufo
-version 1
+The following example demonstrates a comprehensive schema that uses all the features of the UFO IDL, including imports, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
 
+```ufo
+import "./foo.ufo"
+
+// ============================================================================
+// External Documentation
+// ============================================================================
 """ ./docs/welcome.md """
 """ ./docs/authentication.md """
 
+// ============================================================================
+// Constants
+// ============================================================================
+""" Maximum number of items returned in a single page. """
+const MAX_PAGE_SIZE = 100
+
+""" Current API version. """
+const API_VERSION = "1.0.0"
+
+// ============================================================================
+// Enumerations
+// ============================================================================
+""" Represents the status of an order in the system. """
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+""" Priority levels for support tickets. """
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 10
+}
+
+// ============================================================================
+// Patterns
+// ============================================================================
+""" Generates a NATS subject for product-related events. """
+pattern ProductEventSubject = "events.products.{productId}.{eventType}"
+
+""" Generates a Redis cache key for a user session. """
+pattern SessionCacheKey = "cache:session:{sessionId}"
+
+// ============================================================================
+// Shared Types
+// ============================================================================
 """
-Base entity with common fields
+Common fields for all auditable entities.
 """
-type BaseEntity {
+type AuditMetadata {
   id: string
   createdAt: datetime
   updatedAt: datetime
 }
 
 """
-Represents a product in the catalog
+Standard pagination parameters for list requests.
+"""
+type PaginationParams {
+  page: int
+  limit: int
+}
+
+"""
+Standard pagination response metadata.
+"""
+type PaginatedResponse {
+  totalItems: int
+  totalPages: int
+  currentPage: int
+}
+
+// ============================================================================
+// Domain Types
+// ============================================================================
+"""
+Represents a product in the catalog.
 """
 type Product {
-  base: BaseEntity
+  ...AuditMetadata
 
   """ The name of the product. """
   name: string
 
-  """ The price of the product. """
+  """ The price of the product in USD. """
   price: float
+
+  """ The current order status for this product listing. """
+  status: OrderStatus
 
   """ The date when the product will be available. """
   availabilityDate: datetime
 
-  """ A list of tags for the product. """
+  """ A list of tags for categorization. """
   tags?: string[]
 }
 
 """
-Represents a review of a product
+Represents a customer review for a product.
 """
 type Review {
-  """ The rating of the review, from 1 to 5. """
+  """ The rating, from 1 to 5. """
   rating: int
 
-  """ The comment of the review. """
+  """ The customer's written feedback. """
   comment: string
+
+  """ The ID of the user who wrote the review. """
+  userId: string
+}
+
+// ============================================================================
+// RPC Services
+// ============================================================================
+"""
+Catalog Service
+
+Provides operations for managing products and browsing the catalog.
+"""
+rpc Catalog {
+  """
+  # Product Lifecycle
+  Endpoints for creating and managing products.
+  """
+
+  """
+  Creates a new product in the system.
+  """
+  proc CreateProduct {
+    input {
+      product: Product
+    }
+
+    output {
+      success: bool
+      productId: string
+    }
+  }
+
+  """
+  Retrieves a product by its ID, including its reviews.
+  """
+  proc GetProduct {
+    input {
+      productId: string
+    }
+
+    output {
+      product: Product
+      reviews: Review[]
+    }
+  }
+
+  """
+  Lists all products with pagination support.
+  """
+  proc ListProducts {
+    input {
+      ...PaginationParams
+      filterByStatus?: OrderStatus
+    }
+
+    output {
+      ...PaginatedResponse
+      items: Product[]
+    }
+  }
 }
 
 """
-Creates a new product in the system and returns the product id.
+Chat Service
+
+Provides real-time messaging capabilities.
 """
-proc CreateProduct {
-  input {
-    product: Product
+rpc Chat {
+  """
+  Sends a message to a chat room.
+  """
+  proc SendMessage {
+    input {
+      """ The ID of the chat room. """
+      chatId: string
+
+      """ The content of the message. """
+      message: string
+    }
+
+    output {
+      """ The ID of the created message. """
+      messageId: string
+
+      """ The server timestamp of when the message was recorded. """
+      timestamp: datetime
+    }
   }
 
-  output {
-    success: bool
-    productId: string
-  }
-}
+  """
+  Subscribes to new messages in a specific chat room.
+  """
+  stream NewMessage {
+    input {
+      chatId: string
+    }
 
-"""
-Get a product by id with its reviews.
-"""
-proc GetProduct {
-  input {
-    productId: string
-  }
-
-  output {
-    product: Product
-    reviews: Review[]
-  }
-}
-
-"""
-Sends a message to a chat room
-"""
-proc SendMessage {
-  input {
-    """ The id of the chat room to send the message to. """
-    chatId: string
-
-    """ The content of the message. """
-    message: string
-  }
-
-  output {
-    """ The id of the message that was sent. """
-    messageId: string
-
-    """ The timestamp of when the message was sent. """
-    timestamp: datetime
-  }
-}
-
-"""
-Stream of new messages in a specific chat room
-"""
-stream NewMessage {
-  input {
-    chatId: string
-  }
-
-  output {
-    id: string
-    message: string
-    userId: string
-    timestamp: datetime
+    output {
+      id: string
+      message: string
+      userId: string
+      timestamp: datetime
+    }
   }
 }
 ```
 
 ## Limitations
 
-1. Keywords can't be used as identifiers
-2. Complex validation logic (other than type checking and required fields) is your responsibility
+The UFO IDL is designed to be simple and focused. As such, there are a few constraints to be aware of:
+
+1.  **Reserved Keywords:** All language keywords (e.g., `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, `input`, `output`, `import`, `deprecated`, etc.) cannot be used as identifiers for your types, fields, or services.
+2.  **Validation Logic:** The compiler handles type checking and ensures required fields are present. Any additional business validation logic (e.g., "rating must be between 1 and 5") must be implemented in your application code.
