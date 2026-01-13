@@ -1,207 +1,601 @@
 ---
-title: UFO DSL Specification (.ufo)
-description: The official specification for the UFO Domain-Specific Language (v1)
+title: UFO-RPC DSL Specification
+description: Full specification of the UFO RPC (URPC) DSL language
 ---
 
-## 1. Overview
+## Overview
 
-The UFO DSL (`.ufo`) is a minimalist language for defining type-safe APIs, data contracts, and services. It is designed to be **simple to read, easy to write**, and to serve as the single source of truth for your entire stack.
+The UFO DSL is a domain-specific language designed to define RPC services, schemas and contracts with strong typing. It provides a declarative syntax for defining data structures and procedures that UFO RPC can interpret and generate code for.
 
-From a `.ufo` schema, you can generate client SDKs, server stubs, and documentation for any language.
+The primary goal of URPC is to offer an intuitive, human-readable format that ensures the best possible developer experience (DX) while maintaining type safety.
 
-## 2. Hello World
+This DSL is a source of truth for your projects from which you can generate type safe code for multiple programming languages.
+
+## UFO Syntax
+
+This is the syntax for the DSL.
 
 ```ufo
-namespace Greeter
+import "./foo.ufo"
 
-service GreeterService {
-    func SayHello(name: string): string
+// <comment>
+
+/*
+  <multiline comment>
+*/
+
+""" <Standalone documentation> """
+
+""" <Type documentation> """
+type <CustomTypeName> {
+  """ <Field documentation> """
+  <field>[?]: <Type>
+}
+
+""" <Constant documentation> """
+const <ConstantName> = <Value>
+
+""" <Enum documentation> """
+enum <EnumName>[: <EnumType>] {
+  <EnumMember>[ = <EnumValue>]
+  <EnumMember>[ = <EnumValue>]
+}
+
+""" <Pattern documentation> """
+pattern <PatternName> = "<PatternValue>"
+
+""" <RPC documentation> """
+rpc <RPCName> {
+  """ <RPC Standalone documentation> """
+
+  """ <Procedure documentation> """
+  proc <ProcedureName> {
+    input {
+      """ <Field documentation> """
+      <field>[?]: <PrimitiveType> | <CustomType>
+    }
+
+    output {
+      """ <Field documentation> """
+      <field>[?]: <PrimitiveType> | <CustomType>
+    }
+  }
+
+  """ <Stream documentation> """
+  stream <StreamName> {
+    input {
+      """ <Field documentation> """
+      <field>[?]: <PrimitiveType> | <CustomType>
+    }
+
+    output {
+      """ <Field documentation> """
+      <field>[?]: <PrimitiveType> | <CustomType>
+    }
+  }
 }
 ```
 
-## 3. General Syntax
+## Imports
 
-### 3.1 Namespace
+The DSL entrypoint is always a single `.ufo` file called `schema`, but you can import other `.ufo` files to help you keep your schemas organized, modularized and reusable.
 
-Every file must declare a namespace at the top. This namespace groups your types and services.
-
-```ufo
-namespace My.App
-```
-
-### 3.2 Imports
-
-You can import other `.ufo` files or directories.
+To import other files inside your schema you should use the following syntax:
 
 ```ufo
-import "./common"         // Imports everything from the 'common' folder
-import User "./users"     // Imports with an alias (e.g. User.Profile)
-```
+// foo.ufo
+type FooType {}
 
-### 3.3 Visibility
-
-By default, everything is **private** to the file. Use `export` to expose types or services to other files.
-
-```ufo
-type InternalConfig { ... }  // Private
-export type User { ... }     // Public
-```
-
-## 4. Services (RPC)
-
-Services define the operations your API supports.
-
-```ufo
-export service UserService {
-    // A standard Request/Response function
-    func GetUser(id: string): User
-
-    // A real-time stream (Server-Sent Events / WebSockets)
-    stream OnUserUpdated(id: string): User
+// bar.ufo
+import "./foo.ufo"
+type BarType {
+  foo: FooType
 }
 ```
 
-### 4.1 Functions (`func`)
+In the above example, `bar.ufo` imports `foo.ufo` and can use the `FooType` defined in it. The import system always imports all the content of the file, you can think of it as a copy-paste of the imported file content.
 
-Functions take arguments and return a single response.
+UFO RPC automatically detects and blocks circular imports and duplicate imports, e.g. If `A` imports `B` and `C`, but `B` imports `C`, in `A` the content of `C` will only be imported once.
+
+Circular imports are not allowed and will raise an error from the parser, e.g. if `A` imports `B` and `B` imports `A`.
+
+The imports should be always `relative paths`.
+
+This import system helps you to create multiple entry points and share some common types between your schemas and prevent code duplication.
+
+## Types
+
+Types are the building blocks of your API. They define the structure of the data
+that can be exchanged between the client and the server.
+
+### Primitive Types
+
+Primitive types are the types that are built-in into the URPC DSL.
+
+| DSL        | JSON Type | Description                           |
+| ---------- | --------- | ------------------------------------- |
+| `string`   | string    | UTF-8 text string                     |
+| `int`      | integer   | 64-bit integer                        |
+| `float`    | number    | Floating point number                 |
+| `bool`     | boolean   | Either true or false                  |
+| `datetime` | string    | Date and time value (ISO 8601 format) |
+
+### Composite Types
+
+Composite types are types that are composed of other types. They can be used to
+create more complex data structures.
 
 ```ufo
-// func Name(args...): ReturnType
-func CreatePost(title: string, content: string): Post
+// Array
+ElementType[]  // E.g.: string[]
+
+// Inline object
+{
+  field1: Type
+  field2: Type
+}
 ```
 
-### 4.2 Streams (`stream`)
+### Custom Types
 
-Streams allow the server to push data to the client over time.
+You can define custom types additional of the primitive types provided by the
+transpiler that you can use in the input and output of your procedures and streams.
 
 ```ufo
-// stream Name(args...): YieldType
-stream SubscribeToTicker(symbol: string): float
+"""
+<Type documentation>
+"""
+type <CustomTypeName> {
+  """ <Field documentation> """
+  <field>[?]: <Type>
+}
 ```
 
-## 5. Data Types
+#### Custom type documentation
 
-### 5.1 Types (Structs)
+You can add documentation to your custom types to help the developer understand
+how to use them, they can include Markdown syntax that will be rendered in the
+generated documentation.
 
-Types define the shape of your data.
+#### Type composition
+
+To reuse fields from other types, use composition by including the type as a field:
 
 ```ufo
-export type User {
+type BaseEntity {
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type User {
+  base: BaseEntity
+  email: string
+  name: string
+}
+```
+
+#### Optional fields
+
+All fields of a type are required by default. To make a field optional, use the `?` suffix.
+
+```ufo
+// Optional field
+field?: Type
+```
+
+#### Field documentation
+
+You can add documentation to your fields to help the developer understand how to
+use them. It's recommended to be concise and use single line descriptions.
+
+```ufo
+type User {
+  """ The user's email address """
+  email: string
+
+  """ The user's full name """
+  name: string
+}
+```
+
+## Defining Procedures
+
+Procedures are the main building block of your API. They define the procedures
+(AKA functions) that can be implemented on the server and called from the
+client.
+
+```ufo
+"""
+<Procedure documentation>
+"""
+proc <ProcedureName> {
+  input {
+    """ <Field documentation> """
+    <field>[?]: <PrimitiveType> | <CustomType>
+  }
+
+  output {
+    """ <Field documentation> """
+    <field>[?]: <PrimitiveType> | <CustomType>
+  }
+}
+```
+
+### Procedure documentation
+
+You can add documentation to your procedures to help the developer understand
+how to use them, they can include Markdown syntax that will be rendered in the
+generated documentation.
+
+### Procedure input
+
+The input of a procedure defines the parameters that are sent to the server for
+processing.
+
+The fields inside the `input` block can also have their own documentation. It's
+recommended to be concise and use single line descriptions.
+
+### Procedure output
+
+The output defines the structure of the response data.
+
+The fields inside the `output` block can also have their own documentation. It's
+recommended to be concise and use single line descriptions.
+
+## Defining Streams
+
+Streams allow server-to-client real-time communication using Server-Sent Events
+(SSE). They enable unidirectional data flow from the server to subscribed
+clients.
+
+```ufo
+"""
+<Stream documentation>
+"""
+stream <StreamName> {
+  input {
+    """ <Field documentation> """
+    <field>[?]: <PrimitiveType> | <CustomType>
+  }
+
+  output {
+    """ <Field documentation> """
+    <field>[?]: <PrimitiveType> | <CustomType>
+  }
+}
+```
+
+### Stream documentation
+
+You can add documentation to your streams to help developers understand their
+purpose and usage. Documentation can include Markdown syntax.
+
+### Stream input
+
+The input section defines the parameters required to establish a stream
+subscription. These parameters determine what data the client wants to receive.
+
+The fields inside the `input` block can also have their own documentation. It's
+recommended to be concise and use single line descriptions.
+
+### Stream output
+
+The output section defines the structure of events that will be emitted through
+the stream. Each event sent to the client will conform to this structure.
+
+The fields inside the `output` block can also have their own documentation. It's
+recommended to be concise and use single line descriptions.
+
+### Example
+
+```ufo
+"""
+Stream of new messages in a specific chat room
+"""
+stream NewMessage {
+  input {
+    chatId: string
+  }
+
+  output {
     id: string
-    name: string
-    age?: int        // Optional field
-    tags: string[]   // Array of strings
+    message: string
+    userId: string
+    timestamp: datetime
+  }
 }
 ```
 
-### 5.2 Composition (Spread)
+## Documentation
 
-Reuse fields from other types using `...Type`.
+### Docstrings
+
+Docstrings can be used in two ways: associated with specific elements (types,
+procedures, streams or fields) or as standalone documentation.
+
+1.  Associated docstrings: These are placed immediately before a type, procedure,
+    stream or field definition and provide specific documentation for that element.
+
+    ```ufo
+    """
+    This is documentation for MyType.
+    """
+    type MyType {
+      """ This is documentation for myField. """
+      myField: string
+    }
+    ```
+
+2.  Standalone docstrings: These provide general documentation for the schema and
+    are not associated with any specific element. To create a standalone
+    docstring, ensure there is at least one blank line between the docstring and
+    any following element.
+
+    ```ufo
+    """
+    This is general documentation for the entire schema.
+    It can include multiple paragraphs and Markdown formatting.
+    """
+
+    // At least one blank line here
+
+    type MyType {
+      // ...
+    }
+    ```
+
+#### Multi-line Docstrings and Indentation
+
+Docstrings support Markdown syntax, allowing you to format your documentation
+with headings, lists, code blocks, and more.
+
+Since docstrings can contain Markdown, whitespace is significant for formatting constructs like lists or code blocks. To prevent conflicts with URPC's own syntax indentation, UFO RPC automatically normalizes multi-line docstrings.
+
+The leading whitespace from the first non-empty line is considered the baseline indentation. This baseline is then removed from every line in the docstring. This process preserves the _relative_ indentation, ensuring that Markdown formatting remains intact regardless of how the docstring block is indented in the source file.
+
+_Example:_
+
+In the following docstring, the first line has 4 spaces of indentation, which will be removed from all lines.
 
 ```ufo
-type Timestamped {
-    createdAt: datetime
-    updatedAt: datetime
+type MyType {
+  """
+    This is a multi-line docstring.
+
+    The list below will be rendered correctly:
+
+    - Level 1
+      - Level 2
+  """
+  field: string
+}
+```
+
+The resulting content for rendering will be:
+
+```markdown
+This is a multi-line docstring.
+
+The list below will be rendered correctly:
+
+- Level 1
+  - Level 2
+```
+
+Remember to keep your documentation up to date with your schema changes.
+
+### External Documentation Files
+
+For extensive documentation, you can reference external Markdown files:
+
+```ufo
+version 1
+
+// Standalone documentation
+""" ./docs/welcome.md """
+""" ./docs/authentication.md """
+
+// Associated documentation
+""" ./docs/myproc.md """
+proc MyProc {
+  // ...
+}
+```
+
+When a docstring contains only a valid path to a Markdown file, the content of
+that file will be used as documentation. This approach helps maintain clean and
+focused schema files while allowing for detailed documentation in separate
+files.
+
+Remember to keep external documentation files up to date with your schema
+changes.
+
+## Deprecation
+
+URPC provides a mechanism to mark types, procedures, and streams as deprecated,
+indicating they should no longer be used in new code and may be removed in
+future versions.
+
+### Basic Deprecation
+
+To mark an element as deprecated without a specific message, use the
+`deprecated` keyword before the element definition:
+
+```ufo
+deprecated type MyType {
+  // type definition
 }
 
-export type Product {
-    ...Timestamped   // Inherits createdAt, updatedAt
+deprecated proc MyProc {
+  // procedure definition
+}
+
+deprecated stream MyStream {
+  // stream definition
+}
+```
+
+### Deprecation with Message
+
+To provide additional information about the deprecation, include a message in
+parentheses:
+
+```ufo
+deprecated("Replaced by ImprovedType")
+type MyType {
+  // type definition
+}
+
+deprecated("This procedure will be removed in v2.0")
+proc MyProc {
+  // procedure definition
+}
+
+deprecated("Use NewMessageStream instead")
+stream MyStream {
+  // stream definition
+}
+```
+
+### Placement
+
+The `deprecated` keyword must be placed between any docstring and the element
+definition (type, proc, or stream):
+
+```ufo
+"""
+Documentation for MyType
+"""
+deprecated("Use NewType instead")
+type MyType {
+  // type definition
+}
+```
+
+### Effects
+
+Deprecated elements will:
+
+- Be displayed with special styling in the playground to discourage their use
+- Generate warning comments in the output code to discourage their use
+- Not change their behavior in the generated code, it's just a warning
+
+## Complete Example
+
+```ufo
+version 1
+
+""" ./docs/welcome.md """
+""" ./docs/authentication.md """
+
+"""
+Base entity with common fields
+"""
+type BaseEntity {
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+"""
+Represents a product in the catalog
+"""
+type Product {
+  base: BaseEntity
+
+  """ The name of the product. """
+  name: string
+
+  """ The price of the product. """
+  price: float
+
+  """ The date when the product will be available. """
+  availabilityDate: datetime
+
+  """ A list of tags for the product. """
+  tags?: string[]
+}
+
+"""
+Represents a review of a product
+"""
+type Review {
+  """ The rating of the review, from 1 to 5. """
+  rating: int
+
+  """ The comment of the review. """
+  comment: string
+}
+
+"""
+Creates a new product in the system and returns the product id.
+"""
+proc CreateProduct {
+  input {
+    product: Product
+  }
+
+  output {
+    success: bool
+    productId: string
+  }
+}
+
+"""
+Get a product by id with its reviews.
+"""
+proc GetProduct {
+  input {
+    productId: string
+  }
+
+  output {
+    product: Product
+    reviews: Review[]
+  }
+}
+
+"""
+Sends a message to a chat room
+"""
+proc SendMessage {
+  input {
+    """ The id of the chat room to send the message to. """
+    chatId: string
+
+    """ The content of the message. """
+    message: string
+  }
+
+  output {
+    """ The id of the message that was sent. """
+    messageId: string
+
+    """ The timestamp of when the message was sent. """
+    timestamp: datetime
+  }
+}
+
+"""
+Stream of new messages in a specific chat room
+"""
+stream NewMessage {
+  input {
+    chatId: string
+  }
+
+  output {
     id: string
-    price: float
+    message: string
+    userId: string
+    timestamp: datetime
+  }
 }
 ```
 
-### 5.3 Enums
+## Known Limitations
 
-Enums define a fixed set of constants.
-
-```ufo
-export enum Role {
-    ADMIN
-    USER
-    GUEST
-}
-
-// Enums with explicit integer values
-export enum Status: int {
-    ACTIVE = 1
-    INACTIVE = 0
-}
-```
-
-### 5.4 Primitive Types
-
-| Type       | Description                              |
-| :--------- | :--------------------------------------- |
-| `string`   | UTF-8 text                               |
-| `int`      | 64-bit integer                           |
-| `float`    | 64-bit float                             |
-| `bool`     | `true` or `false`                        |
-| `datetime` | ISO 8601 date string                     |
-| `map<K,V>` | Key-Value map (e.g., `map<string, int>`) |
-
-## 6. Project Structure
-
-UFO encourages a clean, predictable project structure.
-
-### 6.1 The Namespace Rule
-
-All files in the same folder **must** belong to the same namespace. This keeps your project organization (folders) and logical organization (namespaces) in sync.
-
-```text
-src/
-  users/
-    user.ufo      -> namespace Users
-    profile.ufo   -> namespace Users
-  orders/
-    order.ufo     -> namespace Orders
-```
-
-### 6.2 Barrel Files
-
-A file without a `namespace` is a "barrel" (usually `index.ufo`). It simply exports other files to create a clean public API for a folder.
-
-```ufo
-// src/index.ufo
-export "./users"
-export "./orders"
-```
-
-## 7. Advanced Features
-
-### 7.1 Constants
-
-Define shared constants for your application.
-
-```ufo
-export const MAX_RETRIES = 3
-export const API_VERSION = "v1"
-```
-
-### 7.2 Patterns
-
-Define string templates for event subjects or topic names.
-
-```ufo
-export pattern UserEvents = "users.{id}.events"
-```
-
-## 8. Configuration (`ufo.yaml`)
-
-The `ufo.yaml` file at your project root configures the code generator.
-
-```yaml
-version: 1
-# Entry point for your schema
-schema: "./src/index.ufo"
-
-# Generators
-generates:
-  # Generate Go Server definitions
-  "./internal/gen":
-    plugin: "go-server"
-
-  # Generate TypeScript Client
-  "./frontend/src/client":
-    plugin: "ts-client"
-```
+1. Keywords can't be used as identifiers
+2. Complex validation logic requires implementation via input processors
+3. Circular type dependencies are not allowed
