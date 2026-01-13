@@ -4,6 +4,12 @@
 
 **UfoRPC** is a Universal RPC schema and generator tool located in a monorepo. It combines a Go-based core (`urpc`) with a Svelte 5-based web playground. The Go core compiles to both a native CLI and a WebAssembly (WASM) binary. The WASM binary is consumed by the playground to provide client-side schema generation and validation directly in the browser. The final build embeds the static playground assets back into the Go binary.
 
+## Maintaining this Document
+
+After completing any task, review this file and update it if you made structural changes or discovered patterns worth documenting. Only add information that helps understand how to work with the project. Avoid implementation details, file listings, or trivial changes. This is a general guide, not a changelog.
+
+When updating this document, do so with the context of the entire document in mind; do not simply add new sections at the end, but place them where they make the most sense within the context of the document.
+
 ## 2. General Instructions (The Constitution)
 
 - **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`urpc/`) and Node/Svelte (`playground/`).
@@ -26,6 +32,9 @@
 - `Taskfile.yml`: Orchestrates the entire build pipeline across languages.
 - `urpc/`: The Go backend/core.
 - `playground/`: The Svelte 5 frontend.
+- `docs/`: Documentation and specifications.
+- `scripts/`: Build and maintenance scripts (e.g., versioning).
+- `assets/`: Static assets like icons and logos.
 
 ### `urpc/` (Go Core)
 
@@ -34,26 +43,31 @@
   - `cmd/urpc`: Main CLI entry point (native).
   - `cmd/urpcwasm`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
-    - **Compiler Core** (`urpc/`):
-      - `lexer/`, `parser/`: Tokenization and AST construction.
-      - `ast/`, `token/`: Syntax tree and token definitions.
+    - `urpc/`: The Compiler Core.
       - `analyzer/`: Semantic analysis and type checking.
-      - `formatter/`: Source code formatting logic.
-      - `docstore/`: Documentation/comment handling.
+      - `ast/`: Abstract Syntax Tree definitions.
+      - `docstore/`: Management of comments and documentation.
+      - `formatter/`: Source code formatting logic (ufofmt).
+      - `lexer/`: Converts source text into tokens.
       - `lsp/`: Language Server Protocol implementation.
-      - `transform/`: AST transformations.
-    - **Generators** (`codegen/`):
-      - `golang/`: Go client/server code generation.
-      - `typescript/`: TS client/types generation.
+      - `parser/`: Converts tokens into the AST.
+      - `token/`: Definitions of token types and positions.
+      - `transform/`: Utilities for modifying the AST.
+    - `codegen/`: Code Generators.
       - `dart/`: Dart client generation.
-      - `openapi/`: OpenAPI v3 spec generation.
-      - `playground/`: WASM/Playground specific helpers.
-    - **Schema & formats**:
-      - `schema/`: Internal intermediate representation (IR) definitions.
-      - `transpile/`: Converters (ufo <-> json).
-    - **Utils**:
-      - `util/`: Shared string/path/debug utilities.
-      - `version/`: Build version metadata.
+      - `golang/`: Go client and server generation.
+      - `openapi/`: OpenAPI v3 specification generation.
+      - `playground/`: WASM-specific generation helpers.
+      - `typescript/`: TypeScript client and type generation.
+      - `python/`: Python client and type generation.
+    - `schema/`: Intermediate Representation (IR) and schema validation.
+    - `transpile/`: Converters between ufoRPC and JSON formats.
+    - `util/`: Shared Utilities.
+      - `debugutil/`: Helpers for printing debug info.
+      - `filepathutil/`: Cross-platform file path handling.
+      - `strutil/`: String manipulation helpers.
+      - `testutil/`: Common test fixtures and helpers.
+    - `version/`: Build version metadata.
   - `dist/`: Build artifacts.
 - **Integration**: Compiles to `dist/urpc.wasm` which is copied to the playground.
 
@@ -99,6 +113,7 @@
 
 **Run these from the project root:**
 
+- **Run all checks**: `task ci`
 - **Setup/Install**: `task deps` (Installs Node modules and Go mods).
 - **Build All**: `task build` (Handles the WASM -> Frontend -> CLI pipeline).
 - **Test All**: `task test`.
