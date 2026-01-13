@@ -1,28 +1,12 @@
 package token
 
+// TokenType represents the type of a token.
+// The string values match the token names used in the lexer rules.
 type TokenType string
 
-type Token struct {
-	// Type is the type of the token.
-	Type TokenType
-	// Literal is the literal value of the token.
-	Literal string
-	// FileName is the name of the file where the token was found.
-	FileName string
-	// LineStart is the line number of the first character of the token.
-	LineStart int
-	// LineEnd is the line number of the last character of the token.
-	LineEnd int
-	// ColumnStart is the column number of the first character of the token.
-	ColumnStart int
-	// ColumnEnd is the column number of the last character of the token.
-	ColumnEnd int
-}
-
 const (
-	// Special tokens
-	Eof     TokenType = "Eof"
-	Illegal TokenType = "Illegal"
+	// Special tokens (handled by participle)
+	EOF = "EOF"
 
 	// Identifiers, comments and docstrings
 	Ident        TokenType = "Ident"
@@ -34,25 +18,33 @@ const (
 	StringLiteral TokenType = "StringLiteral"
 	IntLiteral    TokenType = "IntLiteral"
 	FloatLiteral  TokenType = "FloatLiteral"
-	TrueLiteral   TokenType = "TrueLiteral"
-	FalseLiteral  TokenType = "FalseLiteral"
+	True          TokenType = "True"
+	False         TokenType = "False"
 
 	// Operators and delimiters
-	Newline    TokenType = "Newline"
-	Whitespace TokenType = "Whitespace"
-	Colon      TokenType = "Colon"
-	Comma      TokenType = "Comma"
-	LParen     TokenType = "LParen"
-	RParen     TokenType = "RParen"
-	LBrace     TokenType = "LBrace"
-	RBrace     TokenType = "RBrace"
-	LBracket   TokenType = "LBracket"
-	RBracket   TokenType = "RBracket"
-	At         TokenType = "At"
-	Question   TokenType = "Question"
+	Newline     TokenType = "Newline"
+	Whitespace  TokenType = "Whitespace"
+	Colon       TokenType = "Colon"
+	Comma       TokenType = "Comma"
+	LParen      TokenType = "LParen"
+	RParen      TokenType = "RParen"
+	LBrace      TokenType = "LBrace"
+	RBrace      TokenType = "RBrace"
+	LBracket    TokenType = "LBracket"
+	RBracket    TokenType = "RBracket"
+	Question    TokenType = "Question"
+	Equals      TokenType = "Equals"
+	LessThan    TokenType = "LessThan"
+	GreaterThan TokenType = "GreaterThan"
+	Spread      TokenType = "Spread" // ...
 
 	// Keywords
-	Version    TokenType = "Version"
+	Include    TokenType = "Include"
+	Rpc        TokenType = "Rpc"
+	Const      TokenType = "Const"
+	Enum       TokenType = "Enum"
+	Pattern    TokenType = "Pattern"
+	Map        TokenType = "Map"
 	Deprecated TokenType = "Deprecated"
 	Type       TokenType = "Type"
 	Proc       TokenType = "Proc"
@@ -65,103 +57,3 @@ const (
 	Bool       TokenType = "Bool"
 	Datetime   TokenType = "Datetime"
 )
-
-var TokenTypes = []TokenType{
-	// Special tokens
-	Eof,
-	Illegal,
-
-	// Identifiers, comments and docstrings
-	Ident,
-	Comment,
-	CommentBlock,
-	Docstring,
-
-	// Literals
-	StringLiteral,
-	IntLiteral,
-	FloatLiteral,
-	TrueLiteral,
-	FalseLiteral,
-
-	// Operators and delimiters
-	Newline,
-	Whitespace,
-	Colon,
-	Comma,
-	LParen,
-	RParen,
-	LBrace,
-	RBrace,
-	LBracket,
-	RBracket,
-	At,
-	Question,
-
-	// Keywords
-	Version,
-	Deprecated,
-	Type,
-	Proc,
-	Stream,
-	Input,
-	Output,
-	String,
-	Int,
-	Float,
-	Bool,
-	Datetime,
-}
-
-// delimiters is a map of delimiters to their corresponding token types.
-var delimiters = map[rune]TokenType{
-	'\n': Newline,
-	':':  Colon,
-	',':  Comma,
-	'(':  LParen,
-	')':  RParen,
-	'{':  LBrace,
-	'}':  RBrace,
-	'[':  LBracket,
-	']':  RBracket,
-	'@':  At,
-	'?':  Question,
-}
-
-// IsDelimiter returns true if the character is a delimiter.
-func IsDelimiter(ch rune) bool {
-	_, ok := delimiters[ch]
-	return ok
-}
-
-// GetDelimiterTokenType returns the token type for the given delimiter.
-func GetDelimiterTokenType(ch rune) TokenType {
-	return delimiters[ch]
-}
-
-// keywords is a map of keywords to their corresponding token types.
-var keywords = map[string]TokenType{
-	"version":    Version,
-	"deprecated": Deprecated,
-	"type":       Type,
-	"proc":       Proc,
-	"stream":     Stream,
-	"input":      Input,
-	"output":     Output,
-	"string":     String,
-	"int":        Int,
-	"float":      Float,
-	"bool":       Bool,
-	"datetime":   Datetime,
-}
-
-// IsKeyword returns true if the identifier is a keyword.
-func IsKeyword(ident string) bool {
-	_, ok := keywords[ident]
-	return ok
-}
-
-// GetKeywordTokenType returns the token type for the given keyword.
-func GetKeywordTokenType(ident string) TokenType {
-	return keywords[ident]
-}
