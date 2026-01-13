@@ -1,14 +1,13 @@
 ---
 title: Formatting Guide
-description: A guide to correctly format UFO RPC DSL (URPC)
+description: A guide to correctly format UFO DSL
 ---
 
-This document specifies the standard formatting rules for the UFO-RPC DSL
-(URPC). Consistent formatting enhances code readability, maintainability, and
+This document specifies the standard formatting rules for the UFO DSL. Consistent formatting enhances code readability, maintainability, and
 collaboration. The primary goal is to produce clean, predictable, and
-aesthetically pleasing URPC code.
+aesthetically pleasing UFO code.
 
-> **⚠️ Reference Only:** All style conventions are automatically enforced by the official URPC formatter. Run it manually with `urpc fmt ./schema.urpc`, or let the built-in LSP formatter (bundled with the VS Code extension and configurable for other editors) format files on save.
+> **⚠️ Reference Only:** All style conventions are automatically enforced by the official UFO formatter. Run it manually with `ufo fmt ./schema.ufo`, or let the built-in LSP formatter (bundled with the VS Code extension and configurable for other editors) format files on save.
 
 ## 1. General Principles
 
@@ -24,7 +23,7 @@ aesthetically pleasing URPC code.
 
 _Example:_
 
-```urpc
+```ufo
 type Example {
   field: string
 }
@@ -32,70 +31,66 @@ type Example {
 
 ## 3. Top-Level Elements
 
-Top-level elements include `version`, `type`, `proc`, `stream`, and
-standalone comments.
+Top-level elements include `namespace`, `import`, `export`, and standalone comments.
 
+- **Namespace:** Must be the first non-comment line of the file (unless it's a barrel file).
 - **Default:** Separate each top-level element with one blank line.
 - **Exceptions:**
-  - **First Element:** No blank line before the very first element.
-  - **Consecutive Comments:** Do not insert extra blank lines between
-    consecutive standalone comments.
-  - **Following a Comment:** When an element follows a standalone comment, do
-    not add an extra blank line unless the source intentionally contains one.
-- **Preservation:** Intentionally placed blank lines in the source (e.g. between
-  comments) are respected.
+  - **Consecutive Imports:** Do not insert blank lines between consecutive `import` statements.
+  - **Consecutive Comments:** Do not insert extra blank lines between consecutive standalone comments.
+- **Preservation:** Intentionally placed blank lines in the source are respected.
 
 _Example:_
 
-```urpc
-version 1
+```ufo
+namespace Orders
+
+import "./shared"
+import Auth "./users/auth"
 
 // A standalone comment
-// Another standalone comment
-type TypeA {
+export type Order {
   field: string
 }
 
-type TypeB {
+export type Item {
   field: int
 }
 ```
 
-## 4. Fields and Blocks
+## 4. Blocks and Fields
 
-### 4.1 Fields in a Type
+### 4.1 RPC Blocks
 
-This section applies to fields in a type block, as well as fields in a
-procedure's input, output, or inline object, and stream's input, output.
+`proc` and `stream` definitions must be grouped within an `rpc` block.
+
+```ufo
+export rpc Service {
+  proc Get { ... }
+
+  stream Watch { ... }
+}
+```
+
+### 4.2 Fields in a Type
 
 - Each field is placed on its own line.
 - **Field Separation:** For simple fields without complex formatting, fields may
   be placed consecutively without blank lines. When a field has a docstring,
   separate it from the preceding field with one blank line for readability.
+- **Spread Operator:** The `...` operator should be placed at the beginning of the block or grouped with other spread operators.
 
-_Recommended for simple fields:_
+_Example:_
 
-Do not use blank lines between fields.
+```ufo
+export type User {
+  ...BaseEntity
+  ...AuthInfo
 
-```urpc
-address: {
-  street: string
-  city: string
-  zip: string
-}
-```
-
-_Recommended for fields with docstrings:_
-
-Use one blank line to separate fields that have docstrings.
-
-```urpc
-type Product {
-  """ The unique identifier. """
-  id: string
-
-  """ The product's name. """
+  """ The user's name. """
   name: string
+
+  email: string
 }
 ```
 
@@ -132,7 +127,7 @@ Comment content is preserved exactly (including internal whitespace).
 
 _Example:_
 
-```urpc
+```ufo
 version 1 // EOL comment
 
 type Example {
@@ -149,7 +144,7 @@ type Example {
 
 _Example:_
 
-```urpc
+```ufo
 """
 Docstring for MyType.
 Can be multi-line.
@@ -169,7 +164,7 @@ type MyType {
 
 _Example:_
 
-```urpc
+```ufo
 type User {
   """ The user's unique identifier. """
   id: string
@@ -196,7 +191,7 @@ deprecated.
 
 _Example:_
 
-```urpc
+```ufo
 deprecated type MyType {
   // type definition
 }
@@ -217,7 +212,7 @@ deprecated stream MyStream {
 
 _Example:_
 
-```urpc
+```ufo
 """
 Documentation for MyType
 """
@@ -241,7 +236,7 @@ stream MyStream {
 
 _Example:_
 
-```urpc
+```ufo
 // Correct
 type FooBar {
   myField: string
@@ -259,7 +254,7 @@ type FooBAR {
 
 _Example:_
 
-```urpc
+```ufo
 // Correct
 myInput: FooBar
 zipCode: string

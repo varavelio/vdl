@@ -13,7 +13,7 @@ At its core, UFO RPC is a system built on a **schema as the single source of tru
 
 The ecosystem is comprised of three fundamental pillars:
 
-1.  **A Definition Language (DSL):** A simple and intuitive language (`.urpc`) for defining data types, procedures (request-response), and streams (real-time communication).
+1.  **A Definition Language (DSL):** A simple and intuitive language (`.ufo`) for defining data types, procedures (request-response), and streams (real-time communication), as well as enums, constants, and messaging patterns.
 2.  **First-Class Developer Tooling:** A suite of tools that makes working with the DSL a pleasure, including an **LSP** for autocompletion and validation in your editor, automatic formatters, and a **VSCode extension**.
 3.  **Multi-Language Code Generators:** A powerful engine that reads your schema and generates fully functional, strongly-typed, and resilient clients and servers, initially for **Go** and **TypeScript**.
 
@@ -30,18 +30,18 @@ UFO RPC is built on a series of key principles:
 
 ## Key Features
 
-- **A Human-Centric DSL:** Define your APIs in `.urpc` files that are as easy to read as they are to write. Documentation (in Markdown) lives alongside your code, ensuring it never becomes outdated.
+- **A Human-Centric DSL:** Define your APIs in `.ufo` files that are as easy to read as they are to write. Documentation (in Markdown) lives alongside your code, ensuring it never becomes outdated.
 - **Type-Safe, Multi-Language Code Generation:** First-class support for the most modern stacks. V1 includes:
   - **Go Server & Client:** For building high-performance backends.
   - **TypeScript Server & Client:** For seamless integration with the JavaScript/Node.js ecosystem and modern frontends.
   - **Dart Client:** For building mobile and desktop applications with Flutter.
-- **"Batteries-Included" Interactive Playground:** Every UFO RPC project can generate a static, self-contained web portal where developers can:
+- **"Batteries-Included" Interactive Playground:** Every UFO project can generate a static, self-contained web portal where developers can:
   - Explore all operations and data types.
   - Read the complete Markdown documentation.
   - Execute procedures and subscribe to streams directly from the browser via auto-generated forms.
   - Get ready-to-use `curl` commands and client code snippets.
 - **Resilient Clients & Servers by Default:** The generated clients are not simple wrappers. They come with built-in policies for **retries with exponential backoff**, **per-request timeouts**, and **automatic reconnection for streams**, making your applications robust from day one.
-- **Interoperability with OpenAPI:** Automatically generate an OpenAPI v3 specification from your `.urpc` schema, enabling integration with the vast ecosystem of existing tools.
+- **Interoperability with OpenAPI:** Automatically generate an OpenAPI v3 specification from your `.ufo` schema, enabling integration with the vast ecosystem of existing tools.
 
 ## Who is UFO RPC for?
 
