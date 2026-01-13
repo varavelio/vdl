@@ -78,30 +78,37 @@ rpc <RPCName> {
 
 ## Imports
 
-The DSL entrypoint is always a single `.ufo` file called `schema`, but you can import other `.ufo` files to help you keep your schemas organized, modularized and reusable.
+To maintain clean and maintainable projects, UFO RPC allows you to split your schemas into multiple files.
 
-To import other files inside your schema you should use the following syntax:
+This modular approach helps you organize your types and procedures by domain, making them easier to navigate and reuse across different schemas.
+
+### How to use Imports
+
+You can include other `.ufo` files using the `import` keyword, typically at the top of your file.
 
 ```ufo
-// foo.ufo
-type FooType {}
+// auth.ufo
+type Session {
+  token: string
+  expiresAt: datetime
+}
 
-// bar.ufo
-import "./foo.ufo"
-type BarType {
-  foo: FooType
+// main.ufo
+import "./auth.ufo"
+
+type AuthInfo {
+  session: Session
 }
 ```
 
-In the above example, `bar.ufo` imports `foo.ufo` and can use the `FooType` defined in it. The import system always imports all the content of the file, you can think of it as a copy-paste of the imported file content.
+### Core Principles
 
-UFO RPC automatically detects and blocks circular imports and duplicate imports, e.g. If `A` imports `B` and `C`, but `B` imports `C`, in `A` the content of `C` will only be imported once.
+- **Modular Reusability:** When a file is imported, all its definitions (types, enums, constants, etc.) become available in the current file. You can think of it as a copy-paste of the imported file content.
+- **Relative Paths:** Imports always use relative paths (e.g., `./common.ufo`) starting from the current file's directory.
+- **Automatic De-duplication:** If your project structure leads to the same file being imported multiple times through different paths, UFO RPC ensures it is only processed once, preventing conflicts.
+- **Circular Dependency Prevention:** To maintain a clear and predictable structure, the compiler automatically detects and rejects circular imports (e.g., File A importing File B, which in turn imports File A).
 
-Circular imports are not allowed and will raise an error from the parser, e.g. if `A` imports `B` and `B` imports `A`.
-
-The imports should be always `relative paths`.
-
-This import system helps you to create multiple entry points and share some common types between your schemas and prevent code duplication.
+This system empowers you to build a robust library of common types while keeping your service-specific logic focused and uncluttered.
 
 ## Types
 
