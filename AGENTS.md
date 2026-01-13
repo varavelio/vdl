@@ -34,6 +34,26 @@
   - `cmd/urpc`: Main CLI entry point (native).
   - `cmd/urpcwasm`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
+    - **Compiler Core** (`urpc/`):
+      - `lexer/`, `parser/`: Tokenization and AST construction.
+      - `ast/`, `token/`: Syntax tree and token definitions.
+      - `analyzer/`: Semantic analysis and type checking.
+      - `formatter/`: Source code formatting logic.
+      - `docstore/`: Documentation/comment handling.
+      - `lsp/`: Language Server Protocol implementation.
+      - `transform/`: AST transformations.
+    - **Generators** (`codegen/`):
+      - `golang/`: Go client/server code generation.
+      - `typescript/`: TS client/types generation.
+      - `dart/`: Dart client generation.
+      - `openapi/`: OpenAPI v3 spec generation.
+      - `playground/`: WASM/Playground specific helpers.
+    - **Schema & formats**:
+      - `schema/`: Internal intermediate representation (IR) definitions.
+      - `transpile/`: Converters (ufo <-> json).
+    - **Utils**:
+      - `util/`: Shared string/path/debug utilities.
+      - `version/`: Build version metadata.
   - `dist/`: Build artifacts.
 - **Integration**: Compiles to `dist/urpc.wasm` which is copied to the playground.
 
