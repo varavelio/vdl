@@ -555,47 +555,88 @@ func TestLexer(t *testing.T) {
 
 	t.Run("TestLexerCompleteUFOFile", func(t *testing.T) {
 		input := `
-			include "./foo.ufo"
+			include "./common.ufo"
 
-			// Comment
-			/* Block comment */
+			// Single line comment
+			/* Multi-line
+				comment */
 
-			""" Product documentation """
-			type Product {
-				id: string
-				name: string
-				price: float
-				tags?: string[][]
+			""" Standalone docstring """
+
+			const VERSION = "1.0.0"
+			const MAX_RETRIES = 3
+			const TIMEOUT = 1.5
+			const ENABLE_LOGS = true
+
+			deprecated("Use NewEnum instead")
+			enum OldEnum {
+					Legacy
 			}
 
-			const MAX_ITEMS = 50
-
-			enum OrderStatus {
-				Pending
-				Processing
+			enum Status {
+					Pending
+					Active = "ACTIVE"
+					Closed = 10
 			}
 
-			pattern SessionKey = "cache:session:{sessionId}"
+			pattern CacheKey = "item:{id}"
 
-			rpc Catalog {
-				""" Creates a product """
-				proc CreateProduct {
-					input {
-						product: Product
+			""" Type docstring """
+			type User {
+					id: string
+					age: int
+					score: float
+					isActive: bool
+					createdAt: datetime
+					
+					// Arrays and Maps
+					tags: string[]
+					matrix: int[][]
+					metadata: map<string>
+					counts: map<map<int>>
+					lookup: map<string>[]
+					
+					// Optional
+					profile?: Profile
+					
+					// Inline object
+					address: {
+							street: string
+							zip: string
 					}
-					output {
-						success: bool
-					}
-				}
+					
+					// Composition
+					...AuditInfo
+			}
 
-				stream NewProduct {
-					input {
-						filter: string
+			rpc UserService {
+					""" Proc docstring """
+					deprecated
+					proc GetUser {
+							input {
+									id: string
+									...Pagination
+							}
+							output {
+									user: User
+									// Nested inline object in output
+									extra: {
+											flag: bool
+											meta: {
+													source: string
+											}
+									}
+							}
 					}
-					output {
-						id: string
+
+					stream Subscribe {
+							input {
+									topic: string
+							}
+							output {
+									event: map<string>
+							}
 					}
-				}
 			}
 		`
 
@@ -609,26 +650,60 @@ func TestLexer(t *testing.T) {
 			"Comment",
 			"CommentBlock",
 			"Docstring",
-			"Type", "Ident", "LBrace",
-			"Ident", "Colon", "String",
-			"Ident", "Colon", "String",
-			"Ident", "Colon", "Float",
-			"Ident", "Question", "Colon", "String", "LBracket", "RBracket", "LBracket", "RBracket",
-			"RBrace",
+			"Const", "Ident", "Equals", "StringLiteral",
 			"Const", "Ident", "Equals", "IntLiteral",
+			"Const", "Ident", "Equals", "FloatLiteral",
+			"Const", "Ident", "Equals", "True",
+			"Deprecated", "LParen", "StringLiteral", "RParen",
 			"Enum", "Ident", "LBrace",
 			"Ident",
+			"RBrace",
+			"Enum", "Ident", "LBrace",
 			"Ident",
+			"Ident", "Equals", "StringLiteral",
+			"Ident", "Equals", "IntLiteral",
 			"RBrace",
 			"Pattern", "Ident", "Equals", "StringLiteral",
+			"Docstring",
+			"Type", "Ident", "LBrace",
+			"Ident", "Colon", "String",
+			"Ident", "Colon", "Int",
+			"Ident", "Colon", "Float",
+			"Ident", "Colon", "Bool",
+			"Ident", "Colon", "Datetime",
+			"Comment",
+			"Ident", "Colon", "String", "LBracket", "RBracket",
+			"Ident", "Colon", "Int", "LBracket", "RBracket", "LBracket", "RBracket",
+			"Ident", "Colon", "Map", "LessThan", "String", "GreaterThan",
+			"Ident", "Colon", "Map", "LessThan", "Map", "LessThan", "Int", "GreaterThan", "GreaterThan",
+			"Ident", "Colon", "Map", "LessThan", "String", "GreaterThan", "LBracket", "RBracket",
+			"Comment",
+			"Ident", "Question", "Colon", "Ident",
+			"Comment",
+			"Ident", "Colon", "LBrace",
+			"Ident", "Colon", "String",
+			"Ident", "Colon", "String",
+			"RBrace",
+			"Comment",
+			"Spread", "Ident",
+			"RBrace",
 			"Rpc", "Ident", "LBrace",
 			"Docstring",
+			"Deprecated",
 			"Proc", "Ident", "LBrace",
 			"Input", "LBrace",
-			"Ident", "Colon", "Ident",
+			"Ident", "Colon", "String",
+			"Spread", "Ident",
 			"RBrace",
 			"Output", "LBrace",
+			"Ident", "Colon", "Ident",
+			"Comment",
+			"Ident", "Colon", "LBrace",
 			"Ident", "Colon", "Bool",
+			"Ident", "Colon", "LBrace",
+			"Ident", "Colon", "String",
+			"RBrace",
+			"RBrace",
 			"RBrace",
 			"RBrace",
 			"Stream", "Ident", "LBrace",
@@ -636,7 +711,7 @@ func TestLexer(t *testing.T) {
 			"Ident", "Colon", "String",
 			"RBrace",
 			"Output", "LBrace",
-			"Ident", "Colon", "String",
+			"Ident", "Colon", "Map", "LessThan", "String", "GreaterThan",
 			"RBrace",
 			"RBrace",
 			"RBrace",
