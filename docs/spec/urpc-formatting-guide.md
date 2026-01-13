@@ -1,13 +1,11 @@
 ---
 title: Formatting Guide
-description: A guide to correctly format UFO DSL
+description: Standard formatting conventions for the UFO IDL
 ---
 
-This document specifies the standard formatting rules for the UFO DSL. Consistent formatting enhances code readability, maintainability, and
-collaboration. The primary goal is to produce clean, predictable, and
-aesthetically pleasing UFO code.
+This document specifies the standard formatting rules for the UFO IDL. Consistent formatting enhances code readability, maintainability, and collaboration.
 
-> **⚠️ Reference Only:** All style conventions are automatically enforced by the official UFO formatter. Run it manually with `ufo fmt ./schema.ufo`, or let the built-in LSP formatter (bundled with the VS Code extension and configurable for other editors) format files on save.
+> **Note:** All style conventions are automatically enforced by the official UFO formatter. Run it manually with `ufo fmt ./schema.ufo`, or let the built-in LSP formatter (bundled with the VS Code extension) format files on save.
 
 ## 1. General Principles
 
@@ -21,8 +19,6 @@ aesthetically pleasing UFO code.
 - Use **2 spaces** per indentation level.
 - Do not use tabs.
 
-_Example:_
-
 ```ufo
 type Example {
   field: string
@@ -31,235 +27,201 @@ type Example {
 
 ## 3. Top-Level Elements
 
-Top-level elements include `namespace`, `import`, `export`, and standalone comments.
+Top-level elements include `import`, `type`, `enum`, `const`, `pattern`, `rpc`, and standalone docstrings or comments.
 
-- **Namespace:** Must be the first non-comment line of the file (unless it's a barrel file).
-- **Default:** Separate each top-level element with one blank line.
-- **Exceptions:**
-  - **Consecutive Imports:** Do not insert blank lines between consecutive `import` statements.
-  - **Consecutive Comments:** Do not insert extra blank lines between consecutive standalone comments.
+- **Imports:** Group consecutive `import` statements together without blank lines between them.
+- **Separation:** Separate each top-level element with one blank line.
 - **Preservation:** Intentionally placed blank lines in the source are respected.
 
-_Example:_
-
 ```ufo
-namespace Orders
+import "./common.ufo"
+import "./auth.ufo"
 
-import "./shared"
-import Auth "./users/auth"
+const MAX_PAGE_SIZE = 100
 
-// A standalone comment
-export type Order {
-  field: string
+type Order {
+  id: string
+  total: float
 }
 
-export type Item {
-  field: int
+rpc Orders {
+  proc GetOrder { ... }
 }
 ```
 
 ## 4. Blocks and Fields
 
-### 4.1 RPC Blocks
+### 4.1 Block Structure
 
-`proc` and `stream` definitions must be grouped within an `rpc` block.
+- Opening braces (`{`) are on the same line as the declaration, preceded by one space.
+- Contents inside non-empty blocks start on a new, indented line.
+- The closing brace (`}`) is placed on its own line, aligned with the declaration.
 
 ```ufo
-export rpc Service {
-  proc Get { ... }
-
-  stream Watch { ... }
+type User {
+  id: string
+  name: string
 }
 ```
 
-### 4.2 Fields in a Type
+### 4.2 RPC Blocks
+
+Procedures (`proc`) and streams (`stream`) must be defined inside an `rpc` block. Separate each endpoint with one blank line.
+
+```ufo
+rpc Service {
+  proc Get {
+    input {
+      id: string
+    }
+    output {
+      data: string
+    }
+  }
+
+  stream Watch {
+    input {
+      filter: string
+    }
+    output {
+      event: string
+    }
+  }
+}
+```
+
+### 4.3 Fields
 
 - Each field is placed on its own line.
-- **Field Separation:** For simple fields without complex formatting, fields may
-  be placed consecutively without blank lines. When a field has a docstring,
-  separate it from the preceding field with one blank line for readability.
-- **Spread Operator:** The `...` operator should be placed at the beginning of the block or grouped with other spread operators.
-
-_Example:_
+- Fields without docstrings can be placed consecutively without blank lines.
+- When a field has a docstring, separate it from the preceding field with one blank line.
+- The spread operator (`...`) should be placed at the beginning of the block.
 
 ```ufo
-export type User {
-  ...BaseEntity
-  ...AuthInfo
+type User {
+  ...AuditMetadata
 
-  """ The user's name. """
+  """ The user's display name. """
   name: string
 
+  """ The user's email address. """
   email: string
+
+  age?: int
 }
 ```
 
-### 4.2 Blocks (Type, Input/Output)
+### 4.4 Input and Output Blocks
 
-- Opening braces (`{`) are on the same line as the declaration header (preceded
-  by one space).
-- Contents inside non-empty blocks always start on a new, indented line.
-- The closing brace (`}`) is placed on its own line, aligned with the opening
-  line.
-- In procedure and stream bodies, separate the `input`, and `output` blocks with
-  one blank line.
+In procedures and streams, separate the `input` and `output` blocks with one blank line.
+
+```ufo
+proc CreateUser {
+  input {
+    name: string
+    email: string
+  }
+
+  output {
+    userId: string
+    createdAt: datetime
+  }
+}
+```
 
 ## 5. Spacing
 
-- **Colons (`:`):** No space before; one space after (e.g. `field: string`).
-- **Commas (`,`):** No space before; one space after.
-- **Braces (`{` and `}`):** One space before `{` in declarations; inside blocks,
-  use newlines and proper indentation.
-- **Brackets (`[]`):** No spaces for array types (e.g. `string[]`); no extra
-  interior spacing.
-- **Parentheses (`()`):** No extra spaces inside the parentheses.
-- **Optional Marker (`?`):** Immediately follows the field name (e.g.
-  `email?: string`).
+| Context               | Rule                               | Example          |
+| :-------------------- | :--------------------------------- | :--------------- |
+| Colons (`:`)          | No space before, one space after   | `field: string`  |
+| Braces (`{`)          | One space before in declarations   | `type User {`    |
+| Brackets (`[]`)       | No spaces for array types          | `string[]`       |
+| Optional marker (`?`) | Immediately follows the field name | `email?: string` |
+| Map syntax            | No extra spaces                    | `map<User>`      |
 
 ## 6. Comments
 
-Comment content is preserved exactly (including internal whitespace).
+Comment content is preserved exactly, including internal whitespace.
 
-- **Standalone Comments:** Use `//` or `/* … */` on their own lines; indent to
-  the current block.
-- **End-of-Line (EOL) Comments:** Can use either `//` or block style (`/* … */`)
-  following code on the same line, with at least one space separating them.
-
-_Example:_
+- **Standalone Comments:** Use `//` or `/* ... */` on their own lines, indented to the current block level.
+- **End-of-Line Comments:** Place after code on the same line, with at least one space separating them.
 
 ```ufo
-version 1 // EOL comment
-
+// This is a standalone comment
 type Example {
-  field: string // Inline comment for field
+  field: string  // End-of-line comment
 }
 ```
 
 ## 7. Docstrings
 
-- Place docstrings immediately above the `type`, `proc`, `stream`, or `field` they
-  document.
-- They are enclosed in triple quotes (`"""`), preserving internal newlines and
-  formatting.
-
-_Example:_
-
-```ufo
-"""
-Docstring for MyType.
-Can be multi-line.
-"""
-type MyType {
-  // ...
-}
-```
-
-### 7.1 Field Docstrings
-
+- Place docstrings immediately above the element they document.
+- Enclose in triple quotes (`"""`), preserving internal newlines and formatting.
 - For fields, prefer concise, single-line docstrings.
-- Place the docstring on the line immediately before the field it documents,
-  indented to the same level.
-- When multiple fields have docstrings, separate each one with a blank line to
-  improve readability.
-
-_Example:_
 
 ```ufo
+"""
+Represents a user in the system.
+"""
 type User {
-  """ The user's unique identifier. """
+  """ The unique identifier. """
   id: string
 
-  """ The user's email address. Must be unique. """
-  email: string
-
-  name?: string // A field without a docstring does not require a blank line before it.
+  """ The user's full name. """
+  name: string
 }
 ```
 
 ## 8. Deprecation
 
-The `deprecated` keyword is used to mark types, procedures, or streams as
-deprecated.
-
-- Place the `deprecated` keyword on its own line immediately before the element
-  definition
-- If a docstring exists, place the `deprecated` keyword between the docstring
-  and the element definition
-- For deprecation with a message, use parentheses with the message in quotes
-
-### 8.1 Basic Deprecation
-
-_Example:_
+The `deprecated` keyword marks elements as deprecated. Place it on its own line immediately before the element definition. If a docstring exists, place `deprecated` between the docstring and the element.
 
 ```ufo
-deprecated type MyType {
-  // type definition
+deprecated type LegacyUser {
+  // ...
 }
 
 """
-Documentation for MyProc
+Documentation for this service.
 """
-deprecated proc MyProc {
-  // procedure definition
+deprecated rpc OldService {
+  deprecated proc FetchData {
+    // ...
+  }
 }
 
-deprecated stream MyStream {
-  // stream definition
-}
-```
-
-### 8.2 Deprecation with Message
-
-_Example:_
-
-```ufo
-"""
-Documentation for MyType
-"""
-deprecated("Replaced by ImprovedType")
-type MyType {
-  // type definition
-}
-
-deprecated("Use NewStream instead")
-stream MyStream {
-  // stream definition
+deprecated("Use NewType instead")
+type OldType {
+  // ...
 }
 ```
 
 ## 9. Naming Conventions
 
-### 9.1 Type, Procedure, and Stream Names
+The formatter automatically enforces the following naming conventions:
 
-- Use **strict PascalCase** (also known as UpperCamelCase). Each word starts with an uppercase letter with no underscores or consecutive capital letters.
-- Acronyms longer than two letters should be treated as regular words (e.g. `HttpRequest`, not `HTTPRequest`).
+| Element      | Convention         | Example                 |
+| :----------- | :----------------- | :---------------------- |
+| Types        | `PascalCase`       | `UserProfile`           |
+| Enums        | `PascalCase`       | `OrderStatus`           |
+| Enum Members | `PascalCase`       | `Pending`, `InProgress` |
+| RPC Services | `PascalCase`       | `UserService`           |
+| Procedures   | `PascalCase`       | `GetUser`               |
+| Streams      | `PascalCase`       | `NewMessages`           |
+| Patterns     | `PascalCase`       | `UserEventSubject`      |
+| Fields       | `camelCase`        | `userId`, `createdAt`   |
+| Constants    | `UPPER_SNAKE_CASE` | `MAX_PAGE_SIZE`         |
 
-_Example:_
+### Acronym Handling
 
-```ufo
-// Correct
-type FooBar {
-  myField: string
-}
-
-// Incorrect
-type FooBAR {
-  myField: string
-}
-```
-
-### 9.2 Field Names
-
-- Use **strict camelCase**. The first word is lowercase and each subsequent word starts with an uppercase letter. Do not use underscores or all-caps abbreviations.
-
-_Example:_
+Acronyms longer than two letters are treated as regular words:
 
 ```ufo
 // Correct
-myInput: FooBar
-zipCode: string
+type HttpRequest { ... }
+type JsonParser { ... }
 
 // Incorrect
-MyINPUT: FooBar
-zip_code: string
+type HTTPRequest { ... }
+type JSONParser { ... }
 ```
