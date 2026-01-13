@@ -27,15 +27,15 @@ type Example {
 
 ## 3. Top-Level Elements
 
-Top-level elements include `import`, `type`, `enum`, `const`, `pattern`, `rpc`, and standalone docstrings or comments.
+Top-level elements include `include`, `type`, `enum`, `const`, `pattern`, `rpc`, and standalone docstrings or comments.
 
-- **Imports:** Group consecutive `import` statements together without blank lines between them.
+- **Includes:** Group consecutive `include` statements together without blank lines between them.
 - **Separation:** Separate each top-level element with one blank line.
 - **Preservation:** Intentionally placed blank lines in the source are respected.
 
 ```ufo
-import "./common.ufo"
-import "./auth.ufo"
+include "./common.ufo"
+include "./auth.ufo"
 
 const MAX_PAGE_SIZE = 100
 

@@ -16,7 +16,7 @@ This IDL serves as the single source of truth for your projects, from which you 
 This is the syntax for the IDL.
 
 ```ufo
-import "./foo.ufo"
+include "./foo.ufo"
 
 // <comment>
 
@@ -90,13 +90,13 @@ UFO RPC enforces consistent naming conventions to ensure code generated across a
 
 > **Note:** The formatter will automatically correct casing when you run it on your `.ufo` files, so you can focus on the logic while the tooling ensures consistency.
 
-## Imports
+## Includes
 
 To maintain clean and maintainable projects, UFO RPC allows you to split your schemas into multiple files. This modular approach helps you organize your types and procedures by domain, making them easier to navigate and reuse across different schemas.
 
-### How to use Imports
+### How to use Includes
 
-You can include other `.ufo` files using the `import` keyword, typically at the top of your file.
+You can include other `.ufo` files using the `include` keyword, typically at the top of your file.
 
 ```ufo
 // auth.ufo
@@ -106,7 +106,7 @@ type Session {
 }
 
 // main.ufo
-import "./auth.ufo"
+include "./auth.ufo"
 
 type AuthInfo {
   session: Session
@@ -115,10 +115,9 @@ type AuthInfo {
 
 ### Core Principles
 
-- **Modular Reusability:** When a file is imported, all its definitions (types, enums, constants, etc.) become available in the current file. You can think of it as a copy-paste of the imported file content.
-- **Relative Paths:** Imports always use relative paths (e.g., `./common.ufo`) starting from the current file's directory.
-- **Automatic De-duplication:** If your project structure leads to the same file being imported multiple times through different paths, UFO RPC ensures it is only processed once, preventing conflicts.
-- **Circular Dependency Prevention:** To maintain a clear and predictable structure, the compiler automatically detects and rejects circular imports (e.g., File A importing File B, which in turn imports File A).
+- **Flat Context:** When a file is included, all its definitions (types, enums, constants, etc.) are merged into the global context. You can think of it as copying the content of the included file into the current file.
+- **Relative Paths:** Includes always use relative paths (e.g., `./common.ufo`) starting from the current file's directory.
+- **Idempotent Processing:** Each file is processed only once. If your project structure leads to the same file being included multiple times, the compiler simply skips files it has already processed, preventing duplication.
 
 This system empowers you to build a robust library of common types while keeping your service-specific logic focused and uncluttered.
 
@@ -423,8 +422,8 @@ rpc Users {
 }
 
 // main.ufo
-import "./users_procs.ufo"
-import "./users_streams.ufo"
+include "./users_procs.ufo"
+include "./users_streams.ufo"
 
 // The "Users" RPC now contains GetUser, CreateUser, and UserStatusUpdates.
 ```
@@ -729,7 +728,7 @@ Deprecated elements will:
 The following example demonstrates a comprehensive schema that uses all the features of the UFO IDL, including imports, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
 
 ```ufo
-import "./foo.ufo"
+include "./foo.ufo"
 
 // ============================================================================
 // External Documentation
@@ -950,5 +949,5 @@ rpc Chat {
 
 The UFO IDL is designed to be simple and focused. As such, there are a few constraints to be aware of:
 
-1.  **Reserved Keywords:** All language keywords (e.g., `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, `input`, `output`, `import`, `deprecated`, etc.) cannot be used as identifiers for your types, fields, or services.
+1.  **Reserved Keywords:** All language keywords (e.g., `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, `input`, `output`, `include`, `deprecated`, etc.) cannot be used as identifiers for your types, fields, or services.
 2.  **Validation Logic:** The compiler handles type checking and ensures required fields are present. Any additional business validation logic (e.g., "rating must be between 1 and 5") must be implemented in your application code.
