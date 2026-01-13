@@ -227,6 +227,18 @@ type Article {
 // }
 ```
 
+You can destructure multiple types in a single definition:
+
+```ufo
+type FullEntity {
+  ...AuditMetadata
+  ...OwnershipInfo
+  name: string
+}
+```
+
+> **Important:** Field names must be unique across the entire type. If two destructured types share a field name, or if you define a field that already exists in a destructured type, the compiler will raise an error. You cannot override fields from destructured types.
+
 #### Field Modifiers
 
 - **Required by Default:** All fields are mandatory. The compiler ensures that these fields are present during communication.
