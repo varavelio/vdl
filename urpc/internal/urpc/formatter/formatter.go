@@ -170,7 +170,7 @@ func (f *schemaFormatter) formatComment() {
 
 	shouldBreakBefore := false
 	if !prevEOF {
-		if prevLineDiff.StartToStart > 1 {
+		if prevLineDiff.EndToStart > 1 {
 			shouldBreakBefore = true
 		}
 	}
@@ -197,7 +197,8 @@ func (f *schemaFormatter) formatStandaloneDocstring() {
 			shouldBreakBefore = true
 		}
 
-		if prevLineDiff.StartToStart < -1 {
+		// Preserve blank lines from source
+		if prevLineDiff.EndToStart > 1 {
 			shouldBreakBefore = true
 		}
 	}
@@ -218,7 +219,7 @@ func (f *schemaFormatter) formatInclude() {
 		// If previous was NOT an include or comment, break
 		if prev.Kind() != ast.SchemaChildKindInclude && prev.Kind() != ast.SchemaChildKindComment {
 			shouldBreakBefore = true
-		} else if prevLineDiff.StartToStart < -1 {
+		} else if prevLineDiff.EndToStart > 1 {
 			// If there was a blank line in source, preserve it
 			shouldBreakBefore = true
 		}
@@ -234,7 +235,7 @@ func (f *schemaFormatter) formatInclude() {
 }
 
 func (f *schemaFormatter) formatConst() {
-	f.breakBeforeTopLevel()
+	f.breakBeforeGroupable(ast.SchemaChildKindConst)
 	constFormatter := newConstFormatter(f.g, f.currentIndexChild.Const)
 	constFormatter.format()
 	f.LineAndComment("")
@@ -248,10 +249,55 @@ func (f *schemaFormatter) formatEnum() {
 }
 
 func (f *schemaFormatter) formatPattern() {
-	f.breakBeforeTopLevel()
+	f.breakBeforeGroupable(ast.SchemaChildKindPattern)
 	patternFormatter := newPatternFormatter(f.g, f.currentIndexChild.Pattern)
 	patternFormatter.format()
 	f.LineAndComment("")
+}
+
+func (f *schemaFormatter) breakBeforeGroupable(kind ast.SchemaChildKind) {
+	prev, prevLineDiff, prevEOF := f.peekChild(-1)
+
+	shouldBreakBefore := false
+	if !prevEOF {
+		// If previous was NOT the same kind or comment, break (standard top-level separation)
+		if prev.Kind() != kind && prev.Kind() != ast.SchemaChildKindComment {
+			shouldBreakBefore = true
+		} else if prev.Kind() == ast.SchemaChildKindComment {
+			// If previous was comment, use standard spacing
+			if prevLineDiff.EndToStart > 1 {
+				shouldBreakBefore = true
+			}
+		} else {
+			// Previous was SAME kind.
+			// Only break if one of them has a docstring.
+			// Note: If PREVIOUS had a docstring, it usually occupies multiple lines,
+			// but we are looking at the gap between the end of previous and start of current.
+			// Actually, if previous had a docstring, we DO want a blank line after it to separate it from the next item.
+			// AND if CURRENT has a docstring, we want a blank line before it.
+
+			// Check current docstring
+			if kind == ast.SchemaChildKindConst && f.currentIndexChild.Const.Docstring != nil {
+				shouldBreakBefore = true
+			} else if kind == ast.SchemaChildKindPattern && f.currentIndexChild.Pattern.Docstring != nil {
+				shouldBreakBefore = true
+			}
+
+			// Check previous docstring
+			// We need to check if previous item (of same kind) had a docstring.
+			if !shouldBreakBefore {
+				if kind == ast.SchemaChildKindConst && prev.Const.Docstring != nil {
+					shouldBreakBefore = true
+				} else if kind == ast.SchemaChildKindPattern && prev.Pattern.Docstring != nil {
+					shouldBreakBefore = true
+				}
+			}
+		}
+	}
+
+	if shouldBreakBefore {
+		f.g.Break()
+	}
 }
 
 func (f *schemaFormatter) breakBeforeTopLevel() {
@@ -263,7 +309,7 @@ func (f *schemaFormatter) breakBeforeTopLevel() {
 			shouldBreakBefore = true
 		}
 
-		if prevLineDiff.StartToStart > 1 {
+		if prevLineDiff.EndToStart > 1 {
 			shouldBreakBefore = true
 		}
 	}
