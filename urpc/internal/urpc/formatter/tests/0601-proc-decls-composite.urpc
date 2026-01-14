@@ -1,106 +1,113 @@
-// Nested fields
-proc 
-Test   {    
-  input {
-
-  field: {
-    subfield:{
-      subsubfield: string[]
-  }
+rpc Service {
+  // Nested fields
+  proc Test {
+    input {
+      field: {
+        subfield: {
+          subsubfield: string[]
+        }
+      }
     }
-  } output {
 
-  field: {
-    subfield:{ /* Comment */""" 
-    Field
-    
-          Multi-line
-      """
-      subsubfield: string[]
-  }
+    output {
+      field: {
+        subfield: { /* Comment */
+          """ 
+Field
+
+      Multi-line
+  """
+          subsubfield: string[]
+        }
+      }
     }
   }
-                    }
 
-// Array fields
-proc Test {input{
-  field: string[]
-}output{field:string[]}
+  // Array fields
+  proc Test {
+    input {
+      field: string[]
+    }
+
+    output {
+      field: string[]
+    }
+  }
+
+  // Nested array fields
+  proc Test {
+    input {
+      field: {
+        subfield: {
+          subsubfield: string[]
+        }[]
+      }[]
+    }
+
+    output {
+      field: {
+        subfield: {
+          subsubfield: string[]
+        }[]
+      }[]
+    }
+  }
 }
-
-// Nested array fields
-proc 
-Test   {    
-  input {
-
-  field: {
-    subfield:{
-      subsubfield: string[]
-  }[]
-    }[]
-  } output {
-
-  field: {
-    subfield:{
-      subsubfield: string[]
-  }[]
-    }[]
-  }
-                    }
-
-
 // >>>>
 
-// Nested fields
-proc Test {
-  input {
-    field: {
-      subfield: {
-        subsubfield: string[]
+rpc Service {
+  // Nested fields
+  proc Test {
+    input {
+      field: {
+        subfield: {
+          subsubfield: string[]
+        }
+      }
+    }
+
+    output {
+      field: {
+        subfield: { /* Comment */
+
+          """ 
+Field
+
+      Multi-line
+  """
+          subsubfield: string[]
+        }
       }
     }
   }
 
-  output {
-    field: {
-      subfield: { /* Comment */
-        """ 
-    Field
-    
-          Multi-line
-      """
-        subsubfield: string[]
-      }
+  // Array fields
+  proc Test {
+    input {
+      field: string[]
+    }
+
+    output {
+      field: string[]
     }
   }
-}
 
-// Array fields
-proc Test {
-  input {
-    field: string[]
-  }
-
-  output {
-    field: string[]
-  }
-}
-
-// Nested array fields
-proc Test {
-  input {
-    field: {
-      subfield: {
-        subsubfield: string[]
+  // Nested array fields
+  proc Test {
+    input {
+      field: {
+        subfield: {
+          subsubfield: string[]
+        }[]
       }[]
-    }[]
-  }
+    }
 
-  output {
-    field: {
-      subfield: {
-        subsubfield: string[]
+    output {
+      field: {
+        subfield: {
+          subsubfield: string[]
+        }[]
       }[]
-    }[]
+    }
   }
 }

@@ -1,0 +1,7 @@
+include "./foo.urpc"
+  include   "./bar.urpc"
+
+// >>>>
+
+include "./foo.urpc"
+include "./bar.urpc"

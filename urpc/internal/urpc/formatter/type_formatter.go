@@ -27,7 +27,7 @@ func newTypeFormatter(g *ufogenkit.GenKit, typeDecl *ast.TypeDecl) *typeFormatte
 // Returns the formatted genkit.GenKit.
 func (f *typeFormatter) format() *ufogenkit.GenKit {
 	if f.typeDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, f.typeDecl.Docstring.Value)
+		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.typeDecl.Docstring.Value)))
 	}
 
 	if f.typeDecl.Deprecated != nil {
@@ -35,15 +35,16 @@ func (f *typeFormatter) format() *ufogenkit.GenKit {
 			f.g.Inline("deprecated ")
 		}
 		if f.typeDecl.Deprecated.Message != nil {
-			f.g.Linef("deprecated(\"%s\")", strutil.EscapeQuotes(*f.typeDecl.Deprecated.Message))
+			f.g.Linef("deprecated(\"%s\")", strutil.EscapeQuotes(string(*f.typeDecl.Deprecated.Message)))
 		}
 	}
 
-	// Force strict pascal case
+	// Force strict PascalCase
 	f.g.Inlinef(`type %s `, strutil.ToPascalCase(f.typeDecl.Name))
 
-	fieldsFormatter := newFieldsFormatter(f.g, f.typeDecl, f.typeDecl.Children)
-	fieldsFormatter.format()
+	// Use typeBodyFormatter
+	bodyFormatter := newTypeBodyFormatter(f.g, f.typeDecl, f.typeDecl.Children)
+	bodyFormatter.format()
 
 	return f.g
 }

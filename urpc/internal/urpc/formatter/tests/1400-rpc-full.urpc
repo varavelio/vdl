@@ -1,0 +1,68 @@
+rpc catalog {
+  """
+  # Product Lifecycle
+  Endpoints for creating and managing products.
+  """
+
+  """
+  Creates a new product in the system.
+  """
+    proc createProduct {
+      input {
+      product: Product
+      }
+
+      output {
+        success: bool
+        productId: string
+      }
+    }
+
+    """
+    Subscribes to new messages.
+    """
+    stream newMessages {
+      input {
+        channelId: string
+      }
+      output {
+        text: string
+      }
+    }
+}
+
+// >>>>
+
+rpc Catalog {
+  """
+  # Product Lifecycle
+  Endpoints for creating and managing products.
+  """
+
+  """
+  Creates a new product in the system.
+  """
+  proc CreateProduct {
+    input {
+      product: Product
+    }
+
+    output {
+      success: bool
+      productId: string
+    }
+  }
+
+  """
+  Subscribes to new messages.
+  """
+  stream NewMessages {
+    input {
+      channelId: string
+    }
+
+    output {
+      text: string
+    }
+  }
+}

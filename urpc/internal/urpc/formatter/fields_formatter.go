@@ -1,41 +1,110 @@
 package formatter
 
 import (
-	"fmt"
-
 	"github.com/uforg/ufogenkit"
 	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
 	"github.com/uforg/uforpc/urpc/internal/util/strutil"
 )
 
-type fieldsFormatter struct {
+// Common helpers
+
+func formatComment(g *ufogenkit.GenKit, comment *ast.Comment, breakBefore bool) {
+	if breakBefore {
+		g.Break()
+	}
+	if comment.Simple != nil {
+		g.Line(*comment.Simple)
+	}
+	if comment.Block != nil {
+		g.Line(*comment.Block)
+	}
+}
+
+func formatSpread(g *ufogenkit.GenKit, spread *ast.Spread, breakBefore bool) {
+	if breakBefore {
+		g.Break()
+	}
+	// Force strict PascalCase
+	g.Inlinef("...%s", strutil.ToPascalCase(spread.TypeName))
+}
+
+func formatField(g *ufogenkit.GenKit, field *ast.Field, breakBefore bool, _ any) {
+	if breakBefore {
+		g.Line("")
+	}
+
+	if field.Docstring != nil {
+		g.Inline(`"""`)
+		g.Raw(normalizeDocstring(string(field.Docstring.Value)))
+		g.Raw(`"""`)
+		g.Break()
+	}
+
+	// Force strict camelCase
+	name := strutil.ToCamelCase(field.Name)
+	if field.Optional {
+		g.Inlinef("%s?: ", name)
+	} else {
+		g.Inlinef("%s: ", name)
+	}
+
+	formatFieldType(g, field.Type)
+}
+
+func formatFieldType(g *ufogenkit.GenKit, ft ast.FieldType) {
+	if ft.Base.Named != nil {
+		typeLiteral := *ft.Base.Named
+		// Force strict pascal case for non primitive types
+		if !ast.IsPrimitiveType(typeLiteral) {
+			typeLiteral = strutil.ToPascalCase(typeLiteral)
+		}
+		g.Inline(typeLiteral)
+	} else if ft.Base.Map != nil {
+		g.Inline("map<")
+		formatFieldType(g, *ft.Base.Map.ValueType)
+		g.Inline(">")
+	} else if ft.Base.Object != nil {
+		formatter := newTypeBodyFormatter(g, ft.Base.Object, ft.Base.Object.Children)
+		formatter.format()
+	}
+
+	// Array dimensions
+	for i := 0; i < int(ft.Dimensions); i++ {
+		g.Inline("[]")
+	}
+}
+
+// ----------------------------------------------------------------------------
+// TypeBodyFormatter (for TypeDecl and inline objects)
+
+type typeBodyFormatter struct {
 	g                 *ufogenkit.GenKit
 	parent            ast.WithPositions
-	fields            []*ast.FieldOrComment
+	children          []*ast.TypeDeclChild
 	maxIndex          int
 	currentIndex      int
 	currentIndexEOF   bool
-	currentIndexChild ast.FieldOrComment
+	currentIndexChild ast.TypeDeclChild
 }
 
-func newFieldsFormatter(g *ufogenkit.GenKit, parent ast.WithPositions, fields []*ast.FieldOrComment) *fieldsFormatter {
-	if fields == nil {
-		fields = []*ast.FieldOrComment{}
+func newTypeBodyFormatter(g *ufogenkit.GenKit, parent ast.WithPositions, children []*ast.TypeDeclChild) *typeBodyFormatter {
+	if children == nil {
+		children = []*ast.TypeDeclChild{}
 	}
 
-	maxIndex := max(len(fields)-1, 0)
+	maxIndex := max(len(children)-1, 0)
 	currentIndex := 0
-	currentIndexEOF := len(fields) < 1
-	currentIndexChild := ast.FieldOrComment{}
+	currentIndexEOF := len(children) < 1
+	currentIndexChild := ast.TypeDeclChild{}
 
 	if !currentIndexEOF {
-		currentIndexChild = *fields[0]
+		currentIndexChild = *children[0]
 	}
 
-	return &fieldsFormatter{
+	return &typeBodyFormatter{
 		g:                 g,
 		parent:            parent,
-		fields:            fields,
+		children:          children,
 		maxIndex:          maxIndex,
 		currentIndex:      currentIndex,
 		currentIndexEOF:   currentIndexEOF,
@@ -43,14 +112,13 @@ func newFieldsFormatter(g *ufogenkit.GenKit, parent ast.WithPositions, fields []
 	}
 }
 
-// loadNextChild moves the current index to the next child.
-func (f *fieldsFormatter) loadNextChild() {
+func (f *typeBodyFormatter) loadNextChild() {
 	currentIndex := f.currentIndex + 1
 	currentIndexEOF := currentIndex > f.maxIndex
-	currentIndexChild := ast.FieldOrComment{}
+	currentIndexChild := ast.TypeDeclChild{}
 
 	if !currentIndexEOF {
-		currentIndexChild = *f.fields[currentIndex]
+		currentIndexChild = *f.children[currentIndex]
 	}
 
 	f.currentIndex = currentIndex
@@ -58,43 +126,34 @@ func (f *fieldsFormatter) loadNextChild() {
 	f.currentIndexChild = currentIndexChild
 }
 
-// peekChild returns information about the child at the current index +- offset.
-//
-// Returns:
-//   - The child at the current index +- offset.
-//   - The line diff between the peeked child and the current child.
-//   - A bool indicating if the peeked child is out of bounds (EOL).
-func (f *fieldsFormatter) peekChild(offset int) (ast.FieldOrComment, ast.LineDiff, bool) {
+func (f *typeBodyFormatter) peekChild(offset int) (ast.TypeDeclChild, ast.LineDiff, bool) {
 	peekIndex := f.currentIndex + offset
 	peekIndexEOF := peekIndex < 0 || peekIndex > f.maxIndex
-	peekIndexChild := ast.FieldOrComment{}
+	peekIndexChild := ast.TypeDeclChild{}
 	lineDiff := ast.LineDiff{}
 
 	if !peekIndexEOF {
-		peekIndexChild = *f.fields[peekIndex]
+		peekIndexChild = *f.children[peekIndex]
 		lineDiff = ast.GetLineDiff(peekIndexChild, f.currentIndexChild)
 	}
 
 	return peekIndexChild, lineDiff, peekIndexEOF
 }
 
-// LineAndComment writes a line of content to the formatter. It also handles inline comments.
-func (f *fieldsFormatter) LineAndComment(content string) {
+func (f *typeBodyFormatter) LineAndComment(content string) {
+	// Check for inline comment on the next child
 	next, nextLineDiff, nextEOF := f.peekChild(1)
 
-	// If next is an inline comment
 	if !nextEOF && next.Comment != nil && nextLineDiff.StartToEnd == 0 {
 		f.g.Inline(content)
 
 		if next.Comment.Simple != nil {
-			f.g.Linef(" //%s", *next.Comment.Simple)
+			f.g.Inlinef(" %s", *next.Comment.Simple)
 		}
-
 		if next.Comment.Block != nil {
-			f.g.Linef(" /*%s*/", *next.Comment.Block)
+			f.g.Inlinef(" %s", *next.Comment.Block)
 		}
 
-		// Skip the inline comment because it's already written
 		f.loadNextChild()
 		return
 	}
@@ -102,22 +161,14 @@ func (f *fieldsFormatter) LineAndComment(content string) {
 	f.g.Line(content)
 }
 
-// LineAndCommentf is the same as Line but with a formatted string.
-func (f *fieldsFormatter) LineAndCommentf(format string, args ...any) {
-	f.LineAndComment(fmt.Sprintf(format, args...))
-}
-
-// format formats the entire rule, handling spacing and EOL comments.
-//
-// Returns the formatted genkit.GenKit.
-func (f *fieldsFormatter) format() *ufogenkit.GenKit {
+func (f *typeBodyFormatter) format() *ufogenkit.GenKit {
 	if f.currentIndexEOF {
 		f.g.Inline("{}")
 		return f.g
 	}
 
 	hasInlineComment := false
-	if f.currentIndexChild.Comment != nil {
+	if f.currentIndexChild.Comment != nil && f.parent != nil {
 		lineDiff := ast.GetLineDiff(f.currentIndexChild, f.parent)
 		if lineDiff.StartToStart == 0 {
 			hasInlineComment = true
@@ -125,105 +176,195 @@ func (f *fieldsFormatter) format() *ufogenkit.GenKit {
 	}
 
 	if hasInlineComment {
-		f.g.Inline("{ ")
+		// If the first child is an inline comment, print it on the same line as "{"
+		f.g.Inline("{")
+		FormatInlineComment(f.g, f.currentIndexChild.Comment)
+		f.g.Break()
+		f.loadNextChild() // Skip it
 	} else {
 		f.g.Line("{")
 	}
 
 	f.g.Block(func() {
 		for !f.currentIndexEOF {
-			if f.currentIndexChild.Comment != nil {
-				f.formatComment()
-			}
-
-			if f.currentIndexChild.Field != nil {
-				f.formatField()
-			}
-
+			f.formatChild()
 			f.loadNextChild()
 		}
 	})
 
 	f.g.Inline("}")
-
 	return f.g
 }
 
-func (f *fieldsFormatter) formatComment() {
+func (f *typeBodyFormatter) formatChild() {
+	// Determine spacing
 	_, prevLineDiff, prevEOF := f.peekChild(-1)
+	shouldBreak := false
 
-	shouldBreakBefore := false
 	if !prevEOF {
-		if prevLineDiff.StartToStart < -1 {
-			shouldBreakBefore = true
+		// General rule: preserve blank lines
+		if prevLineDiff.EndToStart > 1 {
+			// fmt.Printf("DEBUG: Break because EndToStart %d > 1\n", prevLineDiff.EndToStart)
+			shouldBreak = true
+		}
+
+		// If current is docstring/field with docstring, ensure break?
+		// formatField handles docstring break internally usually, but we check here too.
+		if f.currentIndexChild.Field != nil && f.currentIndexChild.Field.Docstring != nil {
+			shouldBreak = true
 		}
 	}
 
-	if shouldBreakBefore {
-		f.g.Break()
-	}
-
-	if f.currentIndexChild.Comment.Simple != nil {
-		f.g.Linef("//%s", *f.currentIndexChild.Comment.Simple)
-	}
-
-	if f.currentIndexChild.Comment.Block != nil {
-		f.g.Linef("/*%s*/", *f.currentIndexChild.Comment.Block)
+	if f.currentIndexChild.Comment != nil {
+		formatComment(f.g, f.currentIndexChild.Comment, shouldBreak)
+	} else if f.currentIndexChild.Spread != nil {
+		formatSpread(f.g, f.currentIndexChild.Spread, shouldBreak)
+		f.LineAndComment("")
+	} else if f.currentIndexChild.Field != nil {
+		formatField(f.g, f.currentIndexChild.Field, shouldBreak, f)
+		f.LineAndComment("")
 	}
 }
 
-func (f *fieldsFormatter) formatField() {
-	prev, prevLineDiff, prevEOF := f.peekChild(-1)
+// If current is docstring/field with docstring, ensure break?
+type ioBodyFormatter struct {
+	g                 *ufogenkit.GenKit
+	parent            ast.WithPositions
+	children          []*ast.InputOutputChild
+	maxIndex          int
+	currentIndex      int
+	currentIndexEOF   bool
+	currentIndexChild ast.InputOutputChild
+}
 
-	shouldBreakBefore := false
-	if !prevEOF {
-		if prevLineDiff.EndToStart < -1 {
-			shouldBreakBefore = true
+func newIOBodyFormatter(g *ufogenkit.GenKit, parent ast.WithPositions, children []*ast.InputOutputChild) *ioBodyFormatter {
+	if children == nil {
+		children = []*ast.InputOutputChild{}
+	}
+
+	maxIndex := max(len(children)-1, 0)
+	currentIndex := 0
+	currentIndexEOF := len(children) < 1
+	currentIndexChild := ast.InputOutputChild{}
+
+	if !currentIndexEOF {
+		currentIndexChild = *children[0]
+	}
+
+	return &ioBodyFormatter{
+		g:                 g,
+		parent:            parent,
+		children:          children,
+		maxIndex:          maxIndex,
+		currentIndex:      currentIndex,
+		currentIndexEOF:   currentIndexEOF,
+		currentIndexChild: currentIndexChild,
+	}
+}
+
+func (f *ioBodyFormatter) loadNextChild() {
+	currentIndex := f.currentIndex + 1
+	currentIndexEOF := currentIndex > f.maxIndex
+	currentIndexChild := ast.InputOutputChild{}
+
+	if !currentIndexEOF {
+		currentIndexChild = *f.children[currentIndex]
+	}
+
+	f.currentIndex = currentIndex
+	f.currentIndexEOF = currentIndexEOF
+	f.currentIndexChild = currentIndexChild
+}
+
+func (f *ioBodyFormatter) peekChild(offset int) (ast.InputOutputChild, ast.LineDiff, bool) {
+	peekIndex := f.currentIndex + offset
+	peekIndexEOF := peekIndex < 0 || peekIndex > f.maxIndex
+	peekIndexChild := ast.InputOutputChild{}
+	lineDiff := ast.LineDiff{}
+
+	if !peekIndexEOF {
+		peekIndexChild = *f.children[peekIndex]
+		lineDiff = ast.GetLineDiff(peekIndexChild, f.currentIndexChild)
+	}
+
+	return peekIndexChild, lineDiff, peekIndexEOF
+}
+
+func (f *ioBodyFormatter) LineAndComment(content string) {
+	next, nextLineDiff, nextEOF := f.peekChild(1)
+
+	if !nextEOF && next.Comment != nil && nextLineDiff.StartToEnd == 0 {
+		f.g.Inline(content)
+
+		if next.Comment.Simple != nil {
+			f.g.Inlinef(" %s", *next.Comment.Simple)
+		}
+		if next.Comment.Block != nil {
+			f.g.Inlinef(" %s", *next.Comment.Block)
+		}
+
+		f.loadNextChild()
+		return
+	}
+
+	f.g.Line(content)
+}
+
+func (f *ioBodyFormatter) format() *ufogenkit.GenKit {
+	if f.currentIndexEOF {
+		f.g.Inline("{}")
+		return f.g
+	}
+
+	hasInlineComment := false
+	if f.currentIndexChild.Comment != nil && f.parent != nil {
+		lineDiff := ast.GetLineDiff(f.currentIndexChild, f.parent)
+		if lineDiff.StartToStart == 0 {
+			hasInlineComment = true
 		}
 	}
 
-	if shouldBreakBefore {
+	if hasInlineComment {
+		f.g.Inline("{")
+		FormatInlineComment(f.g, f.currentIndexChild.Comment)
 		f.g.Break()
-	}
-
-	if f.currentIndexChild.Field.Docstring != nil {
-		// Add a break before the docstring if it's not the first field
-		// and the previous element is a field
-		if !prevEOF && prev.Field != nil {
-			f.g.Break()
-		}
-
-		f.g.Inline(`"""`)
-		f.g.Raw(f.currentIndexChild.Field.Docstring.Value)
-		f.g.Raw(`"""`)
-		f.g.Break()
-	}
-
-	// Force strict camel case
-	if f.currentIndexChild.Field.Optional {
-		f.g.Inlinef("%s?: ", strutil.ToCamelCase(f.currentIndexChild.Field.Name))
+		f.loadNextChild()
 	} else {
-		f.g.Inlinef("%s: ", strutil.ToCamelCase(f.currentIndexChild.Field.Name))
+		f.g.Line("{")
 	}
 
-	if f.currentIndexChild.Field.Type.Base.Named != nil {
-		typeLiteral := *f.currentIndexChild.Field.Type.Base.Named
-		// Force strict pascal case for non primitive types
-		if !ast.IsPrimitiveType(typeLiteral) {
-			typeLiteral = strutil.ToPascalCase(typeLiteral)
+	f.g.Block(func() {
+		for !f.currentIndexEOF {
+			f.formatChild()
+			f.loadNextChild()
 		}
-		f.g.Inline(typeLiteral)
+	})
+
+	f.g.Inline("}")
+	return f.g
+}
+
+func (f *ioBodyFormatter) formatChild() {
+	_, prevLineDiff, prevEOF := f.peekChild(-1)
+	shouldBreak := false
+
+	if !prevEOF {
+		if prevLineDiff.EndToStart > 1 {
+			shouldBreak = true
+		}
+
+		if f.currentIndexChild.Field != nil && f.currentIndexChild.Field.Docstring != nil {
+			shouldBreak = true
+		}
 	}
 
-	if f.currentIndexChild.Field.Type.Base.Object != nil {
-		children := f.currentIndexChild.Field.Type.Base.Object.Children
-		nestedFormatter := newFieldsFormatter(f.g, f.currentIndexChild, children)
-		nestedFormatter.format()
+	if f.currentIndexChild.Comment != nil {
+		formatComment(f.g, f.currentIndexChild.Comment, shouldBreak)
+	} else if f.currentIndexChild.Spread != nil {
+		formatSpread(f.g, f.currentIndexChild.Spread, shouldBreak)
+		f.LineAndComment("")
+	} else if f.currentIndexChild.Field != nil {
+		formatField(f.g, f.currentIndexChild.Field, shouldBreak, f)
+		f.LineAndComment("")
 	}
-
-	if f.currentIndexChild.Field.Type.IsArray {
-		f.g.Inline("[]")
-	}
-
-	f.LineAndComment("")
 }

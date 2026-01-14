@@ -61,11 +61,6 @@ func (f *streamFormatter) loadNextChild() {
 }
 
 // peekChild returns information about the child at the current index +- offset.
-//
-// Returns:
-//   - The child at the current index +- offset.
-//   - The line diff between the peeked child and the current child.
-//   - A bool indicating if the peeked child is out of bounds (EOL).
 func (f *streamFormatter) peekChild(offset int) (ast.ProcOrStreamDeclChild, ast.LineDiff, bool) {
 	peekIndex := f.currentIndex + offset
 	peekIndexEOF := peekIndex < 0 || peekIndex > f.maxIndex
@@ -80,12 +75,10 @@ func (f *streamFormatter) peekChild(offset int) (ast.ProcOrStreamDeclChild, ast.
 	return peekIndexChild, lineDiff, peekIndexEOF
 }
 
-// format formats the entire procDecl, handling spacing and EOL comments.
-//
-// Returns the formatted genkit.GenKit.
+// format formats the entire streamDecl, handling spacing and EOL comments.
 func (f *streamFormatter) format() *ufogenkit.GenKit {
 	if f.streamDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, f.streamDecl.Docstring.Value)
+		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.streamDecl.Docstring.Value)))
 	}
 
 	if f.streamDecl.Deprecated != nil {
@@ -93,11 +86,11 @@ func (f *streamFormatter) format() *ufogenkit.GenKit {
 			f.g.Inline("deprecated ")
 		}
 		if f.streamDecl.Deprecated.Message != nil {
-			f.g.Linef("deprecated(\"%s\")", strutil.EscapeQuotes(*f.streamDecl.Deprecated.Message))
+			f.g.Linef("deprecated(\"%s\")", strutil.EscapeQuotes(string(*f.streamDecl.Deprecated.Message)))
 		}
 	}
 
-	// Force strict pascal case
+	// Force strict PascalCase
 	f.g.Inlinef(`stream %s `, strutil.ToPascalCase(f.streamDecl.Name))
 
 	if len(f.streamDecl.Children) < 1 {
@@ -147,7 +140,7 @@ func (f *streamFormatter) formatComment() {
 
 	shouldBreakBefore := false
 	if !prevEOF {
-		if prevLineDiff.StartToStart < -1 {
+		if prevLineDiff.StartToStart > 1 {
 			shouldBreakBefore = true
 		}
 	}
@@ -157,11 +150,11 @@ func (f *streamFormatter) formatComment() {
 	}
 
 	if f.currentIndexChild.Comment.Simple != nil {
-		f.g.Linef("//%s", *f.currentIndexChild.Comment.Simple)
+		f.g.Line(*f.currentIndexChild.Comment.Simple)
 	}
 
 	if f.currentIndexChild.Comment.Block != nil {
-		f.g.Linef("/*%s*/", *f.currentIndexChild.Comment.Block)
+		f.g.Line(*f.currentIndexChild.Comment.Block)
 	}
 }
 
@@ -174,7 +167,7 @@ func (f *streamFormatter) breakBeforeBlock() {
 	}
 
 	if prevWasComment {
-		if prevLineDiff.StartToStart < -1 {
+		if prevLineDiff.StartToStart > 1 {
 			f.g.Break()
 			return
 		}
@@ -187,15 +180,17 @@ func (f *streamFormatter) breakBeforeBlock() {
 func (f *streamFormatter) formatInput() {
 	f.breakBeforeBlock()
 	f.g.Inline("input ")
-	fieldsFormatter := newFieldsFormatter(f.g, f.currentIndexChild, f.currentIndexChild.Input.Children)
-	fieldsFormatter.format()
+	// Use ioBodyFormatter
+	bodyFormatter := newIOBodyFormatter(f.g, f.currentIndexChild, f.currentIndexChild.Input.Children)
+	bodyFormatter.format()
 	f.g.Break()
 }
 
 func (f *streamFormatter) formatOutput() {
 	f.breakBeforeBlock()
 	f.g.Inline("output ")
-	fieldsFormatter := newFieldsFormatter(f.g, f.currentIndexChild, f.currentIndexChild.Output.Children)
-	fieldsFormatter.format()
+	// Use ioBodyFormatter
+	bodyFormatter := newIOBodyFormatter(f.g, f.currentIndexChild, f.currentIndexChild.Output.Children)
+	bodyFormatter.format()
 	f.g.Break()
 }

@@ -1,12 +1,13 @@
+rpc Service {
 /* With docstring */          """
 This is a test proc.
 """deprecated("Deprecated")
 proc 
 Test   {    
-                    } deprecated
+                    } 
 
 
-proc ProcWithInput {input{
+deprecated proc ProcWithInput {input{
   field1: string
 }
 }
@@ -31,39 +32,42 @@ output
 
   ]""" Docstring """field2:string
 }      }
+}
 
 // >>>>
 
-/* With docstring */
-"""
-This is a test proc.
-"""
-deprecated("Deprecated")
-proc Test {}
+rpc Service {
+  /* With docstring */
+  """
+  This is a test proc.
+  """
+  deprecated("Deprecated")
+  proc Test {}
 
-deprecated proc ProcWithInput {
-  input {
-    field1: string
-  }
-}
-
-// With output
-proc ProcWithOutput {
-  output {
-    field1: datetime[]
-  }
-}
-
-// With input and output
-proc ProcFull {
-  input {
-    field1: string
+  deprecated proc ProcWithInput {
+    input {
+      field1: string
+    }
   }
 
-  output {
-    field1: datetime[]
+  // With output
+  proc ProcWithOutput {
+    output {
+      field1: datetime[]
+    }
+  }
 
-    """ Docstring """
-    field2: string
+  // With input and output
+  proc ProcFull {
+    input {
+      field1: string
+    }
+
+    output {
+      field1: datetime[]
+
+      """ Docstring """
+      field2: string
+    }
   }
 }

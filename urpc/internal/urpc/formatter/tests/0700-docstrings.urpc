@@ -10,7 +10,7 @@
 
 """ Standalone """/* Comment */""" Standalone """""" Associated """ type Test {} """ Standalone """
 
-""" Associated """ type Test {}""" Associated """ proc Test {}
+rpc Service { """ Associated """ proc Test {} }
 
 """ Standalone """
 // Comment
@@ -23,14 +23,12 @@
 // >>>>
 
 """ Standalone """
-
 """ Standalone """ // Comment
 """ 
-    Standalone
-    
-          Multi-line
-    """
+Standalone
 
+      Multi-line
+"""
 """ Standalone """ /* Comment */
 """ Standalone """
 
@@ -39,16 +37,14 @@ type Test {}
 
 """ Standalone """
 
-""" Associated """
-type Test {}
-
-""" Associated """
-proc Test {}
+rpc Service {
+  """ Associated """
+  proc Test {}
+}
 
 """ Standalone """
 // Comment
 """ Standalone """
 
 // Comment
-
 """ Standalone """

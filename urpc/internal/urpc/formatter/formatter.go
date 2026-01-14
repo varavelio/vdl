@@ -116,14 +116,18 @@ func (f *schemaFormatter) format() *ufogenkit.GenKit {
 			f.formatComment()
 		case ast.SchemaChildKindDocstring:
 			f.formatStandaloneDocstring()
-		case ast.SchemaChildKindVersion:
-			f.formatVersion()
+		case ast.SchemaChildKindInclude:
+			f.formatInclude()
+		case ast.SchemaChildKindConst:
+			f.formatConst()
+		case ast.SchemaChildKindEnum:
+			f.formatEnum()
+		case ast.SchemaChildKindPattern:
+			f.formatPattern()
 		case ast.SchemaChildKindType:
 			f.formatType()
-		case ast.SchemaChildKindProc:
-			f.formatProc()
-		case ast.SchemaChildKindStream:
-			f.formatStream()
+		case ast.SchemaChildKindRPC:
+			f.formatRPC()
 		}
 
 		f.loadNextChild()
@@ -141,11 +145,11 @@ func (f *schemaFormatter) LineAndComment(content string) {
 		f.g.Inline(content)
 
 		if next.Comment.Simple != nil {
-			f.g.Linef(" //%s", *next.Comment.Simple)
+			f.g.Linef(" %s", *next.Comment.Simple)
 		}
 
 		if next.Comment.Block != nil {
-			f.g.Linef(" /*%s*/", *next.Comment.Block)
+			f.g.Linef(" %s", *next.Comment.Block)
 		}
 
 		// Skip the inline comment because it's already written
@@ -166,7 +170,7 @@ func (f *schemaFormatter) formatComment() {
 
 	shouldBreakBefore := false
 	if !prevEOF {
-		if prevLineDiff.StartToStart < -1 {
+		if prevLineDiff.StartToStart > 1 {
 			shouldBreakBefore = true
 		}
 	}
@@ -176,11 +180,11 @@ func (f *schemaFormatter) formatComment() {
 	}
 
 	if f.currentIndexChild.Comment.Simple != nil {
-		f.g.Linef("//%s", *f.currentIndexChild.Comment.Simple)
+		f.g.Line(*f.currentIndexChild.Comment.Simple)
 	}
 
 	if f.currentIndexChild.Comment.Block != nil {
-		f.g.Linef("/*%s*/", *f.currentIndexChild.Comment.Block)
+		f.g.Line(*f.currentIndexChild.Comment.Block)
 	}
 }
 
@@ -199,17 +203,58 @@ func (f *schemaFormatter) formatStandaloneDocstring() {
 	}
 
 	if shouldBreakBefore {
+		f.g.Line("")
+	}
+
+	f.LineAndCommentf(`"""%s"""`, normalizeDocstring(string(f.currentIndexChild.Docstring.Value)))
+}
+
+func (f *schemaFormatter) formatInclude() {
+	// Group consecutive includes, but respect existing newlines if they are separate groups
+	prev, prevLineDiff, prevEOF := f.peekChild(-1)
+
+	shouldBreakBefore := false
+	if !prevEOF {
+		// If previous was NOT an include or comment, break
+		if prev.Kind() != ast.SchemaChildKindInclude && prev.Kind() != ast.SchemaChildKindComment {
+			shouldBreakBefore = true
+		} else if prevLineDiff.StartToStart < -1 {
+			// If there was a blank line in source, preserve it
+			shouldBreakBefore = true
+		}
+	}
+
+	if shouldBreakBefore {
 		f.g.Break()
 	}
 
-	f.LineAndCommentf(`"""%s"""`, f.currentIndexChild.Docstring.Value)
+	includeFormatter := newIncludeFormatter(f.g, f.currentIndexChild.Include)
+	includeFormatter.format()
+	f.LineAndComment("")
 }
 
-func (f *schemaFormatter) formatVersion() {
-	f.LineAndCommentf("version %d", f.currentIndexChild.Version.Number)
+func (f *schemaFormatter) formatConst() {
+	f.breakBeforeTopLevel()
+	constFormatter := newConstFormatter(f.g, f.currentIndexChild.Const)
+	constFormatter.format()
+	f.LineAndComment("")
 }
 
-func (f *schemaFormatter) formatType() {
+func (f *schemaFormatter) formatEnum() {
+	f.breakBeforeTopLevel()
+	enumFormatter := newEnumFormatter(f.g, f.currentIndexChild.Enum)
+	enumFormatter.format()
+	f.LineAndComment("")
+}
+
+func (f *schemaFormatter) formatPattern() {
+	f.breakBeforeTopLevel()
+	patternFormatter := newPatternFormatter(f.g, f.currentIndexChild.Pattern)
+	patternFormatter.format()
+	f.LineAndComment("")
+}
+
+func (f *schemaFormatter) breakBeforeTopLevel() {
 	prev, prevLineDiff, prevEOF := f.peekChild(-1)
 
 	shouldBreakBefore := false
@@ -218,7 +263,7 @@ func (f *schemaFormatter) formatType() {
 			shouldBreakBefore = true
 		}
 
-		if prevLineDiff.StartToStart < -1 {
+		if prevLineDiff.StartToStart > 1 {
 			shouldBreakBefore = true
 		}
 	}
@@ -226,54 +271,20 @@ func (f *schemaFormatter) formatType() {
 	if shouldBreakBefore {
 		f.g.Break()
 	}
+}
+
+func (f *schemaFormatter) formatType() {
+	f.breakBeforeTopLevel()
 
 	typeFormatter := newTypeFormatter(f.g, f.currentIndexChild.Type)
 	typeFormatter.format()
 	f.LineAndComment("")
 }
 
-func (f *schemaFormatter) formatProc() {
-	prev, prevLineDiff, prevEOF := f.peekChild(-1)
+func (f *schemaFormatter) formatRPC() {
+	f.breakBeforeTopLevel()
 
-	shouldBreakBefore := false
-	if !prevEOF {
-		if prev.Kind() != ast.SchemaChildKindComment {
-			shouldBreakBefore = true
-		}
-
-		if prevLineDiff.StartToStart < -1 {
-			shouldBreakBefore = true
-		}
-	}
-
-	if shouldBreakBefore {
-		f.g.Break()
-	}
-
-	procFormatter := newProcFormatter(f.g, f.currentIndexChild.Proc)
-	procFormatter.format()
-	f.LineAndComment("")
-}
-
-func (f *schemaFormatter) formatStream() {
-	prev, prevLineDiff, prevEOF := f.peekChild(-1)
-
-	shouldBreakBefore := false
-	if !prevEOF {
-		if prev.Kind() != ast.SchemaChildKindComment {
-			shouldBreakBefore = true
-		}
-
-		if prevLineDiff.StartToStart < -1 {
-			shouldBreakBefore = true
-		}
-	}
-
-	if shouldBreakBefore {
-		f.g.Break()
-	}
-
-	streamFormatter := newStreamFormatter(f.g, f.currentIndexChild.Stream)
-	streamFormatter.format()
+	rpcFormatter := newRPCFormatter(f.g, f.currentIndexChild.RPC)
+	rpcFormatter.format()
 	f.LineAndComment("")
 }

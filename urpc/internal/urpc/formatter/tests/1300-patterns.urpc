@@ -1,0 +1,10 @@
+pattern userEventSubject="events.users.{userId}.{eventType}"
+""" Generates a Redis cache key for a session. """
+  pattern sessionCacheKey = "cache:session:{sessionId}"
+
+// >>>>
+
+pattern UserEventSubject = "events.users.{userId}.{eventType}"
+
+""" Generates a Redis cache key for a session. """
+pattern SessionCacheKey = "cache:session:{sessionId}"

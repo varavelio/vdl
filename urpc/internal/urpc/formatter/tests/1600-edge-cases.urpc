@@ -1,0 +1,67 @@
+// Edge cases: Empty blocks, weird spacing
+
+    rpc emptyService {}
+
+enum emptyEnum    {}
+
+type      emptyType {}
+
+type nestedDestructure {
+  ...AuditMetadata
+    ...OwnershipInfo
+name: string }
+
+type withOptional {
+  field?: string
+    other?: int
+
+
+  }
+
+type withGenerics {
+  items: string[]
+    counts: map<int>
+      matrix: float[][]
+        complex: map<User[]>
+  }
+
+type inlineBlocks {  data: {
+    x: int
+    y: int
+  }
+}
+
+// >>>>
+
+// Edge cases: Empty blocks, weird spacing
+
+rpc EmptyService {}
+
+enum EmptyEnum {}
+
+type EmptyType {}
+
+type NestedDestructure {
+  ...AuditMetadata
+  ...OwnershipInfo
+  name: string
+}
+
+type WithOptional {
+  field?: string
+  other?: int
+}
+
+type WithGenerics {
+  items: string[]
+  counts: map<int>
+  matrix: float[][]
+  complex: map<User[]>
+}
+
+type InlineBlocks {
+  data: {
+    x: int
+    y: int
+  }
+}

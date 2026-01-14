@@ -2,7 +2,7 @@ type Foo {  field1: string [] field2: { // This is a comment
     subField1: datetime[]
       subField2: {      subSubField1: string
       [ 
-
+      
       ]
       } [  ]    /* Comment */
       
@@ -33,12 +33,11 @@ type Foo {
     subField2: {
       subSubField1: string[]
     }[] /* Comment */
-
     """ 
-    Field
-    
-          Multi-line
-      """
+Field
+
+      Multi-line
+  """
     subField3: datetime
   }[]
 

@@ -1,0 +1,39 @@
+enum orderStatus {
+  pending
+    processing
+  Shipped
+    Delivered
+      cancelled
+}
+
+enum httpMethod {
+  Get="GET"
+    Post = "POST"
+}
+
+enum priority {
+  Low = 1
+  Medium=2
+    High = 3
+}
+
+// >>>>
+
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+enum HttpMethod {
+  Get = "GET"
+  Post = "POST"
+}
+
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}

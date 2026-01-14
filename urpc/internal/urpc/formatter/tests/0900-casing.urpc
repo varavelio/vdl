@@ -2,6 +2,7 @@ type MyTYPE {
   FIELD: string
 }
 
+rpc Service {
 proc MYProc {
   input {
     myINPUT: myTYPE
@@ -13,6 +14,7 @@ stream MySTREAM {
     MyInput: myTYPE
   }
 }
+}
 
 // >>>>
 
@@ -20,14 +22,16 @@ type MyType {
   field: string
 }
 
-proc Myproc {
-  input {
-    myInput: MyType
+rpc Service {
+  proc Myproc {
+    input {
+      myInput: MyType
+    }
   }
-}
 
-stream MyStream {
-  input {
-    myInput: MyType
+  stream MyStream {
+    input {
+      myInput: MyType
+    }
   }
 }
