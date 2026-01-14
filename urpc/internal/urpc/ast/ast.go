@@ -2,11 +2,52 @@ package ast
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/uforg/uforpc/urpc/internal/util/strutil"
 )
 
-// This AST is used for parsing the URPC schema and it uses the
+// QuotedString is a custom type that implements participle's Capture interface
+// to automatically strip surrounding double quotes from StringLiteral tokens.
+type QuotedString string
+
+// Capture implements the participle Capture interface.
+func (q *QuotedString) Capture(values []string) error {
+	s := values[0]
+	// Strip surrounding quotes if present
+	if len(s) >= 2 && s[0] == '"' && s[len(s)-1] == '"' {
+		s = s[1 : len(s)-1]
+	}
+	*q = QuotedString(s)
+	return nil
+}
+
+// String returns the underlying string value.
+func (q QuotedString) String() string {
+	return string(q)
+}
+
+// DocstringValue is a custom type that implements participle's Capture interface
+// to automatically strip surrounding triple-quote delimiters from Docstring tokens.
+type DocstringValue string
+
+// Capture implements the participle Capture interface.
+func (d *DocstringValue) Capture(values []string) error {
+	s := values[0]
+	// Strip surrounding """ if present
+	if len(s) >= 6 && strings.HasPrefix(s, `"""`) && strings.HasSuffix(s, `"""`) {
+		s = s[3 : len(s)-3]
+	}
+	*d = DocstringValue(s)
+	return nil
+}
+
+// String returns the underlying string value.
+func (d DocstringValue) String() string {
+	return string(d)
+}
+
+// This AST is used for parsing the schema and it uses the
 // participle library for parsing.
 //
 // It includes embedded Positions fields for each node to track the
@@ -42,24 +83,24 @@ func IsPrimitiveType(name PrimitiveType) bool {
 	return slices.Contains(PrimitiveTypes, name)
 }
 
-// Schema is the root of the URPC schema AST.
+// Schema is the root of the schema AST.
 type Schema struct {
 	Positions
 	Children []*SchemaChild `parser:"@@*"`
 }
 
-// GetVersions returns all version declarations in the URPC schema.
-func (s *Schema) GetVersions() []*Version {
-	versions := []*Version{}
+// GetIncludes returns all include declarations in the schema.
+func (s *Schema) GetIncludes() []*Include {
+	includes := []*Include{}
 	for _, node := range s.Children {
-		if node.Kind() == SchemaChildKindVersion {
-			versions = append(versions, node.Version)
+		if node.Kind() == SchemaChildKindInclude {
+			includes = append(includes, node.Include)
 		}
 	}
-	return versions
+	return includes
 }
 
-// GetComments returns all comments in the URPC schema.
+// GetComments returns all comments in the schema.
 func (s *Schema) GetComments() []*Comment {
 	comments := []*Comment{}
 	for _, node := range s.Children {
@@ -70,7 +111,7 @@ func (s *Schema) GetComments() []*Comment {
 	return comments
 }
 
-// GetDocstrings returns all docstrings in the URPC schema.
+// GetDocstrings returns all docstrings in the schema.
 func (s *Schema) GetDocstrings() []*Docstring {
 	docstrings := []*Docstring{}
 	for _, node := range s.Children {
@@ -81,7 +122,7 @@ func (s *Schema) GetDocstrings() []*Docstring {
 	return docstrings
 }
 
-// GetTypes returns all custom types in the URPC schema.
+// GetTypes returns all custom types in the schema.
 func (s *Schema) GetTypes() []*TypeDecl {
 	types := []*TypeDecl{}
 	for _, node := range s.Children {
@@ -101,72 +142,89 @@ func (s *Schema) GetTypesMap() map[string]*TypeDecl {
 	return typesMap
 }
 
-// GetProcs returns all procedures in the URPC schema.
-func (s *Schema) GetProcs() []*ProcDecl {
-	procs := []*ProcDecl{}
+// GetConsts returns all constant declarations in the schema.
+func (s *Schema) GetConsts() []*ConstDecl {
+	consts := []*ConstDecl{}
 	for _, node := range s.Children {
-		if node.Kind() == SchemaChildKindProc {
-			procs = append(procs, node.Proc)
+		if node.Kind() == SchemaChildKindConst {
+			consts = append(consts, node.Const)
 		}
 	}
-	return procs
+	return consts
 }
 
-// GetProcsMap returns a map of procedure names to procedure declarations.
-func (s *Schema) GetProcsMap() map[string]*ProcDecl {
-	procsMap := make(map[string]*ProcDecl)
-	for _, proc := range s.GetProcs() {
-		procsMap[proc.Name] = proc
-	}
-	return procsMap
-}
-
-// GetStreams returns all streams in the URPC schema.
-func (s *Schema) GetStreams() []*StreamDecl {
-	streams := []*StreamDecl{}
+// GetEnums returns all enum declarations in the schema.
+func (s *Schema) GetEnums() []*EnumDecl {
+	enums := []*EnumDecl{}
 	for _, node := range s.Children {
-		if node.Kind() == SchemaChildKindStream {
-			streams = append(streams, node.Stream)
+		if node.Kind() == SchemaChildKindEnum {
+			enums = append(enums, node.Enum)
 		}
 	}
-	return streams
+	return enums
 }
 
-// GetStreamsMap returns a map of stream names to stream declarations.
-func (s *Schema) GetStreamsMap() map[string]*StreamDecl {
-	streamsMap := make(map[string]*StreamDecl)
-	for _, stream := range s.GetStreams() {
-		streamsMap[stream.Name] = stream
+// GetPatterns returns all pattern declarations in the schema.
+func (s *Schema) GetPatterns() []*PatternDecl {
+	patterns := []*PatternDecl{}
+	for _, node := range s.Children {
+		if node.Kind() == SchemaChildKindPattern {
+			patterns = append(patterns, node.Pattern)
+		}
 	}
-	return streamsMap
+	return patterns
+}
+
+// GetRPCs returns all RPC blocks in the schema.
+func (s *Schema) GetRPCs() []*RPCDecl {
+	rpcs := []*RPCDecl{}
+	for _, node := range s.Children {
+		if node.Kind() == SchemaChildKindRPC {
+			rpcs = append(rpcs, node.RPC)
+		}
+	}
+	return rpcs
+}
+
+// GetRPCsMap returns a map of RPC names to RPC declarations.
+func (s *Schema) GetRPCsMap() map[string]*RPCDecl {
+	rpcsMap := make(map[string]*RPCDecl)
+	for _, rpc := range s.GetRPCs() {
+		rpcsMap[rpc.Name] = rpc
+	}
+	return rpcsMap
 }
 
 // SchemaChildKind represents the kind of a schema child node.
 type SchemaChildKind string
 
 const (
-	SchemaChildKindVersion   SchemaChildKind = "Version"
+	SchemaChildKindInclude   SchemaChildKind = "Include"
 	SchemaChildKindComment   SchemaChildKind = "Comment"
 	SchemaChildKindDocstring SchemaChildKind = "Docstring"
 	SchemaChildKindType      SchemaChildKind = "Type"
-	SchemaChildKindProc      SchemaChildKind = "Proc"
-	SchemaChildKindStream    SchemaChildKind = "Stream"
+	SchemaChildKindConst     SchemaChildKind = "Const"
+	SchemaChildKindEnum      SchemaChildKind = "Enum"
+	SchemaChildKindPattern   SchemaChildKind = "Pattern"
+	SchemaChildKindRPC       SchemaChildKind = "RPC"
 )
 
 // SchemaChild represents a child node of the Schema root node.
 type SchemaChild struct {
 	Positions
-	Version   *Version    `parser:"  @@"`
-	Comment   *Comment    `parser:"| @@"`
-	Type      *TypeDecl   `parser:"| @@"`
-	Proc      *ProcDecl   `parser:"| @@"`
-	Stream    *StreamDecl `parser:"| @@"`
-	Docstring *Docstring  `parser:"| @@"`
+	Include   *Include     `parser:"  @@"`
+	Comment   *Comment     `parser:"| @@"`
+	Type      *TypeDecl    `parser:"| @@"`
+	Const     *ConstDecl   `parser:"| @@"`
+	Enum      *EnumDecl    `parser:"| @@"`
+	Pattern   *PatternDecl `parser:"| @@"`
+	RPC       *RPCDecl     `parser:"| @@"`
+	Docstring *Docstring   `parser:"| @@"`
 }
 
 func (n *SchemaChild) Kind() SchemaChildKind {
-	if n.Version != nil {
-		return SchemaChildKindVersion
+	if n.Include != nil {
+		return SchemaChildKindInclude
 	}
 	if n.Comment != nil {
 		return SchemaChildKindComment
@@ -177,22 +235,28 @@ func (n *SchemaChild) Kind() SchemaChildKind {
 	if n.Type != nil {
 		return SchemaChildKindType
 	}
-	if n.Proc != nil {
-		return SchemaChildKindProc
+	if n.Const != nil {
+		return SchemaChildKindConst
 	}
-	if n.Stream != nil {
-		return SchemaChildKindStream
+	if n.Enum != nil {
+		return SchemaChildKindEnum
+	}
+	if n.Pattern != nil {
+		return SchemaChildKindPattern
+	}
+	if n.RPC != nil {
+		return SchemaChildKindRPC
 	}
 	return ""
 }
 
-// Version represents the version of the URPC schema.
-type Version struct {
+// Include represents an include statement.
+type Include struct {
 	Positions
-	Number int `parser:"Version @IntLiteral"`
+	Path QuotedString `parser:"Include @StringLiteral"`
 }
 
-// Comment represents both simple and block comments in the URPC schema.
+// Comment represents both simple and block comments in the schema.
 type Comment struct {
 	Positions
 	Simple *string `parser:"  @Comment"`
@@ -202,10 +266,19 @@ type Comment struct {
 // TypeDecl represents a custom type declaration.
 type TypeDecl struct {
 	Positions
-	Docstring  *Docstring        `parser:"(@@ (?! Newline Newline))?"`
-	Deprecated *Deprecated       `parser:"(@@ (?= Type))?"`
-	Name       string            `parser:"Type @Ident"`
-	Children   []*FieldOrComment `parser:"LBrace @@* RBrace"`
+	Docstring  *Docstring       `parser:"(@@ (?! Newline Newline))?"`
+	Deprecated *Deprecated      `parser:"@@?"`
+	Name       string           `parser:"Type @Ident"`
+	Children   []*TypeDeclChild `parser:"LBrace @@* RBrace"`
+}
+
+// TypeDeclChild represents a child within a type declaration block.
+// Can be a Comment, a Field, or a Spread.
+type TypeDeclChild struct {
+	Positions
+	Comment *Comment `parser:"  @@"`
+	Field   *Field   `parser:"| @@"`
+	Spread  *Spread  `parser:"| @@"`
 }
 
 // GetFlattenedFields returns a recursive flattened list of all fields in the type declaration.
@@ -220,11 +293,125 @@ func (t *TypeDecl) GetFlattenedFields() []*Field {
 	return fields
 }
 
+// ConstDecl represents a constant declaration.
+type ConstDecl struct {
+	Positions
+	Docstring  *Docstring  `parser:"(@@ (?! Newline Newline))?"`
+	Deprecated *Deprecated `parser:"@@?"`
+	Name       string      `parser:"Const @Ident"`
+	Value      *ConstValue `parser:"Equals @@"`
+}
+
+// ConstValue represents the value of a constant.
+type ConstValue struct {
+	Positions
+	Str   *QuotedString `parser:"  @StringLiteral"`
+	Float *string       `parser:"| @FloatLiteral"`
+	Int   *string       `parser:"| @IntLiteral"`
+	True  bool          `parser:"| @True"`
+	False bool          `parser:"| @False"`
+}
+
+// String returns the string representation of the constant value.
+func (cv ConstValue) String() string {
+	if cv.Str != nil {
+		return `"` + strutil.EscapeQuotes(string(*cv.Str)) + `"`
+	}
+	if cv.Float != nil {
+		return *cv.Float
+	}
+	if cv.Int != nil {
+		return *cv.Int
+	}
+	if cv.True {
+		return "true"
+	}
+	if cv.False {
+		return "false"
+	}
+	return ""
+}
+
+// EnumDecl represents an enum declaration.
+type EnumDecl struct {
+	Positions
+	Docstring  *Docstring    `parser:"(@@ (?! Newline Newline))?"`
+	Deprecated *Deprecated   `parser:"@@?"`
+	Name       string        `parser:"Enum @Ident"`
+	Members    []*EnumMember `parser:"LBrace @@* RBrace"`
+}
+
+// EnumMember represents a member of an enum.
+type EnumMember struct {
+	Positions
+	Comment *Comment   `parser:"  @@"`
+	Name    string     `parser:"| @Ident"`
+	Value   *EnumValue `parser:"  (Equals @@)?"`
+}
+
+// EnumValue represents the value of an enum member.
+type EnumValue struct {
+	Positions
+	Str *QuotedString `parser:"  @StringLiteral"`
+	Int *string       `parser:"| @IntLiteral"`
+}
+
+// PatternDecl represents a pattern declaration.
+type PatternDecl struct {
+	Positions
+	Docstring  *Docstring   `parser:"(@@ (?! Newline Newline))?"`
+	Deprecated *Deprecated  `parser:"@@?"`
+	Name       string       `parser:"Pattern @Ident"`
+	Value      QuotedString `parser:"Equals @StringLiteral"`
+}
+
+// RPCDecl represents an RPC service declaration containing procedures and streams.
+type RPCDecl struct {
+	Positions
+	Docstring  *Docstring  `parser:"(@@ (?! Newline Newline))?"`
+	Deprecated *Deprecated `parser:"@@?"`
+	Name       string      `parser:"Rpc @Ident"`
+	Children   []*RPCChild `parser:"LBrace @@* RBrace"`
+}
+
+// GetProcs returns all procedures in this RPC block.
+func (r *RPCDecl) GetProcs() []*ProcDecl {
+	procs := []*ProcDecl{}
+	for _, child := range r.Children {
+		if child.Proc != nil {
+			procs = append(procs, child.Proc)
+		}
+	}
+	return procs
+}
+
+// GetStreams returns all streams in this RPC block.
+func (r *RPCDecl) GetStreams() []*StreamDecl {
+	streams := []*StreamDecl{}
+	for _, child := range r.Children {
+		if child.Stream != nil {
+			streams = append(streams, child.Stream)
+		}
+	}
+	return streams
+}
+
+// RPCChild represents a child within an RPC block.
+// The order of alternatives is important: Proc/Stream must come before Docstring
+// so that ProcDecl/StreamDecl can capture attached docstrings (via their own grammar).
+type RPCChild struct {
+	Positions
+	Comment   *Comment    `parser:"  @@"`
+	Proc      *ProcDecl   `parser:"| @@"`
+	Stream    *StreamDecl `parser:"| @@"`
+	Docstring *Docstring  `parser:"| @@"`
+}
+
 // ProcDecl represents a procedure declaration.
 type ProcDecl struct {
 	Positions
 	Docstring  *Docstring               `parser:"(@@ (?! Newline Newline))?"`
-	Deprecated *Deprecated              `parser:"(@@ (?= Proc))?"`
+	Deprecated *Deprecated              `parser:"@@?"`
 	Name       string                   `parser:"Proc @Ident"`
 	Children   []*ProcOrStreamDeclChild `parser:"LBrace @@* RBrace"`
 }
@@ -233,7 +420,7 @@ type ProcDecl struct {
 type StreamDecl struct {
 	Positions
 	Docstring  *Docstring               `parser:"(@@ (?! Newline Newline))?"`
-	Deprecated *Deprecated              `parser:"(@@ (?= Stream))?"`
+	Deprecated *Deprecated              `parser:"@@?"`
 	Name       string                   `parser:"Stream @Ident"`
 	Children   []*ProcOrStreamDeclChild `parser:"LBrace @@* RBrace"`
 }
@@ -249,7 +436,7 @@ type ProcOrStreamDeclChild struct {
 // ProcOrStreamDeclChildInput represents the Input{...} block within a ProcDecl or StreamDecl.
 type ProcOrStreamDeclChildInput struct {
 	Positions
-	Children []*FieldOrComment `parser:"Input LBrace @@* RBrace"`
+	Children []*InputOutputChild `parser:"Input LBrace @@* RBrace"`
 }
 
 // GetFlattenedFields returns a recursive flattened list of all fields in the input block.
@@ -267,7 +454,7 @@ func (i *ProcOrStreamDeclChildInput) GetFlattenedFields() []*Field {
 // ProcOrStreamDeclChildOutput represents the Output{...} block within a ProcDecl or StreamDecl.
 type ProcOrStreamDeclChildOutput struct {
 	Positions
-	Children []*FieldOrComment `parser:"Output LBrace @@* RBrace"`
+	Children []*InputOutputChild `parser:"Output LBrace @@* RBrace"`
 }
 
 // GetFlattenedFields returns a recursive flattened list of all fields in the output block.
@@ -282,64 +469,41 @@ func (o *ProcOrStreamDeclChildOutput) GetFlattenedFields() []*Field {
 	return fields
 }
 
+// InputOutputChild represents a child within an input or output block.
+// Can be a Comment, Field, or Spread.
+type InputOutputChild struct {
+	Positions
+	Comment *Comment `parser:"  @@"`
+	Field   *Field   `parser:"| @@"`
+	Spread  *Spread  `parser:"| @@"`
+}
+
 //////////////////
 // SHARED TYPES //
 //////////////////
 
-// Docstring represents a docstring in the URPC schema.
+// Docstring represents a docstring in the schema.
 type Docstring struct {
 	Positions
-	Value string `parser:"@Docstring"`
+	Value DocstringValue `parser:"@Docstring"`
 }
 
 // GetExternal returns a path and a bool indicating if the docstring
 // references an external Markdown file.
 func (d Docstring) GetExternal() (string, bool) {
-	return DocstringIsExternal(d.Value)
+	return DocstringIsExternal(string(d.Value))
 }
 
 // Deprecated represents a deprecated declaration.
 type Deprecated struct {
 	Positions
-	Message *string `parser:"Deprecated (LParen @StringLiteral RParen)?"`
+	Message *QuotedString `parser:"Deprecated (LParen @StringLiteral RParen)?"`
 }
 
-// AnyLiteral represents any of the built-in literal types.
-type AnyLiteral struct {
+// Spread represents a spread operator for type composition (...TypeName).
+type Spread struct {
 	Positions
-	Str   *string `parser:"  @StringLiteral"`
-	Int   *string `parser:"| @IntLiteral"`
-	Float *string `parser:"| @FloatLiteral"`
-	True  *string `parser:"| @TrueLiteral"`
-	False *string `parser:"| @FalseLiteral"`
-}
-
-// String returns the string representation of the value of the literal.
-func (al AnyLiteral) String() string {
-	if al.Str != nil {
-		return `"` + strutil.EscapeQuotes(*al.Str) + `"`
-	}
-	if al.Int != nil {
-		return *al.Int
-	}
-	if al.Float != nil {
-		return *al.Float
-	}
-	if al.True != nil {
-		return "true"
-	}
-	if al.False != nil {
-		return "false"
-	}
-	return ""
-}
-
-// FieldOrComment represents a child node within blocks that contain fields,
-// such as TypeDecl, ProcDeclChildInput, ProcDeclChildOutput, and FieldTypeObject.
-type FieldOrComment struct {
-	Positions
-	Comment *Comment `parser:"  @@"`
-	Field   *Field   `parser:"| @@"`
+	TypeName string `parser:"Spread @Ident"`
 }
 
 // Field represents a field definition.
@@ -347,7 +511,7 @@ type Field struct {
 	Positions
 	Docstring *Docstring `parser:"(@@ (?! Newline Newline))?"`
 	Name      string     `parser:"@Ident"`
-	Optional  bool       `parser:"@(Question)?"`
+	Optional  bool       `parser:"@Question?"`
 	Type      FieldType  `parser:"Colon @@"`
 }
 
@@ -355,7 +519,7 @@ type Field struct {
 func (f *Field) GetFlattenedField() []*Field {
 	fields := []*Field{f}
 
-	if f.Type.Base.Object == nil {
+	if f.Type.Base == nil || f.Type.Base.Object == nil {
 		return fields
 	}
 
@@ -376,15 +540,53 @@ type FieldType struct {
 	IsArray bool           `parser:"@(LBracket RBracket)?"`
 }
 
-// FieldTypeBase represents the base type of a field (primitive, named, or inline object).
+// FieldTypeBase represents the base type of a field (named, map, or inline object).
 type FieldTypeBase struct {
 	Positions
-	Named  *string          `parser:"@(Ident | String | Int | Float | Bool | Datetime)"`
+	// Named can be a primitive type (string, int, float, bool, datetime) or a custom type name
+	Named  *string          `parser:"  @(Ident | String | Int | Float | Bool | Datetime)"`
+	Map    *FieldTypeMap    `parser:"| @@"`
 	Object *FieldTypeObject `parser:"| @@"`
+}
+
+// FieldTypeMap represents a map type: map<ValueType>
+type FieldTypeMap struct {
+	Positions
+	ValueType *FieldType `parser:"Map LessThan @@ GreaterThan"`
 }
 
 // FieldTypeObject represents an inline object type definition.
 type FieldTypeObject struct {
 	Positions
-	Children []*FieldOrComment `parser:"LBrace @@* RBrace"`
+	Children []*TypeDeclChild `parser:"LBrace @@* RBrace"`
+}
+
+// AnyLiteral represents any of the built-in literal types.
+type AnyLiteral struct {
+	Positions
+	Str   *QuotedString `parser:"  @StringLiteral"`
+	Float *string       `parser:"| @FloatLiteral"`
+	Int   *string       `parser:"| @IntLiteral"`
+	True  bool          `parser:"| @True"`
+	False bool          `parser:"| @False"`
+}
+
+// String returns the string representation of the value of the literal.
+func (al AnyLiteral) String() string {
+	if al.Str != nil {
+		return `"` + strutil.EscapeQuotes(string(*al.Str)) + `"`
+	}
+	if al.Float != nil {
+		return *al.Float
+	}
+	if al.Int != nil {
+		return *al.Int
+	}
+	if al.True {
+		return "true"
+	}
+	if al.False {
+		return "false"
+	}
+	return ""
 }

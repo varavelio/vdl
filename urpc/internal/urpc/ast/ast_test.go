@@ -34,7 +34,7 @@ func TestDocstringGetExternal(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		d := Docstring{Value: tt.input}
+		d := Docstring{Value: DocstringValue(tt.input)}
 		path, ok := d.GetExternal()
 		require.Equal(t, tt.ok, ok, tt.name)
 		require.Equal(t, tt.expected, path, tt.name)
@@ -53,7 +53,7 @@ func TestFlattenedFields(t *testing.T) {
 		Type: FieldType{
 			Base: &FieldTypeBase{
 				Object: &FieldTypeObject{
-					Children: []*FieldOrComment{
+					Children: []*TypeDeclChild{
 						{Field: fURL},
 						{Field: fSize},
 					},
@@ -67,7 +67,7 @@ func TestFlattenedFields(t *testing.T) {
 		Type: FieldType{
 			Base: &FieldTypeBase{
 				Object: &FieldTypeObject{
-					Children: []*FieldOrComment{
+					Children: []*TypeDeclChild{
 						{Field: fName},
 						{Field: fAvatar},
 					},
@@ -78,7 +78,15 @@ func TestFlattenedFields(t *testing.T) {
 	fId := &Field{Name: "id", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}
 	fRole := &Field{Name: "role", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveString}}}
 
-	fieldsAndComments := []*FieldOrComment{
+	typeDeclChildren := []*TypeDeclChild{
+		{Field: fId},
+		{Comment: &Comment{Simple: &[]string{"// some comment"}[0]}},
+		{Field: fProfile},
+		{Field: fRole},
+	}
+
+	// Create InputOutputChild slice for Input/Output tests
+	inputOutputChildren := []*InputOutputChild{
 		{Field: fId},
 		{Comment: &Comment{Simple: &[]string{"// some comment"}[0]}},
 		{Field: fProfile},
@@ -90,7 +98,7 @@ func TestFlattenedFields(t *testing.T) {
 	t.Run("TypeDecl", func(t *testing.T) {
 		typeDecl := &TypeDecl{
 			Name:     "User",
-			Children: fieldsAndComments,
+			Children: typeDeclChildren,
 		}
 
 		flattened := typeDecl.GetFlattenedFields()
@@ -108,7 +116,7 @@ func TestFlattenedFields(t *testing.T) {
 
 	t.Run("ProcOrStreamDeclChildInput", func(t *testing.T) {
 		inputDecl := &ProcOrStreamDeclChildInput{
-			Children: fieldsAndComments,
+			Children: inputOutputChildren,
 		}
 
 		flattened := inputDecl.GetFlattenedFields()
@@ -127,7 +135,7 @@ func TestFlattenedFields(t *testing.T) {
 
 	t.Run("ProcOrStreamDeclChildOutput", func(t *testing.T) {
 		outputDecl := &ProcOrStreamDeclChildOutput{
-			Children: fieldsAndComments,
+			Children: inputOutputChildren,
 		}
 
 		flattened := outputDecl.GetFlattenedFields()

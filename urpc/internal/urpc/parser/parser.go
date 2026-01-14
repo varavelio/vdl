@@ -14,7 +14,7 @@ type Parser = participle.Parser[ast.Schema]
 
 // ParserInstance is a pre-built parser instance for URPC schemas.
 var ParserInstance = participle.MustBuild[ast.Schema](
-	participle.Lexer(&lexer.ParticipleLexer{}),
-	participle.Elide("Newline", "Whitespace"),
+	participle.Lexer(lexer.URPCLexer),
+	participle.Elide("Whitespace", "Newline"),
 	participle.UseLookahead(4),
 )
