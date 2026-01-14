@@ -649,8 +649,8 @@ func TestParserTypeDecl(t *testing.T) {
 					Type: &ast.TypeDecl{
 						Name: "MyType",
 						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "tags", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, IsArray: true}}},
-							{Field: &ast.Field{Name: "scores", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, IsArray: true}}},
+							{Field: &ast.Field{Name: "tags", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1}}},
+							{Field: &ast.Field{Name: "scores", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 1}}},
 						},
 					},
 				},
@@ -1040,7 +1040,7 @@ func TestParserRPCDecl(t *testing.T) {
 										{
 											Output: &ast.ProcOrStreamDeclChildOutput{
 												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "items", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("Article")}, IsArray: true}}},
+													{Field: &ast.Field{Name: "items", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("Article")}, Dimensions: 1}}},
 												},
 											},
 										},
@@ -1369,7 +1369,7 @@ func TestParserEdgeCases(t *testing.T) {
 												},
 											},
 										},
-										IsArray: true,
+										Dimensions: 1,
 									},
 								},
 							},
@@ -1403,8 +1403,8 @@ func TestParserEdgeCases(t *testing.T) {
 										Base: &ast.FieldTypeBase{
 											Map: &ast.FieldTypeMap{
 												ValueType: &ast.FieldType{
-													Base:    &ast.FieldTypeBase{Named: ptr("string")},
-													IsArray: true,
+													Base:       &ast.FieldTypeBase{Named: ptr("string")},
+													Dimensions: 1,
 												},
 											},
 										},
@@ -1435,6 +1435,305 @@ func TestParserEdgeCases(t *testing.T) {
 						Name: "Profile",
 						Children: []*ast.TypeDeclChild{
 							{Field: &ast.Field{Name: "user", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("User")}}}},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+}
+
+////////////////
+// MULTI-DIMENSIONAL ARRAYS //
+////////////////
+
+func TestParserMultiDimensionalArrays(t *testing.T) {
+	t.Run("2D array of primitives", func(t *testing.T) {
+		input := `
+			type Matrix {
+				data: int[][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "Matrix",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name: "data",
+									Type: ast.FieldType{
+										Base:       &ast.FieldTypeBase{Named: ptr("int")},
+										Dimensions: 2,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("3D array of strings", func(t *testing.T) {
+		input := `
+			type Tensor {
+				values: string[][][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "Tensor",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name: "values",
+									Type: ast.FieldType{
+										Base:       &ast.FieldTypeBase{Named: ptr("string")},
+										Dimensions: 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("2D array of custom types", func(t *testing.T) {
+		input := `
+			type Grid {
+				cells: Cell[][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "Grid",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name: "cells",
+									Type: ast.FieldType{
+										Base:       &ast.FieldTypeBase{Named: ptr("Cell")},
+										Dimensions: 2,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Mixed array dimensions in same type", func(t *testing.T) {
+		input := `
+			type Container {
+				single: int
+				oneDim: int[]
+				twoDim: int[][]
+				threeDim: int[][][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "Container",
+						Children: []*ast.TypeDeclChild{
+							{Field: &ast.Field{Name: "single", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+							{Field: &ast.Field{Name: "oneDim", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 1}}},
+							{Field: &ast.Field{Name: "twoDim", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
+							{Field: &ast.Field{Name: "threeDim", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 3}}},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("2D array of inline objects", func(t *testing.T) {
+		input := `
+			type Board {
+				squares: {
+					value: int
+					color: string
+				}[][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "Board",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name: "squares",
+									Type: ast.FieldType{
+										Base: &ast.FieldTypeBase{
+											Object: &ast.FieldTypeObject{
+												Children: []*ast.TypeDeclChild{
+													{Field: &ast.Field{Name: "value", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+													{Field: &ast.Field{Name: "color", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+												},
+											},
+										},
+										Dimensions: 2,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Map with multi-dimensional array value", func(t *testing.T) {
+		input := `
+			type Cache {
+				matrices: map<int[][]>[][][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "Cache",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name: "matrices",
+									Type: ast.FieldType{
+										Base: &ast.FieldTypeBase{
+											Map: &ast.FieldTypeMap{
+												ValueType: &ast.FieldType{
+													Base:       &ast.FieldTypeBase{Named: ptr("int")},
+													Dimensions: 2,
+												},
+											},
+										},
+										Dimensions: 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Optional multi-dimensional array", func(t *testing.T) {
+		input := `
+			type OptionalMatrix {
+				data?: float[][]
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "OptionalMatrix",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name:     "data",
+									Optional: true,
+									Type: ast.FieldType{
+										Base:       &ast.FieldTypeBase{Named: ptr("float")},
+										Dimensions: 2,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("RPC proc with multi-dimensional arrays", func(t *testing.T) {
+		input := `
+			rpc MatrixService {
+				proc Multiply {
+					input {
+						a: int[][]
+						b: int[][]
+					}
+					output {
+						result: int[][]
+					}
+				}
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					RPC: &ast.RPCDecl{
+						Name: "MatrixService",
+						Children: []*ast.RPCChild{
+							{
+								Proc: &ast.ProcDecl{
+									Name: "Multiply",
+									Children: []*ast.ProcOrStreamDeclChild{
+										{
+											Input: &ast.ProcOrStreamDeclChildInput{
+												Children: []*ast.InputOutputChild{
+													{Field: &ast.Field{Name: "a", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
+													{Field: &ast.Field{Name: "b", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
+												},
+											},
+										},
+										{
+											Output: &ast.ProcOrStreamDeclChildOutput{
+												Children: []*ast.InputOutputChild{
+													{Field: &ast.Field{Name: "result", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
+												},
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},
@@ -1628,6 +1927,18 @@ func TestParserCompleteSchema(t *testing.T) {
 				x: int
 				y: int
 			}[]
+
+			""" 2D Matrix of integers. """
+			matrix: int[][]
+
+			""" 3D Tensor of floats. """
+			tensor: float[][][]
+
+			""" 2D array of inline objects. """
+			grid: {
+				row: int
+				col: int
+			}[][]
 
 			""" Deeply nested inline object. """
 			config: {
@@ -2108,20 +2419,20 @@ func TestParserCompleteSchema(t *testing.T) {
 						{Field: &ast.Field{
 							Docstring: &ast.Docstring{Value: " Array of strings. "},
 							Name:      "tags",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, IsArray: true},
+							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
 						}},
 						// Optional array
 						{Field: &ast.Field{
 							Docstring: &ast.Docstring{Value: " Optional array. "},
 							Name:      "categories",
 							Optional:  true,
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, IsArray: true},
+							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
 						}},
 						// Array of custom types
 						{Field: &ast.Field{
 							Docstring: &ast.Docstring{Value: " Array of custom types. "},
 							Name:      "items",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("OrderStatus")}, IsArray: true},
+							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("OrderStatus")}, Dimensions: 1},
 						}},
 						// Map with string values
 						{Field: &ast.Field{
@@ -2182,7 +2493,33 @@ func TestParserCompleteSchema(t *testing.T) {
 										{Field: &ast.Field{Name: "y", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
 									},
 								}},
-								IsArray: true,
+								Dimensions: 1,
+							},
+						}},
+						// 2D matrix
+						{Field: &ast.Field{
+							Docstring: &ast.Docstring{Value: " 2D Matrix of integers. "},
+							Name:      "matrix",
+							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2},
+						}},
+						// 3D tensor
+						{Field: &ast.Field{
+							Docstring: &ast.Docstring{Value: " 3D Tensor of floats. "},
+							Name:      "tensor",
+							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}, Dimensions: 3},
+						}},
+						// 2D array of inline objects
+						{Field: &ast.Field{
+							Docstring: &ast.Docstring{Value: " 2D array of inline objects. "},
+							Name:      "grid",
+							Type: ast.FieldType{
+								Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
+									Children: []*ast.TypeDeclChild{
+										{Field: &ast.Field{Name: "row", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+										{Field: &ast.Field{Name: "col", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+									},
+								}},
+								Dimensions: 2,
 							},
 						}},
 						// Deeply nested inline object
@@ -2324,7 +2661,7 @@ func TestParserCompleteSchema(t *testing.T) {
 																{Field: &ast.Field{Name: "userId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
 															},
 														}},
-														IsArray: true,
+														Dimensions: 1,
 													},
 												}},
 											},
@@ -2359,7 +2696,7 @@ func TestParserCompleteSchema(t *testing.T) {
 												{Spread: &ast.Spread{TypeName: "PaginatedResponse"}},
 												{Field: &ast.Field{
 													Name: "items",
-													Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("CompleteExample")}, IsArray: true},
+													Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("CompleteExample")}, Dimensions: 1},
 												}},
 											},
 										},
@@ -2542,7 +2879,7 @@ func TestParserCompleteSchema(t *testing.T) {
 																{Field: &ast.Field{Name: "mimeType", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
 															},
 														}},
-														IsArray: true,
+														Dimensions: 1,
 													},
 												}},
 											},

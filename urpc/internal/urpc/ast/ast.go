@@ -554,11 +554,27 @@ func (f *Field) GetFlattenedField() []*Field {
 	return fields
 }
 
+// ArrayDimensions represents the number of array dimensions.
+// 0 means not an array, 1 means [], 2 means [][], etc.
+type ArrayDimensions int
+
+// Capture implements participle's Capture interface to count array bracket pairs.
+// participle calls Capture once per match, so we accumulate instead of replacing.
+func (a *ArrayDimensions) Capture(values []string) error {
+	*a += ArrayDimensions(len(values))
+	return nil
+}
+
 // FieldType represents the type of a field.
 type FieldType struct {
 	Positions
-	Base    *FieldTypeBase `parser:"@@"`
-	IsArray bool           `parser:"@(LBracket RBracket)?"`
+	Base       *FieldTypeBase  `parser:"@@"`
+	Dimensions ArrayDimensions `parser:"(LBracket @RBracket)*"`
+}
+
+// IsArray returns true if this type has at least one array dimension.
+func (ft *FieldType) IsArray() bool {
+	return ft.Dimensions > 0
 }
 
 // FieldTypeBase represents the base type of a field (named, map, or inline object).

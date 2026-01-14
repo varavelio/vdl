@@ -615,3 +615,121 @@ func TestAnyLiteralString(t *testing.T) {
 		})
 	}
 }
+
+//////////////////////////////
+// FIELD TYPE ARRAY TESTS   //
+//////////////////////////////
+
+func TestFieldTypeIsArray(t *testing.T) {
+	ptr := func(s string) *string { return &s }
+
+	tests := []struct {
+		name     string
+		ft       FieldType
+		expected bool
+	}{
+		{
+			name:     "Non-array type",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}},
+			expected: false,
+		},
+		{
+			name:     "1D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
+			expected: true,
+		},
+		{
+			name:     "2D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("int")}, Dimensions: 2},
+			expected: true,
+		},
+		{
+			name:     "3D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("float")}, Dimensions: 3},
+			expected: true,
+		},
+		{
+			name:     "Zero dimensions",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("bool")}, Dimensions: 0},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.expected, tt.ft.IsArray())
+		})
+	}
+}
+
+func TestFieldTypeDimensions(t *testing.T) {
+	ptr := func(s string) *string { return &s }
+
+	tests := []struct {
+		name     string
+		ft       FieldType
+		expected ArrayDimensions
+	}{
+		{
+			name:     "Non-array type",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}},
+			expected: 0,
+		},
+		{
+			name:     "1D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
+			expected: 1,
+		},
+		{
+			name:     "2D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("int")}, Dimensions: 2},
+			expected: 2,
+		},
+		{
+			name:     "3D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("float")}, Dimensions: 3},
+			expected: 3,
+		},
+		{
+			name:     "5D array",
+			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("datetime")}, Dimensions: 5},
+			expected: 5,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.expected, tt.ft.Dimensions)
+		})
+	}
+}
+
+func TestArrayDimensionsCapture(t *testing.T) {
+	t.Run("No calls means zero", func(t *testing.T) {
+		var ad ArrayDimensions
+		require.Equal(t, ArrayDimensions(0), ad)
+	})
+
+	t.Run("Single capture call", func(t *testing.T) {
+		var ad ArrayDimensions
+		err := ad.Capture([]string{"]"})
+		require.NoError(t, err)
+		require.Equal(t, ArrayDimensions(1), ad)
+	})
+
+	t.Run("Multiple capture calls accumulate", func(t *testing.T) {
+		var ad ArrayDimensions
+		// participle calls Capture once per match in a repetition
+		_ = ad.Capture([]string{"]"}) // first []
+		_ = ad.Capture([]string{"]"}) // second []
+		require.Equal(t, ArrayDimensions(2), ad)
+	})
+
+	t.Run("Three dimensions", func(t *testing.T) {
+		var ad ArrayDimensions
+		_ = ad.Capture([]string{"]"})
+		_ = ad.Capture([]string{"]"})
+		_ = ad.Capture([]string{"]"})
+		require.Equal(t, ArrayDimensions(3), ad)
+	})
+}
