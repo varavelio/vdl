@@ -28,7 +28,7 @@ func TestToPascalCase(t *testing.T) {
 		{"hello_world-test_case", "HelloWorldTestCase"},
 		{"hello world-test case", "HelloWorldTestCase"},
 		{"hello world test case", "HelloWorldTestCase"},
-		{"123hello world", "123helloWorld"},
+		{"123hello world", "123HelloWorld"},
 		{"hello123 world", "Hello123World"},
 		{"hello world123", "HelloWorld123"},
 		{"", ""},
@@ -52,6 +52,14 @@ func TestToPascalCase(t *testing.T) {
 		{"multiple__spaces", "MultipleSpaces"},
 		{"multiple__-spaces", "MultipleSpaces"},
 		{"multiple-__spaces", "MultipleSpaces"},
+		// Acronym handling
+		{"HTMLParser", "HtmlParser"},
+		{"JSONBody", "JsonBody"},
+		{"HTTPRequest", "HttpRequest"},
+		{"SimpleXMLParser", "SimpleXmlParser"},
+		{"param_id", "ParamId"},
+		{"param_ID", "ParamId"},
+		{"ServeHTTP", "ServeHttp"},
 	}
 
 	for _, test := range tests {

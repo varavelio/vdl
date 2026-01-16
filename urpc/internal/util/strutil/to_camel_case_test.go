@@ -28,7 +28,7 @@ func TestToCamelCase(t *testing.T) {
 		{"hello_world-test_case", "helloWorldTestCase"},
 		{"hello world-test case", "helloWorldTestCase"},
 		{"hello world test case", "helloWorldTestCase"},
-		{"123hello world", "123helloWorld"},
+		{"123hello world", "123HelloWorld"},
 		{"hello123 world", "hello123World"},
 		{"hello world123", "helloWorld123"},
 		{"", ""},
@@ -52,6 +52,14 @@ func TestToCamelCase(t *testing.T) {
 		{"multiple__spaces", "multipleSpaces"},
 		{"multiple__-spaces", "multipleSpaces"},
 		{"multiple-__spaces", "multipleSpaces"},
+		// Acronym handling
+		{"HTMLParser", "htmlParser"},
+		{"JSONBody", "jsonBody"},
+		{"HTTPRequest", "httpRequest"},
+		{"SimpleXMLParser", "simpleXmlParser"},
+		{"param_id", "paramId"},
+		{"param_ID", "paramId"},
+		{"ServeHTTP", "serveHttp"},
 	}
 
 	for _, test := range tests {
