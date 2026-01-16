@@ -1,5 +1,6 @@
-const   MAX_items   =   50
-  """   The current API version string.   """
+const   MAX_ITEMS  	  = 50   
+
+"""   The current API version string.   """
 const Version="2.1.0"
 const Pi = 3.14159
 const Is_Enabled = true
@@ -9,7 +10,8 @@ const A = 1
   const C = 3
 
 """ Docstring for D """
-  const D = 4
+const D = 4	
+
           const E = 5
 
 // >>>>

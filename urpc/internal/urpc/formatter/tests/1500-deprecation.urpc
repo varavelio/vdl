@@ -1,20 +1,20 @@
-deprecated type legacyUser {
-  id: string
-}
+deprecated	type legacyUser { 
+id   :	string 
+}   
 
-deprecated("Use NewService instead")
-rpc oldService {
-  deprecated proc fetchData {}
-}
+deprecated ( "Use NewService instead") 
+rpc  	  oldService  	  { 
+deprecated proc fetchData {  	  }  	  
+} 
 
-deprecated enum oldStatus {
-  active
-  inactive
-}
+deprecated   enum oldStatus { 
+Active 
+Inactive   
+} 
 
-deprecated const old_limit = 100
+deprecated const old_limit =   100	
 
-deprecated pattern oldPattern = "old.{id}"
+deprecated	pattern oldPattern = "old.{id}"
 
 // >>>>
 

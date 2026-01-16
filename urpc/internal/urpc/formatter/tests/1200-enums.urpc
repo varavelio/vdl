@@ -1,21 +1,21 @@
 enum orderStatus {
   pending
     processing
-  Shipped
-    Delivered
+Shipped	
+Delivered 
       cancelled
-}
+}	
 
 enum httpMethod {
   Get="GET"
     Post = "POST"
-}
+}  	  
 
 enum priority {
   Low = 1
   Medium=2
-    High = 3
-}
+High = 3   
+} 
 
 // >>>>
 
