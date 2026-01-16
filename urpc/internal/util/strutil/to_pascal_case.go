@@ -5,69 +5,70 @@ import (
 	"unicode"
 )
 
-// ToPascalCase converts a string to PascalCase, it will interpret all
-// space like characters, underscores and dashes as word boundaries.
-//
-// Example:
-//
-//	"hello world" -> "HelloWorld"
-//	"hello_world" -> "HelloWorld"
-//	"hello-world" -> "HelloWorld"
-//	"hello world" -> "HelloWorld"
-//	"hello WORLD" -> "HelloWorld"
-//	"helloWORLD"  -> "HelloWorld"
-func ToPascalCase(str string) string {
-	if str == "" {
+// ToPascalCase converts a string to PascalCase.
+// It handles delimiters, camelCase transitions, and acronyms (e.g., "JSONBody" -> "JsonBody").
+func ToPascalCase(s string) string {
+	if s == "" {
 		return ""
 	}
 
-	// First, split the string into words
-	var words []string
-	word := strings.Builder{}
-	for i, char := range str {
-		if unicode.IsSpace(char) || char == '_' || char == '-' {
-			if word.Len() > 0 {
-				words = append(words, word.String())
-				word.Reset()
-			}
-		} else {
-			word.WriteRune(char)
-		}
+	var sb strings.Builder
+	sb.Grow(len(s))
 
-		// Handle the last word
-		if i == len(str)-1 && word.Len() > 0 {
-			words = append(words, word.String())
-		}
-	}
+	runes := []rune(s)
+	length := len(runes)
+	startOfWord := true
 
-	// Then, convert each word to PascalCase
-	result := strings.Builder{}
-	for _, w := range words {
-		if len(w) == 0 {
+	for i := range length {
+		r := runes[i]
+
+		// Treat any non-alphanumeric char as a delimiter
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			startOfWord = true
 			continue
 		}
 
-		// Always capitalize the first character of each word
-		firstChar := unicode.ToUpper(rune(w[0]))
-		result.WriteRune(firstChar)
-
-		// For the rest of the word, preserve existing uppercase letters
-		// that are not at word boundaries
-		if len(w) > 1 {
-			for i := 1; i < len(w); i++ {
-				char := rune(w[i])
-				prevChar := rune(w[i-1])
-
-				// If current char is uppercase and previous char is lowercase,
-				// keep it uppercase (camelCase pattern)
-				if unicode.IsUpper(char) && unicode.IsLower(prevChar) {
-					result.WriteRune(char)
-				} else {
-					result.WriteRune(unicode.ToLower(char))
-				}
+		if i > 0 && !startOfWord {
+			if isWordBoundary(runes, i) {
+				startOfWord = true
 			}
+		}
+
+		if startOfWord {
+			sb.WriteRune(unicode.ToUpper(r))
+			startOfWord = false
+		} else {
+			sb.WriteRune(unicode.ToLower(r))
 		}
 	}
 
-	return result.String()
+	return sb.String()
+}
+
+// isWordBoundary checks if the character at current index `i` marks the start of a new word
+// based on camelCase or acronym rules. Assumes i > 0.
+func isWordBoundary(runes []rune, i int) bool {
+	prev := runes[i-1]
+	curr := runes[i]
+
+	// 1. Digit -> Letter transition (e.g., "123Test")
+	if unicode.IsDigit(prev) && unicode.IsLetter(curr) {
+		return true
+	}
+
+	// 2. Lower -> Upper transition (camelCase: "fooBar")
+	if unicode.IsLower(prev) && unicode.IsUpper(curr) {
+		return true
+	}
+
+	// 3. Acronym Boundary (Upper -> Upper -> Lower)
+	// e.g., "JSONBody": 'B' is Upper, prev 'N' is Upper, next 'o' is Lower.
+	// This marks 'B' as the start of "Body".
+	if unicode.IsUpper(prev) && unicode.IsUpper(curr) {
+		if i+1 < len(runes) && unicode.IsLower(runes[i+1]) {
+			return true
+		}
+	}
+
+	return false
 }
