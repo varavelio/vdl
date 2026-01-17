@@ -1,6 +1,6 @@
 module github.com/uforg/uforpc/urpc
 
-go 1.24.2
+go 1.25
 
 require github.com/uforg/uforpc/embedplayground v0.0.0
 

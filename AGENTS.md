@@ -98,7 +98,7 @@ When updating this document, do so with the context of the entire document in mi
 
 ### Go
 
-- **Version**: 1.24+
+- **Version**: 1.25+
 - **Key Libs**: `go-arg`, `participle`, `ufogenkit`.
 - **Patterns**: Standard Go project layout (`cmd`, `internal`).
 
