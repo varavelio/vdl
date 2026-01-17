@@ -387,13 +387,11 @@ func TestFileSystem_Concurrency(t *testing.T) {
 		const goroutines = 100
 
 		for range goroutines {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				result, err := fs.ReadFile(filePath)
 				require.NoError(t, err)
 				require.Equal(t, content, result)
-			}()
+			})
 		}
 
 		wg.Wait()
@@ -408,12 +406,10 @@ func TestFileSystem_Concurrency(t *testing.T) {
 		const goroutines = 100
 
 		for i := range goroutines {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				content := []byte{byte(i)}
 				fs.WriteFileCache(filePath, content)
-			}()
+			})
 		}
 
 		wg.Wait()
@@ -440,22 +436,18 @@ func TestFileSystem_Concurrency(t *testing.T) {
 
 		// Concurrent reads
 		for range goroutines {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				_, err := fs.ReadFile(filePath)
 				require.NoError(t, err)
-			}()
+			})
 		}
 
 		// Concurrent writes
 		for i := range goroutines {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				content := []byte{byte(i)}
 				fs.WriteFileCache(filePath, content)
-			}()
+			})
 		}
 
 		wg.Wait()
@@ -476,12 +468,10 @@ func TestFileSystem_Concurrency(t *testing.T) {
 
 		// Concurrent removes
 		for i := range goroutines {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
+			wg.Go(func() {
 				filePath := filepath.Join(tempDir, "file"+string(rune('A'+i%26))+".txt")
 				fs.RemoveFileCache(filePath)
-			}()
+			})
 		}
 
 		wg.Wait()
