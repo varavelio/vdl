@@ -3,8 +3,6 @@ package analysis
 import (
 	"fmt"
 	"unicode"
-
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
 )
 
 // validateNaming checks that all identifiers follow the naming conventions:
@@ -233,15 +231,4 @@ func isUpperSnakeCase(s string) bool {
 	}
 
 	return true
-}
-
-// extractFieldsFromAST extracts field names from AST for validation.
-func extractFieldsFromAST(children []*ast.TypeDeclChild) []string {
-	var names []string
-	for _, child := range children {
-		if child.Field != nil {
-			names = append(names, child.Field.Name)
-		}
-	}
-	return names
 }
