@@ -43,15 +43,15 @@ When updating this document, do so with the context of the entire document in mi
   - `cmd/urpc`: Main CLI entry point (native).
   - `cmd/urpcwasm`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
+    - `core/`: Core parsing and AST infrastructure.
+      - `ast/`: Abstract Syntax Tree definitions and position tracking.
+      - `parser/`: Lexical analysis and parsing (lexer and parser combined).
+      - `vfs/`: Virtual File System utilities for file handling.
     - `urpc/`: The Compiler Core.
       - `analyzer/`: Semantic analysis and type checking.
-      - `ast/`: Abstract Syntax Tree definitions.
       - `docstore/`: Management of comments and documentation.
       - `formatter/`: Source code formatting logic (ufofmt).
-      - `lexer/`: Converts source text into tokens.
       - `lsp/`: Language Server Protocol implementation.
-      - `parser/`: Converts tokens into the AST.
-      - `token/`: Definitions of token types and positions.
       - `transform/`: Utilities for modifying the AST.
     - `codegen/`: Code Generators.
       - `dart/`: Dart client generation.
