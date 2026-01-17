@@ -1,0 +1,43 @@
+// Deprecated elements
+
+deprecated type LegacyUser {
+	id: string
+	name: string
+}
+
+deprecated("Use UserV2 instead")
+type OldUser {
+	id: string
+}
+
+deprecated enum OldStatus {
+	Active
+	Inactive
+}
+
+deprecated("Will be removed in v2.0")
+const OLD_LIMIT = 100
+
+deprecated pattern OldPattern = "old.{id}"
+
+deprecated("Migrate to NewService")
+rpc OldService {
+	deprecated proc OldProc {
+		input {
+			id: string
+		}
+		output {
+			data: string
+		}
+	}
+
+	deprecated("Use NewStream instead")
+	stream OldStream {
+		input {
+			id: string
+		}
+		output {
+			event: string
+		}
+	}
+}

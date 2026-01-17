@@ -1,0 +1,12 @@
+// @expect: E501
+
+rpc Users {
+	proc GetUser {
+		input { id: string }
+		output { name: string }
+	}
+	proc GetUser {
+		input { email: string }
+		output { name: string }
+	}
+}

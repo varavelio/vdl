@@ -1,0 +1,7 @@
+include "./users_procs.ufo"
+include "./users_streams.ufo"
+
+type User {
+	id: string
+	name: string
+}

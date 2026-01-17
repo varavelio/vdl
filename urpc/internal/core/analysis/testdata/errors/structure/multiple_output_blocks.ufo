@@ -1,0 +1,9 @@
+// @expect: E702
+
+rpc Users {
+	proc GetUser {
+		input { id: string }
+		output { user: string }
+		output { status: string }
+	}
+}

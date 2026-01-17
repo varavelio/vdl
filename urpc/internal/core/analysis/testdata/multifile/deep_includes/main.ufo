@@ -1,0 +1,5 @@
+include "./level1.ufo"
+
+type Main {
+	level: Level1
+}

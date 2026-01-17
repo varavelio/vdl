@@ -1,0 +1,8 @@
+// @expect: E101
+
+rpc lowercase {
+	proc GetUser {
+		input { id: string }
+		output { name: string }
+	}
+}

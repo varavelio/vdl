@@ -1,0 +1,5 @@
+// @expect: E101
+
+type lowercase {
+	id: string
+}

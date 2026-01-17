@@ -1,0 +1,6 @@
+// @expect: E104
+
+enum Status {
+	active
+	inactive
+}

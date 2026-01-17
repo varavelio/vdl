@@ -1,0 +1,12 @@
+// @expect: E503
+
+rpc Users {
+	proc GetUser {
+		input { id: string }
+		output { name: string }
+	}
+	stream GetUser {
+		input { id: string }
+		output { event: string }
+	}
+}

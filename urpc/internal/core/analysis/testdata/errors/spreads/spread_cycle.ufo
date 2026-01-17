@@ -1,0 +1,11 @@
+// @expect: E204
+
+type A {
+	...B
+	name: string
+}
+
+type B {
+	...A
+	id: string
+}

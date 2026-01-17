@@ -1,0 +1,6 @@
+include "./common.ufo"
+
+type User {
+	...BaseEntity
+	name: string
+}

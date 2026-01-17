@@ -1,0 +1,11 @@
+// @expect: E203
+
+type Base {
+	id: string
+	name: string
+}
+
+type User {
+	...Base
+	name: string
+}

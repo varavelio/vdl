@@ -1,0 +1,12 @@
+// @expect: E502
+
+rpc Users {
+	stream UserUpdates {
+		input { id: string }
+		output { event: string }
+	}
+	stream UserUpdates {
+		input { userId: string }
+		output { data: string }
+	}
+}

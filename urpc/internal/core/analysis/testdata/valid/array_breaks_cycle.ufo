@@ -1,0 +1,11 @@
+// Arrays break type cycles - this is valid
+
+type TreeNode {
+	value: string
+	children: TreeNode[]
+}
+
+type LinkedList {
+	value: int
+	next?: LinkedList[]
+}

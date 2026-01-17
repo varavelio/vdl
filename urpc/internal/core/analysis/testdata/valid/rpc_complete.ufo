@@ -1,0 +1,92 @@
+// Complete RPC with procs and streams
+
+type User {
+	id: string
+	name: string
+}
+
+type Message {
+	id: string
+	content: string
+	timestamp: datetime
+}
+
+rpc Users {
+	""" User management service """
+
+	""" Create a new user """
+	proc CreateUser {
+		input {
+			name: string
+			email: string
+		}
+		output {
+			user: User
+		}
+	}
+
+	""" Get user by ID """
+	proc GetUser {
+		input {
+			id: string
+		}
+		output {
+			user: User
+		}
+	}
+
+	""" Update user """
+	proc UpdateUser {
+		input {
+			id: string
+			name?: string
+			email?: string
+		}
+		output {
+			user: User
+		}
+	}
+
+	""" Delete user """
+	proc DeleteUser {
+		input {
+			id: string
+		}
+		output {
+			success: bool
+		}
+	}
+}
+
+rpc Messaging {
+	""" Real-time messaging """
+
+	proc SendMessage {
+		input {
+			channelId: string
+			content: string
+		}
+		output {
+			message: Message
+		}
+	}
+
+	stream MessageFeed {
+		input {
+			channelId: string
+		}
+		output {
+			message: Message
+		}
+	}
+
+	stream TypingIndicator {
+		input {
+			channelId: string
+		}
+		output {
+			userId: string
+			isTyping: bool
+		}
+	}
+}

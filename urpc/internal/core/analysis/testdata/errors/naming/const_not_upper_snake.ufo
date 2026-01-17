@@ -1,0 +1,3 @@
+// @expect: E103
+
+const maxUsers = 100

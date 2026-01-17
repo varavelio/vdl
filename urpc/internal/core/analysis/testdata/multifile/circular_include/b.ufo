@@ -1,0 +1,2 @@
+include "./a.ufo"
+type B { id: string }
