@@ -272,6 +272,59 @@ func TestBestEffort(t *testing.T) {
 }
 
 // ============================================================================
+// RPC Merge Tests - verify RPCs are merged correctly
+// ============================================================================
+
+func TestRPCMerge(t *testing.T) {
+	t.Run("same_file", func(t *testing.T) {
+		// Multiple declarations of the same RPC in a single file should be merged
+		program, diagnostics := analyzeTestFile(t, "testdata/valid/rpc_merge_same_file.ufo")
+
+		assert.Empty(t, diagnostics, "Expected no diagnostics")
+		require.NotNil(t, program)
+
+		// RPC should exist and be merged
+		assert.Contains(t, program.RPCs, "Users", "Users RPC should exist")
+
+		usersRPC := program.RPCs["Users"]
+		require.NotNil(t, usersRPC)
+
+		// Should have both procs from different declarations
+		assert.Contains(t, usersRPC.Procs, "GetUser", "GetUser proc should exist")
+		assert.Contains(t, usersRPC.Procs, "CreateUser", "CreateUser proc should exist")
+		assert.Len(t, usersRPC.Procs, 2, "Should have exactly 2 procs")
+
+		// Should have stream from third declaration
+		assert.Contains(t, usersRPC.Streams, "UserUpdates", "UserUpdates stream should exist")
+		assert.Len(t, usersRPC.Streams, 1, "Should have exactly 1 stream")
+
+		// DeclaredIn should have the same file 3 times (once per declaration)
+		assert.Len(t, usersRPC.DeclaredIn, 3, "Users RPC should be declared 3 times in the same file")
+	})
+
+	t.Run("multiple_files", func(t *testing.T) {
+		// Multiple declarations across different files should also be merged
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/rpc_merge", "main.ufo")
+
+		assert.Empty(t, diagnostics, "Expected no diagnostics")
+		require.NotNil(t, program)
+
+		usersRPC := program.RPCs["Users"]
+		require.NotNil(t, usersRPC)
+
+		// Should have procs from users_procs.ufo
+		assert.Contains(t, usersRPC.Procs, "GetUser", "GetUser proc should exist")
+		assert.Contains(t, usersRPC.Procs, "CreateUser", "CreateUser proc should exist")
+
+		// Should have streams from users_streams.ufo
+		assert.Contains(t, usersRPC.Streams, "UserUpdates", "UserUpdates stream should exist")
+
+		// Should be declared in 2 files
+		assert.Len(t, usersRPC.DeclaredIn, 2, "Users RPC should be declared in 2 files")
+	})
+}
+
+// ============================================================================
 // Edge Case Tests - VFS-based tests for special scenarios
 // ============================================================================
 

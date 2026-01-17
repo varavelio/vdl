@@ -1,0 +1,22 @@
+// RPC merge within a single file - multiple declarations of the same RPC are merged
+
+rpc Users {
+	proc GetUser {
+		input { id: string }
+		output { name: string }
+	}
+}
+
+rpc Users {
+	proc CreateUser {
+		input { name: string }
+		output { id: string }
+	}
+}
+
+rpc Users {
+	stream UserUpdates {
+		input { userId: string }
+		output { event: string }
+	}
+}
