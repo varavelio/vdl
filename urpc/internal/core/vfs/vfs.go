@@ -88,8 +88,8 @@ func (fs *FileSystem) ReadFile(absolutePath string) ([]byte, error) {
 // writing to disk.
 //
 // The path is normalized to an absolute path internally.
-func (fs *FileSystem) WriteFileCache(path string, content []byte) {
-	absPath, _ := filepath.Abs(path)
+func (fs *FileSystem) WriteFileCache(absolutePath string, content []byte) {
+	absPath, _ := filepath.Abs(absolutePath)
 
 	fs.mu.Lock()
 	fs.files[absPath] = content
@@ -103,8 +103,8 @@ func (fs *FileSystem) WriteFileCache(path string, content []byte) {
 //
 // The path is normalized to an absolute path internally.
 // Returns true if the file was in the cache and removed, false otherwise.
-func (fs *FileSystem) RemoveFileCache(path string) bool {
-	absPath, _ := filepath.Abs(path)
+func (fs *FileSystem) RemoveFileCache(absolutePath string) bool {
+	absPath, _ := filepath.Abs(absolutePath)
 
 	fs.mu.Lock()
 	_, exists := fs.files[absPath]
