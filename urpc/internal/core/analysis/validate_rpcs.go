@@ -242,7 +242,7 @@ func buildProcSymbol(decl *ast.ProcDecl, file string) *ProcSymbol {
 	// Process input/output blocks
 	for _, child := range decl.Children {
 		if child.Input != nil {
-			proc.Input = buildBlockSymbol(child.Input, file)
+			proc.Input = buildInputBlockSymbol(child.Input, file)
 		}
 		if child.Output != nil {
 			proc.Output = buildOutputBlockSymbol(child.Output, file)
@@ -284,7 +284,7 @@ func buildStreamSymbol(decl *ast.StreamDecl, file string) *StreamSymbol {
 	// Process input/output blocks
 	for _, child := range decl.Children {
 		if child.Input != nil {
-			stream.Input = buildBlockSymbol(child.Input, file)
+			stream.Input = buildInputBlockSymbol(child.Input, file)
 		}
 		if child.Output != nil {
 			stream.Output = buildOutputBlockSymbol(child.Output, file)
@@ -294,8 +294,8 @@ func buildStreamSymbol(decl *ast.StreamDecl, file string) *StreamSymbol {
 	return stream
 }
 
-// buildBlockSymbol creates a BlockSymbol from an AST input/output block.
-func buildBlockSymbol(input *ast.ProcOrStreamDeclChildInput, file string) *BlockSymbol {
+// buildInputBlockSymbol creates a BlockSymbol from an AST input/output block.
+func buildInputBlockSymbol(input *ast.ProcOrStreamDeclChildInput, file string) *BlockSymbol {
 	block := &BlockSymbol{
 		Pos:     input.Pos,
 		EndPos:  input.EndPos,

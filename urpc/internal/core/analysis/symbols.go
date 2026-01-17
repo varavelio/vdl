@@ -150,36 +150,6 @@ func (st *symbolTable) lookupEnum(name string) *EnumSymbol {
 	return st.enums[name]
 }
 
-// lookupConst returns the const symbol with the given name, or nil if not found.
-func (st *symbolTable) lookupConst(name string) *ConstSymbol {
-	return st.consts[name]
-}
-
-// lookupPattern returns the pattern symbol with the given name, or nil if not found.
-func (st *symbolTable) lookupPattern(name string) *PatternSymbol {
-	return st.patterns[name]
-}
-
-// lookupRPC returns the RPC symbol with the given name, or nil if not found.
-func (st *symbolTable) lookupRPC(name string) *RPCSymbol {
-	return st.rpcs[name]
-}
-
-// typeExists checks if a type with the given name exists.
-// This includes both custom types and primitive types.
-func (st *symbolTable) typeExists(name string) bool {
-	if ast.IsPrimitiveType(name) {
-		return true
-	}
-	_, ok := st.types[name]
-	if ok {
-		return true
-	}
-	// Also check enums as valid types
-	_, ok = st.enums[name]
-	return ok
-}
-
 // buildProgram creates a Program from the collected symbols.
 func (st *symbolTable) buildProgram(entryPoint string, files map[string]*File) *Program {
 	return &Program{
