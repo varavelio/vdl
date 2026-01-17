@@ -82,17 +82,23 @@ func analyzeTestFile(t *testing.T, filePath string) (*analysis.Program, []analys
 }
 
 // analyzeMultiFileTest sets up a VFS with multiple files and analyzes from an entry point.
+// It loads all .ufo and .md files to support external docstring resolution.
 func analyzeMultiFileTest(t *testing.T, dir string, entryFile string) (*analysis.Program, []analysis.Diagnostic) {
 	t.Helper()
 
 	fs := vfs.New()
 
-	// Walk the directory and add all .ufo files to VFS
+	// Walk the directory and add all .ufo and .md files to VFS
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || !strings.HasSuffix(path, ".ufo") {
+		if info.IsDir() {
+			return nil
+		}
+
+		// Include .ufo and .md files (for external docstrings)
+		if !strings.HasSuffix(path, ".ufo") && !strings.HasSuffix(path, ".md") {
 			return nil
 		}
 
@@ -101,8 +107,12 @@ func analyzeMultiFileTest(t *testing.T, dir string, entryFile string) (*analysis
 			return err
 		}
 
-		// Create virtual path based on file name
-		virtualPath := "/" + filepath.Base(path)
+		// Create virtual path preserving relative structure from dir
+		relPath, err := filepath.Rel(dir, path)
+		if err != nil {
+			return err
+		}
+		virtualPath := "/" + filepath.ToSlash(relPath)
 		fs.WriteFileCache(virtualPath, content)
 		return nil
 	})

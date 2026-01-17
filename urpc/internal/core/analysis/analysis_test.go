@@ -161,6 +161,69 @@ func TestMultiFileSchemas(t *testing.T) {
 		// Should have 3 files
 		assert.Len(t, program.Files, 3, "Should have 3 files")
 	})
+
+	t.Run("external_docstrings", func(t *testing.T) {
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/external_docstrings", "main.ufo")
+
+		assert.Empty(t, diagnostics, "Expected no diagnostics")
+		require.NotNil(t, program)
+
+		// Type docstring should be resolved from ./docs/user_type.md
+		user := program.Types["User"]
+		require.NotNil(t, user, "User type should exist")
+		require.NotNil(t, user.Docstring, "User docstring should be resolved")
+		assert.Contains(t, *user.Docstring, "Represents a user in the system")
+
+		// Field docstring should be resolved from ./docs/user_id.md
+		var idField *analysis.FieldSymbol
+		for _, f := range user.Fields {
+			if f.Name == "id" {
+				idField = f
+				break
+			}
+		}
+		require.NotNil(t, idField, "id field should exist")
+		require.NotNil(t, idField.Docstring, "id field docstring should be resolved")
+		assert.Contains(t, *idField.Docstring, "unique identifier for the user")
+
+		// Enum docstring should be resolved from ./docs/status_enum.md
+		status := program.Enums["Status"]
+		require.NotNil(t, status, "Status enum should exist")
+		require.NotNil(t, status.Docstring, "Status docstring should be resolved")
+		assert.Contains(t, *status.Docstring, "current status of an entity")
+
+		// Proc docstring should be resolved from ./docs/get_user_proc.md
+		usersRPC := program.RPCs["Users"]
+		require.NotNil(t, usersRPC, "Users RPC should exist")
+		getUser := usersRPC.Procs["GetUser"]
+		require.NotNil(t, getUser, "GetUser proc should exist")
+		require.NotNil(t, getUser.Docstring, "GetUser proc docstring should be resolved")
+		assert.Contains(t, *getUser.Docstring, "Retrieves a user by their unique identifier")
+
+		// Standalone docstring should be resolved from ./docs/api_intro.md
+		require.NotEmpty(t, program.StandaloneDocs, "Should have standalone docstrings")
+	})
+
+	t.Run("external_docstring_not_found", func(t *testing.T) {
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/external_docstring_not_found", "main.ufo")
+
+		// Should have E003 error for missing external docstring file
+		require.NotEmpty(t, diagnostics, "Expected E003 diagnostic for missing external file")
+
+		hasE003 := false
+		for _, d := range diagnostics {
+			if d.Code == analysis.CodeDocstringFileNotFound {
+				hasE003 = true
+				assert.Contains(t, d.Message, "nonexistent.md")
+				break
+			}
+		}
+		assert.True(t, hasE003, "Expected CodeDocstringFileNotFound (E003) error")
+
+		// Best-effort: program should still be returned
+		require.NotNil(t, program, "Expected program (best-effort)")
+		assert.Contains(t, program.Types, "User", "User type should still be collected")
+	})
 }
 
 // ============================================================================
