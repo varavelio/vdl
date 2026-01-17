@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
+	"github.com/uforg/uforpc/urpc/internal/core/ast"
 	"github.com/uforg/uforpc/urpc/internal/util/debugutil"
 )
 

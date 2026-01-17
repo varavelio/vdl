@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
+	"github.com/uforg/uforpc/urpc/internal/core/ast"
 	"github.com/uforg/uforpc/urpc/internal/util/testutil"
 )
 
@@ -19,9 +19,9 @@ func qptr(s string) *ast.QuotedString {
 	return &q
 }
 
-////////////////
-// INCLUDES   //
-////////////////
+//////////////
+// INCLUDES //
+//////////////
 
 func TestParserInclude(t *testing.T) {
 	t.Run("Basic include", func(t *testing.T) {

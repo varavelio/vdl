@@ -1,17 +1,16 @@
-package ast_test
+package ast
 
 import (
 	"testing"
 
 	"github.com/alecthomas/participle/v2/lexer"
 	"github.com/stretchr/testify/assert"
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
 )
 
 func TestPositions_GetPositions(t *testing.T) {
 	pos := lexer.Position{Line: 1, Column: 1, Offset: 0}
 	endPos := lexer.Position{Line: 1, Column: 10, Offset: 10}
-	p := ast.Positions{
+	p := Positions{
 		Pos:    pos,
 		EndPos: endPos,
 	}
@@ -22,21 +21,21 @@ func TestPositions_GetPositions(t *testing.T) {
 func TestGetLineDiff(t *testing.T) {
 	tests := []struct {
 		name     string
-		from     ast.Positions
-		to       ast.Positions
-		expected ast.LineDiff
+		from     Positions
+		to       Positions
+		expected LineDiff
 	}{
 		{
 			name: "same lines",
-			from: ast.Positions{
+			from: Positions{
 				Pos:    lexer.Position{Line: 10},
 				EndPos: lexer.Position{Line: 10},
 			},
-			to: ast.Positions{
+			to: Positions{
 				Pos:    lexer.Position{Line: 10},
 				EndPos: lexer.Position{Line: 10},
 			},
-			expected: ast.LineDiff{
+			expected: LineDiff{
 				StartToStart:    0,
 				StartToEnd:      0,
 				EndToStart:      0,
@@ -49,15 +48,15 @@ func TestGetLineDiff(t *testing.T) {
 		},
 		{
 			name: "different lines",
-			from: ast.Positions{
+			from: Positions{
 				Pos:    lexer.Position{Line: 10},
 				EndPos: lexer.Position{Line: 15},
 			},
-			to: ast.Positions{
+			to: Positions{
 				Pos:    lexer.Position{Line: 20},
 				EndPos: lexer.Position{Line: 25},
 			},
-			expected: ast.LineDiff{
+			expected: LineDiff{
 				StartToStart:    10, // 20 - 10
 				StartToEnd:      15, // 25 - 10
 				EndToStart:      5,  // 20 - 15
@@ -70,15 +69,15 @@ func TestGetLineDiff(t *testing.T) {
 		},
 		{
 			name: "different lines (negative diffs)",
-			from: ast.Positions{
+			from: Positions{
 				Pos:    lexer.Position{Line: 20},
 				EndPos: lexer.Position{Line: 25},
 			},
-			to: ast.Positions{
+			to: Positions{
 				Pos:    lexer.Position{Line: 10},
 				EndPos: lexer.Position{Line: 15},
 			},
-			expected: ast.LineDiff{
+			expected: LineDiff{
 				StartToStart:    -10, // 10 - 20
 				StartToEnd:      -5,  // 15 - 20
 				EndToStart:      -15, // 10 - 25
@@ -91,15 +90,15 @@ func TestGetLineDiff(t *testing.T) {
 		},
 		{
 			name: "mixed offsets",
-			from: ast.Positions{
+			from: Positions{
 				Pos:    lexer.Position{Line: 100},
 				EndPos: lexer.Position{Line: 102},
 			},
-			to: ast.Positions{
+			to: Positions{
 				Pos:    lexer.Position{Line: 90},
 				EndPos: lexer.Position{Line: 95},
 			},
-			expected: ast.LineDiff{
+			expected: LineDiff{
 				StartToStart:    -10, // 90 - 100
 				StartToEnd:      -5,  // 95 - 100
 				EndToStart:      -12, // 90 - 102
@@ -114,7 +113,7 @@ func TestGetLineDiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			diff := ast.GetLineDiff(tt.from, tt.to)
+			diff := GetLineDiff(tt.from, tt.to)
 			assert.Equal(t, tt.expected, diff)
 		})
 	}
