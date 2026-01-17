@@ -1,0 +1,11 @@
+// @expect: E805
+// Type and enum share the same name
+
+type User {
+	id: string
+}
+
+enum User {
+	Active
+	Inactive
+}

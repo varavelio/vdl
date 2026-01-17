@@ -194,6 +194,7 @@ func (v *validator) validate() []Diagnostic {
 	diagnostics = append(diagnostics, validateRPCs(v.symbols)...)
 	diagnostics = append(diagnostics, validateCycles(v.symbols)...)
 	diagnostics = append(diagnostics, validateStructure(v.symbols, v.files)...)
+	diagnostics = append(diagnostics, validateGlobalUniqueness(v.symbols)...)
 
 	return diagnostics
 }

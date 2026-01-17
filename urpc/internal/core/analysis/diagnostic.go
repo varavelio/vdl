@@ -74,6 +74,7 @@ const (
 	CodeDuplicateEnum    = "E802"
 	CodeDuplicateConst   = "E803"
 	CodeDuplicatePattern = "E804"
+	CodeDuplicateName    = "E805" // Cross-category name collision
 )
 
 // Diagnostic represents an error found during semantic analysis.
