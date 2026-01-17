@@ -15,13 +15,11 @@ type Program struct {
 	Files map[string]*File
 
 	// Global namespace - all symbols merged from all files
-	Types    map[string]*TypeSymbol
-	Enums    map[string]*EnumSymbol
-	Consts   map[string]*ConstSymbol
-	Patterns map[string]*PatternSymbol
-	RPCs     map[string]*RPCSymbol
-
-	// StandaloneDocs contains top-level standalone docstrings.
+	Types          map[string]*TypeSymbol
+	Enums          map[string]*EnumSymbol
+	Consts         map[string]*ConstSymbol
+	Patterns       map[string]*PatternSymbol
+	RPCs           map[string]*RPCSymbol
 	StandaloneDocs []*DocSymbol
 }
 
