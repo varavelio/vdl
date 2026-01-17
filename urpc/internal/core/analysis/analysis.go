@@ -117,16 +117,16 @@ func Analyze(fs *vfs.FileSystem, entryPoint string) (*Program, []Diagnostic) {
 //
 // Parameters:
 //   - schema: Pre-parsed AST schema
-//   - filename: The filename to use for error reporting (should be absolute path)
+//   - absoluteFilePath: The absolute file path to use for error reporting
 //
 // Returns:
 //   - *Program: The program with all successfully collected symbols (never nil)
 //   - []Diagnostic: All errors found during analysis (empty slice if successful)
-func AnalyzeSchema(schema *ast.Schema, filename string) (*Program, []Diagnostic) {
+func AnalyzeSchema(schema *ast.Schema, absoluteFilePath string) (*Program, []Diagnostic) {
 	// Create a single-file map
 	files := map[string]*File{
-		filename: {
-			Path:     filename,
+		absoluteFilePath: {
+			Path:     absoluteFilePath,
 			AST:      schema,
 			Includes: []string{},
 		},
@@ -143,5 +143,5 @@ func AnalyzeSchema(schema *ast.Schema, filename string) (*Program, []Diagnostic)
 	allDiags := append(collectionDiags, validationDiags...)
 
 	// Phase 4: Result - Always return the program (best-effort)
-	return validator.buildProgram(filename), allDiags
+	return validator.buildProgram(absoluteFilePath), allDiags
 }
