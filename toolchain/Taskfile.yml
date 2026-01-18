@@ -11,16 +11,22 @@ version: "3"
 tasks:
   install:
     desc: Build and install the urpc binary in the local PATH for testing
+    deps:
+      - codegen
     cmd: go install ./cmd/urpc/.
 
   build:wasm:
     desc: Build the WebAssembly binary for the Playground
+    deps:
+      - codegen
     cmds:
       - GOOS=js GOARCH=wasm go build -o ./dist/urpc.wasm ./cmd/urpcwasm/.
       - cp "/usr/local/go/lib/wasm/wasm_exec.js" ./dist/wasm_exec.js
 
   build:urpc:
     desc: Build the urpc binary
+    deps:
+      - codegen
     cmds:
       # LINUX builds
       - GOOS=linux GOARCH=amd64 go build -o ./dist/urpc-linux-amd64 ./cmd/urpc/.
@@ -33,6 +39,15 @@ tasks:
       # DARWIN (macOS) builds
       - GOOS=darwin GOARCH=amd64 go build -o ./dist/urpc-darwin-amd64 ./cmd/urpc/.
       - GOOS=darwin GOARCH=arm64 go build -o ./dist/urpc-darwin-arm64 ./cmd/urpc/.
+
+  codegen:
+    desc: Run all project code generators
+    cmds:
+      - task: gen:ir-schema
+
+  gen:ir-schema:
+    desc: Generate the JSON Schema for the IR package
+    cmd: go run ./cmd/irschema
 
   test:
     desc: Run tests
