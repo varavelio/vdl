@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
 )
 
 // symbolTable manages the collection and lookup of symbols during analysis.

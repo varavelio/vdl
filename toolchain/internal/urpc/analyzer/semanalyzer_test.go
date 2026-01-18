@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
 )
 
 // parseSchema parses the given input string into an ast.Schema.

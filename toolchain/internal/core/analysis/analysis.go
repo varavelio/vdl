@@ -39,8 +39,8 @@
 package analysis
 
 import (
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
-	"github.com/uforg/uforpc/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/core/vfs"
 )
 
 // Analyze performs complete semantic analysis starting from an entry point.

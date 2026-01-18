@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/formatter"
-	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
+	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
 )
 
 func TestExpandTypes(t *testing.T) {

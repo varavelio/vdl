@@ -3,7 +3,7 @@ package lsp
 import (
 	"fmt"
 
-	"github.com/uforg/uforpc/urpc/internal/version"
+	"github.com/varavelio/vdl/urpc/internal/version"
 )
 
 type RequestMessageInitialize struct {

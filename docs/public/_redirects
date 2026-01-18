@@ -3,8 +3,8 @@
 /r/reddit https://www.reddit.com/r/uforpc
 /r/twitter https://x.com/eduardoolat
 /r/x https://x.com/eduardoolat
-/r/github https://github.com/uforg/uforpc
-/r/gh https://github.com/uforg/uforpc
+/r/github https://github.com/varavelio/vdl
+/r/gh https://github.com/varavelio/vdl
 
 # Author links
 /r/author/web https://eduardo.lat
@@ -14,8 +14,8 @@
 /r/author/x https://x.com/eduardoolat
 
 # Documentation short links
-/r/license-code https://github.com/uforg/uforpc/blob/main/LICENSE
-/r/license-gen https://github.com/uforg/uforpc/blob/main/LICENSE-GENERATED-CODE
+/r/license-code https://github.com/varavelio/vdl/blob/main/LICENSE
+/r/license-gen https://github.com/varavelio/vdl/blob/main/LICENSE-GENERATED-CODE
 /r/license https://uforpc.uforg.dev
 /r/configfile https://uforpc.uforg.dev
 /r/config https://uforpc.uforg.dev

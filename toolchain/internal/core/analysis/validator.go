@@ -1,7 +1,7 @@
 package analysis
 
 import (
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
 )
 
 // validator orchestrates symbol collection and validation.

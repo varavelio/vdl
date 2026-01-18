@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/formatter"
-	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
+	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
 )
 
 // ExtractTypeStr extracts a specific type declaration from the URPC schema by name.

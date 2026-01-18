@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
 )
 
 // docstringResolver is in charge of verifying that all external docstrings

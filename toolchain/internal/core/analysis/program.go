@@ -1,7 +1,7 @@
 package analysis
 
 import (
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
 )
 
 // Program represents a fully analyzed and validated UFO RPC project.

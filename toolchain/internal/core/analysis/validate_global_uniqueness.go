@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
 )
 
 // symbolOrigin tracks where a name was first declared for collision detection.

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
-	"github.com/uforg/uforpc/urpc/internal/util/debugutil"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/util/debugutil"
 )
 
 ///////////////////////////

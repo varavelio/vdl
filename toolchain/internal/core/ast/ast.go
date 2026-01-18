@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/urpc/internal/util/strutil"
 )
 
 // QuotedString is a custom type that implements participle's Capture interface

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/core/ast"
-	"github.com/uforg/uforpc/urpc/internal/util/testutil"
+	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/urpc/internal/util/testutil"
 )
 
 // Helper function to create a pointer to a string

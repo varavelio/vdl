@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/BurntSushi/toml"
-	"github.com/uforg/uforpc/urpc/internal/codegen/dart"
-	"github.com/uforg/uforpc/urpc/internal/codegen/golang"
-	"github.com/uforg/uforpc/urpc/internal/codegen/openapi"
-	"github.com/uforg/uforpc/urpc/internal/codegen/playground"
-	"github.com/uforg/uforpc/urpc/internal/codegen/typescript"
+	"github.com/varavelio/vdl/urpc/internal/codegen/dart"
+	"github.com/varavelio/vdl/urpc/internal/codegen/golang"
+	"github.com/varavelio/vdl/urpc/internal/codegen/openapi"
+	"github.com/varavelio/vdl/urpc/internal/codegen/playground"
+	"github.com/varavelio/vdl/urpc/internal/codegen/typescript"
 )
 
 // Config is the configuration for the code generator.

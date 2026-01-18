@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/formatter"
+	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
 )
 
 type RequestMessageTextDocumentFormatting struct {

@@ -1,7 +1,7 @@
 package ir
 
 import (
-	"github.com/uforg/uforpc/urpc/internal/core/analysis"
+	"github.com/varavelio/vdl/urpc/internal/core/analysis"
 )
 
 // flattenFields expands all spreads into a flat list of fields.

@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/core/analysis"
-	"github.com/uforg/uforpc/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/urpc/internal/core/analysis"
+	"github.com/varavelio/vdl/urpc/internal/core/vfs"
 )
 
 var update = flag.Bool("update", false, "update golden files")

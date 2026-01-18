@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/uforg/uforpc/urpc/internal/util/filepathutil"
+	"github.com/varavelio/vdl/urpc/internal/util/filepathutil"
 )
 
 var (

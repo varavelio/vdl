@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
 )
 
 // SymbolKind values (subset of LSP specification)

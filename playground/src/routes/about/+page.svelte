@@ -26,7 +26,7 @@
 
     <div class="flex items-center justify-center space-x-2">
       <a
-        href="https://github.com/uforg/uforpc"
+        href="https://github.com/varavelio/vdl"
         target="_blank"
         class={{
           "btn btn-primary": true,
@@ -125,7 +125,7 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://github.com/uforg/uforpc/blob/main/urpc/go.mod"
+                href="https://github.com/varavelio/vdl/blob/main/urpc/go.mod"
                 target="_blank"
                 class="link"
               >
@@ -134,7 +134,7 @@
             </li>
             <li>
               <a
-                href="https://github.com/uforg/uforpc/blob/main/playground/package.json"
+                href="https://github.com/varavelio/vdl/blob/main/playground/package.json"
                 target="_blank"
                 class="link"
               >

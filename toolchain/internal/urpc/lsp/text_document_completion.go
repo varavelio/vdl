@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/lexer"
-	"github.com/uforg/uforpc/urpc/internal/urpc/token"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/lexer"
+	"github.com/varavelio/vdl/urpc/internal/urpc/token"
 )
 
 const (

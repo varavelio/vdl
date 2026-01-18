@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/lexer"
-	"github.com/uforg/uforpc/urpc/internal/urpc/token"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/lexer"
+	"github.com/varavelio/vdl/urpc/internal/urpc/token"
 )
 
 // RequestMessageTextDocumentRename represents a request for renaming a symbol.

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/alexflint/go-arg"
-	"github.com/uforg/uforpc/urpc/internal/version"
+	"github.com/varavelio/vdl/urpc/internal/version"
 )
 
 type allArgs struct {

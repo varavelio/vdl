@@ -12,7 +12,7 @@
 </script>
 
 <a
-  href="https://github.com/uforg/uforpc/releases/tag/{versionWithPrefix}"
+  href="https://github.com/varavelio/vdl/releases/tag/{versionWithPrefix}"
   target="_blank"
   class={mergeClasses("btn btn-ghost flex items-center", className)}
 >

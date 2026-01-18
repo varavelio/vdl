@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/uforg/uforpc/urpc/internal/schema"
-	"github.com/uforg/uforpc/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/urpc/internal/util/strutil"
 )
 
 // dartTypeLiteral returns the Dart type literal for a field, considering custom/built-in/inline and arrays/optionality.

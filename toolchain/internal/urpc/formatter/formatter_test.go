@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/urpc/internal/util/strutil"
 )
 
 //go:embed tests/*.urpc

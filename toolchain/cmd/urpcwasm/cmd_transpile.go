@@ -8,10 +8,10 @@ import (
 	"strings"
 	"syscall/js"
 
-	"github.com/uforg/uforpc/urpc/internal/schema"
-	"github.com/uforg/uforpc/urpc/internal/transpile"
-	"github.com/uforg/uforpc/urpc/internal/urpc/formatter"
-	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/urpc/internal/transpile"
+	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
+	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
 )
 
 func cmdTranspileWrapper() js.Func {

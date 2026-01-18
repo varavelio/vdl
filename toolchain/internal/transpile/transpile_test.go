@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/schema"
-	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
-	"github.com/uforg/uforpc/urpc/internal/util/testutil"
+	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/urpc/internal/util/testutil"
 )
 
 // Run all transpiler tests

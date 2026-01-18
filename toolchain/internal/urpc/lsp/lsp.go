@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/analyzer"
-	"github.com/uforg/uforpc/urpc/internal/urpc/docstore"
+	"github.com/varavelio/vdl/urpc/internal/urpc/analyzer"
+	"github.com/varavelio/vdl/urpc/internal/urpc/docstore"
 )
 
 type LSP struct {

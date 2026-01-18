@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/urpc/analyzer"
+	"github.com/varavelio/vdl/urpc/internal/urpc/analyzer"
 )
 
 func TestExtractCodeFromContent(t *testing.T) {

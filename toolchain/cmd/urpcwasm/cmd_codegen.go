@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"syscall/js"
 
-	"github.com/uforg/uforpc/urpc/internal/codegen"
+	"github.com/varavelio/vdl/urpc/internal/codegen"
 )
 
 func cmdCodegenWrapper() js.Func {

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/uforg/uforpc/urpc/internal/schema"
+	"github.com/varavelio/vdl/urpc/internal/schema"
 )
 
 func generateDomainTypes(sch schema.Schema, config Config) (string, error) {

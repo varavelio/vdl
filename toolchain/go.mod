@@ -1,10 +1,10 @@
-module github.com/uforg/uforpc/urpc
+module github.com/varavelio/vdl/urpc
 
 go 1.25
 
-require github.com/uforg/uforpc/embedplayground v0.0.0
+require github.com/varavelio/vdl/embedplayground v0.0.0
 
-replace github.com/uforg/uforpc/embedplayground v0.0.0 => ../playground
+replace github.com/varavelio/vdl/embedplayground v0.0.0 => ../playground
 
 require (
 	github.com/BurntSushi/toml v1.5.0

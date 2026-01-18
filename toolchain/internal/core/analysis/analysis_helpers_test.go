@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uforg/uforpc/urpc/internal/core/analysis"
-	"github.com/uforg/uforpc/urpc/internal/core/parser"
-	"github.com/uforg/uforpc/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/urpc/internal/core/analysis"
+	"github.com/varavelio/vdl/urpc/internal/core/parser"
+	"github.com/varavelio/vdl/urpc/internal/core/vfs"
 )
 
 // testdataDir is the path to the testdata directory relative to this test file.

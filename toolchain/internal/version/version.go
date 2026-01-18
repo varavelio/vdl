@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/uforg/uforpc/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/urpc/internal/util/strutil"
 )
 
 // Version is replaced during the release process by the latest Git tag
@@ -22,7 +22,7 @@ var asciiArtRaw = strings.Join([]string{
 
 // basicInfoRaw is used to generate AsciiArt
 var basicInfoRaw = strings.Join([]string{
-	"Star the repo: https://github.com/uforg/uforpc",
+	"Star the repo: https://github.com/varavelio/vdl",
 	"Show usage:    urpc --help",
 	"Show version:  urpc --version",
 }, "\n")

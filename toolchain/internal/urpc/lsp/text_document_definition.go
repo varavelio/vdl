@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/docstore"
-	"github.com/uforg/uforpc/urpc/internal/urpc/lexer"
-	"github.com/uforg/uforpc/urpc/internal/urpc/token"
-	"github.com/uforg/uforpc/urpc/internal/util/filepathutil"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/docstore"
+	"github.com/varavelio/vdl/urpc/internal/urpc/lexer"
+	"github.com/varavelio/vdl/urpc/internal/urpc/token"
+	"github.com/varavelio/vdl/urpc/internal/util/filepathutil"
 )
 
 // RequestMessageTextDocumentDefinition represents a request for the definition of a symbol.

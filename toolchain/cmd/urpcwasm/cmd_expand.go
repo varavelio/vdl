@@ -5,7 +5,7 @@ package main
 import (
 	"syscall/js"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/transform"
+	"github.com/varavelio/vdl/urpc/internal/urpc/transform"
 )
 
 /*

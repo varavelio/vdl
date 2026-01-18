@@ -6,8 +6,8 @@ package analyzer
 import (
 	"fmt"
 
-	"github.com/uforg/uforpc/urpc/internal/urpc/ast"
-	"github.com/uforg/uforpc/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
 )
 
 // Analyzer manages the analysis process for URPC schemas without caching.
