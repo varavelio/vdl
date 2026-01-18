@@ -64,17 +64,17 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/license-code"
+                href="https://uforpc.uforg.dev/r/license"
                 target="_blank"
                 class="link"
               >
-                UFO RPC Generator: AGPL-3.0
+                VDL Generator: MIT
               </a>
               - Ensures this project remains free and open source forever
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/license-gen"
+                href="https://uforpc.uforg.dev/r/license"
                 target="_blank"
                 class="link"
               >
@@ -85,26 +85,7 @@
           </ul>
 
           <p class="text-base-content/80 leading-relaxed">
-            <strong>What This Means</strong>
-          </p>
-
-          <ul class="list-inside list-disc">
-            <li>
-              ✅ For UFO RPC: Anyone who modifies UFO RPC must share their
-              changes with the community
-            </li>
-            <li>
-              ✅ For Your Code: Use generated code in any project (commercial,
-              private, open source)
-            </li>
-            <li>
-              ✅ Forever Free: No one can make UFO RPC proprietary or
-              closed-source
-            </li>
-          </ul>
-
-          <p class="text-base-content/80 leading-relaxed">
-            UFO RPC is provided "AS IS" without warranty of any kind. The
+            VDL is provided "AS IS" without warranty of any kind. The
             authors assume no responsibility for damages or losses from using
             this software. You are responsible for testing generated code before
             production use.
@@ -118,7 +99,7 @@
         <h2 class="card-title mb-4 text-2xl">Dependencies</h2>
         <div class="space-y-4">
           <p class="text-base-content/80 leading-relaxed">
-            UFO RPC is possible thanks to the following awesome open-source
+            VDL is possible thanks to the following awesome open-source
             projects
           </p>
 
