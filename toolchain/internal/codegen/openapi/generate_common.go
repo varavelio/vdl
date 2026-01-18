@@ -1,139 +1,125 @@
 package openapi
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-// generateProperties generates the JSON schema properties for a given list of fields.
-//
-// It returns a map of the JSON schema properties and a list of required fields.
-func generateProperties(fields []schema.FieldDefinition) (map[string]any, []string) {
+// generateTypeRefSchema converts an IR TypeRef to a JSON Schema representation.
+func generateTypeRefSchema(t ir.TypeRef) map[string]any {
+	switch t.Kind {
+	case ir.TypeKindPrimitive:
+		return primitiveToJSONSchema(t.Primitive)
+
+	case ir.TypeKindType:
+		return map[string]any{
+			"$ref": "#/components/schemas/" + t.Type,
+		}
+
+	case ir.TypeKindEnum:
+		return map[string]any{
+			"$ref": "#/components/schemas/" + t.Enum,
+		}
+
+	case ir.TypeKindArray:
+		itemSchema := generateTypeRefSchema(*t.ArrayItem)
+		// For multi-dimensional arrays, we need to nest the array schema
+		for i := 1; i < t.ArrayDimensions; i++ {
+			itemSchema = map[string]any{
+				"type":  "array",
+				"items": itemSchema,
+			}
+		}
+		return map[string]any{
+			"type":  "array",
+			"items": itemSchema,
+		}
+
+	case ir.TypeKindMap:
+		return map[string]any{
+			"type":                 "object",
+			"additionalProperties": generateTypeRefSchema(*t.MapValue),
+		}
+
+	case ir.TypeKindObject:
+		props, required := generatePropertiesFromFields(t.Object.Fields)
+		schema := map[string]any{
+			"type":       "object",
+			"properties": props,
+		}
+		if len(required) > 0 {
+			schema["required"] = required
+		}
+		return schema
+	}
+
+	return map[string]any{}
+}
+
+// primitiveToJSONSchema converts an IR primitive type to JSON Schema.
+func primitiveToJSONSchema(p ir.PrimitiveType) map[string]any {
+	switch p {
+	case ir.PrimitiveString:
+		return map[string]any{"type": "string"}
+	case ir.PrimitiveInt:
+		return map[string]any{"type": "integer"}
+	case ir.PrimitiveFloat:
+		return map[string]any{"type": "number"}
+	case ir.PrimitiveBool:
+		return map[string]any{"type": "boolean"}
+	case ir.PrimitiveDatetime:
+		return map[string]any{"type": "string", "format": "date-time"}
+	}
+	return map[string]any{"type": "string"}
+}
+
+// generatePropertiesFromFields generates JSON schema properties from IR fields.
+// Returns the properties map and a list of required field names.
+func generatePropertiesFromFields(fields []ir.Field) (map[string]any, []string) {
 	properties := map[string]any{}
-	requiredFields := []string{}
+	required := []string{}
 
 	for _, field := range fields {
-		properties[field.Name] = map[string]any{}
+		prop := generateTypeRefSchema(field.Type)
 
-		isInline := field.TypeInline != nil
-		isNamed := field.TypeName != nil
-		isArray := field.IsArray
-		hasDoc := field.Doc != nil
-
-		doc := ""
-		if hasDoc {
-			doc = strings.TrimSpace(strutil.NormalizeIndent(*field.Doc))
-		}
-
-		if isNamed && ast.IsPrimitiveType(*field.TypeName) {
-			fieldType := *field.TypeName
-			switch *field.TypeName {
-			case ast.PrimitiveTypeString:
-				fieldType = "string"
-			case ast.PrimitiveTypeInt:
-				fieldType = "integer"
-			case ast.PrimitiveTypeFloat:
-				fieldType = "number"
-			case ast.PrimitiveTypeBool:
-				fieldType = "boolean"
-			case ast.PrimitiveTypeDatetime:
-				fieldType = "string"
-			}
-
-			prop := map[string]any{
-				"type": fieldType,
-			}
-
-			if *field.TypeName == ast.PrimitiveTypeDatetime {
-				prop["format"] = "date-time"
-			}
-
-			if hasDoc {
-				prop["description"] = doc
-			}
-
-			properties[field.Name] = prop
-		}
-
-		if isNamed && !ast.IsPrimitiveType(*field.TypeName) {
-			allOf := []map[string]any{
-				{
-					"$ref": fmt.Sprintf("#/components/schemas/%s", *field.TypeName),
-				},
-			}
-
-			if hasDoc {
-				allOf = append(allOf, map[string]any{
-					"description": doc,
-				})
-			}
-
-			properties[field.Name] = map[string]any{
-				"allOf": allOf,
+		// Add description if present
+		if field.Doc != "" {
+			// If prop is a $ref, we need to wrap it in allOf to add description
+			if _, hasRef := prop["$ref"]; hasRef {
+				prop = map[string]any{
+					"allOf": []map[string]any{
+						prop,
+						{"description": field.Doc},
+					},
+				}
+			} else {
+				prop["description"] = field.Doc
 			}
 		}
 
-		if isInline {
-			childProps, childRequired := generateProperties(field.TypeInline.Fields)
-
-			prop := map[string]any{
-				"type":       "object",
-				"properties": childProps,
-			}
-
-			if len(childRequired) > 0 {
-				prop["required"] = childRequired
-			}
-
-			if hasDoc {
-				prop["description"] = doc
-			}
-
-			properties[field.Name] = prop
-		}
-
-		if isArray {
-			arrayProp := map[string]any{
-				"type":  "array",
-				"items": properties[field.Name],
-			}
-
-			if hasDoc {
-				arrayProp["description"] = doc
-			}
-
-			properties[field.Name] = arrayProp
-		}
+		properties[field.Name] = prop
 
 		if !field.Optional {
-			requiredFields = append(requiredFields, field.Name)
+			required = append(required, field.Name)
 		}
 	}
 
-	return properties, requiredFields
+	return properties, required
 }
 
-// generateOutputProperties generates the output properties for a given list of fields.
-//
-// It includes the `ok` field and the `error` field to handle both success and failure cases.
-//
-// It returns a map of the JSON schema properties and a list of required fields.
-func generateOutputProperties(fields []schema.FieldDefinition) (map[string]any, []string) {
-	outputProperties, outputRequiredFields := generateProperties(fields)
-	output := componentRequestBodySchema{
-		Type:       "object",
-		Properties: outputProperties,
-		Required:   outputRequiredFields,
+// generateOutputProperties generates the output wrapper with ok/error structure.
+// This follows the VDL response lifecycle spec.
+func generateOutputProperties(fields []ir.Field) (map[string]any, []string) {
+	outputProperties, outputRequiredFields := generatePropertiesFromFields(fields)
+	output := map[string]any{
+		"type":       "object",
+		"properties": outputProperties,
+	}
+	if len(outputRequiredFields) > 0 {
+		output["required"] = outputRequiredFields
 	}
 
 	properties := map[string]any{
-		"ok": map[string]any{
-			"type": "boolean",
-		},
+		"ok":     map[string]any{"type": "boolean"},
 		"output": output,
 		"error": map[string]any{
 			"type": "object",

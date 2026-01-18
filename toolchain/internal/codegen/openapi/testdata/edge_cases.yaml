@@ -1,0 +1,299 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: EdgeCasesProcedures
+    description: Procedures for EdgeCases
+  - name: EdgeCasesStreams
+    description: Streams for EdgeCases
+paths:
+  /EdgeCases/BothEmpty:
+    post:
+      description: Procedure with both empty
+      requestBody:
+        $ref: "#/components/requestBodies/EdgeCases_BothEmptyInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/EdgeCases_BothEmptyOutput"
+      tags:
+        - EdgeCasesProcedures
+  /EdgeCases/EmptyInput:
+    post:
+      description: Procedure with empty input
+      requestBody:
+        $ref: "#/components/requestBodies/EdgeCases_EmptyInputInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/EdgeCases_EmptyInputOutput"
+      tags:
+        - EdgeCasesProcedures
+  /EdgeCases/EmptyInputStream:
+    post:
+      description: Stream with empty input
+      requestBody:
+        $ref: "#/components/requestBodies/EdgeCases_EmptyInputStreamInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/EdgeCases_EmptyInputStreamOutput"
+      tags:
+        - EdgeCasesStreams
+  /EdgeCases/EmptyOutput:
+    post:
+      description: Procedure with empty output
+      requestBody:
+        $ref: "#/components/requestBodies/EdgeCases_EmptyOutputInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/EdgeCases_EmptyOutputOutput"
+      tags:
+        - EdgeCasesProcedures
+  /EdgeCases/LongDocumentation:
+    post:
+      description: "Procedure with very long documentation.\n\nThis procedure does many things:\n\n1. First it validates the input\n2. Then it processes the data\n3. Finally it returns the result\n\n## Parameters\n\n- `complexField`: A deeply nested structure\n\n## Returns\n\nA simple boolean indicating success\n\n## Example\n\n```json\n{\n  \"complexField\": {\n    \"nested\": {\n      \"value\": 42\n    }\n  }\n}\n```"
+      requestBody:
+        $ref: "#/components/requestBodies/EdgeCases_LongDocumentationInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/EdgeCases_LongDocumentationOutput"
+      tags:
+        - EdgeCasesProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    SpecialDoc:
+      description: "Type with special characters in documentation:\n- Supports `code blocks`\n- Supports **bold** and *italic*\n- Supports special chars: <, >, &, \", '"
+      properties:
+        field1:
+          description: Field with `backticks` and "quotes"
+          type: string
+        field2:
+          description: Field with <angle> & ampersand
+          type: integer
+      required:
+        - field1
+        - field2
+      type: object
+  requestBodies:
+    EdgeCases_BothEmptyInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for EdgeCases/BothEmpty procedure
+    EdgeCases_EmptyInputInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for EdgeCases/EmptyInput procedure
+    EdgeCases_EmptyInputStreamInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for EdgeCases/EmptyInputStream stream subscription
+    EdgeCases_EmptyOutputInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: string
+            required:
+              - data
+            type: object
+      description: Request body for EdgeCases/EmptyOutput procedure
+    EdgeCases_LongDocumentationInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              complexField:
+                properties:
+                  nested:
+                    properties:
+                      value:
+                        type: integer
+                    required:
+                      - value
+                    type: object
+                required:
+                  - nested
+                type: object
+            required:
+              - complexField
+            type: object
+      description: Request body for EdgeCases/LongDocumentation procedure
+  responses:
+    EdgeCases_BothEmptyOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties: {}
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for EdgeCases/BothEmpty procedure
+    EdgeCases_EmptyInputOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  result:
+                    type: string
+                required:
+                  - result
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for EdgeCases/EmptyInput procedure
+    EdgeCases_EmptyInputStreamOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  event:
+                    type: string
+                  timestamp:
+                    format: date-time
+                    type: string
+                required:
+                  - event
+                  - timestamp
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for EdgeCases/EmptyInputStream stream
+    EdgeCases_EmptyOutputOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties: {}
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for EdgeCases/EmptyOutput procedure
+    EdgeCases_LongDocumentationOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for EdgeCases/LongDocumentation procedure

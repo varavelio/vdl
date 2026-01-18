@@ -3,27 +3,23 @@ package openapi
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generatePaths(sch schema.Schema) (Paths, error) {
+// generatePaths generates OpenAPI paths from the IR schema.
+// Paths follow the VDL request lifecycle spec: /{RPCName}/{EndpointName}
+func generatePaths(schema *ir.Schema) Paths {
 	paths := Paths{}
 
-	for _, procNode := range sch.GetProcNodes() {
-		name := procNode.Name
-		inputName := fmt.Sprintf("%sInput", name)
-		outputName := fmt.Sprintf("%sOutput", name)
+	for _, rpc := range schema.RPCs {
+		// Generate paths for procedures
+		for _, proc := range rpc.Procs {
+			path := "/" + rpc.Name + "/" + proc.Name
+			inputName := rpc.Name + "_" + proc.Name + "Input"
+			outputName := rpc.Name + "_" + proc.Name + "Output"
 
-		doc := ""
-		if procNode.Doc != nil {
-			doc = *procNode.Doc
-		}
-
-		paths["/"+name] = map[string]any{
-			"post": map[string]any{
-				"deprecated":  procNode.Deprecated != nil,
-				"tags":        []string{"procedures"},
-				"description": doc,
+			operation := map[string]any{
+				"tags": []string{rpc.Name + "Procedures"},
 				"requestBody": map[string]any{
 					"$ref": fmt.Sprintf("#/components/requestBodies/%s", inputName),
 				},
@@ -32,25 +28,29 @@ func generatePaths(sch schema.Schema) (Paths, error) {
 						"$ref": fmt.Sprintf("#/components/responses/%s", outputName),
 					},
 				},
-			},
+			}
+
+			if proc.Doc != "" {
+				operation["description"] = proc.Doc
+			}
+
+			if proc.Deprecated != nil {
+				operation["deprecated"] = true
+			}
+
+			paths[path] = map[string]any{
+				"post": operation,
+			}
 		}
-	}
 
-	for _, streamNode := range sch.GetStreamNodes() {
-		name := streamNode.Name
-		inputName := fmt.Sprintf("%sInput", name)
-		outputName := fmt.Sprintf("%sOutput", name)
+		// Generate paths for streams
+		for _, stream := range rpc.Streams {
+			path := "/" + rpc.Name + "/" + stream.Name
+			inputName := rpc.Name + "_" + stream.Name + "Input"
+			outputName := rpc.Name + "_" + stream.Name + "Output"
 
-		doc := ""
-		if streamNode.Doc != nil {
-			doc = *streamNode.Doc
-		}
-
-		paths["/"+name] = map[string]any{
-			"post": map[string]any{
-				"deprecated":  streamNode.Deprecated != nil,
-				"tags":        []string{"streams"},
-				"description": doc,
+			operation := map[string]any{
+				"tags": []string{rpc.Name + "Streams"},
 				"requestBody": map[string]any{
 					"$ref": fmt.Sprintf("#/components/requestBodies/%s", inputName),
 				},
@@ -59,9 +59,21 @@ func generatePaths(sch schema.Schema) (Paths, error) {
 						"$ref": fmt.Sprintf("#/components/responses/%s", outputName),
 					},
 				},
-			},
+			}
+
+			if stream.Doc != "" {
+				operation["description"] = stream.Doc
+			}
+
+			if stream.Deprecated != nil {
+				operation["deprecated"] = true
+			}
+
+			paths[path] = map[string]any{
+				"post": operation,
+			}
 		}
 	}
 
-	return paths, nil
+	return paths
 }

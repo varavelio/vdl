@@ -1,0 +1,100 @@
+""" Test for edge cases: empty inputs/outputs, special characters in docs """
+
+"""
+# API Documentation
+
+This is a **standalone docstring** with markdown.
+
+- Item 1
+- Item 2
+
+> Note: This tests multiline docs
+"""
+
+""" 
+Type with special characters in documentation:
+- Supports `code blocks`
+- Supports **bold** and *italic*
+- Supports special chars: <, >, &, ", '
+"""
+type SpecialDoc {
+    """ Field with `backticks` and "quotes" """
+    field1: string
+    """ Field with <angle> & ampersand """
+    field2: int
+}
+
+rpc EdgeCases {
+    """ Procedure with empty input """
+    proc EmptyInput {
+        input {}
+        output {
+            result: string
+        }
+    }
+
+    """ Procedure with empty output """
+    proc EmptyOutput {
+        input {
+            data: string
+        }
+        output {}
+    }
+
+    """ Procedure with both empty """
+    proc BothEmpty {
+        input {}
+        output {}
+    }
+
+    """ Stream with empty input """
+    stream EmptyInputStream {
+        input {}
+        output {
+            event: string
+            timestamp: datetime
+        }
+    }
+
+    """
+    Procedure with very long documentation.
+    
+    This procedure does many things:
+    
+    1. First it validates the input
+    2. Then it processes the data
+    3. Finally it returns the result
+    
+    ## Parameters
+    
+    - `complexField`: A deeply nested structure
+    
+    ## Returns
+    
+    A simple boolean indicating success
+    
+    ## Example
+    
+    ```json
+    {
+      "complexField": {
+        "nested": {
+          "value": 42
+        }
+      }
+    }
+    ```
+    """
+    proc LongDocumentation {
+        input {
+            complexField: {
+                nested: {
+                    value: int
+                }
+            }
+        }
+        output {
+            success: bool
+        }
+    }
+}

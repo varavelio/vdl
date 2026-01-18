@@ -1,0 +1,152 @@
+""" Test for multiple RPCs with complex interactions """
+
+enum Role {
+    Admin
+    User
+    Guest
+}
+
+enum Status {
+    Active = 1
+    Inactive = 2
+    Suspended = 3
+}
+
+type User {
+    id: string
+    name: string
+    role: Role
+    status: Status
+}
+
+type Permission {
+    resource: string
+    actions: string[]
+}
+
+""" Authentication service """
+rpc Auth {
+    """ Login procedure """
+    proc Login {
+        input {
+            email: string
+            password: string
+        }
+        output {
+            token: string
+            user: User
+            permissions: Permission[]
+        }
+    }
+
+    """ Logout procedure """
+    proc Logout {
+        input {
+            token: string
+        }
+        output {
+            success: bool
+        }
+    }
+
+    """ Session status stream """
+    stream SessionStatus {
+        input {
+            token: string
+        }
+        output {
+            isValid: bool
+            expiresAt: datetime
+            user?: User
+        }
+    }
+}
+
+""" User management service """
+rpc Users {
+    """ Create a new user """
+    proc Create {
+        input {
+            name: string
+            email: string
+            role: Role
+            metadata?: map<string>
+        }
+        output {
+            user: User
+        }
+    }
+
+    """ List users with filters """
+    proc List {
+        input {
+            roles?: Role[]
+            statuses?: Status[]
+            search?: string
+            limit: int
+            offset: int
+        }
+        output {
+            users: User[]
+            total: int
+        }
+    }
+
+    """ Update user """
+    proc Update {
+        input {
+            id: string
+            name?: string
+            role?: Role
+            status?: Status
+        }
+        output {
+            user: User
+        }
+    }
+
+    """ Stream user changes """
+    stream Changes {
+        input {
+            userIds?: string[]
+        }
+        output {
+            userId: string
+            changeType: string
+            user: User
+            timestamp: datetime
+        }
+    }
+}
+
+""" Notifications service """
+rpc Notifications {
+    """ Send notification """
+    proc Send {
+        input {
+            userId: string
+            title: string
+            body: string
+            data?: map<string>
+        }
+        output {
+            notificationId: string
+            sentAt: datetime
+        }
+    }
+
+    """ Subscribe to notifications """
+    stream Subscribe {
+        input {
+            userId: string
+            channels?: string[]
+        }
+        output {
+            id: string
+            title: string
+            body: string
+            data?: map<string>
+            receivedAt: datetime
+        }
+    }
+}

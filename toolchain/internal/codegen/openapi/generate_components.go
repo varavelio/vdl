@@ -2,17 +2,11 @@ package openapi
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/schema"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
-
-type componentRequestBodySchema struct {
-	Type       string         `json:"type"`
-	Properties map[string]any `json:"properties"`
-	Required   []string       `json:"required,omitempty"`
-}
 
 const authTokenDescription = `
 Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.
@@ -24,7 +18,8 @@ Enter the full value for the Authorization header. The specific format (Bearer, 
 - **API Key:** ''sk_live_123abc456def'' (a raw token)
 `
 
-func generateComponents(sch schema.Schema) (Components, error) {
+// generateComponents generates OpenAPI components from the IR schema.
+func generateComponents(schema *ir.Schema) Components {
 	components := Components{
 		SecuritySchemes: map[string]any{
 			"AuthToken": map[string]any{
@@ -39,105 +34,179 @@ func generateComponents(sch schema.Schema) (Components, error) {
 		Responses:     map[string]any{},
 	}
 
-	for _, typeNode := range sch.GetTypeNodes() {
-		desc := ""
-		if typeNode.Doc != nil {
-			desc = strings.TrimSpace(strutil.NormalizeIndent(*typeNode.Doc))
+	// Generate schemas for custom types
+	for _, t := range schema.Types {
+		components.Schemas[t.Name] = generateTypeSchema(t)
+	}
+
+	// Generate schemas for enums
+	for _, e := range schema.Enums {
+		components.Schemas[e.Name] = generateEnumSchema(e)
+	}
+
+	// Generate request/response bodies for each RPC endpoint
+	for _, rpc := range schema.RPCs {
+		// Procedures
+		for _, proc := range rpc.Procs {
+			inputName := rpc.Name + "_" + proc.Name + "Input"
+			outputName := rpc.Name + "_" + proc.Name + "Output"
+
+			components.RequestBodies[inputName] = generateRequestBody(
+				proc.Input,
+				fmt.Sprintf("Request body for %s/%s procedure", rpc.Name, proc.Name),
+			)
+
+			components.Responses[outputName] = generateProcedureResponse(
+				proc.Output,
+				fmt.Sprintf("Response for %s/%s procedure", rpc.Name, proc.Name),
+			)
 		}
 
-		if typeNode.Deprecated != nil {
-			desc += "\n\nDeprecated: "
-			if *typeNode.Deprecated == "" {
-				desc += "This type is deprecated and should not be used in new code."
-			} else {
-				desc += *typeNode.Deprecated
+		// Streams
+		for _, stream := range rpc.Streams {
+			inputName := rpc.Name + "_" + stream.Name + "Input"
+			outputName := rpc.Name + "_" + stream.Name + "Output"
+
+			components.RequestBodies[inputName] = generateRequestBody(
+				stream.Input,
+				fmt.Sprintf("Request body for %s/%s stream subscription", rpc.Name, stream.Name),
+			)
+
+			components.Responses[outputName] = generateStreamResponse(
+				stream.Output,
+				fmt.Sprintf("Server-Sent Events for %s/%s stream", rpc.Name, stream.Name),
+			)
+		}
+	}
+
+	return components
+}
+
+// generateTypeSchema generates an OpenAPI schema for an IR type.
+func generateTypeSchema(t ir.Type) map[string]any {
+	properties, required := generatePropertiesFromFields(t.Fields)
+
+	schema := map[string]any{
+		"type":       "object",
+		"properties": properties,
+	}
+
+	if t.Doc != "" {
+		schema["description"] = t.Doc
+	}
+
+	if t.Deprecated != nil {
+		schema["deprecated"] = true
+		if t.Deprecated.Message != "" {
+			desc := schema["description"]
+			if desc == nil {
+				desc = ""
 			}
-		}
-
-		properties, requiredFields := generateProperties(typeNode.Fields)
-
-		typeSchema := map[string]any{
-			"deprecated": typeNode.Deprecated != nil,
-			"type":       "object",
-			"properties": properties,
-		}
-		if desc != "" {
-			typeSchema["description"] = desc
-		}
-		if len(requiredFields) > 0 {
-			typeSchema["required"] = requiredFields
-		}
-
-		components.Schemas[typeNode.Name] = typeSchema
-	}
-
-	for _, procNode := range sch.GetProcNodes() {
-		name := procNode.Name
-		inputName := fmt.Sprintf("%sInput", name)
-		outputName := fmt.Sprintf("%sOutput", name)
-
-		inputProperties, inputRequiredFields := generateProperties(procNode.Input)
-		components.RequestBodies[inputName] = map[string]any{
-			"description": "Request body for the " + name + " procedure",
-			"content": map[string]any{
-				"application/json": map[string]any{
-					"schema": componentRequestBodySchema{
-						Type:       "object",
-						Properties: inputProperties,
-						Required:   inputRequiredFields,
-					},
-				},
-			},
-		}
-
-		outputProperties, outputRequiredFields := generateOutputProperties(procNode.Output)
-		components.Responses[outputName] = map[string]any{
-			"description": "Response for the " + name + " procedure both for success and error cases based on the `ok` field.",
-			"content": map[string]any{
-				"application/json": map[string]any{
-					"schema": componentRequestBodySchema{
-						Type:       "object",
-						Properties: outputProperties,
-						Required:   outputRequiredFields,
-					},
-				},
-			},
+			schema["description"] = fmt.Sprintf("%s\n\nDeprecated: %s", desc, t.Deprecated.Message)
 		}
 	}
 
-	for _, streamNode := range sch.GetStreamNodes() {
-		name := streamNode.Name
-		inputName := fmt.Sprintf("%sInput", name)
-		outputName := fmt.Sprintf("%sOutput", name)
-
-		inputProperties, inputRequiredFields := generateProperties(streamNode.Input)
-		components.RequestBodies[inputName] = map[string]any{
-			"description": "Request body for the " + name + " stream",
-			"content": map[string]any{
-				"application/json": map[string]any{
-					"schema": componentRequestBodySchema{
-						Type:       "object",
-						Properties: inputProperties,
-						Required:   inputRequiredFields,
-					},
-				},
-			},
-		}
-
-		outputProperties, outputRequiredFields := generateOutputProperties(streamNode.Output)
-		components.Responses[outputName] = map[string]any{
-			"description": "Server sent events (SSE). Event response for the " + name + " stream, both for success and error cases based on the `ok` field.",
-			"content": map[string]any{
-				"text/event-stream": map[string]any{
-					"schema": componentRequestBodySchema{
-						Type:       "object",
-						Properties: outputProperties,
-						Required:   outputRequiredFields,
-					},
-				},
-			},
-		}
+	if len(required) > 0 {
+		schema["required"] = required
 	}
 
-	return components, nil
+	return schema
+}
+
+// generateEnumSchema generates an OpenAPI schema for an IR enum.
+func generateEnumSchema(e ir.Enum) map[string]any {
+	schema := map[string]any{}
+
+	if e.ValueType == ir.EnumValueTypeString {
+		values := []string{}
+		for _, m := range e.Members {
+			values = append(values, m.Value)
+		}
+		schema["type"] = "string"
+		schema["enum"] = values
+	} else {
+		values := []int{}
+		for _, m := range e.Members {
+			v, _ := strconv.Atoi(m.Value)
+			values = append(values, v)
+		}
+		schema["type"] = "integer"
+		schema["enum"] = values
+	}
+
+	if e.Doc != "" {
+		schema["description"] = e.Doc
+	}
+
+	if e.Deprecated != nil {
+		schema["deprecated"] = true
+	}
+
+	return schema
+}
+
+// generateRequestBody generates an OpenAPI request body from IR fields.
+func generateRequestBody(fields []ir.Field, description string) map[string]any {
+	properties, required := generatePropertiesFromFields(fields)
+
+	schema := map[string]any{
+		"type":       "object",
+		"properties": properties,
+	}
+	if len(required) > 0 {
+		schema["required"] = required
+	}
+
+	return map[string]any{
+		"description": description,
+		"content": map[string]any{
+			"application/json": map[string]any{
+				"schema": schema,
+			},
+		},
+	}
+}
+
+// generateProcedureResponse generates an OpenAPI response for a procedure.
+func generateProcedureResponse(fields []ir.Field, description string) map[string]any {
+	properties, required := generateOutputProperties(fields)
+
+	schema := map[string]any{
+		"type":       "object",
+		"properties": properties,
+	}
+	if len(required) > 0 {
+		schema["required"] = required
+	}
+
+	return map[string]any{
+		"description": description,
+		"content": map[string]any{
+			"application/json": map[string]any{
+				"schema": schema,
+			},
+		},
+	}
+}
+
+// generateStreamResponse generates an OpenAPI response for a stream (SSE).
+func generateStreamResponse(fields []ir.Field, description string) map[string]any {
+	properties, required := generateOutputProperties(fields)
+
+	schema := map[string]any{
+		"type":       "object",
+		"properties": properties,
+	}
+	if len(required) > 0 {
+		schema["required"] = required
+	}
+
+	return map[string]any{
+		"description": description,
+		"content": map[string]any{
+			"text/event-stream": map[string]any{
+				"schema": schema,
+			},
+		},
+	}
 }
