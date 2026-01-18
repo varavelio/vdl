@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/parser"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 

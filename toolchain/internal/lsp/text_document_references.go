@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/lexer"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/token"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/lexer"
+	"github.com/varavelio/vdl/toolchain/internal/core/token"
 )
 
 // RequestMessageTextDocumentReferences represents a request for references of a symbol.

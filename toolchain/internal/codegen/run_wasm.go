@@ -7,8 +7,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 	"github.com/varavelio/vdl/toolchain/internal/transpile"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/parser"
 )
 
 // RunWasmOptions contains options for running code generators in WASM mode

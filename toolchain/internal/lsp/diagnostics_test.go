@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/analyzer"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 func TestDiagnostics(t *testing.T) {

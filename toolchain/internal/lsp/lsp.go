@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/varavelio/vdl/toolchain/internal/urpc/analyzer"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/docstore"
+	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/core/docstore"
 )
 
 type LSP struct {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 

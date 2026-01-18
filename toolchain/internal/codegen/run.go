@@ -10,11 +10,11 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
+	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/docstore"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/transpile"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/analyzer"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/docstore"
 	"github.com/varavelio/vdl/toolchain/internal/util/filepathutil"
 )
 

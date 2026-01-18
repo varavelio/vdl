@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/docstore"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/lexer"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/token"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/docstore"
+	"github.com/varavelio/vdl/toolchain/internal/core/lexer"
+	"github.com/varavelio/vdl/toolchain/internal/core/token"
 	"github.com/varavelio/vdl/toolchain/internal/util/filepathutil"
 )
 

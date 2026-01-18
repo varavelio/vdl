@@ -4,8 +4,8 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/varavelio/vdl/toolchain/internal/urpc/analyzer"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // DiagnosticSeverity defines the severity level of a diagnostic.

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/varavelio/vdl/toolchain/internal/urpc/lsp"
+	"github.com/varavelio/vdl/toolchain/internal/core/lsp"
 )
 
 type cmdLSPArgs struct{}

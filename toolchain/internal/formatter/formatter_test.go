@@ -10,14 +10,14 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-//go:embed tests/*.urpc
+//go:embed tests/*.vdl
 var testFiles embed.FS
 
 func TestFormatEmptySchema(t *testing.T) {
 	input := ""
 	expected := ""
 
-	formatted, err := Format("schema.urpc", input)
+	formatted, err := Format("schema.vdl", input)
 
 	require.NoError(t, err)
 	require.Equal(t, expected, formatted)
