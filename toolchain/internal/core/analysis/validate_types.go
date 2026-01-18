@@ -21,7 +21,7 @@ func validateTypes(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Check RPC proc/stream fields
-	for _, rpc := range symbols.vdls {
+	for _, rpc := range symbols.rpcs {
 		for _, proc := range rpc.Procs {
 			if proc.Input != nil {
 				diagnostics = append(diagnostics, validateFieldTypes(symbols, proc.Input.Fields, "procedure input", proc.Name)...)

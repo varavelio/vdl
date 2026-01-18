@@ -84,7 +84,7 @@ func validateGlobalUniqueness(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Register all RPCs
-	for name, sym := range symbols.vdls {
+	for name, sym := range symbols.rpcs {
 		if orig, exists := seen[name]; exists {
 			diagnostics = append(diagnostics, newDiagnostic(
 				sym.File,

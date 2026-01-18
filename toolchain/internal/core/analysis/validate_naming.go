@@ -78,7 +78,7 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Validate RPC, proc, and stream names
-	for _, rpc := range symbols.vdls {
+	for _, rpc := range symbols.rpcs {
 		if !isPascalCase(rpc.Name) {
 			diagnostics = append(diagnostics, newDiagnostic(
 				rpc.File,

@@ -31,7 +31,7 @@ func validateStructure(symbols *symbolTable, files map[string]*File) []Diagnosti
 	}
 
 	// Validate proc/stream field uniqueness from symbols
-	for _, rpc := range symbols.vdls {
+	for _, rpc := range symbols.rpcs {
 		for _, proc := range rpc.Procs {
 			if proc.Input != nil {
 				diagnostics = append(diagnostics, validateFieldUniqueness(proc.Input.Fields, "input of procedure", proc.Name, proc.File)...)

@@ -19,7 +19,7 @@ func validateSpreads(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Validate RPC proc/stream input/output spreads
-	for _, rpc := range symbols.vdls {
+	for _, rpc := range symbols.rpcs {
 		for _, proc := range rpc.Procs {
 			if proc.Input != nil {
 				diagnostics = append(diagnostics, validateBlockSpreads(symbols, proc.Input, proc.File, "procedure input", proc.Name)...)

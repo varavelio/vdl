@@ -13,7 +13,7 @@ import (
 func validateRPCs(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
-	for _, rpc := range symbols.vdls {
+	for _, rpc := range symbols.rpcs {
 		diagnostics = append(diagnostics, validateRPC(rpc)...)
 	}
 
