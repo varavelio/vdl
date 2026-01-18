@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 	"github.com/varavelio/vdl/toolchain/internal/urpc/formatter"
-	"github.com/varavelio/vdl/toolchain/internal/urpc/parser"
 )
 
 // ExpandTypesStr expands all custom type references in the URPC schema to inline objects.
