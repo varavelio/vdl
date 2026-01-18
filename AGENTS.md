@@ -43,24 +43,23 @@ When updating this document, do so with the context of the entire document in mi
   - `cmd/urpc`: Main CLI entry point (native).
   - `cmd/urpcwasm`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
-    - `core/`: Core parsing and AST infrastructure.
-      - `ast/`: Abstract Syntax Tree definitions and position tracking.
-      - `parser/`: Lexical analysis and parsing (lexer and parser combined).
-      - `vfs/`: Virtual File System utilities for file handling.
-    - `urpc/`: The Compiler Core.
-      - `analyzer/`: Semantic analysis and type checking.
-      - `docstore/`: Management of comments and documentation.
+    - `core/`: The Compiler Core Pipeline (Strict Data Flow).
+      - `vfs/`: Virtual File System (I/O, caching, dirty buffers for LSP).
+      - `ast/`: Abstract Syntax Tree definitions (includes position tracking).
+      - `parser/`: Lexical analysis and parsing (Participle-based).
+      - `analysis/`: Semantic analysis, symbol resolution, and validation (The LSP Brain).
+      - `ir/`: Intermediate Representation (Flattened, source-agnostic model for generators).
+    - `urpc/`: Tooling & Legacy Components.
       - `formatter/`: Source code formatting logic (ufofmt).
-      - `lsp/`: Language Server Protocol implementation.
-      - `transform/`: Utilities for modifying the AST.
-    - `codegen/`: Code Generators.
+      - `lsp/`: Language Server Protocol implementation (consumes core/analysis).
+      - `docstore/`: Documentation management.
+    - `codegen/`: Code Generators (consumes core/ir).
       - `dart/`: Dart client generation.
       - `golang/`: Go client and server generation.
       - `openapi/`: OpenAPI v3 specification generation.
       - `playground/`: WASM-specific generation helpers.
       - `typescript/`: TypeScript client and type generation.
       - `python/`: Python client and type generation.
-    - `schema/`: Intermediate Representation (IR) and schema validation.
     - `transpile/`: Converters between ufoRPC and JSON formats.
     - `util/`: Shared Utilities.
       - `debugutil/`: Helpers for printing debug info.
