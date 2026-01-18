@@ -1,20 +1,19 @@
 # Project links
-/r/discord https://discord.gg/VYz6q2wm4E
-/r/reddit https://www.reddit.com/r/uforpc
-/r/twitter https://x.com/eduardoolat
-/r/x https://x.com/eduardoolat
-/r/github https://github.com/varavelio/vdl
-/r/gh https://github.com/varavelio/vdl
+
+/github https://github.com/varavelio/vdl
+/discord https://discord.gg/VYz6q2wm4E
+/reddit https://www.reddit.com/r/vdl
+/x https://x.com/eduardoolat
 
 # Author links
-/r/author/web https://eduardo.lat
-/r/author/gh https://eduardo.lat/github
-/r/author/linkedin https://eduardo.lat/linkedin
-/r/author/twitter https://x.com/eduardoolat
-/r/author/x https://x.com/eduardoolat
+
+/author https://eduardo.lat
+/author/github https://eduardo.lat/github
+/author/linkedin https://eduardo.lat/linkedin
+/author/x https://x.com/eduardoolat
 
 # Documentation short links
-/r/license https://github.com/varavelio/vdl/blob/main/LICENSE
-/r/configfile https://uforpc.uforg.dev
-/r/config https://uforpc.uforg.dev
-/r/sse https://uforpc.uforg.dev
+
+/license https://github.com/varavelio/vdl/blob/main/LICENSE
+/config https://vdl.varavel.com
+/sse https://vdl.varavel.com

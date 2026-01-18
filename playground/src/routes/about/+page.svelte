@@ -37,7 +37,7 @@
         View on GitHub
       </a>
       <a
-        href="https://uforpc.uforg.dev"
+        href="https://vdl.varavel.com"
         target="_blank"
         class={{
           "btn btn-outline": true,
@@ -64,7 +64,7 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/license"
+                href="https://vdl.varavel.com/license"
                 target="_blank"
                 class="link"
               >
@@ -74,7 +74,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/license"
+                href="https://vdl.varavel.com/license"
                 target="_blank"
                 class="link"
               >
@@ -134,7 +134,7 @@
           <p class="text-base-content/80 leading-relaxed">
             This project was created and is maintained with ❤️ by
             <a
-              href="https://uforpc.uforg.dev/r/author/web"
+              href="https://vdl.varavel.com/author"
               target="_blank"
               class="link"
             >
@@ -145,7 +145,7 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/web"
+                href="https://vdl.varavel.com/author"
                 target="_blank"
                 class="link"
               >
@@ -154,7 +154,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/gh"
+                href="https://vdl.varavel.com/author/github"
                 target="_blank"
                 class="link"
               >
@@ -163,7 +163,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/linkedin"
+                href="https://vdl.varavel.com/author/linkedin"
                 target="_blank"
                 class="link"
               >
@@ -172,7 +172,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/x"
+                href="https://vdl.varavel.com/author/x"
                 target="_blank"
                 class="link"
               >

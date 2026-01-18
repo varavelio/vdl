@@ -1,6 +1,6 @@
 # UFO RPC Code generator config file
 # Star the repo at https://github.com/varavelio/vdl
-# Read more about this file at https://uforpc.uforg.dev/r/configfile
+# Read more about this file at https://vdl.varavel.com/config
 
 version = 1
 

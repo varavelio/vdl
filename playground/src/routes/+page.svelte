@@ -63,7 +63,7 @@
           View on GitHub
         </a>
         <a
-          href="https://uforpc.uforg.dev"
+          href="https://vdl.varavel.com"
           target="_blank"
           class={{
             "btn btn-outline": true,
