@@ -2,7 +2,7 @@
 
 ## 1. Summary
 
-**UfoRPC** is a Universal RPC schema and generator tool located in a monorepo. It combines a Go-based core (`urpc`) with a Svelte 5-based web playground. The Go core compiles to both a native CLI and a WebAssembly (WASM) binary. The WASM binary is consumed by the playground to provide client-side schema generation and validation directly in the browser. The final build embeds the static playground assets back into the Go binary.
+**VDL (Varavel Definition Language)** is a Universal RPC schema and generator tool located in a monorepo. It combines a Go-based core (`toolchain`) with a Svelte 5-based web playground. The Go core compiles to both a native CLI and a WebAssembly (WASM) binary. The WASM binary is consumed by the playground to provide client-side schema generation, validation, formatting, and transformation directly in the browser. The final build embeds the static playground assets back into the Go binary.
 
 ## Maintaining this Document
 
@@ -12,78 +12,69 @@ When updating this document, do so with the context of the entire document in mi
 
 ## 2. General Instructions (The Constitution)
 
-- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`urpc/`) and Node/Svelte (`playground/`).
+- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`) and Node/Svelte (`playground/`).
 - **Command Authority**: The root `Taskfile.yml` is the single source of truth for orchestration. Do not run `npm` or `go` commands manually if a `task` command exists for it.
 - **Verification**:
   - Always run `task fmt` to handle multi-language formatting (Prettier + Go Fmt).
   - Always run `task lint` to check both Go (golangci-lint) and Svelte/TS (Biome).
   - Always run `task test` to verify integrity.
 - **Dependency Management**:
-  - Go: Manage in `urpc/go.mod`.
+  - Go: Manage in `toolchain/go.mod`.
   - Node: Manage in `playground/package.json` or root `package.json` for dev tools.
 - **Code Style**:
   - Go: Idiomatic, `golangci-lint` strictness.
-  - Svelte: Functional components, Svelte 5 runes syntax (if applicable/modern), Tailwind CSS v4.
+  - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4.
+- **Terminology**: The core tool is now referred to as `toolchain` and the binary is named `vdl`.
 
 ## 3. Architecture & Organization
 
 ### Root Layout
 
 - `Taskfile.yml`: Orchestrates the entire build pipeline across languages.
-- `urpc/`: The Go backend/core.
+- `toolchain/`: The Go backend/core (Compiler, CLI, WASM).
 - `playground/`: The Svelte 5 frontend.
-- `docs/`: Documentation and specifications.
-- `scripts/`: Build and maintenance scripts (e.g., versioning).
-- `assets/`: Static assets like icons and logos.
+- `docs/`: Documentation and specifications (contains the VDL spec).
+- `scripts/`: Build and maintenance scripts.
+- `assets/`: Static assets.
 
-### `urpc/` (Go Core)
+### `toolchain/` (Go Core)
 
-- **Role**: Contains the business logic for parsing and generating RPC schemas.
+- **Role**: Contains the business logic for parsing, analyzing, transforming, and generating RPC schemas.
 - **Key Directories**:
-  - `cmd/urpc`: Main CLI entry point (native).
-  - `cmd/urpcwasm`: Entry point for WASM compilation (browser target).
+  - `cmd/`: Entry points.
+    - `urpc/`: Main CLI entry point (native).
+    - `urpcwasm/`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
-    - `core/`: The Compiler Core Pipeline (Strict Data Flow).
-      - `vfs/`: Virtual File System (I/O, caching, dirty buffers for LSP).
-      - `ast/`: Abstract Syntax Tree definitions (includes position tracking).
-      - `parser/`: Lexical analysis and parsing (Participle-based).
-      - `analysis/`: Semantic analysis, symbol resolution, and validation (The LSP Brain).
-      - `ir/`: Intermediate Representation (Flattened, source-agnostic model for generators).
-    - `urpc/`: Tooling & Legacy Components.
-      - `formatter/`: Source code formatting logic (ufofmt).
-      - `lsp/`: Language Server Protocol implementation (consumes core/analysis).
-      - `docstore/`: Documentation management.
-    - `codegen/`: Code Generators (consumes core/ir).
-      - `dart/`: Dart client generation.
-      - `golang/`: Go client and server generation.
-      - `openapi/`: OpenAPI v3 specification generation.
-      - `playground/`: WASM-specific generation helpers.
-      - `typescript/`: TypeScript client and type generation.
-      - `python/`: Python client and type generation.
-    - `transpile/`: Converters between ufoRPC and JSON formats.
-    - `util/`: Shared Utilities.
-      - `debugutil/`: Helpers for printing debug info.
-      - `filepathutil/`: Cross-platform file path handling.
-      - `strutil/`: String manipulation helpers.
-      - `testutil/`: Common test fixtures and helpers.
-    - `version/`: Build version metadata.
+    - `core/`: The Compiler Core Pipeline.
+      - `ast/`: Abstract Syntax Tree definitions. **Crucial**: The AST structure groups `proc` and `stream` definitions inside `rpc` blocks.
+      - `parser/`: Lexical analysis and parsing.
+      - `analysis/`: Semantic analysis and symbol resolution.
+      - `ir/`: Intermediate Representation for generators.
+      - `vfs/`: Virtual File System.
+    - `transform/`: AST Transformations (Used by Playground/LSP).
+      - `expand.go`: Handles type flattening (spreads) and circular reference protection.
+      - `extract.go`: Logic to extract specific AST nodes (Types, RPCs, Procs, Streams) as standalone strings.
+    - `formatter/`: Source code formatting logic (`vdl fmt`).
+    - `lsp/`: Language Server Protocol implementation.
+    - `codegen/`: Code Generators (Go, TS, Dart, etc.).
+    - `util/`: Shared Utilities (strings, paths, debug).
   - `dist/`: Build artifacts.
 - **Integration**: Compiles to `dist/urpc.wasm` which is copied to the playground.
 
 ### `playground/` (Frontend)
 
-- **Role**: A visual editor/playground for UfoRPC.
+- **Role**: A visual editor/playground for VDL.
 - **Tech**: Svelte 5, Vite, TailwindCSS 4, Biome.
 - **Integration**:
   - Consumes `urpc.wasm` (via `wasm_exec.js`).
   - Generates Typescript definitions from Go schemas via `npm run genschema`.
   - Builds to static files that are eventually embedded into the Go binary.
 
-### Build Pipeline (Circular Dependency Resolved via Steps)
+### Build Pipeline
 
 1. **WASM Build**: Go code compiles to WASM (`task build:wasm`).
 2. **Frontend Build**: Playground consumes WASM and builds static assets (`npm run build`).
-3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary (`task build:urpc`).
+3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary (`task build:toolchain`).
 
 ## 4. Testing & Quality
 
@@ -98,8 +89,11 @@ When updating this document, do so with the context of the entire document in mi
 ### Go
 
 - **Version**: 1.25+
-- **Key Libs**: `go-arg`, `participle`, `ufogenkit`.
+- **Key Libs**: `go-arg`, `participle` (parser), `testify`.
 - **Patterns**: Standard Go project layout (`cmd`, `internal`).
+- **AST Handling**:
+  - When working with the AST, remember that `Proc` and `Stream` are children of `RPC`.
+  - Use `transform` package for AST manipulations intended for display or refactoring.
 
 ### Frontend
 
