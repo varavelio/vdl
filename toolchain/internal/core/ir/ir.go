@@ -21,6 +21,8 @@
 //	json, _ := schema.ToJSON()
 package ir
 
+//go:generate go run ir_gen.go
+
 import (
 	"encoding/json"
 )
