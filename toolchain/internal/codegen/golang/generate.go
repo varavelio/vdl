@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"golang.org/x/tools/imports"
 )
 

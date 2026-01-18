@@ -5,17 +5,17 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/varavelio/vdl/urpc/internal/codegen/dart"
-	"github.com/varavelio/vdl/urpc/internal/codegen/golang"
-	"github.com/varavelio/vdl/urpc/internal/codegen/openapi"
-	"github.com/varavelio/vdl/urpc/internal/codegen/playground"
-	"github.com/varavelio/vdl/urpc/internal/codegen/typescript"
-	"github.com/varavelio/vdl/urpc/internal/schema"
-	"github.com/varavelio/vdl/urpc/internal/transpile"
-	"github.com/varavelio/vdl/urpc/internal/urpc/analyzer"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
-	"github.com/varavelio/vdl/urpc/internal/urpc/docstore"
-	"github.com/varavelio/vdl/urpc/internal/util/filepathutil"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/transpile"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/docstore"
+	"github.com/varavelio/vdl/toolchain/internal/util/filepathutil"
 )
 
 // Run runs the code generator and returns an error if one occurred.

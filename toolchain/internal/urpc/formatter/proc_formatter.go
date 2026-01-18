@@ -2,8 +2,8 @@ package formatter
 
 import (
 	"github.com/uforg/ufogenkit"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
-	"github.com/varavelio/vdl/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type procFormatter struct {

@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
-	"github.com/varavelio/vdl/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")

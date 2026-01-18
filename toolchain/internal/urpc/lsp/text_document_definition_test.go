@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/urpc/analyzer"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
 )
 
 func TestFindTokenAtPosition(t *testing.T) {

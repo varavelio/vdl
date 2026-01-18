@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/formatter"
 )
 
 type cmdFmtArgs struct {

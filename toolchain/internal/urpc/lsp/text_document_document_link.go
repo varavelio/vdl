@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
-	"github.com/varavelio/vdl/urpc/internal/urpc/lexer"
-	"github.com/varavelio/vdl/urpc/internal/urpc/token"
-	"github.com/varavelio/vdl/urpc/internal/util/filepathutil"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/lexer"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/token"
+	"github.com/varavelio/vdl/toolchain/internal/util/filepathutil"
 )
 
 // RequestMessageTextDocumentDocumentLink represents a request for document links inside a text document.

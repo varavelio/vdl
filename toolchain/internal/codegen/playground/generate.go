@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/varavelio/vdl/embedplayground"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
-	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
+	embedplayground "github.com/varavelio/vdl/playground"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/formatter"
 )
 
 // Generate takes a schema and a config and generates the playground for the schema.

@@ -3,7 +3,7 @@ package analyzer
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
 )
 
 // FileProvider interface provides a way to get files to the analyzer.

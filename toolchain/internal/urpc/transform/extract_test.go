@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
-	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
-	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/parser"
 )
 
 func TestExtractType(t *testing.T) {

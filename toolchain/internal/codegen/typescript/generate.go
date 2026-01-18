@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/varavelio/vdl/urpc/internal/schema"
-	"github.com/varavelio/vdl/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // Generate takes a schema and a config and generates the TypeScript code for the schema.

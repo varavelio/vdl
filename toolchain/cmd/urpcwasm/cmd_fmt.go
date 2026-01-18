@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/formatter"
 )
 
 func cmdFmtWrapper() js.Func {

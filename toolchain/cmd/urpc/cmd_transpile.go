@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/varavelio/vdl/urpc/internal/schema"
-	"github.com/varavelio/vdl/urpc/internal/transpile"
-	"github.com/varavelio/vdl/urpc/internal/urpc/formatter"
-	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/transpile"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/parser"
 )
 
 type cmdTranspileArgs struct {

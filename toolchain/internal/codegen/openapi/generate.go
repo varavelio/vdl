@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/goccy/go-yaml"
-	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
 )
 
 func Generate(schema schema.Schema, config Config) (string, error) {

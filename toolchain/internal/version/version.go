@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/varavelio/vdl/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // Version is replaced during the release process by the latest Git tag

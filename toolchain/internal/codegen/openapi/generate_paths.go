@@ -3,7 +3,7 @@ package openapi
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
 )
 
 func generatePaths(sch schema.Schema) (Paths, error) {

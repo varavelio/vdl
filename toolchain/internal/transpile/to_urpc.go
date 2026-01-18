@@ -3,8 +3,8 @@ package transpile
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/schema"
-	"github.com/varavelio/vdl/urpc/internal/urpc/ast"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/ast"
 )
 
 // ToURPC transpiles an UFO-RPC JSON schema to it's AST representation.

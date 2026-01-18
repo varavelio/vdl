@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/uforg/ufogenkit"
-	"github.com/varavelio/vdl/urpc/internal/schema"
-	"github.com/varavelio/vdl/urpc/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generateStreamTypes(sch schema.Schema, _ Config) (string, error) {

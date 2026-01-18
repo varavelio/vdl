@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/urpc/parser"
+	"github.com/varavelio/vdl/toolchain/internal/urpc/parser"
 )
 
 // mockFileProvider is a mock implementation of FileProvider for testing

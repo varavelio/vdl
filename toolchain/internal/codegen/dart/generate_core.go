@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"strings"
 
-	"github.com/varavelio/vdl/urpc/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/schema"
 )
 
 //go:embed pieces/core.dart
