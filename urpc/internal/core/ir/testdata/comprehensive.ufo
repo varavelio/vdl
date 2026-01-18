@@ -1,0 +1,446 @@
+// ============================================================================
+// COMPREHENSIVE SYNTAX TEST
+// Tests every feature in the UFO RPC IDL specification
+// ============================================================================
+
+""" 
+This is a standalone docstring at schema level.
+It tests multi-line documentation.
+"""
+
+// ============================================================================
+// ALL PRIMITIVE TYPES
+// ============================================================================
+
+type AllPrimitives {
+    """ String field documentation. """
+    stringField: string
+    intField: int
+    floatField: float
+    boolField: bool
+    datetimeField: datetime
+}
+
+// ============================================================================
+// OPTIONAL FIELDS - All primitives
+// ============================================================================
+
+type AllOptionalPrimitives {
+    optString?: string
+    optInt?: int
+    optFloat?: float
+    optBool?: bool
+    optDatetime?: datetime
+}
+
+// ============================================================================
+// ARRAYS - Various dimensions
+// ============================================================================
+
+type ArrayTypes {
+    // 1D arrays of all primitives
+    strings: string[]
+    ints: int[]
+    floats: float[]
+    bools: bool[]
+    datetimes: datetime[]
+
+    // Multi-dimensional arrays
+    matrix2d: int[][]
+    matrix3d: float[][][]
+
+    // Optional arrays
+    optionalArray?: string[]
+    optionalMatrix?: int[][]
+}
+
+// ============================================================================
+// MAPS - Various nesting levels
+// ============================================================================
+
+type MapTypes {
+    // Maps with primitive values
+    stringMap: map<string>
+    intMap: map<int>
+    floatMap: map<float>
+    boolMap: map<bool>
+    datetimeMap: map<datetime>
+
+    // Nested maps
+    nestedMap: map<map<string>>
+    deeplyNestedMap: map<map<map<int>>>
+
+    // Optional maps
+    optionalMap?: map<string>
+    optionalNestedMap?: map<map<bool>>
+}
+
+// ============================================================================
+// COMPLEX COMBINATIONS - Arrays + Maps
+// ============================================================================
+
+type ComplexCombinations {
+    // Arrays of maps
+    arrayOfMaps: map<string>[]
+    nestedArrayOfMaps: map<int>[][]
+
+    // Maps of arrays
+    mapOfArrays: map<string[]>
+    mapOfMatrices: map<int[][]>
+
+    // Deeply nested combinations
+    mapOfArrayOfMaps: map<map<string>[]>
+    arrayOfMapOfArrays: map<string[]>[]
+}
+
+// ============================================================================
+// INLINE OBJECTS - Various scenarios
+// ============================================================================
+
+type InlineObjectTypes {
+    // Simple inline object
+    simple: {
+        x: int
+        y: int
+    }
+
+    // Inline object with optional fields
+    withOptional: {
+        required: string
+        optional?: int
+    }
+
+    // Deeply nested inline objects
+    nested: {
+        level1: {
+            level2: {
+                value: string
+            }
+        }
+    }
+
+    // Optional inline object
+    optionalObject?: {
+        data: string
+    }
+
+    // Array of inline objects
+    arrayOfObjects: {
+        id: string
+        name: string
+    }[]
+
+    // Map of inline objects
+    mapOfObjects: map<{
+        key: string
+        value: int
+    }>
+}
+
+// ============================================================================
+// SPREADS - Multi-level chains
+// ============================================================================
+
+type Level1 {
+    level1Field: string
+}
+
+type Level2 {
+    ...Level1
+    level2Field: int
+}
+
+type Level3 {
+    ...Level2
+    level3Field: bool
+}
+
+type MultiSpread {
+    ...Level1
+    ...AllOptionalPrimitives
+    ownField: datetime
+}
+
+// ============================================================================
+// ENUMS - All variants
+// ============================================================================
+
+""" String enum with implicit values. """
+enum StringEnumImplicit {
+    Active
+    Inactive
+    Pending
+}
+
+""" String enum with explicit values. """
+enum StringEnumExplicit {
+    Get = "GET"
+    Post = "POST"
+    Put = "PUT"
+    Delete = "DELETE"
+}
+
+""" Integer enum with explicit values. """
+enum IntEnum {
+    Low = 1
+    Medium = 5
+    High = 10
+    Critical = 100
+}
+
+// ============================================================================
+// CONSTANTS - All types
+// ============================================================================
+
+""" String constant. """
+const STRING_CONST = "hello world"
+
+""" Integer constant. """
+const INT_CONST = 42
+
+""" Float constant. """
+const FLOAT_CONST = 3.14159
+
+""" Boolean constant (true). """
+const BOOL_TRUE = true
+
+""" Boolean constant (false). """
+const BOOL_FALSE = false
+
+// ============================================================================
+// PATTERNS - Various placeholder counts
+// ============================================================================
+
+""" Pattern with no placeholders. """
+pattern StaticPattern = "static:value"
+
+""" Pattern with one placeholder. """
+pattern SinglePlaceholder = "users:{userId}"
+
+""" Pattern with multiple placeholders. """
+pattern MultiplePlaceholders = "events:{eventType}:{userId}:{timestamp}"
+
+// ============================================================================
+// TYPE REFERENCES - Using custom types and enums in fields
+// ============================================================================
+
+type TypeReferences {
+    // Reference to custom type
+    primitiveHolder: AllPrimitives
+
+    // Reference to enum types
+    stringEnumRef: StringEnumImplicit
+    intEnumRef: IntEnum
+
+    // Array of custom type
+    typeArray: AllPrimitives[]
+
+    // Array of enum
+    enumArray: StringEnumExplicit[]
+
+    // Map of custom type
+    typeMap: map<AllPrimitives>
+
+    // Map of enum
+    enumMap: map<IntEnum>
+
+    // Complex: array of arrays of custom type
+    typeMatrix: AllPrimitives[][]
+
+    // Complex: map of arrays of enum
+    enumMapArray: map<StringEnumImplicit[]>
+}
+
+// ============================================================================
+// RPC - Complete service definition
+// ============================================================================
+
+"""
+Comprehensive RPC service.
+Tests all RPC features.
+"""
+rpc ComprehensiveService {
+    """
+    # Section Header
+    Standalone documentation inside RPC.
+    """
+
+    """ Simple procedure with primitives. """
+    proc SimplePrimitive {
+        input {
+            name: string
+            count: int
+        }
+        output {
+            success: bool
+            message: string
+        }
+    }
+
+    """ Procedure with complex types. """
+    proc ComplexTypes {
+        input {
+            data: AllPrimitives
+            items: string[]
+            metadata: map<string>
+        }
+        output {
+            results: AllPrimitives[]
+            lookup: map<int>
+        }
+    }
+
+    """ Procedure with inline objects. """
+    proc InlineObjects {
+        input {
+            point: {
+                x: float
+                y: float
+            }
+        }
+        output {
+            bounds: {
+                min: { x: float y: float }
+                max: { x: float y: float }
+            }
+        }
+    }
+
+    """ Procedure with optional fields. """
+    proc OptionalFields {
+        input {
+            required: string
+            optional?: int
+            optionalArray?: string[]
+        }
+        output {
+            data?: AllPrimitives
+            count: int
+        }
+    }
+
+    """ Procedure with spreads in input/output. """
+    proc WithSpreads {
+        input {
+            ...AllPrimitives
+            extraField: string
+        }
+        output {
+            ...Level3
+            result: bool
+        }
+    }
+
+    """ Procedure with enum types. """
+    proc WithEnums {
+        input {
+            status: StringEnumImplicit
+            priority: IntEnum
+        }
+        output {
+            method: StringEnumExplicit
+            newStatus: StringEnumImplicit
+        }
+    }
+
+    """ Simple stream. """
+    stream SimpleStream {
+        input {
+            channelId: string
+        }
+        output {
+            message: string
+            timestamp: datetime
+        }
+    }
+
+    """ Stream with complex types. """
+    stream ComplexStream {
+        input {
+            id: string
+            filters: map<string>
+        }
+        output {
+            eventType: string
+            payload: map<string>
+            sequence: int
+        }
+    }
+}
+
+// ============================================================================
+// DEPRECATION - All combinations
+// ============================================================================
+
+deprecated type DeprecatedType {
+    field: string
+}
+
+deprecated("Use NewType instead")
+type DeprecatedWithMessage {
+    field: string
+}
+
+deprecated enum DeprecatedEnum {
+    Value
+}
+
+deprecated("Use NewEnum instead")
+enum DeprecatedEnumWithMessage {
+    Value = 1
+}
+
+deprecated const DEPRECATED_CONST = "old"
+
+deprecated("Use NEW_CONST instead")
+const DEPRECATED_CONST_MSG = 123
+
+deprecated pattern DeprecatedPattern = "old:{id}"
+
+deprecated("Use NewPattern instead")
+pattern DeprecatedPatternMsg = "legacy:{id}"
+
+""" Documented but deprecated. """
+deprecated("Documentation preserved")
+type DocAndDeprecated {
+    field: string
+}
+
+rpc DeprecatedRpc {
+    deprecated proc DeprecatedProc {
+        input { id: string }
+        output { ok: bool }
+    }
+
+    deprecated("Use NewProc instead")
+    proc DeprecatedProcMsg {
+        input { id: string }
+        output { ok: bool }
+    }
+
+    deprecated stream DeprecatedStream {
+        input { id: string }
+        output { data: string }
+    }
+
+    deprecated("Use NewStream instead")
+    stream DeprecatedStreamMsg {
+        input { id: string }
+        output { data: string }
+    }
+}
+
+deprecated rpc FullyDeprecatedRpc {
+    proc SomeProc {
+        input { x: int }
+        output { y: int }
+    }
+}
+
+deprecated("Entire service deprecated")
+rpc FullyDeprecatedRpcMsg {
+    proc AnotherProc {
+        input { a: string }
+        output { b: string }
+    }
+}

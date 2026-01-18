@@ -1,0 +1,124 @@
+{
+  "types": [
+    {
+      "name": "AuditFields",
+      "fields": [
+        {
+          "name": "createdAt",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "name": "BaseEntity",
+      "fields": [
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "NestedSpread",
+      "fields": [
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "active",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timestamps",
+      "fields": [
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "createdAt",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "constants": [],
+  "patterns": [],
+  "rpcs": []
+}

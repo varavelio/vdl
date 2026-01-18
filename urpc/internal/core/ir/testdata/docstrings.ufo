@@ -1,0 +1,34 @@
+"""
+This is a multi-line docstring.
+
+It has multiple paragraphs and should be normalized.
+
+- Item 1
+- Item 2
+"""
+
+"""
+    This docstring has leading indentation
+    that should be stripped.
+    
+    - Indented list
+      - Nested item
+"""
+type DocumentedType {
+    """ The unique identifier. """
+    id: string
+
+    """
+    A longer field description
+    spanning multiple lines.
+    """
+    description: string
+}
+
+"""
+Enum with documented members.
+"""
+enum DocumentedEnum {
+    First
+    Second
+}

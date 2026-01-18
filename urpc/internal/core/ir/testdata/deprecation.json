@@ -1,0 +1,129 @@
+{
+  "types": [
+    {
+      "name": "LegacyUser",
+      "deprecated": {},
+      "fields": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "OldUser",
+      "deprecated": {
+        "message": "Use UserV2 instead"
+      },
+      "fields": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "OldStatus",
+      "deprecated": {},
+      "valueType": "string",
+      "members": [
+        {
+          "name": "Active",
+          "value": "Active"
+        },
+        {
+          "name": "Inactive",
+          "value": "Inactive"
+        }
+      ]
+    }
+  ],
+  "constants": [
+    {
+      "name": "OLD_LIMIT",
+      "deprecated": {
+        "message": "Will be removed in v3.0"
+      },
+      "valueType": "int",
+      "value": "50"
+    }
+  ],
+  "patterns": [
+    {
+      "name": "OldPattern",
+      "deprecated": {},
+      "template": "old:{id}",
+      "placeholders": ["id"]
+    }
+  ],
+  "rpcs": [
+    {
+      "name": "Legacy",
+      "procs": [
+        {
+          "name": "OldMethod",
+          "deprecated": {},
+          "input": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "primitive": "string"
+              }
+            }
+          ],
+          "output": [
+            {
+              "name": "result",
+              "type": {
+                "kind": "primitive",
+                "primitive": "string"
+              }
+            }
+          ]
+        }
+      ],
+      "streams": [
+        {
+          "name": "OldStream",
+          "deprecated": {
+            "message": "Use NewStream instead"
+          },
+          "input": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "primitive": "string"
+              }
+            }
+          ],
+          "output": [
+            {
+              "name": "data",
+              "type": {
+                "kind": "primitive",
+                "primitive": "string"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

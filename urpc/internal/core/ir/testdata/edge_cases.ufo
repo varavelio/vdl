@@ -1,0 +1,353 @@
+// ============================================================================
+// EDGE CASES TEST
+// Tests unusual but valid syntax combinations
+// ============================================================================
+
+// ============================================================================
+// EMPTY STRUCTURES
+// ============================================================================
+
+// Type with no fields (edge case)
+type EmptyType {
+}
+
+// RPC with no procs or streams
+rpc EmptyRpc {
+}
+
+// ============================================================================
+// SINGLE FIELD TYPES
+// ============================================================================
+
+type SingleField {
+    only: string
+}
+
+type SingleOptionalField {
+    maybeHere?: int
+}
+
+// ============================================================================
+// RPC WITH ONLY PROC
+// ============================================================================
+
+rpc OnlyProcs {
+    proc TheOnlyProc {
+        input {
+            x: int
+        }
+        output {
+            y: int
+        }
+    }
+}
+
+// ============================================================================
+// RPC WITH ONLY STREAM
+// ============================================================================
+
+rpc OnlyStreams {
+    stream TheOnlyStream {
+        input {
+            channel: string
+        }
+        output {
+            data: string
+        }
+    }
+}
+
+// ============================================================================
+// PROC/STREAM WITH EMPTY INPUT/OUTPUT
+// ============================================================================
+
+rpc EmptyBlocks {
+    proc EmptyInput {
+        input {
+        }
+        output {
+            result: string
+        }
+    }
+
+    proc EmptyOutput {
+        input {
+            query: string
+        }
+        output {
+        }
+    }
+
+    proc BothEmpty {
+        input {
+        }
+        output {
+        }
+    }
+
+    stream EmptyStreamBlocks {
+        input {
+        }
+        output {
+        }
+    }
+}
+
+// ============================================================================
+// DEEPLY NESTED INLINE OBJECTS
+// ============================================================================
+
+type DeeplyNested {
+    level1: {
+        level2: {
+            level3: {
+                level4: {
+                    level5: {
+                        value: string
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ============================================================================
+// COMPLEX OPTIONAL COMBINATIONS
+// ============================================================================
+
+type OptionalComplex {
+    // Optional array of arrays
+    optMatrix?: int[][]
+
+    // Optional map of maps
+    optMapMap?: map<map<string>>
+
+    // Optional inline object with optional fields
+    optObject?: {
+        innerOpt?: string
+        innerReq: int
+    }
+
+    // Optional array of inline objects
+    optArrayObj?: {
+        id: string
+    }[]
+
+    // Optional map of inline objects
+    optMapObj?: map<{
+        key: int
+    }>
+}
+
+// ============================================================================
+// MIXING SPREADS WITH INLINE OBJECTS
+// ============================================================================
+
+type SpreadBase {
+    baseField: string
+}
+
+type InlineWithSpread {
+    ...SpreadBase
+    inlineObj: {
+        nested: string
+    }
+}
+
+// ============================================================================
+// ENUMS IN COMPLEX POSITIONS
+// ============================================================================
+
+enum Status {
+    On
+    Off
+}
+
+type EnumsEverywhere {
+    // Direct enum
+    status: Status
+
+    // Array of enums
+    statusList: Status[]
+
+    // Matrix of enums
+    statusMatrix: Status[][]
+
+    // Map of enums
+    statusMap: map<Status>
+
+    // Map of array of enums
+    statusMapArray: map<Status[]>
+
+    // Array of map of enums
+    statusArrayMap: map<Status>[]
+
+    // Optional enum
+    optStatus?: Status
+
+    // Optional array of enums
+    optStatusList?: Status[]
+}
+
+// ============================================================================
+// CUSTOM TYPES IN COMPLEX POSITIONS
+// ============================================================================
+
+type TypesEverywhere {
+    // Direct type
+    single: SingleField
+
+    // Array of types
+    list: SingleField[]
+
+    // Matrix of types
+    matrix: SingleField[][]
+
+    // Map of types
+    lookup: map<SingleField>
+
+    // Map of array of types
+    mapArray: map<SingleField[]>
+
+    // Array of map of types
+    arrayMap: map<SingleField>[]
+
+    // Optional type
+    optSingle?: SingleField
+
+    // Optional array of types
+    optList?: SingleField[]
+}
+
+// ============================================================================
+// INLINE OBJECT ARRAYS AT DIFFERENT DIMENSIONS
+// ============================================================================
+
+type InlineArrays {
+    // 1D array of inline objects
+    arr1d: {
+        value: int
+    }[]
+
+    // 2D array of inline objects
+    arr2d: {
+        x: int
+        y: int
+    }[][]
+
+    // 3D array of inline objects
+    arr3d: {
+        data: string
+    }[][][]
+}
+
+// ============================================================================
+// MULTIPLE STANDALONE DOCS
+// ============================================================================
+
+"""
+First standalone doc in schema.
+"""
+
+"""
+Second standalone doc in schema.
+"""
+
+type AfterDocs {
+    field: string
+}
+
+rpc MultiDocRpc {
+    """
+    First RPC standalone doc.
+    """
+
+    """
+    Second RPC standalone doc.
+    """
+
+    proc SomeProc {
+        input { x: int }
+        output { y: int }
+    }
+}
+
+// ============================================================================
+// SPREADS IN RPC INPUT/OUTPUT
+// ============================================================================
+
+type CommonInput {
+    requestId: string
+    timestamp: datetime
+}
+
+type CommonOutput {
+    success: bool
+    errorCode?: int
+}
+
+rpc SpreadInRpc {
+    proc UsingSpreads {
+        input {
+            ...CommonInput
+            payload: string
+        }
+        output {
+            ...CommonOutput
+            data?: string
+        }
+    }
+
+    stream UsingSpreadStream {
+        input {
+            ...CommonInput
+        }
+        output {
+            ...CommonOutput
+            event: string
+        }
+    }
+}
+
+// ============================================================================
+// ALL CONST TYPES IN DIFFERENT FORMATS
+// ============================================================================
+
+const ZERO_INT = 0
+const POSITIVE_INT = 42
+const LARGE_INT = 9999999
+
+const ZERO_FLOAT = 0.0
+const POSITIVE_FLOAT = 3.14
+const SMALL_FLOAT = 0.001
+
+const EMPTY_STRING = ""
+const STRING_WITH_SPACES = "hello world"
+const STRING_SIMPLE = "simple"
+
+// ============================================================================
+// PATTERNS WITH VARIOUS PLACEHOLDER POSITIONS
+// ============================================================================
+
+pattern PlaceholderAtStart = "{prefix}:rest"
+pattern PlaceholderAtEnd = "prefix:{suffix}"
+pattern PlaceholderMiddle = "start:{middle}:end"
+pattern AdjacentPlaceholders = "{a}:{b}:{c}"
+pattern SingleCharPlaceholder = "{x}"
+
+// ============================================================================
+// ENUM VALUES - Edge cases
+// ============================================================================
+
+enum SingleMemberEnum {
+    Only
+}
+
+enum SingleIntMember {
+    One = 1
+}
+
+// String enum with same name as value
+enum SameName {
+    SameName
+}
