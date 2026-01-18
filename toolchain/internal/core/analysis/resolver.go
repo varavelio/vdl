@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
-	"github.com/varavelio/vdl/urpc/internal/core/parser"
-	"github.com/varavelio/vdl/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 // resolver handles the resolution of includes and external docstrings.

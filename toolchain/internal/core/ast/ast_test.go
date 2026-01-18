@@ -325,8 +325,8 @@ func createTestSchema() *Schema {
 	return &Schema{
 		Children: []*SchemaChild{
 			// Includes
-			{Include: &Include{Path: "./common.ufo"}},
-			{Include: &Include{Path: "./auth.ufo"}},
+			{Include: &Include{Path: "./common.vdl"}},
+			{Include: &Include{Path: "./auth.vdl"}},
 			// Comments
 			{Comment: &Comment{Simple: ptr("// A comment")}},
 			{Comment: &Comment{Block: ptr("/* Block comment */")}},
@@ -369,8 +369,8 @@ func TestSchemaGetIncludes(t *testing.T) {
 	includes := schema.GetIncludes()
 
 	require.Len(t, includes, 2)
-	require.Equal(t, QuotedString("./common.ufo"), includes[0].Path)
-	require.Equal(t, QuotedString("./auth.ufo"), includes[1].Path)
+	require.Equal(t, QuotedString("./common.vdl"), includes[0].Path)
+	require.Equal(t, QuotedString("./auth.vdl"), includes[1].Path)
 }
 
 func TestSchemaGetComments(t *testing.T) {
@@ -486,7 +486,7 @@ func TestSchemaChildKind(t *testing.T) {
 		child    *SchemaChild
 		expected SchemaChildKind
 	}{
-		{"Include", &SchemaChild{Include: &Include{Path: "./test.ufo"}}, SchemaChildKindInclude},
+		{"Include", &SchemaChild{Include: &Include{Path: "./test.vdl"}}, SchemaChildKindInclude},
 		{"Comment", &SchemaChild{Comment: &Comment{Simple: ptr("// comment")}}, SchemaChildKindComment},
 		{"Docstring", &SchemaChild{Docstring: &Docstring{Value: "doc"}}, SchemaChildKindDocstring},
 		{"Type", &SchemaChild{Type: &TypeDecl{Name: "User"}}, SchemaChildKindType},

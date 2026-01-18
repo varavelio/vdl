@@ -3,7 +3,7 @@ package ir
 import (
 	"sort"
 
-	"github.com/varavelio/vdl/urpc/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 )
 
 // FromProgram builds an IR Schema from a validated analysis.Program.

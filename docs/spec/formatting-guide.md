@@ -1,11 +1,11 @@
 ---
 title: Formatting Guide
-description: Standard formatting conventions for the UFO IDL
+description: Standard formatting conventions for the VDL IDL
 ---
 
-This document specifies the standard formatting rules for the UFO IDL. Consistent formatting enhances code readability, maintainability, and collaboration.
+This document specifies the standard formatting rules for the VDL IDL. Consistent formatting enhances code readability, maintainability, and collaboration.
 
-> **Note:** All style conventions are automatically enforced by the official UFO formatter. Run it manually with `ufo fmt ./schema.ufo`, or let the built-in LSP formatter (bundled with the VS Code extension) format files on save.
+> **Note:** All style conventions are automatically enforced by the official VDL formatter. Run it manually with `vdl fmt ./schema.vdl`, or let the built-in LSP formatter (bundled with the VS Code extension) format files on save.
 
 ## 1. General Principles
 
@@ -34,8 +34,8 @@ Top-level elements include `include`, `type`, `enum`, `const`, `pattern`, `rpc`,
 - **Preservation:** Intentionally placed blank lines in the source are respected.
 
 ```ufo
-include "./common.ufo"
-include "./auth.ufo"
+include "./common.vdl"
+include "./auth.vdl"
 
 const MAX_PAGE_SIZE = 100
 

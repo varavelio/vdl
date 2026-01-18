@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
-	"github.com/varavelio/vdl/urpc/internal/util/testutil"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/util/testutil"
 )
 
 // Helper function to create a pointer to a string
@@ -25,15 +25,15 @@ func qptr(s string) *ast.QuotedString {
 
 func TestParserInclude(t *testing.T) {
 	t.Run("Basic include", func(t *testing.T) {
-		input := `include "./foo.ufo"`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		input := `include "./foo.vdl"`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
 			Children: []*ast.SchemaChild{
 				{
 					Include: &ast.Include{
-						Path: "./foo.ufo",
+						Path: "./foo.vdl",
 					},
 				},
 			},
@@ -43,18 +43,18 @@ func TestParserInclude(t *testing.T) {
 
 	t.Run("Multiple includes", func(t *testing.T) {
 		input := `
-			include "./foo.ufo"
-			include "./bar.ufo"
-			include "../common/types.ufo"
+			include "./foo.vdl"
+			include "./bar.vdl"
+			include "../common/types.vdl"
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
 			Children: []*ast.SchemaChild{
-				{Include: &ast.Include{Path: "./foo.ufo"}},
-				{Include: &ast.Include{Path: "./bar.ufo"}},
-				{Include: &ast.Include{Path: "../common/types.ufo"}},
+				{Include: &ast.Include{Path: "./foo.vdl"}},
+				{Include: &ast.Include{Path: "./bar.vdl"}},
+				{Include: &ast.Include{Path: "../common/types.vdl"}},
 			},
 		}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -68,7 +68,7 @@ func TestParserInclude(t *testing.T) {
 func TestParserConstDecl(t *testing.T) {
 	t.Run("String constant", func(t *testing.T) {
 		input := `const API_VERSION = "1.0.0"`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -88,7 +88,7 @@ func TestParserConstDecl(t *testing.T) {
 
 	t.Run("Integer constant", func(t *testing.T) {
 		input := `const MAX_PAGE_SIZE = 100`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -108,7 +108,7 @@ func TestParserConstDecl(t *testing.T) {
 
 	t.Run("Float constant", func(t *testing.T) {
 		input := `const DEFAULT_TAX_RATE = 0.21`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -128,7 +128,7 @@ func TestParserConstDecl(t *testing.T) {
 
 	t.Run("Boolean true constant", func(t *testing.T) {
 		input := `const FEATURE_FLAG_ENABLED = true`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -148,7 +148,7 @@ func TestParserConstDecl(t *testing.T) {
 
 	t.Run("Boolean false constant", func(t *testing.T) {
 		input := `const DEBUG_MODE = false`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -171,7 +171,7 @@ func TestParserConstDecl(t *testing.T) {
 			""" The maximum number of items allowed per request. """
 			const MAX_ITEMS = 50
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -194,7 +194,7 @@ func TestParserConstDecl(t *testing.T) {
 
 	t.Run("Deprecated constant", func(t *testing.T) {
 		input := `deprecated const OLD_LIMIT = 100`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -215,7 +215,7 @@ func TestParserConstDecl(t *testing.T) {
 
 	t.Run("Deprecated constant with message", func(t *testing.T) {
 		input := `deprecated("Use NEW_LIMIT instead") const OLD_LIMIT = 100`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -250,7 +250,7 @@ func TestParserEnumDecl(t *testing.T) {
 				Shipped
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -277,7 +277,7 @@ func TestParserEnumDecl(t *testing.T) {
 				Post = "POST"
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -303,7 +303,7 @@ func TestParserEnumDecl(t *testing.T) {
 				High = 10
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -329,7 +329,7 @@ func TestParserEnumDecl(t *testing.T) {
 				Pending
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -354,7 +354,7 @@ func TestParserEnumDecl(t *testing.T) {
 				Active
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -381,7 +381,7 @@ func TestParserEnumDecl(t *testing.T) {
 func TestParserPatternDecl(t *testing.T) {
 	t.Run("Basic pattern", func(t *testing.T) {
 		input := `pattern UserEventSubject = "events.users.{userId}"`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -402,7 +402,7 @@ func TestParserPatternDecl(t *testing.T) {
 			""" Redis cache key pattern """
 			pattern SessionCacheKey = "cache:session:{sessionId}"
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -421,7 +421,7 @@ func TestParserPatternDecl(t *testing.T) {
 
 	t.Run("Deprecated pattern", func(t *testing.T) {
 		input := `deprecated pattern OldQueueName = "legacy.{id}"`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -450,7 +450,7 @@ func TestParserTypeDecl(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -482,7 +482,7 @@ func TestParserTypeDecl(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -514,7 +514,7 @@ func TestParserTypeDecl(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -547,7 +547,7 @@ func TestParserTypeDecl(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -585,7 +585,7 @@ func TestParserTypeDecl(t *testing.T) {
 				f5: datetime
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -614,7 +614,7 @@ func TestParserTypeDecl(t *testing.T) {
 				optional?: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -640,7 +640,7 @@ func TestParserTypeDecl(t *testing.T) {
 				scores: int[]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -668,7 +668,7 @@ func TestParserTypeDecl(t *testing.T) {
 				}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -707,7 +707,7 @@ func TestParserTypeDecl(t *testing.T) {
 				users: map<User>
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -755,7 +755,7 @@ func TestParserTypeDecl(t *testing.T) {
 				title: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -781,7 +781,7 @@ func TestParserTypeDecl(t *testing.T) {
 				sku: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -813,7 +813,7 @@ func TestParserTypeDecl(t *testing.T) {
 func TestParserRPCDecl(t *testing.T) {
 	t.Run("Empty RPC block", func(t *testing.T) {
 		input := `rpc MyService {}`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -834,7 +834,7 @@ func TestParserRPCDecl(t *testing.T) {
 			""" My service description """
 			rpc MyService {}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -853,7 +853,7 @@ func TestParserRPCDecl(t *testing.T) {
 
 	t.Run("Deprecated RPC", func(t *testing.T) {
 		input := `deprecated rpc OldService {}`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -883,7 +883,7 @@ func TestParserRPCDecl(t *testing.T) {
 				}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -934,7 +934,7 @@ func TestParserRPCDecl(t *testing.T) {
 				}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -978,7 +978,7 @@ func TestParserRPCDecl(t *testing.T) {
 				deprecated proc OldProc {}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1016,7 +1016,7 @@ func TestParserRPCDecl(t *testing.T) {
 				}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1068,7 +1068,7 @@ func TestParserComments(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1094,7 +1094,7 @@ func TestParserComments(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1121,7 +1121,7 @@ func TestParserComments(t *testing.T) {
 				/* After field */
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1149,7 +1149,7 @@ func TestParserComments(t *testing.T) {
 func TestParserDocstrings(t *testing.T) {
 	t.Run("Standalone docstring", func(t *testing.T) {
 		input := `""" This is a standalone docstring. """`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1165,7 +1165,7 @@ func TestParserDocstrings(t *testing.T) {
 			""" First docstring """
 			""" Second docstring """
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1185,7 +1185,7 @@ func TestParserDocstrings(t *testing.T) {
 				field: string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1212,7 +1212,7 @@ func TestParserDocstrings(t *testing.T) {
 				proc DoSomething {}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1239,7 +1239,7 @@ func TestParserDocstrings(t *testing.T) {
 func TestParserEdgeCases(t *testing.T) {
 	t.Run("Empty schema", func(t *testing.T) {
 		input := ``
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1252,7 +1252,7 @@ func TestParserEdgeCases(t *testing.T) {
 		input := `   
 		
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1263,7 +1263,7 @@ func TestParserEdgeCases(t *testing.T) {
 
 	t.Run("Empty type", func(t *testing.T) {
 		input := `type EmptyType {}`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1276,7 +1276,7 @@ func TestParserEdgeCases(t *testing.T) {
 
 	t.Run("Empty enum", func(t *testing.T) {
 		input := `enum EmptyEnum {}`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1297,7 +1297,7 @@ func TestParserEdgeCases(t *testing.T) {
 				}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1349,7 +1349,7 @@ func TestParserEdgeCases(t *testing.T) {
 				}[]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1387,7 +1387,7 @@ func TestParserEdgeCases(t *testing.T) {
 				data: map<string[]>
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1425,7 +1425,7 @@ func TestParserEdgeCases(t *testing.T) {
 				user: User
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1455,7 +1455,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				data: int[][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1487,7 +1487,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				values: string[][][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1519,7 +1519,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				cells: Cell[][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1554,7 +1554,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				threeDim: int[][][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1584,7 +1584,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				}[][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1623,7 +1623,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				matrices: map<int[][]>[][][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1662,7 +1662,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				data?: float[][]
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1703,7 +1703,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 				}
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.ufo", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{
@@ -1748,7 +1748,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 //////////////////////
 
 // TestParserCompleteSchema is a comprehensive test that covers ALL syntax features
-// of the UFO RPC IDL specification. It tests:
+// of the VDL IDL specification. It tests:
 // - Includes (multiple)
 // - Comments (simple and block)
 // - Standalone docstrings (at schema level and inside RPC)
@@ -1761,8 +1761,8 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 // - Stream (with input/output, field docstrings, deprecated)
 func TestParserCompleteSchema(t *testing.T) {
 	input := `
-		include "./common.ufo"
-		include "./auth.ufo"
+		include "./common.vdl"
+		include "./auth.vdl"
 
 		/*
 		  This is a block comment at the schema level.
@@ -2148,7 +2148,7 @@ func TestParserCompleteSchema(t *testing.T) {
 			}
 		}
 	`
-	parsed, err := ParserInstance.ParseString("schema.ufo", input)
+	parsed, err := ParserInstance.ParseString("schema.vdl", input)
 	require.NoError(t, err)
 
 	// Note: EnumValue.Int is stored as *string (the lexer returns the token value as string)
@@ -2157,8 +2157,8 @@ func TestParserCompleteSchema(t *testing.T) {
 	expected := &ast.Schema{
 		Children: []*ast.SchemaChild{
 			// ==================== INCLUDES ====================
-			{Include: &ast.Include{Path: "./common.ufo"}},
-			{Include: &ast.Include{Path: "./auth.ufo"}},
+			{Include: &ast.Include{Path: "./common.vdl"}},
+			{Include: &ast.Include{Path: "./auth.vdl"}},
 
 			// ==================== BLOCK COMMENT ====================
 			{Comment: &ast.Comment{Block: ptr(`/*

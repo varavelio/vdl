@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // validateEnums validates all enum declarations:

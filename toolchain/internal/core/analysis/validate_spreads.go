@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // validateSpreads checks that all spread references are valid:
@@ -19,7 +19,7 @@ func validateSpreads(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Validate RPC proc/stream input/output spreads
-	for _, rpc := range symbols.rpcs {
+	for _, rpc := range symbols.vdls {
 		for _, proc := range rpc.Procs {
 			if proc.Input != nil {
 				diagnostics = append(diagnostics, validateBlockSpreads(symbols, proc.Input, proc.File, "procedure input", proc.Name)...)

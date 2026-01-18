@@ -1,4 +1,4 @@
-include "./common.ufo"
+include "./common.vdl"
 
 type User {
 	...BaseEntity

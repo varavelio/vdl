@@ -1,4 +1,4 @@
-// Package analysis provides semantic analysis for UFO RPC schemas.
+// Package analysis provides semantic analysis for VDL schemas.
 // It validates the meaning of the code, resolves imports, checks types,
 // and produces a unified Program with all symbols merged.
 package analysis
@@ -6,7 +6,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // Error codes for diagnostics.

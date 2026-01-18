@@ -4,12 +4,12 @@ import (
 	"github.com/alecthomas/participle/v2/lexer"
 )
 
-// URPCLexer is the participle lexer definition for the UFO language.
+// VDLLexer is the participle lexer definition for the VDL language.
 // It uses regex-based lexing provided by participle.
 //
 // Token order matters - more specific patterns must come before general ones.
 // Keywords must come before Ident to have higher priority.
-var URPCLexer = lexer.MustSimple([]lexer.SimpleRule{
+var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	// Docstrings (triple quoted strings) - must come before StringLiteral
 	// Match """ followed by characters, allowing single/double quotes but not triple, until closing """
 	{Name: "Docstring", Pattern: `"""(?:[^"]+|"[^"]|""[^"])*"""`},

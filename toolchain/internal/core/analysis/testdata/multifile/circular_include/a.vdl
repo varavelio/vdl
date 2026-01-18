@@ -1,2 +1,2 @@
-include "./b.ufo"
+include "./b.vdl"
 type A { id: string }

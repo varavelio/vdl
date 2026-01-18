@@ -1,22 +1,22 @@
 ---
-title: UFO RPC IDL Specification
-description: Full specification of the UFO RPC Interface Definition Language
+title: VDL Specification
+description: Full specification of the VDL Interface Definition Language
 ---
 
 ## Overview
 
-UFO is a modern **IDL (Interface Definition Language)** designed for Schema-First development. It provides a declarative syntax for defining RPC services, data structures, and contracts with strong typing that UFO RPC can interpret and generate code for.
+VDL is a modern **IDL (Interface Definition Language)** designed for Schema-First development. It provides a declarative syntax for defining RPC services, data structures, and contracts with strong typing that VDL can interpret and generate code for.
 
-The primary goal of URPC is to offer an intuitive, human-readable format that ensures the best possible developer experience (DX) while maintaining type safety.
+The primary goal of VDL is to offer an intuitive, human-readable format that ensures the best possible developer experience (DX) while maintaining type safety.
 
 This IDL serves as the single source of truth for your projects, from which you can generate type-safe code for multiple programming languages.
 
-## UFO Syntax
+## VDL Syntax
 
 This is the syntax for the IDL.
 
 ```ufo
-include "./foo.ufo"
+include "./foo.vdl"
 
 // <comment>
 
@@ -78,7 +78,7 @@ rpc <RPCName> {
 
 ## Naming Conventions
 
-UFO RPC enforces consistent naming conventions to ensure code generated across all target languages is idiomatic and predictable. The built-in formatter will automatically apply these styles to your schema.
+VDL enforces consistent naming conventions to ensure code generated across all target languages is idiomatic and predictable. The built-in formatter will automatically apply these styles to your schema.
 
 | Element                                         | Convention         | Example                  |
 | :---------------------------------------------- | :----------------- | :----------------------- |
@@ -88,25 +88,25 @@ UFO RPC enforces consistent naming conventions to ensure code generated across a
 | Patterns                                        | `PascalCase`       | `UserEventSubject`       |
 | Enum Members                                    | `PascalCase`       | `Pending`, `InProgress`  |
 
-> **Note:** The formatter will automatically correct casing when you run it on your `.ufo` files, so you can focus on the logic while the tooling ensures consistency.
+> **Note:** The formatter will automatically correct casing when you run it on your `.vdl` files, so you can focus on the logic while the tooling ensures consistency.
 
 ## Includes
 
-To maintain clean and maintainable projects, UFO RPC allows you to split your schemas into multiple files. This modular approach helps you organize your types and procedures by domain, making them easier to navigate and reuse across different schemas.
+To maintain clean and maintainable projects, VDL allows you to split your schemas into multiple files. This modular approach helps you organize your types and procedures by domain, making them easier to navigate and reuse across different schemas.
 
 ### How to use Includes
 
-You can include other `.ufo` files using the `include` keyword, typically at the top of your file.
+You can include other `.vdl` files using the `include` keyword, typically at the top of your file.
 
 ```ufo
-// auth.ufo
+// auth.vdl
 type Session {
   token: string
   expiresAt: datetime
 }
 
-// main.ufo
-include "./auth.ufo"
+// main.vdl
+include "./auth.vdl"
 
 type AuthInfo {
   session: Session
@@ -116,7 +116,7 @@ type AuthInfo {
 ### Core Principles
 
 - **Flat Context:** When a file is included, all its definitions (types, enums, constants, etc.) are merged into the global context. You can think of it as copying the content of the included file into the current file.
-- **Relative Paths:** Includes always use relative paths (e.g., `./common.ufo`) starting from the current file's directory.
+- **Relative Paths:** Includes always use relative paths (e.g., `./common.vdl`) starting from the current file's directory.
 - **Idempotent Processing:** Each file is processed only once. If your project structure leads to the same file being included multiple times, the compiler simply skips files it has already processed, preventing duplication.
 
 This system empowers you to build a robust library of common types while keeping your service-specific logic focused and uncluttered.
@@ -127,7 +127,7 @@ Data types are the core components of your schema. They define the precise struc
 
 ### Primitive Types
 
-The UFO IDL provides several built-in primitive types that map directly to standard JSON types while maintaining strong typing.
+The VDL IDL provides several built-in primitive types that map directly to standard JSON types while maintaining strong typing.
 
 | Type       | JSON Equivalent | Description                                 |
 | :--------- | :-------------- | :------------------------------------------ |
@@ -189,7 +189,7 @@ type User {
 
 #### Type Reuse: Composition & Destructuring
 
-UFO RPC provides two powerful ways to share fields between types, allowing you to build complex models from simpler ones while avoiding duplication.
+VDL provides two powerful ways to share fields between types, allowing you to build complex models from simpler ones while avoiding duplication.
 
 **1. Composition (Nesting)**
 Include one type as a property of another. This creates a clear hierarchy and relationship between objects.
@@ -290,7 +290,7 @@ const VERSION = "2.1.0"
 
 ## Enumerations
 
-Enums define a set of named, discrete values. They are ideal for representing a fixed list of options, such as statuses, categories, or modes. UFO RPC supports two types of enums: **string enums** and **integer enums**.
+Enums define a set of named, discrete values. They are ideal for representing a fixed list of options, such as statuses, categories, or modes. VDL supports two types of enums: **string enums** and **integer enums**.
 
 ```ufo
 """
@@ -405,25 +405,25 @@ rpc <RPCName> {
 
 ### RPC Merging Across Files
 
-To facilitate large-scale project organization, UFO RPC supports **RPC merging**. If the same `rpc` block name is declared in multiple files (for example, via includes), the compiler will automatically merge their contents into a single, unified service.
+To facilitate large-scale project organization, VDL supports **RPC merging**. If the same `rpc` block name is declared in multiple files (for example, via includes), the compiler will automatically merge their contents into a single, unified service.
 
 This allows you to split a large service definition across multiple files by domain or feature:
 
 ```ufo
-// users_procs.ufo
+// users_procs.vdl
 rpc Users {
   proc GetUser { ... }
   proc CreateUser { ... }
 }
 
-// users_streams.ufo
+// users_streams.vdl
 rpc Users {
   stream UserStatusUpdates { ... }
 }
 
-// main.ufo
-include "./users_procs.ufo"
-include "./users_streams.ufo"
+// main.vdl
+include "./users_procs.vdl"
+include "./users_streams.vdl"
 
 // The "Users" RPC now contains GetUser, CreateUser, and UserStatusUpdates.
 ```
@@ -592,7 +592,7 @@ rpc MyService {
 
 Docstrings support Markdown syntax, allowing you to format your documentation with headings, lists, code blocks, and more.
 
-Since docstrings can contain Markdown, whitespace is significant for formatting constructs like lists or code blocks. To prevent conflicts with URPC's own syntax indentation, UFO RPC automatically normalizes multi-line docstrings.
+Since docstrings can contain Markdown, whitespace is significant for formatting constructs like lists or code blocks. To prevent conflicts with VDL's own syntax indentation, VDL automatically normalizes multi-line docstrings.
 
 The leading whitespace from the first non-empty line is considered the baseline indentation. This baseline is then removed from every line in the docstring. This process preserves the _relative_ indentation, ensuring that Markdown formatting remains intact regardless of how the docstring block is indented in the source file.
 
@@ -631,7 +631,7 @@ Remember to keep your documentation up to date with your schema changes.
 
 For extensive documentation, you can reference external Markdown files instead of writing content inline. When a docstring contains only a valid path to a `.md` file, the compiler will read the content of that file and use it as the documentation.
 
-**Important:** External file paths must always be **relative to the `.ufo` file** that references them. If the specified file does not exist, the compiler will raise an error.
+**Important:** External file paths must always be **relative to the `.vdl` file** that references them. If the specified file does not exist, the compiler will raise an error.
 
 ```ufo
 // Standalone documentation from external files
@@ -651,7 +651,7 @@ This approach helps maintain clean and focused schema files while allowing for d
 
 ## Deprecation
 
-URPC provides a mechanism to mark elements as deprecated, signaling to API consumers that a feature should no longer be used in new code and may be removed in a future version. This applies to `type`, `rpc`, `proc`, `stream`, `enum`, `const`, and `pattern` definitions.
+VDL provides a mechanism to mark elements as deprecated, signaling to API consumers that a feature should no longer be used in new code and may be removed in a future version. This applies to `type`, `rpc`, `proc`, `stream`, `enum`, `const`, and `pattern` definitions.
 
 ### Basic Deprecation
 
@@ -725,10 +725,10 @@ Deprecated elements will:
 
 ## Complete Example
 
-The following example demonstrates a comprehensive schema that uses all the features of the UFO IDL, including includes, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
+The following example demonstrates a comprehensive schema that uses all the features of the VDL IDL, including includes, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
 
 ```ufo
-include "./foo.ufo"
+include "./foo.vdl"
 
 // ============================================================================
 // External Documentation
@@ -947,7 +947,7 @@ rpc Chat {
 
 ## Limitations
 
-The UFO IDL is designed to be simple and focused. As such, there are a few constraints to be aware of:
+The VDL IDL is designed to be simple and focused. As such, there are a few constraints to be aware of:
 
 1.  **Reserved Keywords:** All language keywords (e.g., `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, `input`, `output`, `include`, `deprecated`, etc.) cannot be used as identifiers for your types, fields, or services.
 2.  **Validation Logic:** The compiler handles type checking and ensures required fields are present. Any additional business validation logic (e.g., "rating must be between 1 and 5") must be implemented in your application code.

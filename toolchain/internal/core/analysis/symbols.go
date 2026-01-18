@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // symbolTable manages the collection and lookup of symbols during analysis.
@@ -117,7 +117,7 @@ func (st *symbolTable) registerPattern(sym *PatternSymbol) *Diagnostic {
 // registerRPC registers or merges an RPC symbol.
 // RPCs with the same name are merged together.
 func (st *symbolTable) registerRPC(sym *RPCSymbol) {
-	if existing, ok := st.rpcs[sym.Name]; ok {
+	if existing, ok := st.vdls[sym.Name]; ok {
 		// Merge: add the new file to DeclaredIn
 		existing.DeclaredIn = append(existing.DeclaredIn, sym.DeclaredIn...)
 		// Merge procs (individual duplicates are checked later)
@@ -131,7 +131,7 @@ func (st *symbolTable) registerRPC(sym *RPCSymbol) {
 		// Merge standalone docs
 		existing.StandaloneDocs = append(existing.StandaloneDocs, sym.StandaloneDocs...)
 	} else {
-		st.rpcs[sym.Name] = sym
+		st.vdls[sym.Name] = sym
 	}
 }
 
@@ -159,7 +159,7 @@ func (st *symbolTable) buildProgram(entryPoint string, files map[string]*File) *
 		Enums:          st.enums,
 		Consts:         st.consts,
 		Patterns:       st.patterns,
-		RPCs:           st.rpcs,
+		RPCs:           st.vdls,
 		StandaloneDocs: st.standaloneDocs,
 	}
 }

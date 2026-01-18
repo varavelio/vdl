@@ -1,4 +1,4 @@
-// Package ir provides the Intermediate Representation for UFO RPC schemas.
+// Package ir provides the Intermediate Representation for VDL schemas.
 //
 // The IR is the "Golden Platter" for code generators. It transforms the complex,
 // validated analysis.Program into a clean, flat, serializable data structure
@@ -13,7 +13,7 @@
 //
 // Usage:
 //
-//	program, diags := analysis.Analyze(fs, "main.ufo")
+//	program, diags := analysis.Analyze(fs, "main.vdl")
 //	if len(diags) > 0 {
 //	    // handle errors
 //	}

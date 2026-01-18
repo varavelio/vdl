@@ -1,5 +1,5 @@
-include "./users_procs.ufo"
-include "./users_streams.ufo"
+include "./users_procs.vdl"
+include "./users_streams.vdl"
 
 type User {
 	id: string

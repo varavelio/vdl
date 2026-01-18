@@ -1,6 +1,6 @@
 # Compiler Core
 
-This directory contains the **core language logic** for UFO RPC. It is responsible for reading, parsing, validating, and transforming `.ufo` source files into a format ready for code generation.
+This directory contains the **core language logic** for VDL. It is responsible for reading, parsing, validating, and transforming `.vdl` source files into a format ready for code generation.
 
 The core is designed as a strict pipeline. No external tools (LSP, CLI, Generators) should interact with the raw source code, they must consume the artifacts produced here.
 
@@ -37,7 +37,7 @@ flowchart LR
 
 **"How the code is written."**
 
-- **Responsibility:** Defines the data structures that represent the raw syntactic structure of a `.ufo` file.
+- **Responsibility:** Defines the data structures that represent the raw syntactic structure of a `.vdl` file.
 - **Contents:** Node definitions (e.g., `Schema`, `RPCDecl`, `TypeDecl`, `EnumDecl`, `ConstDecl`, `PatternDecl`).
 
 **Characteristics:**
@@ -61,7 +61,7 @@ flowchart LR
 - **Lexer:** Tokenizes input using regex-based rules. Keywords have priority over identifiers.
 - **Parser:** Validates **syntax** only (e.g., matching braces, valid keywords). Uses lookahead to distinguish attached from standalone docstrings.
 
-- **Input:** `.ufo` file content (bytes).
+- **Input:** `.vdl` file content (bytes).
 - **Output:** `*ast.Schema` or Syntax Errors (`parser.Error`).
 
 ### `analysis`
@@ -117,7 +117,7 @@ flowchart LR
 | Feature       | `ast`                     | `analysis`          | `ir`                      |
 | ------------- | ------------------------- | ------------------- | ------------------------- |
 | **Scope**     | Single File               | Entire Project      | Optimized for Output      |
-| **Includes**  | Raw Strings (`"./a.ufo"`) | Resolved Graph      | Merged/Invisible          |
+| **Includes**  | Raw Strings (`"./a.vdl"`) | Resolved Graph      | Merged/Invisible          |
 | **Spreads**   | Reference (`...Base`)     | Resolved Pointer    | Copied Fields (Flattened) |
 | **Docs**      | Raw (`""" ./doc.md """`)  | Validated/Inlined   | Normalized Content        |
 | **Positions** | Full (line, column)       | Full (for LSP)      | None (Source Amnesia)     |

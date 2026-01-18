@@ -46,21 +46,21 @@ func TestFileSystem_Resolve(t *testing.T) {
 	})
 
 	t.Run("resolves relative path against baseFile directory", func(t *testing.T) {
-		result := fs.Resolve("/project/src/main.urpc", "types/user.urpc")
+		result := fs.Resolve("/project/src/main.vdl", "types/user.vdl")
 
-		require.Equal(t, "/project/src/types/user.urpc", result)
+		require.Equal(t, "/project/src/types/user.vdl", result)
 	})
 
 	t.Run("handles parent directory traversal in relative path", func(t *testing.T) {
-		result := fs.Resolve("/project/src/nested/file.urpc", "../common/types.urpc")
+		result := fs.Resolve("/project/src/nested/file.vdl", "../common/types.vdl")
 
-		require.Equal(t, "/project/src/common/types.urpc", result)
+		require.Equal(t, "/project/src/common/types.vdl", result)
 	})
 
 	t.Run("handles current directory reference in relative path", func(t *testing.T) {
-		result := fs.Resolve("/project/src/file.urpc", "./types.urpc")
+		result := fs.Resolve("/project/src/file.vdl", "./types.vdl")
 
-		require.Equal(t, "/project/src/types.urpc", result)
+		require.Equal(t, "/project/src/types.vdl", result)
 	})
 
 	t.Run("handles multiple parent traversals", func(t *testing.T) {

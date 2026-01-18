@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // validatePatterns validates all pattern declarations:

@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/core/analysis"
-	"github.com/varavelio/vdl/urpc/internal/core/parser"
-	"github.com/varavelio/vdl/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 // testdataDir is the path to the testdata directory relative to this test file.
@@ -26,7 +26,7 @@ type expectedCodes struct {
 	noErrors bool     // If true, expect zero diagnostics
 }
 
-// parseExpectedCodes reads the first lines of a .ufo file to extract @expect comments.
+// parseExpectedCodes reads the first lines of a .vdl file to extract @expect comments.
 // Files in the "valid" directory are expected to have no errors.
 // Files in other directories must have at least one @expect comment.
 func parseExpectedCodes(t *testing.T, filePath string) expectedCodes {
@@ -68,7 +68,7 @@ func parseExpectedCodes(t *testing.T, filePath string) expectedCodes {
 	return expectedCodes{codes: codes}
 }
 
-// analyzeTestFile parses and analyzes a single .ufo file.
+// analyzeTestFile parses and analyzes a single .vdl file.
 func analyzeTestFile(t *testing.T, filePath string) (*analysis.Program, []analysis.Diagnostic) {
 	t.Helper()
 
@@ -82,13 +82,13 @@ func analyzeTestFile(t *testing.T, filePath string) (*analysis.Program, []analys
 }
 
 // analyzeMultiFileTest sets up a VFS with multiple files and analyzes from an entry point.
-// It loads all .ufo and .md files to support external docstring resolution.
+// It loads all .vdl and .md files to support external docstring resolution.
 func analyzeMultiFileTest(t *testing.T, dir string, entryFile string) (*analysis.Program, []analysis.Diagnostic) {
 	t.Helper()
 
 	fs := vfs.New()
 
-	// Walk the directory and add all .ufo and .md files to VFS
+	// Walk the directory and add all .vdl and .md files to VFS
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -97,8 +97,8 @@ func analyzeMultiFileTest(t *testing.T, dir string, entryFile string) (*analysis
 			return nil
 		}
 
-		// Include .ufo and .md files (for external docstrings)
-		if !strings.HasSuffix(path, ".ufo") && !strings.HasSuffix(path, ".md") {
+		// Include .vdl and .md files (for external docstrings)
+		if !strings.HasSuffix(path, ".vdl") && !strings.HasSuffix(path, ".md") {
 			return nil
 		}
 
@@ -140,7 +140,7 @@ func containsCode(codes []string, target string) bool {
 	return false
 }
 
-// globTestFiles finds all .ufo files matching a pattern within testdata.
+// globTestFiles finds all .vdl files matching a pattern within testdata.
 func globTestFiles(t *testing.T, pattern string) []string {
 	t.Helper()
 
@@ -151,7 +151,7 @@ func globTestFiles(t *testing.T, pattern string) []string {
 	return matches
 }
 
-// globTestFilesRecursive finds all .ufo files in a directory recursively.
+// globTestFilesRecursive finds all .vdl files in a directory recursively.
 func globTestFilesRecursive(t *testing.T, dir string) []string {
 	t.Helper()
 
@@ -162,7 +162,7 @@ func globTestFilesRecursive(t *testing.T, dir string) []string {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.HasSuffix(path, ".ufo") {
+		if !info.IsDir() && strings.HasSuffix(path, ".vdl") {
 			files = append(files, path)
 		}
 		return nil

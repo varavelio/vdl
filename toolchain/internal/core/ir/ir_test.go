@@ -10,26 +10,26 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/core/analysis"
-	"github.com/varavelio/vdl/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 var update = flag.Bool("update", false, "update golden files")
 
 // TestFromProgram_Golden runs golden file tests for the IR builder.
-// Each .ufo file in testdata is parsed, analyzed, converted to IR,
+// Each .vdl file in testdata is parsed, analyzed, converted to IR,
 // and compared against its corresponding .json file.
 //
 // Run with -update flag to regenerate golden files:
 //
 //	go test -run TestFromProgram_Golden -update
 func TestFromProgram_Golden(t *testing.T) {
-	inputs, err := filepath.Glob("testdata/*.ufo")
+	inputs, err := filepath.Glob("testdata/*.vdl")
 	require.NoError(t, err)
-	require.NotEmpty(t, inputs, "no .ufo files found in testdata/")
+	require.NotEmpty(t, inputs, "no .vdl files found in testdata/")
 
 	for _, input := range inputs {
-		name := strings.TrimSuffix(filepath.Base(input), ".ufo")
+		name := strings.TrimSuffix(filepath.Base(input), ".vdl")
 		t.Run(name, func(t *testing.T) {
 			// Get absolute path for analysis
 			absInput, err := filepath.Abs(input)
@@ -48,7 +48,7 @@ func TestFromProgram_Golden(t *testing.T) {
 			require.NoError(t, err)
 
 			// Golden file path (same name, .json extension)
-			goldenPath := strings.TrimSuffix(input, ".ufo") + ".json"
+			goldenPath := strings.TrimSuffix(input, ".vdl") + ".json"
 
 			// 4. Update or compare
 			if *update {
@@ -194,7 +194,7 @@ func TestSorting(t *testing.T) {
 				proc Only { input {} output {} }
 		}
 	`
-	absPath := "/test/sorting.ufo"
+	absPath := "/test/sorting.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
 	program, diags := analysis.Analyze(fs, absPath)
@@ -250,7 +250,7 @@ func TestSpreadFlattening(t *testing.T) {
 				active: bool
 		}
 	`
-	absPath := "/test/spreads.ufo"
+	absPath := "/test/spreads.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
 	program, diags := analysis.Analyze(fs, absPath)
@@ -299,7 +299,7 @@ func TestEnumInfo(t *testing.T) {
 				name: string
 		}
 	`
-	absPath := "/test/enuminfo.ufo"
+	absPath := "/test/enuminfo.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
 	program, diags := analysis.Analyze(fs, absPath)
@@ -356,7 +356,7 @@ func TestArrayTypes(t *testing.T) {
 				nested: int[][]
 		}
 	`
-	absPath := "/test/arrays.ufo"
+	absPath := "/test/arrays.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
 	program, diags := analysis.Analyze(fs, absPath)

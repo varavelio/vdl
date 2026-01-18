@@ -1,14 +1,14 @@
 package analysis
 
 import (
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
-// Program represents a fully analyzed and validated UFO RPC project.
+// Program represents a fully analyzed and validated VDL project.
 // It contains all symbols merged into a global namespace with origin metadata
 // for LSP support (go-to-definition, find-references, etc.).
 type Program struct {
-	// EntryPoint is the absolute path to the main .ufo file.
+	// EntryPoint is the absolute path to the main .vdl file.
 	EntryPoint string
 
 	// Files contains all parsed files in the project, keyed by absolute path.
@@ -23,7 +23,7 @@ type Program struct {
 	StandaloneDocs []*DocSymbol
 }
 
-// File represents a single parsed .ufo file in the project.
+// File represents a single parsed .vdl file in the project.
 type File struct {
 	Path     string      // Absolute path to the file
 	AST      *ast.Schema // Parsed AST

@@ -6,16 +6,16 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/urpc/internal/core/analysis"
-	"github.com/varavelio/vdl/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 // ============================================================================
-// Valid Schema Tests - testdata/valid/*.ufo should have 0 errors
+// Valid Schema Tests - testdata/valid/*.vdl should have 0 errors
 // ============================================================================
 
 func TestValidSchemas(t *testing.T) {
-	files := globTestFiles(t, "valid/*.ufo")
+	files := globTestFiles(t, "valid/*.vdl")
 	require.NotEmpty(t, files, "No valid test files found")
 
 	for _, file := range files {
@@ -40,7 +40,7 @@ func TestValidSchemas(t *testing.T) {
 }
 
 // ============================================================================
-// Error Schema Tests - testdata/errors/**/*.ufo must have @expect comments
+// Error Schema Tests - testdata/errors/**/*.vdl must have @expect comments
 // ============================================================================
 
 func TestErrorSchemas(t *testing.T) {
@@ -83,7 +83,7 @@ func TestErrorSchemas(t *testing.T) {
 
 func TestMultiFileSchemas(t *testing.T) {
 	t.Run("basic_include", func(t *testing.T) {
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/basic_include", "main.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/basic_include", "main.vdl")
 
 		assert.Empty(t, diagnostics, "Expected no diagnostics")
 		require.NotNil(t, program)
@@ -103,7 +103,7 @@ func TestMultiFileSchemas(t *testing.T) {
 	})
 
 	t.Run("rpc_merge", func(t *testing.T) {
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/rpc_merge", "main.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/rpc_merge", "main.vdl")
 
 		assert.Empty(t, diagnostics, "Expected no diagnostics")
 		require.NotNil(t, program)
@@ -114,19 +114,19 @@ func TestMultiFileSchemas(t *testing.T) {
 		usersRPC := program.RPCs["Users"]
 		require.NotNil(t, usersRPC)
 
-		// Should have procs from users_procs.ufo
+		// Should have procs from users_procs.vdl
 		assert.Contains(t, usersRPC.Procs, "GetUser", "GetUser proc should exist")
 		assert.Contains(t, usersRPC.Procs, "CreateUser", "CreateUser proc should exist")
 
-		// Should have streams from users_streams.ufo
+		// Should have streams from users_streams.vdl
 		assert.Contains(t, usersRPC.Streams, "UserUpdates", "UserUpdates stream should exist")
 
-		// Should be declared in 2 files (users_procs.ufo and users_streams.ufo)
+		// Should be declared in 2 files (users_procs.vdl and users_streams.vdl)
 		assert.Len(t, usersRPC.DeclaredIn, 2, "Users RPC should be declared in 2 files")
 	})
 
 	t.Run("circular_include", func(t *testing.T) {
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/circular_include", "a.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/circular_include", "a.vdl")
 
 		// Should detect circular include
 		require.NotEmpty(t, diagnostics, "Expected circular include diagnostic")
@@ -148,7 +148,7 @@ func TestMultiFileSchemas(t *testing.T) {
 	})
 
 	t.Run("deep_includes", func(t *testing.T) {
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/deep_includes", "main.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/deep_includes", "main.vdl")
 
 		assert.Empty(t, diagnostics, "Expected no diagnostics")
 		require.NotNil(t, program)
@@ -163,7 +163,7 @@ func TestMultiFileSchemas(t *testing.T) {
 	})
 
 	t.Run("external_docstrings", func(t *testing.T) {
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/external_docstrings", "main.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/external_docstrings", "main.vdl")
 
 		assert.Empty(t, diagnostics, "Expected no diagnostics")
 		require.NotNil(t, program)
@@ -205,7 +205,7 @@ func TestMultiFileSchemas(t *testing.T) {
 	})
 
 	t.Run("external_docstring_not_found", func(t *testing.T) {
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/external_docstring_not_found", "main.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/external_docstring_not_found", "main.vdl")
 
 		// Should have E003 error for missing external docstring file
 		require.NotEmpty(t, diagnostics, "Expected E003 diagnostic for missing external file")
@@ -227,13 +227,13 @@ func TestMultiFileSchemas(t *testing.T) {
 }
 
 // ============================================================================
-// Symbol Resolution Tests - testdata/resolution/*.ufo
+// Symbol Resolution Tests - testdata/resolution/*.vdl
 // Verify ResolvedType/ResolvedEnum are populated for LSP navigation
 // ============================================================================
 
 func TestSymbolResolution(t *testing.T) {
 	t.Run("type_references", func(t *testing.T) {
-		program, diagnostics := analyzeTestFile(t, "testdata/resolution/type_references.ufo")
+		program, diagnostics := analyzeTestFile(t, "testdata/resolution/type_references.vdl")
 		assert.Empty(t, diagnostics)
 		require.NotNil(t, program)
 
@@ -278,7 +278,7 @@ func TestSymbolResolution(t *testing.T) {
 	})
 
 	t.Run("enum_references", func(t *testing.T) {
-		program, diagnostics := analyzeTestFile(t, "testdata/resolution/enum_references.ufo")
+		program, diagnostics := analyzeTestFile(t, "testdata/resolution/enum_references.vdl")
 		assert.Empty(t, diagnostics)
 		require.NotNil(t, program)
 
@@ -300,13 +300,13 @@ func TestSymbolResolution(t *testing.T) {
 }
 
 // ============================================================================
-// Best-Effort Tests - testdata/best_effort/*.ufo
+// Best-Effort Tests - testdata/best_effort/*.vdl
 // Verify Program is always returned even with errors
 // ============================================================================
 
 func TestBestEffort(t *testing.T) {
 	t.Run("partial_errors", func(t *testing.T) {
-		program, diagnostics := analyzeTestFile(t, "testdata/best_effort/partial_errors.ufo")
+		program, diagnostics := analyzeTestFile(t, "testdata/best_effort/partial_errors.vdl")
 
 		// Should have errors
 		require.NotEmpty(t, diagnostics, "Expected diagnostics for errors")
@@ -321,7 +321,7 @@ func TestBestEffort(t *testing.T) {
 	})
 
 	t.Run("multiple_errors", func(t *testing.T) {
-		program, diagnostics := analyzeTestFile(t, "testdata/best_effort/multiple_errors.ufo")
+		program, diagnostics := analyzeTestFile(t, "testdata/best_effort/multiple_errors.vdl")
 
 		// Should have multiple errors
 		require.True(t, len(diagnostics) >= 3, "Expected at least 3 diagnostics, got %d", len(diagnostics))
@@ -341,7 +341,7 @@ func TestBestEffort(t *testing.T) {
 func TestRPCMerge(t *testing.T) {
 	t.Run("same_file", func(t *testing.T) {
 		// Multiple declarations of the same RPC in a single file should be merged
-		program, diagnostics := analyzeTestFile(t, "testdata/valid/rpc_merge_same_file.ufo")
+		program, diagnostics := analyzeTestFile(t, "testdata/valid/rpc_merge_same_file.vdl")
 
 		assert.Empty(t, diagnostics, "Expected no diagnostics")
 		require.NotNil(t, program)
@@ -367,7 +367,7 @@ func TestRPCMerge(t *testing.T) {
 
 	t.Run("multiple_files", func(t *testing.T) {
 		// Multiple declarations across different files should also be merged
-		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/rpc_merge", "main.ufo")
+		program, diagnostics := analyzeMultiFileTest(t, "testdata/multifile/rpc_merge", "main.vdl")
 
 		assert.Empty(t, diagnostics, "Expected no diagnostics")
 		require.NotNil(t, program)
@@ -375,11 +375,11 @@ func TestRPCMerge(t *testing.T) {
 		usersRPC := program.RPCs["Users"]
 		require.NotNil(t, usersRPC)
 
-		// Should have procs from users_procs.ufo
+		// Should have procs from users_procs.vdl
 		assert.Contains(t, usersRPC.Procs, "GetUser", "GetUser proc should exist")
 		assert.Contains(t, usersRPC.Procs, "CreateUser", "CreateUser proc should exist")
 
-		// Should have streams from users_streams.ufo
+		// Should have streams from users_streams.vdl
 		assert.Contains(t, usersRPC.Streams, "UserUpdates", "UserUpdates stream should exist")
 
 		// Should be declared in 2 files
@@ -395,7 +395,7 @@ func TestEdgeCases(t *testing.T) {
 	t.Run("file_not_found", func(t *testing.T) {
 		fs := vfs.New()
 
-		program, diagnostics := analysis.Analyze(fs, "/nonexistent/file.ufo")
+		program, diagnostics := analysis.Analyze(fs, "/nonexistent/file.vdl")
 
 		require.NotNil(t, program, "Expected empty program (best-effort)")
 		require.Len(t, diagnostics, 1)

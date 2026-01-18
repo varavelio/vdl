@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // validateTypes checks that all type references point to existing types.
@@ -21,7 +21,7 @@ func validateTypes(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Check RPC proc/stream fields
-	for _, rpc := range symbols.rpcs {
+	for _, rpc := range symbols.vdls {
 		for _, proc := range rpc.Procs {
 			if proc.Input != nil {
 				diagnostics = append(diagnostics, validateFieldTypes(symbols, proc.Input.Fields, "procedure input", proc.Name)...)

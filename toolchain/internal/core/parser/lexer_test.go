@@ -15,7 +15,7 @@ type tokenInfo struct {
 
 // lexString is a helper function that lexes a string and returns tokens
 func lexString(input string) ([]tokenInfo, error) {
-	lex, err := URPCLexer.LexString("test.urpc", input)
+	lex, err := VDLLexer.LexString("test.vdl", input)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func lexString(input string) ([]tokenInfo, error) {
 
 		// Get token name from symbols
 		tokenName := ""
-		for name, typ := range URPCLexer.Symbols() {
+		for name, typ := range VDLLexer.Symbols() {
 			if typ == tok.Type {
 				tokenName = name
 				break
@@ -471,7 +471,7 @@ func TestLexer(t *testing.T) {
 	})
 
 	t.Run("TestLexerInclude", func(t *testing.T) {
-		input := `include "./foo.ufo"`
+		input := `include "./foo.vdl"`
 
 		tokens, err := lexString(input)
 		require.NoError(t, err)
@@ -479,7 +479,7 @@ func TestLexer(t *testing.T) {
 		filtered := filterTokens(tokens)
 		expected := []tokenInfo{
 			{Type: "Include", Value: "include"},
-			{Type: "StringLiteral", Value: `"./foo.ufo"`},
+			{Type: "StringLiteral", Value: `"./foo.vdl"`},
 			{Type: "EOF", Value: ""},
 		}
 
@@ -553,9 +553,9 @@ func TestLexer(t *testing.T) {
 		require.Equal(t, expected, filtered)
 	})
 
-	t.Run("TestLexerCompleteUFOFile", func(t *testing.T) {
+	t.Run("TestLexerCompleteVDLFile", func(t *testing.T) {
 		input := `
-			include "./common.ufo"
+			include "./common.vdl"
 
 			// Single line comment
 			/* Multi-line

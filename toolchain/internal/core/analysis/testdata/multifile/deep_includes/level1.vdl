@@ -1,4 +1,4 @@
-include "./level2.ufo"
+include "./level2.vdl"
 
 type Level1 {
 	child: Level2

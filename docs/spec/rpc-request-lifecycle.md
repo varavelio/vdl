@@ -1,9 +1,9 @@
 ---
 title: Request Lifecycle
-description: Lifecycle of a single request in UFO RPC
+description: Lifecycle of a single request in VDL
 ---
 
-This document outlines the end-to-end data flow for both procedure calls and stream subscriptions in UFO RPC. It details the process from the client's initial request to the server's final response, including URL structure, JSON payloads, and error handling. This specification is language-agnostic and applies to all official UFO RPC code generators. You can even implement your own server or client if you need it.
+This document outlines the end-to-end data flow for both procedure calls and stream subscriptions in VDL. It details the process from the client's initial request to the server's final response, including URL structure, JSON payloads, and error handling. This specification is language-agnostic and applies to all official VDL code generators. You can even implement your own server or client if you need it.
 
 ---
 
@@ -22,7 +22,7 @@ The client sends an HTTP `POST` request to the server.
 - **Method:** `POST`
 - **URL Structure:** The URL is formed by appending the RPC service name and procedure name to the base URL.
   - Format: `<baseURL>/<RPCName>/<ProcedureName>`
-  - Example: `https://api.example.com/urpc/Users/CreateUser`
+  - Example: `https://api.example.com/v1/Users/CreateUser`
 - **Headers:**
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -42,7 +42,7 @@ The server receives the request and performs the following steps:
 2.  **Deserialization & Validation:** It decodes the JSON body and performs built-in validation (e.g., checking for required fields). If this fails, it immediately responds with a validation error.
 3.  **Handler Execution:** The server invokes the user-defined business logic for the procedure, passing the validated input.
 
-> **Note:** UFO RPC provides a hook system (middlewares) that allows developers to run custom code at various points in the lifecycle for tasks like authentication, custom input validation, logging, metrics, etc.
+> **Note:** VDL provides a hook system (middlewares) that allows developers to run custom code at various points in the lifecycle for tasks like authentication, custom input validation, logging, metrics, etc.
 
 ### 4. Server Response
 
@@ -110,7 +110,7 @@ The client initiates the connection with a single HTTP `POST` request.
 
 - **Method:** `POST`
 - **URL Structure:** `<baseURL>/<RPCName>/<StreamName>`
-  - Example: `https://api.example.com/urpc/Chat/NewMessage`
+  - Example: `https://api.example.com/v1/Chat/NewMessage`
 - **Headers:**
   - `Accept: text/event-stream`
   - `Content-Type: application/json`

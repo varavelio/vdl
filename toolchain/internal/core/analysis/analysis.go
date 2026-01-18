@@ -1,14 +1,14 @@
-// Package analysis provides semantic analysis for UFO RPC schemas.
+// Package analysis provides semantic analysis for VDL schemas.
 //
 // The analysis package is the "Semantic Brain" of the compiler. It receives an
 // entry point file, recursively resolves all imports, validates complete semantics
-// according to the UFO RPC specification, and produces a unified Program with all
+// according to the VDL specification, and produces a unified Program with all
 // symbols merged into a global namespace.
 //
 // # Usage
 //
 //	fs := vfs.New()
-//	program, diagnostics := analysis.Analyze(fs, "main.ufo")
+//	program, diagnostics := analysis.Analyze(fs, "main.vdl")
 //	if len(diagnostics) > 0 {
 //	    // Handle errors - but program is still usable for LSP features
 //	    for _, d := range diagnostics {
@@ -39,8 +39,8 @@
 package analysis
 
 import (
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
-	"github.com/varavelio/vdl/urpc/internal/core/vfs"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 // Analyze performs complete semantic analysis starting from an entry point.
@@ -56,7 +56,7 @@ import (
 //
 // Parameters:
 //   - fs: Virtual filesystem for reading files (supports caching and dirty buffers)
-//   - entryPoint: Path to the main .ufo file (can be relative or absolute)
+//   - entryPoint: Path to the main .vdl file (can be relative or absolute)
 //
 // Returns:
 //   - *Program: The program with all successfully collected symbols (never nil)
@@ -65,7 +65,7 @@ import (
 // Example:
 //
 //	fs := vfs.New()
-//	program, diagnostics := analysis.Analyze(fs, "schema/main.ufo")
+//	program, diagnostics := analysis.Analyze(fs, "schema/main.vdl")
 //	if len(diagnostics) > 0 {
 //	    for _, d := range diagnostics {
 //	        log.Printf("%s", d)

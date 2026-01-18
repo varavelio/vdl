@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // validateRPCs validates RPC declarations:
@@ -13,7 +13,7 @@ import (
 func validateRPCs(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
-	for _, rpc := range symbols.rpcs {
+	for _, rpc := range symbols.vdls {
 		diagnostics = append(diagnostics, validateRPC(rpc)...)
 	}
 

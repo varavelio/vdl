@@ -3,7 +3,7 @@ package analysis
 import (
 	"fmt"
 
-	"github.com/varavelio/vdl/urpc/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
 // symbolOrigin tracks where a name was first declared for collision detection.
@@ -84,7 +84,7 @@ func validateGlobalUniqueness(symbols *symbolTable) []Diagnostic {
 	}
 
 	// Register all RPCs
-	for name, sym := range symbols.rpcs {
+	for name, sym := range symbols.vdls {
 		if orig, exists := seen[name]; exists {
 			diagnostics = append(diagnostics, newDiagnostic(
 				sym.File,
