@@ -1,7 +1,5 @@
 package lsp
 
-import "fmt"
-
 type NotificationMessageTextDocumentDidClose struct {
 	NotificationMessage
 	Params NotificationMessageTextDocumentDidCloseParams `json:"params"`
@@ -18,17 +16,15 @@ func (l *LSP) handleTextDocumentDidClose(rawMessage []byte) (any, error) {
 		return nil, err
 	}
 
-	filePath := notification.Params.TextDocument.URI
-	if err := l.docstore.CloseInMem(filePath); err != nil {
-		return nil, fmt.Errorf("failed to close in memory file: %w", err)
-	}
+	filePath := uriToPath(notification.Params.TextDocument.URI)
+
+	// Remove the file from the virtual file system cache
+	l.fs.RemoveFileCache(filePath)
 
 	l.logger.Info("text document did close", "uri", notification.Params.TextDocument.URI)
 
 	// Clear diagnostics when a document is closed
-	if l.analyzer != nil {
-		l.clearDiagnostics(filePath)
-	}
+	l.clearDiagnostics(notification.Params.TextDocument.URI)
 
 	return nil, nil
 }

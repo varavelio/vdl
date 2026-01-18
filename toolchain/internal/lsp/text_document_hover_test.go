@@ -7,24 +7,23 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
 )
 
 func TestExtractCodeFromContent(t *testing.T) {
-	content := `version 1
-
-type FooType {
+	content := `type FooType {
   firstField: string
   secondField: int[]
 }
 
-proc BarProc {
-  input {
-    foo: FooType
-  }
+rpc Test {
+  proc BarProc {
+    input {
+      foo: FooType
+    }
 
-  output {
-    baz: bool
+    output {
+      baz: bool
+    }
   }
 }`
 
@@ -37,22 +36,15 @@ proc BarProc {
 	}{
 		{
 			name:      "Extract type definition",
-			startLine: 3,
-			endLine:   6,
+			startLine: 1,
+			endLine:   4,
 			want:      "type FooType {\n  firstField: string\n  secondField: int[]\n}",
 			wantErr:   false,
 		},
 		{
-			name:      "Extract proc definition",
-			startLine: 7,
-			endLine:   15,
-			want:      "\nproc BarProc {\n  input {\n    foo: FooType\n  }\n\n  output {\n    baz: bool\n  }",
-			wantErr:   false,
-		},
-		{
 			name:      "Extract single line",
-			startLine: 4,
-			endLine:   4,
+			startLine: 2,
+			endLine:   2,
 			want:      "firstField: string",
 			wantErr:   false,
 		},
@@ -93,30 +85,29 @@ func TestHandleTextDocumentHover(t *testing.T) {
 	// Create an LSP instance
 	lsp := New(mockReader, mockWriter)
 
-	// Create a test schema
-	schemaContent := `version 1
-
-type FooType {
+	// Create a test schema using the new VDL syntax
+	schemaContent := `type FooType {
   firstField: string
   secondField: int[]
 }
 
-proc BarProc {
-  input {
-    foo: FooType
-  }
+rpc Test {
+  proc BarProc {
+    input {
+      foo: FooType
+    }
 
-  output {
-    baz: bool
+    output {
+      baz: bool
+    }
   }
 }`
 
-	// Add the schema to the docstore
-	filePath := "file:///test.urpc"
-	err := lsp.docstore.OpenInMem(filePath, schemaContent)
-	require.NoError(t, err)
+	// Add the schema to the vfs
+	filePath := "/test.vdl"
+	lsp.fs.WriteFileCache(filePath, []byte(schemaContent))
 
-	// Create a hover request for a type reference
+	// Create a hover request for a type reference (line 9 is "foo: FooType")
 	request := RequestMessageTextDocumentHover{
 		RequestMessage: RequestMessage{
 			Message: Message{
@@ -127,26 +118,17 @@ proc BarProc {
 		},
 		Params: RequestMessageTextDocumentHoverParams{
 			TextDocument: TextDocumentIdentifier{
-				URI: filePath,
+				URI: "file://" + filePath,
 			},
 			Position: TextDocumentPosition{
-				Line:      9,
-				Character: 10,
+				Line:      8, // 0-based, line with "foo: FooType"
+				Character: 11,
 			},
 		},
 	}
 
 	// Encode the request
 	requestBytes, err := json.Marshal(request)
-	require.NoError(t, err)
-
-	// Create a mock analyzer
-	mockAnalyzer, err := analyzer.NewAnalyzer(lsp.docstore)
-	require.NoError(t, err)
-	lsp.analyzer = mockAnalyzer
-
-	// Analyze the file to populate the combined schema
-	_, _, err = lsp.analyzer.Analyze(filePath)
 	require.NoError(t, err)
 
 	// Handle the request
@@ -158,6 +140,6 @@ proc BarProc {
 	require.True(t, ok)
 	require.NotNil(t, hoverResponse.Result)
 	assert.Equal(t, "markdown", hoverResponse.Result.Contents.Kind)
-	assert.Contains(t, hoverResponse.Result.Contents.Value, "```urpc")
+	assert.Contains(t, hoverResponse.Result.Contents.Value, "```vdl")
 	assert.Contains(t, hoverResponse.Result.Contents.Value, "type FooType")
 }

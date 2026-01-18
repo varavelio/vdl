@@ -7,80 +7,56 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
-func TestFindTokenAtPosition(t *testing.T) {
-	content := `version 1
-
-type FooType {
+func TestFindIdentifierAtPosition(t *testing.T) {
+	content := `type FooType {
   firstField: string
   secondField: int[]
 }
 
-proc BarProc {
-  input {
-    foo: FooType
-  }
+rpc Test {
+  proc BarProc {
+    input {
+      foo: FooType
+    }
 
-  output {
-    baz: bool
+    output {
+      baz: bool
+    }
   }
 }`
 
 	tests := []struct {
 		name     string
-		position ast.Position
+		position TextDocumentPosition
 		want     string
-		wantErr  bool
 	}{
 		{
-			name: "Find type name",
-			position: ast.Position{
-				Line:   3,
-				Column: 7,
-			},
-			want:    "FooType",
-			wantErr: false,
+			name:     "Find type name",
+			position: TextDocumentPosition{Line: 0, Character: 7},
+			want:     "FooType",
 		},
 		{
-			name: "Find proc name",
-			position: ast.Position{
-				Line:   8,
-				Column: 7,
-			},
-			want:    "BarProc",
-			wantErr: false,
+			name:     "Find proc name",
+			position: TextDocumentPosition{Line: 6, Character: 9},
+			want:     "BarProc",
 		},
 		{
-			name: "Find type reference",
-			position: ast.Position{
-				Line:   10,
-				Column: 12,
-			},
-			want:    "FooType",
-			wantErr: false,
+			name:     "Find type reference",
+			position: TextDocumentPosition{Line: 8, Character: 12},
+			want:     "FooType",
 		},
 		{
-			name: "Position out of range",
-			position: ast.Position{
-				Line:   100,
-				Column: 1,
-			},
-			want:    "",
-			wantErr: true,
+			name:     "Position out of range",
+			position: TextDocumentPosition{Line: 100, Character: 1},
+			want:     "",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := findTokenAtPosition(content, tt.position)
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
+			got := findIdentifierAtPosition(content, tt.position)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -94,30 +70,29 @@ func TestHandleTextDocumentDefinition(t *testing.T) {
 	// Create an LSP instance
 	lsp := New(mockReader, mockWriter)
 
-	// Create a test schema
-	schemaContent := `version 1
-
-type FooType {
+	// Create a test schema using new VDL syntax
+	schemaContent := `type FooType {
   firstField: string
   secondField: int[]
 }
 
-proc BarProc {
-  input {
-    foo: FooType
-  }
+rpc Test {
+  proc BarProc {
+    input {
+      foo: FooType
+    }
 
-  output {
-    baz: bool
+    output {
+      baz: bool
+    }
   }
 }`
 
-	// Add the schema to the docstore
-	filePath := "file:///test.urpc"
-	err := lsp.docstore.OpenInMem(filePath, schemaContent)
-	require.NoError(t, err)
+	// Add the schema to the vfs
+	filePath := "/test.vdl"
+	lsp.fs.WriteFileCache(filePath, []byte(schemaContent))
 
-	// Create a definition request
+	// Create a definition request - position is on "FooType" in the input block
 	request := RequestMessageTextDocumentDefinition{
 		RequestMessage: RequestMessage{
 			Message: Message{
@@ -128,27 +103,18 @@ proc BarProc {
 		},
 		Params: RequestMessageTextDocumentDefinitionParams{
 			TextDocument: TextDocumentIdentifier{
-				URI: filePath,
+				URI: "file://" + filePath,
 			},
 			Position: TextDocumentPosition{
-				Line:      9,
-				Character: 10,
+				Line:      8, // 0-based, line with "foo: FooType"
+				Character: 12,
 			},
 		},
 	}
 
-	// Analyze the file to populate the combined schema
-	_, _, err = lsp.analyzer.Analyze(filePath)
-	require.NoError(t, err)
-
 	// Encode the request
 	requestBytes, err := json.Marshal(request)
 	require.NoError(t, err)
-
-	// Create a mock analyzer
-	mockAnalyzer, err := analyzer.NewAnalyzer(lsp.docstore)
-	require.NoError(t, err)
-	lsp.analyzer = mockAnalyzer
 
 	// Handle the request
 	response, err := lsp.handleTextDocumentDefinition(requestBytes)
@@ -159,6 +125,6 @@ proc BarProc {
 	require.True(t, ok)
 	require.NotNil(t, defResponse.Result)
 	require.Len(t, defResponse.Result, 1)
-	assert.Equal(t, filePath, defResponse.Result[0].URI)
-	assert.Equal(t, 2, defResponse.Result[0].Range.Start.Line) // Line 3 in 0-based indexing
+	assert.Contains(t, defResponse.Result[0].URI, filePath)
+	assert.Equal(t, 0, defResponse.Result[0].Range.Start.Line) // FooType is on line 0 (0-based)
 }

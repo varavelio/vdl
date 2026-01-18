@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/formatter"
 )
 
 type RequestMessageTextDocumentFormatting struct {
@@ -28,13 +28,10 @@ func (l *LSP) handleTextDocumentFormatting(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode text document formatting request: %w", err)
 	}
 
-	filePath := request.Params.TextDocument.URI
-	content, _, found, err := l.docstore.GetInMemory("", filePath)
-	if !found {
-		return nil, fmt.Errorf("text document not found in memory: %s", filePath)
-	}
+	filePath := uriToPath(request.Params.TextDocument.URI)
+	content, err := l.fs.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get in memory text document: %w", err)
+		return nil, fmt.Errorf("failed to read file from vfs: %w", err)
 	}
 
 	response := ResponseMessageTextDocumentFormatting{
@@ -45,13 +42,13 @@ func (l *LSP) handleTextDocumentFormatting(rawMessage []byte) (any, error) {
 		Result: nil,
 	}
 
-	formattedText, err := formatter.Format(filePath, content)
+	formattedText, err := formatter.Format(filePath, string(content))
 	if err != nil {
 		// If formatting fails, return no edits.
 		return response, nil
 	}
 
-	lines := strings.Split(content, "\n")
+	lines := strings.Split(string(content), "\n")
 	lastLine := max(len(lines)-1, 0)
 	lastLineChar := len(lines[lastLine])
 

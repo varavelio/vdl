@@ -8,21 +8,21 @@ import (
 )
 
 func TestHandleTextDocumentCompletion(t *testing.T) {
-	schema := `version 1
+	schema := `type User {}
 
-type User {}
-
-proc Foo {
-  input { user:  }
+rpc Test {
+  proc Foo {
+    input { user:  }
+  }
 }`
-	uri := "file:///comp.urpc"
+	uri := "file:///comp.vdl"
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentCompletion{
 		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
-			Position:     TextDocumentPosition{Line: 5, Character: 15}, // after colon and space
+			Position:     TextDocumentPosition{Line: 4, Character: 18}, // after colon and space
 		},
 	}
 	b, _ := json.Marshal(req)

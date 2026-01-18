@@ -2,11 +2,8 @@ package lsp
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
-	"github.com/varavelio/vdl/toolchain/internal/core/lexer"
-	"github.com/varavelio/vdl/toolchain/internal/core/token"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 )
 
 // RequestMessageTextDocumentRename represents a request for renaming a symbol.
@@ -45,26 +42,19 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode rename request: %w", err)
 	}
 
-	filePath := request.Params.TextDocument.URI
+	filePath := uriToPath(request.Params.TextDocument.URI)
 	position := request.Params.Position
 	newName := request.Params.NewName
 
 	// Get the current document content
-	content, _, found, err := l.docstore.GetInMemory("", filePath)
-	if !found {
-		return nil, fmt.Errorf("text document not found in memory: %s", filePath)
-	}
+	content, err := l.fs.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get in memory text document: %w", err)
+		return nil, fmt.Errorf("failed to read file from vfs: %w", err)
 	}
-
-	// Convert LSP position (0-based) to 1-based indices expected by lexer util
-	astPosLine := position.Line + 1
-	astPosCol := position.Character + 1
 
 	// Determine the identifier to be renamed
-	oldName, err := findTokenAtPosition(content, ast.Position{Filename: filePath, Line: astPosLine, Column: astPosCol})
-	if err != nil {
+	oldName := findIdentifierAtPosition(string(content), position)
+	if oldName == "" {
 		resp := ResponseMessageTextDocumentRename{
 			ResponseMessage: ResponseMessage{
 				Message: DefaultMessage,
@@ -92,11 +82,11 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 	}
 
 	// Collect all occurrences of the identifier in the document
-	edits := l.collectRenameEditsInDocument(content, oldName, newName)
+	edits := collectRenameEdits(string(content), filePath, oldName, newName)
 
 	workspaceEdit := WorkspaceEdit{
 		Changes: map[string][]TextDocumentTextEdit{
-			filePath: edits,
+			request.Params.TextDocument.URI: edits,
 		},
 	}
 
@@ -111,35 +101,26 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 	return response, nil
 }
 
-// collectRenameEditsInDocument scans the given content and returns text edits that replace every
+// collectRenameEdits scans the given content using the AST and returns text edits that replace every
 // occurrence of oldName (as an identifier) with newName.
-func (l *LSP) collectRenameEditsInDocument(content, oldName, newName string) []TextDocumentTextEdit {
+func collectRenameEdits(content, filePath, oldName, newName string) []TextDocumentTextEdit {
+	// Parse the content to get the AST
+	schema, err := parser.ParserInstance.ParseString(filePath, content)
+	if err != nil || schema == nil {
+		return nil
+	}
+
+	// Find all references in the schema
+	references := findReferencesInSchema(schema, oldName)
+
+	// Convert to text edits
 	var edits []TextDocumentTextEdit
-
-	lex := lexer.NewLexer("", content)
-
-	for {
-		tok := lex.NextToken()
-		if tok.Type == token.Eof {
-			break
-		}
-
-		// We only care about identifiers that exactly match oldName
-		if tok.Type != token.Ident {
-			continue
-		}
-		if strings.TrimSpace(tok.Literal) != oldName {
-			continue
-		}
-
-		// Build range (convert 1-based token positions to 0-based)
-		rng := TextDocumentRange{
-			Start: TextDocumentPosition{Line: tok.LineStart - 1, Character: tok.ColumnStart - 1},
-			End:   TextDocumentPosition{Line: tok.LineEnd - 1, Character: tok.ColumnEnd},
-		}
-
+	for _, ref := range references {
 		edits = append(edits, TextDocumentTextEdit{
-			Range:   rng,
+			Range: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(ref.Pos),
+				End:   convertASTPositionToLSPPosition(ref.EndPos),
+			},
 			NewText: newName,
 		})
 	}

@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
-	"github.com/varavelio/vdl/toolchain/internal/core/docstore"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 type LSP struct {
@@ -17,8 +17,7 @@ type LSP struct {
 	writer               io.Writer
 	handlerMu            sync.Mutex
 	logger               *LSPLogger
-	docstore             *docstore.Docstore
-	analyzer             *analyzer.Analyzer
+	fs                   *vfs.FileSystem
 	analysisTimer        *time.Timer
 	analysisTimerMu      sync.Mutex
 	analysisInProgress   bool
@@ -28,26 +27,22 @@ type LSP struct {
 // New creates a new LSP instance. It uses the given reader and writer to read and write
 // messages to the LSP server.
 func New(reader io.Reader, writer io.Writer) *LSP {
-	docstore := docstore.NewDocstore()
-	analyzerInstance, err := analyzer.NewAnalyzer(docstore)
-	if err != nil {
-		// If analyzer creation fails, we'll log it but continue without analyzer
-		logger := NewLSPLogger()
-		logger.Error("failed to create analyzer", "error", err)
-	}
-
 	return &LSP{
 		reader:               reader,
 		writer:               writer,
 		handlerMu:            sync.Mutex{},
 		logger:               NewLSPLogger(),
-		docstore:             docstore,
-		analyzer:             analyzerInstance,
+		fs:                   vfs.New(),
 		analysisTimer:        nil,
 		analysisTimerMu:      sync.Mutex{},
 		analysisInProgress:   false,
 		analysisInProgressMu: sync.Mutex{},
 	}
+}
+
+// analyze runs the analysis pipeline on the given file URI and returns the program and diagnostics.
+func (l *LSP) analyze(uri string) (*analysis.Program, []analysis.Diagnostic) {
+	return analysis.Analyze(l.fs, uri)
 }
 
 // Run starts the LSP server. It will read messages from the reader and write responses
@@ -181,4 +176,23 @@ func (l *LSP) sendMessage(message any) error {
 	}
 
 	return nil
+}
+
+// uriToPath converts a file:// URI to an absolute file path.
+// If the URI doesn't have file:// prefix, it returns the URI as-is.
+func uriToPath(uri string) string {
+	const prefix = "file://"
+	if len(uri) > len(prefix) && uri[:len(prefix)] == prefix {
+		return uri[len(prefix):]
+	}
+	return uri
+}
+
+// pathToURI converts an absolute file path to a file:// URI.
+func pathToURI(path string) string {
+	const prefix = "file://"
+	if len(path) > len(prefix) && path[:len(prefix)] == prefix {
+		return path
+	}
+	return prefix + path
 }

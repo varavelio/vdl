@@ -8,10 +8,8 @@ import (
 )
 
 func TestHandleTextDocumentDocumentLink(t *testing.T) {
-	schema := `version 1
-
-""" ./doc.md """`
-	uri := "file:///links.urpc"
+	schema := `""" ./doc.md """`
+	uri := "file:///links.vdl"
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentDocumentLink{

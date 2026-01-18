@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 )
 
 // RequestMessageTextDocumentHover represents a request for hover information.
@@ -51,33 +51,32 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode hover request: %w", err)
 	}
 
-	filePath := request.Params.TextDocument.URI
+	filePath := uriToPath(request.Params.TextDocument.URI)
 	position := request.Params.Position
 
 	// Get the document content
-	content, _, found, err := l.docstore.GetInMemory("", filePath)
-	if !found {
-		return nil, fmt.Errorf("text document not found in memory: %s", filePath)
-	}
+	content, err := l.fs.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get in memory text document: %w", err)
+		return nil, fmt.Errorf("failed to read file from vfs: %w", err)
 	}
 
-	// Run the analyzer to get the combined schema
-	astSchema, _, err := l.analyzer.Analyze(filePath)
-	if err != nil {
-		l.logger.Error("failed to analyze document", "uri", filePath, "error", err)
-	}
+	// Run the analysis to get the program
+	program, _ := l.analyze(filePath)
 
-	// Convert LSP position (0-based) to AST position (1-based)
-	astPosition := ast.Position{
-		Filename: filePath,
-		Line:     position.Line + 1,
-		Column:   position.Character + 1,
+	// Find the identifier at the cursor position
+	identifier := findIdentifierAtPosition(string(content), position)
+	if identifier == "" {
+		return ResponseMessageTextDocumentHover{
+			ResponseMessage: ResponseMessage{
+				Message: DefaultMessage,
+				ID:      request.ID,
+			},
+			Result: nil,
+		}, nil
 	}
 
 	// Find the hover information
-	hoverResult := l.findHoverInfo(content, astPosition, astSchema)
+	hoverResult := findHoverInfo(l.fs, identifier, program)
 
 	response := ResponseMessageTextDocumentHover{
 		ResponseMessage: ResponseMessage{
@@ -90,54 +89,117 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 	return response, nil
 }
 
-// findHoverInfo finds hover information for a symbol at the given position.
-func (l *LSP) findHoverInfo(content string, position ast.Position, astSchema *ast.Schema) *HoverResult {
-	// Find the tokenLiteral at the position
-	tokenLiteral, err := findTokenAtPosition(content, position)
-	if err != nil {
-		return nil
+// findHoverInfo finds hover information for a symbol in the program.
+func findHoverInfo(fs interface{ ReadFile(string) ([]byte, error) }, identifier string, program *analysis.Program) *HoverResult {
+	// Check if the identifier is a type
+	if t, ok := program.Types[identifier]; ok {
+		sourceCode, err := extractSourceCode(fs, t.File, t.Pos.Line, t.EndPos.Line)
+		if err != nil {
+			return nil
+		}
+		return &HoverResult{
+			Contents: MarkupContent{
+				Kind:  "markdown",
+				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+			},
+		}
 	}
 
-	// Check if the token is a reference to a type
-	if hoverInfo := l.findTypeHoverInfo(tokenLiteral, astSchema); hoverInfo != nil {
-		return hoverInfo
+	// Check if the identifier is an enum
+	if e, ok := program.Enums[identifier]; ok {
+		sourceCode, err := extractSourceCode(fs, e.File, e.Pos.Line, e.EndPos.Line)
+		if err != nil {
+			return nil
+		}
+		return &HoverResult{
+			Contents: MarkupContent{
+				Kind:  "markdown",
+				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+			},
+		}
+	}
+
+	// Check if the identifier is a constant
+	if c, ok := program.Consts[identifier]; ok {
+		sourceCode, err := extractSourceCode(fs, c.File, c.Pos.Line, c.EndPos.Line)
+		if err != nil {
+			return nil
+		}
+		return &HoverResult{
+			Contents: MarkupContent{
+				Kind:  "markdown",
+				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+			},
+		}
+	}
+
+	// Check if the identifier is a pattern
+	if p, ok := program.Patterns[identifier]; ok {
+		sourceCode, err := extractSourceCode(fs, p.File, p.Pos.Line, p.EndPos.Line)
+		if err != nil {
+			return nil
+		}
+		return &HoverResult{
+			Contents: MarkupContent{
+				Kind:  "markdown",
+				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+			},
+		}
+	}
+
+	// Check if the identifier is an RPC
+	if r, ok := program.RPCs[identifier]; ok {
+		sourceCode, err := extractSourceCode(fs, r.File, r.Pos.Line, r.EndPos.Line)
+		if err != nil {
+			return nil
+		}
+		return &HoverResult{
+			Contents: MarkupContent{
+				Kind:  "markdown",
+				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+			},
+		}
+	}
+
+	// Check procs and streams within RPCs
+	for _, rpc := range program.RPCs {
+		if proc, ok := rpc.Procs[identifier]; ok {
+			sourceCode, err := extractSourceCode(fs, proc.File, proc.Pos.Line, proc.EndPos.Line)
+			if err != nil {
+				return nil
+			}
+			return &HoverResult{
+				Contents: MarkupContent{
+					Kind:  "markdown",
+					Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+				},
+			}
+		}
+		if stream, ok := rpc.Streams[identifier]; ok {
+			sourceCode, err := extractSourceCode(fs, stream.File, stream.Pos.Line, stream.EndPos.Line)
+			if err != nil {
+				return nil
+			}
+			return &HoverResult{
+				Contents: MarkupContent{
+					Kind:  "markdown",
+					Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
+				},
+			}
+		}
 	}
 
 	return nil
 }
 
-// findTypeHoverInfo finds hover information for a type.
-func (l *LSP) findTypeHoverInfo(tokenLiteral string, astSchema *ast.Schema) *HoverResult {
-	// Check if the token is a type name
-	typeDecl, exists := astSchema.GetTypesMap()[tokenLiteral]
-	if !exists {
-		return nil
-	}
-
-	// Get the source code of the type definition
-	sourceCode, err := l.getTypeSourceCode(typeDecl)
+// extractSourceCode extracts a range of lines from a file.
+func extractSourceCode(fs interface{ ReadFile(string) ([]byte, error) }, filePath string, startLine, endLine int) (string, error) {
+	content, err := fs.ReadFile(filePath)
 	if err != nil {
-		return nil
+		return "", err
 	}
 
-	// Create a hover result with the source code
-	return &HoverResult{
-		Contents: MarkupContent{
-			Kind:  "markdown",
-			Value: fmt.Sprintf("```urpc\n%s\n```", sourceCode),
-		},
-	}
-}
-
-// getTypeSourceCode extracts the source code of a type definition.
-func (l *LSP) getTypeSourceCode(typeDecl *ast.TypeDecl) (string, error) {
-	content, _, err := l.docstore.GetFileAndHash("", typeDecl.Pos.Filename)
-	if err != nil {
-		return "", fmt.Errorf("failed to get file content: %w", err)
-	}
-
-	// Extract the type definition from the content
-	return extractCodeFromContent(content, typeDecl.Pos.Line, typeDecl.EndPos.Line)
+	return extractCodeFromContent(string(content), startLine, endLine)
 }
 
 // extractCodeFromContent extracts a range of lines from the content.

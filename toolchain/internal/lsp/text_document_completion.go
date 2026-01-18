@@ -6,8 +6,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
-	"github.com/varavelio/vdl/toolchain/internal/core/lexer"
-	"github.com/varavelio/vdl/toolchain/internal/core/token"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 )
 
 const (
@@ -67,18 +66,15 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode completion request: %w", err)
 	}
 
-	uri := request.Params.TextDocument.URI
+	filePath := uriToPath(request.Params.TextDocument.URI)
 	pos := request.Params.Position
 
-	content, _, found, err := l.docstore.GetInMemory("", uri)
-	if !found {
-		return nil, fmt.Errorf("text document not found in memory: %s", uri)
-	}
+	content, err := l.fs.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get document content: %w", err)
+		return nil, fmt.Errorf("failed to read file from vfs: %w", err)
 	}
 
-	prefix, ok := getFieldTypePrefix(content, pos)
+	prefix, ok := getFieldTypePrefix(string(content), pos)
 	if !ok {
 		// Not appropriate context; return empty result
 		resp := ResponseMessageTextDocumentCompletion{
@@ -94,9 +90,16 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 		itemsMap[prim] = CompletionItemKindValue
 	}
 
-	// Collect custom types via lexer to avoid parse errors in incomplete schemas
-	for _, tName := range collectCustomTypes(content, uri) {
-		itemsMap[tName] = CompletionItemKindValue
+	// Collect custom types from the parsed schema
+	customTypes := collectCustomTypesFromContent(string(content), filePath)
+	for _, tName := range customTypes {
+		itemsMap[tName] = CompletionItemKindStruct
+	}
+
+	// Collect enums from the parsed schema
+	customEnums := collectEnumsFromContent(string(content), filePath)
+	for _, eName := range customEnums {
+		itemsMap[eName] = CompletionItemKindEnum
 	}
 
 	// Convert to slice and sort alphabetically, applying prefix filter
@@ -144,40 +147,40 @@ func getFieldTypePrefix(content string, pos TextDocumentPosition) (string, bool)
 	return trimmed, true
 }
 
-// collectCustomTypes scans the document with the lexer and returns type names defined via "Type Ident".
-func collectCustomTypes(content, uri string) []string {
-	lex := lexer.NewLexer(uri, content)
+// collectCustomTypesFromContent parses the content and returns type names.
+// Note: We ignore parse errors because the parser returns partial results
+// which are useful for completion even in incomplete/invalid schemas.
+func collectCustomTypesFromContent(content, uri string) []string {
+	schema, _ := parser.ParserInstance.ParseString(uri, content)
+	if schema == nil {
+		return nil
+	}
+
 	var types []string
-
-	for {
-		tok := lex.NextToken()
-		if tok.Type == token.Eof {
-			break
-		}
-
-		if tok.Type != token.Type {
-			continue
-		}
-
-		// Skip whitespace/newline tokens to find the next meaningful token
-		nextTok := lex.NextToken()
-		for nextTok.Type == token.Newline || nextTok.Type == token.Whitespace {
-			nextTok = lex.NextToken()
-		}
-
-		if nextTok.Type == token.Ident {
-			types = append(types, strings.TrimSpace(nextTok.Literal))
+	for _, t := range schema.GetTypes() {
+		if t.Name != "" {
+			types = append(types, t.Name)
 		}
 	}
 
-	// Deduplicate
-	unique := make(map[string]struct{})
-	for _, t := range types {
-		unique[t] = struct{}{}
+	return types
+}
+
+// collectEnumsFromContent parses the content and returns enum names.
+// Note: We ignore parse errors because the parser returns partial results
+// which are useful for completion even in incomplete/invalid schemas.
+func collectEnumsFromContent(content, uri string) []string {
+	schema, _ := parser.ParserInstance.ParseString(uri, content)
+	if schema == nil {
+		return nil
 	}
-	res := make([]string, 0, len(unique))
-	for t := range unique {
-		res = append(res, t)
+
+	var enums []string
+	for _, e := range schema.GetEnums() {
+		if e.Name != "" {
+			enums = append(enums, e.Name)
+		}
 	}
-	return res
+
+	return enums
 }

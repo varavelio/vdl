@@ -4,7 +4,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/analyzer"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
@@ -50,25 +50,28 @@ type NotificationMessagePublishDiagnosticsParams struct {
 	Diagnostics []Diagnostic `json:"diagnostics"`
 }
 
-// ConvertAnalyzerDiagnosticToLSPDiagnostic converts an analyzer diagnostic to an LSP diagnostic.
-func ConvertAnalyzerDiagnosticToLSPDiagnostic(analyzerDiag analyzer.Diagnostic) Diagnostic {
+// ConvertAnalysisDiagnosticToLSPDiagnostic converts an analysis diagnostic to an LSP diagnostic.
+func ConvertAnalysisDiagnosticToLSPDiagnostic(diag analysis.Diagnostic) Diagnostic {
 	return Diagnostic{
 		Range: TextDocumentRange{
-			Start: convertASTPositionToLSPPosition(analyzerDiag.Pos),
-			End:   convertASTPositionToLSPPosition(analyzerDiag.EndPos),
+			Start: convertASTPositionToLSPPosition(diag.Pos),
+			End:   convertASTPositionToLSPPosition(diag.EndPos),
 		},
-		Severity: DiagnosticSeverityError, // All analyzer diagnostics are treated as errors for now
-		Source:   "urpc",
-		Message:  analyzerDiag.Message,
+		Severity: DiagnosticSeverityError, // All analysis diagnostics are treated as errors for now
+		Code:     diag.Code,
+		Source:   "vdl",
+		Message:  diag.Message,
 	}
 }
 
 // convertASTPositionToLSPPosition converts an AST position to an LSP position.
 func convertASTPositionToLSPPosition(pos ast.Position) TextDocumentPosition {
 	// LSP positions are zero-based, but AST positions are one-based
+	line := max(pos.Line-1, 0)
+	char := max(pos.Column-1, 0)
 	return TextDocumentPosition{
-		Line:      pos.Line - 1,
-		Character: pos.Column - 1,
+		Line:      line,
+		Character: char,
 	}
 }
 
@@ -99,20 +102,13 @@ func (l *LSP) clearDiagnostics(uri string) {
 
 // analyzeAndPublishDiagnostics analyzes the document at the given URI and publishes diagnostics.
 func (l *LSP) analyzeAndPublishDiagnostics(uri string) {
-	// Get the document content
-	_, _, found, err := l.docstore.GetInMemory("", uri)
-	if err != nil || !found {
-		l.logger.Error("failed to get document content", "uri", uri, "error", err)
-		return
-	}
+	// Run the analysis
+	_, diagnostics := l.analyze(uri)
 
-	// Run the analyzer
-	_, diagnostics, _ := l.analyzer.Analyze(uri)
-
-	// Convert analyzer diagnostics to LSP diagnostics
+	// Convert analysis diagnostics to LSP diagnostics
 	lspDiagnostics := make([]Diagnostic, 0, len(diagnostics))
 	for _, diag := range diagnostics {
-		lspDiagnostics = append(lspDiagnostics, ConvertAnalyzerDiagnosticToLSPDiagnostic(diag))
+		lspDiagnostics = append(lspDiagnostics, ConvertAnalysisDiagnosticToLSPDiagnostic(diag))
 	}
 
 	// Publish diagnostics
@@ -124,12 +120,6 @@ func (l *LSP) analyzeAndPublishDiagnostics(uri string) {
 func (l *LSP) analyzeAndPublishDiagnosticsDebounced(uri string) {
 	// debounceTime is the time to wait before running the analyzer after a document change.
 	const debounceTime = 500 * time.Millisecond
-
-	// Skip if analyzer is not available
-	if l.analyzer == nil {
-		l.logger.Warn("analyzer not available, skipping analysis")
-		return
-	}
 
 	l.analysisTimerMu.Lock()
 	defer l.analysisTimerMu.Unlock()

@@ -75,7 +75,7 @@ func (l *LSP) handleInitialize(rawMessage []byte) (any, error) {
 		},
 		Result: ResponseMessageInitializeResult{
 			ServerInfo: ResponseMessageInitializeResultServerInfo{
-				Name:    "UFO RPC Language Server",
+				Name:    "VDL Language Server",
 				Version: version.VersionWithPrefix,
 			},
 			Capabilities: ResponseMessageInitializeResultCapabilities{
@@ -83,22 +83,22 @@ func (l *LSP) handleInitialize(rawMessage []byte) (any, error) {
 				TextDocumentSync: 1,
 				// Document formatting is supported.
 				DocumentFormattingProvider: true,
-				// Diagnostics are supported if analyzer is available
-				DiagnosticProvider: l.analyzer != nil,
-				// Definition (go to definition) is supported if analyzer is available
-				DefinitionProvider: l.analyzer != nil,
-				// Hover is supported if analyzer is available
-				HoverProvider: l.analyzer != nil,
-				// Rename is supported if analyzer is available
-				RenameProvider: l.analyzer != nil,
-				// Document link is supported if analyzer is available
-				DocumentLinkProvider: l.analyzer != nil,
-				// References are supported if analyzer is available
-				ReferencesProvider: l.analyzer != nil,
-				// Document symbol capabilities are supported if analyzer is available
-				DocumentSymbolProvider: l.analyzer != nil,
-				// Completion capabilities are supported if analyzer is available
-				CompletionProvider: l.analyzer != nil,
+				// Diagnostics are supported
+				DiagnosticProvider: true,
+				// Definition (go to definition) is supported
+				DefinitionProvider: true,
+				// Hover is supported
+				HoverProvider: true,
+				// Rename is supported
+				RenameProvider: true,
+				// Document link is supported
+				DocumentLinkProvider: true,
+				// References are supported
+				ReferencesProvider: true,
+				// Document symbol capabilities are supported
+				DocumentSymbolProvider: true,
+				// Completion capabilities are supported
+				CompletionProvider: true,
 			},
 		},
 	}

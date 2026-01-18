@@ -2,11 +2,8 @@ package lsp
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
-	"github.com/varavelio/vdl/toolchain/internal/core/lexer"
-	"github.com/varavelio/vdl/toolchain/internal/core/token"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 )
 
 // RequestMessageTextDocumentReferences represents a request for references of a symbol.
@@ -35,21 +32,18 @@ func (l *LSP) handleTextDocumentReferences(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode references request: %w", err)
 	}
 
-	uri := request.Params.TextDocument.URI
+	filePath := uriToPath(request.Params.TextDocument.URI)
 	pos := request.Params.Position
 
 	// Get content
-	content, _, found, err := l.docstore.GetInMemory("", uri)
-	if !found {
-		return nil, fmt.Errorf("text document not found in memory: %s", uri)
-	}
+	content, err := l.fs.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get document content: %w", err)
+		return nil, fmt.Errorf("failed to read file from vfs: %w", err)
 	}
 
 	// Determine symbol under cursor
-	symbol, err := findTokenAtPosition(content, ast.Position{Filename: uri, Line: pos.Line + 1, Column: pos.Character + 1})
-	if err != nil {
+	symbol := findIdentifierAtPosition(string(content), pos)
+	if symbol == "" {
 		response := ResponseMessageTextDocumentReferences{
 			ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
 			Result:          nil,
@@ -57,7 +51,7 @@ func (l *LSP) handleTextDocumentReferences(rawMessage []byte) (any, error) {
 		return response, nil
 	}
 
-	locations := l.collectReferences(content, uri, symbol)
+	locations := collectReferences(string(content), filePath, symbol)
 	response := ResponseMessageTextDocumentReferences{
 		ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
 		Result:          locations,
@@ -66,34 +60,25 @@ func (l *LSP) handleTextDocumentReferences(rawMessage []byte) (any, error) {
 	return response, nil
 }
 
-// collectReferences scans the given content and returns a list of Locations where symbol appears.
-func (l *LSP) collectReferences(content, uri, symbol string) []Location {
+// collectReferences scans the given content using the AST and returns a list of Locations where symbol appears.
+func collectReferences(content, filePath, symbol string) []Location {
+	// Parse the content to get the AST
+	schema, err := parser.ParserInstance.ParseString(filePath, content)
+	if err != nil || schema == nil {
+		return nil
+	}
+
+	// Find all references in the schema
+	references := findReferencesInSchema(schema, symbol)
+
+	// Convert to LSP locations
 	var locs []Location
-
-	lex := lexer.NewLexer(uri, content)
-
-	for {
-		tok := lex.NextToken()
-		if tok.Type == token.Eof {
-			break
-		}
-		if tok.Type != token.Ident {
-			continue
-		}
-		if strings.TrimSpace(tok.Literal) != symbol {
-			continue
-		}
-
-		uriWithScheme := uri
-		if !strings.HasPrefix(uriWithScheme, "file://") {
-			uriWithScheme = "file://" + uriWithScheme
-		}
-
+	for _, ref := range references {
 		locs = append(locs, Location{
-			URI: uriWithScheme,
+			URI: pathToURI(filePath),
 			Range: TextDocumentRange{
-				Start: TextDocumentPosition{Line: tok.LineStart - 1, Character: tok.ColumnStart - 1},
-				End:   TextDocumentPosition{Line: tok.LineEnd - 1, Character: tok.ColumnEnd},
+				Start: convertASTPositionToLSPPosition(ref.Pos),
+				End:   convertASTPositionToLSPPosition(ref.EndPos),
 			},
 		})
 	}

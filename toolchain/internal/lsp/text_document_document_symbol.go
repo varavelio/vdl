@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 )
 
 // SymbolKind values (subset of LSP specification)
@@ -71,20 +71,12 @@ func (l *LSP) handleTextDocumentDocumentSymbol(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode documentSymbol request: %w", err)
 	}
 
-	uri := request.Params.TextDocument.URI
+	filePath := uriToPath(request.Params.TextDocument.URI)
 
-	// Run analyzer to get AST schema
-	astSchema, _, err := l.analyzer.Analyze(uri)
-	if err != nil {
-		// Return empty result but no error (so client still gets response)
-		resp := ResponseMessageTextDocumentDocumentSymbol{
-			ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
-			Result:          nil,
-		}
-		return resp, nil
-	}
+	// Run analysis to get the program
+	program, _ := l.analyze(filePath)
 
-	symbols := l.buildDocumentSymbols(astSchema)
+	symbols := buildDocumentSymbols(program, filePath)
 	response := ResponseMessageTextDocumentDocumentSymbol{
 		ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
 		Result:          symbols,
@@ -92,32 +84,41 @@ func (l *LSP) handleTextDocumentDocumentSymbol(rawMessage []byte) (any, error) {
 	return response, nil
 }
 
-// buildDocumentSymbols converts the AST schema to LSP document symbols.
-func (l *LSP) buildDocumentSymbols(schema *ast.Schema) []DocumentSymbol {
+// buildDocumentSymbols converts the program to LSP document symbols.
+// Only includes symbols that are defined in the given file.
+func buildDocumentSymbols(program *analysis.Program, filePath string) []DocumentSymbol {
 	var symbols []DocumentSymbol
 
-	for _, ds := range schema.GetDocstrings() {
-		name := strings.TrimSpace(ds.Value)
-		name = strings.Split(name, "\n")[0]
-		name = strings.ReplaceAll(name, "#", "")
-		name = strings.TrimSpace(name)
-		if len(name) > 30 {
-			name = name[:30] + "..."
-		}
-		if name == "" {
-			continue
-		}
+	// Get the AST for this file to access standalone docstrings
+	if file, ok := program.Files[filePath]; ok && file.AST != nil {
+		// Standalone docstrings
+		for _, ds := range file.AST.GetDocstrings() {
+			name := strings.TrimSpace(string(ds.Value))
+			name = strings.Split(name, "\n")[0]
+			name = strings.ReplaceAll(name, "#", "")
+			name = strings.TrimSpace(name)
+			if len(name) > 30 {
+				name = name[:30] + "..."
+			}
+			if name == "" {
+				continue
+			}
 
-		sym := DocumentSymbol{
-			Name:           name,
-			Kind:           SymbolKindString,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(ds.Pos), End: convertASTPositionToLSPPosition(ds.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(ds.Pos), End: convertASTPositionToLSPPosition(ds.Pos)},
+			sym := DocumentSymbol{
+				Name:           name,
+				Kind:           SymbolKindString,
+				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(ds.Pos), End: convertASTPositionToLSPPosition(ds.EndPos)},
+				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(ds.Pos), End: convertASTPositionToLSPPosition(ds.Pos)},
+			}
+			symbols = append(symbols, sym)
 		}
-		symbols = append(symbols, sym)
 	}
 
-	for _, t := range schema.GetTypes() {
+	// Types defined in this file
+	for _, t := range program.Types {
+		if t.File != filePath {
+			continue
+		}
 		sym := DocumentSymbol{
 			Name:           t.Name,
 			Kind:           SymbolKindStruct,
@@ -127,71 +128,123 @@ func (l *LSP) buildDocumentSymbols(schema *ast.Schema) []DocumentSymbol {
 		symbols = append(symbols, sym)
 	}
 
-	for _, p := range schema.GetProcs() {
-		procSym := DocumentSymbol{
+	// Enums defined in this file
+	for _, e := range program.Enums {
+		if e.File != filePath {
+			continue
+		}
+		sym := DocumentSymbol{
+			Name:           e.Name,
+			Kind:           SymbolKindEnum,
+			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(e.Pos), End: convertASTPositionToLSPPosition(e.EndPos)},
+			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(e.Pos), End: convertASTPositionToLSPPosition(e.Pos)},
+		}
+		symbols = append(symbols, sym)
+	}
+
+	// Constants defined in this file
+	for _, c := range program.Consts {
+		if c.File != filePath {
+			continue
+		}
+		sym := DocumentSymbol{
+			Name:           c.Name,
+			Kind:           SymbolKindConstant,
+			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(c.Pos), End: convertASTPositionToLSPPosition(c.EndPos)},
+			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(c.Pos), End: convertASTPositionToLSPPosition(c.Pos)},
+		}
+		symbols = append(symbols, sym)
+	}
+
+	// Patterns defined in this file
+	for _, p := range program.Patterns {
+		if p.File != filePath {
+			continue
+		}
+		sym := DocumentSymbol{
 			Name:           p.Name,
-			Kind:           SymbolKindFunction,
+			Kind:           SymbolKindVariable,
 			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(p.Pos), End: convertASTPositionToLSPPosition(p.EndPos)},
 			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(p.Pos), End: convertASTPositionToLSPPosition(p.Pos)},
 		}
-
-		// Build children (input/output)
-		for _, child := range p.Children {
-			if child.Input != nil {
-				c := DocumentSymbol{
-					Name:           "input",
-					Kind:           SymbolKindObject,
-					Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Input.Pos), End: convertASTPositionToLSPPosition(child.Input.EndPos)},
-					SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Input.Pos), End: convertASTPositionToLSPPosition(child.Input.Pos)},
-				}
-				procSym.Children = append(procSym.Children, c)
-			}
-			if child.Output != nil {
-				c := DocumentSymbol{
-					Name:           "output",
-					Kind:           SymbolKindObject,
-					Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Output.Pos), End: convertASTPositionToLSPPosition(child.Output.EndPos)},
-					SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Output.Pos), End: convertASTPositionToLSPPosition(child.Output.Pos)},
-				}
-				procSym.Children = append(procSym.Children, c)
-			}
-		}
-
-		symbols = append(symbols, procSym)
+		symbols = append(symbols, sym)
 	}
 
-	for _, s := range schema.GetStreams() {
-		streamSym := DocumentSymbol{
-			Name:           s.Name,
-			Kind:           SymbolKindEvent,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(s.Pos), End: convertASTPositionToLSPPosition(s.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(s.Pos), End: convertASTPositionToLSPPosition(s.Pos)},
+	// RPCs defined in this file (with procs and streams as children)
+	for _, r := range program.RPCs {
+		if r.File != filePath {
+			continue
+		}
+		rpcSym := DocumentSymbol{
+			Name:           r.Name,
+			Kind:           SymbolKindModule,
+			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(r.Pos), End: convertASTPositionToLSPPosition(r.EndPos)},
+			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(r.Pos), End: convertASTPositionToLSPPosition(r.Pos)},
 		}
 
-		// Children (input/output)
-		for _, child := range s.Children {
-			if child.Input != nil {
-				c := DocumentSymbol{
-					Name:           "input",
-					Kind:           SymbolKindObject,
-					Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Input.Pos), End: convertASTPositionToLSPPosition(child.Input.EndPos)},
-					SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Input.Pos), End: convertASTPositionToLSPPosition(child.Input.Pos)},
-				}
-				streamSym.Children = append(streamSym.Children, c)
+		// Add procs as children
+		for _, proc := range r.Procs {
+			if proc.File != filePath {
+				continue
 			}
-			if child.Output != nil {
-				c := DocumentSymbol{
-					Name:           "output",
-					Kind:           SymbolKindObject,
-					Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Output.Pos), End: convertASTPositionToLSPPosition(child.Output.EndPos)},
-					SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(child.Output.Pos), End: convertASTPositionToLSPPosition(child.Output.Pos)},
-				}
-				streamSym.Children = append(streamSym.Children, c)
+			procSym := DocumentSymbol{
+				Name:           proc.Name,
+				Kind:           SymbolKindFunction,
+				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(proc.Pos), End: convertASTPositionToLSPPosition(proc.EndPos)},
+				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(proc.Pos), End: convertASTPositionToLSPPosition(proc.Pos)},
 			}
+
+			// Add input/output as children of proc
+			procSym.Children = buildInputOutputSymbols(proc.Input, proc.Output)
+			rpcSym.Children = append(rpcSym.Children, procSym)
 		}
 
-		symbols = append(symbols, streamSym)
+		// Add streams as children
+		for _, stream := range r.Streams {
+			if stream.File != filePath {
+				continue
+			}
+			streamSym := DocumentSymbol{
+				Name:           stream.Name,
+				Kind:           SymbolKindEvent,
+				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(stream.Pos), End: convertASTPositionToLSPPosition(stream.EndPos)},
+				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(stream.Pos), End: convertASTPositionToLSPPosition(stream.Pos)},
+			}
+
+			// Add input/output as children of stream
+			streamSym.Children = buildInputOutputSymbols(stream.Input, stream.Output)
+			rpcSym.Children = append(rpcSym.Children, streamSym)
+		}
+
+		symbols = append(symbols, rpcSym)
 	}
 
 	return symbols
+}
+
+// buildInputOutputSymbols builds document symbols for input and output blocks.
+func buildInputOutputSymbols(input, output *analysis.BlockSymbol) []DocumentSymbol {
+	var children []DocumentSymbol
+
+	if input != nil {
+		inputSym := DocumentSymbol{
+			Name:           "input",
+			Kind:           SymbolKindObject,
+			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(input.Pos), End: convertASTPositionToLSPPosition(input.EndPos)},
+			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(input.Pos), End: convertASTPositionToLSPPosition(input.Pos)},
+		}
+		children = append(children, inputSym)
+	}
+
+	if output != nil {
+		outputSym := DocumentSymbol{
+			Name:           "output",
+			Kind:           SymbolKindObject,
+			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(output.Pos), End: convertASTPositionToLSPPosition(output.EndPos)},
+			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(output.Pos), End: convertASTPositionToLSPPosition(output.Pos)},
+		}
+		children = append(children, outputSym)
+	}
+
+	return children
 }
