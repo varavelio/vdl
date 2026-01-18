@@ -1,17 +1,17 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type constFormatter struct {
-	g         *ufogenkit.GenKit
+	g         *gen.Generator
 	constDecl *ast.ConstDecl
 }
 
-func newConstFormatter(g *ufogenkit.GenKit, constDecl *ast.ConstDecl) *constFormatter {
+func newConstFormatter(g *gen.Generator, constDecl *ast.ConstDecl) *constFormatter {
 	if constDecl == nil {
 		constDecl = &ast.ConstDecl{}
 	}
@@ -22,7 +22,7 @@ func newConstFormatter(g *ufogenkit.GenKit, constDecl *ast.ConstDecl) *constForm
 	}
 }
 
-func (f *constFormatter) format() *ufogenkit.GenKit {
+func (f *constFormatter) format() *gen.Generator {
 	if f.constDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.constDecl.Docstring.Value)))
 	}

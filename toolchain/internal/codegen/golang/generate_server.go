@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -22,7 +22,7 @@ func generateServer(sch schema.Schema, config Config) (string, error) {
 		return "", fmt.Errorf("server.go: could not find start delimiter")
 	}
 
-	g := ufogenkit.NewGenKit().WithTabs()
+	g := gen.New().WithTabs()
 
 	// Core server piece (types + internal implementation)
 	g.Raw(piece)

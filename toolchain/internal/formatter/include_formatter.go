@@ -1,17 +1,17 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type includeFormatter struct {
-	g           *ufogenkit.GenKit
+	g           *gen.Generator
 	includeDecl *ast.Include
 }
 
-func newIncludeFormatter(g *ufogenkit.GenKit, includeDecl *ast.Include) *includeFormatter {
+func newIncludeFormatter(g *gen.Generator, includeDecl *ast.Include) *includeFormatter {
 	if includeDecl == nil {
 		includeDecl = &ast.Include{}
 	}
@@ -22,7 +22,7 @@ func newIncludeFormatter(g *ufogenkit.GenKit, includeDecl *ast.Include) *include
 	}
 }
 
-func (f *includeFormatter) format() *ufogenkit.GenKit {
+func (f *includeFormatter) format() *gen.Generator {
 	f.g.Inlinef("include \"%s\"", strutil.EscapeQuotes(string(f.includeDecl.Path)))
 	return f.g
 }

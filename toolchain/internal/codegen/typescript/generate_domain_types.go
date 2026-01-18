@@ -3,12 +3,12 @@ package typescript
 import (
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 )
 
 func generateDomainTypes(sch schema.Schema, config Config) (string, error) {
-	g := ufogenkit.NewGenKit().WithSpaces(2)
+	g := gen.New().WithSpaces(2)
 
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Line("// Domain Types")

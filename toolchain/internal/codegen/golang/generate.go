@@ -3,7 +3,7 @@ package golang
 import (
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"golang.org/x/tools/imports"
 )
@@ -21,7 +21,7 @@ func Generate(sch schema.Schema, config Config) (string, error) {
 		generateClient,
 	}
 
-	g := ufogenkit.NewGenKit().WithTabs()
+	g := gen.New().WithTabs()
 	for _, generator := range subGenerators {
 		codeChunk, err := generator(sch, config)
 		if err != nil {

@@ -1,13 +1,13 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type streamFormatter struct {
-	g                 *ufogenkit.GenKit
+	g                 *gen.Generator
 	streamDecl        *ast.StreamDecl
 	children          []*ast.ProcOrStreamDeclChild
 	maxIndex          int
@@ -16,7 +16,7 @@ type streamFormatter struct {
 	currentIndexChild ast.ProcOrStreamDeclChild
 }
 
-func newStreamFormatter(g *ufogenkit.GenKit, streamDecl *ast.StreamDecl) *streamFormatter {
+func newStreamFormatter(g *gen.Generator, streamDecl *ast.StreamDecl) *streamFormatter {
 	if streamDecl == nil {
 		streamDecl = &ast.StreamDecl{}
 	}
@@ -76,7 +76,7 @@ func (f *streamFormatter) peekChild(offset int) (ast.ProcOrStreamDeclChild, ast.
 }
 
 // format formats the entire streamDecl, handling spacing and EOL comments.
-func (f *streamFormatter) format() *ufogenkit.GenKit {
+func (f *streamFormatter) format() *gen.Generator {
 	if f.streamDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.streamDecl.Docstring.Value)))
 	}

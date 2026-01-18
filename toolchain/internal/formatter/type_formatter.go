@@ -1,17 +1,17 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type typeFormatter struct {
-	g        *ufogenkit.GenKit
+	g        *gen.Generator
 	typeDecl *ast.TypeDecl
 }
 
-func newTypeFormatter(g *ufogenkit.GenKit, typeDecl *ast.TypeDecl) *typeFormatter {
+func newTypeFormatter(g *gen.Generator, typeDecl *ast.TypeDecl) *typeFormatter {
 	if typeDecl == nil {
 		typeDecl = &ast.TypeDecl{}
 	}
@@ -24,8 +24,8 @@ func newTypeFormatter(g *ufogenkit.GenKit, typeDecl *ast.TypeDecl) *typeFormatte
 
 // format formats the entire typeDecl, handling spacing and EOL comments.
 //
-// Returns the formatted genkit.GenKit.
-func (f *typeFormatter) format() *ufogenkit.GenKit {
+// Returns the formatted gen.Generator.
+func (f *typeFormatter) format() *gen.Generator {
 	if f.typeDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.typeDecl.Docstring.Value)))
 	}

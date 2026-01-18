@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -72,7 +72,7 @@ func renderType(
 ) string {
 	name = parentName + name
 
-	og := ufogenkit.NewGenKit().WithSpaces(2)
+	og := gen.New().WithSpaces(2)
 	if desc != "" {
 		og.Linef("/**")
 		renderPartialMultilineComment(og, fmt.Sprintf("%s %s", name, desc))
@@ -151,7 +151,7 @@ func renderHydrateField(parentTypeName string, field schema.FieldDefinition) str
 func renderHydrateType(parentName string, name string, fields []schema.FieldDefinition) string {
 	name = parentName + name
 
-	og := ufogenkit.NewGenKit().WithSpaces(2)
+	og := gen.New().WithSpaces(2)
 	og.Linef("function hydrate%s(input: %s): %s {", name, name, name)
 	og.Block(func() {
 		for _, fieldDef := range fields {
@@ -183,17 +183,17 @@ func renderHydrateType(parentName string, name string, fields []schema.FieldDefi
 	return og.String()
 }
 
-// renderPartialMultilineComment receives a text and renders it to the given genkit.GenKit
+// renderPartialMultilineComment receives a text and renders it to the given gen.Generator
 // as a partial multiline comment.
-func renderPartialMultilineComment(g *ufogenkit.GenKit, text string) {
+func renderPartialMultilineComment(g *gen.Generator, text string) {
 	for line := range strings.SplitSeq(text, "\n") {
 		g.Linef(" * %s", line)
 	}
 }
 
 // renderDeprecated receives a pointer to a string and if it is not nil, it will
-// render a comment with the deprecated message to the given genkit.GenKit.
-func renderDeprecated(g *ufogenkit.GenKit, deprecated *string) {
+// render a comment with the deprecated message to the given gen.Generator.
+func renderDeprecated(g *gen.Generator, deprecated *string) {
 	if deprecated == nil {
 		return
 	}

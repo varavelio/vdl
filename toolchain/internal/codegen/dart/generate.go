@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -40,7 +40,7 @@ func Generate(sch schema.Schema, config Config) (Output, error) {
 	}
 
 	// 1) Generate lib/main.dart
-	g := ufogenkit.NewGenKit().WithSpaces(2)
+	g := gen.New().WithSpaces(2)
 	for _, generator := range subGenerators {
 		codeChunk, err := generator(sch, config)
 		if err != nil {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -78,7 +78,7 @@ func renderType(
 ) string {
 	name = parentName + name
 
-	og := ufogenkit.NewGenKit().WithTabs()
+	og := gen.New().WithTabs()
 	renderMultilineComment(og, desc)
 	og.Linef("type %s struct {", name)
 	og.Block(func() {
@@ -162,7 +162,7 @@ func renderPreType(
 ) string {
 	name = parentName + name
 
-	og := ufogenkit.NewGenKit().WithTabs()
+	og := gen.New().WithTabs()
 	og.Linef("// pre%s is the version of %s previous to the required field validation", name, name)
 	og.Linef("type pre%s struct {", name)
 	og.Block(func() {
@@ -353,31 +353,31 @@ func renderPreType(
 	return og.String()
 }
 
-// renderMultilineComment receives a text and renders it to the given genkit.GenKit
+// renderMultilineComment receives a text and renders it to the given gen.Generator
 // as a multiline comment.
-func renderMultilineComment(g *ufogenkit.GenKit, text string) {
+func renderMultilineComment(g *gen.Generator, text string) {
 	for line := range strings.SplitSeq(text, "\n") {
 		g.Linef("// %s", line)
 	}
 }
 
 // renderDocString is the same as renderDoc but it returns a string instead of
-// rendering to the given genkit.GenKit.
+// rendering to the given gen.Generator.
 func renderDocString(doc *string, newLineBefore bool) string {
 	if doc == nil {
 		return ""
 	}
 
-	og := ufogenkit.NewGenKit().WithTabs()
+	og := gen.New().WithTabs()
 	renderDoc(og, doc, newLineBefore)
 	return og.String()
 }
 
 // renderDoc receives a pointer to a string and if it is not nil, it will
-// render a comment with the documentation to the given genkit.GenKit.
+// render a comment with the documentation to the given gen.Generator.
 //
 // It will normalize the indent and trim the trailing and leading whitespace.
-func renderDoc(g *ufogenkit.GenKit, doc *string, newLineBefore bool) {
+func renderDoc(g *gen.Generator, doc *string, newLineBefore bool) {
 	if doc == nil {
 		return
 	}
@@ -390,8 +390,8 @@ func renderDoc(g *ufogenkit.GenKit, doc *string, newLineBefore bool) {
 }
 
 // renderDeprecated receives a pointer to a string and if it is not nil, it will
-// render a comment with the deprecated message to the given genkit.GenKit.
-func renderDeprecated(g *ufogenkit.GenKit, deprecated *string) {
+// render a comment with the deprecated message to the given gen.Generator.
+func renderDeprecated(g *gen.Generator, deprecated *string) {
 	if deprecated == nil {
 		return
 	}

@@ -1,13 +1,13 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type procFormatter struct {
-	g                 *ufogenkit.GenKit
+	g                 *gen.Generator
 	procDecl          *ast.ProcDecl
 	children          []*ast.ProcOrStreamDeclChild
 	maxIndex          int
@@ -16,7 +16,7 @@ type procFormatter struct {
 	currentIndexChild ast.ProcOrStreamDeclChild
 }
 
-func newProcFormatter(g *ufogenkit.GenKit, procDecl *ast.ProcDecl) *procFormatter {
+func newProcFormatter(g *gen.Generator, procDecl *ast.ProcDecl) *procFormatter {
 	if procDecl == nil {
 		procDecl = &ast.ProcDecl{}
 	}
@@ -76,7 +76,7 @@ func (f *procFormatter) peekChild(offset int) (ast.ProcOrStreamDeclChild, ast.Li
 }
 
 // format formats the entire procDecl, handling spacing and EOL comments.
-func (f *procFormatter) format() *ufogenkit.GenKit {
+func (f *procFormatter) format() *gen.Generator {
 	if f.procDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.procDecl.Docstring.Value)))
 	}

@@ -3,13 +3,13 @@ package typescript
 import (
 	"fmt"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generateStreamTypes(sch schema.Schema, _ Config) (string, error) {
-	g := ufogenkit.NewGenKit().WithSpaces(2)
+	g := gen.New().WithSpaces(2)
 
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Line("// Stream Types")

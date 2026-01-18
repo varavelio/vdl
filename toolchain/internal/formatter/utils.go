@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -32,7 +32,7 @@ func escapeQuotes(s string) string {
 }
 
 // FormatComment formats a comment.
-func FormatComment(g *ufogenkit.GenKit, comment *ast.Comment) {
+func FormatComment(g *gen.Generator, comment *ast.Comment) {
 	if comment.Simple != nil {
 		g.Line(*comment.Simple)
 	}
@@ -42,7 +42,7 @@ func FormatComment(g *ufogenkit.GenKit, comment *ast.Comment) {
 }
 
 // FormatInlineComment formats an inline comment.
-func FormatInlineComment(g *ufogenkit.GenKit, comment *ast.Comment) {
+func FormatInlineComment(g *gen.Generator, comment *ast.Comment) {
 	if comment.Simple != nil {
 		g.Inlinef(" %s", *comment.Simple)
 	}

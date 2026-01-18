@@ -3,7 +3,7 @@ package golang
 import (
 	"strings"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 )
 
@@ -28,7 +28,7 @@ var packageHeader = strings.TrimSpace(`
 `)
 
 func generatePackage(_ schema.Schema, config Config) (string, error) {
-	g := ufogenkit.NewGenKit().WithTabs()
+	g := gen.New().WithTabs()
 
 	g.Line(packageHeader)
 	g.Break()

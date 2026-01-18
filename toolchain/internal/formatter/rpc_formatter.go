@@ -1,13 +1,13 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type rpcFormatter struct {
-	g                 *ufogenkit.GenKit
+	g                 *gen.Generator
 	rpcDecl           *ast.RPCDecl
 	children          []*ast.RPCChild
 	maxIndex          int
@@ -16,7 +16,7 @@ type rpcFormatter struct {
 	currentIndexChild ast.RPCChild
 }
 
-func newRPCFormatter(g *ufogenkit.GenKit, rpcDecl *ast.RPCDecl) *rpcFormatter {
+func newRPCFormatter(g *gen.Generator, rpcDecl *ast.RPCDecl) *rpcFormatter {
 	if rpcDecl == nil {
 		rpcDecl = &ast.RPCDecl{}
 	}
@@ -75,7 +75,7 @@ func (f *rpcFormatter) peekChild(offset int) (ast.RPCChild, ast.LineDiff, bool) 
 	return peekIndexChild, lineDiff, peekIndexEOF
 }
 
-func (f *rpcFormatter) format() *ufogenkit.GenKit {
+func (f *rpcFormatter) format() *gen.Generator {
 	if f.rpcDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, f.rpcDecl.Docstring.Value)
 	}

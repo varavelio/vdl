@@ -1,14 +1,14 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // Common helpers
 
-func formatComment(g *ufogenkit.GenKit, comment *ast.Comment, breakBefore bool) {
+func formatComment(g *gen.Generator, comment *ast.Comment, breakBefore bool) {
 	if breakBefore {
 		g.Break()
 	}
@@ -20,7 +20,7 @@ func formatComment(g *ufogenkit.GenKit, comment *ast.Comment, breakBefore bool) 
 	}
 }
 
-func formatSpread(g *ufogenkit.GenKit, spread *ast.Spread, breakBefore bool) {
+func formatSpread(g *gen.Generator, spread *ast.Spread, breakBefore bool) {
 	if breakBefore {
 		g.Break()
 	}
@@ -28,7 +28,7 @@ func formatSpread(g *ufogenkit.GenKit, spread *ast.Spread, breakBefore bool) {
 	g.Inlinef("...%s", strutil.ToPascalCase(spread.TypeName))
 }
 
-func formatField(g *ufogenkit.GenKit, field *ast.Field, breakBefore bool, _ any) {
+func formatField(g *gen.Generator, field *ast.Field, breakBefore bool, _ any) {
 	if breakBefore {
 		g.Line("")
 	}
@@ -51,7 +51,7 @@ func formatField(g *ufogenkit.GenKit, field *ast.Field, breakBefore bool, _ any)
 	formatFieldType(g, field.Type)
 }
 
-func formatFieldType(g *ufogenkit.GenKit, ft ast.FieldType) {
+func formatFieldType(g *gen.Generator, ft ast.FieldType) {
 	if ft.Base.Named != nil {
 		typeLiteral := *ft.Base.Named
 		// Force strict pascal case for non primitive types
@@ -78,7 +78,7 @@ func formatFieldType(g *ufogenkit.GenKit, ft ast.FieldType) {
 // TypeBodyFormatter (for TypeDecl and inline objects)
 
 type typeBodyFormatter struct {
-	g                 *ufogenkit.GenKit
+	g                 *gen.Generator
 	parent            ast.WithPositions
 	children          []*ast.TypeDeclChild
 	maxIndex          int
@@ -87,7 +87,7 @@ type typeBodyFormatter struct {
 	currentIndexChild ast.TypeDeclChild
 }
 
-func newTypeBodyFormatter(g *ufogenkit.GenKit, parent ast.WithPositions, children []*ast.TypeDeclChild) *typeBodyFormatter {
+func newTypeBodyFormatter(g *gen.Generator, parent ast.WithPositions, children []*ast.TypeDeclChild) *typeBodyFormatter {
 	if children == nil {
 		children = []*ast.TypeDeclChild{}
 	}
@@ -161,7 +161,7 @@ func (f *typeBodyFormatter) LineAndComment(content string) {
 	f.g.Line(content)
 }
 
-func (f *typeBodyFormatter) format() *ufogenkit.GenKit {
+func (f *typeBodyFormatter) format() *gen.Generator {
 	if f.currentIndexEOF {
 		f.g.Inline("{}")
 		return f.g
@@ -228,7 +228,7 @@ func (f *typeBodyFormatter) formatChild() {
 
 // If current is docstring/field with docstring, ensure break?
 type ioBodyFormatter struct {
-	g                 *ufogenkit.GenKit
+	g                 *gen.Generator
 	parent            ast.WithPositions
 	children          []*ast.InputOutputChild
 	maxIndex          int
@@ -237,7 +237,7 @@ type ioBodyFormatter struct {
 	currentIndexChild ast.InputOutputChild
 }
 
-func newIOBodyFormatter(g *ufogenkit.GenKit, parent ast.WithPositions, children []*ast.InputOutputChild) *ioBodyFormatter {
+func newIOBodyFormatter(g *gen.Generator, parent ast.WithPositions, children []*ast.InputOutputChild) *ioBodyFormatter {
 	if children == nil {
 		children = []*ast.InputOutputChild{}
 	}
@@ -310,7 +310,7 @@ func (f *ioBodyFormatter) LineAndComment(content string) {
 	f.g.Line(content)
 }
 
-func (f *ioBodyFormatter) format() *ufogenkit.GenKit {
+func (f *ioBodyFormatter) format() *gen.Generator {
 	if f.currentIndexEOF {
 		f.g.Inline("{}")
 		return f.g

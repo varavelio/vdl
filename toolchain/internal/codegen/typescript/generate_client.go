@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/schema"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -22,7 +22,7 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 		return "", fmt.Errorf("client.ts: could not find start delimiter")
 	}
 
-	g := ufogenkit.NewGenKit().WithSpaces(2)
+	g := gen.New().WithSpaces(2)
 
 	g.Raw(piece)
 	g.Break()
@@ -51,7 +51,7 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 }
 
 // generateClientBuilder creates the main NewClient function
-func generateClientBuilder(g *ufogenkit.GenKit) {
+func generateClientBuilder(g *gen.Generator) {
 	g.Line("/**")
 	g.Line(" * Creates a new UFO RPC client builder.")
 	g.Line(" *")
@@ -126,7 +126,7 @@ func generateClientBuilder(g *ufogenkit.GenKit) {
 }
 
 // generateClientClass creates the main Client class
-func generateClientClass(g *ufogenkit.GenKit) {
+func generateClientClass(g *gen.Generator) {
 	g.Line("/**")
 	g.Line(" * Main UFO RPC client providing type-safe access to procedures and streams.")
 	g.Line(" */")
@@ -154,7 +154,7 @@ func generateClientClass(g *ufogenkit.GenKit) {
 }
 
 // generateProcedureImplementation generates all procedure-related code
-func generateProcedureImplementation(g *ufogenkit.GenKit, sch schema.Schema) {
+func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 	g.Line("// =============================================================================")
 	g.Line("// Procedure Implementation")
 	g.Line("// =============================================================================")
@@ -348,7 +348,7 @@ func generateProcedureImplementation(g *ufogenkit.GenKit, sch schema.Schema) {
 }
 
 // generateStreamImplementation generates all stream-related code
-func generateStreamImplementation(g *ufogenkit.GenKit, sch schema.Schema) {
+func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 	g.Line("// =============================================================================")
 	g.Line("// Stream Implementation")
 	g.Line("// =============================================================================")

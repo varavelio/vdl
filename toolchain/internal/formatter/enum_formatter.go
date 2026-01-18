@@ -1,17 +1,17 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type enumFormatter struct {
-	g        *ufogenkit.GenKit
+	g        *gen.Generator
 	enumDecl *ast.EnumDecl
 }
 
-func newEnumFormatter(g *ufogenkit.GenKit, enumDecl *ast.EnumDecl) *enumFormatter {
+func newEnumFormatter(g *gen.Generator, enumDecl *ast.EnumDecl) *enumFormatter {
 	if enumDecl == nil {
 		enumDecl = &ast.EnumDecl{}
 	}
@@ -22,7 +22,7 @@ func newEnumFormatter(g *ufogenkit.GenKit, enumDecl *ast.EnumDecl) *enumFormatte
 	}
 }
 
-func (f *enumFormatter) format() *ufogenkit.GenKit {
+func (f *enumFormatter) format() *gen.Generator {
 	if f.enumDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.enumDecl.Docstring.Value)))
 	}

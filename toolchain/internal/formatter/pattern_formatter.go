@@ -1,17 +1,17 @@
 package formatter
 
 import (
-	"github.com/uforg/ufogenkit"
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type patternFormatter struct {
-	g           *ufogenkit.GenKit
+	g           *gen.Generator
 	patternDecl *ast.PatternDecl
 }
 
-func newPatternFormatter(g *ufogenkit.GenKit, patternDecl *ast.PatternDecl) *patternFormatter {
+func newPatternFormatter(g *gen.Generator, patternDecl *ast.PatternDecl) *patternFormatter {
 	if patternDecl == nil {
 		patternDecl = &ast.PatternDecl{}
 	}
@@ -22,7 +22,7 @@ func newPatternFormatter(g *ufogenkit.GenKit, patternDecl *ast.PatternDecl) *pat
 	}
 }
 
-func (f *patternFormatter) format() *ufogenkit.GenKit {
+func (f *patternFormatter) format() *gen.Generator {
 	if f.patternDecl.Docstring != nil {
 		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.patternDecl.Docstring.Value)))
 	}
