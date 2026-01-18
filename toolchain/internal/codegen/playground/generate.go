@@ -1,100 +1,158 @@
 package playground
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
-	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
+	"strings"
 
 	embedplayground "github.com/varavelio/vdl/playground"
-	"github.com/varavelio/vdl/toolchain/internal/core/ast"
-	"github.com/varavelio/vdl/toolchain/internal/core/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-// Generate takes a schema and a config and generates the playground for the schema.
-func Generate(absConfigDir string, sch *ast.Schema, config Config) error {
-	outputDir := filepath.Join(absConfigDir, config.OutputDir)
-
-	if err := os.RemoveAll(outputDir); err != nil {
-		return fmt.Errorf("error emptying output directory: %w", err)
-	}
-
-	err := extractEmbedFS(embedplayground.BuildFS, "build", outputDir)
-	if err != nil {
-		return fmt.Errorf("error extracting embedded filesystem: %w", err)
-	}
-
-	gitkeepPath := filepath.Join(outputDir, ".gitkeep")
-	if err := os.Remove(gitkeepPath); err != nil {
-		return fmt.Errorf("error deleting .gitkeep file: %w", err)
-	}
-
-	formattedSchema := formatter.FormatSchema(sch)
-	formattedSchemaPath := filepath.Join(outputDir, "schema.urpc")
-	if err := os.WriteFile(formattedSchemaPath, []byte(formattedSchema), 0644); err != nil {
-		return fmt.Errorf("error writing formatted schema to %s: %w", formattedSchemaPath, err)
-	}
-
-	hasConfig := config.DefaultBaseURL != "" || len(config.DefaultHeaders) > 0
-	if hasConfig {
-		type jsonConfigHeader struct {
-			Key   string `json:"key"`
-			Value string `json:"value"`
-		}
-
-		type jsonConfig struct {
-			BaseURL string             `json:"baseUrl,omitempty,omitzero"`
-			Headers []jsonConfigHeader `json:"headers,omitempty,omitzero"`
-		}
-
-		jsonConfigHeaders := make([]jsonConfigHeader, len(config.DefaultHeaders))
-		for i, header := range config.DefaultHeaders {
-			jsonConfigHeaders[i] = jsonConfigHeader(header)
-		}
-
-		jsonConf := jsonConfig{
-			BaseURL: config.DefaultBaseURL,
-			Headers: jsonConfigHeaders,
-		}
-
-		jsonConfigBytes, err := json.Marshal(jsonConf)
-		if err != nil {
-			return fmt.Errorf("error marshalling config to JSON: %w", err)
-		}
-
-		configPath := filepath.Join(outputDir, "config.json")
-		if err := os.WriteFile(configPath, jsonConfigBytes, 0644); err != nil {
-			return fmt.Errorf("error writing config to %s: %w", configPath, err)
-		}
-	}
-
-	return nil
+// File represents a generated file. This mirrors codegen.File to avoid import cycles.
+type File struct {
+	RelativePath string
+	Content      []byte
 }
 
-func extractEmbedFS(embedFS embed.FS, rootDir string, destDir string) error {
-	return fs.WalkDir(embedFS, rootDir, func(path string, d fs.DirEntry, err error) error {
+// Generator implements the playground generator.
+type Generator struct {
+	config Config
+}
+
+// New creates a new playground generator with the given config.
+func New(config Config) *Generator {
+	return &Generator{config: config}
+}
+
+// Name returns the generator name.
+func (g *Generator) Name() string {
+	return "playground"
+}
+
+// Generate produces playground files from the IR schema.
+// The playground consists of:
+// - All static files from the embedded playground build
+// - schema.urpc: The formatted VDL schema (from config.FormattedSchema)
+// - config.json: Optional configuration for base URL and headers
+func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+	files := []File{}
+
+	// Files to skip from embedded content (we'll generate our own)
+	skipFiles := map[string]bool{
+		".gitkeep":    true,
+		"config.json": true,
+		"schema.vdl":  true,
+		"schema.urpc": true,
+	}
+
+	// 1. Extract all files from the embedded playground build
+	embeddedFiles, err := extractEmbedFS(embedplayground.BuildFS, "build")
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter out files we want to replace/skip
+	for _, f := range embeddedFiles {
+		baseName := filepath.Base(f.RelativePath)
+		if skipFiles[baseName] {
+			continue
+		}
+		files = append(files, f)
+	}
+
+	// 2. Add the formatted schema if provided
+	if g.config.FormattedSchema != "" {
+		files = append(files, File{
+			RelativePath: "schema.urpc",
+			Content:      []byte(g.config.FormattedSchema),
+		})
+	}
+
+	// 3. Add config.json if there's configuration to include
+	hasConfig := g.config.DefaultBaseURL != "" || len(g.config.DefaultHeaders) > 0
+	if hasConfig {
+		configJSON, err := g.generateConfigJSON()
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, File{
+			RelativePath: "config.json",
+			Content:      configJSON,
+		})
+	}
+
+	return files, nil
+}
+
+// generateConfigJSON creates the config.json content for the playground.
+func (g *Generator) generateConfigJSON() ([]byte, error) {
+	type jsonConfigHeader struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	}
+
+	type jsonConfig struct {
+		BaseURL string             `json:"baseUrl,omitempty"`
+		Headers []jsonConfigHeader `json:"headers,omitempty"`
+	}
+
+	headers := make([]jsonConfigHeader, len(g.config.DefaultHeaders))
+	for i, header := range g.config.DefaultHeaders {
+		headers[i] = jsonConfigHeader(header)
+	}
+
+	conf := jsonConfig{
+		BaseURL: g.config.DefaultBaseURL,
+		Headers: headers,
+	}
+
+	return json.Marshal(conf)
+}
+
+// extractEmbedFS extracts all files from an embedded filesystem.
+// Returns files with paths relative to the rootDir.
+func extractEmbedFS(embedFS embed.FS, rootDir string) ([]File, error) {
+	files := []File{}
+
+	err := fs.WalkDir(embedFS, rootDir, func(filePath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		relPath, err := filepath.Rel(rootDir, path)
-		if err != nil {
-			return err
-		}
-
-		destPath := filepath.Join(destDir, relPath)
-
+		// Skip directories
 		if d.IsDir() {
-			return os.MkdirAll(destPath, 0o700)
+			return nil
 		}
 
-		data, err := fs.ReadFile(embedFS, path)
+		// Calculate relative path from rootDir
+		// For embedded FS, paths always use forward slashes
+		relPath := strings.TrimPrefix(filePath, rootDir+"/")
+		if relPath == filePath {
+			// If no prefix was trimmed, try without trailing slash
+			relPath = strings.TrimPrefix(filePath, rootDir)
+		}
+
+		// Read file content
+		data, err := fs.ReadFile(embedFS, filePath)
 		if err != nil {
 			return err
 		}
 
-		return os.WriteFile(destPath, data, 0o644)
+		files = append(files, File{
+			RelativePath: relPath,
+			Content:      data,
+		})
+
+		return nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
