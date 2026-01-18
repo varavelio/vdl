@@ -11,7 +11,7 @@ require (
 	github.com/goccy/go-yaml v1.19.2
 	github.com/invopop/jsonschema v0.13.0
 	github.com/stretchr/testify v1.10.0
-	github.com/uforg/ufogenkit v0.1.0
+	github.com/varavelio/gen v0.2.0
 	github.com/varavelio/vdl/playground v0.0.0
 	golang.org/x/tools v0.6.0
 )
