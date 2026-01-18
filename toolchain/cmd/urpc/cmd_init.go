@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//go:embed cmd_init_schema.urpc
+//go:embed cmd_init_schema.vdl
 var initSchema []byte
 
 //go:embed cmd_init_config.toml
@@ -27,12 +27,12 @@ func cmdInit(args *cmdInitArgs) {
 
 	// Validate that path is a directory
 	if info, err := os.Stat(args.Path); err == nil && !info.IsDir() {
-		log.Fatalf("UFO RPC: path must be a directory, not a file: %s", args.Path)
+		log.Fatalf("VDL: path must be a directory, not a file: %s", args.Path)
 	}
 
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(args.Path, 0755); err != nil {
-		log.Fatalf("UFO RPC: failed to create directory: %s", err)
+		log.Fatalf("VDL: failed to create directory: %s", err)
 	}
 
 	// Generate unique filenames
@@ -40,15 +40,15 @@ func cmdInit(args *cmdInitArgs) {
 
 	// Write both files
 	if err := os.WriteFile(schemaPath, initSchema, 0644); err != nil {
-		log.Fatalf("UFO RPC: failed to write schema file: %s", err)
+		log.Fatalf("VDL: failed to write schema file: %s", err)
 	}
 
 	initConfigStr := strings.ReplaceAll(string(initConfig), "{{schema_path}}", "./"+schemaName)
 	if err := os.WriteFile(configPath, []byte(initConfigStr), 0644); err != nil {
-		log.Fatalf("UFO RPC: failed to write config file: %s", err)
+		log.Fatalf("VDL: failed to write config file: %s", err)
 	}
 
-	fmt.Printf("UFO RPC: files initialized:\n- %s\n- %s\n", schemaPath, configPath)
+	fmt.Printf("VDL: files initialized:\n- %s\n- %s\n", schemaPath, configPath)
 }
 
 // generateUniqueFilenames generates unique filenames for the schema and config files
@@ -59,8 +59,8 @@ func cmdInit(args *cmdInitArgs) {
 // - configName: The name of the config file
 // - configPath: The path to the config file
 func generateUniqueFilenames(dir string) (string, string, string, string) {
-	schemaName := "schema.urpc"
-	configName := "uforpc.toml"
+	schemaName := "schema.vdl"
+	configName := "vdl.toml"
 
 	schemaPath := filepath.Join(dir, schemaName)
 	configPath := filepath.Join(dir, configName)
@@ -74,8 +74,8 @@ func generateUniqueFilenames(dir string) (string, string, string, string) {
 
 	// Generate unique suffix using unix timestamp
 	timestamp := time.Now().Unix()
-	schemaName = fmt.Sprintf("schema-%d.urpc", timestamp)
-	configName = fmt.Sprintf("uforpc-%d.toml", timestamp)
+	schemaName = fmt.Sprintf("schema-%d.vdl", timestamp)
+	configName = fmt.Sprintf("vdl-%d.toml", timestamp)
 
 	return schemaName, filepath.Join(dir, schemaName), configName, filepath.Join(dir, configName)
 }

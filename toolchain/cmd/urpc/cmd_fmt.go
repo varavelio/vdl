@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/formatter"
 )
 
 type cmdFmtArgs struct {

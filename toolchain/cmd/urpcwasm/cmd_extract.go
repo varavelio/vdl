@@ -5,7 +5,7 @@ package main
 import (
 	"syscall/js"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/transform"
+	"github.com/varavelio/vdl/toolchain/internal/transform"
 )
 
 /*
@@ -67,7 +67,7 @@ func cmdExtractProcWrapper() js.Func {
 					reject.Invoke("missing input and/or proc name")
 					return
 				}
-				if extracted, err := cmdExtractProc(args[0].String(), args[1].String()); err != nil {
+				if extracted, err := cmdExtractProc(args[0].String(), args[1].String(), args[2].String()); err != nil {
 					reject.Invoke("failed to extract proc: " + err.Error())
 				} else {
 					resolve.Invoke(extracted)
@@ -79,8 +79,8 @@ func cmdExtractProcWrapper() js.Func {
 	})
 }
 
-func cmdExtractProc(input, procName string) (string, error) {
-	return transform.ExtractProcStr("schema.urpc", input, procName)
+func cmdExtractProc(input, rpcName string, procName string) (string, error) {
+	return transform.ExtractProcStr("schema.urpc", input, rpcName, procName)
 }
 
 func cmdExtractStreamWrapper() js.Func {
@@ -94,7 +94,7 @@ func cmdExtractStreamWrapper() js.Func {
 					reject.Invoke("missing input and/or stream name")
 					return
 				}
-				if extracted, err := cmdExtractStream(args[0].String(), args[1].String()); err != nil {
+				if extracted, err := cmdExtractStream(args[0].String(), args[1].String(), args[2].String()); err != nil {
 					reject.Invoke("failed to extract stream: " + err.Error())
 				} else {
 					resolve.Invoke(extracted)
@@ -106,6 +106,6 @@ func cmdExtractStreamWrapper() js.Func {
 	})
 }
 
-func cmdExtractStream(input, streamName string) (string, error) {
-	return transform.ExtractStreamStr("schema.urpc", input, streamName)
+func cmdExtractStream(input, rpcName string, streamName string) (string, error) {
+	return transform.ExtractStreamStr("schema.urpc", input, rpcName, streamName)
 }

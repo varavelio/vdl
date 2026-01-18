@@ -5,7 +5,7 @@ package main
 import (
 	"syscall/js"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/transform"
+	"github.com/varavelio/vdl/toolchain/internal/transform"
 )
 
 /*
