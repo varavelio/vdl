@@ -1,7 +1,7 @@
-include "./foo.urpc"
-  include   "./bar.urpc"
+include "./foo.vdl"
+  include   "./bar.vdl"
 
 // >>>>
 
-include "./foo.urpc"
-include "./bar.urpc"
+include "./foo.vdl"
+include "./bar.vdl"
