@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateStreamTypes(sch schema.Schema, _ Config) (string, error) {
+func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ Config) (string, error) {
+	if len(flat.Streams) == 0 {
+		return "", nil
+	}
+
 	g := gen.New().WithTabs()
 
 	g.Line("// -----------------------------------------------------------------------------")
@@ -16,23 +19,23 @@ func generateStreamTypes(sch schema.Schema, _ Config) (string, error) {
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, streamNode := range sch.GetStreamNodes() {
-		namePascal := strutil.ToPascalCase(streamNode.Name)
-		inputName := fmt.Sprintf("%sInput", namePascal)
-		outputName := fmt.Sprintf("%sOutput", namePascal)
-		responseName := fmt.Sprintf("%sResponse", namePascal)
+	for _, fs := range flat.Streams {
+		streamName := fullStreamName(fs.RPCName, fs.Stream.Name)
+		inputName := fmt.Sprintf("%sInput", streamName)
+		outputName := fmt.Sprintf("%sOutput", streamName)
+		responseName := fmt.Sprintf("%sResponse", streamName)
 
-		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s stream.", inputName, namePascal)
-		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, namePascal)
-		responseDesc := fmt.Sprintf("%s represents the response for the %s stream.", responseName, namePascal)
+		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s.%s stream.", inputName, fs.RPCName, fs.Stream.Name)
+		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s stream.", outputName, fs.RPCName, fs.Stream.Name)
+		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s stream.", responseName, fs.RPCName, fs.Stream.Name)
 
-		g.Line(renderType("", inputName, inputDesc, streamNode.Input))
+		g.Line(renderType("", inputName, inputDesc, fs.Stream.Input))
 		g.Break()
 
-		g.Line(renderPreType("", inputName, streamNode.Input))
+		g.Line(renderPreType("", inputName, fs.Stream.Input))
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, streamNode.Output))
+		g.Line(renderType("", outputName, outputDesc, fs.Stream.Output))
 		g.Break()
 
 		g.Linef("// %s", responseDesc)
@@ -40,11 +43,13 @@ func generateStreamTypes(sch schema.Schema, _ Config) (string, error) {
 		g.Break()
 	}
 
-	g.Line("// ufoStreamNames is a list of all stream names.")
-	g.Line("var ufoStreamNames = []string{")
+	// Generate list of all stream names
+	g.Line("// vdlStreamNames is a list of all stream names.")
+	g.Line("var vdlStreamNames = []string{")
 	g.Block(func() {
-		for _, streamNode := range sch.GetStreamNodes() {
-			g.Linef("\"%s\",", streamNode.Name)
+		for _, fs := range flat.Streams {
+			streamName := fullStreamName(fs.RPCName, fs.Stream.Name)
+			g.Linef("%q,", streamName)
 		}
 	})
 	g.Line("}")

@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 //go:embed pieces/client.go
 var clientRawPiece string
 
-func generateClient(sch schema.Schema, config Config) (string, error) {
+func generateClient(_ *ir.Schema, flat *flatSchema, config Config) (string, error) {
 	if !config.IncludeClient {
 		return "", nil
 	}
@@ -32,7 +32,7 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	g.Line("// clientBuilder provides a fluent API for configuring the UFO RPC client before instantiation.")
+	g.Line("// clientBuilder provides a fluent API for configuring the VDL RPC client before instantiation.")
 	g.Line("//")
 	g.Line("// A builder is obtained by calling NewClient(baseURL), then optional")
 	g.Line("// configuration methods can be chained before calling Build() to obtain a *Client ready for use.")
@@ -44,13 +44,13 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 	g.Line("}")
 	g.Break()
 
-	g.Line("// NewClient instantiates a fluent builder for the UFO RPC client.")
+	g.Line("// NewClient instantiates a fluent builder for the VDL RPC client.")
 	g.Line("//")
-	g.Line("// The baseURL argument must point to the HTTP endpoint that handles UFO RPC")
-	g.Line("// requests, for example: \"https://api.example.com/v1/urpc\".")
+	g.Line("// The baseURL argument must point to the HTTP endpoint that handles VDL RPC")
+	g.Line("// requests, for example: \"https://api.example.com/v1/rpc\".")
 	g.Line("//")
 	g.Line("// Example usage:")
-	g.Line("//   client := NewClient(\"https://api.example.com/v1/urpc\").Build()")
+	g.Line("//   client := NewClient(\"https://api.example.com/v1/rpc\").Build()")
 	g.Line("func NewClient(baseURL string) *clientBuilder {")
 	g.Block(func() {
 		g.Line("return &clientBuilder{baseURL: baseURL, opts: []internalClientOption{}}")
@@ -79,7 +79,7 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 	g.Line("// Build constructs the *Client using the configured options.")
 	g.Line("func (b *clientBuilder) Build() *Client {")
 	g.Block(func() {
-		g.Line("intClient := newInternalClient(b.baseURL, ufoProcedureNames, ufoStreamNames, b.opts...)")
+		g.Line("intClient := newInternalClient(b.baseURL, vdlProcedureNames, vdlStreamNames, b.opts...)")
 		g.Line("return &Client{Procs: &clientProcRegistry{intClient: intClient}, Streams: &clientStreamRegistry{intClient: intClient}}")
 	})
 	g.Line("}")
@@ -105,17 +105,19 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 	g.Line("}")
 	g.Break()
 
-	for _, procNode := range sch.GetProcNodes() {
-		name := strutil.ToPascalCase(procNode.Name)
+	for _, fp := range flat.Procedures {
+		name := fullProcName(fp.RPCName, fp.Procedure.Name)
 		builderName := "clientBuilder" + name
 
 		// Client method to create builder
-		g.Linef("// %s creates a call builder for the %s procedure.", name, name)
-		renderDoc(g, procNode.Doc, true)
-		renderDeprecated(g, procNode.Deprecated)
+		g.Linef("// %s creates a call builder for the %s.%s procedure.", name, fp.RPCName, fp.Procedure.Name)
+		if fp.Procedure.Doc != "" {
+			renderDoc(g, fp.Procedure.Doc, true)
+		}
+		renderDeprecated(g, fp.Procedure.Deprecated)
 		g.Linef("func (registry *clientProcRegistry) %s() *%s {", name, builderName)
 		g.Block(func() {
-			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: \"%s\"}", builderName, name)
+			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: %q}", builderName, name)
 		})
 		g.Line("}")
 		g.Break()
@@ -212,17 +214,19 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 	g.Line("}")
 	g.Break()
 
-	for _, streamNode := range sch.GetStreamNodes() {
-		name := strutil.ToPascalCase(streamNode.Name)
+	for _, fs := range flat.Streams {
+		name := fullStreamName(fs.RPCName, fs.Stream.Name)
 		builderStream := "clientBuilder" + name + "Stream"
 
 		// Client method to create stream builder
-		g.Linef("// %s creates a stream builder for the %s stream.", name, name)
-		renderDoc(g, streamNode.Doc, true)
-		renderDeprecated(g, streamNode.Deprecated)
+		g.Linef("// %s creates a stream builder for the %s.%s stream.", name, fs.RPCName, fs.Stream.Name)
+		if fs.Stream.Doc != "" {
+			renderDoc(g, fs.Stream.Doc, true)
+		}
+		renderDeprecated(g, fs.Stream.Deprecated)
 		g.Linef("func (registry *clientStreamRegistry) %s() *%s {", name, builderStream)
 		g.Block(func() {
-			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: \"%s\"}", builderStream, name)
+			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: %q}", builderStream, name)
 		})
 		g.Line("}")
 		g.Break()

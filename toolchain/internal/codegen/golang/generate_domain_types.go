@@ -4,11 +4,15 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateDomainTypes(sch schema.Schema, config Config) (string, error) {
+func generateDomainTypes(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+	if len(schema.Types) == 0 {
+		return "", nil
+	}
+
 	g := gen.New().WithTabs()
 
 	g.Line("// -----------------------------------------------------------------------------")
@@ -16,18 +20,18 @@ func generateDomainTypes(sch schema.Schema, config Config) (string, error) {
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, typeNode := range sch.GetTypeNodes() {
-		desc := "is a domain type defined in UFO RPC with no documentation."
-		if typeNode.Doc != nil {
-			desc = strings.TrimSpace(strutil.NormalizeIndent(*typeNode.Doc))
+	for _, typeNode := range schema.Types {
+		desc := typeNode.Name + " is a domain type defined in VDL."
+		if typeNode.Doc != "" {
+			desc = strings.TrimSpace(strutil.NormalizeIndent(typeNode.Doc))
 		}
 
 		if typeNode.Deprecated != nil {
 			desc += "\n\nDeprecated: "
-			if *typeNode.Deprecated == "" {
+			if typeNode.Deprecated.Message == "" {
 				desc += "This type is deprecated and should not be used in new code."
 			} else {
-				desc += *typeNode.Deprecated
+				desc += typeNode.Deprecated.Message
 			}
 		}
 
