@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateClient(sch schema.Schema, _ Config) (string, error) {
+func generateClient(_ *ir.Schema, flat *flatSchema, _ Config) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	g.Line("// =============================================================================")
@@ -23,21 +23,21 @@ func generateClient(sch schema.Schema, _ Config) (string, error) {
 	generateClientClass(g)
 	g.Break()
 
-	generateProcedureImplementation(g, sch)
+	generateProcedureImplementation(g, flat)
 	g.Break()
 
-	generateStreamImplementation(g, sch)
+	generateStreamImplementation(g, flat)
 	g.Break()
 
 	return g.String(), nil
 }
 
 func generateClientBuilder(g *gen.Generator) {
-	g.Line("/// Creates a new UFO RPC client builder.")
+	g.Line("/// Creates a new VDL RPC client builder.")
 	g.Line("_ClientBuilder NewClient(String baseURL) => _ClientBuilder(baseURL);")
 	g.Break()
 
-	g.Line("/// Chainable builder for configuring UFO RPC client options (headers, etc.).")
+	g.Line("/// Chainable builder for configuring VDL RPC client options (headers, etc.).")
 	g.Line("class _ClientBuilder {")
 	g.Block(func() {
 		g.Line("final _InternalClientBuilder _builder;")
@@ -49,13 +49,13 @@ func generateClientBuilder(g *gen.Generator) {
 		g.Line("_ClientBuilder withGlobalHeader(String key, String value) { _builder.withGlobalHeader(key, value); return this; }")
 		g.Break()
 		g.Line("/// Builds the configured client instance. Schema metadata is embedded to validate procedure/stream names at runtime.")
-		g.Line("Client build() { final intClient = _builder.build(__ufoProcedureNames, __ufoStreamNames); return Client._internal(intClient); }")
+		g.Line("Client build() { final intClient = _builder.build(__vdlProcedureNames, __vdlStreamNames); return Client._internal(intClient); }")
 	})
 	g.Line("}")
 }
 
 func generateClientClass(g *gen.Generator) {
-	g.Line("/// Main UFO RPC client providing type-safe access to procedures and streams.")
+	g.Line("/// Main VDL RPC client providing type-safe access to procedures and streams.")
 	g.Line("class Client {")
 	g.Block(func() {
 		g.Line("final _ProcRegistry procs;")
@@ -67,7 +67,7 @@ func generateClientClass(g *gen.Generator) {
 	g.Line("}")
 }
 
-func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
+func generateProcedureImplementation(g *gen.Generator, flat *flatSchema) {
 	g.Line("// =============================================================================")
 	g.Line("// Procedure Implementation")
 	g.Line("// =============================================================================")
@@ -79,28 +79,35 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 		g.Line("final _InternalClient _intClient;")
 		g.Line("_ProcRegistry(this._intClient);")
 		g.Break()
-		for _, procNode := range sch.GetProcNodes() {
-			name := strutil.ToPascalCase(procNode.Name)
-			builderName := fmt.Sprintf("_Builder%s", name)
-			g.Linef("/// Creates a call builder for the %s procedure.", name)
-			renderDeprecatedDart(g, procNode.Deprecated)
-			g.Linef("%s %s() => %s(_intClient, '%s');", builderName, strutil.ToCamelCase(procNode.Name), builderName, procNode.Name)
+		for _, fp := range flat.Procedures {
+			proc := fp.Procedure
+			fullName := fullProcName(fp.RPCName, proc.Name)
+			builderName := fmt.Sprintf("_Builder%s", fullName)
+			methodName := strutil.ToCamelCase(fp.RPCName) + strutil.ToPascalCase(proc.Name)
+			path := rpcProcPath(fp.RPCName, proc.Name)
+
+			g.Linef("/// Creates a call builder for the %s procedure.", fullName)
+			if proc.Deprecated != nil {
+				renderDeprecatedDart(g, proc.Deprecated)
+			}
+			g.Linef("%s %s() => %s(_intClient, '%s');", builderName, methodName, builderName, path)
 			g.Break()
 		}
 	})
 	g.Line("}")
 	g.Break()
 
-	for _, procNode := range sch.GetProcNodes() {
-		name := strutil.ToPascalCase(procNode.Name)
-		builderName := fmt.Sprintf("_Builder%s", name)
-		hydrateFuncName := fmt.Sprintf("%sOutput.fromJson", name)
-		inputType := fmt.Sprintf("%sInput", name)
-		outputType := fmt.Sprintf("%sOutput", name)
+	for _, fp := range flat.Procedures {
+		proc := fp.Procedure
+		fullName := fullProcName(fp.RPCName, proc.Name)
+		builderName := fmt.Sprintf("_Builder%s", fullName)
+		hydrateFuncName := fmt.Sprintf("%sOutput.fromJson", fullName)
+		inputType := fmt.Sprintf("%sInput", fullName)
+		outputType := fmt.Sprintf("%sOutput", fullName)
 
-		g.Linef("/// Fluent builder for the %s procedure.", name)
-		if procNode.Deprecated != nil && *procNode.Deprecated != "" {
-			g.Linef("/// @deprecated %s", *procNode.Deprecated)
+		g.Linef("/// Fluent builder for the %s procedure.", fullName)
+		if proc.Deprecated != nil && proc.Deprecated.Message != "" {
+			g.Linef("/// @deprecated %s", proc.Deprecated.Message)
 		}
 		g.Linef("class %s {", builderName)
 		g.Block(func() {
@@ -120,7 +127,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 			g.Linef("/// Sets a per-attempt timeout for this call. The timeout applies to each retry attempt separately.\n%s withTimeout(TimeoutConfig config) { timeoutConfig = TimeoutConfig.sanitised(config); return this; }", builderName)
 			g.Break()
-			g.Linef("/// Executes the %s procedure. Returns the typed output on success or throws a UfoError on failure.", name)
+			g.Linef("/// Executes the %s procedure. Returns the typed output on success or throws a UfoError on failure.", fullName)
 			g.Linef("Future<%s> execute(%s input) async {", outputType, inputType)
 			g.Block(func() {
 				g.Line("final rawResponse = await _intClient.callProc(_procName, input.toJson(), _headers, retryConfig, timeoutConfig);")
@@ -135,7 +142,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 	}
 }
 
-func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
+func generateStreamImplementation(g *gen.Generator, flat *flatSchema) {
 	g.Line("// =============================================================================")
 	g.Line("// Stream Implementation")
 	g.Line("// =============================================================================")
@@ -147,28 +154,35 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 		g.Line("final _InternalClient _intClient;")
 		g.Line("_StreamRegistry(this._intClient);")
 		g.Break()
-		for _, streamNode := range sch.GetStreamNodes() {
-			name := strutil.ToPascalCase(streamNode.Name)
-			builderName := fmt.Sprintf("_Builder%sStream", name)
-			g.Linef("/// Creates a stream builder for the %s stream.", name)
-			renderDeprecatedDart(g, streamNode.Deprecated)
-			g.Linef("%s %s() => %s(_intClient, '%s');", builderName, strutil.ToCamelCase(streamNode.Name), builderName, streamNode.Name)
+		for _, fs := range flat.Streams {
+			stream := fs.Stream
+			fullName := fullStreamName(fs.RPCName, stream.Name)
+			builderName := fmt.Sprintf("_Builder%sStream", fullName)
+			methodName := strutil.ToCamelCase(fs.RPCName) + strutil.ToPascalCase(stream.Name)
+			path := rpcStreamPath(fs.RPCName, stream.Name)
+
+			g.Linef("/// Creates a stream builder for the %s stream.", fullName)
+			if stream.Deprecated != nil {
+				renderDeprecatedDart(g, stream.Deprecated)
+			}
+			g.Linef("%s %s() => %s(_intClient, '%s');", builderName, methodName, builderName, path)
 			g.Break()
 		}
 	})
 	g.Line("}")
 	g.Break()
 
-	for _, streamNode := range sch.GetStreamNodes() {
-		name := strutil.ToPascalCase(streamNode.Name)
-		builderName := fmt.Sprintf("_Builder%sStream", name)
-		hydrateFuncName := fmt.Sprintf("%sOutput.fromJson", name)
-		inputType := fmt.Sprintf("%sInput", name)
-		outputType := fmt.Sprintf("%sOutput", name)
+	for _, fs := range flat.Streams {
+		stream := fs.Stream
+		fullName := fullStreamName(fs.RPCName, stream.Name)
+		builderName := fmt.Sprintf("_Builder%sStream", fullName)
+		hydrateFuncName := fmt.Sprintf("%sOutput.fromJson", fullName)
+		inputType := fmt.Sprintf("%sInput", fullName)
+		outputType := fmt.Sprintf("%sOutput", fullName)
 
-		g.Linef("/// Fluent builder for the %s stream.", name)
-		if streamNode.Deprecated != nil && *streamNode.Deprecated != "" {
-			g.Linef("/// @deprecated %s", *streamNode.Deprecated)
+		g.Linef("/// Fluent builder for the %s stream.", fullName)
+		if stream.Deprecated != nil && stream.Deprecated.Message != "" {
+			g.Linef("/// @deprecated %s", stream.Deprecated.Message)
 		}
 		g.Linef("class %s {", builderName)
 		g.Block(func() {
@@ -184,7 +198,7 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 			g.Linef("/// Overrides the reconnection behavior for this stream. Reconnects are attempted only on connection/read errors or HTTP 5xx at connect time.\n%s withReconnect(ReconnectConfig config) { reconnectConfig = ReconnectConfig.sanitised(config); return this; }", builderName)
 			g.Break()
-			g.Linef("/// Starts the %s stream and returns a typed stream handle with a cancel function.", name)
+			g.Linef("/// Starts the %s stream and returns a typed stream handle with a cancel function.", fullName)
 			g.Linef("_StreamHandle<%s> execute(%s input) {", outputType, inputType)
 			g.Block(func() {
 				g.Line("final handle = _intClient.callStream(_streamName, input.toJson(), _headers, reconnectConfig);")

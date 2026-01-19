@@ -5,267 +5,394 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// dartTypeLiteral returns the Dart type literal for a field, considering custom/built-in/inline and arrays/optionality.
-func dartTypeLiteral(parentTypeName string, field schema.FieldDefinition) string {
-	isNamed := field.IsNamed()
-	isInline := field.IsInline()
+// =============================================================================
+// Type Conversion: IR TypeRef → Dart Type String
+// =============================================================================
 
-	// default to dynamic
-	typeLiteral := "dynamic"
+// typeRefToDart converts an IR TypeRef to its Dart type string representation.
+// parentTypeName is used to generate names for inline object types.
+func typeRefToDart(parentTypeName string, tr ir.TypeRef) string {
+	switch tr.Kind {
+	case ir.TypeKindPrimitive:
+		return primitiveToDart(tr.Primitive)
 
-	if isNamed && field.IsCustomType() {
-		typeLiteral = *field.TypeName
-	}
+	case ir.TypeKindType:
+		return tr.Type
 
-	if isNamed && field.IsBuiltInType() {
-		switch *field.TypeName {
-		case "string":
-			typeLiteral = "String"
-		case "int":
-			typeLiteral = "int"
-		case "float":
-			typeLiteral = "double"
-		case "bool":
-			typeLiteral = "bool"
-		case "datetime":
-			typeLiteral = "DateTime"
+	case ir.TypeKindEnum:
+		return tr.Enum
+
+	case ir.TypeKindArray:
+		// Build nested List types for multi-dimensional arrays
+		elementType := typeRefToDart(parentTypeName, *tr.ArrayItem)
+		result := elementType
+		for i := 0; i < tr.ArrayDimensions; i++ {
+			result = fmt.Sprintf("List<%s>", result)
 		}
+		return result
+
+	case ir.TypeKindMap:
+		valueType := typeRefToDart(parentTypeName, *tr.MapValue)
+		return fmt.Sprintf("Map<String, %s>", valueType)
+
+	case ir.TypeKindObject:
+		// Inline objects get a generated name based on parent
+		return parentTypeName
 	}
 
-	if isInline {
-		typeLiteral = parentTypeName + strutil.ToPascalCase(field.Name)
-	}
-
-	if field.IsArray {
-		typeLiteral = fmt.Sprintf("List<%s>", typeLiteral)
-	}
-
-	if field.Optional {
-		typeLiteral = typeLiteral + "?"
-	}
-
-	return typeLiteral
+	return "dynamic"
 }
 
+// primitiveToDart converts an IR primitive type to its Dart equivalent.
+func primitiveToDart(p ir.PrimitiveType) string {
+	switch p {
+	case ir.PrimitiveString:
+		return "String"
+	case ir.PrimitiveInt:
+		return "int"
+	case ir.PrimitiveFloat:
+		return "double"
+	case ir.PrimitiveBool:
+		return "bool"
+	case ir.PrimitiveDatetime:
+		return "DateTime"
+	}
+	return "dynamic"
+}
+
+// =============================================================================
+// JSON Parsing Expressions
+// =============================================================================
+
 // dartFromJsonExpr returns the Dart expression to parse a single field from JSON value.
-func dartFromJsonExpr(parentTypeName string, field schema.FieldDefinition, jsonAccessor string) string {
-	isNamed := field.IsNamed()
-	isInline := field.IsInline()
+func dartFromJsonExpr(parentTypeName string, field ir.Field, jsonAccessor string) string {
+	return buildFromJsonExpr(parentTypeName, field.Name, field.Type, jsonAccessor)
+}
 
-	switch {
-	case isNamed && field.IsCustomType():
-		// Custom named type
-		if field.IsArray {
-			// List of custom named type
-			return fmt.Sprintf("((%s as List).map((e) => %s.fromJson((e as Map).cast<String, dynamic>())).toList())", jsonAccessor, *field.TypeName)
-		}
-		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", *field.TypeName, jsonAccessor)
+// buildFromJsonExpr builds the fromJson expression for a TypeRef.
+func buildFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, jsonAccessor string) string {
+	switch tr.Kind {
+	case ir.TypeKindPrimitive:
+		return buildPrimitiveFromJson(tr.Primitive, jsonAccessor)
 
-	case isNamed && field.IsBuiltInType():
-		// Built-in types
-		switch *field.TypeName {
-		case "string":
-			if field.IsArray {
-				return fmt.Sprintf("((%s as List).map((e) => e as String).toList())", jsonAccessor)
-			}
-			return fmt.Sprintf("%s as String", jsonAccessor)
-		case "int":
-			if field.IsArray {
-				return fmt.Sprintf("((%s as List).map((e) => (e as num).toInt()).toList())", jsonAccessor)
-			}
-			return fmt.Sprintf("(%s as num).toInt()", jsonAccessor)
-		case "float":
-			if field.IsArray {
-				return fmt.Sprintf("((%s as List).map((e) => (e as num).toDouble()).toList())", jsonAccessor)
-			}
-			return fmt.Sprintf("(%s as num).toDouble()", jsonAccessor)
-		case "bool":
-			if field.IsArray {
-				return fmt.Sprintf("((%s as List).map((e) => e as bool).toList())", jsonAccessor)
-			}
-			return fmt.Sprintf("%s as bool", jsonAccessor)
-		case "datetime":
-			if field.IsArray {
-				return fmt.Sprintf("((%s as List).map((e) => DateTime.parse(e as String)).toList())", jsonAccessor)
-			}
-			return fmt.Sprintf("DateTime.parse(%s as String)", jsonAccessor)
-		}
+	case ir.TypeKindType:
+		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.Type, jsonAccessor)
 
-	case isInline:
-		namePascal := strutil.ToPascalCase(field.Name)
-		if field.IsArray {
-			return fmt.Sprintf("((%s as List).map((e) => %s%s.fromJson((e as Map).cast<String, dynamic>())).toList())", jsonAccessor, parentTypeName, namePascal)
-		}
-		return fmt.Sprintf("%s%s.fromJson((%s as Map).cast<String, dynamic>())", parentTypeName, namePascal, jsonAccessor)
+	case ir.TypeKindEnum:
+		// Enums are just the raw value in Dart
+		return jsonAccessor
+
+	case ir.TypeKindArray:
+		return buildArrayFromJson(parentTypeName, fieldName, tr, jsonAccessor)
+
+	case ir.TypeKindMap:
+		return buildMapFromJson(parentTypeName, fieldName, tr, jsonAccessor)
+
+	case ir.TypeKindObject:
+		inlineName := parentTypeName + strutil.ToPascalCase(fieldName)
+		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", inlineName, jsonAccessor)
 	}
 
-	// Fallback dynamic
-	if field.IsArray {
-		return fmt.Sprintf("List<dynamic>.from(%s as List)", jsonAccessor)
+	return jsonAccessor
+}
+
+// buildPrimitiveFromJson builds the fromJson expression for primitive types.
+func buildPrimitiveFromJson(p ir.PrimitiveType, jsonAccessor string) string {
+	switch p {
+	case ir.PrimitiveString:
+		return fmt.Sprintf("%s as String", jsonAccessor)
+	case ir.PrimitiveInt:
+		return fmt.Sprintf("(%s as num).toInt()", jsonAccessor)
+	case ir.PrimitiveFloat:
+		return fmt.Sprintf("(%s as num).toDouble()", jsonAccessor)
+	case ir.PrimitiveBool:
+		return fmt.Sprintf("%s as bool", jsonAccessor)
+	case ir.PrimitiveDatetime:
+		return fmt.Sprintf("DateTime.parse(%s as String)", jsonAccessor)
 	}
 	return jsonAccessor
 }
 
-// dartToJsonExpr returns the Dart expression to serialise a field to JSON.
-// varName is the variable expression to serialise (must be non-nullable in the call site).
-func dartToJsonExpr(field schema.FieldDefinition, varName string) string {
-	isNamed := field.IsNamed()
-	isInline := field.IsInline()
+// buildArrayFromJson builds the fromJson expression for array types.
+func buildArrayFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAccessor string) string {
+	itemExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.ArrayItem, "e")
 
-	switch {
-	case isNamed && field.IsCustomType():
-		if field.IsArray {
-			return fmt.Sprintf("%s.map((e) => e.toJson()).toList()", varName)
-		}
-		return fmt.Sprintf("%s.toJson()", varName)
-	case isNamed && field.IsBuiltInType():
-		if *field.TypeName == "datetime" {
-			if field.IsArray {
-				return fmt.Sprintf("%s.map((e) => e.toUtc().toIso8601String()).toList()", varName)
-			}
-			return fmt.Sprintf("%s.toUtc().toIso8601String()", varName)
-		}
-		return varName
-	case isInline:
-		if field.IsArray {
-			return fmt.Sprintf("%s.map((e) => e.toJson()).toList()", varName)
-		}
-		return fmt.Sprintf("%s.toJson()", varName)
+	// For multi-dimensional arrays, we need nested maps
+	if tr.ArrayDimensions > 1 {
+		// Build nested map expression
+		result := fmt.Sprintf("((%s as List).map((e) => %s).toList())", jsonAccessor, buildNestedArrayFromJson(parentTypeName, fieldName, *tr.ArrayItem, tr.ArrayDimensions-1, "e"))
+		return result
 	}
-	if field.IsArray {
-		return varName
+
+	return fmt.Sprintf("((%s as List).map((e) => %s).toList())", jsonAccessor, itemExpr)
+}
+
+// buildNestedArrayFromJson builds nested array parsing for multi-dimensional arrays.
+func buildNestedArrayFromJson(parentTypeName, fieldName string, itemType ir.TypeRef, remainingDims int, varName string) string {
+	if remainingDims == 0 {
+		return buildItemFromJsonExpr(parentTypeName, fieldName, itemType, varName)
 	}
+
+	innerExpr := buildNestedArrayFromJson(parentTypeName, fieldName, itemType, remainingDims-1, "inner")
+	return fmt.Sprintf("((%s as List).map((inner) => %s).toList())", varName, innerExpr)
+}
+
+// buildItemFromJsonExpr builds the expression for parsing a single array/map item.
+func buildItemFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, varName string) string {
+	switch tr.Kind {
+	case ir.TypeKindPrimitive:
+		switch tr.Primitive {
+		case ir.PrimitiveString:
+			return fmt.Sprintf("%s as String", varName)
+		case ir.PrimitiveInt:
+			return fmt.Sprintf("(%s as num).toInt()", varName)
+		case ir.PrimitiveFloat:
+			return fmt.Sprintf("(%s as num).toDouble()", varName)
+		case ir.PrimitiveBool:
+			return fmt.Sprintf("%s as bool", varName)
+		case ir.PrimitiveDatetime:
+			return fmt.Sprintf("DateTime.parse(%s as String)", varName)
+		}
+
+	case ir.TypeKindType:
+		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.Type, varName)
+
+	case ir.TypeKindEnum:
+		return varName
+
+	case ir.TypeKindObject:
+		inlineName := parentTypeName + strutil.ToPascalCase(fieldName)
+		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", inlineName, varName)
+
+	case ir.TypeKindArray:
+		innerExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.ArrayItem, "inner")
+		return fmt.Sprintf("((%s as List).map((inner) => %s).toList())", varName, innerExpr)
+
+	case ir.TypeKindMap:
+		innerExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.MapValue, "v")
+		return fmt.Sprintf("((%s as Map).cast<String, dynamic>().map((k, v) => MapEntry(k, %s)))", varName, innerExpr)
+	}
+
 	return varName
 }
 
+// buildMapFromJson builds the fromJson expression for map types.
+func buildMapFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAccessor string) string {
+	valueExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.MapValue, "v")
+	return fmt.Sprintf("((%s as Map).cast<String, dynamic>().map((k, v) => MapEntry(k, %s)))", jsonAccessor, valueExpr)
+}
+
+// =============================================================================
+// JSON Serialization Expressions
+// =============================================================================
+
+// dartToJsonExpr returns the Dart expression to serialise a field to JSON.
+func dartToJsonExpr(field ir.Field, varName string) string {
+	return buildToJsonExpr(field.Type, varName)
+}
+
+// buildToJsonExpr builds the toJson expression for a TypeRef.
+func buildToJsonExpr(tr ir.TypeRef, varName string) string {
+	switch tr.Kind {
+	case ir.TypeKindPrimitive:
+		if tr.Primitive == ir.PrimitiveDatetime {
+			return fmt.Sprintf("%s.toUtc().toIso8601String()", varName)
+		}
+		return varName
+
+	case ir.TypeKindType, ir.TypeKindObject:
+		return fmt.Sprintf("%s.toJson()", varName)
+
+	case ir.TypeKindEnum:
+		return varName
+
+	case ir.TypeKindArray:
+		itemExpr := buildItemToJsonExpr(*tr.ArrayItem, "e")
+		if itemExpr == "e" {
+			return varName
+		}
+		return fmt.Sprintf("%s.map((e) => %s).toList()", varName, itemExpr)
+
+	case ir.TypeKindMap:
+		valueExpr := buildItemToJsonExpr(*tr.MapValue, "v")
+		if valueExpr == "v" {
+			return varName
+		}
+		return fmt.Sprintf("%s.map((k, v) => MapEntry(k, %s))", varName, valueExpr)
+	}
+
+	return varName
+}
+
+// buildItemToJsonExpr builds the toJson expression for a single array/map item.
+func buildItemToJsonExpr(tr ir.TypeRef, varName string) string {
+	switch tr.Kind {
+	case ir.TypeKindPrimitive:
+		if tr.Primitive == ir.PrimitiveDatetime {
+			return fmt.Sprintf("%s.toUtc().toIso8601String()", varName)
+		}
+		return varName
+
+	case ir.TypeKindType, ir.TypeKindObject:
+		return fmt.Sprintf("%s.toJson()", varName)
+
+	case ir.TypeKindEnum:
+		return varName
+
+	case ir.TypeKindArray:
+		innerExpr := buildItemToJsonExpr(*tr.ArrayItem, "inner")
+		if innerExpr == "inner" {
+			return varName
+		}
+		return fmt.Sprintf("%s.map((inner) => %s).toList()", varName, innerExpr)
+
+	case ir.TypeKindMap:
+		innerExpr := buildItemToJsonExpr(*tr.MapValue, "v2")
+		if innerExpr == "v2" {
+			return varName
+		}
+		return fmt.Sprintf("%s.map((k, v2) => MapEntry(k, %s))", varName, innerExpr)
+	}
+
+	return varName
+}
+
+// =============================================================================
+// Type Structure Rendering
+// =============================================================================
+
 // renderDartType renders a Dart class for given fields, including a short description,
 // a factory constructor to hydrate from JSON and a toJson method for serialisation.
-func renderDartType(parentName, name, desc string, fields []schema.FieldDefinition) string {
-	name = parentName + name
+func renderDartType(parentName, name, desc string, fields []ir.Field) string {
+	fullName := parentName + name
 
-	og := gen.New().WithSpaces(2)
+	g := gen.New().WithSpaces(2)
 	if desc != "" {
-		og.Line("/// " + strings.ReplaceAll(desc, "\n", "\n/// "))
+		g.Line("/// " + strings.ReplaceAll(desc, "\n", "\n/// "))
 	}
-	og.Linef("class %s {", name)
-	og.Block(func() {
+	g.Linef("class %s {", fullName)
+	g.Block(func() {
 		// Fields
 		for _, field := range fields {
 			fieldName := strutil.ToCamelCase(field.Name)
-			typeLit := dartTypeLiteral(name, field)
-			// Field description if present in schema
-			if field.Doc != nil && strings.TrimSpace(*field.Doc) != "" {
-				og.Line("/// " + strings.ReplaceAll(strings.TrimSpace(*field.Doc), "\n", "\n/// "))
+			inlineTypeName := fullName + strutil.ToPascalCase(field.Name)
+			typeLit := typeRefToDart(inlineTypeName, field.Type)
+			if field.Optional {
+				typeLit = typeLit + "?"
 			}
-			og.Linef("final %s %s;", typeLit, fieldName)
+			// Field description if present
+			if field.Doc != "" {
+				g.Line("/// " + strings.ReplaceAll(strings.TrimSpace(field.Doc), "\n", "\n/// "))
+			}
+			g.Linef("final %s %s;", typeLit, fieldName)
 		}
-		og.Break()
+		g.Break()
 
 		// Constructor
-		og.Linef("/// Creates a new %s instance.", name)
+		g.Linef("/// Creates a new %s instance.", fullName)
 		if len(fields) == 0 {
-			og.Linef("const %s();", name)
+			g.Linef("const %s();", fullName)
 		} else {
-			og.Linef("const %s({", name)
-			og.Block(func() {
+			g.Linef("const %s({", fullName)
+			g.Block(func() {
 				for _, field := range fields {
 					fieldName := strutil.ToCamelCase(field.Name)
 					isRequired := !field.Optional
 					if isRequired {
-						og.Linef("required this.%s,", fieldName)
+						g.Linef("required this.%s,", fieldName)
 					} else {
-						og.Linef("this.%s,", fieldName)
+						g.Linef("this.%s,", fieldName)
 					}
 				}
 			})
-			og.Line("});")
+			g.Line("});")
 		}
 
-		og.Break()
+		g.Break()
 
 		// fromJson factory
-		og.Linef("/// Hydrates a %s from a JSON map.", name)
-		og.Linef("factory %s.fromJson(Map<String, dynamic> json) {", name)
-		og.Block(func() {
+		g.Linef("/// Hydrates a %s from a JSON map.", fullName)
+		g.Linef("factory %s.fromJson(Map<String, dynamic> json) {", fullName)
+		g.Block(func() {
 			for _, field := range fields {
 				fieldName := strutil.ToCamelCase(field.Name)
-				jsonKey := field.Name
+				jsonKey := strutil.ToCamelCase(field.Name)
 				jsonAccessor := fmt.Sprintf("json['%s']", jsonKey)
-				parseExpr := dartFromJsonExpr(name, field, jsonAccessor)
+				parseExpr := dartFromJsonExpr(fullName, field, jsonAccessor)
 				if field.Optional {
-					og.Linef("final %s = json.containsKey('%s') && %s != null ? %s : null;", fieldName, jsonKey, jsonAccessor, parseExpr)
+					g.Linef("final %s = json.containsKey('%s') && %s != null ? %s : null;", fieldName, jsonKey, jsonAccessor, parseExpr)
 				} else {
-					og.Linef("final %s = %s;", fieldName, parseExpr)
+					g.Linef("final %s = %s;", fieldName, parseExpr)
 				}
 			}
 			// return
-			og.Linef("return %s(", name)
-			og.Block(func() {
+			g.Linef("return %s(", fullName)
+			g.Block(func() {
 				for _, field := range fields {
 					fieldName := strutil.ToCamelCase(field.Name)
-					og.Linef("%s: %s,", fieldName, fieldName)
+					g.Linef("%s: %s,", fieldName, fieldName)
 				}
 			})
-			og.Line(");")
+			g.Line(");")
 		})
-		og.Line("}")
-		og.Break()
+		g.Line("}")
+		g.Break()
 
 		// toJson method
-		og.Linef("/// Serialises this %s to a JSON map compatible with the server.", name)
-		og.Line("Map<String, dynamic> toJson() {")
-		og.Block(func() {
-			og.Line("final _data = <String, dynamic>{};")
+		g.Linef("/// Serialises this %s to a JSON map compatible with the server.", fullName)
+		g.Line("Map<String, dynamic> toJson() {")
+		g.Block(func() {
+			g.Line("final _data = <String, dynamic>{};")
 			for _, field := range fields {
 				fieldName := strutil.ToCamelCase(field.Name)
-				jsonKey := field.Name
+				jsonKey := strutil.ToCamelCase(field.Name)
 				if field.Optional {
 					local := "__v_" + fieldName
-					og.Linef("final %s = %s;", local, fieldName)
+					g.Linef("final %s = %s;", local, fieldName)
 					ser := dartToJsonExpr(field, local)
-					og.Linef("if (%s != null) _data['%s'] = %s;", local, jsonKey, ser)
+					g.Linef("if (%s != null) _data['%s'] = %s;", local, jsonKey, ser)
 				} else {
 					ser := dartToJsonExpr(field, fieldName)
-					og.Linef("_data['%s'] = %s;", jsonKey, ser)
+					g.Linef("_data['%s'] = %s;", jsonKey, ser)
 				}
 			}
-			og.Line("return _data;")
+			g.Line("return _data;")
 		})
-		og.Line("}")
+		g.Line("}")
 	})
-	og.Line("}")
-	og.Break()
+	g.Line("}")
+	g.Break()
 
 	// Children inline types
 	for _, field := range fields {
-		if !field.IsInline() {
-			continue
+		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
+			childName := fullName + strutil.ToPascalCase(field.Name)
+			childDesc := field.Doc
+			g.Line(renderDartType("", childName, childDesc, field.Type.Object.Fields))
 		}
-		// Inline type inherits description if present on the containing field
-		childDesc := ""
-		if field.Doc != nil {
-			childDesc = strings.TrimSpace(*field.Doc)
-		}
-		og.Line(renderDartType(name, strutil.ToPascalCase(field.Name), childDesc, field.TypeInline.Fields))
 	}
 
-	return og.String()
+	return g.String()
 }
 
+// =============================================================================
+// Documentation and Comments
+// =============================================================================
+
 // renderDeprecatedDart writes a deprecated doc line if provided.
-func renderDeprecatedDart(g *gen.Generator, deprecated *string) {
+func renderDeprecatedDart(g *gen.Generator, deprecated *ir.Deprecation) {
 	if deprecated == nil {
 		return
 	}
 	desc := "@deprecated "
-	if *deprecated == "" {
+	if deprecated.Message == "" {
 		desc += "This is deprecated and should not be used in new code."
 	} else {
-		desc += *deprecated
+		desc += deprecated.Message
 	}
 	g.Line("///")
 	for _, line := range strings.Split(desc, "\n") {
