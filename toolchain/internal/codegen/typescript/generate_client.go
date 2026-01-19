@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 //go:embed pieces/client.ts
 var clientRawPiece string
 
-func generateClient(sch schema.Schema, config Config) (string, error) {
+func generateClient(_ *ir.Schema, flat *flatSchema, config Config) (string, error) {
 	if !config.IncludeClient {
 		return "", nil
 	}
@@ -41,11 +41,11 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 	g.Break()
 
 	// Generate procedure registry and builders
-	generateProcedureImplementation(g, sch)
+	generateProcedureImplementation(g, flat)
 	g.Break()
 
 	// Generate stream registry and builders
-	generateStreamImplementation(g, sch)
+	generateStreamImplementation(g, flat)
 
 	return g.String(), nil
 }
@@ -53,14 +53,14 @@ func generateClient(sch schema.Schema, config Config) (string, error) {
 // generateClientBuilder creates the main NewClient function
 func generateClientBuilder(g *gen.Generator) {
 	g.Line("/**")
-	g.Line(" * Creates a new UFO RPC client builder.")
+	g.Line(" * Creates a new VDL RPC client builder.")
 	g.Line(" *")
 	g.Line(" * @param baseURL - The base URL for the RPC endpoint")
 	g.Line(" * @returns A fluent builder for configuring the client")
 	g.Line(" *")
 	g.Line(" * @example")
 	g.Line(" * ```typescript")
-	g.Line(" * const client = NewClient(\"https://api.example.com/v1/urpc\")")
+	g.Line(" * const client = NewClient(\"https://api.example.com/v1/rpc\")")
 	g.Line(" *   .withGlobalHeader(\"Authorization\", \"Bearer token\")")
 	g.Line(" *   .build();")
 	g.Line(" * ```")
@@ -73,7 +73,7 @@ func generateClientBuilder(g *gen.Generator) {
 	g.Break()
 
 	g.Line("/**")
-	g.Line(" * Fluent builder for configuring UFO RPC client options.")
+	g.Line(" * Fluent builder for configuring VDL RPC client options.")
 	g.Line(" */")
 	g.Line("class ClientBuilder {")
 	g.Block(func() {
@@ -117,7 +117,7 @@ func generateClientBuilder(g *gen.Generator) {
 		g.Line(" */")
 		g.Line("build(): Client {")
 		g.Block(func() {
-			g.Line("const intClient = this.builder.build(ufoProcedureNames, ufoStreamNames);")
+			g.Line("const intClient = this.builder.build(vdlProcedureNames, vdlStreamNames);")
 			g.Line("return new Client(intClient);")
 		})
 		g.Line("}")
@@ -128,7 +128,7 @@ func generateClientBuilder(g *gen.Generator) {
 // generateClientClass creates the main Client class
 func generateClientClass(g *gen.Generator) {
 	g.Line("/**")
-	g.Line(" * Main UFO RPC client providing type-safe access to procedures and streams.")
+	g.Line(" * Main VDL RPC client providing type-safe access to procedures and streams.")
 	g.Line(" */")
 	g.Line("export class Client {")
 	g.Block(func() {
@@ -154,7 +154,7 @@ func generateClientClass(g *gen.Generator) {
 }
 
 // generateProcedureImplementation generates all procedure-related code
-func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
+func generateProcedureImplementation(g *gen.Generator, flat *flatSchema) {
 	g.Line("// =============================================================================")
 	g.Line("// Procedure Implementation")
 	g.Line("// =============================================================================")
@@ -176,17 +176,22 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 		g.Break()
 
 		// Generate method for each procedure
-		for _, procNode := range sch.GetProcNodes() {
-			name := strutil.ToPascalCase(procNode.Name)
-			builderName := fmt.Sprintf("builder%s", name)
+		for _, fp := range flat.Procedures {
+			proc := fp.Procedure
+			fullName := fullProcName(fp.RPCName, proc.Name)
+			builderName := fmt.Sprintf("builder%s", fullName)
+			methodName := strutil.ToCamelCase(fp.RPCName) + strutil.ToPascalCase(proc.Name)
+			path := rpcProcPath(fp.RPCName, proc.Name)
 
 			g.Linef("/**")
-			g.Linef(" * Creates a call builder for the %s procedure.", name)
-			renderDeprecated(g, procNode.Deprecated)
+			g.Linef(" * Creates a call builder for the %s procedure.", fullName)
+			if proc.Deprecated != nil {
+				renderDeprecated(g, proc.Deprecated)
+			}
 			g.Linef(" */")
-			g.Linef("%s(): %s {", strutil.ToCamelCase(procNode.Name), builderName)
+			g.Linef("%s(): %s {", methodName, builderName)
 			g.Block(func() {
-				g.Linef("return new %s(this.intClient, \"%s\");", builderName, procNode.Name)
+				g.Linef("return new %s(this.intClient, \"%s\");", builderName, path)
 			})
 			g.Line("}")
 			g.Break()
@@ -196,17 +201,19 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 	g.Break()
 
 	// Generate individual procedure builders
-	for _, procNode := range sch.GetProcNodes() {
-		name := strutil.ToPascalCase(procNode.Name)
-		builderName := fmt.Sprintf("builder%s", name)
-		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", name)
-		inputType := fmt.Sprintf("%sInput", name)
-		outputType := fmt.Sprintf("%sOutput", name)
+	for _, fp := range flat.Procedures {
+		proc := fp.Procedure
+		fullName := fullProcName(fp.RPCName, proc.Name)
+		builderName := fmt.Sprintf("builder%s", fullName)
+		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
+		inputType := fmt.Sprintf("%sInput", fullName)
+		outputType := fmt.Sprintf("%sOutput", fullName)
+		methodName := strutil.ToCamelCase(fp.RPCName) + strutil.ToPascalCase(proc.Name)
 
 		g.Linef("/**")
-		g.Linef(" * Fluent builder for the %s procedure.", name)
-		if procNode.Deprecated != nil && *procNode.Deprecated != "" {
-			g.Linef(" * @deprecated %s", *procNode.Deprecated)
+		g.Linef(" * Fluent builder for the %s procedure.", fullName)
+		if proc.Deprecated != nil && proc.Deprecated.Message != "" {
+			g.Linef(" * @deprecated %s", proc.Deprecated.Message)
 		}
 		g.Linef(" */")
 		g.Linef("class %s {", builderName)
@@ -232,7 +239,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Adds a custom header to the %s request.", name)
+			g.Linef(" * Adds a custom header to the %s request.", fullName)
 			g.Line(" * Can be called multiple times to set different headers.")
 			g.Line(" */")
 			g.Linef("withHeader(key: string, value: string): %s {", builderName)
@@ -244,7 +251,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Configures automatic retry behavior for the %s procedure.", name)
+			g.Linef(" * Configures automatic retry behavior for the %s procedure.", fullName)
 			g.Line(" * Retries are performed with exponential backoff on 5xx errors and network failures.")
 			g.Line(" *")
 			g.Line(" * @param config - Retry configuration object")
@@ -257,12 +264,12 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Line(" * @example")
 			g.Line(" * ```typescript")
 			g.Line(" * // Basic retry configuration")
-			g.Linef(" * const result = await client.procs.%s()", strutil.ToCamelCase(procNode.Name))
+			g.Linef(" * const result = await client.procs.%s()", methodName)
 			g.Line(" *   .withRetries({ maxAttempts: 3 })")
 			g.Line(" *   .execute(input);")
 			g.Line(" *")
 			g.Line(" * // Advanced retry configuration")
-			g.Linef(" * const result = await client.procs.%s()", strutil.ToCamelCase(procNode.Name))
+			g.Linef(" * const result = await client.procs.%s()", methodName)
 			g.Line(" *   .withRetries({")
 			g.Line(" *     maxAttempts: 5,")
 			g.Line(" *     initialDelayMs: 500,")
@@ -288,7 +295,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Configures timeout for each individual attempt of the %s procedure.", name)
+			g.Linef(" * Configures timeout for each individual attempt of the %s procedure.", fullName)
 			g.Line(" * Each retry attempt will be cancelled if it exceeds the specified timeout.")
 			g.Line(" *")
 			g.Line(" * @param config - Timeout configuration object")
@@ -298,7 +305,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Line(" * @example")
 			g.Line(" * ```typescript")
 			g.Line(" * // Set 10 second timeout per attempt")
-			g.Linef(" * const result = await client.procs.%s()", strutil.ToCamelCase(procNode.Name))
+			g.Linef(" * const result = await client.procs.%s()", methodName)
 			g.Line(" *   .withTimeout({ timeoutMs: 10000 })")
 			g.Line(" *   .withRetries({ maxAttempts: 3 })")
 			g.Line(" *   .execute(input);")
@@ -320,9 +327,9 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Executes the %s procedure.", name)
+			g.Linef(" * Executes the %s procedure.", fullName)
 			g.Line(" *")
-			g.Linef(" * @param input - The %s input parameters", name)
+			g.Linef(" * @param input - The %s input parameters", fullName)
 			g.Linef(" * @returns Promise resolving to %s or throws UfoError if something went wrong", outputType)
 			g.Line(" */")
 			g.Linef("async execute(input: %s): Promise<%s> {", inputType, outputType)
@@ -348,7 +355,7 @@ func generateProcedureImplementation(g *gen.Generator, sch schema.Schema) {
 }
 
 // generateStreamImplementation generates all stream-related code
-func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
+func generateStreamImplementation(g *gen.Generator, flat *flatSchema) {
 	g.Line("// =============================================================================")
 	g.Line("// Stream Implementation")
 	g.Line("// =============================================================================")
@@ -371,17 +378,22 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 		g.Break()
 
 		// Generate method for each stream
-		for _, streamNode := range sch.GetStreamNodes() {
-			name := strutil.ToPascalCase(streamNode.Name)
-			builderName := fmt.Sprintf("builder%sStream", name)
+		for _, fs := range flat.Streams {
+			stream := fs.Stream
+			fullName := fullStreamName(fs.RPCName, stream.Name)
+			builderName := fmt.Sprintf("builder%sStream", fullName)
+			methodName := strutil.ToCamelCase(fs.RPCName) + strutil.ToPascalCase(stream.Name)
+			path := rpcStreamPath(fs.RPCName, stream.Name)
 
 			g.Linef("/**")
-			g.Linef(" * Creates a stream builder for the %s stream.", name)
-			renderDeprecated(g, streamNode.Deprecated)
+			g.Linef(" * Creates a stream builder for the %s stream.", fullName)
+			if stream.Deprecated != nil {
+				renderDeprecated(g, stream.Deprecated)
+			}
 			g.Linef(" */")
-			g.Linef("%s(): %s {", strutil.ToCamelCase(streamNode.Name), builderName)
+			g.Linef("%s(): %s {", methodName, builderName)
 			g.Block(func() {
-				g.Linef("return new %s(this.intClient, \"%s\");", builderName, streamNode.Name)
+				g.Linef("return new %s(this.intClient, \"%s\");", builderName, path)
 			})
 			g.Line("}")
 			g.Break()
@@ -391,17 +403,19 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 	g.Break()
 
 	// Generate individual stream builders
-	for _, streamNode := range sch.GetStreamNodes() {
-		name := strutil.ToPascalCase(streamNode.Name)
-		builderName := fmt.Sprintf("builder%sStream", name)
-		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", name)
-		inputType := fmt.Sprintf("%sInput", name)
-		outputType := fmt.Sprintf("%sOutput", name)
+	for _, fs := range flat.Streams {
+		stream := fs.Stream
+		fullName := fullStreamName(fs.RPCName, stream.Name)
+		builderName := fmt.Sprintf("builder%sStream", fullName)
+		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
+		inputType := fmt.Sprintf("%sInput", fullName)
+		outputType := fmt.Sprintf("%sOutput", fullName)
+		methodName := strutil.ToCamelCase(fs.RPCName) + strutil.ToPascalCase(stream.Name)
 
 		g.Linef("/**")
-		g.Linef(" * Fluent builder for the %s stream.", name)
-		if streamNode.Deprecated != nil && *streamNode.Deprecated != "" {
-			g.Linef(" * @deprecated %s", *streamNode.Deprecated)
+		g.Linef(" * Fluent builder for the %s stream.", fullName)
+		if stream.Deprecated != nil && stream.Deprecated.Message != "" {
+			g.Linef(" * @deprecated %s", stream.Deprecated.Message)
 		}
 		g.Linef(" */")
 		g.Linef("class %s {", builderName)
@@ -426,7 +440,7 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Adds a custom header to the %s stream request.", name)
+			g.Linef(" * Adds a custom header to the %s stream request.", fullName)
 			g.Line(" * Can be called multiple times to set different headers.")
 			g.Line(" */")
 			g.Linef("withHeader(key: string, value: string): %s {", builderName)
@@ -438,7 +452,7 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Configures automatic reconnection for the %s stream.", name)
+			g.Linef(" * Configures automatic reconnection for the %s stream.", fullName)
 			g.Line(" * The stream will automatically attempt to reconnect when the connection is lost,")
 			g.Line(" * but NOT when manually cancelled using the cancel() function.")
 			g.Line(" *")
@@ -452,12 +466,12 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Line(" * @example")
 			g.Line(" * ```typescript")
 			g.Line(" * // Basic reconnection configuration")
-			g.Linef(" * const { stream, cancel } = client.streams.%s()", strutil.ToCamelCase(streamNode.Name))
+			g.Linef(" * const { stream, cancel } = client.streams.%s()", methodName)
 			g.Line(" *   .withReconnect({ maxAttempts: 5 })")
 			g.Line(" *   .execute(input);")
 			g.Line(" *")
 			g.Line(" * // Advanced reconnection configuration")
-			g.Linef(" * const { stream, cancel } = client.streams.%s()", strutil.ToCamelCase(streamNode.Name))
+			g.Linef(" * const { stream, cancel } = client.streams.%s()", methodName)
 			g.Line(" *   .withReconnect({")
 			g.Line(" *     maxAttempts: 10,")
 			g.Line(" *     initialDelayMs: 500,")
@@ -483,16 +497,16 @@ func generateStreamImplementation(g *gen.Generator, sch schema.Schema) {
 			g.Break()
 
 			g.Line("/**")
-			g.Linef(" * Opens the %s Server-Sent Events stream.", name)
+			g.Linef(" * Opens the %s Server-Sent Events stream.", fullName)
 			g.Line(" *")
-			g.Linef(" * @param input - The %s input parameters", name)
+			g.Linef(" * @param input - The %s input parameters", fullName)
 			g.Line(" * @returns Object containing:")
 			g.Linef(" *   - stream: AsyncGenerator yielding Response<%s> events", outputType)
 			g.Line(" *   - cancel: Function for cancelling the stream")
 			g.Line(" *")
 			g.Line(" * @example")
 			g.Line(" * ```typescript")
-			g.Linef(" * const { stream, cancel } = client.streams.%s().execute(input);", strutil.ToCamelCase(streamNode.Name))
+			g.Linef(" * const { stream, cancel } = client.streams.%s().execute(input);", methodName)
 			g.Line(" * ")
 			g.Line(" * // All stream events are received here")
 			g.Line(" * for await (const event of stream) {")

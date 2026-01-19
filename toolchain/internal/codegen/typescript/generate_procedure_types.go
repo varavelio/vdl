@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/schema"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateProcedureTypes(sch schema.Schema, _ Config) (string, error) {
+func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ Config) (string, error) {
+	if len(flat.Procedures) == 0 {
+		return "", nil
+	}
+
 	g := gen.New().WithSpaces(2)
 
 	g.Line("// -----------------------------------------------------------------------------")
@@ -16,23 +19,25 @@ func generateProcedureTypes(sch schema.Schema, _ Config) (string, error) {
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, procNode := range sch.GetProcNodes() {
-		namePascal := strutil.ToPascalCase(procNode.Name)
-		inputName := fmt.Sprintf("%sInput", namePascal)
-		outputName := fmt.Sprintf("%sOutput", namePascal)
-		responseName := fmt.Sprintf("%sResponse", namePascal)
+	for _, fp := range flat.Procedures {
+		proc := fp.Procedure
+		fullName := fullProcName(fp.RPCName, proc.Name)
 
-		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s procedure.", inputName, namePascal)
-		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s procedure.", outputName, namePascal)
-		responseDesc := fmt.Sprintf("%s represents the response for the %s procedure.", responseName, namePascal)
+		inputName := fmt.Sprintf("%sInput", fullName)
+		outputName := fmt.Sprintf("%sOutput", fullName)
+		responseName := fmt.Sprintf("%sResponse", fullName)
 
-		g.Line(renderType("", inputName, inputDesc, procNode.Input))
+		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s procedure.", inputName, fullName)
+		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s procedure.", outputName, fullName)
+		responseDesc := fmt.Sprintf("%s represents the response for the %s procedure.", responseName, fullName)
+
+		g.Line(renderType("", inputName, inputDesc, proc.Input))
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, procNode.Output))
+		g.Line(renderType("", outputName, outputDesc, proc.Output))
 		g.Break()
 
-		g.Line(renderHydrateType("", outputName, procNode.Output))
+		g.Line(renderHydrateType("", outputName, proc.Output))
 		g.Break()
 
 		g.Linef("// %s", responseDesc)
@@ -40,11 +45,13 @@ func generateProcedureTypes(sch schema.Schema, _ Config) (string, error) {
 		g.Break()
 	}
 
-	g.Line("// ufoProcedureNames is a list of all procedure names.")
-	g.Line("const ufoProcedureNames: string[] = [")
+	// Generate procedure names list
+	g.Line("// vdlProcedureNames is a list of all procedure names.")
+	g.Line("const vdlProcedureNames: string[] = [")
 	g.Block(func() {
-		for _, procNode := range sch.GetProcNodes() {
-			g.Linef("\"%s\",", procNode.Name)
+		for _, fp := range flat.Procedures {
+			path := rpcProcPath(fp.RPCName, fp.Procedure.Name)
+			g.Linef("\"%s\",", path)
 		}
 	})
 	g.Line("]")
