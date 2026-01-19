@@ -1,14 +1,16 @@
 package codegen
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/parser"
-	"github.com/varavelio/vdl/toolchain/internal/transpile"
 )
 
 // RunWasmOptions contains options for running code generators in WASM mode
@@ -16,7 +18,7 @@ import (
 type RunWasmOptions struct {
 	// Generator must be one of: "golang-server", "golang-client", "typescript-client", "dart-client".
 	Generator string `json:"generator"`
-	// SchemaInput is the schema content as a string (URPC schema only).
+	// SchemaInput is the schema content as a string (VDL schema only).
 	SchemaInput string `json:"schemaInput"`
 	// GolangPackageName is required when Generator is golang-server or golang-client.
 	GolangPackageName string `json:"golangPackageName"`
@@ -59,26 +61,42 @@ func runWasm(opts RunWasmOptions) (RunWasmOutput, error) {
 		return RunWasmOutput{}, fmt.Errorf("missing schema input")
 	}
 
-	// Parse input into JSON schema
-	astSchema, err := parser.ParserInstance.ParseString("schema.urpc", opts.SchemaInput)
+	// Parse input into AST
+	astSchema, err := parser.ParserInstance.ParseString("schema.vdl", opts.SchemaInput)
 	if err != nil {
-		return RunWasmOutput{}, fmt.Errorf("failed to parse URPC schema: %s", err)
+		return RunWasmOutput{}, fmt.Errorf("failed to parse VDL schema: %s", err)
 	}
-	jsonSchema, err := transpile.ToJSON(*astSchema)
-	if err != nil {
-		return RunWasmOutput{}, fmt.Errorf("failed to transpile URPC to JSON: %s", err)
+
+	// Run semantic analysis on the parsed schema
+	program, diagnostics := analysis.AnalyzeSchema(astSchema, "/virtual/schema.vdl")
+	if len(diagnostics) > 0 {
+		// Collect all error messages
+		var errMsgs string
+		for i, d := range diagnostics {
+			if i > 0 {
+				errMsgs += "\n"
+			}
+			errMsgs += d.String()
+		}
+		return RunWasmOutput{}, fmt.Errorf("schema validation failed:\n%s", errMsgs)
 	}
+
+	// Convert to IR Schema
+	schema := ir.FromProgram(program)
+
+	ctx := context.Background()
 
 	if opts.Generator == "golang-server" {
 		if opts.GolangPackageName == "" {
 			return RunWasmOutput{}, fmt.Errorf("golang-server requires 'GolangPackageName'")
 		}
 		cfg := golang.Config{PackageName: opts.GolangPackageName, IncludeServer: true, IncludeClient: false}
-		fileContent, err := golang.Generate(jsonSchema, cfg)
+		gen := golang.New(cfg)
+		files, err := gen.Generate(ctx, schema)
 		if err != nil {
 			return RunWasmOutput{}, fmt.Errorf("failed to generate golang server: %s", err)
 		}
-		return RunWasmOutput{Files: []RunWasmOutputFile{{Path: "server.go", Content: fileContent}}}, nil
+		return convertGolangFiles(files), nil
 	}
 
 	if opts.Generator == "golang-client" {
@@ -86,34 +104,69 @@ func runWasm(opts RunWasmOptions) (RunWasmOutput, error) {
 			return RunWasmOutput{}, fmt.Errorf("golang-client requires 'GolangPackageName'")
 		}
 		cfg := golang.Config{PackageName: opts.GolangPackageName, IncludeServer: false, IncludeClient: true}
-		fileContent, err := golang.Generate(jsonSchema, cfg)
+		gen := golang.New(cfg)
+		files, err := gen.Generate(ctx, schema)
 		if err != nil {
 			return RunWasmOutput{}, fmt.Errorf("failed to generate golang client: %s", err)
 		}
-		return RunWasmOutput{Files: []RunWasmOutputFile{{Path: "client.go", Content: fileContent}}}, nil
+		return convertGolangFiles(files), nil
 	}
 
 	if opts.Generator == "typescript-client" {
 		cfg := typescript.Config{IncludeServer: false, IncludeClient: true}
-		fileContent, err := typescript.Generate(jsonSchema, cfg)
+		gen := typescript.New(cfg)
+		files, err := gen.Generate(ctx, schema)
 		if err != nil {
 			return RunWasmOutput{}, fmt.Errorf("failed to generate typescript client: %s", err)
 		}
-		return RunWasmOutput{Files: []RunWasmOutputFile{{Path: "client.ts", Content: fileContent}}}, nil
+		return convertTypescriptFiles(files), nil
 	}
 
 	if opts.Generator == "dart-client" {
 		cfg := dart.Config{PackageName: opts.DartPackageName}
-		output, err := dart.Generate(jsonSchema, cfg)
+		gen := dart.New(cfg)
+		files, err := gen.Generate(ctx, schema)
 		if err != nil {
 			return RunWasmOutput{}, fmt.Errorf("failed to generate dart client: %s", err)
 		}
-		files := make([]RunWasmOutputFile, len(output.Files))
-		for i, file := range output.Files {
-			files[i] = RunWasmOutputFile{Path: file.Path, Content: file.Content}
-		}
-		return RunWasmOutput{Files: files}, nil
+		return convertDartFiles(files), nil
 	}
 
 	return RunWasmOutput{}, fmt.Errorf("unsupported generator: %s", opts.Generator)
+}
+
+// convertGolangFiles converts golang.File slice to RunWasmOutput.
+func convertGolangFiles(files []golang.File) RunWasmOutput {
+	outputFiles := make([]RunWasmOutputFile, len(files))
+	for i, file := range files {
+		outputFiles[i] = RunWasmOutputFile{
+			Path:    file.RelativePath,
+			Content: string(file.Content),
+		}
+	}
+	return RunWasmOutput{Files: outputFiles}
+}
+
+// convertTypescriptFiles converts typescript.File slice to RunWasmOutput.
+func convertTypescriptFiles(files []typescript.File) RunWasmOutput {
+	outputFiles := make([]RunWasmOutputFile, len(files))
+	for i, file := range files {
+		outputFiles[i] = RunWasmOutputFile{
+			Path:    file.RelativePath,
+			Content: string(file.Content),
+		}
+	}
+	return RunWasmOutput{Files: outputFiles}
+}
+
+// convertDartFiles converts dart.File slice to RunWasmOutput.
+func convertDartFiles(files []dart.File) RunWasmOutput {
+	outputFiles := make([]RunWasmOutputFile, len(files))
+	for i, file := range files {
+		outputFiles[i] = RunWasmOutputFile{
+			Path:    file.RelativePath,
+			Content: string(file.Content),
+		}
+	}
+	return RunWasmOutput{Files: outputFiles}
 }

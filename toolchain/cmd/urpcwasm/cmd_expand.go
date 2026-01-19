@@ -9,7 +9,7 @@ import (
 )
 
 /*
-	Expands all custom type references to inline objects in the URPC schema.
+	Expands all custom type references to inline objects in the VDL schema.
 
 	Available command:
 	cmdExpandTypes(input: string): Promise<string>
@@ -42,5 +42,5 @@ func cmdExpandTypesWrapper() js.Func {
 }
 
 func cmdExpandTypes(input string) (string, error) {
-	return transform.ExpandTypesStr("schema.urpc", input)
+	return transform.ExpandTypesStr("schema.vdl", input)
 }

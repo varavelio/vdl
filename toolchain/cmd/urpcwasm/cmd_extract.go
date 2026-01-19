@@ -9,7 +9,7 @@ import (
 )
 
 /*
-	Extract commands for URPC schema manipulation.
+	Extract commands for VDL schema manipulation.
 
 	Available commands:
 
@@ -53,7 +53,7 @@ func cmdExtractTypeWrapper() js.Func {
 }
 
 func cmdExtractType(input, typeName string) (string, error) {
-	return transform.ExtractTypeStr("schema.urpc", input, typeName)
+	return transform.ExtractTypeStr("schema.vdl", input, typeName)
 }
 
 func cmdExtractProcWrapper() js.Func {
@@ -80,7 +80,7 @@ func cmdExtractProcWrapper() js.Func {
 }
 
 func cmdExtractProc(input, rpcName string, procName string) (string, error) {
-	return transform.ExtractProcStr("schema.urpc", input, rpcName, procName)
+	return transform.ExtractProcStr("schema.vdl", input, rpcName, procName)
 }
 
 func cmdExtractStreamWrapper() js.Func {
@@ -107,5 +107,5 @@ func cmdExtractStreamWrapper() js.Func {
 }
 
 func cmdExtractStream(input, rpcName string, streamName string) (string, error) {
-	return transform.ExtractStreamStr("schema.urpc", input, rpcName, streamName)
+	return transform.ExtractStreamStr("schema.vdl", input, rpcName, streamName)
 }

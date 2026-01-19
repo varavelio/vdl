@@ -13,7 +13,7 @@ import (
 // Core Types
 // -----------------------------------------------------------------------------
 
-// Response represents the response of a UFO RPC call.
+// Response represents the response of a VDL call.
 type Response[T any] struct {
 	Ok     bool  `json:"ok"`
 	Output T     `json:"output,omitempty,omitzero"`
@@ -29,7 +29,7 @@ func (r Response[T]) Write(w io.Writer) error {
 func (r Response[T]) String() string {
 	b, err := json.Marshal(r)
 	if err != nil {
-		return fmt.Sprintf("failed to marshal UFO RPC Response: %s", err.Error())
+		return fmt.Sprintf("failed to marshal VDL Response: %s", err.Error())
 	}
 	return string(b)
 }
@@ -39,7 +39,7 @@ func (r Response[T]) Bytes() []byte {
 	return []byte(r.String())
 }
 
-// Error represents a standardized error in the UFO RPC system.
+// Error represents a standardized error in the VDL system.
 //
 // It provides structured information about errors that occur within the system,
 // enabling consistent error handling across servers and clients.
@@ -130,7 +130,7 @@ func (e Error) ToJSON() string {
 	b, err := json.Marshal(e)
 	if err != nil {
 		return fmt.Sprintf(
-			`{"message":%q,"error":"Failed to marshal UFO RPC Error: %s"}`,
+			`{"message":%q,"error":"Failed to marshal VDL Error: %s"}`,
 			e.Message, err.Error(),
 		)
 	}

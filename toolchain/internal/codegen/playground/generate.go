@@ -36,7 +36,7 @@ func (g *Generator) Name() string {
 // Generate produces playground files from the IR schema.
 // The playground consists of:
 // - All static files from the embedded playground build
-// - schema.urpc: The formatted VDL schema (from config.FormattedSchema)
+// - schema.vdl: The formatted VDL schema (from config.FormattedSchema)
 // - config.json: Optional configuration for base URL and headers
 func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
 	files := []File{}
@@ -46,7 +46,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		".gitkeep":    true,
 		"config.json": true,
 		"schema.vdl":  true,
-		"schema.urpc": true,
 	}
 
 	// 1. Extract all files from the embedded playground build
@@ -67,7 +66,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	// 2. Add the formatted schema if provided
 	if g.config.FormattedSchema != "" {
 		files = append(files, File{
-			RelativePath: "schema.urpc",
+			RelativePath: "schema.vdl",
 			Content:      []byte(g.config.FormattedSchema),
 		})
 	}

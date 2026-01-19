@@ -61,16 +61,16 @@ rpc Users {
 	files, err := gen.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	// Find schema.urpc file
+	// Find schema.vdl file
 	var schemaFile *File
 	for i := range files {
-		if files[i].RelativePath == "schema.urpc" {
+		if files[i].RelativePath == "schema.vdl" {
 			schemaFile = &files[i]
 			break
 		}
 	}
 
-	require.NotNil(t, schemaFile, "schema.urpc should be included")
+	require.NotNil(t, schemaFile, "schema.vdl should be included")
 	assert.Equal(t, schemaSource, string(schemaFile.Content))
 }
 
@@ -136,9 +136,9 @@ func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
 	files, err := gen.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	// schema.urpc should NOT be included when FormattedSchema is empty
+	// schema.vdl should NOT be included when FormattedSchema is empty
 	for _, f := range files {
-		assert.NotEqual(t, "schema.urpc", f.RelativePath)
+		assert.NotEqual(t, "schema.vdl", f.RelativePath)
 	}
 }
 

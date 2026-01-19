@@ -16,7 +16,7 @@ type LSPLogger struct {
 	writeMu  sync.Mutex
 }
 
-// NewLSPLogger creates a new logger. It will log to a file named .urpc-lsp.log in the
+// NewLSPLogger creates a new logger. It will log to a file named .vdl-lsp.log in the
 // user's home directory and if that fails, it will store the log in the system's temp
 // directory.
 //
@@ -27,7 +27,7 @@ func NewLSPLogger() *LSPLogger {
 		dir = os.TempDir()
 	}
 
-	filePath := filepath.Join(dir, ".urpc-lsp.log")
+	filePath := filepath.Join(dir, ".vdl-lsp.log")
 
 	lgr := &LSPLogger{
 		filePath: filePath,

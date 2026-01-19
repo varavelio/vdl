@@ -33,7 +33,7 @@ func cmdFmtWrapper() js.Func {
 }
 
 func cmdFmt(input string) (string, error) {
-	formatted, err := formatter.Format("schema.urpc", input)
+	formatted, err := formatter.Format("schema.vdl", input)
 	if err != nil {
 		return "", fmt.Errorf("failed to format file: %w", err)
 	}

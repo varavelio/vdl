@@ -53,7 +53,7 @@ func astCleanPositionsRecursively(val reflect.Value, emptyPos reflect.Value, inc
 	}
 }
 
-// ASTEqual compares two URPC structs and fails if they are not ASTEqual.
+// ASTEqual compares two VDL structs and fails if they are not ASTEqual.
 // The validation includes the positions of the AST nodes.
 func ASTEqual(t *testing.T, expected, actual *ast.Schema, msgAndArgs ...any) {
 	t.Helper()
@@ -65,7 +65,7 @@ func ASTEqual(t *testing.T, expected, actual *ast.Schema, msgAndArgs ...any) {
 	require.Equal(t, expectedJSON, actualJSON, msgAndArgs...)
 }
 
-// ASTEqualNoPos compares two URPC structs and fails if they are not equal.
+// ASTEqualNoPos compares two VDL structs and fails if they are not equal.
 // It ignores the positions of any nested AST nodes.
 func ASTEqualNoPos(t *testing.T, expected, actual *ast.Schema, msgAndArgs ...any) {
 	t.Helper()

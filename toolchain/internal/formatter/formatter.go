@@ -10,7 +10,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// Format formats URPC code according to the spec, using 2 spaces for indentation.
+// Format formats VDL code according to the spec, using 2 spaces for indentation.
 func Format(filename, content string) (string, error) {
 	if strings.TrimSpace(content) == "" {
 		return "", nil
@@ -18,13 +18,13 @@ func Format(filename, content string) (string, error) {
 
 	schema, err := parser.ParserInstance.ParseString(filename, content)
 	if err != nil {
-		return "", fmt.Errorf("error parsing URPC: %w", err)
+		return "", fmt.Errorf("error parsing VDL: %w", err)
 	}
 
 	return FormatSchema(schema), nil
 }
 
-// FormatSchema formats an already parsed UFO RPC AST Schema.
+// FormatSchema formats an already parsed VDL AST Schema.
 func FormatSchema(sch *ast.Schema) string {
 	g := gen.New().WithSpaces(2)
 

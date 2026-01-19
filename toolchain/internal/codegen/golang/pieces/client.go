@@ -331,7 +331,7 @@ func (c *internalClient) proc(
 			resp.Body.Close()
 			return Response[json.RawMessage]{
 				Ok:    false,
-				Error: asError(fmt.Errorf("failed to decode UFO RPC response: %w", err)),
+				Error: asError(fmt.Errorf("failed to decode VDL response: %w", err)),
 			}
 		}
 		resp.Body.Close()

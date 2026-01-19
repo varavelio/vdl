@@ -21,7 +21,7 @@ const (
 	OperationTypeStream = "stream"
 )
 
-// HTTPAdapter defines the interface required by UFO RPC server to handle
+// HTTPAdapter defines the interface required by VDL server to handle
 // incoming HTTP requests and write responses to clients. This abstraction allows
 // the server to work with different HTTP frameworks while maintaining the same
 // core functionality.
@@ -53,7 +53,7 @@ type HTTPAdapter interface {
 }
 
 // NetHTTPAdapter implements HTTPAdapter for Go's standard net/http package.
-// This adapter bridges the UFO RPC server with the standard HTTP library, allowing
+// This adapter bridges the VDL server with the standard HTTP library, allowing
 // seamless integration with existing HTTP servers and middleware.
 type NetHTTPAdapter struct {
 	responseWriter http.ResponseWriter
@@ -67,7 +67,7 @@ type NetHTTPAdapter struct {
 //   - w: The http.ResponseWriter to write responses to
 //   - r: The *http.Request containing the incoming request data
 //
-// Returns a HTTPAdapter implementation ready for use with UFO RPC server.
+// Returns a HTTPAdapter implementation ready for use with VDL server.
 func NewNetHTTPAdapter(w http.ResponseWriter, r *http.Request) HTTPAdapter {
 	return &NetHTTPAdapter{
 		responseWriter: w,
@@ -233,7 +233,7 @@ type internalServer[T any] struct {
 	streamDeserializers map[string]DeserializeFunc
 }
 
-// newInternalServer creates a new UFO RPC server instance with the specified
+// newInternalServer creates a new VDL server instance with the specified
 // procedure and stream names. The server is initialized with empty handler
 // maps and middleware slices, ready for registration.
 //

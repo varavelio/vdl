@@ -18,12 +18,12 @@ var wrappers map[string]js.Func = map[string]js.Func{
 }
 
 func main() {
-	log.Println("UFO RPC WASM: Initializing...")
+	log.Println("VDL WASM: Initializing...")
 
 	for name, wrapper := range wrappers {
 		js.Global().Set(name, wrapper)
 	}
 
-	log.Println("UFO RPC WASM: Initialized")
+	log.Println("VDL WASM: Initialized")
 	<-make(chan any)
 }

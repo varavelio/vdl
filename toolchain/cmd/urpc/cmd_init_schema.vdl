@@ -1,6 +1,6 @@
 version 1
 
-// UFO RPC Schema example
+// VDL Schema example
 // More info: https://github.com/varavelio/vdl
 
 type FooType {

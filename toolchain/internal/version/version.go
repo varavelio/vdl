@@ -15,19 +15,19 @@ const VersionWithPrefix = "v" + Version
 
 // asciiArtRaw is used to generate AsciiArt
 var asciiArtRaw = strings.Join([]string{
-	"╦ ╦╔═╗╔═╗  ╦═╗╔═╗╔═╗",
-	"║ ║╠╣ ║ ║  ╠╦╝╠═╝║  ",
-	"╚═╝╚  ╚═╝  ╩╚═╩  ╚═╝",
+	"╦  ╦╔╦╗╦  ",
+	"╚╗╔╝ ║║║  ",
+	" ╚╝ ═╩╝╩═╝",
 }, "\n")
 
 // basicInfoRaw is used to generate AsciiArt
 var basicInfoRaw = strings.Join([]string{
 	"Star the repo: https://github.com/varavelio/vdl",
-	"Show usage:    urpc --help",
-	"Show version:  urpc --version",
+	"Show usage:    vdl --help",
+	"Show version:  vdl --version",
 }, "\n")
 
-// AsciiArt is the ASCII art for the UFO RPC logo.
+// AsciiArt is the ASCII art for the VDL logo.
 // It is generated dynamically to ensure that the logo is always
 // centered and the lines are always the same width.
 var AsciiArt = func() string {

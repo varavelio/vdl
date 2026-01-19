@@ -14,7 +14,7 @@ type Config struct {
 	// This becomes the base path for all generated files.
 	OutputDir string `toml:"output_dir"`
 
-	// DefaultBaseURL is the default urpc base URL to use.
+	// DefaultBaseURL is the default VDL base URL to use.
 	DefaultBaseURL string `toml:"default_base_url"`
 
 	// DefaultHeaders is the default headers to use.
@@ -22,7 +22,7 @@ type Config struct {
 
 	// FormattedSchema is the VDL schema source code, pre-formatted.
 	// This is passed by the caller since the IR doesn't contain the original source.
-	// If empty, the playground will not include a schema.urpc file.
+	// If empty, the playground will not include a schema.vdl file.
 	FormattedSchema string `toml:"-"`
 }
 
