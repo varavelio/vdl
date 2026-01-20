@@ -35,11 +35,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./urpc/dist/urpc-darwin-amd64
-            ./urpc/dist/urpc-darwin-arm64
-            ./urpc/dist/urpc-linux-amd64
-            ./urpc/dist/urpc-linux-arm64
-            ./urpc/dist/urpc-windows-amd64.exe
-            ./urpc/dist/urpc-windows-arm64.exe
-            ./urpc/dist/urpc.wasm
-            ./urpc/dist/wasm_exec.js
+            ./toolchain/dist/vdl-darwin-amd64
+            ./toolchain/dist/vdl-darwin-arm64
+            ./toolchain/dist/vdl-linux-amd64
+            ./toolchain/dist/vdl-linux-arm64
+            ./toolchain/dist/vdl-windows-amd64.exe
+            ./toolchain/dist/vdl-windows-arm64.exe
+            ./toolchain/dist/vdl.wasm
+            ./toolchain/dist/wasm_exec.js
