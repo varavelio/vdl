@@ -14,11 +14,14 @@ const Version = "0.0.0-dev"
 const VersionWithPrefix = "v" + Version
 
 // asciiArtRaw is used to generate AsciiArt
-var asciiArtRaw = strings.Join([]string{
-	"╦  ╦╔╦╗╦  ",
-	"╚╗╔╝ ║║║  ",
-	" ╚╝ ═╩╝╩═╝",
-}, "\n")
+var asciiArtRaw = strings.TrimSpace(`
+██╗   ██╗██████╗ ██╗
+██║   ██║██╔══██╗██║
+██║   ██║██║  ██║██║
+╚██╗ ██╔╝██║  ██║██║
+ ╚████╔╝ ██████╔╝███████╗
+  ╚═══╝  ╚═════╝ ╚══════╝
+`)
 
 // basicInfoRaw is used to generate AsciiArt
 var basicInfoRaw = strings.Join([]string{
@@ -37,7 +40,7 @@ var AsciiArt = func() string {
 			maxWidth = utf8.RuneCountInString(line)
 		}
 	}
-	dashes := strings.Repeat("-", maxWidth)
+	horizontal := strings.Repeat("─", maxWidth)
 
 	combined := strings.Join([]string{
 		strutil.CenterText(asciiArtRaw, maxWidth),
@@ -46,16 +49,16 @@ var AsciiArt = func() string {
 		basicInfoRaw,
 	}, "\n")
 
-	combinedWithLines := ""
+	var combinedWithLines strings.Builder
 	for line := range strings.SplitSeq(combined, "\n") {
 		spaces := maxWidth - utf8.RuneCountInString(line)
-		combinedWithLines += fmt.Sprintf("| %s%s |\n", line, strings.Repeat(" ", spaces))
+		fmt.Fprintf(&combinedWithLines, "│ %s%s │\n", line, strings.Repeat(" ", spaces))
 	}
 
 	lines := []string{
-		"+-" + dashes + "-+",
-		strings.TrimSpace(combinedWithLines),
-		"+-" + dashes + "-+",
+		"┌─" + horizontal + "─┐",
+		strings.TrimSpace(combinedWithLines.String()),
+		"└─" + horizontal + "─┘",
 	}
 
 	return strings.Join(lines, "\n")
