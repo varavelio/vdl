@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/varavelio/vdl/main/toolchain/internal/core/ir/ir.schema.json",
+  "$id": "https://vdl.varavel.com/schemas/v0/ir.schema.json",
   "$ref": "#/$defs/Schema",
   "$defs": {
     "Constant": {

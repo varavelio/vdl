@@ -43,11 +43,11 @@ tasks:
   codegen:
     desc: Run all project code generators
     cmds:
-      - task: gen:ir-schema
+      - task: gen:schemas
 
-  gen:ir-schema:
-    desc: Generate the JSON Schema for the IR package
-    cmd: go run ./cmd/irschema
+  gen:schemas:
+    desc: Generate the JSON Schemas for the project
+    cmd: go run ./internal/cmd/schemagen/.
 
   test:
     desc: Run tests
