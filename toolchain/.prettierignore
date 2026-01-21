@@ -1,2 +1,1 @@
-# Specific files to ignore
-internal/core/ir/ir.schema.json
+*.schema.json
