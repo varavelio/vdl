@@ -8,10 +8,25 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// Version is replaced during the release process by the latest Git tag
-// and should not be manually edited.
-const Version = "0.0.0-dev"
-const VersionWithPrefix = "v" + Version
+func init() {
+	// Clean up the Version
+	Version = strings.TrimPrefix(strings.TrimSpace(Version), "v")
+
+	// Set VersionMajor based on Version
+	parts := strings.Split(Version, ".")
+	if len(parts) > 0 {
+		VersionMajor = parts[0]
+	}
+}
+
+var (
+	// Version is replaced during the release process by the latest Git tag
+	// and should not be manually edited.
+	Version = "0.0.0-dev"
+
+	// VersionMajor is the major version extracted from Version.
+	VersionMajor = "0"
+)
 
 // asciiArtRaw is used to generate AsciiArt
 var asciiArtRaw = strings.TrimSpace(`
@@ -44,7 +59,7 @@ var AsciiArt = func() string {
 
 	combined := strings.Join([]string{
 		strutil.CenterText(asciiArtRaw, maxWidth),
-		strutil.CenterText(VersionWithPrefix, maxWidth),
+		strutil.CenterText("v"+Version, maxWidth),
 		"",
 		basicInfoRaw,
 	}, "\n")

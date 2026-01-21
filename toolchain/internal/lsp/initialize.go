@@ -76,7 +76,7 @@ func (l *LSP) handleInitialize(rawMessage []byte) (any, error) {
 		Result: ResponseMessageInitializeResult{
 			ServerInfo: ResponseMessageInitializeResultServerInfo{
 				Name:    "VDL Language Server",
-				Version: version.VersionWithPrefix,
+				Version: "v" + version.Version,
 			},
 			Capabilities: ResponseMessageInitializeResultCapabilities{
 				// Documents are synced by always sending the full content of the document.
