@@ -354,8 +354,7 @@
       "const": 1
     },
     "schema": {
-      "type": "string",
-      "minLength": 1
+      "type": "string"
     },
     "targets": {
       "items": {
@@ -369,7 +368,6 @@
   "type": "object",
   "required": [
     "version",
-    "schema",
     "targets"
   ],
   "title": "VDL Config Schema",

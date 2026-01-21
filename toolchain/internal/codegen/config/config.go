@@ -1,9 +1,13 @@
 package config
 
 import (
+	_ "embed"
+	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/kaptinlin/jsonschema"
 	"gopkg.in/yaml.v3"
 )
 
@@ -15,9 +19,12 @@ const (
 	TargetPlayground = "playground"
 )
 
+//go:embed config.schema.json
+var schemaJSON []byte
+
 type VDLConfig struct {
 	Version int            `yaml:"version" json:"version" jsonschema:"required,const=1"`
-	Schema  string         `yaml:"schema" json:"schema" jsonschema:"required,description=Path to the default global VDL schema file."`
+	Schema  string         `yaml:"schema" json:"schema,omitempty" jsonschema:"description=Path to the default global VDL schema file."`
 	Targets []TargetConfig `yaml:"targets" json:"targets" jsonschema:"required,minItems=1"`
 }
 
@@ -35,17 +42,58 @@ func LoadConfig(path string) (*VDLConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
+	return ParseConfig(data)
+}
 
+// ParseConfig parses and validates VDL configuration from bytes.
+func ParseConfig(data []byte) (*VDLConfig, error) {
+	// 1. Validate against JSON Schema (YAML -> JSON -> Schema)
+	if err := ValidateSchema(data); err != nil {
+		return nil, fmt.Errorf("config validation failed: %w", err)
+	}
+
+	// 2. Parse YAML
 	var cfg VDLConfig
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
+	// 3. Logical validation
 	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
+}
+
+// ValidateSchema converts YAML to JSON and validates it against the embedded schema.
+func ValidateSchema(yamlData []byte) error {
+	var raw any
+	if err := yaml.Unmarshal(yamlData, &raw); err != nil {
+		return fmt.Errorf("invalid yaml: %w", err)
+	}
+
+	jsonData, err := json.Marshal(raw)
+	if err != nil {
+		return fmt.Errorf("failed to convert yaml to json: %w", err)
+	}
+
+	compiler := jsonschema.NewCompiler()
+	schema, err := compiler.Compile(schemaJSON)
+	if err != nil {
+		return fmt.Errorf("internal error: invalid embedded schema: %w", err)
+	}
+
+	result := schema.Validate(jsonData)
+	if !result.IsValid() {
+		var parts []string
+		for path, err := range result.Errors {
+			parts = append(parts, fmt.Sprintf("%s: %s", path, err.Message))
+		}
+		return fmt.Errorf("%s", strings.Join(parts, "; "))
+	}
+
+	return nil
 }
 
 func (c *VDLConfig) validate() error {
@@ -59,7 +107,7 @@ func (c *VDLConfig) validate() error {
 			t.Schema = c.Schema
 		}
 		if t.Schema == "" {
-			return fmt.Errorf("target #%d (%s): no schema defined", i, t.Target)
+			return fmt.Errorf("target #%d (%s): no schema defined (must be defined globally or locally)", i, t.Target)
 		}
 		if err := t.decodeOptions(); err != nil {
 			return fmt.Errorf("target #%d (%s): %w", i, t.Target, err)

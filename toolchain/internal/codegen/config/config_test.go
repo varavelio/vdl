@@ -2,27 +2,17 @@ package config
 
 import (
 	"embed"
-	"encoding/json"
 	"io/fs"
 	"strings"
 	"testing"
 
-	"github.com/kaptinlin/jsonschema"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v3"
 )
-
-//go:embed config.schema.json
-var schemaJSON []byte
 
 //go:embed testdata/*.yaml
 var testdataFS embed.FS
 
 func TestConfigSchema_AllTestFiles(t *testing.T) {
-	compiler := jsonschema.NewCompiler()
-	schema, err := compiler.Compile(schemaJSON)
-	require.NoError(t, err, "failed to compile schema")
-
 	entries, err := fs.ReadDir(testdataFS, "testdata")
 	require.NoError(t, err, "failed to read testdata directory")
 
@@ -49,13 +39,15 @@ func TestConfigSchema_AllTestFiles(t *testing.T) {
 
 		testName := friendlyTestName(entry.Name())
 		t.Run(testName, func(t *testing.T) {
-			data := loadTestdataAsJSON(t, entry.Name())
-			result := schema.Validate(data)
+			data, err := testdataFS.ReadFile("testdata/" + entry.Name())
+			require.NoError(t, err, "failed to read test file")
+
+			_, err = ParseConfig(data)
 
 			if shouldBeValid {
-				require.True(t, result.IsValid(), "expected valid but got errors: %v", formatErrors(result))
+				require.NoError(t, err, "expected valid config but got error")
 			} else {
-				require.False(t, result.IsValid(), "expected invalid config to fail validation")
+				require.Error(t, err, "expected invalid config to fail validation")
 			}
 		})
 	}
@@ -73,39 +65,6 @@ func TestTargetConstants(t *testing.T) {
 		require.Equal(t, "openapi", TargetOpenAPI)
 		require.Equal(t, "playground", TargetPlayground)
 	})
-}
-
-func loadTestdataAsJSON(t *testing.T, filename string) any {
-	t.Helper()
-
-	yamlData, err := testdataFS.ReadFile("testdata/" + filename)
-	require.NoError(t, err, "failed to read testdata file: %s", filename)
-
-	var data any
-	err = yaml.Unmarshal(yamlData, &data)
-	require.NoError(t, err, "failed to parse YAML: %s", filename)
-
-	// Convert to JSON and back to ensure proper type handling for the validator.
-	jsonData, err := json.Marshal(data)
-	require.NoError(t, err, "failed to convert to JSON: %s", filename)
-
-	var result any
-	err = json.Unmarshal(jsonData, &result)
-	require.NoError(t, err, "failed to parse JSON: %s", filename)
-
-	return result
-}
-
-func formatErrors(result *jsonschema.EvaluationResult) string {
-	if result.IsValid() {
-		return ""
-	}
-
-	var parts []string
-	for path, err := range result.Errors {
-		parts = append(parts, path+": "+err.Message)
-	}
-	return strings.Join(parts, "; ")
 }
 
 func friendlyTestName(filename string) string {

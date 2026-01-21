@@ -72,7 +72,7 @@ func (targetWrapper) JSONSchema() *jsonschema.Schema {
 
 type configSchema struct {
 	Version int             `json:"version" jsonschema:"const=1"`
-	Schema  string          `json:"schema" jsonschema:"minLength=1"`
+	Schema  string          `json:"schema,omitempty"`
 	Targets []targetWrapper `json:"targets" jsonschema:"minItems=1"`
 }
 
