@@ -1,0 +1,15 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - target: openapi
+    output: ./gen/docs
+    clean: true
+    options:
+      filename: api-spec.yaml
+      title: Complete API
+      version: "2.0.0"
+      description: A complete API specification
+      base_url: https://api.example.com/v2
+      contact_name: API Team
+      contact_email: api@example.com
+      license_name: MIT

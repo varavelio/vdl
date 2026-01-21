@@ -1,0 +1,9 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - target: go
+    output: ./gen/go
+    options:
+      package: mypkg
+  - target: invalid_target
+    output: ./gen/invalid

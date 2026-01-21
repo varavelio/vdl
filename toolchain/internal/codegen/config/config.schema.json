@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vdl.varavel.com/schemas/v0/config.schema.json",
+  "$defs": {
+    "DartOptions": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://github.com/varavelio/vdl/toolchain/internal/codegen/config/dart-options",
+      "properties": {
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        },
+        "package": {
+          "type": "string",
+          "description": "The name of the Dart package."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "package"
+      ]
+    },
+    "DartTarget": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "target": {
+          "type": "string",
+          "const": "dart"
+        },
+        "options": {
+          "$ref": "#/$defs/DartOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "target"
+      ]
+    },
+    "GoOptions": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://github.com/varavelio/vdl/toolchain/internal/codegen/config/go-options",
+      "properties": {
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        },
+        "package": {
+          "type": "string",
+          "description": "The Go package name to use in generated files."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "package"
+      ]
+    },
+    "GoTarget": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "target": {
+          "type": "string",
+          "const": "go"
+        },
+        "options": {
+          "$ref": "#/$defs/GoOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "target"
+      ]
+    },
+    "OpenAPIOptions": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://github.com/varavelio/vdl/toolchain/internal/codegen/config/open-api-options",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "description": "The name of the output file.",
+          "default": "openapi.json"
+        },
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "contact_name": {
+          "type": "string"
+        },
+        "contact_email": {
+          "type": "string"
+        },
+        "license_name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "title",
+        "version"
+      ]
+    },
+    "OpenAPITarget": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "target": {
+          "type": "string",
+          "const": "openapi"
+        },
+        "options": {
+          "$ref": "#/$defs/OpenAPIOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "target"
+      ]
+    },
+    "PlaygroundOptions": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://github.com/varavelio/vdl/toolchain/internal/codegen/config/playground-options",
+      "properties": {
+        "default_base_url": {
+          "type": "string"
+        },
+        "default_headers": {
+          "items": {
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "key",
+              "value"
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PlaygroundTarget": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "target": {
+          "type": "string",
+          "const": "playground"
+        },
+        "options": {
+          "$ref": "#/$defs/PlaygroundOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "target"
+      ]
+    },
+    "TsTarget": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "target": {
+          "type": "string",
+          "const": "typescript"
+        },
+        "options": {
+          "$ref": "#/$defs/TypeScriptOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "target"
+      ]
+    },
+    "TypeScriptOptions": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://github.com/varavelio/vdl/toolchain/internal/codegen/config/type-script-options",
+      "properties": {
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "targetWrapper": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/GoTarget"
+        },
+        {
+          "$ref": "#/$defs/TsTarget"
+        },
+        {
+          "$ref": "#/$defs/DartTarget"
+        },
+        {
+          "$ref": "#/$defs/OpenAPITarget"
+        },
+        {
+          "$ref": "#/$defs/PlaygroundTarget"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/targetWrapper"
+      },
+      "type": "array",
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "version",
+    "schema",
+    "targets"
+  ],
+  "title": "VDL Config Schema",
+  "description": "JSON Schema for the VDL Config"
+}

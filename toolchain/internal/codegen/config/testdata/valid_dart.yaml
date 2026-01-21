@@ -1,0 +1,9 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - target: dart
+    output: ./gen/dart
+    options:
+      gen_client: true
+      gen_server: false
+      package: my_dart_pkg

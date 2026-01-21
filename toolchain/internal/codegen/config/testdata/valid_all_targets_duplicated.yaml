@@ -1,0 +1,33 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - target: go
+    output: ./a
+  - target: go
+    output: ./b
+  - target: typescript
+    output: ./c
+  - target: typescript
+    output: ./d
+  - target: dart
+    output: ./e
+    options:
+      package: pkg
+  - target: dart
+    output: ./f
+    options:
+      package: pkg2
+  - target: openapi
+    output: ./g
+    options:
+      title: API 1
+      version: "1.0"
+  - target: openapi
+    output: ./h
+    options:
+      title: API 2
+      version: "2.0"
+  - target: playground
+    output: ./i
+  - target: playground
+    output: ./j

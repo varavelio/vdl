@@ -10,4 +10,5 @@ package main
 
 func main() {
 	generateIRSchema()
+	generateConfigSchema()
 }
