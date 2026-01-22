@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,11 +12,8 @@ import (
 )
 
 func generateIRSchema() {
-	// schemaID is the canonical URL for the IR JSON Schema.
-	schemaID := fmt.Sprintf("https://vdl.varavel.com/schemas/v%s/ir.schema.json", version.VersionMajor)
-
 	schema := (&jsonschema.Reflector{}).Reflect(&ir.Schema{})
-	schema.ID = jsonschema.ID(schemaID)
+	schema.ID = jsonschema.ID(version.SchemaIRID)
 	schema.Title = "VDL IR Schema"
 	schema.Description = "JSON Schema for the VDL Intermediate Representation"
 
