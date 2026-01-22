@@ -34,7 +34,6 @@ func ToSnakeCase(str string) string {
 		if i > 0 && !lastWasUnderscore {
 			if shouldInsertUnderscore(runes, i) {
 				sb.WriteRune('_')
-				lastWasUnderscore = true
 			}
 		}
 
