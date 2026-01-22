@@ -11,6 +11,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+//go:embed config.schema.json
+var schemaJSON []byte
+
 const (
 	TargetGo         = "go"
 	TargetTypeScript = "typescript"
@@ -18,9 +21,6 @@ const (
 	TargetOpenAPI    = "openapi"
 	TargetPlayground = "playground"
 )
-
-//go:embed config.schema.json
-var schemaJSON []byte
 
 type VDLConfig struct {
 	Version int            `yaml:"version" json:"version" jsonschema:"required,const=1"`
@@ -37,6 +37,68 @@ type TargetConfig struct {
 	ParsedOptions any       `yaml:"-" json:"-"`
 }
 
+// BaseCodeOptions defines standard options shared across code generators.
+type BaseCodeOptions struct {
+	GenClient   bool  `yaml:"gen_client" json:"gen_client,omitempty" jsonschema:"default=false,description=Generate RPC client code."`
+	GenServer   bool  `yaml:"gen_server" json:"gen_server,omitempty" jsonschema:"default=false,description=Generate RPC server interfaces and handlers."`
+	GenPatterns *bool `yaml:"gen_patterns" json:"gen_patterns,omitempty" jsonschema:"default=true,description=Generate helper functions for patterns."`
+	GenConsts   *bool `yaml:"gen_consts" json:"gen_consts,omitempty" jsonschema:"default=true,description=Generate constant definitions."`
+}
+
+// ShouldGenPatterns returns true if patterns should be generated (default: true).
+func (b BaseCodeOptions) ShouldGenPatterns() bool {
+	if b.GenPatterns == nil {
+		return true
+	}
+	return *b.GenPatterns
+}
+
+// ShouldGenConsts returns true if constants should be generated (default: true).
+func (b BaseCodeOptions) ShouldGenConsts() bool {
+	if b.GenConsts == nil {
+		return true
+	}
+	return *b.GenConsts
+}
+
+// GoOptions contains configuration for the Go target.
+type GoOptions struct {
+	BaseCodeOptions `yaml:",inline" json:",inline"`
+	Package         string `yaml:"package" json:"package" jsonschema:"required,description=The Go package name to use in generated files."`
+}
+
+// TypeScriptOptions contains configuration for the TypeScript target.
+type TypeScriptOptions struct {
+	BaseCodeOptions `yaml:",inline" json:",inline"`
+}
+
+// DartOptions contains configuration for the Dart target.
+type DartOptions struct {
+	BaseCodeOptions `yaml:",inline" json:",inline"`
+	Package         string `yaml:"package" json:"package" jsonschema:"required,description=The name of the Dart package."`
+}
+
+// OpenAPIOptions contains configuration for the OpenAPI target.
+type OpenAPIOptions struct {
+	Filename     string `yaml:"filename" json:"filename,omitempty" jsonschema:"default=openapi.json,description=The name of the output file."`
+	Title        string `yaml:"title" json:"title" jsonschema:"required"`
+	Version      string `yaml:"version" json:"version" jsonschema:"required"`
+	Description  string `yaml:"description" json:"description,omitempty"`
+	BaseURL      string `yaml:"base_url" json:"base_url,omitempty"`
+	ContactName  string `yaml:"contact_name" json:"contact_name,omitempty"`
+	ContactEmail string `yaml:"contact_email" json:"contact_email,omitempty"`
+	LicenseName  string `yaml:"license_name" json:"license_name,omitempty"`
+}
+
+// PlaygroundOptions contains configuration for the Playground target.
+type PlaygroundOptions struct {
+	DefaultBaseURL string `yaml:"default_base_url" json:"default_base_url,omitempty"`
+	DefaultHeaders []struct {
+		Key   string `yaml:"key" json:"key"`
+		Value string `yaml:"value" json:"value"`
+	} `yaml:"default_headers" json:"default_headers,omitempty"`
+}
+
 func LoadConfig(path string) (*VDLConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -47,74 +109,71 @@ func LoadConfig(path string) (*VDLConfig, error) {
 
 // ParseConfig parses and validates VDL configuration from bytes.
 func ParseConfig(data []byte) (*VDLConfig, error) {
-	// 1. Validate against JSON Schema (YAML -> JSON -> Schema)
-	if err := ValidateSchema(data); err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
-	}
-
-	// 2. Parse YAML
-	var cfg VDLConfig
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, fmt.Errorf("failed to parse config file: %w", err)
-	}
-
-	// 3. Logical validation
-	if err := cfg.validate(); err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
+	return Validate(data)
 }
 
-// ValidateSchema converts YAML to JSON and validates it against the embedded schema.
-func ValidateSchema(yamlData []byte) error {
+// Validate parses and validates VDL configuration from bytes.
+// It combines schema validation, unmarshaling, and logical validation.
+func Validate(data []byte) (*VDLConfig, error) {
+	// 1. Parse YAML into Node (Intermediate representation)
+	// This avoids parsing the YAML text twice.
+	var node yaml.Node
+	if err := yaml.Unmarshal(data, &node); err != nil {
+		return nil, fmt.Errorf("failed to parse yaml: %w", err)
+	}
+
+	// 2. Validate against JSON Schema
+	// We first decode the node into a generic map/interface to convert to JSON,
+	// because jsonschema requires JSON data (or equivalent interface).
 	var raw any
-	if err := yaml.Unmarshal(yamlData, &raw); err != nil {
-		return fmt.Errorf("invalid yaml: %w", err)
+	if err := node.Decode(&raw); err != nil {
+		return nil, fmt.Errorf("failed to decode yaml for validation: %w", err)
 	}
 
 	jsonData, err := json.Marshal(raw)
 	if err != nil {
-		return fmt.Errorf("failed to convert yaml to json: %w", err)
+		return nil, fmt.Errorf("failed to convert yaml to json: %w", err)
 	}
 
 	compiler := jsonschema.NewCompiler()
 	schema, err := compiler.Compile(schemaJSON)
 	if err != nil {
-		return fmt.Errorf("internal error: invalid embedded schema: %w", err)
+		return nil, fmt.Errorf("internal error: invalid embedded schema: %w", err)
 	}
 
-	result := schema.Validate(jsonData)
-	if !result.IsValid() {
+	if result := schema.Validate(jsonData); !result.IsValid() {
 		var parts []string
 		for path, err := range result.Errors {
 			parts = append(parts, fmt.Sprintf("%s: %s", path, err.Message))
 		}
-		return fmt.Errorf("%s", strings.Join(parts, "; "))
+		return nil, fmt.Errorf("%s", strings.Join(parts, "; "))
 	}
 
-	return nil
-}
-
-func (c *VDLConfig) validate() error {
-	if c.Version != 1 {
-		return fmt.Errorf("unsupported version: %d", c.Version)
+	// 3. Decode into VDLConfig Struct
+	var cfg VDLConfig
+	if err := node.Decode(&cfg); err != nil {
+		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
-	for i := range c.Targets {
-		t := &c.Targets[i]
+	// 4. Logical validation
+	if cfg.Version != 1 {
+		return nil, fmt.Errorf("unsupported version: %d", cfg.Version)
+	}
+
+	for i := range cfg.Targets {
+		t := &cfg.Targets[i]
 		if t.Schema == "" {
-			t.Schema = c.Schema
+			t.Schema = cfg.Schema
 		}
 		if t.Schema == "" {
-			return fmt.Errorf("target #%d (%s): no schema defined (must be defined globally or locally)", i, t.Target)
+			return nil, fmt.Errorf("target #%d (%s): no schema defined (must be defined globally or locally)", i, t.Target)
 		}
 		if err := t.decodeOptions(); err != nil {
-			return fmt.Errorf("target #%d (%s): %w", i, t.Target, err)
+			return nil, fmt.Errorf("target #%d (%s): %w", i, t.Target, err)
 		}
 	}
 
-	return nil
+	return &cfg, nil
 }
 
 func (t *TargetConfig) decodeOptions() error {
