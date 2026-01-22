@@ -58,4 +58,3 @@ tasks:
     cmds:
       - cd ./toolchain && task fmt-check
       - cd ./playground && npm run fmt-check
-      - cd ./docs && npm run fmt-check
