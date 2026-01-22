@@ -1,17 +1,19 @@
 // VDL Schema example
-// More info: https://github.com/varavelio/vdl
+// More info: https://vdl.varavel.com
 
 type FooType {
   firstField: string
   secondField: int[]
 }
 
-proc BarProc {
-  input {
-    foo: FooType
-  }
+rpc MyRpc {
+  proc BarProc {
+    input {
+      foo: FooType
+    }
 
-  output {
-    baz: bool
+    output {
+      baz: bool
+    }
   }
 }
