@@ -85,9 +85,9 @@
           </ul>
 
           <p class="text-base-content/80 leading-relaxed">
-            VDL is provided "AS IS" without warranty of any kind. The
-            authors assume no responsibility for damages or losses from using
-            this software. You are responsible for testing generated code before
+            VDL is provided "AS IS" without warranty of any kind. The authors
+            assume no responsibility for damages or losses from using this
+            software. You are responsible for testing generated code before
             production use.
           </p>
         </div>
@@ -99,8 +99,7 @@
         <h2 class="card-title mb-4 text-2xl">Dependencies</h2>
         <div class="space-y-4">
           <p class="text-base-content/80 leading-relaxed">
-            VDL is possible thanks to the following awesome open-source
-            projects
+            VDL is possible thanks to the following awesome open-source projects
           </p>
 
           <ul class="list-inside list-disc">
