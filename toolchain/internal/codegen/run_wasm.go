@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
@@ -16,14 +17,16 @@ import (
 // RunWasmOptions contains options for running code generators in WASM mode
 // without writing to files.
 type RunWasmOptions struct {
-	// Generator must be one of: "golang-server", "golang-client", "typescript-client", "dart-client".
+	// Generator must be one of: "go", "typescript", "dart".
 	Generator string `json:"generator"`
 	// SchemaInput is the schema content as a string (VDL schema only).
 	SchemaInput string `json:"schemaInput"`
-	// GolangPackageName is required when Generator is golang-server or golang-client.
-	GolangPackageName string `json:"golangPackageName"`
-	// DartPackageName is required when Generator is dart-client.
-	DartPackageName string `json:"dartPackageName"`
+	// PackageName is required for "go" and "dart" generators.
+	PackageName string `json:"packageName"`
+	// GoGenClient determines if the Go client should be generated (default: false).
+	GoGenClient bool `json:"goGenClient"`
+	// GoGenServer determines if the Go server should be generated (default: false).
+	GoGenServer bool `json:"goGenServer"`
 }
 
 // RunWasmOutputFile is a single generated file.
@@ -86,53 +89,62 @@ func runWasm(opts RunWasmOptions) (RunWasmOutput, error) {
 
 	ctx := context.Background()
 
-	if opts.Generator == "golang-server" {
-		if opts.GolangPackageName == "" {
-			return RunWasmOutput{}, fmt.Errorf("golang-server requires 'GolangPackageName'")
+	switch opts.Generator {
+	case "go":
+		if opts.PackageName == "" {
+			return RunWasmOutput{}, fmt.Errorf("go generator requires 'packageName'")
 		}
-		cfg := golang.Config{PackageName: opts.GolangPackageName, IncludeServer: true, IncludeClient: false}
+		cfg := &config.GoConfig{
+			Package: opts.PackageName,
+			CommonConfig: config.CommonConfig{
+				Output: "vdl.go",
+			},
+			ServerConfig: config.ServerConfig{GenServer: opts.GoGenServer},
+			ClientConfig: config.ClientConfig{GenClient: opts.GoGenClient},
+		}
 		gen := golang.New(cfg)
 		files, err := gen.Generate(ctx, schema)
 		if err != nil {
-			return RunWasmOutput{}, fmt.Errorf("failed to generate golang server: %s", err)
+			return RunWasmOutput{}, fmt.Errorf("failed to generate go code: %s", err)
 		}
 		return convertGolangFiles(files), nil
-	}
 
-	if opts.Generator == "golang-client" {
-		if opts.GolangPackageName == "" {
-			return RunWasmOutput{}, fmt.Errorf("golang-client requires 'GolangPackageName'")
+	case "typescript":
+		cfg := &config.TypeScriptConfig{
+			CommonConfig: config.CommonConfig{
+				Output: "src",
+			},
+			ClientConfig: config.ClientConfig{GenClient: true},
+			ServerConfig: config.ServerConfig{GenServer: false},
 		}
-		cfg := golang.Config{PackageName: opts.GolangPackageName, IncludeServer: false, IncludeClient: true}
-		gen := golang.New(cfg)
-		files, err := gen.Generate(ctx, schema)
-		if err != nil {
-			return RunWasmOutput{}, fmt.Errorf("failed to generate golang client: %s", err)
-		}
-		return convertGolangFiles(files), nil
-	}
-
-	if opts.Generator == "typescript-client" {
-		cfg := typescript.Config{IncludeServer: false, IncludeClient: true}
 		gen := typescript.New(cfg)
 		files, err := gen.Generate(ctx, schema)
 		if err != nil {
-			return RunWasmOutput{}, fmt.Errorf("failed to generate typescript client: %s", err)
+			return RunWasmOutput{}, fmt.Errorf("failed to generate typescript code: %s", err)
 		}
 		return convertTypescriptFiles(files), nil
-	}
 
-	if opts.Generator == "dart-client" {
-		cfg := dart.Config{PackageName: opts.DartPackageName}
+	case "dart":
+		if opts.PackageName == "" {
+			return RunWasmOutput{}, fmt.Errorf("dart generator requires 'packageName'")
+		}
+		cfg := &config.DartConfig{
+			Package: opts.PackageName,
+			CommonConfig: config.CommonConfig{
+				Output: "lib",
+			},
+			ClientConfig: config.ClientConfig{GenClient: true},
+		}
 		gen := dart.New(cfg)
 		files, err := gen.Generate(ctx, schema)
 		if err != nil {
-			return RunWasmOutput{}, fmt.Errorf("failed to generate dart client: %s", err)
+			return RunWasmOutput{}, fmt.Errorf("failed to generate dart code: %s", err)
 		}
 		return convertDartFiles(files), nil
-	}
 
-	return RunWasmOutput{}, fmt.Errorf("unsupported generator: %s", opts.Generator)
+	default:
+		return RunWasmOutput{}, fmt.Errorf("unsupported generator: %s", opts.Generator)
+	}
 }
 
 // convertGolangFiles converts golang.File slice to RunWasmOutput.

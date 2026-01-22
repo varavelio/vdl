@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
@@ -20,93 +21,94 @@ import (
 
 // Run runs the code generator and returns an error if one occurred.
 func Run(configPath string) error {
-	configBytes, err := os.ReadFile(configPath)
-	if err != nil {
-		return fmt.Errorf("failed to read %s config file: %s", configPath, err)
-	}
-
-	config := Config{}
-	if err := config.UnmarshalAndValidate(configBytes); err != nil {
-		return fmt.Errorf("failed to unmarshal config: %w", err)
-	}
-
-	///////////////////////////////////////
-	// PARSE AND ANALYZE THE VDL SCHEMA  //
-	///////////////////////////////////////
-
+	// Normalize config path first to ensure we resolve relative paths correctly
 	absConfigPath, err := filepathutil.NormalizeFromWD(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to normalize config path: %w", err)
 	}
-
 	absConfigDir := filepath.Dir(absConfigPath)
-	absSchemaPath := filepath.Join(absConfigDir, config.Schema)
 
-	// Create virtual filesystem and analyze
-	fs := vfs.New()
-	program, diagnostics := analysis.Analyze(fs, absSchemaPath)
-	if len(diagnostics) > 0 {
-		// Collect all error messages
-		var errMsgs []string
-		for _, d := range diagnostics {
-			errMsgs = append(errMsgs, d.String())
-		}
-		return fmt.Errorf("schema validation failed:\n%s", joinErrors(errMsgs))
+	cfg, err := config.LoadConfig(absConfigPath)
+	if err != nil {
+		return err
 	}
 
-	// Convert analysis.Program to IR Schema
-	schema := ir.FromProgram(program)
+	// Cache for parsed schemas to avoid reparsing the same file multiple times
+	schemaCache := make(map[string]*ir.Schema)
+	fs := vfs.New()
 
-	/////////////////////////
-	// RUN CODE GENERATORS //
-	/////////////////////////
+	// Helper to get or parse schema
+	getSchema := func(schemaPath string) (*ir.Schema, *vfs.FileSystem, error) {
+		// Schema path is relative to the config file
+		absSchemaPath := filepath.Join(absConfigDir, schemaPath)
+		if cached, ok := schemaCache[absSchemaPath]; ok {
+			return cached, fs, nil
+		}
+
+		program, diagnostics := analysis.Analyze(fs, absSchemaPath)
+		if len(diagnostics) > 0 {
+			var errMsgs []string
+			for _, d := range diagnostics {
+				errMsgs = append(errMsgs, d.String())
+			}
+			return nil, nil, fmt.Errorf("schema validation failed for %s:\n%s", absSchemaPath, joinErrors(errMsgs))
+		}
+
+		schema := ir.FromProgram(program)
+		schemaCache[absSchemaPath] = schema
+		return schema, fs, nil
+	}
 
 	ctx := context.Background()
 
-	if config.HasOpenAPI() {
-		if err := runOpenAPI(ctx, absConfigDir, config.OpenAPI, schema); err != nil {
-			return fmt.Errorf("failed to run openapi code generator: %w", err)
-		}
-	}
+	for i, target := range cfg.Targets {
+		// Note: validateAndSetDefaults ensures exactly one is set and Schema is populated.
+		// We pass the pointer to the config struct directly.
 
-	if config.HasPlayground() {
-		// Get formatted schema for playground
-		formattedSchema := getFormattedSchema(fs, absSchemaPath)
-		if err := runPlayground(ctx, absConfigDir, config.Playground, config.OpenAPI, schema, formattedSchema); err != nil {
-			return fmt.Errorf("failed to run playground code generator: %w", err)
-		}
-	}
+		if target.Go != nil {
+			schema, _, err := getSchema(target.Go.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runGolang(ctx, absConfigDir, target.Go, schema); err != nil {
+				return fmt.Errorf("target #%d (go): %w", i, err)
+			}
+		} else if target.TypeScript != nil {
+			schema, _, err := getSchema(target.TypeScript.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runTypeScript(ctx, absConfigDir, target.TypeScript, schema); err != nil {
+				return fmt.Errorf("target #%d (typescript): %w", i, err)
+			}
+		} else if target.Dart != nil {
+			schema, _, err := getSchema(target.Dart.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runDart(ctx, absConfigDir, target.Dart, schema); err != nil {
+				return fmt.Errorf("target #%d (dart): %w", i, err)
+			}
+		} else if target.OpenAPI != nil {
+			schema, _, err := getSchema(target.OpenAPI.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runOpenAPI(ctx, absConfigDir, target.OpenAPI, schema); err != nil {
+				return fmt.Errorf("target #%d (openapi): %w", i, err)
+			}
+		} else if target.Playground != nil {
+			schema, fsRef, err := getSchema(target.Playground.Schema)
+			if err != nil {
+				return err
+			}
+			// Playground needs formatted schema
+			absSchemaPath := filepath.Join(absConfigDir, target.Playground.Schema)
+			formatted := getFormattedSchema(fsRef, absSchemaPath)
 
-	if config.HasGolangServer() {
-		cfg := *config.GolangServer
-		cfg.IncludeServer = true
-		cfg.IncludeClient = false
-		if err := runGolang(ctx, absConfigDir, &cfg, schema); err != nil {
-			return fmt.Errorf("failed to run golang-server code generator: %w", err)
-		}
-	}
-
-	if config.HasGolangClient() {
-		cfg := *config.GolangClient
-		cfg.IncludeServer = false
-		cfg.IncludeClient = true
-		if err := runGolang(ctx, absConfigDir, &cfg, schema); err != nil {
-			return fmt.Errorf("failed to run golang-client code generator: %w", err)
-		}
-	}
-
-	if config.HasTypescriptClient() {
-		cfg := *config.TypescriptClient
-		cfg.IncludeServer = false
-		cfg.IncludeClient = true
-		if err := runTypescript(ctx, absConfigDir, &cfg, schema); err != nil {
-			return fmt.Errorf("failed to run typescript-client code generator: %w", err)
-		}
-	}
-
-	if config.HasDartClient() {
-		if err := runDart(ctx, absConfigDir, config.DartClient, schema); err != nil {
-			return fmt.Errorf("failed to run dart-client code generator: %w", err)
+			if err := runPlayground(ctx, absConfigDir, target.Playground, schema, formatted); err != nil {
+				return fmt.Errorf("target #%d (playground): %w", i, err)
+			}
 		}
 	}
 
@@ -138,9 +140,8 @@ func getFormattedSchema(fs *vfs.FileSystem, absSchemaPath string) string {
 	return formatted
 }
 
-func runOpenAPI(ctx context.Context, absConfigDir string, config openapi.Config, schema *ir.Schema) error {
-	outputFile := filepath.Join(absConfigDir, config.OutputFile)
-	outputDir := filepath.Dir(outputFile)
+func runOpenAPI(ctx context.Context, absConfigDir string, config *config.OpenAPIConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, config.Output)
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
@@ -165,19 +166,16 @@ func runOpenAPI(ctx context.Context, absConfigDir string, config openapi.Config,
 	return nil
 }
 
-func runPlayground(ctx context.Context, absConfigDir string, config *playground.Config, openAPIConfig openapi.Config, schema *ir.Schema, formattedSchema string) error {
-	outputDir := filepath.Join(absConfigDir, config.OutputDir)
+func runPlayground(ctx context.Context, absConfigDir string, playgroundConfig *config.PlaygroundConfig, schema *ir.Schema, formattedSchema string) error {
+	outputDir := filepath.Join(absConfigDir, playgroundConfig.Output)
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	// Set the formatted schema in the config
-	config.FormattedSchema = formattedSchema
-
 	// Generate the playground using new Generator interface
-	gen := playground.New(*config)
+	gen := playground.New(playgroundConfig, formattedSchema)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate playground: %w", err)
@@ -196,33 +194,30 @@ func runPlayground(ctx context.Context, absConfigDir string, config *playground.
 	}
 
 	// Generate the openapi.yaml file for the playground
-	openAPIOutputFile := filepath.Join(outputDir, "openapi.yaml")
-	openAPIConfig.OutputFile = "openapi.yaml"
-	if openAPIConfig.BaseURL == "" {
-		openAPIConfig.BaseURL = config.DefaultBaseURL
+	// Synthesize an OpenAPI config
+	openAPIConfig := &config.OpenAPIConfig{
+		CommonConfig: config.CommonConfig{
+			Output: playgroundConfig.Output,
+			Schema: playgroundConfig.Schema,
+		},
+		Filename: "openapi.yaml",
+		Title:    "VDL API",
+		Version:  "1.0.0",
+		BaseURL:  playgroundConfig.DefaultBaseURL,
 	}
 
-	openAPIGen := openapi.New(openAPIConfig)
-	openAPIFiles, err := openAPIGen.Generate(ctx, schema)
-	if err != nil {
-		return fmt.Errorf("failed to generate openapi.yaml code: %w", err)
+	// Re-use runOpenAPI logic? No, runOpenAPI calculates path relative to absConfigDir.
+	// Here playgroundConfig.Output is already relative to absConfigDir.
+	// So we can call runOpenAPI directly!
+	if err := runOpenAPI(ctx, absConfigDir, openAPIConfig, schema); err != nil {
+		return fmt.Errorf("failed to generate openapi.yaml for playground: %w", err)
 	}
-
-	for _, file := range openAPIFiles {
-		outPath := filepath.Join(outputDir, file.RelativePath)
-		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated openapi.yaml code to file: %w", err)
-		}
-	}
-
-	_ = openAPIOutputFile // Silence unused variable warning
 
 	return nil
 }
 
-func runGolang(ctx context.Context, absConfigDir string, config *golang.Config, schema *ir.Schema) error {
-	outputFile := filepath.Join(absConfigDir, config.OutputFile)
-	outputDir := filepath.Dir(outputFile)
+func runGolang(ctx context.Context, absConfigDir string, config *config.GoConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, config.Output)
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
@@ -230,7 +225,7 @@ func runGolang(ctx context.Context, absConfigDir string, config *golang.Config, 
 	}
 
 	// Generate the code using new Generator interface
-	gen := golang.New(*config)
+	gen := golang.New(config)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
@@ -251,9 +246,8 @@ func runGolang(ctx context.Context, absConfigDir string, config *golang.Config, 
 	return nil
 }
 
-func runTypescript(ctx context.Context, absConfigDir string, config *typescript.Config, schema *ir.Schema) error {
-	outputFile := filepath.Join(absConfigDir, config.OutputFile)
-	outputDir := filepath.Dir(outputFile)
+func runTypeScript(ctx context.Context, absConfigDir string, config *config.TypeScriptConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, config.Output)
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
@@ -261,7 +255,7 @@ func runTypescript(ctx context.Context, absConfigDir string, config *typescript.
 	}
 
 	// Generate the code using new Generator interface
-	gen := typescript.New(*config)
+	gen := typescript.New(config)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
@@ -282,8 +276,8 @@ func runTypescript(ctx context.Context, absConfigDir string, config *typescript.
 	return nil
 }
 
-func runDart(ctx context.Context, absConfigDir string, config *dart.Config, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.OutputDir)
+func runDart(ctx context.Context, absConfigDir string, config *config.DartConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, config.Output)
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
@@ -291,7 +285,7 @@ func runDart(ctx context.Context, absConfigDir string, config *dart.Config, sche
 	}
 
 	// Generate the code using new Generator interface
-	gen := dart.New(*config)
+	gen := dart.New(config)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)

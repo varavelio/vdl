@@ -14,6 +14,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
+	"gopkg.in/yaml.v3"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -56,27 +57,37 @@ func TestGenerate_Golden(t *testing.T) {
 			require.NoError(t, err)
 			require.Len(t, files, 1)
 
-			got := files[0].Content
+			gotBytes := files[0].Content
 
 			// Golden file path (same name, .yaml extension)
 			goldenPath := strings.TrimSuffix(input, ".vdl") + ".yaml"
 
 			// 4. Update or compare
 			if *update {
-				err := os.WriteFile(goldenPath, got, 0644)
+				err := os.WriteFile(goldenPath, gotBytes, 0644)
 				require.NoError(t, err)
 				t.Logf("updated golden file: %s", goldenPath)
 				return
 			}
 
 			// 5. Read and compare with golden
-			want, err := os.ReadFile(goldenPath)
+			wantBytes, err := os.ReadFile(goldenPath)
 			if os.IsNotExist(err) {
 				t.Fatalf("golden file not found: %s (run with -update to create)", goldenPath)
 			}
 			require.NoError(t, err)
 
-			assert.Equal(t, string(want), string(got))
+			// Perform structural comparison instead of string comparison
+			// to be resilient to formatting changes (e.g. Prettier)
+			var wantObj, gotObj any
+
+			err = yaml.Unmarshal(wantBytes, &wantObj)
+			require.NoError(t, err, "failed to unmarshal golden file")
+
+			err = yaml.Unmarshal(gotBytes, &gotObj)
+			require.NoError(t, err, "failed to unmarshal generated output")
+
+			assert.Equal(t, wantObj, gotObj)
 		})
 	}
 }
