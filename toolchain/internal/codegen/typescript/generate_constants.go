@@ -4,11 +4,16 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// generateConstants generates TypeScript constant definitions.
-func generateConstants(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+func generateConstants(schema *ir.Schema, _ *flatSchema, config *config.TypeScriptConfig) (string, error) {
+	if !config.ShouldGenConsts() {
+		return "", nil
+	}
+
 	if len(schema.Constants) == 0 {
 		return "", nil
 	}
@@ -21,48 +26,36 @@ func generateConstants(schema *ir.Schema, _ *flatSchema, _ Config) (string, erro
 	g.Break()
 
 	for _, constant := range schema.Constants {
-		renderConstant(g, constant)
+		generateConstant(g, constant)
 	}
 
 	return g.String(), nil
 }
 
-// renderConstant renders a single constant definition.
-func renderConstant(g *gen.Generator, constant ir.Constant) {
-	// Generate doc comment
+// generateConstant generates TypeScript code for a single constant.
+func generateConstant(g *gen.Generator, constant ir.Constant) {
+	// Documentation
 	if constant.Doc != "" {
-		g.Linef("/**")
-		renderPartialMultilineComment(g, strings.TrimSpace(constant.Doc))
-		if constant.Deprecated != nil {
-			renderDeprecated(g, constant.Deprecated)
-		}
-		g.Linef(" */")
-	} else if constant.Deprecated != nil {
-		g.Linef("/**")
-		renderDeprecated(g, constant.Deprecated)
-		g.Linef(" */")
+		doc := strings.TrimSpace(strutil.NormalizeIndent(constant.Doc))
+		renderMultilineComment(g, doc)
 	}
 
-	// Determine the TypeScript type and value format
-	var tsType, tsValue string
+	// Deprecation
+	renderDeprecated(g, constant.Deprecated)
+
+	// Constant definition
 	switch constant.ValueType {
 	case ir.ConstValueTypeString:
-		tsType = "string"
-		tsValue = `"` + constant.Value + `"`
+		g.Linef("export const %s: string = %q;", constant.Name, constant.Value)
 	case ir.ConstValueTypeInt:
-		tsType = "number"
-		tsValue = constant.Value
+		g.Linef("export const %s: number = %s;", constant.Name, constant.Value)
 	case ir.ConstValueTypeFloat:
-		tsType = "number"
-		tsValue = constant.Value
+		g.Linef("export const %s: number = %s;", constant.Name, constant.Value)
 	case ir.ConstValueTypeBool:
-		tsType = "boolean"
-		tsValue = constant.Value
+		g.Linef("export const %s: boolean = %s;", constant.Name, constant.Value)
 	default:
-		tsType = "unknown"
-		tsValue = constant.Value
+		// Fallback: treat as string
+		g.Linef("export const %s: string = %q;", constant.Name, constant.Value)
 	}
-
-	g.Linef("export const %s: %s = %s;", constant.Name, tsType, tsValue)
 	g.Break()
 }

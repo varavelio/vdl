@@ -5,11 +5,17 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // generatePatterns generates TypeScript pattern template functions.
-func generatePatterns(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+func generatePatterns(schema *ir.Schema, _ *flatSchema, config *config.TypeScriptConfig) (string, error) {
+	if !config.ShouldGenPatterns() {
+		return "", nil
+	}
+
 	if len(schema.Patterns) == 0 {
 		return "", nil
 	}
@@ -32,12 +38,8 @@ func generatePatterns(schema *ir.Schema, _ *flatSchema, _ Config) (string, error
 func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 	// Generate doc comment
 	if pattern.Doc != "" {
-		g.Linef("/**")
-		renderPartialMultilineComment(g, strings.TrimSpace(pattern.Doc))
-		if pattern.Deprecated != nil {
-			renderDeprecated(g, pattern.Deprecated)
-		}
-		g.Linef(" */")
+		doc := strings.TrimSpace(strutil.NormalizeIndent(pattern.Doc))
+		renderMultilineComment(g, doc)
 	} else if pattern.Deprecated != nil {
 		g.Linef("/**")
 		renderDeprecated(g, pattern.Deprecated)
@@ -56,7 +58,7 @@ func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 		templateLiteral := convertPatternToTemplateLiteral(pattern.Template, pattern.Placeholders)
 		g.Linef("return %s;", templateLiteral)
 	})
-	g.Linef("}")
+	g.Line("}")
 	g.Break()
 }
 

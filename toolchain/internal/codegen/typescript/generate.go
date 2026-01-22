@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -17,11 +18,11 @@ type File struct {
 
 // Generator implements the TypeScript code generator.
 type Generator struct {
-	config Config
+	config *config.TypeScriptConfig
 }
 
 // New creates a new TypeScript generator with the given config.
-func New(config Config) *Generator {
+func New(config *config.TypeScriptConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -35,7 +36,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	// Flatten the schema for easier iteration
 	flat := flattenSchema(schema)
 
-	subGenerators := []func(*ir.Schema, *flatSchema, Config) (string, error){
+	subGenerators := []func(*ir.Schema, *flatSchema, *config.TypeScriptConfig) (string, error){
 		generateCoreTypes,
 		generateEnums,
 		generateConstants,
@@ -65,7 +66,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	generatedCode := builder.String()
 	generatedCode = strutil.LimitConsecutiveNewlines(generatedCode, 2)
 
-	outputFile := g.config.OutputFile
+	outputFile := g.config.Output
 	if outputFile == "" {
 		outputFile = "vdl.ts"
 	}

@@ -1,15 +1,16 @@
 package typescript
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// generateEnums generates TypeScript enum type definitions.
-func generateEnums(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+func generateEnums(schema *ir.Schema, _ *flatSchema, _ *config.TypeScriptConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}
@@ -17,82 +18,93 @@ func generateEnums(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	g.Line("// -----------------------------------------------------------------------------")
-	g.Line("// Enums")
+	g.Line("// Enumerations")
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
 	for _, enum := range schema.Enums {
-		renderEnum(g, enum)
+		generateEnum(g, enum)
 	}
 
 	return g.String(), nil
 }
 
-// renderEnum renders a single enum definition.
-func renderEnum(g *gen.Generator, enum ir.Enum) {
-	// Generate doc comment
+// generateEnum generates TypeScript code for a single enum type.
+// It generates:
+// 1. A type definition (union of literal types)
+// 2. An object holding the values (as constant)
+// 3. An array of all values
+// 4. A type guard function
+func generateEnum(g *gen.Generator, enum ir.Enum) {
+	// Documentation
 	if enum.Doc != "" {
-		g.Linef("/**")
-		renderPartialMultilineComment(g, strings.TrimSpace(enum.Doc))
-		if enum.Deprecated != nil {
-			renderDeprecated(g, enum.Deprecated)
-		}
-		g.Linef(" */")
-	} else if enum.Deprecated != nil {
-		g.Linef("/**")
-		renderDeprecated(g, enum.Deprecated)
-		g.Linef(" */")
+		doc := strings.TrimSpace(strutil.NormalizeIndent(enum.Doc))
+		renderMultilineComment(g, doc)
+	} else {
+		g.Linef("/** %s is an enumeration type. */", enum.Name)
 	}
 
-	// TypeScript enums as union types for better type safety
+	// Deprecation
+	renderDeprecated(g, enum.Deprecated)
+
+	// 1. Type definition
+	// export type Status = "active" | "inactive";
 	if len(enum.Members) == 0 {
 		g.Linef("export type %s = never;", enum.Name)
 	} else {
-		values := make([]string, len(enum.Members))
-		for i, member := range enum.Members {
+		var values []string
+		for _, member := range enum.Members {
 			if enum.ValueType == ir.EnumValueTypeString {
-				values[i] = fmt.Sprintf("\"%s\"", member.Value)
+				values = append(values, strconv.Quote(member.Value))
 			} else {
-				values[i] = member.Value
+				// Integer value
+				// Don't quote numbers in TS union types
+				values = append(values, member.Value)
 			}
 		}
 		g.Linef("export type %s = %s;", enum.Name, strings.Join(values, " | "))
 	}
 	g.Break()
 
-	// Generate const object with enum values for runtime access
+	// 2. Values object
+	// export const StatusValues = { Active: "active", Inactive: "inactive" } as const;
 	g.Linef("export const %sValues = {", enum.Name)
 	g.Block(func() {
 		for _, member := range enum.Members {
 			if enum.ValueType == ir.EnumValueTypeString {
-				g.Linef("%s: \"%s\",", member.Name, member.Value)
+				g.Linef("%s: %q,", member.Name, member.Value)
 			} else {
-				g.Linef("%s: %s,", member.Name, member.Value)
+				// Integer value
+				intVal, _ := strconv.Atoi(member.Value)
+				g.Linef("%s: %d,", member.Name, intVal)
 			}
 		}
 	})
-	g.Linef("} as const;")
+	g.Line("} as const;")
 	g.Break()
 
-	// Generate list of all enum values
+	// 3. List of values
+	// export const StatusList: Status[] = ["active", "inactive"];
 	g.Linef("export const %sList: %s[] = [", enum.Name, enum.Name)
 	g.Block(func() {
 		for _, member := range enum.Members {
 			if enum.ValueType == ir.EnumValueTypeString {
-				g.Linef("\"%s\",", member.Value)
+				g.Linef("%q,", member.Value)
 			} else {
+				// Integer value
 				g.Linef("%s,", member.Value)
 			}
 		}
 	})
-	g.Linef("];")
+	g.Line("];")
 	g.Break()
 
-	// Generate type guard function
+	// 4. Type guard
+	// export function isStatus(value: unknown): value is Status { ... }
 	g.Linef("export function is%s(value: unknown): value is %s {", enum.Name, enum.Name)
 	g.Block(func() {
 		g.Linef("return %sList.includes(value as %s);", enum.Name, enum.Name)
 	})
-	g.Linef("}")
+	g.Line("}")
 	g.Break()
 }

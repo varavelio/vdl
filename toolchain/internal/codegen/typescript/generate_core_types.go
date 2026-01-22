@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -11,7 +12,7 @@ import (
 //go:embed pieces/core_types.ts
 var coreTypesRawPiece string
 
-func generateCoreTypes(_ *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+func generateCoreTypes(_ *ir.Schema, _ *flatSchema, _ *config.TypeScriptConfig) (string, error) {
 	piece := strutil.GetStrAfter(coreTypesRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
 		return "", fmt.Errorf("core_types.ts: could not find start delimiter")

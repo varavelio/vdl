@@ -296,9 +296,17 @@ func renderHydrateType(parentName string, name string, fields []ir.Field) string
 // Documentation and Comments
 // =============================================================================
 
+// renderMultilineComment renders a complete multiline comment.
+func renderMultilineComment(g *gen.Generator, text string) {
+	g.Line("/**")
+	renderPartialMultilineComment(g, text)
+	g.Line(" */")
+}
+
 // renderPartialMultilineComment renders text as a partial multiline comment.
 func renderPartialMultilineComment(g *gen.Generator, text string) {
-	for line := range strings.SplitSeq(text, "\n") {
+	lines := strings.Split(text, "\n")
+	for _, line := range lines {
 		g.Linef(" * %s", line)
 	}
 }

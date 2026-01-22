@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -12,8 +13,8 @@ import (
 //go:embed pieces/client.ts
 var clientRawPiece string
 
-func generateClient(_ *ir.Schema, flat *flatSchema, config Config) (string, error) {
-	if !config.IncludeClient {
+func generateClient(_ *ir.Schema, flat *flatSchema, config *config.TypeScriptConfig) (string, error) {
+	if !config.GenClient {
 		return "", nil
 	}
 
