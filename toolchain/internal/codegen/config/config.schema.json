@@ -19,16 +19,6 @@
           "type": "string",
           "description": "Optional override for the VDL schema file specific to this target."
         },
-        "gen_client": {
-          "type": "boolean",
-          "description": "Generate RPC client code.",
-          "default": false
-        },
-        "gen_server": {
-          "type": "boolean",
-          "description": "Generate RPC server interfaces and handlers.",
-          "default": false
-        },
         "gen_patterns": {
           "type": "boolean",
           "description": "Generate helper functions for patterns.",
@@ -38,6 +28,11 @@
           "type": "boolean",
           "description": "Generate constant definitions.",
           "default": true
+        },
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
         },
         "package": {
           "type": "string",
@@ -67,16 +62,6 @@
           "type": "string",
           "description": "Optional override for the VDL schema file specific to this target."
         },
-        "gen_client": {
-          "type": "boolean",
-          "description": "Generate RPC client code.",
-          "default": false
-        },
-        "gen_server": {
-          "type": "boolean",
-          "description": "Generate RPC server interfaces and handlers.",
-          "default": false
-        },
         "gen_patterns": {
           "type": "boolean",
           "description": "Generate helper functions for patterns.",
@@ -86,6 +71,16 @@
           "type": "boolean",
           "description": "Generate constant definitions.",
           "default": true
+        },
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
         },
         "package": {
           "type": "string",
@@ -117,8 +112,8 @@
         },
         "filename": {
           "type": "string",
-          "description": "The name of the output file.",
-          "default": "openapi.json"
+          "description": "The name of the output file (can be .yml, .yaml or .json).",
+          "default": "openapi.yaml"
         },
         "title": {
           "type": "string"
@@ -232,16 +227,6 @@
           "type": "string",
           "description": "Optional override for the VDL schema file specific to this target."
         },
-        "gen_client": {
-          "type": "boolean",
-          "description": "Generate RPC client code.",
-          "default": false
-        },
-        "gen_server": {
-          "type": "boolean",
-          "description": "Generate RPC server interfaces and handlers.",
-          "default": false
-        },
         "gen_patterns": {
           "type": "boolean",
           "description": "Generate helper functions for patterns.",
@@ -251,6 +236,16 @@
           "type": "boolean",
           "description": "Generate constant definitions.",
           "default": true
+        },
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
         }
       },
       "additionalProperties": false,

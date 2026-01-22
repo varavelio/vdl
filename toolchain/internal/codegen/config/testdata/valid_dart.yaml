@@ -4,5 +4,4 @@ targets:
   - dart:
       output: ./gen/dart
       gen_client: true
-      gen_server: false
       package: my_dart_pkg

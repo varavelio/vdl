@@ -5,7 +5,6 @@ targets:
       output: ./gen/dart
       clean: true
       gen_client: true
-      gen_server: true
       gen_patterns: false
       gen_consts: true
       package: my_package

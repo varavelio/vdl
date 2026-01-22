@@ -30,61 +30,81 @@ type TargetConfig struct {
 	Playground *PlaygroundConfig `yaml:"playground,omitempty" json:"playground,omitempty"`
 }
 
-// CommonConfig defines options common to all targets.
+// CommonConfig defines the shared configuration options available to all generation targets.
 type CommonConfig struct {
 	Output string `yaml:"output" json:"output" jsonschema:"required,minLength=1,description=The output directory where the generated files will be placed."`
 	Clean  bool   `yaml:"clean,omitempty" json:"clean,omitempty" jsonschema:"default=false,description=If true empties the output directory before generation."`
 	Schema string `yaml:"schema,omitempty" json:"schema,omitempty" jsonschema:"description=Optional override for the VDL schema file specific to this target."`
 }
 
-// BaseCodeOptions defines standard options shared across code generators.
-type BaseCodeOptions struct {
-	GenClient   bool  `yaml:"gen_client" json:"gen_client,omitempty" jsonschema:"default=false,description=Generate RPC client code."`
-	GenServer   bool  `yaml:"gen_server" json:"gen_server,omitempty" jsonschema:"default=false,description=Generate RPC server interfaces and handlers."`
+// PatternsConfig defines configuration for generating patterns.
+type PatternsConfig struct {
 	GenPatterns *bool `yaml:"gen_patterns" json:"gen_patterns,omitempty" jsonschema:"default=true,description=Generate helper functions for patterns."`
-	GenConsts   *bool `yaml:"gen_consts" json:"gen_consts,omitempty" jsonschema:"default=true,description=Generate constant definitions."`
 }
 
 // ShouldGenPatterns returns true if patterns should be generated (default: true).
-func (b BaseCodeOptions) ShouldGenPatterns() bool {
+func (b PatternsConfig) ShouldGenPatterns() bool {
 	if b.GenPatterns == nil {
 		return true
 	}
 	return *b.GenPatterns
 }
 
+// ConstsConfig defines configuration for generating constants.
+type ConstsConfig struct {
+	GenConsts *bool `yaml:"gen_consts" json:"gen_consts,omitempty" jsonschema:"default=true,description=Generate constant definitions."`
+}
+
 // ShouldGenConsts returns true if constants should be generated (default: true).
-func (b BaseCodeOptions) ShouldGenConsts() bool {
+func (b ConstsConfig) ShouldGenConsts() bool {
 	if b.GenConsts == nil {
 		return true
 	}
 	return *b.GenConsts
 }
 
+// ClientConfig defines configuration for generating RPCs clients.
+type ClientConfig struct {
+	GenClient bool `yaml:"gen_client" json:"gen_client,omitempty" jsonschema:"default=false,description=Generate RPC client code."`
+}
+
+// ServerConfig defines configuration for generating RPCs servers.
+type ServerConfig struct {
+	GenServer bool `yaml:"gen_server" json:"gen_server,omitempty" jsonschema:"default=false,description=Generate RPC server interfaces and handlers."`
+}
+
 // GoConfig contains configuration for the Go target.
 type GoConfig struct {
-	CommonConfig    `yaml:",inline" json:",inline"`
-	BaseCodeOptions `yaml:",inline" json:",inline"`
-	Package         string `yaml:"package" json:"package" jsonschema:"required,description=The Go package name to use in generated files."`
+	CommonConfig   `yaml:",inline" json:",inline"`
+	PatternsConfig `yaml:",inline" json:",inline"`
+	ConstsConfig   `yaml:",inline" json:",inline"`
+	ClientConfig   `yaml:",inline" json:",inline"`
+	ServerConfig   `yaml:",inline" json:",inline"`
+	Package        string `yaml:"package" json:"package" jsonschema:"required,description=The Go package name to use in generated files."`
 }
 
 // TypeScriptConfig contains configuration for the TypeScript target.
 type TypeScriptConfig struct {
-	CommonConfig    `yaml:",inline" json:",inline"`
-	BaseCodeOptions `yaml:",inline" json:",inline"`
+	CommonConfig   `yaml:",inline" json:",inline"`
+	PatternsConfig `yaml:",inline" json:",inline"`
+	ConstsConfig   `yaml:",inline" json:",inline"`
+	ClientConfig   `yaml:",inline" json:",inline"`
+	ServerConfig   `yaml:",inline" json:",inline"`
 }
 
 // DartConfig contains configuration for the Dart target.
 type DartConfig struct {
-	CommonConfig    `yaml:",inline" json:",inline"`
-	BaseCodeOptions `yaml:",inline" json:",inline"`
-	Package         string `yaml:"package" json:"package" jsonschema:"required,description=The name of the Dart package."`
+	CommonConfig   `yaml:",inline" json:",inline"`
+	PatternsConfig `yaml:",inline" json:",inline"`
+	ConstsConfig   `yaml:",inline" json:",inline"`
+	ClientConfig   `yaml:",inline" json:",inline"`
+	Package        string `yaml:"package" json:"package" jsonschema:"required,description=The name of the Dart package."`
 }
 
 // OpenAPIConfig contains configuration for the OpenAPI target.
 type OpenAPIConfig struct {
 	CommonConfig `yaml:",inline" json:",inline"`
-	Filename     string `yaml:"filename" json:"filename,omitempty" jsonschema:"default=openapi.json,description=The name of the output file."`
+	Filename     string `yaml:"filename" json:"filename,omitempty" jsonschema:"default=openapi.yaml,description=The name of the output file (can be .yml\\, .yaml or .json)."`
 	Title        string `yaml:"title" json:"title" jsonschema:"required"`
 	Version      string `yaml:"version" json:"version" jsonschema:"required"`
 	Description  string `yaml:"description" json:"description,omitempty"`
