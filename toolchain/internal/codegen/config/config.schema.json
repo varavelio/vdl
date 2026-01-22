@@ -190,6 +190,42 @@
         "output"
       ]
     },
+    "PluginConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "command": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1,
+          "description": "The command to execute the plugin (executable + args)."
+        },
+        "options": {
+          "type": "object",
+          "description": "Arbitrary options passed to the plugin."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "command"
+      ]
+    },
     "TargetConfig": {
       "properties": {
         "go": {
@@ -206,6 +242,9 @@
         },
         "playground": {
           "$ref": "#/$defs/PlaygroundConfig"
+        },
+        "plugin": {
+          "$ref": "#/$defs/PluginConfig"
         }
       },
       "additionalProperties": false,

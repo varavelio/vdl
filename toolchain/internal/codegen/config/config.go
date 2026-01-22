@@ -28,6 +28,7 @@ type TargetConfig struct {
 	Dart       *DartConfig       `yaml:"dart,omitempty" json:"dart,omitempty"`
 	OpenAPI    *OpenAPIConfig    `yaml:"openapi,omitempty" json:"openapi,omitempty"`
 	Playground *PlaygroundConfig `yaml:"playground,omitempty" json:"playground,omitempty"`
+	Plugin     *PluginConfig     `yaml:"plugin,omitempty" json:"plugin,omitempty"`
 }
 
 // CommonConfig defines the shared configuration options available to all generation targets.
@@ -122,6 +123,13 @@ type PlaygroundConfig struct {
 		Key   string `yaml:"key" json:"key"`
 		Value string `yaml:"value" json:"value"`
 	} `yaml:"default_headers" json:"default_headers,omitempty"`
+}
+
+// PluginConfig contains configuration for external plugin generators.
+type PluginConfig struct {
+	CommonConfig `yaml:",inline" json:",inline"`
+	Command      []string       `yaml:"command" json:"command" jsonschema:"required,minItems=1,description=The command to execute the plugin (executable + args)."`
+	Options      map[string]any `yaml:"options,omitempty" json:"options,omitempty" jsonschema:"description=Arbitrary options passed to the plugin."`
 }
 
 func LoadConfig(path string) (*VDLConfig, error) {
@@ -221,6 +229,10 @@ func (t *TargetConfig) validateAndSetDefaults(globalSchema string) error {
 	if t.Playground != nil {
 		count++
 		schema = &t.Playground.Schema
+	}
+	if t.Plugin != nil {
+		count++
+		schema = &t.Plugin.Schema
 	}
 
 	if count == 0 {

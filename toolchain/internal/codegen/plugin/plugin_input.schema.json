@@ -1,0 +1,395 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vdl.varavel.com/schemas/v0/plugin_input.schema.json",
+  "$ref": "#/$defs/Input",
+  "$defs": {
+    "Constant": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "valueType": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "valueType",
+        "value"
+      ]
+    },
+    "Deprecation": {
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Enum": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "valueType": {
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/EnumMember"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "valueType",
+        "members"
+      ]
+    },
+    "EnumInfo": {
+      "properties": {
+        "valueType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "valueType"
+      ]
+    },
+    "EnumMember": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "Field": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "type": {
+          "$ref": "#/$defs/TypeRef"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "InlineObject": {
+      "properties": {
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "fields"
+      ]
+    },
+    "Input": {
+      "properties": {
+        "ir": {
+          "$ref": "#/$defs/Schema"
+        },
+        "options": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "ir",
+        "options"
+      ]
+    },
+    "Pattern": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "template": {
+          "type": "string"
+        },
+        "placeholders": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "template",
+        "placeholders"
+      ]
+    },
+    "Procedure": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "input": {
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "output": {
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "input",
+        "output"
+      ]
+    },
+    "RPC": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "procs": {
+          "items": {
+            "$ref": "#/$defs/Procedure"
+          },
+          "type": "array"
+        },
+        "streams": {
+          "items": {
+            "$ref": "#/$defs/Stream"
+          },
+          "type": "array"
+        },
+        "docs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "procs",
+        "streams"
+      ]
+    },
+    "Schema": {
+      "properties": {
+        "types": {
+          "items": {
+            "$ref": "#/$defs/Type"
+          },
+          "type": "array"
+        },
+        "enums": {
+          "items": {
+            "$ref": "#/$defs/Enum"
+          },
+          "type": "array"
+        },
+        "constants": {
+          "items": {
+            "$ref": "#/$defs/Constant"
+          },
+          "type": "array"
+        },
+        "patterns": {
+          "items": {
+            "$ref": "#/$defs/Pattern"
+          },
+          "type": "array"
+        },
+        "rpcs": {
+          "items": {
+            "$ref": "#/$defs/RPC"
+          },
+          "type": "array"
+        },
+        "standaloneDocs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "types",
+        "enums",
+        "constants",
+        "patterns",
+        "rpcs"
+      ]
+    },
+    "Stream": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "input": {
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "output": {
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "input",
+        "output"
+      ]
+    },
+    "Type": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/Deprecation"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "fields"
+      ]
+    },
+    "TypeRef": {
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "primitive": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "string"
+        },
+        "enumInfo": {
+          "$ref": "#/$defs/EnumInfo"
+        },
+        "arrayItem": {
+          "$ref": "#/$defs/TypeRef"
+        },
+        "arrayDimensions": {
+          "type": "integer"
+        },
+        "mapValue": {
+          "$ref": "#/$defs/TypeRef"
+        },
+        "object": {
+          "$ref": "#/$defs/InlineObject"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "kind"
+      ]
+    }
+  },
+  "title": "VDL Plugin Input Schema",
+  "description": "JSON Schema for the VDL Plugin Input Protocol"
+}

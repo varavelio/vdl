@@ -21,6 +21,8 @@ func init() {
 	// Initialize Schema IDs after VersionMajor is set
 	SchemaIRID = fmt.Sprintf("https://vdl.varavel.com/schemas/v%s/ir.schema.json", VersionMajor)
 	SchemaConfigID = fmt.Sprintf("https://vdl.varavel.com/schemas/v%s/config.schema.json", VersionMajor)
+	SchemaPluginInputID = fmt.Sprintf("https://vdl.varavel.com/schemas/v%s/plugin_input.schema.json", VersionMajor)
+	SchemaPluginOutputID = fmt.Sprintf("https://vdl.varavel.com/schemas/v%s/plugin_output.schema.json", VersionMajor)
 }
 
 var (
@@ -39,6 +41,12 @@ var (
 
 	// SchemaConfigID is the canonical URL for the VDL Config JSON Schema.
 	SchemaConfigID string
+
+	// SchemaPluginInputID is the canonical URL for the Plugin Input JSON Schema.
+	SchemaPluginInputID string
+
+	// SchemaPluginOutputID is the canonical URL for the Plugin Output JSON Schema.
+	SchemaPluginOutputID string
 )
 
 // asciiArtRaw is used to generate AsciiArt

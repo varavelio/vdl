@@ -11,6 +11,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
@@ -109,6 +110,51 @@ func Run(configPath string) error {
 			if err := runPlayground(ctx, absConfigDir, target.Playground, schema, formatted); err != nil {
 				return fmt.Errorf("target #%d (playground): %w", i, err)
 			}
+		} else if target.Plugin != nil {
+			schema, _, err := getSchema(target.Plugin.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runPlugin(ctx, absConfigDir, target.Plugin, schema); err != nil {
+				return fmt.Errorf("target #%d (plugin): %w", i, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func runPlugin(ctx context.Context, absConfigDir string, config *config.PluginConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, config.Output)
+
+	// Clean output directory if requested
+	if config.Clean {
+		if err := os.RemoveAll(outputDir); err != nil {
+			return fmt.Errorf("failed to clean output directory: %w", err)
+		}
+	}
+
+	// Ensure output directory exists
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Generate the code using new Generator interface
+	gen := plugin.New(config)
+	files, err := gen.Generate(ctx, schema)
+	if err != nil {
+		return fmt.Errorf("failed to generate code: %w", err)
+	}
+
+	// Write the generated files
+	for _, file := range files {
+		outPath := filepath.Join(outputDir, file.Path)
+		outDir := filepath.Dir(outPath)
+		if err := os.MkdirAll(outDir, 0755); err != nil {
+			return fmt.Errorf("failed to create output directory: %w", err)
+		}
+		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
+			return fmt.Errorf("failed to write generated code to file: %w", err)
 		}
 	}
 
