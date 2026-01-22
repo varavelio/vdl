@@ -5,7 +5,6 @@ go 1.25
 replace github.com/varavelio/vdl/playground v0.0.0 => ../playground
 
 require (
-	github.com/BurntSushi/toml v1.6.0
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/alexflint/go-arg v1.6.1
 	github.com/goccy/go-yaml v1.19.2
