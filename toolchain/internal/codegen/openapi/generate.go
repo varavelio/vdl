@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/goccy/go-yaml"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
@@ -20,11 +21,11 @@ type File struct {
 
 // Generator implements the OpenAPI generator.
 type Generator struct {
-	config Config
+	config *config.OpenAPIConfig
 }
 
 // New creates a new OpenAPI generator with the given config.
-func New(config Config) *Generator {
+func New(config *config.OpenAPIConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -35,27 +36,27 @@ func (g *Generator) Name() string {
 
 // Generate produces OpenAPI spec files from the IR schema.
 func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
-	config := g.config
+	cfg := g.config
 
-	if config.Title == "" {
-		config.Title = "VDL RPC API"
+	if cfg.Title == "" {
+		cfg.Title = "VDL RPC API"
 	}
-	if config.Version == "" {
-		config.Version = "1.0.0"
+	if cfg.Version == "" {
+		cfg.Version = "1.0.0"
 	}
 
 	spec := Spec{
 		OpenAPI: "3.0.0",
 		Info: Info{
-			Title:       config.Title,
-			Version:     config.Version,
-			Description: config.Description,
+			Title:       cfg.Title,
+			Version:     cfg.Version,
+			Description: cfg.Description,
 			Contact: InfoContact{
-				Name:  config.ContactName,
-				Email: config.ContactEmail,
+				Name:  cfg.ContactName,
+				Email: cfg.ContactEmail,
 			},
 			License: InfoLicense{
-				Name: config.LicenseName,
+				Name: cfg.LicenseName,
 			},
 		},
 		Security: []map[string][]string{
@@ -65,10 +66,10 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		},
 	}
 
-	if config.BaseURL != "" {
+	if cfg.BaseURL != "" {
 		spec.Servers = []Server{
 			{
-				URL: config.BaseURL,
+				URL: cfg.BaseURL,
 			},
 		}
 	}
@@ -83,19 +84,19 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	spec.Components = generateComponents(schema)
 
 	// Encode spec
-	code, err := encodeSpec(spec, config)
+	code, err := encodeSpec(spec, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate spec file: %w", err)
 	}
 
-	outputFile := config.OutputFile
-	if outputFile == "" {
-		outputFile = "openapi.yaml"
+	filename := cfg.Filename
+	if filename == "" {
+		filename = "openapi.yaml"
 	}
 
 	return []File{
 		{
-			RelativePath: outputFile,
+			RelativePath: filename,
 			Content:      []byte(code),
 		},
 	}, nil
@@ -140,8 +141,13 @@ func generateTags(schema *ir.Schema) []Tag {
 	return tags
 }
 
-func encodeSpec(spec Spec, config Config) (string, error) {
-	isYAML := strings.HasSuffix(config.OutputFile, ".yaml") || strings.HasSuffix(config.OutputFile, ".yml")
+func encodeSpec(spec Spec, cfg *config.OpenAPIConfig) (string, error) {
+	filename := cfg.Filename
+	if filename == "" {
+		filename = "openapi.yaml"
+	}
+
+	isYAML := strings.HasSuffix(filename, ".yaml") || strings.HasSuffix(filename, ".yml")
 	var buf bytes.Buffer
 
 	if isYAML {

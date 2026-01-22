@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
@@ -45,10 +46,10 @@ func TestGenerate_Golden(t *testing.T) {
 			schema := ir.FromProgram(program)
 
 			// 3. Generate OpenAPI
-			gen := New(Config{
-				OutputFile: "openapi.yaml",
-				Title:      "Test API",
-				Version:    "1.0.0",
+			gen := New(&config.OpenAPIConfig{
+				Filename: "openapi.yaml",
+				Title:    "Test API",
+				Version:  "1.0.0",
 			})
 
 			files, err := gen.Generate(context.Background(), schema)
@@ -82,13 +83,13 @@ func TestGenerate_Golden(t *testing.T) {
 
 // TestGenerator_Name tests that the generator returns the correct name.
 func TestGenerator_Name(t *testing.T) {
-	gen := New(Config{})
+	gen := New(&config.OpenAPIConfig{})
 	assert.Equal(t, "openapi", gen.Name())
 }
 
 // TestGenerator_DefaultConfig tests that defaults are applied.
 func TestGenerator_DefaultConfig(t *testing.T) {
-	gen := New(Config{})
+	gen := New(&config.OpenAPIConfig{})
 
 	schema := &ir.Schema{
 		Types: []ir.Type{},
@@ -109,9 +110,9 @@ func TestGenerator_DefaultConfig(t *testing.T) {
 
 // TestGenerator_JSONOutput tests JSON output format.
 func TestGenerator_JSONOutput(t *testing.T) {
-	gen := New(Config{
-		OutputFile: "api.json",
-		Title:      "JSON Test API",
+	gen := New(&config.OpenAPIConfig{
+		Filename: "api.json",
+		Title:    "JSON Test API",
 	})
 
 	schema := &ir.Schema{
