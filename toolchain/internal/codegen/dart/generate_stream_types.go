@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ Config) (string, error) {
+func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.DartConfig) (string, error) {
 	if len(flat.Streams) == 0 {
 		return "", nil
 	}

@@ -399,3 +399,11 @@ func renderDeprecatedDart(g *gen.Generator, deprecated *ir.Deprecation) {
 		g.Linef("/// %s", line)
 	}
 }
+
+// renderMultilineCommentDart renders a complete multiline comment for Dart.
+func renderMultilineCommentDart(g *gen.Generator, text string) {
+	lines := strings.Split(text, "\n")
+	for _, line := range lines {
+		g.Linef("/// %s", line)
+	}
+}

@@ -4,10 +4,11 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateDomainTypes(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+func generateDomainTypes(schema *ir.Schema, _ *flatSchema, _ *config.DartConfig) (string, error) {
 	if len(schema.Types) == 0 {
 		return "", nil
 	}

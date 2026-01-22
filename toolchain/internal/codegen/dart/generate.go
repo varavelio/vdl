@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -27,11 +28,11 @@ type File struct {
 
 // Generator implements the Dart code generator.
 type Generator struct {
-	config Config
+	config *config.DartConfig
 }
 
 // New creates a new Dart generator with the given config.
-func New(config Config) *Generator {
+func New(config *config.DartConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -45,7 +46,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	// Flatten the schema for easier iteration
 	flat := flattenSchema(schema)
 
-	subGenerators := []func(*ir.Schema, *flatSchema, Config) (string, error){
+	subGenerators := []func(*ir.Schema, *flatSchema, *config.DartConfig) (string, error){
 		generateCore,
 		generateEnums,
 		generateConstants,
@@ -80,7 +81,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// 2) Generate pubspec.yaml
-	pubspecContent := strings.ReplaceAll(pubspecRawPiece, "{{ package_name }}", g.config.PackageName)
+	pubspecContent := strings.ReplaceAll(pubspecRawPiece, "{{ package_name }}", g.config.Package)
 	pubspec := File{
 		RelativePath: "pubspec.yaml",
 		Content:      []byte(pubspecContent),

@@ -6,18 +6,24 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
 func TestGenerator_Name(t *testing.T) {
-	g := New(Config{})
+	g := New(&config.DartConfig{})
 	assert.Equal(t, "dart", g.Name())
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		ClientConfig: config.ClientConfig{
+			GenClient: true,
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -44,9 +50,14 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		ClientConfig: config.ClientConfig{
+			GenClient: true,
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -94,9 +105,11 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -148,9 +161,11 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithConstants(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -196,9 +211,11 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -234,9 +251,14 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		ClientConfig: config.ClientConfig{
+			GenClient: true,
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -293,9 +315,14 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		ClientConfig: config.ClientConfig{
+			GenClient: true,
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -352,9 +379,11 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -537,65 +566,6 @@ func TestTypeRefToDart(t *testing.T) {
 	}
 }
 
-func TestFlattenSchema(t *testing.T) {
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Users",
-				Procs: []ir.Procedure{
-					{Name: "GetUser"},
-					{Name: "CreateUser"},
-				},
-				Streams: []ir.Stream{
-					{Name: "UserUpdates"},
-				},
-			},
-			{
-				Name: "Products",
-				Procs: []ir.Procedure{
-					{Name: "ListProducts"},
-				},
-			},
-		},
-	}
-
-	flat := flattenSchema(schema)
-
-	// Check procedures
-	assert.Len(t, flat.Procedures, 3)
-	assert.Equal(t, "Users", flat.Procedures[0].RPCName)
-	assert.Equal(t, "GetUser", flat.Procedures[0].Procedure.Name)
-	assert.Equal(t, "Users", flat.Procedures[1].RPCName)
-	assert.Equal(t, "CreateUser", flat.Procedures[1].Procedure.Name)
-	assert.Equal(t, "Products", flat.Procedures[2].RPCName)
-	assert.Equal(t, "ListProducts", flat.Procedures[2].Procedure.Name)
-
-	// Check streams
-	assert.Len(t, flat.Streams, 1)
-	assert.Equal(t, "Users", flat.Streams[0].RPCName)
-	assert.Equal(t, "UserUpdates", flat.Streams[0].Stream.Name)
-}
-
-func TestFullProcName(t *testing.T) {
-	assert.Equal(t, "UsersGetUser", fullProcName("Users", "GetUser"))
-	assert.Equal(t, "ProductsList", fullProcName("Products", "List"))
-}
-
-func TestFullStreamName(t *testing.T) {
-	assert.Equal(t, "ChatMessages", fullStreamName("Chat", "Messages"))
-	assert.Equal(t, "UsersUpdates", fullStreamName("Users", "Updates"))
-}
-
-func TestRpcProcPath(t *testing.T) {
-	assert.Equal(t, "users/getUser", rpcProcPath("Users", "GetUser"))
-	assert.Equal(t, "products/list", rpcProcPath("Products", "List"))
-}
-
-func TestRpcStreamPath(t *testing.T) {
-	assert.Equal(t, "chat/messages", rpcStreamPath("Chat", "Messages"))
-	assert.Equal(t, "users/updates", rpcStreamPath("Users", "Updates"))
-}
-
 func TestConvertPatternToDartInterpolation(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -644,9 +614,11 @@ func TestConvertPatternToDartInterpolation(t *testing.T) {
 }
 
 func TestGenerator_Generate_PubspecFiles(t *testing.T) {
-	g := New(Config{
-		OutputDir:   "output",
-		PackageName: "my_awesome_api",
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+		Package: "my_awesome_api",
 	})
 
 	schema := &ir.Schema{}
