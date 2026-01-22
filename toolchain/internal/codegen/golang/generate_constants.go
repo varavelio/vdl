@@ -4,11 +4,16 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateConstants(schema *ir.Schema, _ *flatSchema, _ Config) (string, error) {
+func generateConstants(schema *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
+	if !config.ShouldGenConsts() {
+		return "", nil
+	}
+
 	if len(schema.Constants) == 0 {
 		return "", nil
 	}

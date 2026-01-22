@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -12,8 +13,8 @@ import (
 //go:embed pieces/client.go
 var clientRawPiece string
 
-func generateClient(_ *ir.Schema, flat *flatSchema, config Config) (string, error) {
-	if !config.IncludeClient {
+func generateClient(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
+	if !config.GenClient {
 		return "", nil
 	}
 
@@ -276,7 +277,7 @@ func generateClient(_ *ir.Schema, flat *flatSchema, config Config) (string, erro
 		g.Line("//")
 		g.Line("// Each event on the channel follows these rules:")
 		g.Linef("//   - Ok=true  ⇒ Output contains a %sOutput value.", name)
-		g.Line("//   - Ok=false ⇒ Error describes either a server sent or transport error.")
+		g.Linef("//   - Ok=false ⇒ Error describes either a server sent or transport error.")
 		g.Line("//")
 		g.Line("// The caller should cancel the supplied context to terminate the stream and must")
 		g.Line("// drain the channel until it is closed.")

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"golang.org/x/tools/imports"
 )
@@ -17,11 +18,11 @@ type File struct {
 
 // Generator implements the Go code generator.
 type Generator struct {
-	config Config
+	config *config.GoConfig
 }
 
 // New creates a new Go generator with the given config.
-func New(config Config) *Generator {
+func New(config *config.GoConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -35,7 +36,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	// Flatten the schema for easier iteration
 	flat := flattenSchema(schema)
 
-	subGenerators := []func(*ir.Schema, *flatSchema, Config) (string, error){
+	subGenerators := []func(*ir.Schema, *flatSchema, *config.GoConfig) (string, error){
 		generatePackage,
 		generateCoreTypes,
 		generateOptional,
@@ -73,7 +74,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		generatedCode = string(formattedCode)
 	}
 
-	outputFile := g.config.OutputFile
+	outputFile := g.config.Output
 	if outputFile == "" {
 		outputFile = "vdl.go"
 	}

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
@@ -27,14 +28,14 @@ var packageHeader = strings.TrimSpace(`
 //nolint:all
 `)
 
-func generatePackage(_ *ir.Schema, _ *flatSchema, config Config) (string, error) {
+func generatePackage(_ *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
 	g := gen.New().WithTabs()
 
 	g.Line(packageHeader)
 	g.Break()
 
-	g.Linef("// Package %s contains the generated code for the VDL RPC schema", config.PackageName)
-	g.Linef("package %s", config.PackageName)
+	g.Linef("// Package %s contains the generated code for the VDL RPC schema", config.Package)
+	g.Linef("package %s", config.Package)
 	g.Break()
 
 	// Import block - we'll import everything and let goimports clean up unused ones
@@ -49,7 +50,7 @@ func generatePackage(_ *ir.Schema, _ *flatSchema, config Config) (string, error)
 		"time",
 	}
 
-	if config.IncludeClient {
+	if config.GenClient {
 		imports = append(imports, "bufio", "bytes", "strings")
 	}
 

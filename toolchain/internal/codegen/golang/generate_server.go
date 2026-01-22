@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -12,8 +13,8 @@ import (
 //go:embed pieces/server.go
 var serverRawPiece string
 
-func generateServer(_ *ir.Schema, flat *flatSchema, config Config) (string, error) {
-	if !config.IncludeServer {
+func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
+	if !config.GenServer {
 		return "", nil
 	}
 
