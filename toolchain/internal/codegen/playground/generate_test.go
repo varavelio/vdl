@@ -6,18 +6,21 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(Config{})
+	gen := New(&config.PlaygroundConfig{}, "")
 	assert.Equal(t, "playground", gen.Name())
 }
 
 func TestGenerator_Generate_BasicFiles(t *testing.T) {
-	gen := New(Config{
-		OutputDir: "dist",
-	})
+	gen := New(&config.PlaygroundConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "dist",
+		},
+	}, "")
 
 	schema := &ir.Schema{
 		Types: []ir.Type{},
@@ -51,10 +54,11 @@ rpc Users {
 }
 `
 
-	gen := New(Config{
-		OutputDir:       "dist",
-		FormattedSchema: schemaSource,
-	})
+	gen := New(&config.PlaygroundConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "dist",
+		},
+	}, schemaSource)
 
 	schema := &ir.Schema{}
 
@@ -75,14 +79,19 @@ rpc Users {
 }
 
 func TestGenerator_Generate_WithConfig(t *testing.T) {
-	gen := New(Config{
-		OutputDir:      "dist",
+	gen := New(&config.PlaygroundConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "dist",
+		},
 		DefaultBaseURL: "https://api.example.com",
-		DefaultHeaders: []Header{
+		DefaultHeaders: []struct {
+			Key   string `yaml:"key" json:"key"`
+			Value string `yaml:"value" json:"value"`
+		}{
 			{Key: "Authorization", Value: "Bearer token"},
 			{Key: "X-Custom", Value: "value"},
 		},
-	})
+	}, "")
 
 	schema := &ir.Schema{}
 
@@ -109,10 +118,12 @@ func TestGenerator_Generate_WithConfig(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
-	gen := New(Config{
-		OutputDir: "dist",
+	gen := New(&config.PlaygroundConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "dist",
+		},
 		// No base URL or headers
-	})
+	}, "")
 
 	schema := &ir.Schema{}
 
@@ -126,10 +137,11 @@ func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
-	gen := New(Config{
-		OutputDir:       "dist",
-		FormattedSchema: "", // Empty
-	})
+	gen := New(&config.PlaygroundConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "dist",
+		},
+	}, "")
 
 	schema := &ir.Schema{}
 
@@ -142,27 +154,16 @@ func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
 	}
 }
 
-func TestConfig_Validate(t *testing.T) {
-	t.Run("valid config", func(t *testing.T) {
-		cfg := Config{OutputDir: "dist"}
-		assert.NoError(t, cfg.Validate())
-	})
-
-	t.Run("missing output_dir", func(t *testing.T) {
-		cfg := Config{}
-		err := cfg.Validate()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "output_dir")
-	})
-}
-
 func TestGenerateConfigJSON(t *testing.T) {
-	gen := New(Config{
+	gen := New(&config.PlaygroundConfig{
 		DefaultBaseURL: "https://api.test.com",
-		DefaultHeaders: []Header{
+		DefaultHeaders: []struct {
+			Key   string `yaml:"key" json:"key"`
+			Value string `yaml:"value" json:"value"`
+		}{
 			{Key: "Content-Type", Value: "application/json"},
 		},
-	})
+	}, "")
 
 	jsonBytes, err := gen.generateConfigJSON()
 	require.NoError(t, err)

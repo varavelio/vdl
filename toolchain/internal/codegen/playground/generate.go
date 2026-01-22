@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	embedplayground "github.com/varavelio/vdl/playground"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
@@ -20,12 +21,16 @@ type File struct {
 
 // Generator implements the playground generator.
 type Generator struct {
-	config Config
+	config          *config.PlaygroundConfig
+	formattedSchema string
 }
 
 // New creates a new playground generator with the given config.
-func New(config Config) *Generator {
-	return &Generator{config: config}
+func New(config *config.PlaygroundConfig, formattedSchema string) *Generator {
+	return &Generator{
+		config:          config,
+		formattedSchema: formattedSchema,
+	}
 }
 
 // Name returns the generator name.
@@ -36,7 +41,7 @@ func (g *Generator) Name() string {
 // Generate produces playground files from the IR schema.
 // The playground consists of:
 // - All static files from the embedded playground build
-// - schema.vdl: The formatted VDL schema (from config.FormattedSchema)
+// - schema.vdl: The formatted VDL schema (from g.formattedSchema)
 // - config.json: Optional configuration for base URL and headers
 func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
 	files := []File{}
@@ -64,10 +69,10 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// 2. Add the formatted schema if provided
-	if g.config.FormattedSchema != "" {
+	if g.formattedSchema != "" {
 		files = append(files, File{
 			RelativePath: "schema.vdl",
-			Content:      []byte(g.config.FormattedSchema),
+			Content:      []byte(g.formattedSchema),
 		})
 	}
 
@@ -101,7 +106,10 @@ func (g *Generator) generateConfigJSON() ([]byte, error) {
 
 	headers := make([]jsonConfigHeader, len(g.config.DefaultHeaders))
 	for i, header := range g.config.DefaultHeaders {
-		headers[i] = jsonConfigHeader(header)
+		headers[i] = jsonConfigHeader{
+			Key:   header.Key,
+			Value: header.Value,
+		}
 	}
 
 	conf := jsonConfig{
