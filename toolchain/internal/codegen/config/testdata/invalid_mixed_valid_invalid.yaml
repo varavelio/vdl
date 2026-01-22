@@ -1,9 +1,8 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: go
-    output: ./gen/go
-    options:
+  - go:
+      output: ./gen/go
       package: mypkg
-  - target: invalid_target
-    output: ./gen/invalid
+  - invalid_target:
+      output: ./gen/invalid

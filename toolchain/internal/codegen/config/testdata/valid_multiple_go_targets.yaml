@@ -1,22 +1,19 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: go
-    output: ./gen/go/client
-    options:
+  - go:
+      output: ./gen/go/client
       gen_client: true
       gen_server: false
       package: client
-  - target: go
-    output: ./gen/go/server
-    options:
+  - go:
+      output: ./gen/go/server
       gen_client: false
       gen_server: true
       package: server
-  - target: go
-    output: ./gen/go/full
-    clean: true
-    options:
+  - go:
+      output: ./gen/go/full
+      clean: true
       gen_client: true
       gen_server: true
       package: full

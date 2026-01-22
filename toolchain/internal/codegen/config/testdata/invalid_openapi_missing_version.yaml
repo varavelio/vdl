@@ -1,7 +1,6 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: openapi
-    output: ./gen/docs
-    options:
+  - openapi:
+      output: ./gen/docs
       title: Missing Version

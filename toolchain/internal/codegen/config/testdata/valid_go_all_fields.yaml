@@ -1,11 +1,10 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: go
-    output: ./gen/go
-    clean: true
-    schema: ./custom-go.vdl
-    options:
+  - go:
+      output: ./gen/go
+      clean: true
+      schema: ./custom-go.vdl
       gen_client: true
       gen_server: true
       gen_patterns: false

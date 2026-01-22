@@ -1,6 +1,5 @@
 version: 1
 targets:
-  - target: go
-    output: gen/go
-    options:
+  - go:
+      output: gen/go
       package: mypkg

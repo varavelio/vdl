@@ -1,6 +1,7 @@
 version: 1
 schema: ./default.vdl
 targets:
-  - target: go
-    output: ./gen/go
-    schema: ./custom.vdl
+  - go:
+      output: ./gen/go
+      schema: ./custom.vdl
+      package: main

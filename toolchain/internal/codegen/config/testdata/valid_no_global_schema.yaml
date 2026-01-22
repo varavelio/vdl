@@ -1,7 +1,6 @@
 version: 1
 targets:
-  - target: go
-    output: gen/go
-    schema: vdl/schema.vdl
-    options:
+  - go:
+      output: gen/go
+      schema: vdl/schema.vdl
       package: mypkg

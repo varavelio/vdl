@@ -14,27 +14,27 @@ import (
 //go:embed config.schema.json
 var schemaJSON []byte
 
-const (
-	TargetGo         = "go"
-	TargetTypeScript = "typescript"
-	TargetDart       = "dart"
-	TargetOpenAPI    = "openapi"
-	TargetPlayground = "playground"
-)
-
 type VDLConfig struct {
-	Version int            `yaml:"version" json:"version" jsonschema:"required,const=1"`
+	Version int            `yaml:"version" json:"version" jsonschema:"required"`
 	Schema  string         `yaml:"schema" json:"schema,omitempty" jsonschema:"description=Path to the default global VDL schema file."`
 	Targets []TargetConfig `yaml:"targets" json:"targets" jsonschema:"required,minItems=1"`
 }
 
+// TargetConfig represents a configuration for a specific generation target.
+// Only one of the fields must be set.
 type TargetConfig struct {
-	Target        string    `yaml:"target" json:"target" jsonschema:"required,enum=go,enum=typescript,enum=dart,enum=openapi,enum=playground"`
-	Output        string    `yaml:"output" json:"output" jsonschema:"required,description=The output directory where the generated files will be placed."`
-	Clean         bool      `yaml:"clean" json:"clean,omitempty" jsonschema:"default=false,description=If true empties the output directory before generation."`
-	Schema        string    `yaml:"schema" json:"schema,omitempty" jsonschema:"description=Optional override for the VDL schema file specific to this target."`
-	Options       yaml.Node `yaml:"options" json:"-"`
-	ParsedOptions any       `yaml:"-" json:"-"`
+	Go         *GoConfig         `yaml:"go,omitempty" json:"go,omitempty"`
+	TypeScript *TypeScriptConfig `yaml:"typescript,omitempty" json:"typescript,omitempty"`
+	Dart       *DartConfig       `yaml:"dart,omitempty" json:"dart,omitempty"`
+	OpenAPI    *OpenAPIConfig    `yaml:"openapi,omitempty" json:"openapi,omitempty"`
+	Playground *PlaygroundConfig `yaml:"playground,omitempty" json:"playground,omitempty"`
+}
+
+// CommonConfig defines options common to all targets.
+type CommonConfig struct {
+	Output string `yaml:"output" json:"output" jsonschema:"required,minLength=1,description=The output directory where the generated files will be placed."`
+	Clean  bool   `yaml:"clean,omitempty" json:"clean,omitempty" jsonschema:"default=false,description=If true empties the output directory before generation."`
+	Schema string `yaml:"schema,omitempty" json:"schema,omitempty" jsonschema:"description=Optional override for the VDL schema file specific to this target."`
 }
 
 // BaseCodeOptions defines standard options shared across code generators.
@@ -61,25 +61,29 @@ func (b BaseCodeOptions) ShouldGenConsts() bool {
 	return *b.GenConsts
 }
 
-// GoOptions contains configuration for the Go target.
-type GoOptions struct {
+// GoConfig contains configuration for the Go target.
+type GoConfig struct {
+	CommonConfig    `yaml:",inline" json:",inline"`
 	BaseCodeOptions `yaml:",inline" json:",inline"`
 	Package         string `yaml:"package" json:"package" jsonschema:"required,description=The Go package name to use in generated files."`
 }
 
-// TypeScriptOptions contains configuration for the TypeScript target.
-type TypeScriptOptions struct {
+// TypeScriptConfig contains configuration for the TypeScript target.
+type TypeScriptConfig struct {
+	CommonConfig    `yaml:",inline" json:",inline"`
 	BaseCodeOptions `yaml:",inline" json:",inline"`
 }
 
-// DartOptions contains configuration for the Dart target.
-type DartOptions struct {
+// DartConfig contains configuration for the Dart target.
+type DartConfig struct {
+	CommonConfig    `yaml:",inline" json:",inline"`
 	BaseCodeOptions `yaml:",inline" json:",inline"`
 	Package         string `yaml:"package" json:"package" jsonschema:"required,description=The name of the Dart package."`
 }
 
-// OpenAPIOptions contains configuration for the OpenAPI target.
-type OpenAPIOptions struct {
+// OpenAPIConfig contains configuration for the OpenAPI target.
+type OpenAPIConfig struct {
+	CommonConfig `yaml:",inline" json:",inline"`
 	Filename     string `yaml:"filename" json:"filename,omitempty" jsonschema:"default=openapi.json,description=The name of the output file."`
 	Title        string `yaml:"title" json:"title" jsonschema:"required"`
 	Version      string `yaml:"version" json:"version" jsonschema:"required"`
@@ -90,8 +94,9 @@ type OpenAPIOptions struct {
 	LicenseName  string `yaml:"license_name" json:"license_name,omitempty"`
 }
 
-// PlaygroundOptions contains configuration for the Playground target.
-type PlaygroundOptions struct {
+// PlaygroundConfig contains configuration for the Playground target.
+type PlaygroundConfig struct {
+	CommonConfig   `yaml:",inline" json:",inline"`
 	DefaultBaseURL string `yaml:"default_base_url" json:"default_base_url,omitempty"`
 	DefaultHeaders []struct {
 		Key   string `yaml:"key" json:"key"`
@@ -162,49 +167,59 @@ func Validate(data []byte) (*VDLConfig, error) {
 
 	for i := range cfg.Targets {
 		t := &cfg.Targets[i]
-		if t.Schema == "" {
-			t.Schema = cfg.Schema
-		}
-		if t.Schema == "" {
-			return nil, fmt.Errorf("target #%d (%s): no schema defined (must be defined globally or locally)", i, t.Target)
-		}
-		if err := t.decodeOptions(); err != nil {
-			return nil, fmt.Errorf("target #%d (%s): %w", i, t.Target, err)
+		if err := t.validateAndSetDefaults(cfg.Schema); err != nil {
+			return nil, fmt.Errorf("target #%d: %w", i, err)
 		}
 	}
 
 	return &cfg, nil
 }
 
-func (t *TargetConfig) decodeOptions() error {
-	var opts any
+func (t *TargetConfig) validateAndSetDefaults(globalSchema string) error {
+	count := 0
+	var schema *string
 
-	switch t.Target {
-	case TargetGo:
-		opts = &GoOptions{}
-	case TargetTypeScript:
-		opts = &TypeScriptOptions{}
-	case TargetDart:
-		opts = &DartOptions{}
-	case TargetOpenAPI:
-		o := &OpenAPIOptions{}
-		if err := t.Options.Decode(o); err != nil {
-			return err
+	if t.Go != nil {
+		count++
+		schema = &t.Go.Schema
+	}
+	if t.TypeScript != nil {
+		count++
+		schema = &t.TypeScript.Schema
+	}
+	if t.Dart != nil {
+		count++
+		schema = &t.Dart.Schema
+	}
+	if t.OpenAPI != nil {
+		count++
+		schema = &t.OpenAPI.Schema
+		if t.OpenAPI.Filename == "" {
+			t.OpenAPI.Filename = "openapi.yaml"
 		}
-		if o.Filename == "" {
-			o.Filename = "openapi.yaml"
-		}
-		t.ParsedOptions = o
-		return nil
-	case TargetPlayground:
-		opts = &PlaygroundOptions{}
-	default:
-		return fmt.Errorf("unknown target: %q", t.Target)
+	}
+	if t.Playground != nil {
+		count++
+		schema = &t.Playground.Schema
 	}
 
-	if err := t.Options.Decode(opts); err != nil {
-		return err
+	if count == 0 {
+		return fmt.Errorf("no language configuration found for the target")
 	}
-	t.ParsedOptions = opts
+	if count > 1 {
+		return fmt.Errorf("multiple language configurations found in the same target block")
+	}
+
+	// Apply global schema if local one is missing
+	if schema != nil {
+		if *schema == "" {
+			*schema = globalSchema
+		}
+		// Check again if it's still empty
+		if *schema == "" {
+			return fmt.Errorf("no schema defined for the target (must be defined globally or locally)")
+		}
+	}
+
 	return nil
 }

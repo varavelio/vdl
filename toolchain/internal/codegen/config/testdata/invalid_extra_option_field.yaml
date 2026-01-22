@@ -1,9 +1,8 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: go
-    output: ./gen/go
-    options:
+  - go:
+      output: ./gen/go
       gen_client: true
       gen_server: true
       package: mypkg

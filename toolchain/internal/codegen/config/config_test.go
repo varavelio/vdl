@@ -57,16 +57,6 @@ func TestConfigSchema_AllTestFiles(t *testing.T) {
 	require.Greater(t, invalidCount, 0, "no invalid_*.yaml test files found")
 }
 
-func TestTargetConstants(t *testing.T) {
-	t.Run("constants have expected values", func(t *testing.T) {
-		require.Equal(t, "go", TargetGo)
-		require.Equal(t, "typescript", TargetTypeScript)
-		require.Equal(t, "dart", TargetDart)
-		require.Equal(t, "openapi", TargetOpenAPI)
-		require.Equal(t, "playground", TargetPlayground)
-	})
-}
-
 func friendlyTestName(filename string) string {
 	// Remove extension
 	name := strings.TrimSuffix(filename, ".yaml")

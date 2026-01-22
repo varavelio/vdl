@@ -1,10 +1,9 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: openapi
-    output: ./gen/docs
-    clean: true
-    options:
+  - openapi:
+      output: ./gen/docs
+      clean: true
       filename: api-spec.yaml
       title: Complete API
       version: "2.0.0"

@@ -1,15 +1,13 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: typescript
-    output: ./gen/ts/client
-    options:
+  - typescript:
+      output: ./gen/ts/client
       gen_client: true
       gen_server: false
-  - target: typescript
-    output: ./gen/ts/server
-    options:
+  - typescript:
+      output: ./gen/ts/server
       gen_client: false
       gen_server: true
-  - target: typescript
-    output: ./gen/ts/shared
+  - typescript:
+      output: ./gen/ts/shared

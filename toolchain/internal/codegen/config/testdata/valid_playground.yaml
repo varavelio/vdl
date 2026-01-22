@@ -1,9 +1,8 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: playground
-    output: ./gen/playground
-    options:
+  - playground:
+      output: ./gen/playground
       default_base_url: https://api.example.com
       default_headers:
         - key: Authorization

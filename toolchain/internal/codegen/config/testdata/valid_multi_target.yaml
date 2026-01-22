@@ -1,19 +1,16 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: go
-    output: ./gen/go
-    options:
+  - go:
+      output: ./gen/go
       gen_client: true
       gen_server: true
       package: api
-  - target: typescript
-    output: ./gen/ts
-    options:
+  - typescript:
+      output: ./gen/ts
       gen_client: true
       gen_server: false
-  - target: openapi
-    output: ./gen/docs
-    options:
+  - openapi:
+      output: ./gen/docs
       title: My Multi-Target API
       version: "2.0.0"

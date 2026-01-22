@@ -2,5 +2,6 @@ version: 1
 schema: ./schema.vdl
 unknown_field: bad
 targets:
-  - target: go
-    output: ./gen/go
+  - go:
+      output: ./gen/go
+      package: main

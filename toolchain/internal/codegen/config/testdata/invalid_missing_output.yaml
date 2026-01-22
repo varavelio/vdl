@@ -1,4 +1,5 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: go
+  - go:
+      package: main

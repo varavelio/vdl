@@ -1,9 +1,8 @@
 version: 1
 schema: ./schema.vdl
 targets:
-  - target: typescript
-    output: ./gen/ts
-    options:
+  - typescript:
+      output: ./gen/ts
       gen_client: true
       gen_server: true
       gen_patterns: true
