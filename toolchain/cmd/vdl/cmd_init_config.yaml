@@ -2,34 +2,49 @@
 
 # VDL code generator config file
 # Star the repo at https://github.com/varavelio/vdl
-# Read more about this file at https://vdl.varavel.com/config
+# See all available options at https://vdl.varavel.com/config
 
 version: 1
 schema: "{{schema_path}}"
 
+# You can add as many targets as you want, including multiple for the same language.
 targets:
   # - go:
   #     output: ./vdlgen/go
   #     package: vdl
-  #     gen_server: true
-  #     gen_client: true
+  #     gen_server: false
+  #     gen_client: false
+  #     gen_patterns: true
+  #     gen_consts: true
 
   # - typescript:
   #     output: ./vdlgen/ts
-  #     gen_client: true
+  #     gen_server: false
+  #     gen_client: false
+  #     gen_patterns: true
+  #     gen_consts: true
 
   # - dart:
   #     output: ./vdlgen/dart
   #     package: vdl
-  #     gen_client: true
+  #     gen_client: false
+  #     gen_patterns: true
+  #     gen_consts: true
 
   # - openapi:
   #     output: ./vdlgen/openapi
   #     filename: openapi.yaml
   #     title: "VDL API"
   #     version: "1.0.0"
+  #     description: "VDL API"
   #     base_url: "http://example.com/api/v1/vdl"
+  #     contact_name: "Example"
+  #     contact_email: "api-support@example.com"
+  #     license_name: "Proprietary"
 
   # - playground:
   #     output: ./vdlgen/playground
   #     default_base_url: "http://example.com/api/v1/vdl"
+  #     default_headers:
+  #       - key: "Authorization"
+  #         value: "Bearer token"
