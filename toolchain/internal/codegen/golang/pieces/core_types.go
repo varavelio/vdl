@@ -29,7 +29,7 @@ func (r Response[T]) Write(w io.Writer) error {
 func (r Response[T]) String() string {
 	b, err := json.Marshal(r)
 	if err != nil {
-		return fmt.Sprintf("failed to marshal VDL Response: %s", err.Error())
+		return fmt.Sprintf(`{"ok":false,"error":{"message":%q}}`, "failed to marshal VDL Response: "+err.Error())
 	}
 	return string(b)
 }
@@ -130,20 +130,21 @@ func (e Error) ToJSON() string {
 	b, err := json.Marshal(e)
 	if err != nil {
 		return fmt.Sprintf(
-			`{"message":%q,"error":"Failed to marshal VDL Error: %s"}`,
-			e.Message, err.Error(),
+			`{"message":%q,"details":{"message":%q}}`,
+			"failed to marshal VDL Error: "+err.Error(), e.Message,
 		)
 	}
 	return string(b)
 }
 
-// asError converts any error into a Error.
+// ToError converts any error into a Error.
+//
 // If the provided error is already a Error, it returns it as is.
 // Otherwise, it wraps the error message into a new Error.
 //
 // This function ensures that all errors conform to the Error structure,
 // facilitating consistent error handling across the system.
-func asError(err error) Error {
+func ToError(err error) Error {
 	switch e := err.(type) {
 	case Error:
 		return e

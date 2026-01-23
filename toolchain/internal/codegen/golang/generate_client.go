@@ -13,7 +13,8 @@ import (
 //go:embed pieces/client.go
 var clientRawPiece string
 
-func generateClient(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
+// generateClientCore generates the core client implementation (rpc_client.go).
+func generateClientCore(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}
@@ -95,10 +96,6 @@ func generateClient(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 	g.Line("}")
 	g.Break()
 
-	// -----------------------------------------------------------------------------
-	// Generate procedure wrappers
-	// -----------------------------------------------------------------------------
-
 	g.Line("type clientProcRegistry struct {")
 	g.Block(func() {
 		g.Line("intClient *internalClient")
@@ -106,16 +103,34 @@ func generateClient(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 	g.Line("}")
 	g.Break()
 
-	for _, fp := range flat.Procedures {
-		name := fullProcName(fp.RPCName, fp.Procedure.Name)
+	g.Line("type clientStreamRegistry struct {")
+	g.Block(func() {
+		g.Line("intClient *internalClient")
+	})
+	g.Line("}")
+	g.Break()
+
+	return g.String(), nil
+}
+
+// generateClientRPC generates the client implementation for a specific RPC (rpc_{rpcName}_client.go).
+func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
+	if !config.GenClient {
+		return "", nil
+	}
+
+	g := gen.New().WithTabs()
+
+	for _, proc := range rpc.Procs {
+		name := fullProcName(rpc.Name, proc.Name)
 		builderName := "clientBuilder" + name
 
 		// Client method to create builder
-		g.Linef("// %s creates a call builder for the %s.%s procedure.", name, fp.RPCName, fp.Procedure.Name)
-		if fp.Procedure.Doc != "" {
-			renderDoc(g, fp.Procedure.Doc, true)
+		g.Linef("// %s creates a call builder for the %s.%s procedure.", name, rpc.Name, proc.Name)
+		if proc.Doc != "" {
+			renderDoc(g, proc.Doc, true)
 		}
-		renderDeprecated(g, fp.Procedure.Deprecated)
+		renderDeprecated(g, proc.Deprecated)
 		g.Linef("func (registry *clientProcRegistry) %s() *%s {", name, builderName)
 		g.Block(func() {
 			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: %q}", builderName, name)
@@ -204,27 +219,16 @@ func generateClient(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Break()
 	}
 
-	// -----------------------------------------------------------------------------
-	// Generate stream wrappers
-	// -----------------------------------------------------------------------------
-
-	g.Line("type clientStreamRegistry struct {")
-	g.Block(func() {
-		g.Line("intClient *internalClient")
-	})
-	g.Line("}")
-	g.Break()
-
-	for _, fs := range flat.Streams {
-		name := fullStreamName(fs.RPCName, fs.Stream.Name)
+	for _, stream := range rpc.Streams {
+		name := fullStreamName(rpc.Name, stream.Name)
 		builderStream := "clientBuilder" + name + "Stream"
 
 		// Client method to create stream builder
-		g.Linef("// %s creates a stream builder for the %s.%s stream.", name, fs.RPCName, fs.Stream.Name)
-		if fs.Stream.Doc != "" {
-			renderDoc(g, fs.Stream.Doc, true)
+		g.Linef("// %s creates a stream builder for the %s.%s stream.", name, rpc.Name, stream.Name)
+		if stream.Doc != "" {
+			renderDoc(g, stream.Doc, true)
 		}
-		renderDeprecated(g, fs.Stream.Deprecated)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (registry *clientStreamRegistry) %s() *%s {", name, builderStream)
 		g.Block(func() {
 			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: %q}", builderStream, name)

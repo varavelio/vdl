@@ -155,6 +155,20 @@ func renderPreField(parentTypeName string, field ir.Field) string {
 	return result + jsonTag
 }
 
+// getInlineObject returns the inline object definition if the type is an object
+// or contains one (recursively in arrays/maps). Returns nil otherwise.
+func getInlineObject(tr ir.TypeRef) *ir.InlineObject {
+	switch tr.Kind {
+	case ir.TypeKindObject:
+		return tr.Object
+	case ir.TypeKindArray:
+		return getInlineObject(*tr.ArrayItem)
+	case ir.TypeKindMap:
+		return getInlineObject(*tr.MapValue)
+	}
+	return nil
+}
+
 // =============================================================================
 // Type Structure Rendering
 // =============================================================================
@@ -176,9 +190,9 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 
 	// Render children inline types
 	for _, field := range fields {
-		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
+		if inlineObj := getInlineObject(field.Type); inlineObj != nil {
 			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderType("", childName, "", field.Type.Object.Fields))
+			g.Line(renderType("", childName, "", inlineObj.Fields))
 		}
 	}
 
@@ -202,9 +216,9 @@ func renderPreType(parentName, name string, fields []ir.Field) string {
 
 	// Render children inline pre-types
 	for _, field := range fields {
-		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
+		if inlineObj := getInlineObject(field.Type); inlineObj != nil {
 			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderPreType("", childName, field.Type.Object.Fields))
+			g.Line(renderPreType("", childName, inlineObj.Fields))
 		}
 	}
 
@@ -248,7 +262,8 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 			if needsPre {
 				g.Linef("if p.%s.Present {", fieldName)
 				g.Block(func() {
-					renderNestedValidation(g, field, fieldName)
+					source := fmt.Sprintf("p.%s.Value", fieldName)
+					renderNestedValidation(g, source, field.Type, field.Name)
 				})
 				g.Line("}")
 			}
@@ -264,41 +279,52 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 }
 
 // renderNestedValidation renders validation code for nested types.
-func renderNestedValidation(g *gen.Generator, field ir.Field, fieldName string) {
-	switch field.Type.Kind {
+func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fieldName string) {
+	switch tr.Kind {
 	case ir.TypeKindType, ir.TypeKindObject:
-		g.Linef("if err := p.%s.Value.validate(); err != nil {", fieldName)
+		g.Linef("if err := %s.validate(); err != nil {", source)
 		g.Block(func() {
-			g.Linef("return errorMissingRequiredField(\"field %s: \" + err.Error())", field.Name)
+			g.Linef("return errorMissingRequiredField(\"field %s: \" + err.Error())", fieldName)
 		})
 		g.Line("}")
 
 	case ir.TypeKindArray:
-		if needsPreType(*field.Type.ArrayItem) {
-			g.Linef("for _, item := range p.%s.Value {", fieldName)
-			g.Block(func() {
-				g.Line("if err := item.validate(); err != nil {")
-				g.Block(func() {
-					g.Linef("return errorMissingRequiredField(\"field %s: \" + err.Error())", field.Name)
-				})
-				g.Line("}")
-			})
-			g.Line("}")
+		if needsPreType(*tr.ArrayItem) {
+			renderArrayValidation(g, source, tr.ArrayDimensions, *tr.ArrayItem, fieldName)
 		}
 
 	case ir.TypeKindMap:
-		if needsPreType(*field.Type.MapValue) {
-			g.Linef("for key, value := range p.%s.Value {", fieldName)
+		if needsPreType(*tr.MapValue) {
+			g.Linef("for key, value := range %s {", source)
 			g.Block(func() {
-				g.Line("if err := value.validate(); err != nil {")
-				g.Block(func() {
-					g.Linef("return errorMissingRequiredField(\"field %s[\" + key + \"]: \" + err.Error())", field.Name)
-				})
-				g.Line("}")
+				// Optimization: if it's a direct object, use the key in the error message
+				if tr.MapValue.Kind == ir.TypeKindType || tr.MapValue.Kind == ir.TypeKindObject {
+					g.Line("if err := value.validate(); err != nil {")
+					g.Block(func() {
+						g.Linef("return errorMissingRequiredField(\"field %s[\" + key + \"]: \" + err.Error())", fieldName)
+					})
+					g.Line("}")
+				} else {
+					renderNestedValidation(g, "value", *tr.MapValue, fieldName)
+				}
 			})
 			g.Line("}")
 		}
 	}
+}
+
+// renderArrayValidation recursively validates array elements based on dimensions.
+func renderArrayValidation(g *gen.Generator, source string, dims int, itemType ir.TypeRef, fieldName string) {
+	if dims == 0 {
+		renderNestedValidation(g, source, itemType, fieldName)
+		return
+	}
+
+	g.Linef("for _, item := range %s {", source)
+	g.Block(func() {
+		renderArrayValidation(g, "item", dims-1, itemType, fieldName)
+	})
+	g.Line("}")
 }
 
 // renderTransformFunc generates the transform method for a pre-type.
@@ -350,71 +376,92 @@ func renderFieldTransform(g *gen.Generator, field ir.Field, fieldName, tempName,
 	isRequired := !field.Optional
 	goType := typeRefToGo(parentType+fieldName, field.Type)
 
-	switch field.Type.Kind {
+	source := fmt.Sprintf("p.%s.Value", fieldName)
+	if !isRequired {
+		g.Linef("%s := Optional[%s]{Present: p.%s.Present}", tempName, goType, fieldName)
+		g.Linef("if p.%s.Present {", fieldName)
+		g.Block(func() {
+			valTemp := "val" + strutil.ToPascalCase(fieldName)
+			g.Linef("var %s %s", valTemp, goType)
+			renderValueTransform(g, source, valTemp, field.Type, parentType+fieldName, "tmp")
+			g.Linef("%s.Value = %s", tempName, valTemp)
+		})
+		g.Line("}")
+	} else {
+		g.Linef("var %s %s", tempName, goType)
+		renderValueTransform(g, source, tempName, field.Type, parentType+fieldName, "tmp")
+	}
+}
+
+// renderValueTransform generates code to transform source (of pre-type) to dest (of final type).
+func renderValueTransform(g *gen.Generator, source, dest string, tr ir.TypeRef, ctxName string, tempPrefix string) {
+	if !needsPreType(tr) {
+		g.Linef("%s = %s", dest, source)
+		return
+	}
+
+	switch tr.Kind {
 	case ir.TypeKindType, ir.TypeKindObject:
-		if isRequired {
-			g.Linef("%s := p.%s.Value.transform()", tempName, fieldName)
-		} else {
-			g.Linef("%s := Optional[%s]{Present: p.%s.Present}", tempName, goType, fieldName)
-			g.Linef("if p.%s.Present {", fieldName)
-			g.Block(func() {
-				g.Linef("%s.Value = p.%s.Value.transform()", tempName, fieldName)
-			})
-			g.Line("}")
-		}
+		g.Linef("%s = %s.transform()", dest, source)
 
 	case ir.TypeKindArray:
-		if needsPreType(*field.Type.ArrayItem) {
-			elemType := typeRefToGo(parentType+fieldName, *field.Type.ArrayItem)
-			arrPrefix := strings.Repeat("[]", field.Type.ArrayDimensions)
-			fullElemType := arrPrefix[:len(arrPrefix)-2] + elemType // Remove one [] level
-
-			g.Linef("items%s := make(%s%s, len(p.%s.Value))", tempName, arrPrefix, elemType, fieldName)
-			g.Linef("for idx, preItem := range p.%s.Value {", fieldName)
-			g.Block(func() {
-				g.Linef("items%s[idx] = preItem.transform()", tempName)
-			})
-			g.Line("}")
-
-			if isRequired {
-				g.Linef("%s := items%s", tempName, tempName)
-			} else {
-				g.Linef("%s := Optional[%s%s]{Present: p.%s.Present, Value: items%s}",
-					tempName, arrPrefix, fullElemType, fieldName, tempName)
-			}
-		} else {
-			if isRequired {
-				g.Linef("%s := p.%s.Value", tempName, fieldName)
-			} else {
-				g.Linef("%s := p.%s", tempName, fieldName)
-			}
-		}
+		renderArrayTransform(g, source, dest, tr.ArrayDimensions, *tr.ArrayItem, ctxName, tempPrefix)
 
 	case ir.TypeKindMap:
-		if needsPreType(*field.Type.MapValue) {
-			valueType := typeRefToGo(parentType+fieldName, *field.Type.MapValue)
-
-			g.Linef("map%s := make(map[string]%s)", tempName, valueType)
-			g.Linef("for key, preValue := range p.%s.Value {", fieldName)
-			g.Block(func() {
-				g.Linef("map%s[key] = preValue.transform()", tempName)
-			})
-			g.Line("}")
-
-			if isRequired {
-				g.Linef("%s := map%s", tempName, tempName)
-			} else {
-				g.Linef("%s := Optional[map[string]%s]{Present: p.%s.Present, Value: map%s}",
-					tempName, valueType, fieldName, tempName)
-			}
-		} else {
-			if isRequired {
-				g.Linef("%s := p.%s.Value", tempName, fieldName)
-			} else {
-				g.Linef("%s := p.%s", tempName, fieldName)
-			}
-		}
+		destType := typeRefToGo(ctxName, tr)
+		g.Linef("%s = make(%s)", dest, destType)
+		g.Linef("for k, v := range %s {", source)
+		g.Block(func() {
+			itemType := *tr.MapValue
+			itemDestType := typeRefToGo(ctxName, itemType)
+			tempVar := tempPrefix + "_"
+			g.Linef("var %s %s", tempVar, itemDestType)
+			renderValueTransform(g, "v", tempVar, itemType, ctxName, tempVar)
+			g.Linef("%s[k] = %s", dest, tempVar)
+		})
+		g.Line("}")
 	}
+}
+
+// renderArrayTransform recursively generates array transformation code handling dimensions.
+func renderArrayTransform(g *gen.Generator, source, dest string, dims int, itemType ir.TypeRef, ctxName string, tempPrefix string) {
+	if dims == 0 {
+		renderValueTransform(g, source, dest, itemType, ctxName, tempPrefix)
+		return
+	}
+
+	// Calculate type for destination slice at this level
+	synthType := ir.TypeRef{
+		Kind:            ir.TypeKindArray,
+		ArrayDimensions: dims,
+		ArrayItem:       &itemType,
+	}
+	destType := typeRefToGo(ctxName, synthType)
+
+	g.Linef("%s = make(%s, len(%s))", dest, destType, source)
+	g.Linef("for i, v := range %s {", source)
+	g.Block(func() {
+		// Next level type
+		var nextLevelType string
+		if dims == 1 {
+			nextLevelType = typeRefToGo(ctxName, itemType)
+		} else {
+			synthNext := ir.TypeRef{
+				Kind:            ir.TypeKindArray,
+				ArrayDimensions: dims - 1,
+				ArrayItem:       &itemType,
+			}
+			nextLevelType = typeRefToGo(ctxName, synthNext)
+		}
+
+		tempVar := tempPrefix + "_"
+		g.Linef("var %s %s", tempVar, nextLevelType)
+
+		renderArrayTransform(g, "v", tempVar, dims-1, itemType, ctxName, tempVar)
+
+		g.Linef("%s[i] = %s", dest, tempVar)
+	})
+	g.Line("}")
 }
 
 // =============================================================================

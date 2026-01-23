@@ -428,7 +428,7 @@ func (s *internalServer[T]) handleRequest(
 		// Send an event with the error before closing the connection
 		response := Response[any]{
 			Ok:    false,
-			Error: asError(err),
+			Error: ToError(err),
 		}
 		jsonData, marshalErr := json.Marshal(response)
 		if marshalErr != nil {
@@ -448,7 +448,7 @@ func (s *internalServer[T]) handleRequest(
 	response := Response[any]{}
 	if err != nil {
 		response.Ok = false
-		response.Error = asError(err)
+		response.Error = ToError(err)
 	} else {
 		response.Ok = true
 		response.Output = output

@@ -13,7 +13,8 @@ import (
 //go:embed pieces/server.go
 var serverRawPiece string
 
-func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
+// generateServerCore generates the core server implementation (rpc_server.go).
+func generateServerCore(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
@@ -106,37 +107,56 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 	g.Line("}")
 	g.Break()
 
-	// -----------------------------------------------------------------------------
-	// Procedures registry and entries
-	// -----------------------------------------------------------------------------
-	g.Line("// serverProcRegistry groups all procedures and exposes typed entries to register")
-	g.Line("// per-procedure middlewares and the final business handler. Input deserialization")
-	g.Line("// and validation is handled automatically using generated pre* types.")
 	g.Line("type serverProcRegistry[T any] struct {")
 	g.Block(func() {
 		g.Line("intServer *internalServer[T]")
-		for _, fp := range flat.Procedures {
-			name := fullProcName(fp.RPCName, fp.Procedure.Name)
-			g.Linef("%s proc%sEntry[T]", name, name)
-		}
 	})
 	g.Line("}")
 	g.Break()
 
 	g.Line("func newServerProcRegistry[T any](intServer *internalServer[T]) *serverProcRegistry[T] {")
 	g.Block(func() {
-		g.Line("r := &serverProcRegistry[T]{intServer: intServer}")
-		for _, fp := range flat.Procedures {
-			name := fullProcName(fp.RPCName, fp.Procedure.Name)
-			g.Linef("r.%s = proc%sEntry[T]{intServer: intServer}", name, name)
-		}
-		g.Line("return r")
+		g.Line("return &serverProcRegistry[T]{intServer: intServer}")
 	})
 	g.Line("}")
 	g.Break()
 
-	for _, fp := range flat.Procedures {
-		name := fullProcName(fp.RPCName, fp.Procedure.Name)
+	g.Line("type serverStreamRegistry[T any] struct {")
+	g.Block(func() {
+		g.Line("intServer *internalServer[T]")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Line("func newServerStreamRegistry[T any](intServer *internalServer[T]) *serverStreamRegistry[T] {")
+	g.Block(func() {
+		g.Line("return &serverStreamRegistry[T]{intServer: intServer}")
+	})
+	g.Line("}")
+	g.Break()
+
+	return g.String(), nil
+}
+
+// generateServerRPC generates the server implementation for a specific RPC (rpc_{rpcName}_server.go).
+func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
+	if !config.GenServer {
+		return "", nil
+	}
+
+	g := gen.New().WithTabs()
+
+	// Procedures
+	for _, proc := range rpc.Procs {
+		name := fullProcName(rpc.Name, proc.Name)
+
+		g.Linef("// Register the %s procedure.", name)
+		g.Linef("func (r *serverProcRegistry[T]) %s() proc%sEntry[T] {", name, name)
+		g.Block(func() {
+			g.Linef("return proc%sEntry[T]{intServer: r.intServer}", name)
+		})
+		g.Line("}")
+		g.Break()
 
 		g.Linef("// proc%sEntry contains the typed API for the %s procedure.", name, name)
 		g.Linef("type proc%sEntry[T any] struct {", name)
@@ -162,10 +182,10 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Line("//")
 		g.Line("// Execution order: middlewares run in the order they were registered,")
 		g.Line("// then the final handler is invoked.")
-		if fp.Procedure.Doc != "" {
-			renderDoc(g, fp.Procedure.Doc, true)
+		if proc.Doc != "" {
+			renderDoc(g, proc.Doc, true)
 		}
-		renderDeprecated(g, fp.Procedure.Deprecated)
+		renderDeprecated(g, proc.Deprecated)
 		g.Linef("func (e proc%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", name, name)
 		g.Block(func() {
 			g.Linef("adapted := func(next ProcHandlerFunc[T, any, any]) ProcHandlerFunc[T, any, any] {")
@@ -233,10 +253,10 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Line("//  1) Deserialize and validate the input using generated pre* types")
 		g.Line("//  2) Build the procedure's middleware chain")
 		g.Line("//  3) Invoke your handler with a typed context")
-		if fp.Procedure.Doc != "" {
-			renderDoc(g, fp.Procedure.Doc, true)
+		if proc.Doc != "" {
+			renderDoc(g, proc.Doc, true)
 		}
-		renderDeprecated(g, fp.Procedure.Deprecated)
+		renderDeprecated(g, proc.Deprecated)
 		g.Linef("func (e proc%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", name, name)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any]) (any, error) {")
@@ -278,37 +298,18 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Break()
 	}
 
-	// -----------------------------------------------------------------------------
-	// Streams registry and entries
-	// -----------------------------------------------------------------------------
-	g.Line("// serverStreamRegistry groups all streams and exposes typed entries to register")
-	g.Line("// per-stream middlewares, emit middlewares, and the final business handler.")
-	g.Line("// Streaming uses Server-Sent Events and the middleware chain is composed per request.")
-	g.Line("type serverStreamRegistry[T any] struct {")
-	g.Block(func() {
-		g.Line("intServer *internalServer[T]")
-		for _, fs := range flat.Streams {
-			name := fullStreamName(fs.RPCName, fs.Stream.Name)
-			g.Linef("%s stream%sEntry[T]", name, name)
-		}
-	})
-	g.Line("}")
-	g.Break()
+	// Streams
+	for _, stream := range rpc.Streams {
+		name := fullStreamName(rpc.Name, stream.Name)
 
-	g.Line("func newServerStreamRegistry[T any](intServer *internalServer[T]) *serverStreamRegistry[T] {")
-	g.Block(func() {
-		g.Line("r := &serverStreamRegistry[T]{intServer: intServer}")
-		for _, fs := range flat.Streams {
-			name := fullStreamName(fs.RPCName, fs.Stream.Name)
-			g.Linef("r.%s = stream%sEntry[T]{intServer: intServer}", name, name)
-		}
-		g.Line("return r")
-	})
-	g.Line("}")
-	g.Break()
+		g.Linef("// Register the %s stream.", name)
+		g.Linef("func (r *serverStreamRegistry[T]) %s() stream%sEntry[T] {", name, name)
+		g.Block(func() {
+			g.Linef("return stream%sEntry[T]{intServer: r.intServer}", name)
+		})
+		g.Line("}")
+		g.Break()
 
-	for _, fs := range flat.Streams {
-		name := fullStreamName(fs.RPCName, fs.Stream.Name)
 		g.Linef("// stream%sEntry contains the typed API for the %s stream.", name, name)
 		g.Linef("type stream%sEntry[T any] struct {", name)
 		g.Block(func() {
@@ -334,10 +335,10 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Linef("// modify, or augment the handling of incoming stream requests for %s.", name)
 		g.Line("//")
 		g.Line("// Execution order: middlewares run in registration order, then the handler.")
-		if fs.Stream.Doc != "" {
-			renderDoc(g, fs.Stream.Doc, true)
+		if stream.Doc != "" {
+			renderDoc(g, stream.Doc, true)
 		}
-		renderDeprecated(g, fs.Stream.Deprecated)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (e stream%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", name, name)
 		g.Block(func() {
 			g.Linef("adapted := func(next StreamHandlerFunc[T, any, any]) StreamHandlerFunc[T, any, any] {")
@@ -402,10 +403,10 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Line("// transform, filter, decorate, or audit outgoing events in a type-safe way.")
 		g.Line("//")
 		g.Line("// Execution order: emit middlewares run in registration order for every event.")
-		if fs.Stream.Doc != "" {
-			renderDoc(g, fs.Stream.Doc, true)
+		if stream.Doc != "" {
+			renderDoc(g, stream.Doc, true)
 		}
-		renderDeprecated(g, fs.Stream.Deprecated)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (e stream%sEntry[T]) UseEmit(mw %sEmitMiddlewareFunc[T]) {", name, name)
 		g.Block(func() {
 			g.Linef("adapted := func(next EmitFunc[T, any, any]) EmitFunc[T, any, any] {")
@@ -463,10 +464,10 @@ func generateServer(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (st
 		g.Line("//  1) Deserialize and validate the input using generated pre* types")
 		g.Line("//  2) Build the stream's middleware chain and the emit chain")
 		g.Line("//  3) Provide a typed emit function and invoke your handler")
-		if fs.Stream.Doc != "" {
-			renderDoc(g, fs.Stream.Doc, true)
+		if stream.Doc != "" {
+			renderDoc(g, stream.Doc, true)
 		}
-		renderDeprecated(g, fs.Stream.Deprecated)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (e stream%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", name, name)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any], emitGeneric EmitFunc[T, any, any]) error {")

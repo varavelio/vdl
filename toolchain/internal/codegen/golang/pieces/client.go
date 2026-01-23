@@ -246,7 +246,7 @@ func (c *internalClient) proc(
 			}
 			return Response[json.RawMessage]{
 				Ok:    false,
-				Error: asError(fmt.Errorf("failed to create HTTP request: %w", err)),
+				Error: ToError(fmt.Errorf("failed to create HTTP request: %w", err)),
 			}
 		}
 
@@ -276,7 +276,7 @@ func (c *internalClient) proc(
 					Details:  map[string]any{"timeout": timeoutConf.Timeout, "attempt": attempt},
 				}
 			} else {
-				lastError = asError(fmt.Errorf("http request failed: %w", err))
+				lastError = ToError(fmt.Errorf("http request failed: %w", err))
 			}
 
 			// Retry on timeout or network errors if we have attempts left
@@ -331,7 +331,7 @@ func (c *internalClient) proc(
 			resp.Body.Close()
 			return Response[json.RawMessage]{
 				Ok:    false,
-				Error: asError(fmt.Errorf("failed to decode VDL response: %w", err)),
+				Error: ToError(fmt.Errorf("failed to decode VDL response: %w", err)),
 			}
 		}
 		resp.Body.Close()
@@ -466,7 +466,7 @@ func (c *internalClient) stream(
 			ch := make(chan Response[json.RawMessage], 1)
 			ch <- Response[json.RawMessage]{
 				Ok:    false,
-				Error: asError(fmt.Errorf("failed to marshal input for %s: %w", streamName, err)),
+				Error: ToError(fmt.Errorf("failed to marshal input for %s: %w", streamName, err)),
 			}
 			close(ch)
 			return ch
@@ -504,7 +504,7 @@ func (c *internalClient) stream(
 			if err != nil {
 				events <- Response[json.RawMessage]{
 					Ok:    false,
-					Error: asError(fmt.Errorf("failed to create HTTP request: %w", err)),
+					Error: ToError(fmt.Errorf("failed to create HTTP request: %w", err)),
 				}
 				return
 			}
@@ -541,7 +541,7 @@ func (c *internalClient) stream(
 
 				events <- Response[json.RawMessage]{
 					Ok:    false,
-					Error: asError(fmt.Errorf("stream request failed: %w", err)),
+					Error: ToError(fmt.Errorf("stream request failed: %w", err)),
 				}
 				return
 			}
@@ -631,7 +631,7 @@ func handleStreamEvents(
 			// Protocol violation – stop the stream without reconnect
 			events <- Response[json.RawMessage]{
 				Ok:    false,
-				Error: asError(fmt.Errorf("received invalid SSE payload: %v", err)),
+				Error: ToError(fmt.Errorf("received invalid SSE payload: %v", err)),
 			}
 			return
 		}

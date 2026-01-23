@@ -36,55 +36,160 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	// Flatten the schema for easier iteration
 	flat := flattenSchema(schema)
 
-	subGenerators := []func(*ir.Schema, *flatSchema, *config.GoConfig) (string, error){
-		generatePackage,
-		generateCoreTypes,
-		generateOptional,
+	// Map of filename -> generator
+	builders := make(map[string]*gen.Generator)
+
+	// Helper to get or create a builder for a file
+	getBuilder := func(filename string) *gen.Generator {
+		if b, ok := builders[filename]; ok {
+			return b
+		}
+		b := gen.New().WithTabs()
+
+		// Always start with package declaration
+		pkgCode := generatePackage(schema, flat, g.config)
+		b.Raw(pkgCode)
+		b.Break()
+
+		builders[filename] = b
+		return b
+	}
+
+	// Core Types (types_core.go)
+	code, err := generateCoreTypes(schema, flat, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("types_core.go")
+		b.Raw(code)
+		b.Break()
+		b.Break()
+	}
+
+	// Optional utility type (optional.go)
+	code, err = generateOptional(schema, flat, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("optional.go")
+		b.Raw(code)
+		b.Break()
+		b.Break()
+	}
+
+	// Types (types.go) - Domain types
+	// Contains: Enums, Domain Types, Procedure Types, Stream Types
+	typeGenerators := []func(*ir.Schema, *flatSchema, *config.GoConfig) (string, error){
 		generateEnums,
-		generateConstants,
-		generatePatterns,
 		generateDomainTypes,
 		generateProcedureTypes,
 		generateStreamTypes,
-		generateServer,
-		generateClient,
 	}
 
-	builder := gen.New().WithTabs()
-	for _, generator := range subGenerators {
-		codeChunk, err := generator(schema, flat, g.config)
+	for _, generator := range typeGenerators {
+		code, err := generator(schema, flat, g.config)
 		if err != nil {
 			return nil, err
 		}
-
-		codeChunk = strings.TrimSpace(codeChunk)
-		if codeChunk == "" {
-			continue
+		if code = strings.TrimSpace(code); code != "" {
+			b := getBuilder("types.go")
+			b.Raw(code)
+			b.Break()
 		}
-		builder.Raw(codeChunk)
-		builder.Break()
-		builder.Break()
 	}
 
-	generatedCode := builder.String()
-
-	// Try to format the generated code (might not work when running in WebAssembly)
-	formattedCode, err := imports.Process("", []byte(generatedCode), nil)
-	if err == nil {
-		generatedCode = string(formattedCode)
+	// Constants (consts.go)
+	code, err = generateConstants(schema, flat, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("consts.go")
+		b.Raw(code)
+		b.Break()
+		b.Break()
 	}
 
-	outputFile := g.config.Output
-	if outputFile == "" {
-		outputFile = "vdl.go"
+	// Patterns (patterns.go)
+	code, err = generatePatterns(schema, flat, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("patterns.go")
+		b.Raw(code)
+		b.Break()
+		b.Break()
 	}
 
-	return []File{
-		{
-			RelativePath: outputFile,
-			Content:      []byte(generatedCode),
-		},
-	}, nil
+	// RPC Server (rpc_server.go) - Core + All RPCs
+	code, err = generateServerCore(schema, flat, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("rpc_server.go")
+		b.Raw(code)
+		b.Break()
+		b.Break()
+	}
+	for _, rpc := range schema.RPCs {
+		code, err := generateServerRPC(rpc, g.config)
+		if err != nil {
+			return nil, err
+		}
+		if code = strings.TrimSpace(code); code != "" {
+			b := getBuilder("rpc_server.go")
+			b.Raw(code)
+			b.Break()
+			b.Break()
+		}
+	}
+
+	// RPC Client (rpc_client.go) - Core + All RPCs
+	code, err = generateClientCore(schema, flat, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("rpc_client.go")
+		b.Raw(code)
+		b.Break()
+		b.Break()
+	}
+	for _, rpc := range schema.RPCs {
+		code, err := generateClientRPC(rpc, g.config)
+		if err != nil {
+			return nil, err
+		}
+		if code = strings.TrimSpace(code); code != "" {
+			b := getBuilder("rpc_client.go")
+			b.Raw(code)
+			b.Break()
+			b.Break()
+		}
+	}
+
+	// Convert builders to files
+	var files []File
+	for filename, builder := range builders {
+		content := builder.String()
+
+		// Format code
+		formattedCode, err := imports.Process("", []byte(content), nil)
+		if err == nil {
+			content = string(formattedCode)
+		}
+
+		files = append(files, File{
+			RelativePath: filename,
+			Content:      []byte(content),
+		})
+	}
+
+	return files, nil
 }
 
 // flatSchema provides pre-computed flattened views of the schema for easier iteration.
