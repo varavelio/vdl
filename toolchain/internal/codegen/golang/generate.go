@@ -64,7 +64,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b := getBuilder("types_core.go")
 		b.Raw(code)
 		b.Break()
-		b.Break()
 	}
 
 	// Optional utility type (optional.go)
@@ -75,7 +74,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	if code = strings.TrimSpace(code); code != "" {
 		b := getBuilder("optional.go")
 		b.Raw(code)
-		b.Break()
 		b.Break()
 	}
 
@@ -109,7 +107,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b := getBuilder("consts.go")
 		b.Raw(code)
 		b.Break()
-		b.Break()
 	}
 
 	// Patterns (patterns.go)
@@ -120,7 +117,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	if code = strings.TrimSpace(code); code != "" {
 		b := getBuilder("patterns.go")
 		b.Raw(code)
-		b.Break()
 		b.Break()
 	}
 
@@ -133,7 +129,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b := getBuilder("rpc_server.go")
 		b.Raw(code)
 		b.Break()
-		b.Break()
 	}
 	for _, rpc := range schema.RPCs {
 		code, err := generateServerRPC(rpc, g.config)
@@ -143,7 +138,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		if code = strings.TrimSpace(code); code != "" {
 			b := getBuilder("rpc_server.go")
 			b.Raw(code)
-			b.Break()
 			b.Break()
 		}
 	}
@@ -157,7 +151,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b := getBuilder("rpc_client.go")
 		b.Raw(code)
 		b.Break()
-		b.Break()
 	}
 	for _, rpc := range schema.RPCs {
 		code, err := generateClientRPC(rpc, g.config)
@@ -167,7 +160,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		if code = strings.TrimSpace(code); code != "" {
 			b := getBuilder("rpc_client.go")
 			b.Raw(code)
-			b.Break()
 			b.Break()
 		}
 	}
