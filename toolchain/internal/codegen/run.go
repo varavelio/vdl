@@ -9,6 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin"
@@ -89,6 +90,14 @@ func Run(configPath string) error {
 			}
 			if err := runDart(ctx, absConfigDir, target.Dart, schema); err != nil {
 				return fmt.Errorf("target #%d (dart): %w", i, err)
+			}
+		} else if target.JSONSchema != nil {
+			schema, _, err := getSchema(target.JSONSchema.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runJSONSchema(ctx, absConfigDir, target.JSONSchema, schema); err != nil {
+				return fmt.Errorf("target #%d (jsonschema): %w", i, err)
 			}
 		} else if target.OpenAPI != nil {
 			schema, _, err := getSchema(target.OpenAPI.Schema)
@@ -332,6 +341,37 @@ func runDart(ctx context.Context, absConfigDir string, config *config.DartConfig
 
 	// Generate the code using new Generator interface
 	gen := dart.New(config)
+	files, err := gen.Generate(ctx, schema)
+	if err != nil {
+		return fmt.Errorf("failed to generate code: %w", err)
+	}
+
+	// Write the generated files
+	for _, file := range files {
+		outputFile := filepath.Join(outputDir, file.RelativePath)
+		outputFileDir := filepath.Dir(outputFile)
+		if err := os.MkdirAll(outputFileDir, 0755); err != nil {
+			return fmt.Errorf("failed to create output directory: %w", err)
+		}
+
+		if err := os.WriteFile(outputFile, file.Content, 0644); err != nil {
+			return fmt.Errorf("failed to write generated code to file %s: %w", outputFile, err)
+		}
+	}
+
+	return nil
+}
+
+func runJSONSchema(ctx context.Context, absConfigDir string, config *config.JSONSchemaConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, config.Output)
+
+	// Ensure output directory exists
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Generate the code using new Generator interface
+	gen := jsonschema.New(config)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)

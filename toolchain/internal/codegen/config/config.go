@@ -26,6 +26,7 @@ type TargetConfig struct {
 	Go         *GoConfig         `yaml:"go,omitempty" json:"go,omitempty"`
 	TypeScript *TypeScriptConfig `yaml:"typescript,omitempty" json:"typescript,omitempty"`
 	Dart       *DartConfig       `yaml:"dart,omitempty" json:"dart,omitempty"`
+	JSONSchema *JSONSchemaConfig `yaml:"jsonschema,omitempty" json:"jsonschema,omitempty"`
 	OpenAPI    *OpenAPIConfig    `yaml:"openapi,omitempty" json:"openapi,omitempty"`
 	Playground *PlaygroundConfig `yaml:"playground,omitempty" json:"playground,omitempty"`
 	Plugin     *PluginConfig     `yaml:"plugin,omitempty" json:"plugin,omitempty"`
@@ -100,6 +101,13 @@ type DartConfig struct {
 	ConstsConfig   `yaml:",inline" json:",inline"`
 	ClientConfig   `yaml:",inline" json:",inline"`
 	Package        string `yaml:"package" json:"package" jsonschema:"required,description=The name of the Dart package."`
+}
+
+// JSONSchemaConfig contains configuration for the JSON Schema target.
+type JSONSchemaConfig struct {
+	CommonConfig `yaml:",inline" json:",inline"`
+	ID           string `yaml:"id" json:"id,omitempty" jsonschema:"description=The $id of the schema."`
+	Filename     string `yaml:"filename" json:"filename,omitempty" jsonschema:"default=schema.json,description=The name of the output file."`
 }
 
 // OpenAPIConfig contains configuration for the OpenAPI target.
@@ -218,6 +226,13 @@ func (t *TargetConfig) validateAndSetDefaults(globalSchema string) error {
 	if t.Dart != nil {
 		count++
 		schema = &t.Dart.Schema
+	}
+	if t.JSONSchema != nil {
+		count++
+		schema = &t.JSONSchema.Schema
+		if t.JSONSchema.Filename == "" {
+			t.JSONSchema.Filename = "schema.json"
+		}
 	}
 	if t.OpenAPI != nil {
 		count++

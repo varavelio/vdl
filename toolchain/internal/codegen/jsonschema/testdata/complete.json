@@ -1,0 +1,218 @@
+{
+  "$defs": {
+    "Catalog_CreateProductInput": {
+      "description": "Input for Catalog/CreateProduct procedure",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/OrderStatus"
+        }
+      },
+      "required": ["name", "price"],
+      "type": "object"
+    },
+    "Catalog_CreateProductOutput": {
+      "description": "Output for Catalog/CreateProduct procedure",
+      "properties": {
+        "product": {
+          "$ref": "#/$defs/Product"
+        }
+      },
+      "required": ["product"],
+      "type": "object"
+    },
+    "Catalog_GetAllProductsInput": {
+      "description": "Input for Catalog/GetAllProducts procedure",
+      "properties": {},
+      "type": "object"
+    },
+    "Catalog_GetAllProductsOutput": {
+      "description": "Output for Catalog/GetAllProducts procedure",
+      "properties": {
+        "products": {
+          "items": {
+            "$ref": "#/$defs/Product"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["products"],
+      "type": "object"
+    },
+    "Catalog_ListProductsInput": {
+      "description": "Input for Catalog/ListProducts procedure",
+      "properties": {
+        "filterByStatus": {
+          "$ref": "#/$defs/OrderStatus"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "page": {
+          "type": "integer"
+        }
+      },
+      "required": ["limit", "page"],
+      "type": "object"
+    },
+    "Catalog_ListProductsOutput": {
+      "description": "Output for Catalog/ListProducts procedure",
+      "properties": {
+        "products": {
+          "items": {
+            "$ref": "#/$defs/Product"
+          },
+          "type": "array"
+        },
+        "totalItems": {
+          "type": "integer"
+        },
+        "totalPages": {
+          "type": "integer"
+        }
+      },
+      "required": ["products", "totalItems", "totalPages"],
+      "type": "object"
+    },
+    "Chat_NewMessagesInput": {
+      "description": "Input for Chat/NewMessages stream",
+      "properties": {
+        "chatId": {
+          "type": "string"
+        }
+      },
+      "required": ["chatId"],
+      "type": "object"
+    },
+    "Chat_NewMessagesOutput": {
+      "description": "Output for Chat/NewMessages stream",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "text", "timestamp", "userId"],
+      "type": "object"
+    },
+    "Chat_SendMessageInput": {
+      "description": "Input for Chat/SendMessage procedure",
+      "properties": {
+        "chatId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": ["chatId", "text"],
+      "type": "object"
+    },
+    "Chat_SendMessageOutput": {
+      "description": "Output for Chat/SendMessage procedure",
+      "properties": {
+        "messageId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": ["messageId", "timestamp"],
+      "type": "object"
+    },
+    "OrderStatus": {
+      "description": "Status of an order.",
+      "enum": ["Pending", "Processing", "Shipped", "Delivered"],
+      "type": "string"
+    },
+    "PaginatedResponse": {
+      "properties": {
+        "totalItems": {
+          "type": "integer"
+        },
+        "totalPages": {
+          "type": "integer"
+        }
+      },
+      "required": ["totalItems", "totalPages"],
+      "type": "object"
+    },
+    "PaginationParams": {
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "page": {
+          "type": "integer"
+        }
+      },
+      "required": ["limit", "page"],
+      "type": "object"
+    },
+    "Priority": {
+      "description": "Priority levels.",
+      "enum": [1, 2, 3],
+      "type": "integer"
+    },
+    "Product": {
+      "description": "A product in the catalog.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "matrix": {
+          "items": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "status": {
+          "$ref": "#/$defs/OrderStatus"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["id", "name", "price", "priority", "status"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

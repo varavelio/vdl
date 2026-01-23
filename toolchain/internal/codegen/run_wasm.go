@@ -8,6 +8,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
@@ -17,7 +18,7 @@ import (
 // RunWasmOptions contains options for running code generators in WASM mode
 // without writing to files.
 type RunWasmOptions struct {
-	// Generator must be one of: "go", "typescript", "dart".
+	// Generator must be one of: "go", "typescript", "dart", "jsonschema".
 	Generator string `json:"generator"`
 	// SchemaInput is the schema content as a string (VDL schema only).
 	SchemaInput string `json:"schemaInput"`
@@ -142,6 +143,20 @@ func runWasm(opts RunWasmOptions) (RunWasmOutput, error) {
 		}
 		return convertDartFiles(files), nil
 
+	case "jsonschema":
+		cfg := &config.JSONSchemaConfig{
+			CommonConfig: config.CommonConfig{
+				Output: ".",
+			},
+			Filename: "schema.json",
+		}
+		gen := jsonschema.New(cfg)
+		files, err := gen.Generate(ctx, schema)
+		if err != nil {
+			return RunWasmOutput{}, fmt.Errorf("failed to generate jsonschema: %s", err)
+		}
+		return convertJSONSchemaFiles(files), nil
+
 	default:
 		return RunWasmOutput{}, fmt.Errorf("unsupported generator: %s", opts.Generator)
 	}
@@ -173,6 +188,18 @@ func convertTypescriptFiles(files []typescript.File) RunWasmOutput {
 
 // convertDartFiles converts dart.File slice to RunWasmOutput.
 func convertDartFiles(files []dart.File) RunWasmOutput {
+	outputFiles := make([]RunWasmOutputFile, len(files))
+	for i, file := range files {
+		outputFiles[i] = RunWasmOutputFile{
+			Path:    file.RelativePath,
+			Content: string(file.Content),
+		}
+	}
+	return RunWasmOutput{Files: outputFiles}
+}
+
+// convertJSONSchemaFiles converts jsonschema.File slice to RunWasmOutput.
+func convertJSONSchemaFiles(files []jsonschema.File) RunWasmOutput {
 	outputFiles := make([]RunWasmOutputFile, len(files))
 	for i, file := range files {
 		outputFiles[i] = RunWasmOutputFile{

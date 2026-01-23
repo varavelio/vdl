@@ -31,6 +31,11 @@ targets:
   #     gen_patterns: true
   #     gen_consts: true
 
+  # - jsonschema:
+  #     output: ./vdlgen/jsonschema
+  #     filename: schema.json
+  #     id: "https://example.com/schema.json"
+
   # - openapi:
   #     output: ./vdlgen/openapi
   #     filename: openapi.yaml
