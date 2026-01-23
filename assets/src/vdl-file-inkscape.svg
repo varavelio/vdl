@@ -7,9 +7,9 @@
    width="384"
    height="512"
    viewBox="0 0 384 511.99999"
-   sodipodi:docname="vdl-file.svg"
+   sodipodi:docname="vdl-file-inkscape.svg"
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
-   inkscape:export-filename="vdl-icon-prod.svg"
+   inkscape:export-filename="vdl-file.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,9 +28,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="true"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="37.476658"
-     inkscape:cy="268.70057"
+     inkscape:zoom="1"
+     inkscape:cx="-134"
+     inkscape:cy="150"
      inkscape:window-width="2560"
      inkscape:window-height="1011"
      inkscape:window-x="0"
@@ -57,18 +57,18 @@
      id="rect11"
      style="fill:#2962ff;stroke-width:8.35107"
      inkscape:label="Background"
-     d="M 23.392,-5e-6 H 288.32278 L 304.05591,0.08838335 384,80.079836 V 95.636185 488.60799 C 384,501.56716 373.56717,512 360.608,512 H 23.392 C 10.432832,512 0,501.56716 0,488.60799 V 23.391995 C 0,10.432827 10.432832,-5e-6 23.392,-5e-6 Z"
-     sodipodi:nodetypes="sccccssssss" />
+     d="m 23.142,0.05423441 c 93.55343,0.28884369 170.22798,-0.43718294 263.78058,0.0883933 L 384.25,97.43075 l -0.5,391.23148 c -0.0166,12.95916 -10.43283,23.39201 -23.392,23.39201 H 23.142 c -12.959168,0 -23.392,-10.43284 -23.392,-23.39201 V 23.446235 C -0.25,10.487067 10.182832,0.05423441 23.142,0.05423441 Z"
+     sodipodi:nodetypes="sccssssss" />
   <path
-     style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.787693"
-     d="M 83.692308,220.83076 H 64 V 165.6923 h 114.21539 v 55.13846 h -19.69231 l 33.37291,105.66557 33.58094,-105.66557 H 205.78462 V 165.6923 H 320 v 55.13846 H 300.3077 L 249.10769,382.30769 H 134.89231 Z"
+     style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.918462"
+     d="M 65.711539,242.00384 H 42.75 v -64.29231 h 133.17693 v 64.29231 h -22.96154 l 38.91333,123.2077 39.1559,-123.2077 h -22.96154 v -64.2923 H 341.25 v 64.29231 H 318.28847 L 258.58846,430.28846 H 125.41154 Z"
      id="path1"
      inkscape:label="V"
      sodipodi:nodetypes="cccccccccccccccc" />
   <path
-     style="fill:#ffffff;fill-opacity:0.70385027;stroke:none;stroke-width:9.8;stroke-dasharray:none;stroke-opacity:1"
-     d="M 300.05591,4.0883883 380.5,84.500002 h -81 z"
+     style="fill:#ffffff;fill-opacity:0.70385;stroke:none;stroke-width:11.8568;stroke-dasharray:none;stroke-opacity:1"
+     d="M 283.17258,4.0883883 380.5,101.37651 307.5,102.5 c -20,0 -25,-7.999998 -25,-24.999998 z"
      id="path12"
-     sodipodi:nodetypes="cccc"
+     sodipodi:nodetypes="ccccc"
      inkscape:label="Ear" />
 </svg>
