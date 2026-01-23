@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="384"
+   height="512"
+   viewBox="0 0 384 511.99999"
+   sodipodi:docname="vdl-file.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   inkscape:export-filename="vdl-icon-prod.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="37.476658"
+     inkscape:cy="268.70057"
+     inkscape:window-width="2560"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1"
+     showguides="true">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="82.5"
+       originy="107.5"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <path
+     id="rect11"
+     style="fill:#2962ff;stroke-width:8.35107"
+     inkscape:label="Background"
+     d="M 23.392,-5e-6 H 288.32278 L 304.05591,0.08838335 384,80.079836 V 95.636185 488.60799 C 384,501.56716 373.56717,512 360.608,512 H 23.392 C 10.432832,512 0,501.56716 0,488.60799 V 23.391995 C 0,10.432827 10.432832,-5e-6 23.392,-5e-6 Z"
+     sodipodi:nodetypes="sccccssssss" />
+  <path
+     style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.787693"
+     d="M 83.692308,220.83076 H 64 V 165.6923 h 114.21539 v 55.13846 h -19.69231 l 33.37291,105.66557 33.58094,-105.66557 H 205.78462 V 165.6923 H 320 v 55.13846 H 300.3077 L 249.10769,382.30769 H 134.89231 Z"
+     id="path1"
+     inkscape:label="V"
+     sodipodi:nodetypes="cccccccccccccccc" />
+  <path
+     style="fill:#ffffff;fill-opacity:0.70385027;stroke:none;stroke-width:9.8;stroke-dasharray:none;stroke-opacity:1"
+     d="M 300.05591,4.0883883 380.5,84.500002 h -81 z"
+     id="path12"
+     sodipodi:nodetypes="cccc"
+     inkscape:label="Ear" />
+</svg>
