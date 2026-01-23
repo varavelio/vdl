@@ -94,6 +94,38 @@
         "package"
       ]
     },
+    "JSONSchemaConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "id": {
+          "type": "string",
+          "description": "The $id of the schema."
+        },
+        "filename": {
+          "type": "string",
+          "description": "The name of the output file.",
+          "default": "schema.json"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
     "OpenAPIConfig": {
       "properties": {
         "output": {
@@ -236,6 +268,9 @@
         },
         "dart": {
           "$ref": "#/$defs/DartConfig"
+        },
+        "jsonschema": {
+          "$ref": "#/$defs/JSONSchemaConfig"
         },
         "openapi": {
           "$ref": "#/$defs/OpenAPIConfig"
