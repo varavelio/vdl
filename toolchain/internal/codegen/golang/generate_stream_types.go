@@ -45,8 +45,8 @@ func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) (st
 	}
 
 	// Generate list of all stream names
-	g.Line("// vdlStreamNames is a list of all stream names.")
-	g.Line("var vdlStreamNames = []string{")
+	g.Line("// VDLStreamNames is a list of all stream names.")
+	g.Line("var VDLStreamNames = []string{")
 	g.Block(func() {
 		for _, fs := range flat.Streams {
 			streamName := fullStreamName(fs.RPCName, fs.Stream.Name)

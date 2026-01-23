@@ -85,7 +85,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		generateProcedureTypes,
 		generateStreamTypes,
 	}
-
 	for _, generator := range typeGenerators {
 		code, err := generator(schema, flat, g.config)
 		if err != nil {

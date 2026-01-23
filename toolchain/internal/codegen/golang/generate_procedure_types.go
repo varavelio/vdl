@@ -45,8 +45,8 @@ func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) 
 	}
 
 	// Generate list of all procedure names
-	g.Line("// vdlProcedureNames is a list of all procedure names.")
-	g.Line("var vdlProcedureNames = []string{")
+	g.Line("// VDLProcedureNames is a list of all procedure names.")
+	g.Line("var VDLProcedureNames = []string{")
 	g.Block(func() {
 		for _, fp := range flat.Procedures {
 			procName := fullProcName(fp.RPCName, fp.Procedure.Name)

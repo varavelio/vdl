@@ -81,7 +81,7 @@ func generateClientCore(_ *ir.Schema, flat *flatSchema, config *config.GoConfig)
 	g.Line("// Build constructs the *Client using the configured options.")
 	g.Line("func (b *clientBuilder) Build() *Client {")
 	g.Block(func() {
-		g.Line("intClient := newInternalClient(b.baseURL, vdlProcedureNames, vdlStreamNames, b.opts...)")
+		g.Line("intClient := newInternalClient(b.baseURL, VDLProcedureNames, VDLStreamNames, b.opts...)")
 		g.Line("return &Client{Procs: &clientProcRegistry{intClient: intClient}, Streams: &clientStreamRegistry{intClient: intClient}}")
 	})
 	g.Line("}")
