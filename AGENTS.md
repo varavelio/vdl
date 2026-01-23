@@ -24,7 +24,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Code Style**:
   - Go: Idiomatic, `golangci-lint` strictness.
   - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4.
-- **Terminology**: The core tool is now referred to as `toolchain` and the binary is named `vdl`.
+- **Terminology**: The core tool is referred to as `toolchain`. The binary is named `vdl`.
 
 ## 3. Architecture & Organization
 
@@ -42,8 +42,8 @@ When updating this document, do so with the context of the entire document in mi
 - **Role**: Contains the business logic for parsing, analyzing, transforming, and generating RPC schemas.
 - **Key Directories**:
   - `cmd/`: Entry points.
-    - `urpc/`: Main CLI entry point (native).
-    - `urpcwasm/`: Entry point for WASM compilation (browser target).
+    - `vdl/`: Main CLI entry point (native).
+    - `vdlwasm/`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
     - `core/`: The Compiler Core Pipeline.
       - `ast/`: Abstract Syntax Tree definitions. **Crucial**: The AST structure groups `proc` and `stream` definitions inside `rpc` blocks.
@@ -57,24 +57,25 @@ When updating this document, do so with the context of the entire document in mi
     - `formatter/`: Source code formatting logic (`vdl fmt`).
     - `lsp/`: Language Server Protocol implementation.
     - `codegen/`: Code Generators (Go, TS, Dart, etc.).
+    - `cmd/schemagen/`: Internal tool to generate JSON schemas for IR and Config.
     - `util/`: Shared Utilities (strings, paths, debug).
-  - `dist/`: Build artifacts.
-- **Integration**: Compiles to `dist/urpc.wasm` which is copied to the playground.
+  - `dist/`: Build artifacts (e.g., `vdl.wasm`).
+- **Integration**: Compiles to `dist/vdl.wasm` which is copied to the playground.
 
 ### `playground/` (Frontend)
 
 - **Role**: A visual editor/playground for VDL.
-- **Tech**: Svelte 5, Vite, TailwindCSS 4, Biome.
+- **Tech**: Svelte 5 (Runes), Vite, TailwindCSS 4, Biome.
 - **Integration**:
-  - Consumes `urpc.wasm` (via `wasm_exec.js`).
-  - Generates Typescript definitions from Go schemas via `npm run genschema`.
+  - Consumes `vdl.wasm` (via `wasm_exec.js`).
+  - Generates Typescript definitions from Go schemas.
   - Builds to static files that are eventually embedded into the Go binary.
 
 ### Build Pipeline
 
-1. **WASM Build**: Go code compiles to WASM (`task build:wasm`).
+1. **WASM Build**: Go code compiles to WASM (`task build:wasm`) -> `toolchain/dist/vdl.wasm`.
 2. **Frontend Build**: Playground consumes WASM and builds static assets (`npm run build`).
-3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary (`task build:toolchain`).
+3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary (`task build:vdl`).
 
 ## 4. Testing & Quality
 
@@ -89,7 +90,7 @@ When updating this document, do so with the context of the entire document in mi
 ### Go
 
 - **Version**: 1.25+
-- **Key Libs**: `go-arg`, `participle` (parser), `testify`.
+- **Key Libs**: `go-arg`, `participle` (parser), `testify`, `jsonschema`.
 - **Patterns**: Standard Go project layout (`cmd`, `internal`).
 - **AST Handling**:
   - When working with the AST, remember that `Proc` and `Stream` are children of `RPC`.
