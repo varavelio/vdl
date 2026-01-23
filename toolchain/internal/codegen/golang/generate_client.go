@@ -14,7 +14,7 @@ import (
 var clientRawPiece string
 
 // generateClientCore generates the core client implementation (rpc_client.go).
-func generateClientCore(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
+func generateClientCore(_ *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}

@@ -14,7 +14,7 @@ import (
 var serverRawPiece string
 
 // generateServerCore generates the core server implementation (rpc_server.go).
-func generateServerCore(_ *ir.Schema, flat *flatSchema, config *config.GoConfig) (string, error) {
+func generateServerCore(_ *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
