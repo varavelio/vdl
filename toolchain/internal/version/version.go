@@ -28,9 +28,13 @@ func init() {
 var (
 	// Version is replaced during the release process by the latest Git tag
 	// and should not be manually edited.
+	//
+	// This string does not contain the "v" prefix.
 	Version = "0.0.0-dev"
 
 	// VersionMajor is the major version extracted from Version.
+	//
+	// This string does not contain the "v" prefix.
 	VersionMajor = "0"
 )
 
