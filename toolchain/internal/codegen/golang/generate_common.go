@@ -129,7 +129,7 @@ func renderField(parentTypeName string, field ir.Field) string {
 	// JSON tag
 	jsonTag := fmt.Sprintf(" `json:\"%s\"`", nameCamel)
 	if field.Optional {
-		jsonTag = fmt.Sprintf(" `json:\"%s,omitempty\"`", nameCamel)
+		jsonTag = fmt.Sprintf(" `json:\"%s,omitzero\"`", nameCamel)
 	}
 
 	doc := renderDocString(field.Doc, false)
@@ -150,7 +150,7 @@ func renderPreField(parentTypeName string, field ir.Field) string {
 	// All pre-type fields are optional for validation
 	typeLiteral = fmt.Sprintf("Optional[%s]", typeLiteral)
 
-	jsonTag := fmt.Sprintf(" `json:\"%s,omitempty\"`", nameCamel)
+	jsonTag := fmt.Sprintf(" `json:\"%s,omitzero\"`", nameCamel)
 	result := fmt.Sprintf("%s %s", namePascal, typeLiteral)
 	return result + jsonTag
 }
