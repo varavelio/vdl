@@ -15,8 +15,8 @@ func generatePaths(schema *ir.Schema) Paths {
 		// Generate paths for procedures
 		for _, proc := range rpc.Procs {
 			path := "/" + rpc.Name + "/" + proc.Name
-			inputName := rpc.Name + "_" + proc.Name + "Input"
-			outputName := rpc.Name + "_" + proc.Name + "Output"
+			inputName := rpc.Name + proc.Name + "Input"
+			outputName := rpc.Name + proc.Name + "Output"
 
 			operation := map[string]any{
 				"tags": []string{rpc.Name + "Procedures"},
@@ -46,8 +46,8 @@ func generatePaths(schema *ir.Schema) Paths {
 		// Generate paths for streams
 		for _, stream := range rpc.Streams {
 			path := "/" + rpc.Name + "/" + stream.Name
-			inputName := rpc.Name + "_" + stream.Name + "Input"
-			outputName := rpc.Name + "_" + stream.Name + "Output"
+			inputName := rpc.Name + stream.Name + "Input"
+			outputName := rpc.Name + stream.Name + "Output"
 
 			operation := map[string]any{
 				"tags": []string{rpc.Name + "Streams"},

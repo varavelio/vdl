@@ -14,50 +14,50 @@ paths:
     post:
       description: Procedure with both empty
       requestBody:
-        $ref: "#/components/requestBodies/EdgeCases_BothEmptyInput"
+        $ref: "#/components/requestBodies/EdgeCasesBothEmptyInput"
       responses:
         "200":
-          $ref: "#/components/responses/EdgeCases_BothEmptyOutput"
+          $ref: "#/components/responses/EdgeCasesBothEmptyOutput"
       tags:
         - EdgeCasesProcedures
   /EdgeCases/EmptyInput:
     post:
       description: Procedure with empty input
       requestBody:
-        $ref: "#/components/requestBodies/EdgeCases_EmptyInputInput"
+        $ref: "#/components/requestBodies/EdgeCasesEmptyInputInput"
       responses:
         "200":
-          $ref: "#/components/responses/EdgeCases_EmptyInputOutput"
+          $ref: "#/components/responses/EdgeCasesEmptyInputOutput"
       tags:
         - EdgeCasesProcedures
   /EdgeCases/EmptyInputStream:
     post:
       description: Stream with empty input
       requestBody:
-        $ref: "#/components/requestBodies/EdgeCases_EmptyInputStreamInput"
+        $ref: "#/components/requestBodies/EdgeCasesEmptyInputStreamInput"
       responses:
         "200":
-          $ref: "#/components/responses/EdgeCases_EmptyInputStreamOutput"
+          $ref: "#/components/responses/EdgeCasesEmptyInputStreamOutput"
       tags:
         - EdgeCasesStreams
   /EdgeCases/EmptyOutput:
     post:
       description: Procedure with empty output
       requestBody:
-        $ref: "#/components/requestBodies/EdgeCases_EmptyOutputInput"
+        $ref: "#/components/requestBodies/EdgeCasesEmptyOutputInput"
       responses:
         "200":
-          $ref: "#/components/responses/EdgeCases_EmptyOutputOutput"
+          $ref: "#/components/responses/EdgeCasesEmptyOutputOutput"
       tags:
         - EdgeCasesProcedures
   /EdgeCases/LongDocumentation:
     post:
       description: "Procedure with very long documentation.\n\nThis procedure does many things:\n\n1. First it validates the input\n2. Then it processes the data\n3. Finally it returns the result\n\n## Parameters\n\n- `complexField`: A deeply nested structure\n\n## Returns\n\nA simple boolean indicating success\n\n## Example\n\n```json\n{\n  \"complexField\": {\n    \"nested\": {\n      \"value\": 42\n    }\n  }\n}\n```"
       requestBody:
-        $ref: "#/components/requestBodies/EdgeCases_LongDocumentationInput"
+        $ref: "#/components/requestBodies/EdgeCasesLongDocumentationInput"
       responses:
         "200":
-          $ref: "#/components/responses/EdgeCases_LongDocumentationOutput"
+          $ref: "#/components/responses/EdgeCasesLongDocumentationOutput"
       tags:
         - EdgeCasesProcedures
 components:
@@ -82,28 +82,28 @@ components:
         - field2
       type: object
   requestBodies:
-    EdgeCases_BothEmptyInput:
+    EdgeCasesBothEmptyInput:
       content:
         application/json:
           schema:
             properties: {}
             type: object
       description: Request body for EdgeCases/BothEmpty procedure
-    EdgeCases_EmptyInputInput:
+    EdgeCasesEmptyInputInput:
       content:
         application/json:
           schema:
             properties: {}
             type: object
       description: Request body for EdgeCases/EmptyInput procedure
-    EdgeCases_EmptyInputStreamInput:
+    EdgeCasesEmptyInputStreamInput:
       content:
         application/json:
           schema:
             properties: {}
             type: object
       description: Request body for EdgeCases/EmptyInputStream stream subscription
-    EdgeCases_EmptyOutputInput:
+    EdgeCasesEmptyOutputInput:
       content:
         application/json:
           schema:
@@ -114,7 +114,7 @@ components:
               - data
             type: object
       description: Request body for EdgeCases/EmptyOutput procedure
-    EdgeCases_LongDocumentationInput:
+    EdgeCasesLongDocumentationInput:
       content:
         application/json:
           schema:
@@ -136,7 +136,7 @@ components:
             type: object
       description: Request body for EdgeCases/LongDocumentation procedure
   responses:
-    EdgeCases_BothEmptyOutput:
+    EdgeCasesBothEmptyOutput:
       content:
         application/json:
           schema:
@@ -165,7 +165,7 @@ components:
               - ok
             type: object
       description: Response for EdgeCases/BothEmpty procedure
-    EdgeCases_EmptyInputOutput:
+    EdgeCasesEmptyInputOutput:
       content:
         application/json:
           schema:
@@ -198,7 +198,7 @@ components:
               - ok
             type: object
       description: Response for EdgeCases/EmptyInput procedure
-    EdgeCases_EmptyInputStreamOutput:
+    EdgeCasesEmptyInputStreamOutput:
       content:
         text/event-stream:
           schema:
@@ -235,7 +235,7 @@ components:
               - ok
             type: object
       description: Server-Sent Events for EdgeCases/EmptyInputStream stream
-    EdgeCases_EmptyOutputOutput:
+    EdgeCasesEmptyOutputOutput:
       content:
         application/json:
           schema:
@@ -264,7 +264,7 @@ components:
               - ok
             type: object
       description: Response for EdgeCases/EmptyOutput procedure
-    EdgeCases_LongDocumentationOutput:
+    EdgeCasesLongDocumentationOutput:
       content:
         application/json:
           schema:

@@ -12,40 +12,40 @@ paths:
     post:
       description: Create with spread in input
       requestBody:
-        $ref: "#/components/requestBodies/Articles_CreateInput"
+        $ref: "#/components/requestBodies/ArticlesCreateInput"
       responses:
         "200":
-          $ref: "#/components/responses/Articles_CreateOutput"
+          $ref: "#/components/responses/ArticlesCreateOutput"
       tags:
         - ArticlesProcedures
   /Articles/Get:
     post:
       description: Get with minimal spread
       requestBody:
-        $ref: "#/components/requestBodies/Articles_GetInput"
+        $ref: "#/components/requestBodies/ArticlesGetInput"
       responses:
         "200":
-          $ref: "#/components/responses/Articles_GetOutput"
+          $ref: "#/components/responses/ArticlesGetOutput"
       tags:
         - ArticlesProcedures
   /Articles/List:
     post:
       description: List with spread in both input and output
       requestBody:
-        $ref: "#/components/requestBodies/Articles_ListInput"
+        $ref: "#/components/requestBodies/ArticlesListInput"
       responses:
         "200":
-          $ref: "#/components/responses/Articles_ListOutput"
+          $ref: "#/components/responses/ArticlesListOutput"
       tags:
         - ArticlesProcedures
   /Articles/Update:
     post:
       description: Update with multiple optional spread fields
       requestBody:
-        $ref: "#/components/requestBodies/Articles_UpdateInput"
+        $ref: "#/components/requestBodies/ArticlesUpdateInput"
       responses:
         "200":
-          $ref: "#/components/responses/Articles_UpdateOutput"
+          $ref: "#/components/responses/ArticlesUpdateOutput"
       tags:
         - ArticlesProcedures
 components:
@@ -140,7 +140,7 @@ components:
         - updatedAt
       type: object
   requestBodies:
-    Articles_CreateInput:
+    ArticlesCreateInput:
       content:
         application/json:
           schema:
@@ -164,7 +164,7 @@ components:
               - content
             type: object
       description: Request body for Articles/Create procedure
-    Articles_GetInput:
+    ArticlesGetInput:
       content:
         application/json:
           schema:
@@ -175,7 +175,7 @@ components:
               - id
             type: object
       description: Request body for Articles/Get procedure
-    Articles_ListInput:
+    ArticlesListInput:
       content:
         application/json:
           schema:
@@ -193,7 +193,7 @@ components:
               - limit
             type: object
       description: Request body for Articles/List procedure
-    Articles_UpdateInput:
+    ArticlesUpdateInput:
       content:
         application/json:
           schema:
@@ -219,7 +219,7 @@ components:
             type: object
       description: Request body for Articles/Update procedure
   responses:
-    Articles_CreateOutput:
+    ArticlesCreateOutput:
       content:
         application/json:
           schema:
@@ -252,7 +252,7 @@ components:
               - ok
             type: object
       description: Response for Articles/Create procedure
-    Articles_GetOutput:
+    ArticlesGetOutput:
       content:
         application/json:
           schema:
@@ -285,7 +285,7 @@ components:
               - ok
             type: object
       description: Response for Articles/Get procedure
-    Articles_ListOutput:
+    ArticlesListOutput:
       content:
         application/json:
           schema:
@@ -335,7 +335,7 @@ components:
               - ok
             type: object
       description: Response for Articles/List procedure
-    Articles_UpdateOutput:
+    ArticlesUpdateOutput:
       content:
         application/json:
           schema:

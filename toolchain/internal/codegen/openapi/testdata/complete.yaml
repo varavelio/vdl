@@ -16,50 +16,50 @@ paths:
     post:
       description: Creates a new product.
       requestBody:
-        $ref: "#/components/requestBodies/Catalog_CreateProductInput"
+        $ref: "#/components/requestBodies/CatalogCreateProductInput"
       responses:
         "200":
-          $ref: "#/components/responses/Catalog_CreateProductOutput"
+          $ref: "#/components/responses/CatalogCreateProductOutput"
       tags:
         - CatalogProcedures
   /Catalog/GetAllProducts:
     post:
       deprecated: true
       requestBody:
-        $ref: "#/components/requestBodies/Catalog_GetAllProductsInput"
+        $ref: "#/components/requestBodies/CatalogGetAllProductsInput"
       responses:
         "200":
-          $ref: "#/components/responses/Catalog_GetAllProductsOutput"
+          $ref: "#/components/responses/CatalogGetAllProductsOutput"
       tags:
         - CatalogProcedures
   /Catalog/ListProducts:
     post:
       description: Lists products with pagination.
       requestBody:
-        $ref: "#/components/requestBodies/Catalog_ListProductsInput"
+        $ref: "#/components/requestBodies/CatalogListProductsInput"
       responses:
         "200":
-          $ref: "#/components/responses/Catalog_ListProductsOutput"
+          $ref: "#/components/responses/CatalogListProductsOutput"
       tags:
         - CatalogProcedures
   /Chat/NewMessages:
     post:
       description: Stream of new messages.
       requestBody:
-        $ref: "#/components/requestBodies/Chat_NewMessagesInput"
+        $ref: "#/components/requestBodies/ChatNewMessagesInput"
       responses:
         "200":
-          $ref: "#/components/responses/Chat_NewMessagesOutput"
+          $ref: "#/components/responses/ChatNewMessagesOutput"
       tags:
         - ChatStreams
   /Chat/SendMessage:
     post:
       description: Sends a message.
       requestBody:
-        $ref: "#/components/requestBodies/Chat_SendMessageInput"
+        $ref: "#/components/requestBodies/ChatSendMessageInput"
       responses:
         "200":
-          $ref: "#/components/responses/Chat_SendMessageOutput"
+          $ref: "#/components/responses/ChatSendMessageOutput"
       tags:
         - ChatProcedures
 components:
@@ -134,7 +134,7 @@ components:
         - priority
       type: object
   requestBodies:
-    Catalog_CreateProductInput:
+    CatalogCreateProductInput:
       content:
         application/json:
           schema:
@@ -150,14 +150,14 @@ components:
               - price
             type: object
       description: Request body for Catalog/CreateProduct procedure
-    Catalog_GetAllProductsInput:
+    CatalogGetAllProductsInput:
       content:
         application/json:
           schema:
             properties: {}
             type: object
       description: Request body for Catalog/GetAllProducts procedure
-    Catalog_ListProductsInput:
+    CatalogListProductsInput:
       content:
         application/json:
           schema:
@@ -173,7 +173,7 @@ components:
               - limit
             type: object
       description: Request body for Catalog/ListProducts procedure
-    Chat_NewMessagesInput:
+    ChatNewMessagesInput:
       content:
         application/json:
           schema:
@@ -184,7 +184,7 @@ components:
               - chatId
             type: object
       description: Request body for Chat/NewMessages stream subscription
-    Chat_SendMessageInput:
+    ChatSendMessageInput:
       content:
         application/json:
           schema:
@@ -199,7 +199,7 @@ components:
             type: object
       description: Request body for Chat/SendMessage procedure
   responses:
-    Catalog_CreateProductOutput:
+    CatalogCreateProductOutput:
       content:
         application/json:
           schema:
@@ -232,7 +232,7 @@ components:
               - ok
             type: object
       description: Response for Catalog/CreateProduct procedure
-    Catalog_GetAllProductsOutput:
+    CatalogGetAllProductsOutput:
       content:
         application/json:
           schema:
@@ -267,7 +267,7 @@ components:
               - ok
             type: object
       description: Response for Catalog/GetAllProducts procedure
-    Catalog_ListProductsOutput:
+    CatalogListProductsOutput:
       content:
         application/json:
           schema:
@@ -308,7 +308,7 @@ components:
               - ok
             type: object
       description: Response for Catalog/ListProducts procedure
-    Chat_NewMessagesOutput:
+    ChatNewMessagesOutput:
       content:
         text/event-stream:
           schema:
@@ -351,7 +351,7 @@ components:
               - ok
             type: object
       description: Server-Sent Events for Chat/NewMessages stream
-    Chat_SendMessageOutput:
+    ChatSendMessageOutput:
       content:
         application/json:
           schema:

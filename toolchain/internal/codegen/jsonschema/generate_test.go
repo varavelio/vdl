@@ -124,8 +124,8 @@ func TestGenerator_Generate(t *testing.T) {
 	assert.Contains(t, content, `"$id": "https://example.com/schema.json"`)
 	assert.Contains(t, content, `"$schema": "https://json-schema.org/draft/2020-12/schema"`)
 	assert.Contains(t, content, `"User": {`)
-	assert.Contains(t, content, `"UserService_CreateInput": {`)
-	assert.Contains(t, content, `"UserService_CreateOutput": {`)
+	assert.Contains(t, content, `"UserServiceCreateInput": {`)
+	assert.Contains(t, content, `"UserServiceCreateOutput": {`)
 }
 
 func TestGenerateTypeRefSchema(t *testing.T) {

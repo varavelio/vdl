@@ -12,30 +12,30 @@ paths:
     post:
       description: "Extreme nesting: array of maps of arrays of maps"
       requestBody:
-        $ref: "#/components/requestBodies/DataProcessing_ExtremeNestingInput"
+        $ref: "#/components/requestBodies/DataProcessingExtremeNestingInput"
       responses:
         "200":
-          $ref: "#/components/responses/DataProcessing_ExtremeNestingOutput"
+          $ref: "#/components/responses/DataProcessingExtremeNestingOutput"
       tags:
         - DataProcessingProcedures
   /DataProcessing/ProcessMaps:
     post:
       description: Work with nested maps
       requestBody:
-        $ref: "#/components/requestBodies/DataProcessing_ProcessMapsInput"
+        $ref: "#/components/requestBodies/DataProcessingProcessMapsInput"
       responses:
         "200":
-          $ref: "#/components/responses/DataProcessing_ProcessMapsOutput"
+          $ref: "#/components/responses/DataProcessingProcessMapsOutput"
       tags:
         - DataProcessingProcedures
   /DataProcessing/ProcessMatrix:
     post:
       description: Process multi-dimensional data structures
       requestBody:
-        $ref: "#/components/requestBodies/DataProcessing_ProcessMatrixInput"
+        $ref: "#/components/requestBodies/DataProcessingProcessMatrixInput"
       responses:
         "200":
-          $ref: "#/components/responses/DataProcessing_ProcessMatrixOutput"
+          $ref: "#/components/responses/DataProcessingProcessMatrixOutput"
       tags:
         - DataProcessingProcedures
 components:
@@ -74,7 +74,7 @@ components:
         - data
       type: object
   requestBodies:
-    DataProcessing_ExtremeNestingInput:
+    DataProcessingExtremeNestingInput:
       content:
         application/json:
           schema:
@@ -112,7 +112,7 @@ components:
               - level3
             type: object
       description: Request body for DataProcessing/ExtremeNesting procedure
-    DataProcessing_ProcessMapsInput:
+    DataProcessingProcessMapsInput:
       content:
         application/json:
           schema:
@@ -148,7 +148,7 @@ components:
               - users
             type: object
       description: Request body for DataProcessing/ProcessMaps procedure
-    DataProcessing_ProcessMatrixInput:
+    DataProcessingProcessMatrixInput:
       content:
         application/json:
           schema:
@@ -183,7 +183,7 @@ components:
             type: object
       description: Request body for DataProcessing/ProcessMatrix procedure
   responses:
-    DataProcessing_ExtremeNestingOutput:
+    DataProcessingExtremeNestingOutput:
       content:
         application/json:
           schema:
@@ -216,7 +216,7 @@ components:
               - ok
             type: object
       description: Response for DataProcessing/ExtremeNesting procedure
-    DataProcessing_ProcessMapsOutput:
+    DataProcessingProcessMapsOutput:
       content:
         application/json:
           schema:
@@ -262,7 +262,7 @@ components:
               - ok
             type: object
       description: Response for DataProcessing/ProcessMaps procedure
-    DataProcessing_ProcessMatrixOutput:
+    DataProcessingProcessMatrixOutput:
       content:
         application/json:
           schema:

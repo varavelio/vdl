@@ -22,90 +22,90 @@ paths:
     post:
       description: Login procedure
       requestBody:
-        $ref: "#/components/requestBodies/Auth_LoginInput"
+        $ref: "#/components/requestBodies/AuthLoginInput"
       responses:
         "200":
-          $ref: "#/components/responses/Auth_LoginOutput"
+          $ref: "#/components/responses/AuthLoginOutput"
       tags:
         - AuthProcedures
   /Auth/Logout:
     post:
       description: Logout procedure
       requestBody:
-        $ref: "#/components/requestBodies/Auth_LogoutInput"
+        $ref: "#/components/requestBodies/AuthLogoutInput"
       responses:
         "200":
-          $ref: "#/components/responses/Auth_LogoutOutput"
+          $ref: "#/components/responses/AuthLogoutOutput"
       tags:
         - AuthProcedures
   /Auth/SessionStatus:
     post:
       description: Session status stream
       requestBody:
-        $ref: "#/components/requestBodies/Auth_SessionStatusInput"
+        $ref: "#/components/requestBodies/AuthSessionStatusInput"
       responses:
         "200":
-          $ref: "#/components/responses/Auth_SessionStatusOutput"
+          $ref: "#/components/responses/AuthSessionStatusOutput"
       tags:
         - AuthStreams
   /Notifications/Send:
     post:
       description: Send notification
       requestBody:
-        $ref: "#/components/requestBodies/Notifications_SendInput"
+        $ref: "#/components/requestBodies/NotificationsSendInput"
       responses:
         "200":
-          $ref: "#/components/responses/Notifications_SendOutput"
+          $ref: "#/components/responses/NotificationsSendOutput"
       tags:
         - NotificationsProcedures
   /Notifications/Subscribe:
     post:
       description: Subscribe to notifications
       requestBody:
-        $ref: "#/components/requestBodies/Notifications_SubscribeInput"
+        $ref: "#/components/requestBodies/NotificationsSubscribeInput"
       responses:
         "200":
-          $ref: "#/components/responses/Notifications_SubscribeOutput"
+          $ref: "#/components/responses/NotificationsSubscribeOutput"
       tags:
         - NotificationsStreams
   /Users/Changes:
     post:
       description: Stream user changes
       requestBody:
-        $ref: "#/components/requestBodies/Users_ChangesInput"
+        $ref: "#/components/requestBodies/UsersChangesInput"
       responses:
         "200":
-          $ref: "#/components/responses/Users_ChangesOutput"
+          $ref: "#/components/responses/UsersChangesOutput"
       tags:
         - UsersStreams
   /Users/Create:
     post:
       description: Create a new user
       requestBody:
-        $ref: "#/components/requestBodies/Users_CreateInput"
+        $ref: "#/components/requestBodies/UsersCreateInput"
       responses:
         "200":
-          $ref: "#/components/responses/Users_CreateOutput"
+          $ref: "#/components/responses/UsersCreateOutput"
       tags:
         - UsersProcedures
   /Users/List:
     post:
       description: List users with filters
       requestBody:
-        $ref: "#/components/requestBodies/Users_ListInput"
+        $ref: "#/components/requestBodies/UsersListInput"
       responses:
         "200":
-          $ref: "#/components/responses/Users_ListOutput"
+          $ref: "#/components/responses/UsersListOutput"
       tags:
         - UsersProcedures
   /Users/Update:
     post:
       description: Update user
       requestBody:
-        $ref: "#/components/requestBodies/Users_UpdateInput"
+        $ref: "#/components/requestBodies/UsersUpdateInput"
       responses:
         "200":
-          $ref: "#/components/responses/Users_UpdateOutput"
+          $ref: "#/components/responses/UsersUpdateOutput"
       tags:
         - UsersProcedures
 components:
@@ -157,7 +157,7 @@ components:
         - status
       type: object
   requestBodies:
-    Auth_LoginInput:
+    AuthLoginInput:
       content:
         application/json:
           schema:
@@ -171,7 +171,7 @@ components:
               - password
             type: object
       description: Request body for Auth/Login procedure
-    Auth_LogoutInput:
+    AuthLogoutInput:
       content:
         application/json:
           schema:
@@ -182,7 +182,7 @@ components:
               - token
             type: object
       description: Request body for Auth/Logout procedure
-    Auth_SessionStatusInput:
+    AuthSessionStatusInput:
       content:
         application/json:
           schema:
@@ -193,7 +193,7 @@ components:
               - token
             type: object
       description: Request body for Auth/SessionStatus stream subscription
-    Notifications_SendInput:
+    NotificationsSendInput:
       content:
         application/json:
           schema:
@@ -214,7 +214,7 @@ components:
               - body
             type: object
       description: Request body for Notifications/Send procedure
-    Notifications_SubscribeInput:
+    NotificationsSubscribeInput:
       content:
         application/json:
           schema:
@@ -229,7 +229,7 @@ components:
               - userId
             type: object
       description: Request body for Notifications/Subscribe stream subscription
-    Users_ChangesInput:
+    UsersChangesInput:
       content:
         application/json:
           schema:
@@ -240,7 +240,7 @@ components:
                 type: array
             type: object
       description: Request body for Users/Changes stream subscription
-    Users_CreateInput:
+    UsersCreateInput:
       content:
         application/json:
           schema:
@@ -261,7 +261,7 @@ components:
               - role
             type: object
       description: Request body for Users/Create procedure
-    Users_ListInput:
+    UsersListInput:
       content:
         application/json:
           schema:
@@ -285,7 +285,7 @@ components:
               - offset
             type: object
       description: Request body for Users/List procedure
-    Users_UpdateInput:
+    UsersUpdateInput:
       content:
         application/json:
           schema:
@@ -303,7 +303,7 @@ components:
             type: object
       description: Request body for Users/Update procedure
   responses:
-    Auth_LoginOutput:
+    AuthLoginOutput:
       content:
         application/json:
           schema:
@@ -344,7 +344,7 @@ components:
               - ok
             type: object
       description: Response for Auth/Login procedure
-    Auth_LogoutOutput:
+    AuthLogoutOutput:
       content:
         application/json:
           schema:
@@ -377,7 +377,7 @@ components:
               - ok
             type: object
       description: Response for Auth/Logout procedure
-    Auth_SessionStatusOutput:
+    AuthSessionStatusOutput:
       content:
         text/event-stream:
           schema:
@@ -416,7 +416,7 @@ components:
               - ok
             type: object
       description: Server-Sent Events for Auth/SessionStatus stream
-    Notifications_SendOutput:
+    NotificationsSendOutput:
       content:
         application/json:
           schema:
@@ -453,7 +453,7 @@ components:
               - ok
             type: object
       description: Response for Notifications/Send procedure
-    Notifications_SubscribeOutput:
+    NotificationsSubscribeOutput:
       content:
         text/event-stream:
           schema:
@@ -500,7 +500,7 @@ components:
               - ok
             type: object
       description: Server-Sent Events for Notifications/Subscribe stream
-    Users_ChangesOutput:
+    UsersChangesOutput:
       content:
         text/event-stream:
           schema:
@@ -543,7 +543,7 @@ components:
               - ok
             type: object
       description: Server-Sent Events for Users/Changes stream
-    Users_CreateOutput:
+    UsersCreateOutput:
       content:
         application/json:
           schema:
@@ -576,7 +576,7 @@ components:
               - ok
             type: object
       description: Response for Users/Create procedure
-    Users_ListOutput:
+    UsersListOutput:
       content:
         application/json:
           schema:
@@ -614,7 +614,7 @@ components:
               - ok
             type: object
       description: Response for Users/List procedure
-    Users_UpdateOutput:
+    UsersUpdateOutput:
       content:
         application/json:
           schema:

@@ -62,8 +62,8 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	for _, rpc := range schema.RPCs {
 		// Procedures
 		for _, proc := range rpc.Procs {
-			inputName := rpc.Name + "_" + proc.Name + "Input"
-			outputName := rpc.Name + "_" + proc.Name + "Output"
+			inputName := rpc.Name + proc.Name + "Input"
+			outputName := rpc.Name + proc.Name + "Output"
 
 			definitions[inputName] = generateObjectSchema(proc.Input, fmt.Sprintf("Input for %s/%s procedure", rpc.Name, proc.Name))
 			definitions[outputName] = generateObjectSchema(proc.Output, fmt.Sprintf("Output for %s/%s procedure", rpc.Name, proc.Name))
@@ -71,8 +71,8 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 		// Streams
 		for _, stream := range rpc.Streams {
-			inputName := rpc.Name + "_" + stream.Name + "Input"
-			outputName := rpc.Name + "_" + stream.Name + "Output"
+			inputName := rpc.Name + stream.Name + "Input"
+			outputName := rpc.Name + stream.Name + "Output"
 
 			definitions[inputName] = generateObjectSchema(stream.Input, fmt.Sprintf("Input for %s/%s stream", rpc.Name, stream.Name))
 			definitions[outputName] = generateObjectSchema(stream.Output, fmt.Sprintf("Output for %s/%s stream", rpc.Name, stream.Name))

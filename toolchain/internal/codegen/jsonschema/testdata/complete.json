@@ -1,6 +1,6 @@
 {
   "$defs": {
-    "Catalog_CreateProductInput": {
+    "CatalogCreateProductInput": {
       "description": "Input for Catalog/CreateProduct procedure",
       "properties": {
         "name": {
@@ -16,7 +16,7 @@
       "required": ["name", "price"],
       "type": "object"
     },
-    "Catalog_CreateProductOutput": {
+    "CatalogCreateProductOutput": {
       "description": "Output for Catalog/CreateProduct procedure",
       "properties": {
         "product": {
@@ -26,12 +26,12 @@
       "required": ["product"],
       "type": "object"
     },
-    "Catalog_GetAllProductsInput": {
+    "CatalogGetAllProductsInput": {
       "description": "Input for Catalog/GetAllProducts procedure",
       "properties": {},
       "type": "object"
     },
-    "Catalog_GetAllProductsOutput": {
+    "CatalogGetAllProductsOutput": {
       "description": "Output for Catalog/GetAllProducts procedure",
       "properties": {
         "products": {
@@ -44,7 +44,7 @@
       "required": ["products"],
       "type": "object"
     },
-    "Catalog_ListProductsInput": {
+    "CatalogListProductsInput": {
       "description": "Input for Catalog/ListProducts procedure",
       "properties": {
         "filterByStatus": {
@@ -60,7 +60,7 @@
       "required": ["limit", "page"],
       "type": "object"
     },
-    "Catalog_ListProductsOutput": {
+    "CatalogListProductsOutput": {
       "description": "Output for Catalog/ListProducts procedure",
       "properties": {
         "products": {
@@ -79,7 +79,7 @@
       "required": ["products", "totalItems", "totalPages"],
       "type": "object"
     },
-    "Chat_NewMessagesInput": {
+    "ChatNewMessagesInput": {
       "description": "Input for Chat/NewMessages stream",
       "properties": {
         "chatId": {
@@ -89,7 +89,7 @@
       "required": ["chatId"],
       "type": "object"
     },
-    "Chat_NewMessagesOutput": {
+    "ChatNewMessagesOutput": {
       "description": "Output for Chat/NewMessages stream",
       "properties": {
         "id": {
@@ -109,7 +109,7 @@
       "required": ["id", "text", "timestamp", "userId"],
       "type": "object"
     },
-    "Chat_SendMessageInput": {
+    "ChatSendMessageInput": {
       "description": "Input for Chat/SendMessage procedure",
       "properties": {
         "chatId": {
@@ -122,7 +122,7 @@
       "required": ["chatId", "text"],
       "type": "object"
     },
-    "Chat_SendMessageOutput": {
+    "ChatSendMessageOutput": {
       "description": "Output for Chat/SendMessage procedure",
       "properties": {
         "messageId": {

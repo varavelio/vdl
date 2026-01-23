@@ -12,20 +12,20 @@ paths:
     post:
       description: Creates a new user.
       requestBody:
-        $ref: "#/components/requestBodies/Users_CreateUserInput"
+        $ref: "#/components/requestBodies/UsersCreateUserInput"
       responses:
         "200":
-          $ref: "#/components/responses/Users_CreateUserOutput"
+          $ref: "#/components/responses/UsersCreateUserOutput"
       tags:
         - UsersProcedures
   /Users/GetUser:
     post:
       description: Gets a user by ID.
       requestBody:
-        $ref: "#/components/requestBodies/Users_GetUserInput"
+        $ref: "#/components/requestBodies/UsersGetUserInput"
       responses:
         "200":
-          $ref: "#/components/responses/Users_GetUserOutput"
+          $ref: "#/components/responses/UsersGetUserOutput"
       tags:
         - UsersProcedures
 components:
@@ -49,7 +49,7 @@ components:
         - name
       type: object
   requestBodies:
-    Users_CreateUserInput:
+    UsersCreateUserInput:
       content:
         application/json:
           schema:
@@ -63,7 +63,7 @@ components:
               - email
             type: object
       description: Request body for Users/CreateUser procedure
-    Users_GetUserInput:
+    UsersGetUserInput:
       content:
         application/json:
           schema:
@@ -75,7 +75,7 @@ components:
             type: object
       description: Request body for Users/GetUser procedure
   responses:
-    Users_CreateUserOutput:
+    UsersCreateUserOutput:
       content:
         application/json:
           schema:
@@ -108,7 +108,7 @@ components:
               - ok
             type: object
       description: Response for Users/CreateUser procedure
-    Users_GetUserOutput:
+    UsersGetUserOutput:
       content:
         application/json:
           schema:

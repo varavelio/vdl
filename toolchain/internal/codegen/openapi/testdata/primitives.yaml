@@ -12,40 +12,40 @@ paths:
     post:
       description: Test all primitive types
       requestBody:
-        $ref: "#/components/requestBodies/Primitives_AllPrimitivesInput"
+        $ref: "#/components/requestBodies/PrimitivesAllPrimitivesInput"
       responses:
         "200":
-          $ref: "#/components/responses/Primitives_AllPrimitivesOutput"
+          $ref: "#/components/responses/PrimitivesAllPrimitivesOutput"
       tags:
         - PrimitivesProcedures
   /Primitives/OptionalPrimitives:
     post:
       description: Test optional primitives
       requestBody:
-        $ref: "#/components/requestBodies/Primitives_OptionalPrimitivesInput"
+        $ref: "#/components/requestBodies/PrimitivesOptionalPrimitivesInput"
       responses:
         "200":
-          $ref: "#/components/responses/Primitives_OptionalPrimitivesOutput"
+          $ref: "#/components/responses/PrimitivesOptionalPrimitivesOutput"
       tags:
         - PrimitivesProcedures
   /Primitives/PrimitiveArrays:
     post:
       description: Test arrays of primitives
       requestBody:
-        $ref: "#/components/requestBodies/Primitives_PrimitiveArraysInput"
+        $ref: "#/components/requestBodies/PrimitivesPrimitiveArraysInput"
       responses:
         "200":
-          $ref: "#/components/responses/Primitives_PrimitiveArraysOutput"
+          $ref: "#/components/responses/PrimitivesPrimitiveArraysOutput"
       tags:
         - PrimitivesProcedures
   /Primitives/PrimitiveMaps:
     post:
       description: Test maps of primitives
       requestBody:
-        $ref: "#/components/requestBodies/Primitives_PrimitiveMapsInput"
+        $ref: "#/components/requestBodies/PrimitivesPrimitiveMapsInput"
       responses:
         "200":
-          $ref: "#/components/responses/Primitives_PrimitiveMapsOutput"
+          $ref: "#/components/responses/PrimitivesPrimitiveMapsOutput"
       tags:
         - PrimitivesProcedures
 components:
@@ -56,7 +56,7 @@ components:
       name: Authorization
       type: apiKey
   requestBodies:
-    Primitives_AllPrimitivesInput:
+    PrimitivesAllPrimitivesInput:
       content:
         application/json:
           schema:
@@ -80,7 +80,7 @@ components:
               - datetimeField
             type: object
       description: Request body for Primitives/AllPrimitives procedure
-    Primitives_OptionalPrimitivesInput:
+    PrimitivesOptionalPrimitivesInput:
       content:
         application/json:
           schema:
@@ -102,7 +102,7 @@ components:
               - requiredString
             type: object
       description: Request body for Primitives/OptionalPrimitives procedure
-    Primitives_PrimitiveArraysInput:
+    PrimitivesPrimitiveArraysInput:
       content:
         application/json:
           schema:
@@ -136,7 +136,7 @@ components:
               - datetimes
             type: object
       description: Request body for Primitives/PrimitiveArrays procedure
-    Primitives_PrimitiveMapsInput:
+    PrimitivesPrimitiveMapsInput:
       content:
         application/json:
           schema:
@@ -171,7 +171,7 @@ components:
             type: object
       description: Request body for Primitives/PrimitiveMaps procedure
   responses:
-    Primitives_AllPrimitivesOutput:
+    PrimitivesAllPrimitivesOutput:
       content:
         application/json:
           schema:
@@ -217,7 +217,7 @@ components:
               - ok
             type: object
       description: Response for Primitives/AllPrimitives procedure
-    Primitives_OptionalPrimitivesOutput:
+    PrimitivesOptionalPrimitivesOutput:
       content:
         application/json:
           schema:
@@ -255,7 +255,7 @@ components:
               - ok
             type: object
       description: Response for Primitives/OptionalPrimitives procedure
-    Primitives_PrimitiveArraysOutput:
+    PrimitivesPrimitiveArraysOutput:
       content:
         application/json:
           schema:
@@ -301,7 +301,7 @@ components:
               - ok
             type: object
       description: Response for Primitives/PrimitiveArrays procedure
-    Primitives_PrimitiveMapsOutput:
+    PrimitivesPrimitiveMapsOutput:
       content:
         application/json:
           schema:

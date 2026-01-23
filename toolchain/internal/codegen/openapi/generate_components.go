@@ -48,8 +48,8 @@ func generateComponents(schema *ir.Schema) Components {
 	for _, rpc := range schema.RPCs {
 		// Procedures
 		for _, proc := range rpc.Procs {
-			inputName := rpc.Name + "_" + proc.Name + "Input"
-			outputName := rpc.Name + "_" + proc.Name + "Output"
+			inputName := rpc.Name + proc.Name + "Input"
+			outputName := rpc.Name + proc.Name + "Output"
 
 			components.RequestBodies[inputName] = generateRequestBody(
 				proc.Input,
@@ -64,8 +64,8 @@ func generateComponents(schema *ir.Schema) Components {
 
 		// Streams
 		for _, stream := range rpc.Streams {
-			inputName := rpc.Name + "_" + stream.Name + "Input"
-			outputName := rpc.Name + "_" + stream.Name + "Output"
+			inputName := rpc.Name + stream.Name + "Input"
+			outputName := rpc.Name + stream.Name + "Output"
 
 			components.RequestBodies[inputName] = generateRequestBody(
 				stream.Input,
