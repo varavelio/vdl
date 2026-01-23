@@ -10,6 +10,16 @@ import (
 // Optional utility type
 // -----------------------------------------------------------------------------
 
+// Some creates an Optional[T] with a present value set to v.
+func Some[T any](v T) Optional[T] {
+	return Optional[T]{Value: v, Present: true}
+}
+
+// None creates an Optional[T] with no present value, using the zero value of T.
+func None[T any]() Optional[T] {
+	return Optional[T]{Present: false}
+}
+
 // Optional represents a general purpose value that may or may not be present.
 //
 // Can be used for handling nullable JSON fields.
@@ -20,14 +30,12 @@ type Optional[T any] struct {
 	Value   T    // The actual value when present; otherwise, the zero value of T.
 }
 
-// Some creates an Optional[T] with a present value set to v.
-func Some[T any](v T) Optional[T] {
-	return Optional[T]{Value: v, Present: true}
-}
-
-// None creates an Optional[T] with no present value, using the zero value of T.
-func None[T any]() Optional[T] {
-	return Optional[T]{Present: false}
+// IsZero returns true if the Optional is not present.
+//
+// This allows the "omitzero" struct tag (available in Go 1.24+) to omit
+// this field when Present is false, even if Value is not zero.
+func (o Optional[T]) IsZero() bool {
+	return !o.Present
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

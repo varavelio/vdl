@@ -553,6 +553,88 @@ func TestOr(t *testing.T) {
 	})
 }
 
+func TestOmitZero(t *testing.T) {
+	type OmitZeroStruct struct {
+		String Optional[string] `json:"string,omitzero"`
+		Int    Optional[int]    `json:"int,omitzero"`
+		Bool   Optional[bool]   `json:"bool,omitzero"`
+	}
+
+	t.Run("omits none values", func(t *testing.T) {
+		s := OmitZeroStruct{
+			String: None[string](),
+			Int:    None[int](),
+			Bool:   None[bool](),
+		}
+		b, err := json.Marshal(s)
+		require.NoError(t, err)
+		require.Equal(t, "{}", string(b))
+	})
+
+	t.Run("includes some zero values", func(t *testing.T) {
+		s := OmitZeroStruct{
+			String: Some(""),
+			Int:    Some(0),
+			Bool:   Some(false),
+		}
+		b, err := json.Marshal(s)
+		require.NoError(t, err)
+		require.Equal(t, `{"string":"","int":0,"bool":false}`, string(b))
+	})
+
+	t.Run("includes some non-zero values", func(t *testing.T) {
+		s := OmitZeroStruct{
+			String: Some("hello"),
+			Int:    Some(42),
+			Bool:   Some(true),
+		}
+		b, err := json.Marshal(s)
+		require.NoError(t, err)
+		require.Equal(t, `{"string":"hello","int":42,"bool":true}`, string(b))
+	})
+
+	t.Run("omits dirty none with IsZero", func(t *testing.T) {
+		s := OmitZeroStruct{
+			Int: Optional[int]{Present: false, Value: 123},
+		}
+		b, err := json.Marshal(s)
+		require.NoError(t, err)
+		require.Equal(t, `{}`, string(b))
+	})
+}
+
+func TestNoOmitZero(t *testing.T) {
+	t.Run("marshals none as null without omitzero", func(t *testing.T) {
+		s := TestStructure{
+			Text:    None[string](),
+			Number:  None[int](),
+			Decimal: None[float64](),
+			Flag:    None[bool](),
+			Generic: None[[]int](),
+		}
+		b, err := json.Marshal(s)
+		require.NoError(t, err)
+		expected := `{"text":null,"number":null,"decimal":null,"flag":null,"generic":null}`
+		require.Equal(t, expected, string(b))
+	})
+
+	t.Run("marshals zero values as values without omitzero", func(t *testing.T) {
+		s := TestStructure{
+			Text:    Some(""),
+			Number:  Some(0),
+			Decimal: Some(0.0),
+			Flag:    Some(false),
+			Generic: Some([]int{}),
+		}
+
+		b, err := json.Marshal(s)
+		require.NoError(t, err)
+
+		expected := `{"text":"","number":0,"decimal":0,"flag":false,"generic":[]}`
+		require.Equal(t, expected, string(b))
+	})
+}
+
 func TestEdgeCases(t *testing.T) {
 	t.Run("unmarshal empty json", func(t *testing.T) {
 		var opt Optional[string]
