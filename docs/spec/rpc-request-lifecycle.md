@@ -148,6 +148,7 @@ The server-side handler logic can now call the `emit` function at any time to pu
 
 - **SSE Formatting:** The server formats the output into a standard JSON payload and sends it as an SSE `data` event.
 - **Data Transmission:** The formatted event is written to the open HTTP connection.
+- **No Newlines:** The JSON payload must be serialized as a single line. Since SSE uses newlines as delimiters, any raw newline within the JSON data will break the protocol. The server must ensure the JSON is minified or newlines are properly escaped.
 
   **Success Event:**
 
