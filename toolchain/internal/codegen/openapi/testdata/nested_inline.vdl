@@ -1,50 +1,51 @@
 """ Test for deeply nested inline objects """
 
 rpc Analytics {
-    """ Get user activity with nested inline structures """
-    proc GetUserActivity {
-        input {
-            userId: string
-            filters: {
-                dateRange: {
-                    start: datetime
-                    end: datetime
-                }
-                categories?: string[]
-                options: {
-                    includeDeleted: bool
-                    pagination: {
-                        page: int
-                        limit: int
-                        sortBy?: {
-                            field: string
-                            direction: string
-                        }
-                    }
-                }
+  """ Get user activity with nested inline structures """
+  proc GetUserActivity {
+    input {
+      userId: string
+      filters: {
+        dateRange: {
+          start: datetime
+          end: datetime
+        }
+        categories?: string[]
+        options: {
+          includeDeleted: bool
+          pagination: {
+            page: int
+            limit: int
+            sortBy?: {
+              field: string
+              direction: string
             }
+          }
         }
-        output {
-            activities: {
-                id: string
-                metadata: {
-                    source: string
-                    tags: string[]
-                    location?: {
-                        latitude: float
-                        longitude: float
-                        address?: {
-                            street: string
-                            city: string
-                            country: string
-                        }
-                    }
-                }
-                timestamps: {
-                    created: datetime
-                    updated?: datetime
-                }
-            }[]
-        }
+      }
     }
+
+    output {
+      activities: {
+        id: string
+        metadata: {
+          source: string
+          tags: string[]
+          location?: {
+            latitude: float
+            longitude: float
+            address?: {
+              street: string
+              city: string
+              country: string
+            }
+          }
+        }
+        timestamps: {
+          created: datetime
+          updated?: datetime
+        }
+      }[]
+    }
+  }
 }

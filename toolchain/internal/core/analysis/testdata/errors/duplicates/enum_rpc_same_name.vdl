@@ -2,13 +2,18 @@
 // Enum and RPC share the same name
 
 enum Orders {
-	Pending
-	Complete
+  Pending
+  Complete
 }
 
 rpc Orders {
-	proc GetOrder {
-		input { id: string }
-		output { status: string }
-	}
+  proc GetOrder {
+    input {
+      id: string
+    }
+
+    output {
+      status: string
+    }
+  }
 }

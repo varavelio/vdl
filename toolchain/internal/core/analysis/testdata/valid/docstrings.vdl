@@ -9,23 +9,23 @@ It can span multiple lines.
 User represents a registered user in the system.
 """
 type User {
-	""" The unique identifier """
-	id: string
+  """ The unique identifier """
+  id: string
 
-	""" The user's display name """
-	name: string
+  """ The user's display name """
+  name: string
 
-	""" Optional email address """
-	email?: string
+  """ Optional email address """
+  email?: string
 }
 
 """
 Status of an order in the system.
 """
 enum OrderStatus {
-	Pending
-	Processing
-	Shipped
+  Pending
+  Processing
+  Shipped
 }
 
 """ Maximum page size for pagination """
@@ -39,17 +39,18 @@ User management service.
 Provides CRUD operations for users.
 """
 rpc Users {
-	"""
-	Creates a new user in the system.
-	"""
-	proc CreateUser {
-		input {
-			""" The user's name """
-			name: string
-		}
-		output {
-			""" The created user """
-			user: User
-		}
-	}
+  """
+  Creates a new user in the system.
+  """
+  proc CreateUser {
+    input {
+      """ The user's name """
+      name: string
+    }
+
+    output {
+      """ The created user """
+      user: User
+    }
+  }
 }

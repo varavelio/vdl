@@ -1,5 +1,5 @@
 include "./level1.vdl"
 
 type Main {
-	level: Level1
+  level: Level1
 }

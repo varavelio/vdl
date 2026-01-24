@@ -1,2 +1,5 @@
 include "./b.vdl"
-type A { id: string }
+
+type A {
+  id: string
+}

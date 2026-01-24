@@ -1,36 +1,36 @@
 // Arrays and maps of various depths
 
 type SimpleArrays {
-	strings: string[]
-	ints: int[]
-	floats: float[]
-	bools: bool[]
-	dates: datetime[]
+  strings: string[]
+  ints: int[]
+  floats: float[]
+  bools: bool[]
+  dates: datetime[]
 }
 
 type NestedArrays {
-	matrix: int[][]
-	cube: string[][][]
+  matrix: int[][]
+  cube: string[][][]
 }
 
 type SimpleMaps {
-	stringMap: map<string>
-	intMap: map<int>
-	floatMap: map<float>
-	boolMap: map<bool>
+  stringMap: map<string>
+  intMap: map<int>
+  floatMap: map<float>
+  boolMap: map<bool>
 }
 
 type NestedMaps {
-	mapOfMaps: map<map<string>>
-	mapOfArrays: map<string[]>
+  mapOfMaps: map<map<string>>
+  mapOfArrays: map<string[]>
 }
 
 type CustomTypeMaps {
-	users: map<User>
-	userLists: map<User[]>
+  users: map<User>
+  userLists: map<User[]>
 }
 
 type User {
-	id: string
-	name: string
+  id: string
+  name: string
 }

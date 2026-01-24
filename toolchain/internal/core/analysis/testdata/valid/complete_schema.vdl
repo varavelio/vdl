@@ -8,74 +8,77 @@ const TAX_RATE = 0.21
 const FEATURE_ENABLED = true
 
 enum OrderStatus {
-	Pending
-	Processing
-	Shipped
-	Delivered
-	Cancelled
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
 }
 
 enum Priority {
-	Low = 1
-	Medium = 2
-	High = 3
+  Low = 1
+  Medium = 2
+  High = 3
 }
 
 pattern UserEventSubject = "events.users.{userId}.{eventType}"
 pattern SessionCacheKey = "cache:session:{sessionId}"
 
 type AuditMetadata {
-	id: string
-	createdAt: datetime
-	updatedAt: datetime
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
 }
 
 type User {
-	...AuditMetadata
-	name: string
-	email?: string
-	status: OrderStatus
-	priority: Priority
+  ...AuditMetadata
+  name: string
+  email?: string
+  status: OrderStatus
+  priority: Priority
 }
 
 type Product {
-	...AuditMetadata
-	name: string
-	price: float
-	tags: string[]
-	metadata: map<string>
+  ...AuditMetadata
+  name: string
+  price: float
+  tags: string[]
+  metadata: map<string>
 }
 
 rpc Catalog {
-	""" Product operations """
+  """ Product operations """
 
-	proc GetProduct {
-		input {
-			id: string
-		}
-		output {
-			product: Product
-		}
-	}
+  proc GetProduct {
+    input {
+      id: string
+    }
 
-	proc ListProducts {
-		input {
-			page: int
-			limit: int
-		}
-		output {
-			items: Product[]
-			total: int
-		}
-	}
+    output {
+      product: Product
+    }
+  }
 
-	stream ProductUpdates {
-		input {
-			productId: string
-		}
-		output {
-			event: string
-			product: Product
-		}
-	}
+  proc ListProducts {
+    input {
+      page: int
+      limit: int
+    }
+
+    output {
+      items: Product[]
+      total: int
+    }
+  }
+
+  stream ProductUpdates {
+    input {
+      productId: string
+    }
+
+    output {
+      event: string
+      product: Product
+    }
+  }
 }

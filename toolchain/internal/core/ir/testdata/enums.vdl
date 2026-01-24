@@ -1,30 +1,30 @@
 """ Order status enum with implicit string values. """
 enum OrderStatus {
-    Pending
-    Processing
-    Shipped
-    Delivered
-    Cancelled
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
 }
 
 """ Priority levels with explicit int values. """
 enum Priority {
-    Low = 1
-    Medium = 2
-    High = 3
-    Critical = 10
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 10
 }
 
 """ HTTP methods with explicit string values. """
 enum HttpMethod {
-    Get = "GET"
-    Post = "POST"
-    Put = "PUT"
-    Delete = "DELETE"
+  Get = "GET"
+  Post = "POST"
+  Put = "PUT"
+  Delete = "DELETE"
 }
 
 type Order {
-    id: string
-    status: OrderStatus
-    priority: Priority
+  id: string
+  status: OrderStatus
+  priority: Priority
 }

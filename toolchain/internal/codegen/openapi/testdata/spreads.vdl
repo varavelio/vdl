@@ -1,91 +1,95 @@
 """ Test for type spreading in input/output blocks """
 
 type Timestamps {
-    createdAt: datetime
-    updatedAt: datetime
+  createdAt: datetime
+  updatedAt: datetime
 }
 
 type Identifiable {
-    id: string
+  id: string
 }
 
 type Pagination {
-    page: int
-    limit: int
+  page: int
+  limit: int
 }
 
 type PaginationResult {
-    totalItems: int
-    totalPages: int
-    currentPage: int
-    hasNextPage: bool
-    hasPrevPage: bool
+  totalItems: int
+  totalPages: int
+  currentPage: int
+  hasNextPage: bool
+  hasPrevPage: bool
 }
 
 type Author {
-    name: string
-    email: string
+  name: string
+  email: string
 }
 
 """ Article with multiple spreads """
 type Article {
-    ...Identifiable
-    ...Timestamps
-    title: string
-    content: string
-    author: Author
+  ...Identifiable
+  ...Timestamps
+  title: string
+  content: string
+  author: Author
 }
 
 rpc Articles {
-    """ Create with spread in input """
-    proc Create {
-        input {
-            ...Author
-            title: string
-            content: string
-            tags?: string[]
-        }
-        output {
-            article: Article
-        }
+  """ Create with spread in input """
+  proc Create {
+    input {
+      ...Author
+      title: string
+      content: string
+      tags?: string[]
     }
 
-    """ List with spread in both input and output """
-    proc List {
-        input {
-            ...Pagination
-            authorEmail?: string
-            searchQuery?: string
-        }
-        output {
-            ...PaginationResult
-            articles: Article[]
-        }
+    output {
+      article: Article
+    }
+  }
+
+  """ List with spread in both input and output """
+  proc List {
+    input {
+      ...Pagination
+      authorEmail?: string
+      searchQuery?: string
     }
 
-    """ Get with minimal spread """
-    proc Get {
-        input {
-            ...Identifiable
-        }
-        output {
-            article: Article
-        }
+    output {
+      ...PaginationResult
+      articles: Article[]
+    }
+  }
+
+  """ Get with minimal spread """
+  proc Get {
+    input {
+      ...Identifiable
     }
 
-    """ Update with multiple optional spread fields """
-    proc Update {
-        input {
-            ...Identifiable
-            title?: string
-            content?: string
-            author?: {
-                ...Author
-            }
-        }
-        output {
-            ...Timestamps
-            article: Article
-        }
+    output {
+      article: Article
     }
+  }
+
+  """ Update with multiple optional spread fields """
+  proc Update {
+    input {
+      ...Identifiable
+      title?: string
+      content?: string
+      author?: {
+        ...Author
+      }
+    }
+
+    output {
+      ...Timestamps
+      article: Article
+    }
+  }
 }

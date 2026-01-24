@@ -2,7 +2,7 @@
 // Type and pattern share the same name
 
 type Config {
-	value: string
+  value: string
 }
 
 pattern Config = "config.{key}"

@@ -1,3 +1,4 @@
+// fmt:off
 // @expect: E102
 
 rpc Users {

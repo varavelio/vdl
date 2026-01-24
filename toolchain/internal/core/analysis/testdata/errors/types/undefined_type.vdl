@@ -1,5 +1,5 @@
 // @expect: E201
 
 type User {
-	profile: Profile
+  profile: Profile
 }

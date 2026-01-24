@@ -3,11 +3,11 @@
 // Arrays do NOT break type cycles - circular references are always forbidden
 
 type TreeNode {
-	value: string
-	children: TreeNode[]
+  value: string
+  children: TreeNode[]
 }
 
 type LinkedList {
-	value: int
-	next?: LinkedList[]
+  value: int
+  next?: LinkedList[]
 }

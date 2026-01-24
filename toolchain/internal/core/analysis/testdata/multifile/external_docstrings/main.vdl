@@ -4,21 +4,26 @@
 
 """ ./docs/user_type.md """
 type User {
-	""" ./docs/user_id.md """
-	id: string
-	name: string
+  """ ./docs/user_id.md """
+  id: string
+  name: string
 }
 
 """ ./docs/status_enum.md """
 enum Status {
-	Active
-	Inactive
+  Active
+  Inactive
 }
 
 rpc Users {
-	""" ./docs/get_user_proc.md """
-	proc GetUser {
-		input { id: string }
-		output { name: string }
-	}
+  """ ./docs/get_user_proc.md """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      name: string
+    }
+  }
 }

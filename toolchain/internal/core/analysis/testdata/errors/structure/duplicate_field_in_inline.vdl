@@ -1,8 +1,8 @@
 // @expect: E703
 
 type User {
-	data: {
-		id: string
-		id: int
-	}
+  data: {
+    id: string
+    id: int
+  }
 }

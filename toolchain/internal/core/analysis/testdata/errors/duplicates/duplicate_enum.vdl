@@ -1,9 +1,9 @@
 // @expect: E802
 
 enum Status {
-	Active
+  Active
 }
 
 enum Status {
-	Pending
+  Pending
 }

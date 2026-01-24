@@ -2,10 +2,10 @@
 // Type and enum share the same name
 
 type User {
-	id: string
+  id: string
 }
 
 enum User {
-	Active
-	Inactive
+  Active
+  Inactive
 }

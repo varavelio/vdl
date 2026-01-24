@@ -1,69 +1,80 @@
 """ Test for complex array and map combinations """
 
 type Coordinate {
-    x: float
-    y: float
+  x: float
+  y: float
 }
 
 type Matrix {
-    rows: int
-    cols: int
-    data: float[][]
+  rows: int
+  cols: int
+  data: float[][]
 }
 
 rpc DataProcessing {
-    """ Process multi-dimensional data structures """
-    proc ProcessMatrix {
-        input {
-            """ 2D array of integers """
-            matrix: int[][]
-            """ 3D array of floats (e.g., RGB image data) """
-            tensor: float[][][]
-            """ Array of coordinate arrays (polygons) """
-            polygons: Coordinate[][]
-        }
-        output {
-            result: Matrix
-            stats: {
-                min: float
-                max: float
-                dimensions: int[]
-            }
-        }
+  """ Process multi-dimensional data structures """
+  proc ProcessMatrix {
+    input {
+      """ 2D array of integers """
+      matrix: int[][]
+
+      """ 3D array of floats (e.g., RGB image data) """
+      tensor: float[][][]
+
+      """ Array of coordinate arrays (polygons) """
+      polygons: Coordinate[][]
     }
 
-    """ Work with nested maps """
-    proc ProcessMaps {
-        input {
-            """ Map of string to int """
-            counts: map<int>
-            """ Map of string to array of strings """
-            tags: map<string[]>
-            """ Map of string to map of string to float (nested maps) """
-            scores: map<map<float>>
-            """ Map of string to custom type """
-            users: map<Coordinate>
-        }
-        output {
-            """ Array of maps """
-            results: map<int>[]
-            """ Map of arrays """
-            grouped: map<float[]>
-        }
+    output {
+      result: Matrix
+      stats: {
+        min: float
+        max: float
+        dimensions: int[]
+      }
+    }
+  }
+
+  """ Work with nested maps """
+  proc ProcessMaps {
+    input {
+      """ Map of string to int """
+      counts: map<int>
+
+      """ Map of string to array of strings """
+      tags: map<string[]>
+
+      """ Map of string to map of string to float (nested maps) """
+      scores: map<map<float>>
+
+      """ Map of string to custom type """
+      users: map<Coordinate>
     }
 
-    """ Extreme nesting: array of maps of arrays of maps """
-    proc ExtremeNesting {
-        input {
-            """ map<string[]>[] - array of maps where values are string arrays """
-            level1: map<string[]>[]
-            """ map<map<int>[]> - map where values are arrays of maps of ints """
-            level2: map<map<int>[]>
-            """ map<Coordinate[]>[] - array of maps of coordinate arrays """
-            level3: map<Coordinate[]>[]
-        }
-        output {
-            success: bool
-        }
+    output {
+      """ Array of maps """
+      results: map<int>[]
+
+      """ Map of arrays """
+      grouped: map<float[]>
     }
+  }
+
+  """ Extreme nesting: array of maps of arrays of maps """
+  proc ExtremeNesting {
+    input {
+      """ map<string[]>[] - array of maps where values are string arrays """
+      level1: map<string[]>[]
+
+      """ map<map<int>[]> - map where values are arrays of maps of ints """
+      level2: map<map<int>[]>
+
+      """ map<Coordinate[]>[] - array of maps of coordinate arrays """
+      level3: map<Coordinate[]>[]
+    }
+
+    output {
+      success: bool
+    }
+  }
 }

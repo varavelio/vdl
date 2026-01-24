@@ -1,12 +1,13 @@
 // @expect: E201
 
 rpc Users {
-	proc GetUser {
-		input {
-			id: string
-		}
-		output {
-			user: UndefinedUser
-		}
-	}
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: UndefinedUser
+    }
+  }
 }

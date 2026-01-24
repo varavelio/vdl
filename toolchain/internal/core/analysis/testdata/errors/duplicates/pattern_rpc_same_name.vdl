@@ -4,8 +4,13 @@
 pattern Products = "products.{id}"
 
 rpc Products {
-	proc GetProduct {
-		input { id: string }
-		output { name: string }
-	}
+  proc GetProduct {
+    input {
+      id: string
+    }
+
+    output {
+      name: string
+    }
+  }
 }

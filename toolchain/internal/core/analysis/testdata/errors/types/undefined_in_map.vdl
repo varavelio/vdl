@@ -1,5 +1,5 @@
 // @expect: E201
 
 type User {
-	profiles: map<Profile>
+  profiles: map<Profile>
 }

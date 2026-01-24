@@ -1,11 +1,14 @@
 // @expect: E703
 
 rpc Users {
-	proc GetUser {
-		input {
-			id: string
-			id: int
-		}
-		output { name: string }
-	}
+  proc GetUser {
+    input {
+      id: string
+      id: int
+    }
+
+    output {
+      name: string
+    }
+  }
 }

@@ -2,5 +2,5 @@
 
 """ ./nonexistent.md """
 type User {
-	id: string
+  id: string
 }

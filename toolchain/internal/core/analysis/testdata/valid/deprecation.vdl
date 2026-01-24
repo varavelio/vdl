@@ -1,18 +1,18 @@
 // Deprecated elements
 
 deprecated type LegacyUser {
-	id: string
-	name: string
+  id: string
+  name: string
 }
 
 deprecated("Use UserV2 instead")
 type OldUser {
-	id: string
+  id: string
 }
 
 deprecated enum OldStatus {
-	Active
-	Inactive
+  Active
+  Inactive
 }
 
 deprecated("Will be removed in v2.0")
@@ -22,22 +22,24 @@ deprecated pattern OldPattern = "old.{id}"
 
 deprecated("Migrate to NewService")
 rpc OldService {
-	deprecated proc OldProc {
-		input {
-			id: string
-		}
-		output {
-			data: string
-		}
-	}
+  deprecated proc OldProc {
+    input {
+      id: string
+    }
 
-	deprecated("Use NewStream instead")
-	stream OldStream {
-		input {
-			id: string
-		}
-		output {
-			event: string
-		}
-	}
+    output {
+      data: string
+    }
+  }
+
+  deprecated("Use NewStream instead")
+  stream OldStream {
+    input {
+      id: string
+    }
+
+    output {
+      event: string
+    }
+  }
 }

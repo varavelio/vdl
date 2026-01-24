@@ -1,4 +1,4 @@
 type BaseEntity {
-	id: string
-	createdAt: datetime
+  id: string
+  createdAt: datetime
 }

@@ -1,5 +1,5 @@
 include "./level2.vdl"
 
 type Level1 {
-	child: Level2
+  child: Level2
 }

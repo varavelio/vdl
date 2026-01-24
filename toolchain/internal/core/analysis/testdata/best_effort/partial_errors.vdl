@@ -1,3 +1,4 @@
+// fmt:off
 // @expect: E201
 // @expect: E103
 // Tests that valid symbols are collected even when some have errors

@@ -1,7 +1,7 @@
 // @expect: E304
 
 enum Status {
-	Active
-	Active
-	Pending
+  Active
+  Active
+  Pending
 }
