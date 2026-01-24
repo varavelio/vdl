@@ -127,6 +127,17 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("}")
 	g.Break()
 
+	g.Line("// WithMaxMessageSize sets the default maximum message size for all streams.")
+	g.Line("//")
+	g.Line("// The default value is 4MB.")
+	g.Line("func (b *clientBuilder) WithMaxMessageSize(size int64) *clientBuilder {")
+	g.Block(func() {
+		g.Line("b.opts = append(b.opts, withGlobalMaxMessageSize(size))")
+		g.Line("return b")
+	})
+	g.Line("}")
+	g.Break()
+
 	g.Line("// Build constructs the *Client using the configured options.")
 	g.Line("func (b *clientBuilder) Build() *Client {")
 	g.Block(func() {
@@ -219,6 +230,17 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Linef("func (r *%s) WithReconnectConfig(conf ReconnectConfig) *%s {", rpcStructName, rpcStructName)
 	g.Block(func() {
 		g.Linef("r.intClient.setRPCReconnectConfig(%q, conf)", rpcName)
+		g.Line("return r")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// WithMaxMessageSize sets the default maximum message size for all streams in the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This configuration overrides the global defaults but can be overridden by operation-specific configurations.")
+	g.Linef("func (r *%s) WithMaxMessageSize(size int64) *%s {", rpcStructName, rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intClient.setRPCMaxMessageSize(%q, size)", rpcName)
 		g.Line("return r")
 	})
 	g.Line("}")
@@ -413,6 +435,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			g.Line("input         any")
 			g.Line("headerProviders []HeaderProvider")
 			g.Line("reconnectConf *ReconnectConfig")
+			g.Line("maxMessageSize int64")
 			g.Line("onConnect     func()")
 			g.Line("onDisconnect  func(error)")
 			g.Line("onReconnect   func(int, time.Duration)")
@@ -465,6 +488,18 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("}")
 		g.Break()
 
+		// WithMaxMessageSize method
+		g.Linef("// WithMaxMessageSize sets the maximum message size for the %s stream.", uniqueName)
+		g.Line("//")
+		g.Line("// This configuration overrides both global and RPC-level defaults.")
+		g.Linef("func (b *%s) WithMaxMessageSize(size int64) *%s {", builderStream, builderStream)
+		g.Block(func() {
+			g.Line("b.maxMessageSize = size")
+			g.Line("return b")
+		})
+		g.Line("}")
+		g.Break()
+
 		// Hooks
 		g.Linef("// OnConnect registers a callback that is invoked when the stream is successfully connected.")
 		g.Linef("func (b *%s) OnConnect(cb func()) *%s {", builderStream, builderStream)
@@ -506,7 +541,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("// drain the channel until it is closed.")
 		g.Linef("func (b *%s) Execute(ctx context.Context, input %sInput) <-chan Response[%sOutput] {", builderStream, uniqueName, uniqueName)
 		g.Block(func() {
-			g.Line("rawCh := b.client.stream(ctx, b.rpcName, b.name, input, b.headerProviders, b.reconnectConf, b.onConnect, b.onDisconnect, b.onReconnect)")
+			g.Line("rawCh := b.client.stream(ctx, b.rpcName, b.name, input, b.headerProviders, b.reconnectConf, b.maxMessageSize, b.onConnect, b.onDisconnect, b.onReconnect)")
 			g.Linef("outCh := make(chan Response[%sOutput])", uniqueName)
 			g.Line("go func() {")
 			g.Block(func() {

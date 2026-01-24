@@ -91,14 +91,16 @@ type internalClient struct {
 	rpcHeaderProviders map[string][]HeaderProvider
 
 	// Default Configurations
-	globalRetryConf     *RetryConfig
-	globalTimeoutConf   *TimeoutConfig
-	globalReconnectConf *ReconnectConfig
+	globalRetryConf      *RetryConfig
+	globalTimeoutConf    *TimeoutConfig
+	globalReconnectConf  *ReconnectConfig
+	globalMaxMessageSize int64
 
 	// Per-RPC Default Configurations
-	rpcRetryConf     map[string]*RetryConfig
-	rpcTimeoutConf   map[string]*TimeoutConfig
-	rpcReconnectConf map[string]*ReconnectConfig
+	rpcRetryConf      map[string]*RetryConfig
+	rpcTimeoutConf    map[string]*TimeoutConfig
+	rpcReconnectConf  map[string]*ReconnectConfig
+	rpcMaxMessageSize map[string]int64
 
 	// mu protects concurrent access to the configuration maps
 	mu sync.RWMutex
@@ -163,6 +165,13 @@ func withGlobalReconnectConfig(conf ReconnectConfig) internalClientOption {
 	}
 }
 
+// withGlobalMaxMessageSize sets the global maximum message size for streams.
+func withGlobalMaxMessageSize(size int64) internalClientOption {
+	return func(c *internalClient) {
+		c.globalMaxMessageSize = size
+	}
+}
+
 // newInternalClient creates a new internalClient capable of talking to the UFO
 // RPC server described by procNames and streamNames.
 //
@@ -201,6 +210,7 @@ func newInternalClient(
 		rpcRetryConf:       make(map[string]*RetryConfig),
 		rpcTimeoutConf:     make(map[string]*TimeoutConfig),
 		rpcReconnectConf:   make(map[string]*ReconnectConfig),
+		rpcMaxMessageSize:  make(map[string]int64),
 	}
 
 	// Apply functional options.
@@ -275,6 +285,12 @@ func (b *internalClientBuilder) withGlobalReconnectConfig(conf ReconnectConfig) 
 	return b
 }
 
+// withGlobalMaxMessageSize sets the global maximum message size for streams.
+func (b *internalClientBuilder) withGlobalMaxMessageSize(size int64) *internalClientBuilder {
+	b.opts = append(b.opts, withGlobalMaxMessageSize(size))
+	return b
+}
+
 // Build creates the internalClient applying all accumulated options.
 func (b *internalClientBuilder) Build() *internalClient {
 	return newInternalClient(b.baseURL, b.procDefs, b.streamDefs, b.opts...)
@@ -299,6 +315,13 @@ func (c *internalClient) setRPCReconnectConfig(rpcName string, conf ReconnectCon
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.rpcReconnectConf[rpcName] = &conf
+}
+
+// setRPCMaxMessageSize sets the default max message size for a specific RPC.
+func (c *internalClient) setRPCMaxMessageSize(rpcName string, size int64) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.rpcMaxMessageSize[rpcName] = size
 }
 
 // setRPCHeaderProvider adds a header provider for a specific RPC.
@@ -369,6 +392,23 @@ func (c *internalClient) mergeReconnectConfig(rpcName string, opConf *ReconnectC
 		MaxDelay:        5 * time.Second,
 		DelayMultiplier: 2.0,
 	}
+}
+
+// mergeMaxMessageSize resolves the max message size based on precedence:
+// Operation > RPC > Global > Default (4MB).
+func (c *internalClient) mergeMaxMessageSize(rpcName string, opSize int64) int64 {
+	if opSize > 0 {
+		return opSize
+	}
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	if rpcSize, ok := c.rpcMaxMessageSize[rpcName]; ok && rpcSize > 0 {
+		return rpcSize
+	}
+	if c.globalMaxMessageSize > 0 {
+		return c.globalMaxMessageSize
+	}
+	return 4 * 1024 * 1024 // Default: 4MB
 }
 
 // executeChain builds the interceptor chain and executes the final invoker.
@@ -598,6 +638,7 @@ func (c *internalClient) stream(
 	input any,
 	opHeaderProviders []HeaderProvider,
 	opReconnectConf *ReconnectConfig,
+	opMaxMessageSize int64,
 	onConnect func(),
 	onDisconnect func(error),
 	onReconnect func(int, time.Duration),
@@ -637,6 +678,7 @@ func (c *internalClient) stream(
 		}
 
 		reconnectConf := c.mergeReconnectConfig(req.RPCName, opReconnectConf)
+		maxMessageSize := c.mergeMaxMessageSize(req.RPCName, opMaxMessageSize)
 
 		// Encode input
 		var payload []byte
@@ -768,7 +810,7 @@ func (c *internalClient) stream(
 				}
 				reconnectAttempt = 0
 
-				hadError := handleStreamEvents(ctx, resp, events)
+				hadError := handleStreamEvents(ctx, resp, maxMessageSize, events)
 				resp.Body.Close()
 
 				if hadError && reconnectAttempt < reconnectConf.MaxAttempts {
@@ -799,10 +841,12 @@ func (c *internalClient) stream(
 func handleStreamEvents(
 	ctx context.Context,
 	resp *http.Response,
+	maxMessageSize int64,
 	events chan<- Response[json.RawMessage],
 ) (hadError bool) {
 	scanner := bufio.NewScanner(resp.Body)
-	scanner.Buffer(make([]byte, 0, 64*1024), bufio.MaxScanTokenSize)
+	// Set the scanner buffer to handle large tokens up to maxMessageSize
+	scanner.Buffer(make([]byte, 4096), int(maxMessageSize))
 
 	var dataBuf bytes.Buffer
 
@@ -834,6 +878,18 @@ func handleStreamEvents(
 
 		if !scanner.Scan() {
 			if err := scanner.Err(); err != nil {
+				// If the error is due to token size, it is a fatal error, do not reconnect
+				if err == bufio.ErrTooLong {
+					events <- Response[json.RawMessage]{
+						Ok: false,
+						Error: Error{
+							Category: "ProtocolError",
+							Code:     "MESSAGE_TOO_LARGE",
+							Message:  fmt.Sprintf("Stream message exceeded maximum size of %d bytes", maxMessageSize),
+						},
+					}
+					return false // Fatal error, no reconnect
+				}
 				hadError = true
 			}
 			return
@@ -848,6 +904,20 @@ func handleStreamEvents(
 		}
 		if strings.HasPrefix(line, "data:") {
 			chunk := strings.TrimSpace(strings.TrimPrefix(line, "data:"))
+
+			// Check if accumulating this chunk would exceed the limit
+			if int64(dataBuf.Len()+len(chunk)) > maxMessageSize {
+				events <- Response[json.RawMessage]{
+					Ok: false,
+					Error: Error{
+						Category: "ProtocolError",
+						Code:     "MESSAGE_TOO_LARGE",
+						Message:  fmt.Sprintf("Stream message accumulation exceeded maximum size of %d bytes", maxMessageSize),
+					},
+				}
+				return false // Fatal error, no reconnect
+			}
+
 			dataBuf.WriteString(chunk)
 		}
 	}
@@ -941,6 +1011,7 @@ type streamCall struct {
 	input           any
 	headerProviders []HeaderProvider
 	reconnectConf   *ReconnectConfig
+	maxMessageSize  int64
 	onConnect       func()
 	onDisconnect    func(error)
 	onReconnect     func(int, time.Duration)
@@ -964,6 +1035,12 @@ func (s *streamCall) withHeaderProvider(provider HeaderProvider) *streamCall {
 // withReconnectConfig sets the reconnection configuration for this stream.
 func (s *streamCall) withReconnectConfig(reconnectConfig ReconnectConfig) *streamCall {
 	s.reconnectConf = &reconnectConfig
+	return s
+}
+
+// withMaxMessageSize sets the maximum message size for this stream.
+func (s *streamCall) withMaxMessageSize(size int64) *streamCall {
+	s.maxMessageSize = size
 	return s
 }
 
@@ -994,6 +1071,7 @@ func (s *streamCall) execute(ctx context.Context) <-chan Response[json.RawMessag
 		s.input,
 		s.headerProviders,
 		s.reconnectConf,
+		s.maxMessageSize,
 		s.onConnect,
 		s.onDisconnect,
 		s.onReconnect,
@@ -1009,5 +1087,6 @@ func (c *internalClient) newStreamCallBuilder(rpcName, name string, input any) *
 		input:           input,
 		headerProviders: []HeaderProvider{},
 		reconnectConf:   nil,
+		maxMessageSize:  0,
 	}
 }
