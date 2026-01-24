@@ -962,9 +962,7 @@ func applyJitter(d time.Duration, jitterFactor float64) time.Duration {
 	}
 
 	// Clamp jitterFactor to [0.0, 1.0] for safety
-	if jitterFactor > 1.0 {
-		jitterFactor = 1.0
-	}
+	jitterFactor = min(jitterFactor, 1.0)
 
 	// Range: [d * (1 - jitter), d * (1 + jitter)]
 	delta := float64(d) * jitterFactor
