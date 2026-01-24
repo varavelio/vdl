@@ -73,5 +73,11 @@
   "constants": [],
   "patterns": [],
   "rpcs": [],
-  "standaloneDocs": ["Basic types test schema."]
+  "procedures": null,
+  "streams": null,
+  "docs": [
+    {
+      "content": "Basic types test schema."
+    }
+  ]
 }

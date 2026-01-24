@@ -11,12 +11,12 @@ import (
 // All spreads are expanded, docs are normalized, and collections are sorted.
 func FromProgram(program *analysis.Program) *Schema {
 	schema := &Schema{
-		Types:          make([]Type, 0, len(program.Types)),
-		Enums:          make([]Enum, 0, len(program.Enums)),
-		Constants:      make([]Constant, 0, len(program.Consts)),
-		Patterns:       make([]Pattern, 0, len(program.Patterns)),
-		RPCs:           make([]RPC, 0, len(program.RPCs)),
-		StandaloneDocs: make([]string, 0, len(program.StandaloneDocs)),
+		Types:     make([]Type, 0, len(program.Types)),
+		Enums:     make([]Enum, 0, len(program.Enums)),
+		Constants: make([]Constant, 0, len(program.Consts)),
+		Patterns:  make([]Pattern, 0, len(program.Patterns)),
+		RPCs:      make([]RPC, 0, len(program.RPCs)),
+		Docs:      make([]Doc, 0, len(program.StandaloneDocs)),
 	}
 
 	// Convert types
@@ -49,11 +49,27 @@ func FromProgram(program *analysis.Program) *Schema {
 	}
 	sortRPCs(schema.RPCs)
 
+	// Populate flattened views
+	for _, rpc := range schema.RPCs {
+		schema.Procedures = append(schema.Procedures, rpc.Procs...)
+		schema.Streams = append(schema.Streams, rpc.Streams...)
+
+		// Add RPC-level docs
+		for _, doc := range rpc.Docs {
+			schema.Docs = append(schema.Docs, Doc{
+				RPCName: rpc.Name,
+				Content: doc,
+			})
+		}
+	}
+
 	// Convert standalone docs
 	for _, doc := range program.StandaloneDocs {
 		normalized := normalizeDoc(&doc.Content)
 		if normalized != "" {
-			schema.StandaloneDocs = append(schema.StandaloneDocs, normalized)
+			schema.Docs = append(schema.Docs, Doc{
+				Content: normalized,
+			})
 		}
 	}
 
@@ -264,13 +280,13 @@ func convertRPC(
 ) RPC {
 	procs := make([]Procedure, 0, len(rpc.Procs))
 	for _, proc := range rpc.Procs {
-		procs = append(procs, convertProcedure(proc, types, enums))
+		procs = append(procs, convertProcedure(proc, types, enums, rpc.Name))
 	}
 	sortProcedures(procs)
 
 	streams := make([]Stream, 0, len(rpc.Streams))
 	for _, stream := range rpc.Streams {
-		streams = append(streams, convertStream(stream, types, enums))
+		streams = append(streams, convertStream(stream, types, enums, rpc.Name))
 	}
 	sortStreams(streams)
 
@@ -296,8 +312,10 @@ func convertProcedure(
 	proc *analysis.ProcSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
+	rpcName string,
 ) Procedure {
 	return Procedure{
+		RPCName:    rpcName,
 		Name:       proc.Name,
 		Doc:        normalizeDoc(proc.Docstring),
 		Deprecated: convertDeprecation(proc.Deprecated),
@@ -310,8 +328,10 @@ func convertStream(
 	stream *analysis.StreamSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
+	rpcName string,
 ) Stream {
 	return Stream{
+		RPCName:    rpcName,
 		Name:       stream.Name,
 		Doc:        normalizeDoc(stream.Docstring),
 		Deprecated: convertDeprecation(stream.Deprecated),

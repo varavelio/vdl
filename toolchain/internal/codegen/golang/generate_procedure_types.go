@@ -8,8 +8,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) (string, error) {
-	if len(flat.Procedures) == 0 {
+func generateProcedureTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) {
+	if len(schema.Procedures) == 0 {
 		return "", nil
 	}
 
@@ -20,23 +20,23 @@ func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) 
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, fp := range flat.Procedures {
-		procName := fullProcName(fp.RPCName, fp.Procedure.Name)
+	for _, proc := range schema.Procedures {
+		procName := proc.FullName()
 		inputName := fmt.Sprintf("%sInput", procName)
 		outputName := fmt.Sprintf("%sOutput", procName)
 		responseName := fmt.Sprintf("%sResponse", procName)
 
-		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s.%s procedure.", inputName, fp.RPCName, fp.Procedure.Name)
-		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s procedure.", outputName, fp.RPCName, fp.Procedure.Name)
-		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s procedure.", responseName, fp.RPCName, fp.Procedure.Name)
+		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s.%s procedure.", inputName, proc.RPCName, proc.Name)
+		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s procedure.", outputName, proc.RPCName, proc.Name)
+		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s procedure.", responseName, proc.RPCName, proc.Name)
 
-		g.Line(renderType("", inputName, inputDesc, fp.Procedure.Input))
+		g.Line(renderType("", inputName, inputDesc, proc.Input))
 		g.Break()
 
-		g.Line(renderPreType("", inputName, fp.Procedure.Input))
+		g.Line(renderPreType("", inputName, proc.Input))
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, fp.Procedure.Output))
+		g.Line(renderType("", outputName, outputDesc, proc.Output))
 		g.Break()
 
 		g.Linef("// %s", responseDesc)
@@ -48,8 +48,8 @@ func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) 
 	g.Line("// VDLProcedureNames is a list of all procedure names.")
 	g.Line("var VDLProcedureNames = []string{")
 	g.Block(func() {
-		for _, fp := range flat.Procedures {
-			procName := fullProcName(fp.RPCName, fp.Procedure.Name)
+		for _, proc := range schema.Procedures {
+			procName := proc.FullName()
 			g.Linef("%q,", procName)
 		}
 	})

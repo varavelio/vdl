@@ -12,7 +12,7 @@ import (
 //go:embed pieces/core_types.go
 var coreTypesRawPiece string
 
-func generateCoreTypes(_ *ir.Schema, _ *flatSchema, _ *config.GoConfig) (string, error) {
+func generateCoreTypes(_ *ir.Schema, _ *config.GoConfig) (string, error) {
 	piece := strutil.GetStrAfter(coreTypesRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
 		return "", fmt.Errorf("core_types.go: could not find start delimiter")

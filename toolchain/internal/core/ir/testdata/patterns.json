@@ -22,5 +22,8 @@
       "placeholders": ["userId", "eventType"]
     }
   ],
-  "rpcs": []
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
 }

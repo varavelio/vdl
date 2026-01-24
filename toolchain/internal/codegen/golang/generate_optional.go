@@ -12,7 +12,7 @@ import (
 //go:embed pieces/optional.go
 var optionalRawPiece string
 
-func generateOptional(_ *ir.Schema, _ *flatSchema, _ *config.GoConfig) (string, error) {
+func generateOptional(_ *ir.Schema, _ *config.GoConfig) (string, error) {
 	piece := strutil.GetStrAfter(optionalRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
 		return "", fmt.Errorf("optional.go: could not find start delimiter")

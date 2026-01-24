@@ -13,7 +13,7 @@ import (
 //go:embed pieces/client.ts
 var clientRawPiece string
 
-func generateClient(_ *ir.Schema, flat *flatSchema, config *config.TypeScriptConfig) (string, error) {
+func generateClient(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}
@@ -42,11 +42,11 @@ func generateClient(_ *ir.Schema, flat *flatSchema, config *config.TypeScriptCon
 	g.Break()
 
 	// Generate procedure registry and builders
-	generateProcedureImplementation(g, flat)
+	generateProcedureImplementation(g, schema)
 	g.Break()
 
 	// Generate stream registry and builders
-	generateStreamImplementation(g, flat)
+	generateStreamImplementation(g, schema)
 
 	return g.String(), nil
 }
@@ -155,7 +155,7 @@ func generateClientClass(g *gen.Generator) {
 }
 
 // generateProcedureImplementation generates all procedure-related code
-func generateProcedureImplementation(g *gen.Generator, flat *flatSchema) {
+func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 	g.Line("// =============================================================================")
 	g.Line("// Procedure Implementation")
 	g.Line("// =============================================================================")
@@ -177,12 +177,11 @@ func generateProcedureImplementation(g *gen.Generator, flat *flatSchema) {
 		g.Break()
 
 		// Generate method for each procedure
-		for _, fp := range flat.Procedures {
-			proc := fp.Procedure
-			fullName := fullProcName(fp.RPCName, proc.Name)
+		for _, proc := range schema.Procedures {
+			fullName := proc.FullName()
 			builderName := fmt.Sprintf("builder%s", fullName)
-			methodName := strutil.ToCamelCase(fp.RPCName) + strutil.ToPascalCase(proc.Name)
-			path := rpcProcPath(fp.RPCName, proc.Name)
+			methodName := strutil.ToCamelCase(proc.RPCName) + strutil.ToPascalCase(proc.Name)
+			path := proc.Path()
 
 			g.Linef("/**")
 			g.Linef(" * Creates a call builder for the %s procedure.", fullName)
@@ -202,14 +201,13 @@ func generateProcedureImplementation(g *gen.Generator, flat *flatSchema) {
 	g.Break()
 
 	// Generate individual procedure builders
-	for _, fp := range flat.Procedures {
-		proc := fp.Procedure
-		fullName := fullProcName(fp.RPCName, proc.Name)
+	for _, proc := range schema.Procedures {
+		fullName := proc.FullName()
 		builderName := fmt.Sprintf("builder%s", fullName)
 		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
 		inputType := fmt.Sprintf("%sInput", fullName)
 		outputType := fmt.Sprintf("%sOutput", fullName)
-		methodName := strutil.ToCamelCase(fp.RPCName) + strutil.ToPascalCase(proc.Name)
+		methodName := strutil.ToCamelCase(proc.RPCName) + strutil.ToPascalCase(proc.Name)
 
 		g.Linef("/**")
 		g.Linef(" * Fluent builder for the %s procedure.", fullName)
@@ -356,7 +354,7 @@ func generateProcedureImplementation(g *gen.Generator, flat *flatSchema) {
 }
 
 // generateStreamImplementation generates all stream-related code
-func generateStreamImplementation(g *gen.Generator, flat *flatSchema) {
+func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 	g.Line("// =============================================================================")
 	g.Line("// Stream Implementation")
 	g.Line("// =============================================================================")
@@ -379,12 +377,11 @@ func generateStreamImplementation(g *gen.Generator, flat *flatSchema) {
 		g.Break()
 
 		// Generate method for each stream
-		for _, fs := range flat.Streams {
-			stream := fs.Stream
-			fullName := fullStreamName(fs.RPCName, stream.Name)
+		for _, stream := range schema.Streams {
+			fullName := stream.FullName()
 			builderName := fmt.Sprintf("builder%sStream", fullName)
-			methodName := strutil.ToCamelCase(fs.RPCName) + strutil.ToPascalCase(stream.Name)
-			path := rpcStreamPath(fs.RPCName, stream.Name)
+			methodName := strutil.ToCamelCase(stream.RPCName) + strutil.ToPascalCase(stream.Name)
+			path := stream.Path()
 
 			g.Linef("/**")
 			g.Linef(" * Creates a stream builder for the %s stream.", fullName)
@@ -404,14 +401,13 @@ func generateStreamImplementation(g *gen.Generator, flat *flatSchema) {
 	g.Break()
 
 	// Generate individual stream builders
-	for _, fs := range flat.Streams {
-		stream := fs.Stream
-		fullName := fullStreamName(fs.RPCName, stream.Name)
+	for _, stream := range schema.Streams {
+		fullName := stream.FullName()
 		builderName := fmt.Sprintf("builder%sStream", fullName)
 		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
 		inputType := fmt.Sprintf("%sInput", fullName)
 		outputType := fmt.Sprintf("%sOutput", fullName)
-		methodName := strutil.ToCamelCase(fs.RPCName) + strutil.ToPascalCase(stream.Name)
+		methodName := strutil.ToCamelCase(stream.RPCName) + strutil.ToPascalCase(stream.Name)
 
 		g.Linef("/**")
 		g.Linef(" * Fluent builder for the %s stream.", fullName)

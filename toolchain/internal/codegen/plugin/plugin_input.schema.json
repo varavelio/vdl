@@ -6,19 +6,24 @@
     "Constant": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The unique name of the constant"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the constant"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "valueType": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of the constant value"
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value of the constant as a string"
         }
       },
       "additionalProperties": false,
@@ -32,31 +37,54 @@
     "Deprecation": {
       "properties": {
         "message": {
-          "type": "string"
+          "type": "string",
+          "description": "A message explaining the deprecation and suggested alternative"
         }
       },
       "additionalProperties": false,
       "type": "object"
     },
+    "Doc": {
+      "properties": {
+        "rpcName": {
+          "type": "string",
+          "description": "The name of the RPC service this doc belongs to, if empty this is a global standalone documentation block"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the documentation"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "content"
+      ]
+    },
     "Enum": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The unique name of the enum"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the enum"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "valueType": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of values contained in this enum"
         },
         "members": {
           "items": {
             "$ref": "#/$defs/EnumMember"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of enum members"
         }
       },
       "additionalProperties": false,
@@ -70,7 +98,8 @@
     "EnumInfo": {
       "properties": {
         "valueType": {
-          "type": "string"
+          "type": "string",
+          "description": "The underlying value type of the enum (string or int)"
         }
       },
       "additionalProperties": false,
@@ -82,10 +111,12 @@
     "EnumMember": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the enum member"
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value of the enum member"
         }
       },
       "additionalProperties": false,
@@ -98,16 +129,20 @@
     "Field": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the field"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the field"
         },
         "optional": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the field is optional"
         },
         "type": {
-          "$ref": "#/$defs/TypeRef"
+          "$ref": "#/$defs/TypeRef",
+          "description": "The type definition of the field"
         }
       },
       "additionalProperties": false,
@@ -123,7 +158,8 @@
           "items": {
             "$ref": "#/$defs/Field"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of fields in the inline object"
         }
       },
       "additionalProperties": false,
@@ -151,22 +187,27 @@
     "Pattern": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The unique name of the pattern"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the pattern"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "template": {
-          "type": "string"
+          "type": "string",
+          "description": "The template string containing placeholders"
         },
         "placeholders": {
           "items": {
             "type": "string"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of placeholder names extracted from the template"
         }
       },
       "additionalProperties": false,
@@ -179,31 +220,41 @@
     },
     "Procedure": {
       "properties": {
+        "rpcName": {
+          "type": "string",
+          "description": "The name of the parent RPC service"
+        },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the procedure"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the procedure"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "input": {
           "items": {
             "$ref": "#/$defs/Field"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of input parameters"
         },
         "output": {
           "items": {
             "$ref": "#/$defs/Field"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of output parameters"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "rpcName",
         "name",
         "input",
         "output"
@@ -212,31 +263,37 @@
     "RPC": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The unique name of the RPC service"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the RPC service"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "procs": {
           "items": {
             "$ref": "#/$defs/Procedure"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of procedures in this RPC"
         },
         "streams": {
           "items": {
             "$ref": "#/$defs/Stream"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of streams in this RPC"
         },
         "docs": {
           "items": {
             "type": "string"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Standalone documentation blocks specific to this RPC"
         }
       },
       "additionalProperties": false,
@@ -253,37 +310,57 @@
           "items": {
             "$ref": "#/$defs/Type"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of all type definitions in the schema"
         },
         "enums": {
           "items": {
             "$ref": "#/$defs/Enum"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of all enum definitions in the schema"
         },
         "constants": {
           "items": {
             "$ref": "#/$defs/Constant"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of all constant definitions in the schema"
         },
         "patterns": {
           "items": {
             "$ref": "#/$defs/Pattern"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of all pattern definitions in the schema"
         },
         "rpcs": {
           "items": {
             "$ref": "#/$defs/RPC"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of all RPC service definitions in the schema"
         },
-        "standaloneDocs": {
+        "procedures": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/Procedure"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Flattened list of all procedures from all RPCs"
+        },
+        "streams": {
+          "items": {
+            "$ref": "#/$defs/Stream"
+          },
+          "type": "array",
+          "description": "Flattened list of all streams from all RPCs"
+        },
+        "docs": {
+          "items": {
+            "$ref": "#/$defs/Doc"
+          },
+          "type": "array",
+          "description": "List of all standalone documentation blocks (even from all RPCs)"
         }
       },
       "additionalProperties": false,
@@ -293,36 +370,49 @@
         "enums",
         "constants",
         "patterns",
-        "rpcs"
+        "rpcs",
+        "procedures",
+        "streams",
+        "docs"
       ]
     },
     "Stream": {
       "properties": {
+        "rpcName": {
+          "type": "string",
+          "description": "The name of the parent RPC service"
+        },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the stream"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the stream"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "input": {
           "items": {
             "$ref": "#/$defs/Field"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of input parameters"
         },
         "output": {
           "items": {
             "$ref": "#/$defs/Field"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of output parameters"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "rpcName",
         "name",
         "input",
         "output"
@@ -331,19 +421,23 @@
     "Type": {
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The unique name of the type"
         },
         "doc": {
-          "type": "string"
+          "type": "string",
+          "description": "Documentation for the type"
         },
         "deprecated": {
-          "$ref": "#/$defs/Deprecation"
+          "$ref": "#/$defs/Deprecation",
+          "description": "Deprecation status if deprecated"
         },
         "fields": {
           "items": {
             "$ref": "#/$defs/Field"
           },
-          "type": "array"
+          "type": "array",
+          "description": "List of fields in the type"
         }
       },
       "additionalProperties": false,
@@ -356,31 +450,40 @@
     "TypeRef": {
       "properties": {
         "kind": {
-          "type": "string"
+          "type": "string",
+          "description": "The category of the type (primitive, type, enum, array, map, object)"
         },
         "primitive": {
-          "type": "string"
+          "type": "string",
+          "description": "The specific primitive type if Kind is primitive"
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the custom type if Kind is type"
         },
         "enum": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the enum if Kind is enum"
         },
         "enumInfo": {
-          "$ref": "#/$defs/EnumInfo"
+          "$ref": "#/$defs/EnumInfo",
+          "description": "Additional metadata for enum types"
         },
         "arrayItem": {
-          "$ref": "#/$defs/TypeRef"
+          "$ref": "#/$defs/TypeRef",
+          "description": "The type of elements in the array if Kind is array"
         },
         "arrayDimensions": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of array dimensions (e.g. 2 for int[][])"
         },
         "mapValue": {
-          "$ref": "#/$defs/TypeRef"
+          "$ref": "#/$defs/TypeRef",
+          "description": "The type of values in the map if Kind is map"
         },
         "object": {
-          "$ref": "#/$defs/InlineObject"
+          "$ref": "#/$defs/InlineObject",
+          "description": "Definition of the inline object if Kind is object"
         }
       },
       "additionalProperties": false,

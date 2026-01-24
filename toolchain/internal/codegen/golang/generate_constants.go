@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateConstants(schema *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
+func generateConstants(schema *ir.Schema, config *config.GoConfig) (string, error) {
 	if !config.ShouldGenConsts() {
 		return "", nil
 	}

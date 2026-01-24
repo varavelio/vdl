@@ -10,7 +10,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateEnums(schema *ir.Schema, _ *flatSchema, _ *config.TypeScriptConfig) (string, error) {
+func generateEnums(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}

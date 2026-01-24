@@ -33,9 +33,6 @@ func (g *Generator) Name() string {
 
 // Generate produces Go source files from the IR schema.
 func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
-	// Flatten the schema for easier iteration
-	flat := flattenSchema(schema)
-
 	// Map of filename -> generator
 	builders := make(map[string]*gen.Generator)
 
@@ -47,7 +44,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b := gen.New().WithTabs()
 
 		// Always start with package declaration
-		pkgCode := generatePackage(schema, flat, g.config)
+		pkgCode := generatePackage(schema, g.config)
 		b.Raw(pkgCode)
 		b.Break()
 
@@ -56,7 +53,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// Core Types (types_core.go)
-	code, err := generateCoreTypes(schema, flat, g.config)
+	code, err := generateCoreTypes(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +64,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// Optional utility type (optional.go)
-	code, err = generateOptional(schema, flat, g.config)
+	code, err = generateOptional(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -79,14 +76,14 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// Types (types.go) - Domain types
 	// Contains: Enums, Domain Types, Procedure Types, Stream Types
-	typeGenerators := []func(*ir.Schema, *flatSchema, *config.GoConfig) (string, error){
+	typeGenerators := []func(*ir.Schema, *config.GoConfig) (string, error){
 		generateEnums,
 		generateDomainTypes,
 		generateProcedureTypes,
 		generateStreamTypes,
 	}
 	for _, generator := range typeGenerators {
-		code, err := generator(schema, flat, g.config)
+		code, err := generator(schema, g.config)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +95,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// Constants (consts.go)
-	code, err = generateConstants(schema, flat, g.config)
+	code, err = generateConstants(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +106,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// Patterns (patterns.go)
-	code, err = generatePatterns(schema, flat, g.config)
+	code, err = generatePatterns(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +117,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// RPC Server (rpc_server.go) - Core + All RPCs
-	code, err = generateServerCore(schema, flat, g.config)
+	code, err = generateServerCore(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +139,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// RPC Client (rpc_client.go) - Core + All RPCs
-	code, err = generateClientCore(schema, flat, g.config)
+	code, err = generateClientCore(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -181,60 +178,4 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	return files, nil
-}
-
-// flatSchema provides pre-computed flattened views of the schema for easier iteration.
-// This avoids nested loops throughout the generators.
-type flatSchema struct {
-	// Procedures contains all procedures from all RPCs with their parent RPC name.
-	Procedures []flatProcedure
-	// Streams contains all streams from all RPCs with their parent RPC name.
-	Streams []flatStream
-}
-
-// flatProcedure represents a procedure with its parent RPC context.
-type flatProcedure struct {
-	RPCName   string
-	Procedure ir.Procedure
-}
-
-// flatStream represents a stream with its parent RPC context.
-type flatStream struct {
-	RPCName string
-	Stream  ir.Stream
-}
-
-// flattenSchema creates flattened views of procedures and streams for easier iteration.
-func flattenSchema(schema *ir.Schema) *flatSchema {
-	flat := &flatSchema{
-		Procedures: []flatProcedure{},
-		Streams:    []flatStream{},
-	}
-
-	for _, rpc := range schema.RPCs {
-		for _, proc := range rpc.Procs {
-			flat.Procedures = append(flat.Procedures, flatProcedure{
-				RPCName:   rpc.Name,
-				Procedure: proc,
-			})
-		}
-		for _, stream := range rpc.Streams {
-			flat.Streams = append(flat.Streams, flatStream{
-				RPCName: rpc.Name,
-				Stream:  stream,
-			})
-		}
-	}
-
-	return flat
-}
-
-// fullProcName returns the fully qualified procedure name: {RPC}{Proc}
-func fullProcName(rpcName, procName string) string {
-	return rpcName + procName
-}
-
-// fullStreamName returns the fully qualified stream name: {RPC}{Stream}
-func fullStreamName(rpcName, streamName string) string {
-	return rpcName + streamName
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.DartConfig) (string, error) {
-	if len(flat.Procedures) == 0 {
+func generateProcedureTypes(schema *ir.Schema, _ *config.DartConfig) (string, error) {
+	if len(schema.Procedures) == 0 {
 		return "", nil
 	}
 
@@ -20,9 +20,8 @@ func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.DartConfig
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, fp := range flat.Procedures {
-		proc := fp.Procedure
-		fullName := fullProcName(fp.RPCName, proc.Name)
+	for _, proc := range schema.Procedures {
+		fullName := proc.FullName()
 
 		inputName := fmt.Sprintf("%sInput", fullName)
 		outputName := fmt.Sprintf("%sOutput", fullName)
@@ -46,8 +45,8 @@ func generateProcedureTypes(_ *ir.Schema, flat *flatSchema, _ *config.DartConfig
 	g.Line("/// __vdlProcedureNames lists all procedure identifiers available in this client.")
 	g.Line("const List<String> __vdlProcedureNames = [")
 	g.Block(func() {
-		for _, fp := range flat.Procedures {
-			path := rpcProcPath(fp.RPCName, fp.Procedure.Name)
+		for _, proc := range schema.Procedures {
+			path := proc.Path()
 			g.Linef("'%s',", path)
 		}
 	})

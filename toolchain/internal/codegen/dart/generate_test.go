@@ -7,12 +7,25 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 func TestGenerator_Name(t *testing.T) {
 	g := New(&config.DartConfig{})
 	assert.Equal(t, "dart", g.Name())
+}
+
+func parseAndBuildIR(t *testing.T, content string) *ir.Schema {
+	fs := vfs.New()
+	path := "/test.vdl"
+	fs.WriteFileCache(path, []byte(content))
+
+	program, diags := analysis.Analyze(fs, path)
+	require.Empty(t, diags, "analysis failed")
+
+	return ir.FromProgram(program)
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
@@ -22,13 +35,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types:     []ir.Type{},
-		Enums:     []ir.Enum{},
-		Constants: []ir.Constant{},
-		Patterns:  []ir.Pattern{},
-		RPCs:      []ir.RPC{},
-	}
+	schema := parseAndBuildIR(t, "")
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -52,30 +59,15 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{
-			{
-				Name: "User",
-				Doc:  "Represents a user in the system.",
-				Fields: []ir.Field{
-					{
-						Name: "id",
-						Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-					},
-					{
-						Name: "email",
-						Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-					},
-					{
-						Name:     "age",
-						Optional: true,
-						Type:     ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveInt},
-					},
-				},
-			},
-		},
-		RPCs: []ir.RPC{},
-	}
+	vdl := `
+		type User {
+			// Represents a user in the system.
+			id: string
+			email: string
+			age?: int
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -103,28 +95,20 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Enums: []ir.Enum{
-			{
-				Name:      "OrderStatus",
-				ValueType: ir.EnumValueTypeString,
-				Members: []ir.EnumMember{
-					{Name: "Pending", Value: "pending"},
-					{Name: "Shipped", Value: "shipped"},
-					{Name: "Delivered", Value: "delivered"},
-				},
-			},
-			{
-				Name:      "Priority",
-				ValueType: ir.EnumValueTypeInt,
-				Members: []ir.EnumMember{
-					{Name: "Low", Value: "1"},
-					{Name: "Medium", Value: "2"},
-					{Name: "High", Value: "3"},
-				},
-			},
-		},
-	}
+	vdl := `
+		enum OrderStatus {
+			Pending = "pending"
+			Shipped = "shipped"
+			Delivered = "delivered"
+		}
+
+		enum Priority {
+			Low = 1
+			Medium = 2
+			High = 3
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -158,30 +142,13 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Constants: []ir.Constant{
-			{
-				Name:      "MAX_PAGE_SIZE",
-				ValueType: ir.ConstValueTypeInt,
-				Value:     "100",
-			},
-			{
-				Name:      "API_VERSION",
-				ValueType: ir.ConstValueTypeString,
-				Value:     "1.0.0",
-			},
-			{
-				Name:      "DEFAULT_RATE",
-				ValueType: ir.ConstValueTypeFloat,
-				Value:     "0.21",
-			},
-			{
-				Name:      "ENABLED",
-				ValueType: ir.ConstValueTypeBool,
-				Value:     "true",
-			},
-		},
-	}
+	vdl := `
+		const MAX_PAGE_SIZE = 100
+		const API_VERSION = "1.0.0"
+		const DEFAULT_RATE = 0.21
+		const ENABLED = true
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -207,20 +174,11 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Patterns: []ir.Pattern{
-			{
-				Name:         "UserEventSubject",
-				Template:     "events.users.{userId}.{eventType}",
-				Placeholders: []string{"userId", "eventType"},
-			},
-			{
-				Name:         "CacheKey",
-				Template:     "cache:{key}",
-				Placeholders: []string{"key"},
-			},
-		},
-	}
+	vdl := `
+		pattern UserEventSubject = "events.users.{userId}.{eventType}"
+		pattern CacheKey = "cache:{key}"
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -246,34 +204,20 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Users",
-				Procs: []ir.Procedure{
-					{
-						Name: "GetUser",
-						Input: []ir.Field{
-							{
-								Name: "userId",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-						Output: []ir.Field{
-							{
-								Name: "id",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-							{
-								Name: "name",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	vdl := `
+		rpc Users {
+			proc GetUser {
+				input {
+					userId: string
+				}
+				output {
+					id: string
+					name: string
+				}
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -292,7 +236,7 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	assert.Contains(t, clientContent, "typedef UsersGetUserResponse = Response<UsersGetUserOutput>;")
 
 	// Check procedure path in metadata
-	assert.Contains(t, clientContent, "'users/getUser'")
+	assert.Contains(t, clientContent, "'Users/GetUser'")
 
 	// Check client implementation is NOT present
 	assert.NotContains(t, clientContent, "class _BuilderUsersGetUser")
@@ -306,34 +250,20 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Chat",
-				Streams: []ir.Stream{
-					{
-						Name: "Messages",
-						Input: []ir.Field{
-							{
-								Name: "roomId",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-						Output: []ir.Field{
-							{
-								Name: "message",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-							{
-								Name: "timestamp",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveDatetime},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	vdl := `
+		rpc Chat {
+			stream Messages {
+				input {
+					roomId: string
+				}
+				output {
+					message: string
+					timestamp: datetime
+				}
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -352,7 +282,7 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 	assert.Contains(t, clientContent, "typedef ChatMessagesResponse = Response<ChatMessagesOutput>;")
 
 	// Check stream path in metadata
-	assert.Contains(t, clientContent, "'chat/messages'")
+	assert.Contains(t, clientContent, "'Chat/Messages'")
 
 	// Check client implementation is NOT present
 	assert.NotContains(t, clientContent, "class _BuilderChatMessagesStream")
@@ -366,65 +296,23 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{
-			{
-				Name: "Product",
-				Fields: []ir.Field{
-					// Array
-					{
-						Name: "tags",
-						Type: ir.TypeRef{
-							Kind:            ir.TypeKindArray,
-							ArrayDimensions: 1,
-							ArrayItem:       &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-						},
-					},
-					// Multi-dimensional array
-					{
-						Name: "matrix",
-						Type: ir.TypeRef{
-							Kind:            ir.TypeKindArray,
-							ArrayDimensions: 2,
-							ArrayItem:       &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveInt},
-						},
-					},
-					// Map
-					{
-						Name: "metadata",
-						Type: ir.TypeRef{
-							Kind:     ir.TypeKindMap,
-							MapValue: &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-						},
-					},
-					// Custom type reference
-					{
-						Name: "owner",
-						Type: ir.TypeRef{Kind: ir.TypeKindType, Type: "User"},
-					},
-					// Inline object
-					{
-						Name: "address",
-						Type: ir.TypeRef{
-							Kind: ir.TypeKindObject,
-							Object: &ir.InlineObject{
-								Fields: []ir.Field{
-									{
-										Name: "city",
-										Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-									},
-									{
-										Name: "zip",
-										Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	vdl := `
+		type User {
+			id: string
+		}
+
+		type Product {
+			tags: string[]
+			matrix: int[][]
+			metadata: map<string>
+			owner: User
+			address: {
+				city: string
+				zip: string
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -455,6 +343,12 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 }
 
 func TestTypeRefToDart(t *testing.T) {
+	// ... (rest of the tests using TypeRef directly can remain as they test low-level logic)
+	// But since this is a unit test for a private function (if it were private),
+	// or specific type conversion logic, we might want to keep it.
+	// Since typeRefToDart is not exported, it's testing internal logic.
+	// We can keep it as is, or remove it if we rely on full generation tests.
+	// For now I'll keep it but fix imports if needed.
 	tests := []struct {
 		name   string
 		tr     ir.TypeRef
@@ -541,53 +435,6 @@ func TestTypeRefToDart(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := typeRefToDart(tt.parent, tt.tr)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-func TestConvertPatternToDartInterpolation(t *testing.T) {
-	tests := []struct {
-		name         string
-		template     string
-		placeholders []string
-		want         string
-	}{
-		{
-			name:         "simple pattern",
-			template:     "events.{userId}",
-			placeholders: []string{"userId"},
-			want:         "'events.$userId'",
-		},
-		{
-			name:         "multiple placeholders",
-			template:     "events.users.{userId}.{eventType}",
-			placeholders: []string{"userId", "eventType"},
-			want:         "'events.users.$userId.$eventType'",
-		},
-		{
-			name:         "placeholder at start",
-			template:     "{prefix}.suffix",
-			placeholders: []string{"prefix"},
-			want:         "'$prefix.suffix'",
-		},
-		{
-			name:         "placeholder at end",
-			template:     "prefix.{suffix}",
-			placeholders: []string{"suffix"},
-			want:         "'prefix.$suffix'",
-		},
-		{
-			name:         "no placeholders",
-			template:     "static.path",
-			placeholders: []string{},
-			want:         "'static.path'",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := convertPatternToDartInterpolation(tt.template, tt.placeholders)
 			assert.Equal(t, tt.want, got)
 		})
 	}

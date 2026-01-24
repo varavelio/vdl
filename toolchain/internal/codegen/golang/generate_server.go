@@ -14,7 +14,7 @@ import (
 var serverRawPiece string
 
 // generateServerCore generates the core server implementation (rpc_server.go).
-func generateServerCore(_ *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
+func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
@@ -148,7 +148,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 	// Procedures
 	for _, proc := range rpc.Procs {
-		name := fullProcName(rpc.Name, proc.Name)
+		name := rpc.Name + proc.Name
 
 		g.Linef("// Register the %s procedure.", name)
 		g.Linef("func (r *serverProcRegistry[T]) %s() proc%sEntry[T] {", name, name)
@@ -300,7 +300,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 	// Streams
 	for _, stream := range rpc.Streams {
-		name := fullStreamName(rpc.Name, stream.Name)
+		name := rpc.Name + stream.Name
 
 		g.Linef("// Register the %s stream.", name)
 		g.Linef("func (r *serverStreamRegistry[T]) %s() stream%sEntry[T] {", name, name)

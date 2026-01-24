@@ -8,8 +8,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.TypeScriptConfig) (string, error) {
-	if len(flat.Streams) == 0 {
+func generateStreamTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
+	if len(schema.Streams) == 0 {
 		return "", nil
 	}
 
@@ -20,9 +20,8 @@ func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.TypeScriptCon
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, fs := range flat.Streams {
-		stream := fs.Stream
-		fullName := fullStreamName(fs.RPCName, stream.Name)
+	for _, stream := range schema.Streams {
+		fullName := stream.FullName()
 
 		inputName := fmt.Sprintf("%sInput", fullName)
 		outputName := fmt.Sprintf("%sOutput", fullName)
@@ -50,8 +49,8 @@ func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.TypeScriptCon
 	g.Line("// vdlStreamNames is a list of all stream names.")
 	g.Line("const vdlStreamNames: string[] = [")
 	g.Block(func() {
-		for _, fs := range flat.Streams {
-			path := rpcStreamPath(fs.RPCName, fs.Stream.Name)
+		for _, stream := range schema.Streams {
+			path := stream.Path()
 			g.Linef("\"%s\",", path)
 		}
 	})

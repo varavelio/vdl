@@ -8,7 +8,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateDomainTypes(schema *ir.Schema, _ *flatSchema, _ *config.DartConfig) (string, error) {
+func generateDomainTypes(schema *ir.Schema, _ *config.DartConfig) (string, error) {
 	if len(schema.Types) == 0 {
 		return "", nil
 	}

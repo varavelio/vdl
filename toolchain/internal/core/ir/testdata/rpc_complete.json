@@ -74,6 +74,7 @@
       "doc": "Notification service.",
       "procs": [
         {
+          "rpcName": "Notifications",
           "name": "SendNotification",
           "input": [
             {
@@ -109,6 +110,7 @@
       "doc": "User management service.",
       "procs": [
         {
+          "rpcName": "Users",
           "name": "CreateUser",
           "doc": "Creates a new user in the system.",
           "input": [
@@ -145,6 +147,7 @@
           ]
         },
         {
+          "rpcName": "Users",
           "name": "GetUser",
           "doc": "Retrieves a user by ID.",
           "input": [
@@ -167,6 +170,7 @@
           ]
         },
         {
+          "rpcName": "Users",
           "name": "ListUsers",
           "doc": "Lists users with pagination.",
           "input": [
@@ -224,6 +228,7 @@
       ],
       "streams": [
         {
+          "rpcName": "Users",
           "name": "UserStatusUpdates",
           "doc": "Stream of user status updates.",
           "input": [
@@ -256,6 +261,191 @@
       "docs": [
         "# User Operations\nThe following procedures handle user lifecycle."
       ]
+    }
+  ],
+  "procedures": [
+    {
+      "rpcName": "Notifications",
+      "name": "SendNotification",
+      "input": [
+        {
+          "name": "userId",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "message",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "sent",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "Users",
+      "name": "CreateUser",
+      "doc": "Creates a new user in the system.",
+      "input": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "email",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "user",
+          "type": {
+            "kind": "type",
+            "type": "User"
+          }
+        },
+        {
+          "name": "success",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "Users",
+      "name": "GetUser",
+      "doc": "Retrieves a user by ID.",
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "user",
+          "type": {
+            "kind": "type",
+            "type": "User"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "Users",
+      "name": "ListUsers",
+      "doc": "Lists users with pagination.",
+      "input": [
+        {
+          "name": "page",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "limit",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "filterByName",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "totalItems",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "totalPages",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "users",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "type",
+              "type": "User"
+            },
+            "arrayDimensions": 1
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "rpcName": "Users",
+      "name": "UserStatusUpdates",
+      "doc": "Stream of user status updates.",
+      "input": [
+        {
+          "name": "userId",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "status",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        }
+      ]
+    }
+  ],
+  "docs": [
+    {
+      "rpcName": "Users",
+      "content": "# User Operations\nThe following procedures handle user lifecycle."
     }
   ]
 }

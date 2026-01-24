@@ -43,7 +43,11 @@
   "constants": [],
   "patterns": [],
   "rpcs": [],
-  "standaloneDocs": [
-    "This is a multi-line docstring.\n\nIt has multiple paragraphs and should be normalized.\n\n- Item 1\n- Item 2"
+  "procedures": null,
+  "streams": null,
+  "docs": [
+    {
+      "content": "This is a multi-line docstring.\n\nIt has multiple paragraphs and should be normalized.\n\n- Item 1\n- Item 2"
+    }
   ]
 }

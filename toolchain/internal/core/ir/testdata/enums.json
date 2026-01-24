@@ -110,5 +110,8 @@
   ],
   "constants": [],
   "patterns": [],
-  "rpcs": []
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
 }

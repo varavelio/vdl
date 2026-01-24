@@ -692,11 +692,13 @@
       "name": "EmptyBlocks",
       "procs": [
         {
+          "rpcName": "EmptyBlocks",
           "name": "BothEmpty",
           "input": [],
           "output": []
         },
         {
+          "rpcName": "EmptyBlocks",
           "name": "EmptyInput",
           "input": [],
           "output": [
@@ -710,6 +712,7 @@
           ]
         },
         {
+          "rpcName": "EmptyBlocks",
           "name": "EmptyOutput",
           "input": [
             {
@@ -725,6 +728,7 @@
       ],
       "streams": [
         {
+          "rpcName": "EmptyBlocks",
           "name": "EmptyStreamBlocks",
           "input": [],
           "output": []
@@ -740,6 +744,7 @@
       "name": "MultiDocRpc",
       "procs": [
         {
+          "rpcName": "MultiDocRpc",
           "name": "SomeProc",
           "input": [
             {
@@ -768,6 +773,7 @@
       "name": "OnlyProcs",
       "procs": [
         {
+          "rpcName": "OnlyProcs",
           "name": "TheOnlyProc",
           "input": [
             {
@@ -796,6 +802,7 @@
       "procs": [],
       "streams": [
         {
+          "rpcName": "OnlyStreams",
           "name": "TheOnlyStream",
           "input": [
             {
@@ -822,6 +829,7 @@
       "name": "SpreadInRpc",
       "procs": [
         {
+          "rpcName": "SpreadInRpc",
           "name": "UsingSpreads",
           "input": [
             {
@@ -875,6 +883,7 @@
       ],
       "streams": [
         {
+          "rpcName": "SpreadInRpc",
           "name": "UsingSpreadStream",
           "input": [
             {
@@ -920,8 +929,226 @@
       ]
     }
   ],
-  "standaloneDocs": [
-    "First standalone doc in schema.",
-    "Second standalone doc in schema."
+  "procedures": [
+    {
+      "rpcName": "EmptyBlocks",
+      "name": "BothEmpty",
+      "input": [],
+      "output": []
+    },
+    {
+      "rpcName": "EmptyBlocks",
+      "name": "EmptyInput",
+      "input": [],
+      "output": [
+        {
+          "name": "result",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "EmptyBlocks",
+      "name": "EmptyOutput",
+      "input": [
+        {
+          "name": "query",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": []
+    },
+    {
+      "rpcName": "MultiDocRpc",
+      "name": "SomeProc",
+      "input": [
+        {
+          "name": "x",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "y",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "OnlyProcs",
+      "name": "TheOnlyProc",
+      "input": [
+        {
+          "name": "x",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "y",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "SpreadInRpc",
+      "name": "UsingSpreads",
+      "input": [
+        {
+          "name": "requestId",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "payload",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "success",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        },
+        {
+          "name": "errorCode",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "data",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "rpcName": "EmptyBlocks",
+      "name": "EmptyStreamBlocks",
+      "input": [],
+      "output": []
+    },
+    {
+      "rpcName": "OnlyStreams",
+      "name": "TheOnlyStream",
+      "input": [
+        {
+          "name": "channel",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "SpreadInRpc",
+      "name": "UsingSpreadStream",
+      "input": [
+        {
+          "name": "requestId",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "success",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        },
+        {
+          "name": "errorCode",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "event",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "docs": [
+    {
+      "rpcName": "MultiDocRpc",
+      "content": "First RPC standalone doc."
+    },
+    {
+      "rpcName": "MultiDocRpc",
+      "content": "Second RPC standalone doc."
+    },
+    {
+      "content": "First standalone doc in schema."
+    },
+    {
+      "content": "Second standalone doc in schema."
+    }
   ]
 }

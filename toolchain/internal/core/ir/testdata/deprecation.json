@@ -76,6 +76,7 @@
       "name": "Legacy",
       "procs": [
         {
+          "rpcName": "Legacy",
           "name": "OldMethod",
           "deprecated": {},
           "input": [
@@ -100,6 +101,7 @@
       ],
       "streams": [
         {
+          "rpcName": "Legacy",
           "name": "OldStream",
           "deprecated": {
             "message": "Use NewStream instead"
@@ -125,5 +127,58 @@
         }
       ]
     }
-  ]
+  ],
+  "procedures": [
+    {
+      "rpcName": "Legacy",
+      "name": "OldMethod",
+      "deprecated": {},
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "result",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "rpcName": "Legacy",
+      "name": "OldStream",
+      "deprecated": {
+        "message": "Use NewStream instead"
+      },
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "docs": []
 }

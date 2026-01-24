@@ -8,8 +8,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) (string, error) {
-	if len(flat.Streams) == 0 {
+func generateStreamTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) {
+	if len(schema.Streams) == 0 {
 		return "", nil
 	}
 
@@ -20,23 +20,23 @@ func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) (st
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Break()
 
-	for _, fs := range flat.Streams {
-		streamName := fullStreamName(fs.RPCName, fs.Stream.Name)
+	for _, stream := range schema.Streams {
+		streamName := stream.FullName()
 		inputName := fmt.Sprintf("%sInput", streamName)
 		outputName := fmt.Sprintf("%sOutput", streamName)
 		responseName := fmt.Sprintf("%sResponse", streamName)
 
-		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s.%s stream.", inputName, fs.RPCName, fs.Stream.Name)
-		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s stream.", outputName, fs.RPCName, fs.Stream.Name)
-		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s stream.", responseName, fs.RPCName, fs.Stream.Name)
+		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s.%s stream.", inputName, stream.RPCName, stream.Name)
+		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s stream.", outputName, stream.RPCName, stream.Name)
+		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s stream.", responseName, stream.RPCName, stream.Name)
 
-		g.Line(renderType("", inputName, inputDesc, fs.Stream.Input))
+		g.Line(renderType("", inputName, inputDesc, stream.Input))
 		g.Break()
 
-		g.Line(renderPreType("", inputName, fs.Stream.Input))
+		g.Line(renderPreType("", inputName, stream.Input))
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, fs.Stream.Output))
+		g.Line(renderType("", outputName, outputDesc, stream.Output))
 		g.Break()
 
 		g.Linef("// %s", responseDesc)
@@ -48,8 +48,8 @@ func generateStreamTypes(_ *ir.Schema, flat *flatSchema, _ *config.GoConfig) (st
 	g.Line("// VDLStreamNames is a list of all stream names.")
 	g.Line("var VDLStreamNames = []string{")
 	g.Block(func() {
-		for _, fs := range flat.Streams {
-			streamName := fullStreamName(fs.RPCName, fs.Stream.Name)
+		for _, stream := range schema.Streams {
+			streamName := stream.FullName()
 			g.Linef("%q,", streamName)
 		}
 	})

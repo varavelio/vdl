@@ -7,12 +7,25 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
 func TestGenerator_Name(t *testing.T) {
 	g := New(&config.TypeScriptConfig{})
 	assert.Equal(t, "typescript", g.Name())
+}
+
+func parseAndBuildIR(t *testing.T, content string) *ir.Schema {
+	fs := vfs.New()
+	path := "/test.vdl"
+	fs.WriteFileCache(path, []byte(content))
+
+	program, diags := analysis.Analyze(fs, path)
+	require.Empty(t, diags, "analysis failed")
+
+	return ir.FromProgram(program)
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
@@ -25,13 +38,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types:     []ir.Type{},
-		Enums:     []ir.Enum{},
-		Constants: []ir.Constant{},
-		Patterns:  []ir.Pattern{},
-		RPCs:      []ir.RPC{},
-	}
+	schema := parseAndBuildIR(t, "")
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -51,30 +58,15 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{
-			{
-				Name: "User",
-				Doc:  "Represents a user in the system.",
-				Fields: []ir.Field{
-					{
-						Name: "id",
-						Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-					},
-					{
-						Name: "email",
-						Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-					},
-					{
-						Name:     "age",
-						Optional: true,
-						Type:     ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveInt},
-					},
-				},
-			},
-		},
-		RPCs: []ir.RPC{},
-	}
+	vdl := `
+		type User {
+			// Represents a user in the system.
+			id: string
+			email: string
+			age?: int
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -94,28 +86,20 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Enums: []ir.Enum{
-			{
-				Name:      "OrderStatus",
-				ValueType: ir.EnumValueTypeString,
-				Members: []ir.EnumMember{
-					{Name: "Pending", Value: "pending"},
-					{Name: "Shipped", Value: "shipped"},
-					{Name: "Delivered", Value: "delivered"},
-				},
-			},
-			{
-				Name:      "Priority",
-				ValueType: ir.EnumValueTypeInt,
-				Members: []ir.EnumMember{
-					{Name: "Low", Value: "1"},
-					{Name: "Medium", Value: "2"},
-					{Name: "High", Value: "3"},
-				},
-			},
-		},
-	}
+	vdl := `
+		enum OrderStatus {
+			Pending = "pending"
+			Shipped = "shipped"
+			Delivered = "delivered"
+		}
+
+		enum Priority {
+			Low = 1
+			Medium = 2
+			High = 3
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -144,30 +128,13 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Constants: []ir.Constant{
-			{
-				Name:      "MAX_PAGE_SIZE",
-				ValueType: ir.ConstValueTypeInt,
-				Value:     "100",
-			},
-			{
-				Name:      "API_VERSION",
-				ValueType: ir.ConstValueTypeString,
-				Value:     "1.0.0",
-			},
-			{
-				Name:      "DEFAULT_RATE",
-				ValueType: ir.ConstValueTypeFloat,
-				Value:     "0.21",
-			},
-			{
-				Name:      "ENABLED",
-				ValueType: ir.ConstValueTypeBool,
-				Value:     "true",
-			},
-		},
-	}
+	vdl := `
+		const MAX_PAGE_SIZE = 100
+		const API_VERSION = "1.0.0"
+		const DEFAULT_RATE = 0.21
+		const ENABLED = true
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -187,20 +154,11 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Patterns: []ir.Pattern{
-			{
-				Name:         "UserEventSubject",
-				Template:     "events.users.{userId}.{eventType}",
-				Placeholders: []string{"userId", "eventType"},
-			},
-			{
-				Name:         "CacheKey",
-				Template:     "cache:{key}",
-				Placeholders: []string{"key"},
-			},
-		},
-	}
+	vdl := `
+		pattern UserEventSubject = "events.users.{userId}.{eventType}"
+		pattern CacheKey = "cache:{key}"
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -223,34 +181,20 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Users",
-				Procs: []ir.Procedure{
-					{
-						Name: "GetUser",
-						Input: []ir.Field{
-							{
-								Name: "userId",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-						Output: []ir.Field{
-							{
-								Name: "id",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-							{
-								Name: "name",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	vdl := `
+		rpc Users {
+			proc GetUser {
+				input {
+					userId: string
+				}
+				output {
+					id: string
+					name: string
+				}
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -264,7 +208,7 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	assert.Contains(t, content, "export type UsersGetUserResponse = Response<UsersGetUserOutput>")
 
 	// Check procedure names list
-	assert.Contains(t, content, `"users/getUser"`)
+	assert.Contains(t, content, `"Users/GetUser"`)
 
 	// Check client implementation
 	assert.Contains(t, content, "class builderUsersGetUser")
@@ -281,34 +225,20 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Chat",
-				Streams: []ir.Stream{
-					{
-						Name: "Messages",
-						Input: []ir.Field{
-							{
-								Name: "roomId",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-						Output: []ir.Field{
-							{
-								Name: "message",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-							{
-								Name: "timestamp",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveDatetime},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	vdl := `
+		rpc Chat {
+			stream Messages {
+				input {
+					roomId: string
+				}
+				output {
+					message: string
+					timestamp: datetime
+				}
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -322,7 +252,7 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 	assert.Contains(t, content, "export type ChatMessagesResponse = Response<ChatMessagesOutput>")
 
 	// Check stream names list
-	assert.Contains(t, content, `"chat/messages"`)
+	assert.Contains(t, content, `"Chat/Messages"`)
 
 	// Check client implementation
 	assert.Contains(t, content, "class builderChatMessagesStream")
@@ -336,65 +266,23 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{
-			{
-				Name: "Product",
-				Fields: []ir.Field{
-					// Array
-					{
-						Name: "tags",
-						Type: ir.TypeRef{
-							Kind:            ir.TypeKindArray,
-							ArrayDimensions: 1,
-							ArrayItem:       &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-						},
-					},
-					// Multi-dimensional array
-					{
-						Name: "matrix",
-						Type: ir.TypeRef{
-							Kind:            ir.TypeKindArray,
-							ArrayDimensions: 2,
-							ArrayItem:       &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveInt},
-						},
-					},
-					// Map
-					{
-						Name: "metadata",
-						Type: ir.TypeRef{
-							Kind:     ir.TypeKindMap,
-							MapValue: &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-						},
-					},
-					// Custom type reference
-					{
-						Name: "owner",
-						Type: ir.TypeRef{Kind: ir.TypeKindType, Type: "User"},
-					},
-					// Inline object
-					{
-						Name: "address",
-						Type: ir.TypeRef{
-							Kind: ir.TypeKindObject,
-							Object: &ir.InlineObject{
-								Fields: []ir.Field{
-									{
-										Name: "city",
-										Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-									},
-									{
-										Name: "zip",
-										Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	vdl := `
+		type User {
+			id: string
+		}
+
+		type Product {
+			tags: string[]
+			matrix: int[][]
+			metadata: map<string>
+			owner: User
+			address: {
+				city: string
+				zip: string
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -512,65 +400,6 @@ func TestTypeRefToTS(t *testing.T) {
 	}
 }
 
-func TestFlattenSchema(t *testing.T) {
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Users",
-				Procs: []ir.Procedure{
-					{Name: "GetUser"},
-					{Name: "CreateUser"},
-				},
-				Streams: []ir.Stream{
-					{Name: "UserUpdates"},
-				},
-			},
-			{
-				Name: "Products",
-				Procs: []ir.Procedure{
-					{Name: "ListProducts"},
-				},
-			},
-		},
-	}
-
-	flat := flattenSchema(schema)
-
-	// Check procedures
-	assert.Len(t, flat.Procedures, 3)
-	assert.Equal(t, "Users", flat.Procedures[0].RPCName)
-	assert.Equal(t, "GetUser", flat.Procedures[0].Procedure.Name)
-	assert.Equal(t, "Users", flat.Procedures[1].RPCName)
-	assert.Equal(t, "CreateUser", flat.Procedures[1].Procedure.Name)
-	assert.Equal(t, "Products", flat.Procedures[2].RPCName)
-	assert.Equal(t, "ListProducts", flat.Procedures[2].Procedure.Name)
-
-	// Check streams
-	assert.Len(t, flat.Streams, 1)
-	assert.Equal(t, "Users", flat.Streams[0].RPCName)
-	assert.Equal(t, "UserUpdates", flat.Streams[0].Stream.Name)
-}
-
-func TestFullProcName(t *testing.T) {
-	assert.Equal(t, "UsersGetUser", fullProcName("Users", "GetUser"))
-	assert.Equal(t, "ProductsList", fullProcName("Products", "List"))
-}
-
-func TestFullStreamName(t *testing.T) {
-	assert.Equal(t, "ChatMessages", fullStreamName("Chat", "Messages"))
-	assert.Equal(t, "UsersUpdates", fullStreamName("Users", "Updates"))
-}
-
-func TestRpcProcPath(t *testing.T) {
-	assert.Equal(t, "users/getUser", rpcProcPath("Users", "GetUser"))
-	assert.Equal(t, "products/list", rpcProcPath("Products", "List"))
-}
-
-func TestRpcStreamPath(t *testing.T) {
-	assert.Equal(t, "chat/messages", rpcStreamPath("Chat", "Messages"))
-	assert.Equal(t, "users/updates", rpcStreamPath("Users", "Updates"))
-}
-
 func TestConvertPatternToTemplateLiteral(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -628,16 +457,20 @@ func TestGenerator_Generate_NoClient(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
-			{
-				Name: "Users",
-				Procs: []ir.Procedure{
-					{Name: "GetUser"},
-				},
-			},
-		},
-	}
+	vdl := `
+		rpc Users {
+			proc GetUser {
+				input {
+					userId: string
+				}
+				output {
+					id: string
+					name: string
+				}
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -661,26 +494,19 @@ func TestGenerator_Generate_WithDeprecation(t *testing.T) {
 		},
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{
-			{
-				Name:       "LegacyUser",
-				Doc:        "Old user type",
-				Deprecated: &ir.Deprecation{Message: "Use NewUser instead"},
-				Fields: []ir.Field{
-					{Name: "id", Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString}},
-				},
-			},
-		},
-		Enums: []ir.Enum{
-			{
-				Name:       "OldStatus",
-				Deprecated: &ir.Deprecation{},
-				ValueType:  ir.EnumValueTypeString,
-				Members:    []ir.EnumMember{{Name: "Active", Value: "active"}},
-			},
-		},
-	}
+	vdl := `
+		deprecated("Use NewUser instead")
+		type LegacyUser {
+			// Old user type
+			id: string
+		}
+
+		deprecated
+		enum OldStatus {
+			Active
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)

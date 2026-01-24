@@ -11,7 +11,7 @@ import (
 )
 
 // generatePatterns generates Dart pattern template functions.
-func generatePatterns(schema *ir.Schema, _ *flatSchema, config *config.DartConfig) (string, error) {
+func generatePatterns(schema *ir.Schema, config *config.DartConfig) (string, error) {
 	if !config.ShouldGenPatterns() {
 		return "", nil
 	}

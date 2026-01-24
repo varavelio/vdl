@@ -1007,6 +1007,7 @@
       "doc": "Comprehensive RPC service.\nTests all RPC features.",
       "procs": [
         {
+          "rpcName": "ComprehensiveService",
           "name": "ComplexTypes",
           "doc": "Procedure with complex types.",
           "input": [
@@ -1064,6 +1065,7 @@
           ]
         },
         {
+          "rpcName": "ComprehensiveService",
           "name": "InlineObjects",
           "doc": "Procedure with inline objects.",
           "input": [
@@ -1154,6 +1156,7 @@
           ]
         },
         {
+          "rpcName": "ComprehensiveService",
           "name": "OptionalFields",
           "doc": "Procedure with optional fields.",
           "input": [
@@ -1204,6 +1207,7 @@
           ]
         },
         {
+          "rpcName": "ComprehensiveService",
           "name": "SimplePrimitive",
           "doc": "Simple procedure with primitives.",
           "input": [
@@ -1240,6 +1244,7 @@
           ]
         },
         {
+          "rpcName": "ComprehensiveService",
           "name": "WithEnums",
           "doc": "Procedure with enum types.",
           "input": [
@@ -1288,6 +1293,7 @@
           ]
         },
         {
+          "rpcName": "ComprehensiveService",
           "name": "WithSpreads",
           "doc": "Procedure with spreads in input/output.",
           "input": [
@@ -1369,6 +1375,7 @@
       ],
       "streams": [
         {
+          "rpcName": "ComprehensiveService",
           "name": "ComplexStream",
           "doc": "Stream with complex types.",
           "input": [
@@ -1418,6 +1425,7 @@
           ]
         },
         {
+          "rpcName": "ComprehensiveService",
           "name": "SimpleStream",
           "doc": "Simple stream.",
           "input": [
@@ -1453,6 +1461,7 @@
       "name": "DeprecatedRpc",
       "procs": [
         {
+          "rpcName": "DeprecatedRpc",
           "name": "DeprecatedProc",
           "deprecated": {},
           "input": [
@@ -1475,6 +1484,7 @@
           ]
         },
         {
+          "rpcName": "DeprecatedRpc",
           "name": "DeprecatedProcMsg",
           "deprecated": {
             "message": "Use NewProc instead"
@@ -1501,6 +1511,7 @@
       ],
       "streams": [
         {
+          "rpcName": "DeprecatedRpc",
           "name": "DeprecatedStream",
           "deprecated": {},
           "input": [
@@ -1523,6 +1534,7 @@
           ]
         },
         {
+          "rpcName": "DeprecatedRpc",
           "name": "DeprecatedStreamMsg",
           "deprecated": {
             "message": "Use NewStream instead"
@@ -1553,6 +1565,7 @@
       "deprecated": {},
       "procs": [
         {
+          "rpcName": "FullyDeprecatedRpc",
           "name": "SomeProc",
           "input": [
             {
@@ -1583,6 +1596,7 @@
       },
       "procs": [
         {
+          "rpcName": "FullyDeprecatedRpcMsg",
           "name": "AnotherProc",
           "input": [
             {
@@ -1607,7 +1621,603 @@
       "streams": []
     }
   ],
-  "standaloneDocs": [
-    "This is a standalone docstring at schema level.\nIt tests multi-line documentation."
+  "procedures": [
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "ComplexTypes",
+      "doc": "Procedure with complex types.",
+      "input": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "type",
+            "type": "AllPrimitives"
+          }
+        },
+        {
+          "name": "items",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "primitive",
+              "primitive": "string"
+            },
+            "arrayDimensions": 1
+          }
+        },
+        {
+          "name": "metadata",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "primitive",
+              "primitive": "string"
+            }
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "results",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "type",
+              "type": "AllPrimitives"
+            },
+            "arrayDimensions": 1
+          }
+        },
+        {
+          "name": "lookup",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "primitive",
+              "primitive": "int"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "InlineObjects",
+      "doc": "Procedure with inline objects.",
+      "input": [
+        {
+          "name": "point",
+          "type": {
+            "kind": "object",
+            "object": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "kind": "primitive",
+                    "primitive": "float"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "kind": "primitive",
+                    "primitive": "float"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "bounds",
+          "type": {
+            "kind": "object",
+            "object": {
+              "fields": [
+                {
+                  "name": "min",
+                  "type": {
+                    "kind": "object",
+                    "object": {
+                      "fields": [
+                        {
+                          "name": "x",
+                          "type": {
+                            "kind": "primitive",
+                            "primitive": "float"
+                          }
+                        },
+                        {
+                          "name": "y",
+                          "type": {
+                            "kind": "primitive",
+                            "primitive": "float"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "max",
+                  "type": {
+                    "kind": "object",
+                    "object": {
+                      "fields": [
+                        {
+                          "name": "x",
+                          "type": {
+                            "kind": "primitive",
+                            "primitive": "float"
+                          }
+                        },
+                        {
+                          "name": "y",
+                          "type": {
+                            "kind": "primitive",
+                            "primitive": "float"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "OptionalFields",
+      "doc": "Procedure with optional fields.",
+      "input": [
+        {
+          "name": "required",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "optional",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "optionalArray",
+          "optional": true,
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "primitive",
+              "primitive": "string"
+            },
+            "arrayDimensions": 1
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "data",
+          "optional": true,
+          "type": {
+            "kind": "type",
+            "type": "AllPrimitives"
+          }
+        },
+        {
+          "name": "count",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "SimplePrimitive",
+      "doc": "Simple procedure with primitives.",
+      "input": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "count",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "success",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        },
+        {
+          "name": "message",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "WithEnums",
+      "doc": "Procedure with enum types.",
+      "input": [
+        {
+          "name": "status",
+          "type": {
+            "kind": "enum",
+            "enum": "StringEnumImplicit",
+            "enumInfo": {
+              "valueType": "string"
+            }
+          }
+        },
+        {
+          "name": "priority",
+          "type": {
+            "kind": "enum",
+            "enum": "IntEnum",
+            "enumInfo": {
+              "valueType": "int"
+            }
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "method",
+          "type": {
+            "kind": "enum",
+            "enum": "StringEnumExplicit",
+            "enumInfo": {
+              "valueType": "string"
+            }
+          }
+        },
+        {
+          "name": "newStatus",
+          "type": {
+            "kind": "enum",
+            "enum": "StringEnumImplicit",
+            "enumInfo": {
+              "valueType": "string"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "WithSpreads",
+      "doc": "Procedure with spreads in input/output.",
+      "input": [
+        {
+          "name": "stringField",
+          "doc": "String field documentation.",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "intField",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "floatField",
+          "type": {
+            "kind": "primitive",
+            "primitive": "float"
+          }
+        },
+        {
+          "name": "boolField",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        },
+        {
+          "name": "datetimeField",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        },
+        {
+          "name": "extraField",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "level1Field",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "level2Field",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "level3Field",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        },
+        {
+          "name": "result",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "DeprecatedRpc",
+      "name": "DeprecatedProc",
+      "deprecated": {},
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "ok",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "DeprecatedRpc",
+      "name": "DeprecatedProcMsg",
+      "deprecated": {
+        "message": "Use NewProc instead"
+      },
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "ok",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "FullyDeprecatedRpc",
+      "name": "SomeProc",
+      "input": [
+        {
+          "name": "x",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "y",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "FullyDeprecatedRpcMsg",
+      "name": "AnotherProc",
+      "input": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "b",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "ComplexStream",
+      "doc": "Stream with complex types.",
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "filters",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "primitive",
+              "primitive": "string"
+            }
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "eventType",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "payload",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "primitive",
+              "primitive": "string"
+            }
+          }
+        },
+        {
+          "name": "sequence",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "ComprehensiveService",
+      "name": "SimpleStream",
+      "doc": "Simple stream.",
+      "input": [
+        {
+          "name": "channelId",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "message",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "DeprecatedRpc",
+      "name": "DeprecatedStream",
+      "deprecated": {},
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "DeprecatedRpc",
+      "name": "DeprecatedStreamMsg",
+      "deprecated": {
+        "message": "Use NewStream instead"
+      },
+      "input": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "data",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "docs": [
+    {
+      "rpcName": "ComprehensiveService",
+      "content": "# Section Header\nStandalone documentation inside RPC."
+    },
+    {
+      "content": "This is a standalone docstring at schema level.\nIt tests multi-line documentation."
+    }
   ]
 }

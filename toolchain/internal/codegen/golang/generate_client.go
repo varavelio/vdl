@@ -14,7 +14,7 @@ import (
 var clientRawPiece string
 
 // generateClientCore generates the core client implementation (rpc_client.go).
-func generateClientCore(_ *ir.Schema, _ *flatSchema, config *config.GoConfig) (string, error) {
+func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}
@@ -122,7 +122,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g := gen.New().WithTabs()
 
 	for _, proc := range rpc.Procs {
-		name := fullProcName(rpc.Name, proc.Name)
+		name := rpc.Name + proc.Name
 		builderName := "clientBuilder" + name
 
 		// Client method to create builder
@@ -220,7 +220,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	}
 
 	for _, stream := range rpc.Streams {
-		name := fullStreamName(rpc.Name, stream.Name)
+		name := rpc.Name + stream.Name
 		builderStream := "clientBuilder" + name + "Stream"
 
 		// Client method to create stream builder
