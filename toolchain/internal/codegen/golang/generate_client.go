@@ -107,6 +107,7 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("//   - retryConfig.initialDelay: Initial delay between retries (default: 0)")
 	g.Line("//   - retryConfig.maxDelay: Maximum delay between retries (default: 0)")
 	g.Line("//   - retryConfig.delayMultiplier: Cumulative multiplier applied to initialDelay on each retry (default: 1.0)")
+	g.Line("//   - retryConfig.jitter: Randomness factor to prevent synchronized retries (thundering herd). Range: 0.0-1.0 (default: 0.2)")
 	g.Line("func (b *clientBuilder) WithRetryConfig(conf RetryConfig) *clientBuilder {")
 	g.Block(func() {
 		g.Line("b.opts = append(b.opts, withGlobalRetryConfig(conf))")
@@ -131,6 +132,7 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("//   - reconnectConfig.initialDelay: Initial delay between reconnection attempts (default: 1 second)")
 	g.Line("//   - reconnectConfig.maxDelay: Maximum delay between reconnection attempts (default: 30 seconds)")
 	g.Line("//   - reconnectConfig.delayMultiplier: Cumulative multiplier applied to initialDelay on each retry (default: 1.5)")
+	g.Line("//   - reconnectConfig.jitter: Randomness factor to prevent synchronized retries (thundering herd). Range: 0.0-1.0 (default: 0.2)")
 	g.Line("func (b *clientBuilder) WithReconnectConfig(conf ReconnectConfig) *clientBuilder {")
 	g.Block(func() {
 		g.Line("b.opts = append(b.opts, withGlobalReconnectConfig(conf))")
@@ -223,6 +225,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Line("//   - retryConfig.initialDelay: Initial delay between retries (default: 0)")
 	g.Line("//   - retryConfig.maxDelay: Maximum delay between retries (default: 0)")
 	g.Line("//   - retryConfig.delayMultiplier: Cumulative multiplier applied to initialDelay on each retry (default: 1.0)")
+	g.Line("//   - retryConfig.jitter: Randomness factor to prevent synchronized retries (thundering herd). Range: 0.0-1.0 (default: 0.2)")
 	g.Linef("func (r *%s) WithRetryConfig(conf RetryConfig) *%s {", rpcStructName, rpcStructName)
 	g.Block(func() {
 		g.Linef("r.intClient.setRPCRetryConfig(%q, conf)", rpcName)
@@ -251,6 +254,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Line("//   - reconnectConfig.initialDelay: Initial delay between reconnection attempts (default: 1 second)")
 	g.Line("//   - reconnectConfig.maxDelay: Maximum delay between reconnection attempts (default: 30 seconds)")
 	g.Line("//   - reconnectConfig.delayMultiplier: Cumulative multiplier applied to initialDelay on each retry (default: 1.5)")
+	g.Line("//   - reconnectConfig.jitter: Randomness factor to prevent synchronized retries (thundering herd). Range: 0.0-1.0 (default: 0.2)")
 	g.Linef("func (r *%s) WithReconnectConfig(conf ReconnectConfig) *%s {", rpcStructName, rpcStructName)
 	g.Block(func() {
 		g.Linef("r.intClient.setRPCReconnectConfig(%q, conf)", rpcName)
@@ -380,6 +384,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("//   - retryConfig.initialDelay: Initial delay between retries (default: 0)")
 		g.Line("//   - retryConfig.maxDelay: Maximum delay between retries (default: 0)")
 		g.Line("//   - retryConfig.delayMultiplier: Cumulative multiplier applied to initialDelay on each retry (default: 1.0)")
+		g.Line("//   - retryConfig.jitter: Randomness factor to prevent synchronized retries (thundering herd). Range: 0.0-1.0 (default: 0.2)")
 		g.Linef("func (b *%s) WithRetryConfig(retryConfig RetryConfig) *%s {", builderName, builderName)
 		g.Block(func() {
 			g.Line("b.retryConf = &retryConfig")
@@ -504,6 +509,7 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("//   - reconnectConfig.initialDelay: Initial delay between reconnection attempts (default: 1 second)")
 		g.Line("//   - reconnectConfig.maxDelay: Maximum delay between reconnection attempts (default: 30 seconds)")
 		g.Line("//   - reconnectConfig.delayMultiplier: Cumulative multiplier applied to initialDelay on each retry (default: 1.5)")
+		g.Line("//   - reconnectConfig.jitter: Randomness factor to prevent synchronized retries (thundering herd). Range: 0.0-1.0 (default: 0.2)")
 		g.Linef("func (b *%s) WithReconnectConfig(reconnectConfig ReconnectConfig) *%s {", builderStream, builderStream)
 		g.Block(func() {
 			g.Line("b.reconnectConf = &reconnectConfig")

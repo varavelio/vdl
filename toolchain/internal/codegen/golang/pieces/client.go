@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strings"
 	"sync"
@@ -29,6 +30,8 @@ type RetryConfig struct {
 	MaxDelay time.Duration
 	// Cumulative multiplier applied to initialDelayMs on each retry (default: 1.0)
 	DelayMultiplier float64
+	// Jitter introduces randomness to the delay to avoid thundering herd (default: 0.2)
+	Jitter float64
 }
 
 // TimeoutConfig defines timeout behavior for procedure calls.
@@ -47,6 +50,8 @@ type ReconnectConfig struct {
 	MaxDelay time.Duration
 	// Cumulative multiplier applied to initialDelayMs on each retry (default: 1.5)
 	DelayMultiplier float64
+	// Jitter introduces randomness to the delay to avoid thundering herd (default: 0.2)
+	Jitter float64
 }
 
 // HeaderProvider receives the current headers and mutates them in place.
@@ -350,6 +355,7 @@ func (c *internalClient) mergeRetryConfig(rpcName string, opConf *RetryConfig) *
 		InitialDelay:    0,
 		MaxDelay:        0,
 		DelayMultiplier: 1.0,
+		Jitter:          0.2,
 	}
 }
 
@@ -391,6 +397,7 @@ func (c *internalClient) mergeReconnectConfig(rpcName string, opConf *ReconnectC
 		InitialDelay:    1 * time.Second,
 		MaxDelay:        30 * time.Second,
 		DelayMultiplier: 1.5,
+		Jitter:          0.2,
 	}
 }
 
@@ -930,9 +937,9 @@ func calculateBackoff(config *RetryConfig, attempt int) time.Duration {
 		delay = time.Duration(float64(delay) * config.DelayMultiplier)
 	}
 	if delay > config.MaxDelay {
-		return config.MaxDelay
+		delay = config.MaxDelay
 	}
-	return delay
+	return applyJitter(delay, config.Jitter)
 }
 
 // calculateReconnectBackoff calculates the backoff delay for reconnection attempts.
@@ -942,9 +949,36 @@ func calculateReconnectBackoff(config *ReconnectConfig, attempt int) time.Durati
 		delay = time.Duration(float64(delay) * config.DelayMultiplier)
 	}
 	if delay > config.MaxDelay {
-		return config.MaxDelay
+		delay = config.MaxDelay
 	}
-	return delay
+	return applyJitter(delay, config.Jitter)
+}
+
+// applyJitter applies a random jitter to the duration.
+// jitterFactor is a fraction (e.g., 0.2 for 20%).
+func applyJitter(d time.Duration, jitterFactor float64) time.Duration {
+	if jitterFactor <= 0 {
+		return d
+	}
+
+	// Clamp jitterFactor to [0.0, 1.0] for safety
+	if jitterFactor > 1.0 {
+		jitterFactor = 1.0
+	}
+
+	// Range: [d * (1 - jitter), d * (1 + jitter)]
+	delta := float64(d) * jitterFactor
+	min := float64(d) - delta
+	max := float64(d) + delta
+
+	// Ensure min is not negative (though d should be positive)
+	if min < 0 {
+		min = 0
+	}
+
+	random := rand.Float64() // 0.0 to 1.0
+	result := min + (random * (max - min))
+	return time.Duration(result)
 }
 
 // procCallBuilder is a fluent builder for invoking a procedure.
