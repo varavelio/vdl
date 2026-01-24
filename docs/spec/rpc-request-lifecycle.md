@@ -84,6 +84,12 @@ The server sends a single HTTP response back to the client.
   }
   ```
 
+  The `error` object contains the following fields:
+  - **message** (`string`): A human-readable description of the error.
+  - **category** (`string`, optional): Categorizes the error by its nature or source (e.g., "ValidationError", "DatabaseError").
+  - **code** (`string`, optional): A machine-readable identifier for the specific error condition (e.g., "INVALID_EMAIL").
+  - **details** (`object`, optional): Additional structured information or context about the error.
+
 ### 6. Client Handling
 
 The client library receives the HTTP response.
