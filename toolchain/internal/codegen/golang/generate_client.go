@@ -70,9 +70,58 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Break()
 
 	g.Line("// WithGlobalHeader sets a header that will be sent with every request.")
-	g.Line("func (b *clientBuilder) WithGlobalHeader(key, value string) *clientBuilder {")
+	g.Line("// This is a convenience method that adds a static header provider.")
+	g.Line("func (b *clientBuilder) WithHeader(key, value string) *clientBuilder {")
 	g.Block(func() {
 		g.Line("b.opts = append(b.opts, withGlobalHeader(key, value))")
+		g.Line("return b")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Line("// WithHeaderProvider adds a dynamic header provider that is called before every request.")
+	g.Line("// This is useful for injecting dynamic tokens (e.g. Auth) that might expire.")
+	g.Line("// The provider can mutate the header map in-place.")
+	g.Line("func (b *clientBuilder) WithHeaderProvider(provider HeaderProvider) *clientBuilder {")
+	g.Block(func() {
+		g.Line("b.opts = append(b.opts, withHeaderProvider(provider))")
+		g.Line("return b")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Line("// WithInterceptor adds a global interceptor (middleware) that wraps every request.")
+	g.Line("// Interceptors are executed in the order they are added.")
+	g.Line("func (b *clientBuilder) WithInterceptor(interceptor Interceptor) *clientBuilder {")
+	g.Block(func() {
+		g.Line("b.opts = append(b.opts, withInterceptor(interceptor))")
+		g.Line("return b")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Line("// WithRetryConfig sets the default retry configuration for all procedures.")
+	g.Line("func (b *clientBuilder) WithRetryConfig(conf RetryConfig) *clientBuilder {")
+	g.Block(func() {
+		g.Line("b.opts = append(b.opts, withGlobalRetryConfig(conf))")
+		g.Line("return b")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Line("// WithTimeoutConfig sets the default timeout configuration for all procedures.")
+	g.Line("func (b *clientBuilder) WithTimeoutConfig(conf TimeoutConfig) *clientBuilder {")
+	g.Block(func() {
+		g.Line("b.opts = append(b.opts, withGlobalTimeoutConfig(conf))")
+		g.Line("return b")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Line("// WithReconnectConfig sets the default reconnection configuration for all streams.")
+	g.Line("func (b *clientBuilder) WithReconnectConfig(conf ReconnectConfig) *clientBuilder {")
+	g.Block(func() {
+		g.Line("b.opts = append(b.opts, withGlobalReconnectConfig(conf))")
 		g.Line("return b")
 	})
 	g.Line("}")
@@ -82,7 +131,7 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("func (b *clientBuilder) Build() *Client {")
 	g.Block(func() {
 		g.Line("intClient := newInternalClient(b.baseURL, VDLProcedureNames, VDLStreamNames, b.opts...)")
-		g.Line("return &Client{Procs: &clientProcRegistry{intClient: intClient}, Streams: &clientStreamRegistry{intClient: intClient}}")
+		g.Line("return &Client{RPCs: &clientRPCRegistry{intClient: intClient}}")
 	})
 	g.Line("}")
 	g.Break()
@@ -90,20 +139,12 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("// Client provides a high-level, type-safe interface for invoking RPC procedures and streams.")
 	g.Line("type Client struct {")
 	g.Block(func() {
-		g.Line("Procs     *clientProcRegistry")
-		g.Line("Streams   *clientStreamRegistry")
+		g.Line("RPCs *clientRPCRegistry")
 	})
 	g.Line("}")
 	g.Break()
 
-	g.Line("type clientProcRegistry struct {")
-	g.Block(func() {
-		g.Line("intClient *internalClient")
-	})
-	g.Line("}")
-	g.Break()
-
-	g.Line("type clientStreamRegistry struct {")
+	g.Line("type clientRPCRegistry struct {")
 	g.Block(func() {
 		g.Line("intClient *internalClient")
 	})
@@ -121,30 +162,135 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 	g := gen.New().WithTabs()
 
+	rpcName := rpc.Name
+	rpcStructName := fmt.Sprintf("client%sRPC", rpcName)
+	procsStructName := fmt.Sprintf("client%sProcs", rpcName)
+	streamsStructName := fmt.Sprintf("client%sStreams", rpcName)
+
+	// 1. Method on clientRPCRegistry to get this RPC
+	g.Linef("// %s returns the client registry for the %s RPC service.", rpcName, rpcName)
+	g.Linef("func (r *clientRPCRegistry) %s() *%s {", rpcName, rpcStructName)
+	g.Block(func() {
+		g.Linef("return &%s{", rpcStructName)
+		g.Linef("Procs: &%s{intClient: r.intClient},", procsStructName)
+		g.Linef("Streams: &%s{intClient: r.intClient},", streamsStructName)
+		g.Line("intClient: r.intClient,")
+		g.Line("}")
+	})
+	g.Line("}")
+	g.Break()
+
+	// 2. Struct for this RPC
+	g.Linef("type %s struct {", rpcStructName)
+	g.Block(func() {
+		g.Line("intClient *internalClient")
+		g.Linef("Procs     *%s", procsStructName)
+		g.Linef("Streams   *%s", streamsStructName)
+	})
+	g.Line("}")
+	g.Break()
+
+	// RPC Config setters
+	g.Linef("// WithRetryConfig sets the default retry configuration for all procedures in the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This configuration overrides the global defaults but can be overridden by operation-specific configurations.")
+	g.Linef("func (r *%s) WithRetryConfig(conf RetryConfig) *%s {", rpcStructName, rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intClient.setRPCRetryConfig(%q, conf)", rpcName)
+		g.Line("return r")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// WithTimeoutConfig sets the default timeout configuration for all procedures in the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This configuration overrides the global defaults but can be overridden by operation-specific configurations.")
+	g.Linef("func (r *%s) WithTimeoutConfig(conf TimeoutConfig) *%s {", rpcStructName, rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intClient.setRPCTimeoutConfig(%q, conf)", rpcName)
+		g.Line("return r")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// WithReconnectConfig sets the default reconnection configuration for all streams in the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This configuration overrides the global defaults but can be overridden by operation-specific configurations.")
+	g.Linef("func (r *%s) WithReconnectConfig(conf ReconnectConfig) *%s {", rpcStructName, rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intClient.setRPCReconnectConfig(%q, conf)", rpcName)
+		g.Line("return r")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// WithHeaderProvider adds a header provider for all operations in the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// RPC-level providers are executed after global providers and before operation-specific providers.")
+	g.Linef("func (r *%s) WithHeaderProvider(provider HeaderProvider) *%s {", rpcStructName, rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intClient.setRPCHeaderProvider(%q, provider)", rpcName)
+		g.Line("return r")
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// WithHeader adds a static header for all operations in the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This is a convenience method that adds a static header provider at the RPC level.")
+	g.Linef("func (r *%s) WithHeader(key, value string) *%s {", rpcStructName, rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intClient.setRPCHeaderProvider(%q, func(_ context.Context, h http.Header) error {", rpcName)
+		g.Line("h.Set(key, value)")
+		g.Line("return nil")
+		g.Line("})")
+		g.Line("return r")
+	})
+	g.Line("}")
+	g.Break()
+
+	// 3. Procs Registry Struct
+	g.Linef("type %s struct {", procsStructName)
+	g.Block(func() {
+		g.Line("intClient *internalClient")
+	})
+	g.Line("}")
+	g.Break()
+
+	// 4. Streams Registry Struct
+	g.Linef("type %s struct {", streamsStructName)
+	g.Block(func() {
+		g.Line("intClient *internalClient")
+	})
+	g.Line("}")
+	g.Break()
+
 	for _, proc := range rpc.Procs {
-		name := rpc.Name + proc.Name
-		builderName := "clientBuilder" + name
+		uniqueName := rpc.Name + proc.Name
+		builderName := "clientBuilder" + uniqueName
 
 		// Client method to create builder
-		g.Linef("// %s creates a call builder for the %s.%s procedure.", name, rpc.Name, proc.Name)
+		g.Linef("// %s creates a call builder for the %s.%s procedure.", proc.Name, rpc.Name, proc.Name)
 		if proc.Doc != "" {
 			renderDoc(g, proc.Doc, true)
 		}
 		renderDeprecated(g, proc.Deprecated)
-		g.Linef("func (registry *clientProcRegistry) %s() *%s {", name, builderName)
+		g.Linef("func (registry *%s) %s() *%s {", procsStructName, proc.Name, builderName)
 		g.Block(func() {
-			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: %q}", builderName, name)
+			g.Linef("return &%s{client: registry.intClient, headerProviders: []HeaderProvider{}, rpcName: %q, name: %q}", builderName, rpcName, proc.Name)
 		})
 		g.Line("}")
 		g.Break()
 
 		// Builder struct
-		g.Linef("// %s represents a fluent call builder for the %s procedure.", builderName, name)
+		g.Linef("// %s represents a fluent call builder for the %s procedure.", builderName, uniqueName)
 		g.Linef("type %s struct {", builderName)
 		g.Block(func() {
+			g.Line("rpcName     string")
 			g.Line("name        string")
 			g.Line("client      *internalClient")
-			g.Line("headers     map[string]string")
+			g.Line("input       any")
+			g.Line("headerProviders []HeaderProvider")
 			g.Line("retryConf   *RetryConfig")
 			g.Line("timeoutConf *TimeoutConfig")
 		})
@@ -152,17 +298,36 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Break()
 
 		// WithHeader method
-		g.Linef("// WithHeader adds a single HTTP header to the %s invocation.", name)
+		g.Linef("// WithHeader adds a single HTTP header to the %s invocation.", uniqueName)
+		g.Line("//")
+		g.Line("// This header is applied after global and RPC-level headers, potentially overriding them.")
 		g.Linef("func (b *%s) WithHeader(key, value string) *%s {", builderName, builderName)
 		g.Block(func() {
-			g.Line("b.headers[key] = value")
+			g.Line("b.headerProviders = append(b.headerProviders, func(_ context.Context, h http.Header) error {")
+			g.Line("h.Set(key, value)")
+			g.Line("return nil")
+			g.Line("})")
+			g.Line("return b")
+		})
+		g.Line("}")
+		g.Break()
+
+		// WithHeaderProvider method
+		g.Linef("// WithHeaderProvider adds a dynamic header provider to the %s invocation.", uniqueName)
+		g.Line("//")
+		g.Line("// The provider is executed after global and RPC-level providers.")
+		g.Linef("func (b *%s) WithHeaderProvider(provider HeaderProvider) *%s {", builderName, builderName)
+		g.Block(func() {
+			g.Line("b.headerProviders = append(b.headerProviders, provider)")
 			g.Line("return b")
 		})
 		g.Line("}")
 		g.Break()
 
 		// WithRetryConfig method
-		g.Linef("// WithRetryConfig sets the retry configuration for the %s procedure.", name)
+		g.Linef("// WithRetryConfig sets the retry configuration for the %s procedure.", uniqueName)
+		g.Line("//")
+		g.Line("// This configuration overrides both global and RPC-level defaults.")
 		g.Line("//")
 		g.Line("// Parameters:")
 		g.Line("//   - retryConfig.maxAttempts: Maximum number of retry attempts (default: 3)")
@@ -178,7 +343,9 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Break()
 
 		// WithTimeoutConfig method
-		g.Linef("// WithTimeoutConfig sets the timeout configuration for the %s procedure.", name)
+		g.Linef("// WithTimeoutConfig sets the timeout configuration for the %s procedure.", uniqueName)
+		g.Line("//")
+		g.Line("// This configuration overrides both global and RPC-level defaults.")
 		g.Line("//")
 		g.Line("// Parameters:")
 		g.Line("//   - timeoutConfig.timeout: Request timeout (default: 30 seconds)")
@@ -191,25 +358,25 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Break()
 
 		// Execute method
-		g.Linef("// Execute sends a request to the %s procedure.", name)
+		g.Linef("// Execute sends a request to the %s procedure.", uniqueName)
 		g.Line("//")
 		g.Line("// Returns:")
-		g.Linef("//   1. The parsed %sOutput value on success.", name)
+		g.Linef("//   1. The parsed %sOutput value on success.", uniqueName)
 		g.Line("//   2. The error when the server responds with Ok=false or a transport/JSON error occurs.")
-		g.Linef("func (b *%s) Execute(ctx context.Context, input %sInput) (%sOutput, error) {", builderName, name, name)
+		g.Linef("func (b *%s) Execute(ctx context.Context, input %sInput) (%sOutput, error) {", builderName, uniqueName, uniqueName)
 		g.Block(func() {
-			g.Line("raw := b.client.proc(ctx, b.name, input, b.headers, b.retryConf, b.timeoutConf)")
+			g.Line("raw := b.client.proc(ctx, b.rpcName, b.name, input, b.headerProviders, b.retryConf, b.timeoutConf)")
 
 			g.Line("if !raw.Ok {")
 			g.Block(func() {
-				g.Linef("return %sOutput{}, raw.Error", name)
+				g.Linef("return %sOutput{}, raw.Error", uniqueName)
 			})
 			g.Line("}")
 
-			g.Linef("var out %sOutput", name)
+			g.Linef("var out %sOutput", uniqueName)
 			g.Line("if err := json.Unmarshal(raw.Output, &out); err != nil {")
 			g.Block(func() {
-				g.Linef("return %sOutput{}, Error{Message: fmt.Sprintf(\"failed to decode %s output: %%v\", err)}", name, name)
+				g.Linef("return %sOutput{}, Error{Message: fmt.Sprintf(\"failed to decode %s output: %%v\", err)}", uniqueName, uniqueName)
 			})
 			g.Line("}")
 
@@ -220,46 +387,70 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	}
 
 	for _, stream := range rpc.Streams {
-		name := rpc.Name + stream.Name
-		builderStream := "clientBuilder" + name + "Stream"
+		uniqueName := rpc.Name + stream.Name
+		builderStream := "clientBuilder" + uniqueName + "Stream"
 
 		// Client method to create stream builder
-		g.Linef("// %s creates a stream builder for the %s.%s stream.", name, rpc.Name, stream.Name)
+		g.Linef("// %s creates a stream builder for the %s.%s stream.", stream.Name, rpc.Name, stream.Name)
 		if stream.Doc != "" {
 			renderDoc(g, stream.Doc, true)
 		}
 		renderDeprecated(g, stream.Deprecated)
-		g.Linef("func (registry *clientStreamRegistry) %s() *%s {", name, builderStream)
+		g.Linef("func (registry *%s) %s() *%s {", streamsStructName, stream.Name, builderStream)
 		g.Block(func() {
-			g.Linef("return &%s{client: registry.intClient, headers: map[string]string{}, name: %q}", builderStream, name)
+			g.Linef("return &%s{client: registry.intClient, headerProviders: []HeaderProvider{}, rpcName: %q, name: %q}", builderStream, rpcName, stream.Name)
 		})
 		g.Line("}")
 		g.Break()
 
 		// Builder struct
-		g.Linef("// %s represents a fluent call builder for the %s stream.", builderStream, name)
+		g.Linef("// %s represents a fluent call builder for the %s stream.", builderStream, uniqueName)
 		g.Linef("type %s struct {", builderStream)
 		g.Block(func() {
+			g.Line("rpcName       string")
 			g.Line("name          string")
 			g.Line("client        *internalClient")
-			g.Line("headers       map[string]string")
+			g.Line("input         any")
+			g.Line("headerProviders []HeaderProvider")
 			g.Line("reconnectConf *ReconnectConfig")
+			g.Line("onConnect     func()")
+			g.Line("onDisconnect  func(error)")
+			g.Line("onReconnect   func(int, time.Duration)")
 		})
 		g.Line("}")
 		g.Break()
 
 		// WithHeader
-		g.Linef("// WithHeader adds a single HTTP header to the %s stream subscription.", name)
+		g.Linef("// WithHeader adds a single HTTP header to the %s stream subscription.", uniqueName)
+		g.Line("//")
+		g.Line("// This header is applied after global and RPC-level headers, potentially overriding them.")
 		g.Linef("func (b *%s) WithHeader(key, value string) *%s {", builderStream, builderStream)
 		g.Block(func() {
-			g.Line("b.headers[key] = value")
+			g.Line("b.headerProviders = append(b.headerProviders, func(_ context.Context, h http.Header) error {")
+			g.Line("h.Set(key, value)")
+			g.Line("return nil")
+			g.Line("})")
+			g.Line("return b")
+		})
+		g.Line("}")
+		g.Break()
+
+		// WithHeaderProvider method
+		g.Linef("// WithHeaderProvider adds a dynamic header provider to the %s stream subscription.", uniqueName)
+		g.Line("//")
+		g.Line("// The provider is executed after global and RPC-level providers.")
+		g.Linef("func (b *%s) WithHeaderProvider(provider HeaderProvider) *%s {", builderStream, builderStream)
+		g.Block(func() {
+			g.Line("b.headerProviders = append(b.headerProviders, provider)")
 			g.Line("return b")
 		})
 		g.Line("}")
 		g.Break()
 
 		// WithReconnectConfig method
-		g.Linef("// WithReconnectConfig sets the reconnection configuration for the %s stream.", name)
+		g.Linef("// WithReconnectConfig sets the reconnection configuration for the %s stream.", uniqueName)
+		g.Line("//")
+		g.Line("// This configuration overrides both global and RPC-level defaults.")
 		g.Line("//")
 		g.Line("// Parameters:")
 		g.Line("//   - reconnectConfig.maxAttempts: Maximum number of reconnection attempts (default: 5)")
@@ -274,39 +465,67 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("}")
 		g.Break()
 
+		// Hooks
+		g.Linef("// OnConnect registers a callback that is invoked when the stream is successfully connected.")
+		g.Linef("func (b *%s) OnConnect(cb func()) *%s {", builderStream, builderStream)
+		g.Block(func() {
+			g.Line("b.onConnect = cb")
+			g.Line("return b")
+		})
+		g.Line("}")
+		g.Break()
+
+		g.Linef("// OnDisconnect registers a callback that is invoked when the stream is disconnected.")
+		g.Linef("func (b *%s) OnDisconnect(cb func(error)) *%s {", builderStream, builderStream)
+		g.Block(func() {
+			g.Line("b.onDisconnect = cb")
+			g.Line("return b")
+		})
+		g.Line("}")
+		g.Break()
+
+		g.Linef("// OnReconnect registers a callback that is invoked when the stream is attempting to reconnect.")
+		g.Linef("func (b *%s) OnReconnect(cb func(int, time.Duration)) *%s {", builderStream, builderStream)
+		g.Block(func() {
+			g.Line("b.onReconnect = cb")
+			g.Line("return b")
+		})
+		g.Line("}")
+		g.Break()
+
 		// Execute
-		g.Linef("// Execute opens the %s Server-Sent Events stream.", name)
+		g.Linef("// Execute opens the %s Server-Sent Events stream.", uniqueName)
 		g.Line("//")
-		g.Linef("// It returns a read-only channel of Response[%sOutput].", name)
+		g.Linef("// It returns a read-only channel of Response[%sOutput].", uniqueName)
 		g.Line("//")
 		g.Line("// Each event on the channel follows these rules:")
-		g.Linef("//   - Ok=true  ⇒ Output contains a %sOutput value.", name)
+		g.Linef("//   - Ok=true  ⇒ Output contains a %sOutput value.", uniqueName)
 		g.Linef("//   - Ok=false ⇒ Error describes either a server sent or transport error.")
 		g.Line("//")
 		g.Line("// The caller should cancel the supplied context to terminate the stream and must")
 		g.Line("// drain the channel until it is closed.")
-		g.Linef("func (b *%s) Execute(ctx context.Context, input %sInput) <-chan Response[%sOutput] {", builderStream, name, name)
+		g.Linef("func (b *%s) Execute(ctx context.Context, input %sInput) <-chan Response[%sOutput] {", builderStream, uniqueName, uniqueName)
 		g.Block(func() {
-			g.Line("rawCh := b.client.stream(ctx, b.name, input, b.headers, b.reconnectConf)")
-			g.Linef("outCh := make(chan Response[%sOutput])", name)
+			g.Line("rawCh := b.client.stream(ctx, b.rpcName, b.name, input, b.headerProviders, b.reconnectConf, b.onConnect, b.onDisconnect, b.onReconnect)")
+			g.Linef("outCh := make(chan Response[%sOutput])", uniqueName)
 			g.Line("go func() {")
 			g.Block(func() {
 				g.Line("for evt := range rawCh {")
 				g.Block(func() {
 					g.Line("if !evt.Ok {")
 					g.Block(func() {
-						g.Linef("outCh <- Response[%sOutput]{Ok: false, Error: evt.Error}", name)
+						g.Linef("outCh <- Response[%sOutput]{Ok: false, Error: evt.Error}", uniqueName)
 					})
 					g.Line("continue")
 					g.Line("}")
-					g.Linef("var out %sOutput", name)
+					g.Linef("var out %sOutput", uniqueName)
 					g.Line("if err := json.Unmarshal(evt.Output, &out); err != nil {")
 					g.Block(func() {
-						g.Linef("outCh <- Response[%sOutput]{Ok: false, Error: Error{Message: fmt.Sprintf(\"failed to decode %s output: %%v\", err)}}", name, name)
+						g.Linef("outCh <- Response[%sOutput]{Ok: false, Error: Error{Message: fmt.Sprintf(\"failed to decode %s output: %%v\", err)}}", uniqueName, uniqueName)
 					})
 					g.Line("continue")
 					g.Line("}")
-					g.Linef("outCh <- Response[%sOutput]{Ok: true, Output: out}", name)
+					g.Linef("outCh <- Response[%sOutput]{Ok: true, Output: out}", uniqueName)
 				})
 				g.Line("}")
 				g.Line("close(outCh)")
