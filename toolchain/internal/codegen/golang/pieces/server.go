@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"sync"
+	"time"
 )
 
 /** START FROM HERE **/
@@ -185,6 +186,13 @@ type EmitMiddlewareFunc[T any, I any, O any] func(
 // DeserializerFunc function convert raw JSON input into typed input prior to handler execution.
 type DeserializerFunc func(raw json.RawMessage) (any, error)
 
+// StreamConfig allows configuring the behavior of streams.
+type StreamConfig struct {
+	// PingInterval is the interval at which ping events are sent to the client
+	// to keep the connection alive. Defaults to 30 seconds.
+	PingInterval time.Duration
+}
+
 // -----------------------------------------------------------------------------
 // Server Internal Implementation
 // -----------------------------------------------------------------------------
@@ -238,6 +246,17 @@ type internalServer[T any] struct {
 	// streamDeserializers contains per-stream input deserializers
 	// Map format: rpcName -> streamName -> deserializer
 	streamDeserializers map[string]map[string]DeserializerFunc
+
+	// globalStreamConfig contains the global configuration for streams
+	globalStreamConfig StreamConfig
+
+	// rpcStreamConfigs contains per-RPC configuration for streams
+	// Map format: rpcName -> config
+	rpcStreamConfigs map[string]StreamConfig
+
+	// streamConfigs contains per-stream configuration
+	// Map format: rpcName -> streamName -> config
+	streamConfigs map[string]map[string]StreamConfig
 }
 
 // newInternalServer creates a new VDL server instance with the specified
@@ -268,6 +287,8 @@ func newInternalServer[T any](
 	streamEmitMiddlewares := make(map[string]map[string][]EmitMiddlewareFunc[T, any, any])
 	procDeserializers := make(map[string]map[string]DeserializerFunc)
 	streamDeserializers := make(map[string]map[string]DeserializerFunc)
+	rpcStreamConfigs := make(map[string]StreamConfig)
+	streamConfigs := make(map[string]map[string]StreamConfig)
 
 	// Helper to ensure RPC map existence
 	ensureRPC := func(rpcName string) {
@@ -280,6 +301,7 @@ func newInternalServer[T any](
 			streamEmitMiddlewares[rpcName] = make(map[string][]EmitMiddlewareFunc[T, any, any])
 			procDeserializers[rpcName] = make(map[string]DeserializerFunc)
 			streamDeserializers[rpcName] = make(map[string]DeserializerFunc)
+			streamConfigs[rpcName] = make(map[string]StreamConfig)
 		}
 	}
 
@@ -304,6 +326,9 @@ func newInternalServer[T any](
 		streamEmitMiddlewares: streamEmitMiddlewares,
 		procDeserializers:     procDeserializers,
 		streamDeserializers:   streamDeserializers,
+		globalStreamConfig:    StreamConfig{PingInterval: 30 * time.Second},
+		rpcStreamConfigs:      rpcStreamConfigs,
+		streamConfigs:         streamConfigs,
 	}
 }
 
@@ -366,6 +391,33 @@ func (s *internalServer[T]) addStreamEmitMiddleware(
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
 	s.streamEmitMiddlewares[rpcName][streamName] = append(s.streamEmitMiddlewares[rpcName][streamName], mw)
+	return s
+}
+
+// setGlobalStreamConfig sets the global configuration for streams.
+func (s *internalServer[T]) setGlobalStreamConfig(cfg StreamConfig) *internalServer[T] {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+	if cfg.PingInterval <= 0 {
+		cfg.PingInterval = 30 * time.Second
+	}
+	s.globalStreamConfig = cfg
+	return s
+}
+
+// setRPCStreamConfig sets the configuration for streams within a specific RPC.
+func (s *internalServer[T]) setRPCStreamConfig(rpcName string, cfg StreamConfig) *internalServer[T] {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+	s.rpcStreamConfigs[rpcName] = cfg
+	return s
+}
+
+// setStreamConfig sets the configuration for a specific stream.
+func (s *internalServer[T]) setStreamConfig(rpcName, streamName string, cfg StreamConfig) *internalServer[T] {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+	s.streamConfigs[rpcName][streamName] = cfg
 	return s
 }
 
@@ -581,6 +633,16 @@ func (s *internalServer[T]) handleStreamRequest(
 	emitMws := s.streamEmitMiddlewares[rpcName][streamName]
 	rpcMws := s.rpcMiddlewares[rpcName]
 	deserialize := s.streamDeserializers[rpcName][streamName]
+
+	// Determine configuration (Precedence: Stream > RPC > Global)
+	pingInterval := s.globalStreamConfig.PingInterval
+	if cfg, ok := s.rpcStreamConfigs[rpcName]; ok && cfg.PingInterval > 0 {
+		pingInterval = cfg.PingInterval
+	}
+	if cfg, ok := s.streamConfigs[rpcName][streamName]; ok && cfg.PingInterval > 0 {
+		pingInterval = cfg.PingInterval
+	}
+
 	s.handlersMu.RUnlock()
 
 	// Set SSE headers to the response
@@ -602,6 +664,36 @@ func (s *internalServer[T]) handleStreamRequest(
 	}
 	c.Input = typedInput
 
+	// We need to synchronize writes to the httpAdapter because pings run in a separate goroutine
+	var writeMu sync.Mutex
+	safeWrite := func(parts ...[]byte) error {
+		writeMu.Lock()
+		defer writeMu.Unlock()
+		for _, part := range parts {
+			if _, err := httpAdapter.Write(part); err != nil {
+				return err
+			}
+		}
+		return httpAdapter.Flush()
+	}
+
+	// Start Ping Loop
+	ctx, cancel := context.WithCancel(c.Context)
+	defer cancel()
+
+	go func() {
+		ticker := time.NewTicker(pingInterval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				_ = safeWrite([]byte(": ping\n\n"))
+			}
+		}
+	}()
+
 	// Base emit writes SSE envelope with {ok:true, output}
 	baseEmit := func(_ *HandlerContext[T, any], data any) error {
 		response := Response[any]{
@@ -612,14 +704,7 @@ func (s *internalServer[T]) handleStreamRequest(
 		if err != nil {
 			return fmt.Errorf("failed to marshal stream data: %w", err)
 		}
-		resPayload := fmt.Sprintf("data: %s\n\n", jsonData)
-		if _, err = httpAdapter.Write([]byte(resPayload)); err != nil {
-			return err
-		}
-		if err := httpAdapter.Flush(); err != nil {
-			return err
-		}
-		return nil
+		return safeWrite([]byte("data: "), jsonData, []byte("\n\n"))
 	}
 
 	// Compose emit middlewares (reverse registration order)

@@ -84,6 +84,12 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("func (s *Server[T]) Use(mw GlobalMiddlewareFunc[T]) { s.intServer.addGlobalMiddleware(mw) }")
 	g.Break()
 
+	g.Line("// SetStreamConfig sets the global configuration for all streams.")
+	g.Line("//")
+	g.Line("// This applies to all streams unless overridden by RPC-level or stream-specific configurations (if set).")
+	g.Line("func (s *Server[T]) SetStreamConfig(cfg StreamConfig) { s.intServer.setGlobalStreamConfig(cfg) }")
+	g.Break()
+
 	g.Line("// HandleRequest processes an incoming RPC request and drives the complete")
 	g.Line("// request lifecycle (parsing, middleware chains, handler dispatch, response).")
 	g.Line("//")
@@ -163,6 +169,16 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Linef("func (r *%s[T]) Use(mw GlobalMiddlewareFunc[T]) {", rpcStructName)
 	g.Block(func() {
 		g.Linef("r.intServer.addRPCMiddleware(%q, mw)", rpcName)
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// SetStreamConfig sets the configuration for all streams within the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This overrides the global configuration but is overridden by stream-specific configuration (if set).")
+	g.Linef("func (r *%s[T]) SetStreamConfig(cfg StreamConfig) {", rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intServer.setRPCStreamConfig(%q, cfg)", rpcName)
 	})
 	g.Line("}")
 	g.Break()
@@ -372,6 +388,16 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Linef("type %sHandlerFunc[T any] func(c *%sHandlerContext[T], emit %sEmitFunc[T]) error", uniqueName, uniqueName, uniqueName)
 		g.Linef("type %sMiddlewareFunc[T any] func(next %sHandlerFunc[T]) %sHandlerFunc[T]", uniqueName, uniqueName, uniqueName)
 		g.Linef("type %sEmitMiddlewareFunc[T any] func(next %sEmitFunc[T]) %sEmitFunc[T]", uniqueName, uniqueName, uniqueName)
+		g.Break()
+
+		g.Linef("// SetConfig sets the configuration for the %s stream.", uniqueName)
+		g.Line("//")
+		g.Line("// This overrides both global and RPC-level configurations.")
+		g.Linef("func (e stream%sEntry[T]) SetConfig(cfg StreamConfig) {", uniqueName)
+		g.Block(func() {
+			g.Linef("e.intServer.setStreamConfig(%q, %q, cfg)", rpcName, stream.Name)
+		})
+		g.Line("}")
 		g.Break()
 
 		// Generate Use (stream middleware)
