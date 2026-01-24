@@ -27,7 +27,10 @@ func newTypeFormatter(g *gen.Generator, typeDecl *ast.TypeDecl) *typeFormatter {
 // Returns the formatted gen.Generator.
 func (f *typeFormatter) format() *gen.Generator {
 	if f.typeDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.typeDecl.Docstring.Value)))
+		normalized, printed := FormatDocstring(f.g, string(f.typeDecl.Docstring.Value))
+		if !printed {
+			f.g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	if f.typeDecl.Deprecated != nil {

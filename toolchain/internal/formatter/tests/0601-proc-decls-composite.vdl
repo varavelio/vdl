@@ -73,10 +73,10 @@ rpc Service {
         subfield: { /* Comment */
 
           """
-Field
+          Field
 
-      Multi-line
-"""
+                Multi-line
+          """
           subsubfield: string[]
         }
       }

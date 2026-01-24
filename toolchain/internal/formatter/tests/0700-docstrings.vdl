@@ -20,6 +20,30 @@ rpc Service { """ Associated """ proc Test {} }
 
 """ Standalone """
 
+// Nested Docstring
+rpc MyRpc {
+  proc MyProc {
+    input {
+      foo: {
+        bar: {
+          baz: {
+            qux: {
+"""
+        This Docstring
+    Should
+      be
+        Formatted Correctly
+          """
+              field1: string
+                  """This one too""" field2: int
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 // >>>>
 
 """ Standalone """
@@ -51,3 +75,29 @@ rpc Service {
 // Comment
 
 """ Standalone """
+
+// Nested Docstring
+rpc MyRpc {
+  proc MyProc {
+    input {
+      foo: {
+        bar: {
+          baz: {
+            qux: {
+              """
+                  This Docstring
+              Should
+                be
+                  Formatted Correctly
+              """
+              field1: string
+
+              """ This one too """
+              field2: int
+            }
+          }
+        }
+      }
+    }
+  }
+}

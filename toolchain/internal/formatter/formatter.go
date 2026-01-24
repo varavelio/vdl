@@ -207,7 +207,10 @@ func (f *schemaFormatter) formatStandaloneDocstring() {
 		f.g.Line("")
 	}
 
-	f.LineAndCommentf(`"""%s"""`, normalizeDocstring(string(f.currentIndexChild.Docstring.Value)))
+	normalized, printed := FormatDocstring(f.g, string(f.currentIndexChild.Docstring.Value))
+	if !printed {
+		f.LineAndCommentf(`"""%s"""`, normalized)
+	}
 }
 
 func (f *schemaFormatter) formatInclude() {

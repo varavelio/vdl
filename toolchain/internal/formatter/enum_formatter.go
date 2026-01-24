@@ -24,7 +24,10 @@ func newEnumFormatter(g *gen.Generator, enumDecl *ast.EnumDecl) *enumFormatter {
 
 func (f *enumFormatter) format() *gen.Generator {
 	if f.enumDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.enumDecl.Docstring.Value)))
+		normalized, printed := FormatDocstring(f.g, string(f.enumDecl.Docstring.Value))
+		if !printed {
+			f.g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	if f.enumDecl.Deprecated != nil {

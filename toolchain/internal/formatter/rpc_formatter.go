@@ -77,7 +77,10 @@ func (f *rpcFormatter) peekChild(offset int) (ast.RPCChild, ast.LineDiff, bool) 
 
 func (f *rpcFormatter) format() *gen.Generator {
 	if f.rpcDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, f.rpcDecl.Docstring.Value)
+		normalized, printed := FormatDocstring(f.g, string(f.rpcDecl.Docstring.Value))
+		if !printed {
+			f.g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	if f.rpcDecl.Deprecated != nil {
@@ -144,7 +147,10 @@ func (f *rpcFormatter) formatComment() {
 
 func (f *rpcFormatter) formatStandaloneDocstring() {
 	f.breakBeforeBlock()
-	f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.currentIndexChild.Docstring.Value)))
+	normalized, printed := FormatDocstring(f.g, string(f.currentIndexChild.Docstring.Value))
+	if !printed {
+		f.g.Linef(`"""%s"""`, normalized)
+	}
 }
 
 func (f *rpcFormatter) formatProc() {

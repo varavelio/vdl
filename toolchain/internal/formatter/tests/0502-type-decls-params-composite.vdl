@@ -34,10 +34,10 @@ type Foo {
       subSubField1: string[]
     }[] /* Comment */
     """
-Field
+    Field
 
-      Multi-line
-"""
+          Multi-line
+    """
     subField3: datetime
   }[]
 

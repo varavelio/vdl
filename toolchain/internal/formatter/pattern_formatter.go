@@ -24,7 +24,10 @@ func newPatternFormatter(g *gen.Generator, patternDecl *ast.PatternDecl) *patter
 
 func (f *patternFormatter) format() *gen.Generator {
 	if f.patternDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.patternDecl.Docstring.Value)))
+		normalized, printed := FormatDocstring(f.g, string(f.patternDecl.Docstring.Value))
+		if !printed {
+			f.g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	if f.patternDecl.Deprecated != nil {

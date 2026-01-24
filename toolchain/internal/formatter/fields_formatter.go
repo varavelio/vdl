@@ -34,10 +34,10 @@ func formatField(g *gen.Generator, field *ast.Field, breakBefore bool, _ any) {
 	}
 
 	if field.Docstring != nil {
-		g.Inline(`"""`)
-		g.Raw(normalizeDocstring(string(field.Docstring.Value)))
-		g.Raw(`"""`)
-		g.Break()
+		normalized, printed := FormatDocstring(g, string(field.Docstring.Value))
+		if !printed {
+			g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	// Force strict camelCase

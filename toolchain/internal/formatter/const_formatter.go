@@ -24,7 +24,10 @@ func newConstFormatter(g *gen.Generator, constDecl *ast.ConstDecl) *constFormatt
 
 func (f *constFormatter) format() *gen.Generator {
 	if f.constDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.constDecl.Docstring.Value)))
+		normalized, printed := FormatDocstring(f.g, string(f.constDecl.Docstring.Value))
+		if !printed {
+			f.g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	if f.constDecl.Deprecated != nil {

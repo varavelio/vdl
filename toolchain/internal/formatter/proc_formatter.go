@@ -78,7 +78,10 @@ func (f *procFormatter) peekChild(offset int) (ast.ProcOrStreamDeclChild, ast.Li
 // format formats the entire procDecl, handling spacing and EOL comments.
 func (f *procFormatter) format() *gen.Generator {
 	if f.procDecl.Docstring != nil {
-		f.g.Linef(`"""%s"""`, normalizeDocstring(string(f.procDecl.Docstring.Value)))
+		normalized, printed := FormatDocstring(f.g, string(f.procDecl.Docstring.Value))
+		if !printed {
+			f.g.Linef(`"""%s"""`, normalized)
+		}
 	}
 
 	if f.procDecl.Deprecated != nil {
