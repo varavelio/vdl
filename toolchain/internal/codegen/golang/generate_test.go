@@ -40,7 +40,8 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types.go, optional.go, rpc_server.go, rpc_client.go
+	// Expect types_core.go, optional.go, rpc_server.go, rpc_client.go
+	// types.go is NOT generated because there are no domain types.
 	require.Len(t, files, 4)
 
 	fileMap := make(map[string]string)
@@ -48,8 +49,8 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	require.Contains(t, fileMap, "types.go")
-	assert.Contains(t, fileMap["types.go"], "package api")
+	require.Contains(t, fileMap, "types_core.go")
+	assert.Contains(t, fileMap["types_core.go"], "package api")
 	require.Contains(t, fileMap, "optional.go")
 	require.Contains(t, fileMap, "rpc_server.go")
 	require.Contains(t, fileMap, "rpc_client.go")
@@ -97,14 +98,15 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types.go, optional.go, rpc_server.go, rpc_client.go
-	require.Len(t, files, 4)
+	// Expect types_core.go, types.go, optional.go, rpc_server.go, rpc_client.go
+	require.Len(t, files, 5)
 
 	fileMap := make(map[string]string)
 	for _, f := range files {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
+	require.Contains(t, fileMap, "types_core.go")
 	require.Contains(t, fileMap, "types.go")
 	content := fileMap["types.go"]
 	assert.Contains(t, content, "type User struct")
@@ -147,14 +149,15 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types.go and optional.go
-	require.Len(t, files, 2)
+	// Expect types_core.go, types.go and optional.go
+	require.Len(t, files, 3)
 
 	fileMap := make(map[string]string)
 	for _, f := range files {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
+	require.Contains(t, fileMap, "types_core.go")
 	require.Contains(t, fileMap, "types.go")
 	content := fileMap["types.go"]
 
@@ -206,7 +209,8 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types.go, optional.go, and consts.go
+	// Expect types_core.go, optional.go, and consts.go
+	// types.go is NOT generated as there are no domain types
 	require.Len(t, files, 3)
 
 	// Find consts.go
@@ -251,7 +255,8 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types.go, optional.go, and patterns.go
+	// Expect types_core.go, optional.go, and patterns.go
+	// types.go is NOT generated as there are no domain types
 	require.Len(t, files, 3)
 
 	var patternsFile File
@@ -321,33 +326,34 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
+	// Check types_core.go
+	require.Contains(t, fileMap, "types_core.go")
+
 	// Check types.go
 	require.Contains(t, fileMap, "types.go")
 	typesContent := fileMap["types.go"]
 	assert.Contains(t, typesContent, "type UsersGetUserInput struct")
 	assert.Contains(t, typesContent, "type UsersGetUserOutput struct")
 
-	// Check rpc_server.go (core)
+	// Check rpc_server.go (core + RPCs)
 	require.Contains(t, fileMap, "rpc_server.go")
 	serverCore := fileMap["rpc_server.go"]
 	assert.Contains(t, serverCore, "type Server[T any] struct")
+	// RPC specific code should be here too
+	assert.Contains(t, serverCore, "type procUsersGetUserEntry[T any] struct")
+	assert.Contains(t, serverCore, "func (e procUsersGetUserEntry[T]) Handle")
 
-	// Check rpc_client.go (core)
+	// Check rpc_client.go (core + RPCs)
 	require.Contains(t, fileMap, "rpc_client.go")
 	clientCore := fileMap["rpc_client.go"]
 	assert.Contains(t, clientCore, "type Client struct")
+	// RPC specific code should be here too
+	assert.Contains(t, clientCore, "type clientBuilderUsersGetUser struct")
+	assert.Contains(t, clientCore, "func (b *clientBuilderUsersGetUser) Execute")
 
-	// Check rpc_users_server.go
-	require.Contains(t, fileMap, "rpc_users_server.go")
-	usersServer := fileMap["rpc_users_server.go"]
-	assert.Contains(t, usersServer, "type procUsersGetUserEntry[T any] struct")
-	assert.Contains(t, usersServer, "func (e procUsersGetUserEntry[T]) Handle")
-
-	// Check rpc_users_client.go
-	require.Contains(t, fileMap, "rpc_users_client.go")
-	usersClient := fileMap["rpc_users_client.go"]
-	assert.Contains(t, usersClient, "type clientBuilderUsersGetUser struct")
-	assert.Contains(t, usersClient, "func (b *clientBuilderUsersGetUser) Execute")
+	// Files rpc_users_server.go and rpc_users_client.go are no longer generated
+	require.NotContains(t, fileMap, "rpc_users_server.go")
+	require.NotContains(t, fileMap, "rpc_users_client.go")
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
@@ -401,23 +407,30 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
+	// Check types_core.go
+	require.Contains(t, fileMap, "types_core.go")
+
 	// Check types.go
 	require.Contains(t, fileMap, "types.go")
 	typesContent := fileMap["types.go"]
 	assert.Contains(t, typesContent, "type ChatMessagesInput struct")
 	assert.Contains(t, typesContent, "type ChatMessagesOutput struct")
 
-	// Check rpc_chat_server.go
-	require.Contains(t, fileMap, "rpc_chat_server.go")
-	chatServer := fileMap["rpc_chat_server.go"]
-	assert.Contains(t, chatServer, "type streamChatMessagesEntry[T any] struct")
-	assert.Contains(t, chatServer, "func (e streamChatMessagesEntry[T]) Handle")
-	assert.Contains(t, chatServer, "func (e streamChatMessagesEntry[T]) UseEmit")
+	// Check rpc_server.go (core + streams)
+	require.Contains(t, fileMap, "rpc_server.go")
+	serverCore := fileMap["rpc_server.go"]
+	assert.Contains(t, serverCore, "type streamChatMessagesEntry[T any] struct")
+	assert.Contains(t, serverCore, "func (e streamChatMessagesEntry[T]) Handle")
+	assert.Contains(t, serverCore, "func (e streamChatMessagesEntry[T]) UseEmit")
 
-	// Check rpc_chat_client.go
-	require.Contains(t, fileMap, "rpc_chat_client.go")
-	chatClient := fileMap["rpc_chat_client.go"]
-	assert.Contains(t, chatClient, "type clientBuilderChatMessagesStream struct")
+	// Check rpc_client.go (core + streams)
+	require.Contains(t, fileMap, "rpc_client.go")
+	clientCore := fileMap["rpc_client.go"]
+	assert.Contains(t, clientCore, "type clientBuilderChatMessagesStream struct")
+
+	// Files rpc_chat_server.go and rpc_chat_client.go are no longer generated
+	require.NotContains(t, fileMap, "rpc_chat_server.go")
+	require.NotContains(t, fileMap, "rpc_chat_client.go")
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
@@ -490,14 +503,15 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types.go and optional.go
-	require.Len(t, files, 2)
+	// Expect types_core.go, types.go and optional.go
+	require.Len(t, files, 3)
 
 	fileMap := make(map[string]string)
 	for _, f := range files {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
+	require.Contains(t, fileMap, "types_core.go")
 	require.Contains(t, fileMap, "types.go")
 	content := fileMap["types.go"]
 
