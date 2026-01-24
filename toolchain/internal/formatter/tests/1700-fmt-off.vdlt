@@ -1,0 +1,11 @@
+// fmt:off
+type   User   {
+  id  :  string
+}
+
+// >>>>
+
+// fmt:off
+type   User   {
+  id  :  string
+}

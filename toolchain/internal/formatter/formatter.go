@@ -16,6 +16,12 @@ func Format(filename, content string) (string, error) {
 		return "", nil
 	}
 
+	// Check if the file starts with // fmt:off or //fmt:off
+	trimmed := strings.TrimSpace(content)
+	if strings.HasPrefix(trimmed, "// fmt:off") || strings.HasPrefix(trimmed, "//fmt:off") {
+		return content, nil
+	}
+
 	schema, err := parser.ParserInstance.ParseString(filename, content)
 	if err != nil {
 		return "", fmt.Errorf("error parsing VDL: %w", err)
