@@ -45,9 +45,13 @@ func generatePattern(g *gen.Generator, pattern ir.Pattern) {
 	renderDeprecated(g, pattern.Deprecated)
 
 	// Generate function signature
-	params := make([]string, len(pattern.Placeholders))
-	for i, placeholder := range pattern.Placeholders {
-		params[i] = placeholder + " string"
+	var params []string
+	seen := make(map[string]bool)
+	for _, placeholder := range pattern.Placeholders {
+		if !seen[placeholder] {
+			params = append(params, placeholder+" string")
+			seen[placeholder] = true
+		}
 	}
 
 	g.Linef("func %s(%s) string {", pattern.Name, strings.Join(params, ", "))
