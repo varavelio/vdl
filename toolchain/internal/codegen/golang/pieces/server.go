@@ -186,6 +186,12 @@ type EmitMiddlewareFunc[T any, I any, O any] func(
 // DeserializerFunc function convert raw JSON input into typed input prior to handler execution.
 type DeserializerFunc func(raw json.RawMessage) (any, error)
 
+// ErrorHandlerFunc transforms an internal Go error into a public VDL Error.
+//
+// The handler receives the full request context, enabling structured logging
+// with access to Props, RPC Name, Operation Name, and other metadata.
+type ErrorHandlerFunc[T any] func(c *HandlerContext[T, any], err error) Error
+
 // StreamConfig allows configuring the behavior of streams.
 type StreamConfig struct {
 	// PingInterval is the interval at which ping events are sent to the client
@@ -257,6 +263,13 @@ type internalServer[T any] struct {
 	// streamConfigs contains per-stream configuration
 	// Map format: rpcName -> streamName -> config
 	streamConfigs map[string]map[string]StreamConfig
+
+	// globalErrorHandler is the global error handler
+	globalErrorHandler ErrorHandlerFunc[T]
+
+	// rpcErrorHandlers contains per-RPC error handlers
+	// Map format: rpcName -> handler
+	rpcErrorHandlers map[string]ErrorHandlerFunc[T]
 }
 
 // newInternalServer creates a new VDL server instance with the specified
@@ -289,6 +302,7 @@ func newInternalServer[T any](
 	streamDeserializers := make(map[string]map[string]DeserializerFunc)
 	rpcStreamConfigs := make(map[string]StreamConfig)
 	streamConfigs := make(map[string]map[string]StreamConfig)
+	rpcErrorHandlers := make(map[string]ErrorHandlerFunc[T])
 
 	// Helper to ensure RPC map existence
 	ensureRPC := func(rpcName string) {
@@ -329,6 +343,8 @@ func newInternalServer[T any](
 		globalStreamConfig:    StreamConfig{PingInterval: 30 * time.Second},
 		rpcStreamConfigs:      rpcStreamConfigs,
 		streamConfigs:         streamConfigs,
+		globalErrorHandler:    nil,
+		rpcErrorHandlers:      rpcErrorHandlers,
 	}
 }
 
@@ -419,6 +435,41 @@ func (s *internalServer[T]) setStreamConfig(rpcName, streamName string, cfg Stre
 	defer s.handlersMu.Unlock()
 	s.streamConfigs[rpcName][streamName] = cfg
 	return s
+}
+
+// setGlobalErrorHandler sets the global error handler.
+func (s *internalServer[T]) setGlobalErrorHandler(handler ErrorHandlerFunc[T]) *internalServer[T] {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+	s.globalErrorHandler = handler
+	return s
+}
+
+// setRPCErrorHandler sets the error handler for a specific RPC.
+func (s *internalServer[T]) setRPCErrorHandler(rpcName string, handler ErrorHandlerFunc[T]) *internalServer[T] {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+	s.rpcErrorHandlers[rpcName] = handler
+	return s
+}
+
+// resolveErrorHandler returns the appropriate error handler for the given RPC name.
+// Precedence: RPC > Global > Default (Passthrough)
+func (s *internalServer[T]) resolveErrorHandler(rpcName string) ErrorHandlerFunc[T] {
+	s.handlersMu.RLock()
+	defer s.handlersMu.RUnlock()
+
+	if handler, ok := s.rpcErrorHandlers[rpcName]; ok && handler != nil {
+		return handler
+	}
+	if s.globalErrorHandler != nil {
+		return s.globalErrorHandler
+	}
+
+	// Default: Passthrough
+	return func(c *HandlerContext[T, any], err error) Error {
+		return ToError(err)
+	}
 }
 
 // setProcHandler registers the final implementation function and deserializer for the specified procedure name.
@@ -527,10 +578,12 @@ func (s *internalServer[T]) handleRequest(
 		}
 
 		// Send an event with the error before closing the connection
+		errorHandler := s.resolveErrorHandler(rpcName)
 		response := Response[any]{
 			Ok:    false,
-			Error: ToError(err),
+			Error: errorHandler(c, err),
 		}
+
 		jsonData, marshalErr := json.Marshal(response)
 		if marshalErr != nil {
 			return fmt.Errorf("failed to marshal stream error: %w", marshalErr)
@@ -549,7 +602,8 @@ func (s *internalServer[T]) handleRequest(
 	response := Response[any]{}
 	if err != nil {
 		response.Ok = false
-		response.Error = ToError(err)
+		errorHandler := s.resolveErrorHandler(rpcName)
+		response.Error = errorHandler(c, err)
 	} else {
 		response.Ok = true
 		response.Output = output

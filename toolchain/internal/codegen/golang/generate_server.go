@@ -90,6 +90,13 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("func (s *Server[T]) SetStreamConfig(cfg StreamConfig) { s.intServer.setGlobalStreamConfig(cfg) }")
 	g.Break()
 
+	g.Line("// SetErrorHandler sets a global error handler that intercepts and transforms errors")
+	g.Line("// from all RPCs before sending them to the client.")
+	g.Line("//")
+	g.Line("// This handler applies to all RPCs unless a specific handler is registered for an RPC.")
+	g.Line("func (s *Server[T]) SetErrorHandler(fn ErrorHandlerFunc[T]) { s.intServer.setGlobalErrorHandler(fn) }")
+	g.Break()
+
 	g.Line("// HandleRequest processes an incoming RPC request and drives the complete")
 	g.Line("// request lifecycle (parsing, middleware chains, handler dispatch, response).")
 	g.Line("//")
@@ -179,6 +186,16 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Linef("func (r *%s[T]) SetStreamConfig(cfg StreamConfig) {", rpcStructName)
 	g.Block(func() {
 		g.Linef("r.intServer.setRPCStreamConfig(%q, cfg)", rpcName)
+	})
+	g.Line("}")
+	g.Break()
+
+	g.Linef("// SetErrorHandler sets an error handler specifically for the %s RPC.", rpcName)
+	g.Line("//")
+	g.Line("// This handler overrides the global error handler for all operations within this RPC.")
+	g.Linef("func (r *%s[T]) SetErrorHandler(fn ErrorHandlerFunc[T]) {", rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intServer.setRPCErrorHandler(%q, fn)", rpcName)
 	})
 	g.Line("}")
 	g.Break()

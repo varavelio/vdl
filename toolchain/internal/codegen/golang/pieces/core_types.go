@@ -126,6 +126,32 @@ func (e Error) String() string {
 	return e.Message
 }
 
+// Is reports whether the target error matches this error.
+//
+// It checks if the target is of type Error (or *Error) and compares
+// their Code and Message fields.
+//
+// Matching Logic:
+//  1. If both errors have a Code, they match if the Codes are identical.
+//  2. If one or both lack a Code, they match if the Messages are identical.
+//  3. Details and Category are ignored for comparison to avoid issues with non-comparable map types.
+func (e Error) Is(target error) bool {
+	var t Error
+	switch err := target.(type) {
+	case Error:
+		t = err
+	case *Error:
+		t = *err
+	default:
+		return false
+	}
+
+	if e.Code != "" && t.Code != "" {
+		return e.Code == t.Code
+	}
+	return e.Message == t.Message
+}
+
 // ToJSON returns the Error as a JSON-formatted string including all its fields.
 // This is useful for logging and debugging purposes.
 //
