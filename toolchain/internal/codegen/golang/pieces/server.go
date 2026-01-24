@@ -16,11 +16,6 @@ import (
 // Server Types
 // -----------------------------------------------------------------------------
 
-const (
-	OperationTypeProc   = "proc"
-	OperationTypeStream = "stream"
-)
-
 // HTTPAdapter defines the interface required by VDL server to handle
 // incoming HTTP requests and write responses to clients. This abstraction allows
 // the server to work with different HTTP frameworks while maintaining the same
@@ -128,18 +123,18 @@ type HandlerContext[T any, I any] struct {
 	// Context is the standard Go context.Context for cancellations and deadlines.
 	Context context.Context
 
-	// operationName is the name of the invoked proc or stream (e.g., "CreateUser").
-	operationName string
-
-	// operationType is the type of operation ("proc" or "stream").
-	operationType string
+	// operation is the details of the RPC operation including it's RPC name, operation name and type.
+	operation OperationDefinition
 }
 
-// OperationName returns the name of the operation (e.g. "CreateUser", "GetPost", etc.)
-func (h *HandlerContext[T, I]) OperationName() string { return h.operationName }
+// RPCName returns the name of the RPC service
+func (h *HandlerContext[T, I]) RPCName() string { return h.operation.RPCName }
 
-// OperationType returns the type of operation (e.g. "proc" or "stream")
-func (h *HandlerContext[T, I]) OperationType() string { return h.operationType }
+// OperationName returns the name of the operation (e.g. "CreateUser", "GetPost", etc.)
+func (h *HandlerContext[T, I]) OperationName() string { return h.operation.Name }
+
+// OperationType returns the type of operation, can be [OperationTypeProc] ("proc") or [OperationTypeStream] ("stream")
+func (h *HandlerContext[T, I]) OperationType() OperationType { return h.operation.Type }
 
 // GlobalHandlerFunc is the signature for a global handler function.
 // Both for procedures and streams
@@ -202,39 +197,51 @@ type DeserializerFunc func(raw json.RawMessage) (any, error)
 // custom data (authentication info, user sessions, etc.) through the entire
 // request processing pipeline.
 type internalServer[T any] struct {
-	// procNames contains the list of all registered procedure names
-	procNames []string
-	// procNamesMap contains the list of all registered procedure names
-	procNamesMap map[string]bool
-	// streamNames contains the list of all registered stream names
-	streamNames []string
-	// streamNamesMap contains the list of all registered stream names
-	streamNamesMap map[string]bool
-	// operationNamesMap contains the list of all registered operation names
-	// and its corresponding type
-	operationNamesMap map[string]string
 	// handlersMu protects all handler maps and middleware slices from concurrent access
 	handlersMu sync.RWMutex
+
+	// operationDefs contains the definition of all registered operations
+	// Map format: rpcName -> operationName -> OperationType ("proc" or "stream")
+	operationDefs map[string]map[string]OperationType
+
 	// procHandlers stores the final implementation functions for procedures
-	procHandlers map[string]ProcHandlerFunc[T, any, any]
+	// Map format: rpcName -> procName -> handler
+	procHandlers map[string]map[string]ProcHandlerFunc[T, any, any]
+
 	// streamHandlers stores the final implementation functions for streams
-	streamHandlers map[string]StreamHandlerFunc[T, any, any]
+	// Map format: rpcName -> streamName -> handler
+	streamHandlers map[string]map[string]StreamHandlerFunc[T, any, any]
+
 	// globalMiddlewares contains middlewares that run for every request (both procs and streams)
 	globalMiddlewares []GlobalMiddlewareFunc[T]
+
+	// rpcMiddlewares contains middlewares that run for every request within a specific RPC
+	// Map format: rpcName -> middlewares
+	rpcMiddlewares map[string][]GlobalMiddlewareFunc[T]
+
 	// procMiddlewares contains per-procedure middlewares
-	procMiddlewares map[string][]ProcMiddlewareFunc[T, any, any]
+	// Map format: rpcName -> procName -> middlewares
+	procMiddlewares map[string]map[string][]ProcMiddlewareFunc[T, any, any]
+
 	// streamMiddlewares contains per-stream middlewares
-	streamMiddlewares map[string][]StreamMiddlewareFunc[T, any, any]
+	// Map format: rpcName -> streamName -> middlewares
+	streamMiddlewares map[string]map[string][]StreamMiddlewareFunc[T, any, any]
+
 	// streamEmitMiddlewares contains per-stream emit middlewares
-	streamEmitMiddlewares map[string][]EmitMiddlewareFunc[T, any, any]
+	// Map format: rpcName -> streamName -> middlewares
+	streamEmitMiddlewares map[string]map[string][]EmitMiddlewareFunc[T, any, any]
+
 	// procDeserializers contains per-procedure input deserializers
-	procDeserializers map[string]DeserializerFunc
+	// Map format: rpcName -> procName -> deserializer
+	procDeserializers map[string]map[string]DeserializerFunc
+
 	// streamDeserializers contains per-stream input deserializers
-	streamDeserializers map[string]DeserializerFunc
+	// Map format: rpcName -> streamName -> deserializer
+	streamDeserializers map[string]map[string]DeserializerFunc
 }
 
 // newInternalServer creates a new VDL server instance with the specified
-// procedure and stream names. The server is initialized with empty handler
+// procedure and stream definitions. The server is initialized with empty handler
 // maps and middleware slices, ready for registration.
 //
 // The generic type T represents the user context type, used to pass additional
@@ -242,41 +249,61 @@ type internalServer[T any] struct {
 // other request-scoped data.
 //
 // Parameters:
-//   - procNames: List of procedure names that this server will handle
-//   - streamNames: List of stream names that this server will handle
+//   - procDefs: List of procedure definitions that this server will handle
+//   - streamDefs: List of stream definitions that this server will handle
 //
 // Returns a new internalServer instance ready for handler and middleware registration.
 func newInternalServer[T any](
-	procNames []string,
-	streamNames []string,
+	procDefs []OperationDefinition,
+	streamDefs []OperationDefinition,
 ) *internalServer[T] {
-	procNamesMap := make(map[string]bool)
-	streamNamesMap := make(map[string]bool)
-	operationNamesMap := make(map[string]string)
-	for _, procName := range procNames {
-		procNamesMap[procName] = true
-		operationNamesMap[procName] = OperationTypeProc
+	operationDefs := make(map[string]map[string]OperationType)
+
+	// Initialize maps
+	procHandlers := make(map[string]map[string]ProcHandlerFunc[T, any, any])
+	streamHandlers := make(map[string]map[string]StreamHandlerFunc[T, any, any])
+	rpcMiddlewares := make(map[string][]GlobalMiddlewareFunc[T])
+	procMiddlewares := make(map[string]map[string][]ProcMiddlewareFunc[T, any, any])
+	streamMiddlewares := make(map[string]map[string][]StreamMiddlewareFunc[T, any, any])
+	streamEmitMiddlewares := make(map[string]map[string][]EmitMiddlewareFunc[T, any, any])
+	procDeserializers := make(map[string]map[string]DeserializerFunc)
+	streamDeserializers := make(map[string]map[string]DeserializerFunc)
+
+	// Helper to ensure RPC map existence
+	ensureRPC := func(rpcName string) {
+		if _, ok := operationDefs[rpcName]; !ok {
+			operationDefs[rpcName] = make(map[string]OperationType)
+			procHandlers[rpcName] = make(map[string]ProcHandlerFunc[T, any, any])
+			streamHandlers[rpcName] = make(map[string]StreamHandlerFunc[T, any, any])
+			procMiddlewares[rpcName] = make(map[string][]ProcMiddlewareFunc[T, any, any])
+			streamMiddlewares[rpcName] = make(map[string][]StreamMiddlewareFunc[T, any, any])
+			streamEmitMiddlewares[rpcName] = make(map[string][]EmitMiddlewareFunc[T, any, any])
+			procDeserializers[rpcName] = make(map[string]DeserializerFunc)
+			streamDeserializers[rpcName] = make(map[string]DeserializerFunc)
+		}
 	}
-	for _, streamName := range streamNames {
-		streamNamesMap[streamName] = true
-		operationNamesMap[streamName] = OperationTypeStream
+
+	for _, def := range procDefs {
+		ensureRPC(def.RPCName)
+		operationDefs[def.RPCName][def.Name] = def.Type
+	}
+	for _, def := range streamDefs {
+		ensureRPC(def.RPCName)
+		operationDefs[def.RPCName][def.Name] = def.Type
 	}
 
 	return &internalServer[T]{
-		procNames:             procNames,
-		procNamesMap:          procNamesMap,
-		streamNames:           streamNames,
-		streamNamesMap:        streamNamesMap,
-		operationNamesMap:     operationNamesMap,
 		handlersMu:            sync.RWMutex{},
-		procHandlers:          map[string]ProcHandlerFunc[T, any, any]{},
-		streamHandlers:        map[string]StreamHandlerFunc[T, any, any]{},
+		operationDefs:         operationDefs,
+		procHandlers:          procHandlers,
+		streamHandlers:        streamHandlers,
 		globalMiddlewares:     []GlobalMiddlewareFunc[T]{},
-		procMiddlewares:       map[string][]ProcMiddlewareFunc[T, any, any]{},
-		streamMiddlewares:     map[string][]StreamMiddlewareFunc[T, any, any]{},
-		streamEmitMiddlewares: map[string][]EmitMiddlewareFunc[T, any, any]{},
-		procDeserializers:     map[string]DeserializerFunc{},
-		streamDeserializers:   map[string]DeserializerFunc{},
+		rpcMiddlewares:        rpcMiddlewares,
+		procMiddlewares:       procMiddlewares,
+		streamMiddlewares:     streamMiddlewares,
+		streamEmitMiddlewares: streamEmitMiddlewares,
+		procDeserializers:     procDeserializers,
+		streamDeserializers:   streamDeserializers,
 	}
 }
 
@@ -291,39 +318,54 @@ func (s *internalServer[T]) addGlobalMiddleware(
 	return s
 }
 
+// addRPCMiddleware registers a middleware that executes for every request within a specific RPC.
+// Middlewares are executed in the order they were registered.
+func (s *internalServer[T]) addRPCMiddleware(
+	rpcName string,
+	mw GlobalMiddlewareFunc[T],
+) *internalServer[T] {
+	s.handlersMu.Lock()
+	defer s.handlersMu.Unlock()
+	s.rpcMiddlewares[rpcName] = append(s.rpcMiddlewares[rpcName], mw)
+	return s
+}
+
 // addProcMiddleware registers a wrapper middleware for a specific procedure.
 // Middlewares are executed in the order they were registered.
 func (s *internalServer[T]) addProcMiddleware(
+	rpcName string,
 	procName string,
 	mw ProcMiddlewareFunc[T, any, any],
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
-	s.procMiddlewares[procName] = append(s.procMiddlewares[procName], mw)
+	s.procMiddlewares[rpcName][procName] = append(s.procMiddlewares[rpcName][procName], mw)
 	return s
 }
 
 // addStreamMiddleware registers a wrapper middleware for a specific stream.
 // Middlewares are executed in the order they were registered.
 func (s *internalServer[T]) addStreamMiddleware(
+	rpcName string,
 	streamName string,
 	mw StreamMiddlewareFunc[T, any, any],
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
-	s.streamMiddlewares[streamName] = append(s.streamMiddlewares[streamName], mw)
+	s.streamMiddlewares[rpcName][streamName] = append(s.streamMiddlewares[rpcName][streamName], mw)
 	return s
 }
 
 // addStreamEmitMiddleware registers an emit wrapper middleware for a specific stream.
 // Middlewares are executed in the order they were registered.
 func (s *internalServer[T]) addStreamEmitMiddleware(
+	rpcName string,
 	streamName string,
 	mw EmitMiddlewareFunc[T, any, any],
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
-	s.streamEmitMiddlewares[streamName] = append(s.streamEmitMiddlewares[streamName], mw)
+	s.streamEmitMiddlewares[rpcName][streamName] = append(s.streamEmitMiddlewares[rpcName][streamName], mw)
 	return s
 }
 
@@ -332,17 +374,18 @@ func (s *internalServer[T]) addStreamEmitMiddleware(
 //
 // Panics if a handler is already registered for the given procedure name.
 func (s *internalServer[T]) setProcHandler(
+	rpcName string,
 	procName string,
 	handler ProcHandlerFunc[T, any, any],
 	deserializer DeserializerFunc,
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
-	if _, exists := s.procHandlers[procName]; exists {
-		panic(fmt.Sprintf("the procedure handler for %s is already registered", procName))
+	if _, exists := s.procHandlers[rpcName][procName]; exists {
+		panic(fmt.Sprintf("the procedure handler for %s.%s is already registered", rpcName, procName))
 	}
-	s.procHandlers[procName] = handler
-	s.procDeserializers[procName] = deserializer
+	s.procHandlers[rpcName][procName] = handler
+	s.procDeserializers[rpcName][procName] = deserializer
 	return s
 }
 
@@ -351,17 +394,18 @@ func (s *internalServer[T]) setProcHandler(
 //
 // Panics if a handler is already registered for the given stream name.
 func (s *internalServer[T]) setStreamHandler(
+	rpcName string,
 	streamName string,
 	handler StreamHandlerFunc[T, any, any],
 	deserializer DeserializerFunc,
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
-	if _, exists := s.streamHandlers[streamName]; exists {
-		panic(fmt.Sprintf("the stream handler for %s is already registered", streamName))
+	if _, exists := s.streamHandlers[rpcName][streamName]; exists {
+		panic(fmt.Sprintf("the stream handler for %s.%s is already registered", rpcName, streamName))
 	}
-	s.streamHandlers[streamName] = handler
-	s.streamDeserializers[streamName] = deserializer
+	s.streamHandlers[rpcName][streamName] = handler
+	s.streamDeserializers[rpcName][streamName] = deserializer
 	return s
 }
 
@@ -374,6 +418,7 @@ func (s *internalServer[T]) setStreamHandler(
 // Parameters:
 //   - ctx: The request context
 //   - props: The UFO context containing user-defined data
+//   - rpcName: The name of the RPC service to invoke
 //   - operationName: The name of the procedure or stream to invoke
 //   - httpAdapter: The HTTP adapter for reading requests and writing responses
 //
@@ -381,6 +426,7 @@ func (s *internalServer[T]) setStreamHandler(
 func (s *internalServer[T]) handleRequest(
 	ctx context.Context,
 	props T,
+	rpcName string,
 	operationName string,
 	httpAdapter HTTPAdapter,
 ) error {
@@ -398,27 +444,30 @@ func (s *internalServer[T]) handleRequest(
 		return s.writeProcResponse(httpAdapter, res)
 	}
 
-	operationType, operationExists := s.operationNamesMap[operationName]
+	operationType, operationExists := s.operationDefs[rpcName][operationName]
 	if !operationExists {
 		res := Response[any]{
 			Ok:    false,
-			Error: Error{Message: "Invalid operation name"},
+			Error: Error{Message: fmt.Sprintf("Invalid operation: %s.%s", rpcName, operationName)},
 		}
 		return s.writeProcResponse(httpAdapter, res)
 	}
 
 	// Build the unified handler context (raw input at this point).
 	c := &HandlerContext[T, any]{
-		Input:         rawInput,
-		Props:         props,
-		Context:       ctx,
-		operationName: operationName,
-		operationType: operationType,
+		Input:   rawInput,
+		Props:   props,
+		Context: ctx,
+		operation: OperationDefinition{
+			RPCName: rpcName,
+			Name:    operationName,
+			Type:    operationType,
+		},
 	}
 
 	// Handle Stream
 	if operationType == OperationTypeStream {
-		err := s.handleStreamRequest(c, operationName, rawInput, httpAdapter)
+		err := s.handleStreamRequest(c, rpcName, operationName, rawInput, httpAdapter)
 
 		// If no error, return without sending any response
 		if err == nil {
@@ -444,7 +493,7 @@ func (s *internalServer[T]) handleRequest(
 	}
 
 	// Handle Procedure
-	output, err := s.handleProcRequest(c, operationName, rawInput)
+	output, err := s.handleProcRequest(c, rpcName, operationName, rawInput)
 	response := Response[any]{}
 	if err != nil {
 		response.Ok = false
@@ -461,21 +510,23 @@ func (s *internalServer[T]) handleRequest(
 // It returns the procedure output (as any) and an error if the handler failed.
 func (s *internalServer[T]) handleProcRequest(
 	c *HandlerContext[T, any],
+	rpcName string,
 	procName string,
 	rawInput json.RawMessage,
 ) (any, error) {
 	// Snapshot handler, middlewares, and deserializer under read lock
 	s.handlersMu.RLock()
-	baseHandler, ok := s.procHandlers[procName]
-	mws := s.procMiddlewares[procName]
-	deserialize := s.procDeserializers[procName]
+	baseHandler, ok := s.procHandlers[rpcName][procName]
+	mws := s.procMiddlewares[rpcName][procName]
+	rpcMws := s.rpcMiddlewares[rpcName]
+	deserialize := s.procDeserializers[rpcName][procName]
 	s.handlersMu.RUnlock()
 
 	if !ok {
-		return nil, fmt.Errorf("%s procedure not implemented", procName)
+		return nil, fmt.Errorf("%s.%s procedure not implemented", rpcName, procName)
 	}
 	if deserialize == nil {
-		return nil, fmt.Errorf("%s procedure deserializer not registered", procName)
+		return nil, fmt.Errorf("%s.%s procedure deserializer not registered", rpcName, procName)
 	}
 
 	// Deserialize, validate and transform input into its typed form
@@ -494,8 +545,16 @@ func (s *internalServer[T]) handleProcRequest(
 		}
 	}
 
-	// Wrap the specific chain with global middlewares (executed before specific ones)
+	// Wrap the specific chain with RPC-level middlewares (executed before specific ones)
 	exec := func(c *HandlerContext[T, any]) (any, error) { return final(c) }
+	if len(rpcMws) > 0 {
+		mwChain := append([]GlobalMiddlewareFunc[T](nil), rpcMws...)
+		for i := len(mwChain) - 1; i >= 0; i-- {
+			exec = mwChain[i](exec)
+		}
+	}
+
+	// Wrap the chain with global middlewares (executed before RPC-level ones)
 	if len(s.globalMiddlewares) > 0 {
 		mwChain := append([]GlobalMiddlewareFunc[T](nil), s.globalMiddlewares...)
 		for i := len(mwChain) - 1; i >= 0; i-- {
@@ -510,16 +569,18 @@ func (s *internalServer[T]) handleProcRequest(
 // composes emit middlewares, and executes the stream handler.
 func (s *internalServer[T]) handleStreamRequest(
 	c *HandlerContext[T, any],
+	rpcName string,
 	streamName string,
 	rawInput json.RawMessage,
 	httpAdapter HTTPAdapter,
 ) error {
 	// Snapshot handler, middlewares, emit middlewares and deserializer under read lock
 	s.handlersMu.RLock()
-	baseHandler, ok := s.streamHandlers[streamName]
-	streamMws := s.streamMiddlewares[streamName]
-	emitMws := s.streamEmitMiddlewares[streamName]
-	deserialize := s.streamDeserializers[streamName]
+	baseHandler, ok := s.streamHandlers[rpcName][streamName]
+	streamMws := s.streamMiddlewares[rpcName][streamName]
+	emitMws := s.streamEmitMiddlewares[rpcName][streamName]
+	rpcMws := s.rpcMiddlewares[rpcName]
+	deserialize := s.streamDeserializers[rpcName][streamName]
 	s.handlersMu.RUnlock()
 
 	// Set SSE headers to the response
@@ -528,10 +589,10 @@ func (s *internalServer[T]) handleStreamRequest(
 	httpAdapter.SetHeader("Connection", "keep-alive")
 
 	if !ok {
-		return fmt.Errorf("%s stream not implemented", streamName)
+		return fmt.Errorf("%s.%s stream not implemented", rpcName, streamName)
 	}
 	if deserialize == nil {
-		return fmt.Errorf("%s stream deserializer not registered", streamName)
+		return fmt.Errorf("%s.%s stream deserializer not registered", rpcName, streamName)
 	}
 
 	// Deserialize, validate and transform input into its typed form
@@ -579,8 +640,16 @@ func (s *internalServer[T]) handleStreamRequest(
 		}
 	}
 
-	// Wrap the specific stream chain with global middlewares (executed before specific ones)
+	// Wrap the specific stream chain with RPC-level middlewares (executed before specific ones)
 	exec := func(c *HandlerContext[T, any]) (any, error) { return nil, final(c, emitFinal) }
+	if len(rpcMws) > 0 {
+		mwChain := append([]GlobalMiddlewareFunc[T](nil), rpcMws...)
+		for i := len(mwChain) - 1; i >= 0; i-- {
+			exec = mwChain[i](exec)
+		}
+	}
+
+	// Wrap with global middlewares (executed before RPC-level ones)
 	if len(s.globalMiddlewares) > 0 {
 		mwChain := append([]GlobalMiddlewareFunc[T](nil), s.globalMiddlewares...)
 		for i := len(mwChain) - 1; i >= 0; i-- {

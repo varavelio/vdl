@@ -13,6 +13,20 @@ import (
 // Core Types
 // -----------------------------------------------------------------------------
 
+type OperationType string
+
+const (
+	OperationTypeProc   OperationType = "proc"
+	OperationTypeStream OperationType = "stream"
+)
+
+// OperationDefinition represents the definition of a VDL operation (proc or stream).
+type OperationDefinition struct {
+	RPCName string
+	Name    string
+	Type    OperationType
+}
+
 // Response represents the response of a VDL call.
 type Response[T any] struct {
 	Ok     bool  `json:"ok"`

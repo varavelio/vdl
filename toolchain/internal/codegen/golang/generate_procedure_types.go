@@ -45,12 +45,11 @@ func generateProcedureTypes(schema *ir.Schema, _ *config.GoConfig) (string, erro
 	}
 
 	// Generate list of all procedure names
-	g.Line("// VDLProcedureNames is a list of all procedure names.")
-	g.Line("var VDLProcedureNames = []string{")
+	g.Line("// VDLProcedureNames is a list of all procedure definitions.")
+	g.Line("var VDLProcedureNames = []OperationDefinition{")
 	g.Block(func() {
 		for _, proc := range schema.Procedures {
-			procName := proc.FullName()
-			g.Linef("%q,", procName)
+			g.Linef("{RPCName: %q, Name: %q, Type: OperationTypeProc},", proc.RPCName, proc.Name)
 		}
 	})
 	g.Line("}")

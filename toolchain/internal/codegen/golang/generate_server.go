@@ -47,8 +47,7 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("type Server[T any] struct {")
 	g.Block(func() {
 		g.Line("intServer *internalServer[T]")
-		g.Line("Procs     *serverProcRegistry[T]")
-		g.Line("Streams   *serverStreamRegistry[T]")
+		g.Line("RPCs      *serverRPCRegistry[T]")
 	})
 	g.Line("}")
 	g.Break()
@@ -69,8 +68,7 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 		g.Line("return &Server[T]{")
 		g.Block(func() {
 			g.Line("intServer: intServer,")
-			g.Line("Procs:     newServerProcRegistry(intServer),")
-			g.Line("Streams:   newServerStreamRegistry(intServer),")
+			g.Line("RPCs:      newServerRPCRegistry(intServer),")
 		})
 		g.Line("}")
 	})
@@ -98,39 +96,25 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("//       props := AppProps{UserID: \"abc\"}")
 	g.Line("//       op := r.PathValue(\"operationName\")")
 	g.Line("//       adapter := NewNetHTTPAdapter(w, r)")
-	g.Line("//       _ = server.HandleRequest(ctx, props, op, adapter)")
+	g.Line("//       _ = server.HandleRequest(ctx, props, \"MyRpc\", op, adapter)")
 	g.Line("//   })")
-	g.Line("func (s *Server[T]) HandleRequest(ctx context.Context, props T, operationName string, httpAdapter HTTPAdapter) error {")
+	g.Line("func (s *Server[T]) HandleRequest(ctx context.Context, props T, rpcName, operationName string, httpAdapter HTTPAdapter) error {")
 	g.Block(func() {
-		g.Line("return s.intServer.handleRequest(ctx, props, operationName, httpAdapter)")
+		g.Line("return s.intServer.handleRequest(ctx, props, rpcName, operationName, httpAdapter)")
 	})
 	g.Line("}")
 	g.Break()
 
-	g.Line("type serverProcRegistry[T any] struct {")
+	g.Line("type serverRPCRegistry[T any] struct {")
 	g.Block(func() {
 		g.Line("intServer *internalServer[T]")
 	})
 	g.Line("}")
 	g.Break()
 
-	g.Line("func newServerProcRegistry[T any](intServer *internalServer[T]) *serverProcRegistry[T] {")
+	g.Line("func newServerRPCRegistry[T any](intServer *internalServer[T]) *serverRPCRegistry[T] {")
 	g.Block(func() {
-		g.Line("return &serverProcRegistry[T]{intServer: intServer}")
-	})
-	g.Line("}")
-	g.Break()
-
-	g.Line("type serverStreamRegistry[T any] struct {")
-	g.Block(func() {
-		g.Line("intServer *internalServer[T]")
-	})
-	g.Line("}")
-	g.Break()
-
-	g.Line("func newServerStreamRegistry[T any](intServer *internalServer[T]) *serverStreamRegistry[T] {")
-	g.Block(func() {
-		g.Line("return &serverStreamRegistry[T]{intServer: intServer}")
+		g.Line("return &serverRPCRegistry[T]{intServer: intServer}")
 	})
 	g.Line("}")
 	g.Break()
@@ -146,20 +130,73 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 	g := gen.New().WithTabs()
 
+	rpcName := rpc.Name
+	rpcStructName := fmt.Sprintf("server%sRPC", rpcName)
+	procsStructName := fmt.Sprintf("server%sProcs", rpcName)
+	streamsStructName := fmt.Sprintf("server%sStreams", rpcName)
+
+	// 1. Method on serverRPCRegistry to get this RPC
+	g.Linef("// %s returns the registry for the %s RPC service.", rpcName, rpcName)
+	g.Linef("func (r *serverRPCRegistry[T]) %s() *%s[T] {", rpcName, rpcStructName)
+	g.Block(func() {
+		g.Linef("return &%s[T]{", rpcStructName)
+		g.Line("intServer: r.intServer,")
+		g.Linef("Procs: &%s[T]{intServer: r.intServer},", procsStructName)
+		g.Linef("Streams: &%s[T]{intServer: r.intServer},", streamsStructName)
+		g.Line("}")
+	})
+	g.Line("}")
+	g.Break()
+
+	// 2. Struct for this RPC
+	g.Linef("type %s[T any] struct {", rpcStructName)
+	g.Block(func() {
+		g.Line("intServer *internalServer[T]")
+		g.Linef("Procs     *%s[T]", procsStructName)
+		g.Linef("Streams   *%s[T]", streamsStructName)
+	})
+	g.Line("}")
+	g.Break()
+
+	// 3. Use method for this RPC
+	g.Linef("// Use registers a middleware that executes for every request within the %s RPC.", rpcName)
+	g.Linef("func (r *%s[T]) Use(mw GlobalMiddlewareFunc[T]) {", rpcStructName)
+	g.Block(func() {
+		g.Linef("r.intServer.addRPCMiddleware(%q, mw)", rpcName)
+	})
+	g.Line("}")
+	g.Break()
+
+	// 4. Procs Registry Struct
+	g.Linef("type %s[T any] struct {", procsStructName)
+	g.Block(func() {
+		g.Line("intServer *internalServer[T]")
+	})
+	g.Line("}")
+	g.Break()
+
+	// 5. Streams Registry Struct
+	g.Linef("type %s[T any] struct {", streamsStructName)
+	g.Block(func() {
+		g.Line("intServer *internalServer[T]")
+	})
+	g.Line("}")
+	g.Break()
+
 	// Procedures
 	for _, proc := range rpc.Procs {
-		name := rpc.Name + proc.Name
+		uniqueName := rpc.Name + proc.Name
 
-		g.Linef("// Register the %s procedure.", name)
-		g.Linef("func (r *serverProcRegistry[T]) %s() proc%sEntry[T] {", name, name)
+		g.Linef("// Register the %s procedure.", proc.Name)
+		g.Linef("func (r *%s[T]) %s() proc%sEntry[T] {", procsStructName, proc.Name, uniqueName)
 		g.Block(func() {
-			g.Linef("return proc%sEntry[T]{intServer: r.intServer}", name)
+			g.Linef("return proc%sEntry[T]{intServer: r.intServer}", uniqueName)
 		})
 		g.Line("}")
 		g.Break()
 
-		g.Linef("// proc%sEntry contains the typed API for the %s procedure.", name, name)
-		g.Linef("type proc%sEntry[T any] struct {", name)
+		g.Linef("// proc%sEntry contains the typed API for the %s procedure.", uniqueName, uniqueName)
+		g.Linef("type proc%sEntry[T any] struct {", uniqueName)
 		g.Block(func() {
 			g.Line("intServer *internalServer[T]")
 		})
@@ -167,14 +204,14 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Break()
 
 		// Generate type aliases
-		g.Linef("// Type aliases for %s procedure", name)
-		g.Linef("type %sHandlerContext[T any] = HandlerContext[T, %sInput]", name, name)
-		g.Linef("type %sHandlerFunc[T any] func(c *%sHandlerContext[T]) (%sOutput, error)", name, name, name)
-		g.Linef("type %sMiddlewareFunc[T any] func(next %sHandlerFunc[T]) %sHandlerFunc[T]", name, name, name)
+		g.Linef("// Type aliases for %s procedure", uniqueName)
+		g.Linef("type %sHandlerContext[T any] = HandlerContext[T, %sInput]", uniqueName, uniqueName)
+		g.Linef("type %sHandlerFunc[T any] func(c *%sHandlerContext[T]) (%sOutput, error)", uniqueName, uniqueName, uniqueName)
+		g.Linef("type %sMiddlewareFunc[T any] func(next %sHandlerFunc[T]) %sHandlerFunc[T]", uniqueName, uniqueName, uniqueName)
 		g.Break()
 
 		// Use (procedure middleware)
-		g.Linef("// Use registers a typed middleware for the %s procedure.", name)
+		g.Linef("// Use registers a typed middleware for the %s procedure.", uniqueName)
 		g.Line("//")
 		g.Line("// The middleware wraps the business handler registered with Handle, allowing you")
 		g.Line("// to implement cross-cutting concerns such as validation, logging, auth, or")
@@ -186,7 +223,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			renderDoc(g, proc.Doc, true)
 		}
 		renderDeprecated(g, proc.Deprecated)
-		g.Linef("func (e proc%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", name, name)
+		g.Linef("func (e proc%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next ProcHandlerFunc[T, any, any]) ProcHandlerFunc[T, any, any] {")
 			g.Block(func() {
@@ -195,7 +232,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 				g.Block(func() {
 					g.Line("// Create a type-safe 'next' function for the specific middleware to call.")
 					g.Line("// This function acts as a bridge to translate the call back into the generic world.")
-					g.Linef("typedNext := func(c *%sHandlerContext[T]) (%sOutput, error) {", name, name)
+					g.Linef("typedNext := func(c *%sHandlerContext[T]) (%sOutput, error) {", uniqueName, uniqueName)
 					g.Block(func() {
 						g.Line("// Crucially, sync mutations from the specific context back to the generic")
 						g.Line("// context before proceeding down the chain.")
@@ -207,13 +244,13 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 						g.Line("if err != nil {")
 						g.Block(func() {
 							g.Line("// On error, return the zero value for the specific output type.")
-							g.Linef("var zero %sOutput", name)
+							g.Linef("var zero %sOutput", uniqueName)
 							g.Line("return zero, err")
 						})
 						g.Line("}")
 
 						g.Line("// On success, assert the 'any' output to the specific output type.")
-						g.Linef("specificOutput, _ := genericOutput.(%sOutput)", name)
+						g.Linef("specificOutput, _ := genericOutput.(%sOutput)", uniqueName)
 						g.Line("return specificOutput, nil")
 					})
 					g.Line("}")
@@ -224,14 +261,19 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 					g.Line("// Prepare the initial arguments for the typed chain by creating a")
 					g.Line("// specific context from the generic one.")
-					g.Linef("input, _ := cGeneric.Input.(%sInput)", name)
-					g.Linef("cSpecific := &%sHandlerContext[T]{", name)
+					g.Linef("input, _ := cGeneric.Input.(%sInput)", uniqueName)
+					g.Linef("cSpecific := &%sHandlerContext[T]{", uniqueName)
 					g.Block(func() {
-						g.Line("Input:         input,")
-						g.Line("Props:         cGeneric.Props,")
-						g.Line("Context:       cGeneric.Context,")
-						g.Line("operationName: cGeneric.operationName,")
-						g.Line("operationType: cGeneric.operationType,")
+						g.Line("Input:   input,")
+						g.Line("Props:   cGeneric.Props,")
+						g.Line("Context: cGeneric.Context,")
+						g.Line("operation: OperationDefinition{")
+						g.Block(func() {
+							g.Line("RPCName: cGeneric.RPCName(),")
+							g.Line("Name:    cGeneric.OperationName(),")
+							g.Line("Type:    cGeneric.OperationType(),")
+						})
+						g.Line("},")
 					})
 					g.Line("}")
 
@@ -241,13 +283,13 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 				g.Line("}")
 			})
 			g.Line("}")
-			g.Linef("e.intServer.addProcMiddleware(%q, adapted)", name)
+			g.Linef("e.intServer.addProcMiddleware(%q, %q, adapted)", rpcName, proc.Name)
 		})
 		g.Line("}")
 		g.Break()
 
 		// Handle (procedure handler)
-		g.Linef("// Handle registers the business handler for the %s procedure.", name)
+		g.Linef("// Handle registers the business handler for the %s procedure.", uniqueName)
 		g.Line("//")
 		g.Line("// The server will:")
 		g.Line("//  1) Deserialize and validate the input using generated pre* types")
@@ -257,20 +299,25 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			renderDoc(g, proc.Doc, true)
 		}
 		renderDeprecated(g, proc.Deprecated)
-		g.Linef("func (e proc%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", name, name)
+		g.Linef("func (e proc%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any]) (any, error) {")
 			g.Block(func() {
 				g.Line("// Create the specific context from the generic one provided by the server.")
 				g.Line("// It's assumed a higher layer guarantees the type is correct.")
-				g.Linef("input, _ := cGeneric.Input.(%sInput)", name)
-				g.Linef("cSpecific := &%sHandlerContext[T]{", name)
+				g.Linef("input, _ := cGeneric.Input.(%sInput)", uniqueName)
+				g.Linef("cSpecific := &%sHandlerContext[T]{", uniqueName)
 				g.Block(func() {
-					g.Line("Input:         input,")
-					g.Line("Props:         cGeneric.Props,")
-					g.Line("Context:       cGeneric.Context,")
-					g.Line("operationName: cGeneric.operationName,")
-					g.Line("operationType: cGeneric.operationType,")
+					g.Line("Input:   input,")
+					g.Line("Props:   cGeneric.Props,")
+					g.Line("Context: cGeneric.Context,")
+					g.Line("operation: OperationDefinition{")
+					g.Block(func() {
+						g.Line("RPCName: cGeneric.RPCName(),")
+						g.Line("Name:    cGeneric.OperationName(),")
+						g.Line("Type:    cGeneric.OperationType(),")
+					})
+					g.Line("},")
 				})
 				g.Line("}")
 
@@ -282,9 +329,9 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 			g.Linef("deserializer := func(raw json.RawMessage) (any, error) {")
 			g.Block(func() {
-				g.Linef("var pre pre%sInput", name)
+				g.Linef("var pre pre%sInput", uniqueName)
 				g.Line("if err := json.Unmarshal(raw, &pre); err != nil {")
-				g.Block(func() { g.Linef("return nil, fmt.Errorf(\"failed to unmarshal %s input: %%w\", err)", name) })
+				g.Block(func() { g.Linef("return nil, fmt.Errorf(\"failed to unmarshal %s input: %%w\", err)", uniqueName) })
 				g.Line("}")
 				g.Line("if err := pre.validate(); err != nil { return nil, err }")
 				g.Line("typed := pre.transform()")
@@ -292,7 +339,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			})
 			g.Line("}")
 
-			g.Linef("e.intServer.setProcHandler(%q, adaptedHandler, deserializer)", name)
+			g.Linef("e.intServer.setProcHandler(%q, %q, adaptedHandler, deserializer)", rpcName, proc.Name)
 		})
 		g.Line("}")
 		g.Break()
@@ -300,18 +347,18 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 	// Streams
 	for _, stream := range rpc.Streams {
-		name := rpc.Name + stream.Name
+		uniqueName := rpc.Name + stream.Name
 
-		g.Linef("// Register the %s stream.", name)
-		g.Linef("func (r *serverStreamRegistry[T]) %s() stream%sEntry[T] {", name, name)
+		g.Linef("// Register the %s stream.", stream.Name)
+		g.Linef("func (r *%s[T]) %s() stream%sEntry[T] {", streamsStructName, stream.Name, uniqueName)
 		g.Block(func() {
-			g.Linef("return stream%sEntry[T]{intServer: r.intServer}", name)
+			g.Linef("return stream%sEntry[T]{intServer: r.intServer}", uniqueName)
 		})
 		g.Line("}")
 		g.Break()
 
-		g.Linef("// stream%sEntry contains the typed API for the %s stream.", name, name)
-		g.Linef("type stream%sEntry[T any] struct {", name)
+		g.Linef("// stream%sEntry contains the typed API for the %s stream.", uniqueName, uniqueName)
+		g.Linef("type stream%sEntry[T any] struct {", uniqueName)
 		g.Block(func() {
 			g.Line("intServer *internalServer[T]")
 		})
@@ -319,27 +366,27 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Break()
 
 		// Generate type aliases
-		g.Linef("// Type aliases for %s stream", name)
-		g.Linef("type %sHandlerContext[T any] = HandlerContext[T, %sInput]", name, name)
-		g.Linef("type %sEmitFunc[T any] func(c *%sHandlerContext[T], output %sOutput) error", name, name, name)
-		g.Linef("type %sHandlerFunc[T any] func(c *%sHandlerContext[T], emit %sEmitFunc[T]) error", name, name, name)
-		g.Linef("type %sMiddlewareFunc[T any] func(next %sHandlerFunc[T]) %sHandlerFunc[T]", name, name, name)
-		g.Linef("type %sEmitMiddlewareFunc[T any] func(next %sEmitFunc[T]) %sEmitFunc[T]", name, name, name)
+		g.Linef("// Type aliases for %s stream", uniqueName)
+		g.Linef("type %sHandlerContext[T any] = HandlerContext[T, %sInput]", uniqueName, uniqueName)
+		g.Linef("type %sEmitFunc[T any] func(c *%sHandlerContext[T], output %sOutput) error", uniqueName, uniqueName, uniqueName)
+		g.Linef("type %sHandlerFunc[T any] func(c *%sHandlerContext[T], emit %sEmitFunc[T]) error", uniqueName, uniqueName, uniqueName)
+		g.Linef("type %sMiddlewareFunc[T any] func(next %sHandlerFunc[T]) %sHandlerFunc[T]", uniqueName, uniqueName, uniqueName)
+		g.Linef("type %sEmitMiddlewareFunc[T any] func(next %sEmitFunc[T]) %sEmitFunc[T]", uniqueName, uniqueName, uniqueName)
 		g.Break()
 
 		// Generate Use (stream middleware)
-		g.Linef("// Use registers a typed middleware for the %s stream.", name)
+		g.Linef("// Use registers a typed middleware for the %s stream.", uniqueName)
 		g.Linef("//")
-		g.Linef("// This function allows you to add a middleware specific to the %s stream.", name)
+		g.Linef("// This function allows you to add a middleware specific to the %s stream.", uniqueName)
 		g.Linef("// The middleware is applied to the stream's handler chain, enabling you to intercept,")
-		g.Linef("// modify, or augment the handling of incoming stream requests for %s.", name)
+		g.Linef("// modify, or augment the handling of incoming stream requests for %s.", uniqueName)
 		g.Line("//")
 		g.Line("// Execution order: middlewares run in registration order, then the handler.")
 		if stream.Doc != "" {
 			renderDoc(g, stream.Doc, true)
 		}
 		renderDeprecated(g, stream.Deprecated)
-		g.Linef("func (e stream%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", name, name)
+		g.Linef("func (e stream%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next StreamHandlerFunc[T, any, any]) StreamHandlerFunc[T, any, any] {")
 			g.Block(func() {
@@ -348,7 +395,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 				g.Block(func() {
 					g.Line("// Create a type-safe 'next' function for the specific middleware to call.")
 					g.Line("// This function acts as a bridge to translate the call back into the generic world.")
-					g.Linef("typedNext := func(c *%sHandlerContext[T], emit %sEmitFunc[T]) error {", name, name)
+					g.Linef("typedNext := func(c *%sHandlerContext[T], emit %sEmitFunc[T]) error {", uniqueName, uniqueName)
 					g.Block(func() {
 						g.Line("// Crucially, sync mutations from the specific context back to the generic")
 						g.Line("// context before proceeding down the chain.")
@@ -366,7 +413,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 					g.Line("// Create a type-safe 'emit' function that delegates to the generic one.")
 					g.Line("// It uses 'cGeneric' from the outer scope, which is the correct context.")
-					g.Linef("emitSpecific := func(c *%sHandlerContext[T], output %sOutput) error {", name, name)
+					g.Linef("emitSpecific := func(c *%sHandlerContext[T], output %sOutput) error {", uniqueName, uniqueName)
 					g.Block(func() {
 						g.Line("return emitGeneric(cGeneric, output)")
 					})
@@ -374,14 +421,19 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 					g.Line("// Prepare the initial arguments for the typed chain by creating a")
 					g.Line("// specific context from the generic one.")
-					g.Linef("input, _ := cGeneric.Input.(%sInput)", name)
-					g.Linef("cSpecific := &%sHandlerContext[T]{", name)
+					g.Linef("input, _ := cGeneric.Input.(%sInput)", uniqueName)
+					g.Linef("cSpecific := &%sHandlerContext[T]{", uniqueName)
 					g.Block(func() {
-						g.Line("Input:         input,")
-						g.Line("Props:         cGeneric.Props,")
-						g.Line("Context:       cGeneric.Context,")
-						g.Line("operationName: cGeneric.operationName,")
-						g.Line("operationType: cGeneric.operationType,")
+						g.Line("Input:   input,")
+						g.Line("Props:   cGeneric.Props,")
+						g.Line("Context: cGeneric.Context,")
+						g.Line("operation: OperationDefinition{")
+						g.Block(func() {
+							g.Line("RPCName: cGeneric.RPCName(),")
+							g.Line("Name:    cGeneric.OperationName(),")
+							g.Line("Type:    cGeneric.OperationType(),")
+						})
+						g.Line("},")
 					})
 					g.Line("}")
 
@@ -391,13 +443,13 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 				g.Line("}")
 			})
 			g.Line("}")
-			g.Linef("e.intServer.addStreamMiddleware(%q, adapted)", name)
+			g.Linef("e.intServer.addStreamMiddleware(%q, %q, adapted)", rpcName, stream.Name)
 		})
 		g.Line("}")
 		g.Break()
 
 		// UseEmit (emit middleware)
-		g.Linef("// UseEmit registers a typed emit middleware for the %s stream.", name)
+		g.Linef("// UseEmit registers a typed emit middleware for the %s stream.", uniqueName)
 		g.Line("//")
 		g.Line("// Emit middlewares wrap every call to emit inside your handler, allowing you to")
 		g.Line("// transform, filter, decorate, or audit outgoing events in a type-safe way.")
@@ -407,7 +459,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			renderDoc(g, stream.Doc, true)
 		}
 		renderDeprecated(g, stream.Deprecated)
-		g.Linef("func (e stream%sEntry[T]) UseEmit(mw %sEmitMiddlewareFunc[T]) {", name, name)
+		g.Linef("func (e stream%sEntry[T]) UseEmit(mw %sEmitMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next EmitFunc[T, any, any]) EmitFunc[T, any, any] {")
 			g.Block(func() {
@@ -416,7 +468,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 				g.Block(func() {
 					g.Line("// Create a type-safe 'next' function for the specific emit middleware to call.")
 					g.Line("// This function acts as a bridge, calling the original generic 'next' function.")
-					g.Linef("typedNext := func(c *%sHandlerContext[T], output %sOutput) error {", name, name)
+					g.Linef("typedNext := func(c *%sHandlerContext[T], output %sOutput) error {", uniqueName, uniqueName)
 					g.Block(func() {
 						g.Line("// Crucially, sync mutations from the specific context back to the generic")
 						g.Line("// context before proceeding down the chain.")
@@ -434,17 +486,22 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 					g.Line("// Prepare the arguments for the typed chain by creating a specific context")
 					g.Line("// and asserting the output type.")
-					g.Linef("input, _ := cGeneric.Input.(%sInput)", name)
-					g.Linef("cSpecific := &%sHandlerContext[T]{", name)
+					g.Linef("input, _ := cGeneric.Input.(%sInput)", uniqueName)
+					g.Linef("cSpecific := &%sHandlerContext[T]{", uniqueName)
 					g.Block(func() {
-						g.Line("Input:         input,")
-						g.Line("Props:         cGeneric.Props,")
-						g.Line("Context:       cGeneric.Context,")
-						g.Line("operationName: cGeneric.operationName,")
-						g.Line("operationType: cGeneric.operationType,")
+						g.Line("Input:   input,")
+						g.Line("Props:   cGeneric.Props,")
+						g.Line("Context: cGeneric.Context,")
+						g.Line("operation: OperationDefinition{")
+						g.Block(func() {
+							g.Line("RPCName: cGeneric.RPCName(),")
+							g.Line("Name:    cGeneric.OperationName(),")
+							g.Line("Type:    cGeneric.OperationType(),")
+						})
+						g.Line("},")
 					})
 					g.Line("}")
-					g.Linef("outputSpecific, _ := outputGeneric.(%sOutput)", name)
+					g.Linef("outputSpecific, _ := outputGeneric.(%sOutput)", uniqueName)
 
 					g.Line("// Execute the fully composed, type-safe emit middleware chain.")
 					g.Line("return emitChain(cSpecific, outputSpecific)")
@@ -452,13 +509,13 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 				g.Line("}")
 			})
 			g.Line("}")
-			g.Linef("e.intServer.addStreamEmitMiddleware(%q, adapted)", name)
+			g.Linef("e.intServer.addStreamEmitMiddleware(%q, %q, adapted)", rpcName, stream.Name)
 		})
 		g.Line("}")
 		g.Break()
 
 		// Handle (stream handler)
-		g.Linef("// Handle registers the business handler for the %s stream.", name)
+		g.Linef("// Handle registers the business handler for the %s stream.", uniqueName)
 		g.Line("//")
 		g.Line("// The server will:")
 		g.Line("//  1) Deserialize and validate the input using generated pre* types")
@@ -468,13 +525,13 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			renderDoc(g, stream.Doc, true)
 		}
 		renderDeprecated(g, stream.Deprecated)
-		g.Linef("func (e stream%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", name, name)
+		g.Linef("func (e stream%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any], emitGeneric EmitFunc[T, any, any]) error {")
 			g.Block(func() {
 				g.Line("// Create the specific, type-safe emit function by wrapping the generic one.")
 				g.Line("// It uses 'cGeneric' from the outer scope, which has the correct type for the generic call.")
-				g.Linef("emitSpecific := func(c *%sHandlerContext[T], output %sOutput) error {", name, name)
+				g.Linef("emitSpecific := func(c *%sHandlerContext[T], output %sOutput) error {", uniqueName, uniqueName)
 				g.Block(func() {
 					g.Line("return emitGeneric(cGeneric, output)")
 				})
@@ -482,14 +539,19 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 				g.Line("// Create the specific context from the generic one provided by the server.")
 				g.Line("// It's assumed a higher layer guarantees the type is correct.")
-				g.Linef("input, _ := cGeneric.Input.(%sInput)", name)
-				g.Linef("cSpecific := &%sHandlerContext[T]{", name)
+				g.Linef("input, _ := cGeneric.Input.(%sInput)", uniqueName)
+				g.Linef("cSpecific := &%sHandlerContext[T]{", uniqueName)
 				g.Block(func() {
-					g.Line("Input:         input,")
-					g.Line("Props:         cGeneric.Props,")
-					g.Line("Context:       cGeneric.Context,")
-					g.Line("operationName: cGeneric.operationName,")
-					g.Line("operationType: cGeneric.operationType,")
+					g.Line("Input:   input,")
+					g.Line("Props:   cGeneric.Props,")
+					g.Line("Context: cGeneric.Context,")
+					g.Line("operation: OperationDefinition{")
+					g.Block(func() {
+						g.Line("RPCName: cGeneric.RPCName(),")
+						g.Line("Name:    cGeneric.OperationName(),")
+						g.Line("Type:    cGeneric.OperationType(),")
+					})
+					g.Line("},")
 				})
 				g.Line("}")
 
@@ -500,9 +562,9 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 
 			g.Linef("deserializer := func(raw json.RawMessage) (any, error) {")
 			g.Block(func() {
-				g.Linef("var pre pre%sInput", name)
+				g.Linef("var pre pre%sInput", uniqueName)
 				g.Line("if err := json.Unmarshal(raw, &pre); err != nil {")
-				g.Block(func() { g.Linef("return nil, fmt.Errorf(\"failed to unmarshal %s input: %%w\", err)", name) })
+				g.Block(func() { g.Linef("return nil, fmt.Errorf(\"failed to unmarshal %s input: %%w\", err)", uniqueName) })
 				g.Line("}")
 				g.Line("if err := pre.validate(); err != nil { return nil, err }")
 				g.Line("typed := pre.transform()")
@@ -510,7 +572,7 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 			})
 			g.Line("}")
 
-			g.Linef("e.intServer.setStreamHandler(%q, adaptedHandler, deserializer)", name)
+			g.Linef("e.intServer.setStreamHandler(%q, %q, adaptedHandler, deserializer)", rpcName, stream.Name)
 		})
 		g.Line("}")
 		g.Break()

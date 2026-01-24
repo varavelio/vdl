@@ -45,12 +45,11 @@ func generateStreamTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) 
 	}
 
 	// Generate list of all stream names
-	g.Line("// VDLStreamNames is a list of all stream names.")
-	g.Line("var VDLStreamNames = []string{")
+	g.Line("// VDLStreamNames is a list of all stream definitions.")
+	g.Line("var VDLStreamNames = []OperationDefinition{")
 	g.Block(func() {
 		for _, stream := range schema.Streams {
-			streamName := stream.FullName()
-			g.Linef("%q,", streamName)
+			g.Linef("{RPCName: %q, Name: %q, Type: OperationTypeStream},", stream.RPCName, stream.Name)
 		}
 	})
 	g.Line("}")
