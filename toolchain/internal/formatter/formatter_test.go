@@ -10,7 +10,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-//go:embed tests/*.vdl
+//go:embed tests/*.vdlt
 var testFiles embed.FS
 
 func TestFormatEmptySchema(t *testing.T) {

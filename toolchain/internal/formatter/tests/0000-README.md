@@ -9,7 +9,7 @@ VDL Formatter.
 
 All test files must follow the naming convention:
 
-`NNNN-<descriptive-name>.vdl`
+`NNNN-<descriptive-name>.vdlt`
 
 Where:
 
@@ -17,7 +17,9 @@ Where:
 - `<descriptive-name>` briefly explains the purpose of the test (e.g.,
   `docstrings`, `nested-fields`).
 
-Example: `0001-simple-comment.vdl`
+Example: `0001-simple-comment.vdlt`
+
+We use vdlt to prevent the LSP to autimatically format the code.
 
 ## Test File Structure
 
