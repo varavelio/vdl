@@ -11,15 +11,6 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-//go:embed pieces/pubspec.yaml
-var pubspecRawPiece string
-
-//go:embed pieces/pubspec.lock
-var pubspecLockRawPiece string
-
-//go:embed pieces/.gitignore
-var gitignoreRawPiece string
-
 // File represents a generated file. This mirrors codegen.File to avoid import cycles.
 type File struct {
 	RelativePath string
@@ -54,7 +45,6 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		generateDomainTypes,
 		generateProcedureTypes,
 		generateStreamTypes,
-		generateClient,
 	}
 
 	// 1) Generate lib/client.dart
@@ -76,34 +66,12 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	libClientContent = strutil.LimitConsecutiveNewlines(libClientContent, 2)
 
 	dartClient := File{
-		RelativePath: "lib/client.dart",
+		RelativePath: "client.dart",
 		Content:      []byte(libClientContent),
-	}
-
-	// 2) Generate pubspec.yaml
-	pubspecContent := strings.ReplaceAll(pubspecRawPiece, "{{ package_name }}", g.config.Package)
-	pubspec := File{
-		RelativePath: "pubspec.yaml",
-		Content:      []byte(pubspecContent),
-	}
-
-	// 3) Generate pubspec.lock
-	pubspecLock := File{
-		RelativePath: "pubspec.lock",
-		Content:      []byte(pubspecLockRawPiece),
-	}
-
-	// 4) Generate .gitignore
-	gitignore := File{
-		RelativePath: ".gitignore",
-		Content:      []byte(gitignoreRawPiece),
 	}
 
 	return []File{
 		dartClient,
-		pubspec,
-		pubspecLock,
-		gitignore,
 	}, nil
 }
 

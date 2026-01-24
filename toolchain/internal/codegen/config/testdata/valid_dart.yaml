@@ -3,5 +3,3 @@ schema: ./schema.vdl
 targets:
   - dart:
       output: ./gen/dart
-      gen_client: true
-      package: my_dart_pkg

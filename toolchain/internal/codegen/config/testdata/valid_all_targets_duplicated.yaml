@@ -13,10 +13,8 @@ targets:
       output: ./d
   - dart:
       output: ./e
-      package: pkg
   - dart:
       output: ./f
-      package: pkg2
   - openapi:
       output: ./g
       title: API 1

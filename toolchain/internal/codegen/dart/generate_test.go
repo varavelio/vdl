@@ -20,10 +20,6 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -36,12 +32,12 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // client.dart, pubspec.yaml, pubspec.lock, .gitignore
+	require.Len(t, files, 1) // client.dart
 
 	// Find client.dart
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -54,10 +50,6 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -90,7 +82,7 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -109,7 +101,6 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -140,7 +131,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -165,7 +156,6 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -198,7 +188,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -215,7 +205,6 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -238,7 +227,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -255,10 +244,6 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -295,7 +280,7 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -306,12 +291,12 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	assert.Contains(t, clientContent, "class UsersGetUserOutput {")
 	assert.Contains(t, clientContent, "typedef UsersGetUserResponse = Response<UsersGetUserOutput>;")
 
-	// Check procedure path
+	// Check procedure path in metadata
 	assert.Contains(t, clientContent, "'users/getUser'")
 
-	// Check client implementation
-	assert.Contains(t, clientContent, "class _BuilderUsersGetUser {")
-	assert.Contains(t, clientContent, "Future<UsersGetUserOutput> execute(UsersGetUserInput input)")
+	// Check client implementation is NOT present
+	assert.NotContains(t, clientContent, "class _BuilderUsersGetUser")
+	assert.NotContains(t, clientContent, "Future<UsersGetUserOutput> execute(UsersGetUserInput input)")
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
@@ -319,10 +304,6 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -359,7 +340,7 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -370,12 +351,12 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 	assert.Contains(t, clientContent, "class ChatMessagesOutput {")
 	assert.Contains(t, clientContent, "typedef ChatMessagesResponse = Response<ChatMessagesOutput>;")
 
-	// Check stream path
+	// Check stream path in metadata
 	assert.Contains(t, clientContent, "'chat/messages'")
 
-	// Check client implementation
-	assert.Contains(t, clientContent, "class _BuilderChatMessagesStream {")
-	assert.Contains(t, clientContent, "_StreamHandle<ChatMessagesOutput> execute(ChatMessagesInput input)")
+	// Check client implementation is NOT present
+	assert.NotContains(t, clientContent, "class _BuilderChatMessagesStream")
+	assert.NotContains(t, clientContent, "_StreamHandle<ChatMessagesOutput> execute(ChatMessagesInput input)")
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
@@ -383,7 +364,6 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 		CommonConfig: config.CommonConfig{
 			Output: "output",
 		},
-		Package: "my_api",
 	})
 
 	schema := &ir.Schema{
@@ -451,7 +431,7 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	var clientContent string
 	for _, f := range files {
-		if f.RelativePath == "lib/client.dart" {
+		if f.RelativePath == "client.dart" {
 			clientContent = string(f.Content)
 			break
 		}
@@ -611,30 +591,4 @@ func TestConvertPatternToDartInterpolation(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
-}
-
-func TestGenerator_Generate_PubspecFiles(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
-		Package: "my_awesome_api",
-	})
-
-	schema := &ir.Schema{}
-
-	files, err := g.Generate(context.Background(), schema)
-	require.NoError(t, err)
-
-	// Find pubspec.yaml
-	var pubspecContent string
-	for _, f := range files {
-		if f.RelativePath == "pubspec.yaml" {
-			pubspecContent = string(f.Content)
-			break
-		}
-	}
-
-	// Check that package name is replaced
-	assert.Contains(t, pubspecContent, "my_awesome_api")
 }

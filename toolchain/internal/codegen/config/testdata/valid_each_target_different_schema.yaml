@@ -11,4 +11,3 @@ targets:
   - dart:
       output: ./gen/dart
       schema: ./dart-schema.vdl
-      package: my_dart

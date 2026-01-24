@@ -99,8 +99,6 @@ type DartConfig struct {
 	CommonConfig   `yaml:",inline" json:",inline"`
 	PatternsConfig `yaml:",inline" json:",inline"`
 	ConstsConfig   `yaml:",inline" json:",inline"`
-	ClientConfig   `yaml:",inline" json:",inline"`
-	Package        string `yaml:"package" json:"package" jsonschema:"required,description=The name of the Dart package."`
 }
 
 // JSONSchemaConfig contains configuration for the JSON Schema target.

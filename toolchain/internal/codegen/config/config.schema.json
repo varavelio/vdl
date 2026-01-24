@@ -28,22 +28,12 @@
           "type": "boolean",
           "description": "Generate constant definitions.",
           "default": true
-        },
-        "gen_client": {
-          "type": "boolean",
-          "description": "Generate RPC client code.",
-          "default": false
-        },
-        "package": {
-          "type": "string",
-          "description": "The name of the Dart package."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "output",
-        "package"
+        "output"
       ]
     },
     "GoConfig": {
