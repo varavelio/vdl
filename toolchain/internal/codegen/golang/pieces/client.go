@@ -21,13 +21,13 @@ import (
 
 // RetryConfig defines retry behavior for procedure calls.
 type RetryConfig struct {
-	// Maximum number of retry attempts (default: 3)
+	// Maximum number of retry attempts (default: 1)
 	MaxAttempts int
-	// Initial delay between retries (default: 1 second)
+	// Initial delay between retries (default: 0)
 	InitialDelay time.Duration
-	// Maximum delay between retries (default: 5 seconds)
+	// Maximum delay between retries (default: 0)
 	MaxDelay time.Duration
-	// Cumulative multiplier applied to initialDelayMs on each retry (default: 2.0)
+	// Cumulative multiplier applied to initialDelayMs on each retry (default: 1.0)
 	DelayMultiplier float64
 }
 
@@ -39,13 +39,13 @@ type TimeoutConfig struct {
 
 // ReconnectConfig defines reconnection behavior for stream calls.
 type ReconnectConfig struct {
-	// Maximum number of reconnection attempts (default: 5)
+	// Maximum number of reconnection attempts (default: 30)
 	MaxAttempts int
 	// Initial delay between reconnection attempts (default: 1 second)
 	InitialDelay time.Duration
-	// Maximum delay between reconnection attempts (default: 5 seconds)
+	// Maximum delay between reconnection attempts (default: 30 seconds)
 	MaxDelay time.Duration
-	// Cumulative multiplier applied to initialDelayMs on each retry (default: 2.0)
+	// Cumulative multiplier applied to initialDelayMs on each retry (default: 1.5)
 	DelayMultiplier float64
 }
 
