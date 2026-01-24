@@ -346,10 +346,10 @@ func (c *internalClient) mergeRetryConfig(rpcName string, opConf *RetryConfig) *
 		return c.globalRetryConf
 	}
 	return &RetryConfig{
-		MaxAttempts:     3,
-		InitialDelay:    1 * time.Second,
-		MaxDelay:        5 * time.Second,
-		DelayMultiplier: 2.0,
+		MaxAttempts:     1,
+		InitialDelay:    0,
+		MaxDelay:        0,
+		DelayMultiplier: 1.0,
 	}
 }
 
@@ -387,10 +387,10 @@ func (c *internalClient) mergeReconnectConfig(rpcName string, opConf *ReconnectC
 		return c.globalReconnectConf
 	}
 	return &ReconnectConfig{
-		MaxAttempts:     5,
+		MaxAttempts:     30,
 		InitialDelay:    1 * time.Second,
-		MaxDelay:        5 * time.Second,
-		DelayMultiplier: 2.0,
+		MaxDelay:        30 * time.Second,
+		DelayMultiplier: 1.5,
 	}
 }
 
