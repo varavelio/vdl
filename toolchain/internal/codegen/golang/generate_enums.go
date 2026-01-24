@@ -2,12 +2,10 @@ package golang
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generateEnums(schema *ir.Schema, config *config.GoConfig) (string, error) {
@@ -33,7 +31,7 @@ func generateEnums(schema *ir.Schema, config *config.GoConfig) (string, error) {
 func generateEnum(g *gen.Generator, enum ir.Enum) {
 	// Documentation
 	if enum.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(enum.Doc))
+		doc := enum.Doc
 		renderMultilineComment(g, doc)
 	} else {
 		g.Linef("// %s is an enumeration type.", enum.Name)

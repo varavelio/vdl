@@ -7,7 +7,6 @@ import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // generatePatterns generates TypeScript pattern template functions.
@@ -38,8 +37,7 @@ func generatePatterns(schema *ir.Schema, config *config.TypeScriptConfig) (strin
 func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 	// Generate doc comment
 	if pattern.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(pattern.Doc))
-		renderMultilineComment(g, doc)
+		renderMultilineComment(g, pattern.Doc)
 	} else if pattern.Deprecated != nil {
 		g.Linef("/**")
 		renderDeprecated(g, pattern.Deprecated)

@@ -1,12 +1,9 @@
 package golang
 
 import (
-	"strings"
-
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generateDomainTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) {
@@ -24,7 +21,7 @@ func generateDomainTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) 
 	for _, typeNode := range schema.Types {
 		desc := typeNode.Name + " is a domain type defined in VDL."
 		if typeNode.Doc != "" {
-			desc = strings.TrimSpace(strutil.NormalizeIndent(typeNode.Doc))
+			desc = typeNode.Doc
 		}
 
 		if typeNode.Deprecated != nil {

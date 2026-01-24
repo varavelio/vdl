@@ -7,7 +7,6 @@ import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // generatePatterns generates Dart pattern template functions.
@@ -38,7 +37,7 @@ func generatePatterns(schema *ir.Schema, config *config.DartConfig) (string, err
 func renderDartPattern(g *gen.Generator, pattern ir.Pattern) {
 	// Generate doc comment
 	if pattern.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(pattern.Doc))
+		doc := strings.TrimSpace(pattern.Doc)
 		renderMultilineCommentDart(g, doc)
 	}
 	if pattern.Deprecated != nil {

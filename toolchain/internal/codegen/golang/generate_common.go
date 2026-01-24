@@ -496,7 +496,7 @@ func renderDoc(g *gen.Generator, doc string, newLineBefore bool) {
 		g.Line("//")
 	}
 
-	renderMultilineComment(g, strings.TrimSpace(strutil.NormalizeIndent(doc)))
+	renderMultilineComment(g, doc)
 }
 
 // renderDeprecated renders a deprecation comment.

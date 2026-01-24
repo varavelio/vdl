@@ -1,12 +1,9 @@
 package golang
 
 import (
-	"strings"
-
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generateConstants(schema *ir.Schema, config *config.GoConfig) (string, error) {
@@ -36,8 +33,7 @@ func generateConstants(schema *ir.Schema, config *config.GoConfig) (string, erro
 func generateConstant(g *gen.Generator, constant ir.Constant) {
 	// Documentation
 	if constant.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(constant.Doc))
-		renderMultilineComment(g, doc)
+		renderMultilineComment(g, constant.Doc)
 	}
 
 	// Deprecation

@@ -6,7 +6,6 @@ import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generatePatterns(schema *ir.Schema, config *config.GoConfig) (string, error) {
@@ -36,7 +35,7 @@ func generatePatterns(schema *ir.Schema, config *config.GoConfig) (string, error
 func generatePattern(g *gen.Generator, pattern ir.Pattern) {
 	// Documentation
 	if pattern.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(pattern.Doc))
+		doc := pattern.Doc
 		renderMultilineComment(g, doc)
 	} else {
 		g.Linef("// %s generates a string from the pattern template.", pattern.Name)

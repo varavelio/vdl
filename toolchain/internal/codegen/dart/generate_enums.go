@@ -7,7 +7,6 @@ import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func generateEnums(schema *ir.Schema, _ *config.DartConfig) (string, error) {
@@ -33,7 +32,7 @@ func generateEnums(schema *ir.Schema, _ *config.DartConfig) (string, error) {
 func renderDartEnum(g *gen.Generator, enum ir.Enum) {
 	// Generate doc comment
 	if enum.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(enum.Doc))
+		doc := strings.TrimSpace(enum.Doc)
 		renderMultilineCommentDart(g, doc)
 	} else {
 		g.Linef("/// %s is an enumeration type.", enum.Name)

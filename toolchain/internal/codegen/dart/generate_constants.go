@@ -7,7 +7,6 @@ import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // generateConstants generates Dart constant definitions.
@@ -38,7 +37,7 @@ func generateConstants(schema *ir.Schema, config *config.DartConfig) (string, er
 func renderDartConstant(g *gen.Generator, constant ir.Constant) {
 	// Generate doc comment
 	if constant.Doc != "" {
-		doc := strings.TrimSpace(strutil.NormalizeIndent(constant.Doc))
+		doc := strings.TrimSpace(constant.Doc)
 		renderMultilineCommentDart(g, doc)
 	}
 	if constant.Deprecated != nil {
