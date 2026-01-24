@@ -83,7 +83,7 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("//   - read/augment the HandlerContext")
 	g.Line("//   - short-circuit by returning an error")
 	g.Line("//   - call next to continue the chain")
-	g.Line("func (s *Server[T]) Use(mw GlobalMiddleware[T]) { s.intServer.addGlobalMiddleware(mw) }")
+	g.Line("func (s *Server[T]) Use(mw GlobalMiddlewareFunc[T]) { s.intServer.addGlobalMiddleware(mw) }")
 	g.Break()
 
 	g.Line("// HandleRequest processes an incoming RPC request and drives the complete")

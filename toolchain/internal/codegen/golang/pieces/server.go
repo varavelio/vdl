@@ -54,7 +54,7 @@ type HTTPAdapter interface {
 
 // NetHTTPAdapter implements HTTPAdapter for Go's standard net/http package.
 // This adapter bridges the VDL server with the standard HTTP library, allowing
-// seamless integration with existing HTTP servers and middleware.
+// seamless integration with existing HTTP servers and middlewares.
 type NetHTTPAdapter struct {
 	responseWriter http.ResponseWriter
 	request        *http.Request
@@ -147,8 +147,8 @@ type GlobalHandlerFunc[T any] func(
 	c *HandlerContext[T, any],
 ) (any, error)
 
-// GlobalMiddleware is the signature for a middleware applied to all requests.
-type GlobalMiddleware[T any] func(
+// GlobalMiddlewareFunc is the signature for a middleware applied to all requests.
+type GlobalMiddlewareFunc[T any] func(
 	next GlobalHandlerFunc[T],
 ) GlobalHandlerFunc[T]
 
@@ -160,7 +160,7 @@ type ProcHandlerFunc[T any, I any, O any] func(
 // ProcMiddlewareFunc is the signature for a proc-specific typed middleware.
 // It uses a wrapper pattern for a clean composition.
 //
-// This is the same as [GlobalMiddleware] but for specific procedures and with types.
+// This is the same as [GlobalMiddlewareFunc] but for specific procedures and with types.
 type ProcMiddlewareFunc[T any, I any, O any] func(
 	next ProcHandlerFunc[T, I, O],
 ) ProcHandlerFunc[T, I, O]
@@ -187,8 +187,8 @@ type EmitMiddlewareFunc[T any, I any, O any] func(
 	next EmitFunc[T, I, O],
 ) EmitFunc[T, I, O]
 
-// Deserializer function convert raw JSON input into typed input prior to handler execution.
-type DeserializeFunc func(raw json.RawMessage) (any, error)
+// DeserializerFunc function convert raw JSON input into typed input prior to handler execution.
+type DeserializerFunc func(raw json.RawMessage) (any, error)
 
 // -----------------------------------------------------------------------------
 // Server Internal Implementation
@@ -220,7 +220,7 @@ type internalServer[T any] struct {
 	// streamHandlers stores the final implementation functions for streams
 	streamHandlers map[string]StreamHandlerFunc[T, any, any]
 	// globalMiddlewares contains middlewares that run for every request (both procs and streams)
-	globalMiddlewares []GlobalMiddleware[T]
+	globalMiddlewares []GlobalMiddlewareFunc[T]
 	// procMiddlewares contains per-procedure middlewares
 	procMiddlewares map[string][]ProcMiddlewareFunc[T, any, any]
 	// streamMiddlewares contains per-stream middlewares
@@ -228,9 +228,9 @@ type internalServer[T any] struct {
 	// streamEmitMiddlewares contains per-stream emit middlewares
 	streamEmitMiddlewares map[string][]EmitMiddlewareFunc[T, any, any]
 	// procDeserializers contains per-procedure input deserializers
-	procDeserializers map[string]DeserializeFunc
+	procDeserializers map[string]DeserializerFunc
 	// streamDeserializers contains per-stream input deserializers
-	streamDeserializers map[string]DeserializeFunc
+	streamDeserializers map[string]DeserializerFunc
 }
 
 // newInternalServer creates a new VDL server instance with the specified
@@ -271,19 +271,19 @@ func newInternalServer[T any](
 		handlersMu:            sync.RWMutex{},
 		procHandlers:          map[string]ProcHandlerFunc[T, any, any]{},
 		streamHandlers:        map[string]StreamHandlerFunc[T, any, any]{},
-		globalMiddlewares:     []GlobalMiddleware[T]{},
+		globalMiddlewares:     []GlobalMiddlewareFunc[T]{},
 		procMiddlewares:       map[string][]ProcMiddlewareFunc[T, any, any]{},
 		streamMiddlewares:     map[string][]StreamMiddlewareFunc[T, any, any]{},
 		streamEmitMiddlewares: map[string][]EmitMiddlewareFunc[T, any, any]{},
-		procDeserializers:     map[string]DeserializeFunc{},
-		streamDeserializers:   map[string]DeserializeFunc{},
+		procDeserializers:     map[string]DeserializerFunc{},
+		streamDeserializers:   map[string]DeserializerFunc{},
 	}
 }
 
 // addGlobalMiddleware registers a global middleware that executes for every request (proc and stream).
 // Middlewares are executed in the order they were registered.
 func (s *internalServer[T]) addGlobalMiddleware(
-	mw GlobalMiddleware[T],
+	mw GlobalMiddlewareFunc[T],
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
@@ -334,7 +334,7 @@ func (s *internalServer[T]) addStreamEmitMiddleware(
 func (s *internalServer[T]) setProcHandler(
 	procName string,
 	handler ProcHandlerFunc[T, any, any],
-	deserializer DeserializeFunc,
+	deserializer DeserializerFunc,
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
@@ -353,7 +353,7 @@ func (s *internalServer[T]) setProcHandler(
 func (s *internalServer[T]) setStreamHandler(
 	streamName string,
 	handler StreamHandlerFunc[T, any, any],
-	deserializer DeserializeFunc,
+	deserializer DeserializerFunc,
 ) *internalServer[T] {
 	s.handlersMu.Lock()
 	defer s.handlersMu.Unlock()
@@ -497,7 +497,7 @@ func (s *internalServer[T]) handleProcRequest(
 	// Wrap the specific chain with global middlewares (executed before specific ones)
 	exec := func(c *HandlerContext[T, any]) (any, error) { return final(c) }
 	if len(s.globalMiddlewares) > 0 {
-		mwChain := append([]GlobalMiddleware[T](nil), s.globalMiddlewares...)
+		mwChain := append([]GlobalMiddlewareFunc[T](nil), s.globalMiddlewares...)
 		for i := len(mwChain) - 1; i >= 0; i-- {
 			exec = mwChain[i](exec)
 		}
@@ -582,7 +582,7 @@ func (s *internalServer[T]) handleStreamRequest(
 	// Wrap the specific stream chain with global middlewares (executed before specific ones)
 	exec := func(c *HandlerContext[T, any]) (any, error) { return nil, final(c, emitFinal) }
 	if len(s.globalMiddlewares) > 0 {
-		mwChain := append([]GlobalMiddleware[T](nil), s.globalMiddlewares...)
+		mwChain := append([]GlobalMiddlewareFunc[T](nil), s.globalMiddlewares...)
 		for i := len(mwChain) - 1; i >= 0; i-- {
 			exec = mwChain[i](exec)
 		}
