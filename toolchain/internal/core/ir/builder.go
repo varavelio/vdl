@@ -2,8 +2,10 @@ package ir
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // FromProgram builds an IR Schema from a validated analysis.Program.
@@ -397,4 +399,11 @@ func sortStreams(streams []Stream) {
 	sort.Slice(streams, func(i, j int) bool {
 		return streams[i].Name < streams[j].Name
 	})
+}
+
+func normalizeDoc(raw *string) string {
+	if raw == nil {
+		return ""
+	}
+	return strings.TrimSpace(strutil.NormalizeIndent(*raw))
 }

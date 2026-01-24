@@ -27,7 +27,7 @@ func myFunc() {
 	// This has extra indentation.
 	return true
 }
-	`,
+`,
 		},
 		{
 			name: "Markdown code block with spaces",
@@ -65,7 +65,7 @@ This is a test.
 		{
 			name:     "String with only whitespace",
 			input:    "\n    \n\t\n",
-			expected: "\n    \n\t\n",
+			expected: "\n\n\n",
 		},
 		{
 			name: "Text starting with empty lines",

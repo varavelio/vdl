@@ -33,11 +33,11 @@ type Foo {
     subField2: {
       subSubField1: string[]
     }[] /* Comment */
-    """ 
+    """
 Field
 
       Multi-line
-  """
+"""
     subField3: datetime
   }[]
 

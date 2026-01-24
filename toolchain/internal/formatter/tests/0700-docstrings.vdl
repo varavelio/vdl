@@ -25,7 +25,7 @@ rpc Service { """ Associated """ proc Test {} }
 """ Standalone """
 
 """ Standalone """ // Comment
-""" 
+"""
 Standalone
 
       Multi-line
