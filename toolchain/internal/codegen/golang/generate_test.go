@@ -47,9 +47,9 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, optional.go, rpc_server.go, rpc_client.go
-	// types.go is NOT generated because there are no domain types.
-	require.Len(t, files, 4)
+	// Expect types_core.go, optional.go, rpc_server.go, rpc_client.go AND types.go
+	// types.go is generated because it contains VDLProcedureNames and VDLStreamNames variables.
+	require.Len(t, files, 5)
 
 	fileMap := make(map[string]string)
 	for _, f := range files {
@@ -61,6 +61,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 	require.Contains(t, fileMap, "optional.go")
 	require.Contains(t, fileMap, "rpc_server.go")
 	require.Contains(t, fileMap, "rpc_client.go")
+	require.Contains(t, fileMap, "types.go")
 }
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
@@ -176,9 +177,8 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, optional.go, and consts.go
-	// types.go is NOT generated as there are no domain types
-	require.Len(t, files, 3)
+	// Expect types_core.go, optional.go, consts.go and types.go
+	require.Len(t, files, 4)
 
 	// Find consts.go
 	var constsFile File
@@ -213,9 +213,8 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, optional.go, and patterns.go
-	// types.go is NOT generated as there are no domain types
-	require.Len(t, files, 3)
+	// Expect types_core.go, optional.go, patterns.go and types.go
+	require.Len(t, files, 4)
 
 	var patternsFile File
 	for _, f := range files {
