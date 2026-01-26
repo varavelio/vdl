@@ -1,0 +1,45 @@
+// String enum for testing
+enum Color {
+  Red
+  Green
+  Blue
+}
+
+// Int enum for testing
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}
+
+// Container type for optional enum fields
+type Container {
+  color?: Color
+  priority?: Priority
+}
+
+rpc Service {
+  // Echo valid enum values
+  proc Echo {
+    input {
+      color: Color
+      priority: Priority
+    }
+
+    output {
+      color: Color
+      priority: Priority
+    }
+  }
+
+  // Test optional enum fields
+  proc EchoOptional {
+    input {
+      container: Container
+    }
+
+    output {
+      container: Container
+    }
+  }
+}

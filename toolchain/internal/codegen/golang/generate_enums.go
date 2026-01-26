@@ -2,6 +2,7 @@ package golang
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
@@ -97,22 +98,97 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	g.Linef("func (e %s) IsValid() bool {", enum.Name)
 	g.Block(func() {
 		g.Line("switch e {")
-		g.Line("case")
-		g.Block(func() {
-			for i, member := range enum.Members {
-				constName := enum.Name + member.Name
-				if i < len(enum.Members)-1 {
-					g.Linef("%s,", constName)
-				} else {
-					g.Linef("%s:", constName)
-				}
-			}
-		})
+		g.Linef("case %s:", enumCaseList(enum))
 		g.Block(func() {
 			g.Line("return true")
 		})
 		g.Line("}")
 		g.Line("return false")
+	})
+	g.Line("}")
+	g.Break()
+
+	// MarshalJSON method
+	generateEnumMarshalJSON(g, enum)
+
+	// UnmarshalJSON method
+	generateEnumUnmarshalJSON(g, enum)
+}
+
+// enumCaseList returns a comma-separated list of all enum constant names.
+func enumCaseList(enum ir.Enum) string {
+	var result strings.Builder
+	for i, member := range enum.Members {
+		if i > 0 {
+			result.WriteString(", ")
+		}
+		result.WriteString(enum.Name + member.Name)
+	}
+	return result.String()
+}
+
+// generateEnumMarshalJSON generates the json.Marshaler implementation.
+func generateEnumMarshalJSON(g *gen.Generator, enum ir.Enum) {
+	g.Linef("// MarshalJSON implements json.Marshaler.")
+	g.Linef("// Returns an error if the value is not a valid %s member.", enum.Name)
+	g.Linef("func (e %s) MarshalJSON() ([]byte, error) {", enum.Name)
+	g.Block(func() {
+		g.Line("if !e.IsValid() {")
+		g.Block(func() {
+			if enum.ValueType == ir.EnumValueTypeString {
+				g.Linef("return nil, fmt.Errorf(\"cannot marshal invalid value '%%s' for enum %s\", string(e))", enum.Name)
+			} else {
+				g.Linef("return nil, fmt.Errorf(\"cannot marshal invalid value '%%d' for enum %s\", int(e))", enum.Name)
+			}
+		})
+		g.Line("}")
+		if enum.ValueType == ir.EnumValueTypeString {
+			g.Line("return json.Marshal(string(e))")
+		} else {
+			g.Line("return json.Marshal(int(e))")
+		}
+	})
+	g.Line("}")
+	g.Break()
+}
+
+// generateEnumUnmarshalJSON generates the json.Unmarshaler implementation.
+func generateEnumUnmarshalJSON(g *gen.Generator, enum ir.Enum) {
+	g.Linef("// UnmarshalJSON implements json.Unmarshaler.")
+	g.Linef("// Returns an error if the value is not a valid %s member.", enum.Name)
+	g.Linef("func (e *%s) UnmarshalJSON(data []byte) error {", enum.Name)
+	g.Block(func() {
+		if enum.ValueType == ir.EnumValueTypeString {
+			g.Line("var s string")
+			g.Line("if err := json.Unmarshal(data, &s); err != nil {")
+			g.Block(func() {
+				g.Line("return err")
+			})
+			g.Line("}")
+			g.Break()
+			g.Linef("v := %s(s)", enum.Name)
+		} else {
+			g.Line("var n int")
+			g.Line("if err := json.Unmarshal(data, &n); err != nil {")
+			g.Block(func() {
+				g.Line("return err")
+			})
+			g.Line("}")
+			g.Break()
+			g.Linef("v := %s(n)", enum.Name)
+		}
+		g.Line("if !v.IsValid() {")
+		g.Block(func() {
+			if enum.ValueType == ir.EnumValueTypeString {
+				g.Linef("return fmt.Errorf(\"invalid value '%%s' for enum %s\", s)", enum.Name)
+			} else {
+				g.Linef("return fmt.Errorf(\"invalid value '%%d' for enum %s\", n)", enum.Name)
+			}
+		})
+		g.Line("}")
+		g.Break()
+		g.Line("*e = v")
+		g.Line("return nil")
 	})
 	g.Line("}")
 	g.Break()
