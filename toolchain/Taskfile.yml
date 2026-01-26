@@ -62,6 +62,7 @@ tasks:
     cmds:
       - prettier . --write # Format non-go files
       - go fmt ./...
+      - go run ./cmd/vdl/. fmt ./**/*.vdl # Format .vdl files using the current fmt command
 
   fmt-check:
     desc: Run code formatter check
