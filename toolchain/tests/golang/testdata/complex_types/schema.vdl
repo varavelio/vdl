@@ -1,0 +1,27 @@
+type Address {
+  street: string
+  city: string
+  zip: int
+}
+
+type User {
+  id: int
+  username: string
+  isActive: bool
+  tags: string[]
+  metadata: map<string>
+  address?: Address
+}
+
+rpc Service {
+  proc Echo {
+    input {
+      user: User
+      matrix: int[][]
+    }
+    output {
+      user: User
+      matrix: int[][]
+    }
+  }
+}

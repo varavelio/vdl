@@ -1,0 +1,12 @@
+type Data {
+  required: string
+}
+
+rpc Service {
+  proc Send {
+    input {
+      data: Data
+    }
+    output {}
+  }
+}

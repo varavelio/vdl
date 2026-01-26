@@ -1,0 +1,6 @@
+rpc Service {
+  stream Data {
+    input {}
+    output {}
+  }
+}

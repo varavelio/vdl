@@ -1,4 +1,4 @@
-// Verifies basic RPC functionality: a simple Add proc that sums two numbers.
+// Verifies procs with empty input/output (void operations) work correctly.
 package main
 
 import (
@@ -14,8 +14,8 @@ type AppProps struct{}
 func main() {
 	server := gen.NewServer[AppProps]()
 
-	server.RPCs.Calculator().Procs.Add().Handle(func(c *gen.CalculatorAddHandlerContext[AppProps]) (gen.CalculatorAddOutput, error) {
-		return gen.CalculatorAddOutput{Sum: c.Input.A + c.Input.B}, nil
+	server.RPCs.Service().Procs.Ping().Handle(func(c *gen.ServicePingHandlerContext[AppProps]) (gen.ServicePingOutput, error) {
+		return gen.ServicePingOutput{}, nil
 	})
 
 	mux := http.NewServeMux()
@@ -28,12 +28,9 @@ func main() {
 	defer ts.Close()
 
 	client := gen.NewClient(ts.URL + "/rpc").Build()
-	output, err := client.RPCs.Calculator().Procs.Add().Execute(context.Background(), gen.CalculatorAddInput{A: 10, B: 32})
-	if err != nil {
+
+	if _, err := client.RPCs.Service().Procs.Ping().Execute(context.Background(), gen.ServicePingInput{}); err != nil {
 		panic(err)
-	}
-	if output.Sum != 42 {
-		panic(fmt.Sprintf("expected 42, got %d", output.Sum))
 	}
 
 	fmt.Println("Success")

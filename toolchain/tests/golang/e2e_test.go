@@ -81,13 +81,12 @@ func runTestCase(t *testing.T, caseDir string) {
 	outGen, err := cmdGen.CombinedOutput()
 	require.NoError(t, err, "vdl generate failed:\n%s", string(outGen))
 
-	// Run main.go
 	// Safety timeout to prevent deadlocks from hanging the test suite indefinitely.
 	// 20s should be enough for compilation and execution.
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	cmdRun := exec.CommandContext(ctx, "go", "run", "main.go")
+	cmdRun := exec.CommandContext(ctx, "go", "run", ".")
 	cmdRun.Dir = caseDir
 	outRun, err := cmdRun.CombinedOutput()
 	if err != nil {

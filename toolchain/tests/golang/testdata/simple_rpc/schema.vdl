@@ -4,6 +4,7 @@ rpc Calculator {
       a: int
       b: int
     }
+
     output {
       sum: int
     }

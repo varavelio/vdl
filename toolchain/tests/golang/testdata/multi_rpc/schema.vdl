@@ -1,15 +1,13 @@
-rpc Auth {
-  proc Login {
+rpc A {
+  proc X {
     input {}
-
     output {}
   }
 }
 
-rpc Users {
-  proc Get {
+rpc B {
+  proc Y {
     input {}
-
     output {}
   }
 }

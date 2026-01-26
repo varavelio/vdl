@@ -1,4 +1,4 @@
-// Verifies basic RPC functionality: a simple Add proc that sums two numbers.
+// Verifies multiple RPC blocks with different procs work correctly.
 package main
 
 import (
@@ -14,8 +14,11 @@ type AppProps struct{}
 func main() {
 	server := gen.NewServer[AppProps]()
 
-	server.RPCs.Calculator().Procs.Add().Handle(func(c *gen.CalculatorAddHandlerContext[AppProps]) (gen.CalculatorAddOutput, error) {
-		return gen.CalculatorAddOutput{Sum: c.Input.A + c.Input.B}, nil
+	server.RPCs.A().Procs.X().Handle(func(c *gen.AXHandlerContext[AppProps]) (gen.AXOutput, error) {
+		return gen.AXOutput{}, nil
+	})
+	server.RPCs.B().Procs.Y().Handle(func(c *gen.BYHandlerContext[AppProps]) (gen.BYOutput, error) {
+		return gen.BYOutput{}, nil
 	})
 
 	mux := http.NewServeMux()
@@ -28,12 +31,12 @@ func main() {
 	defer ts.Close()
 
 	client := gen.NewClient(ts.URL + "/rpc").Build()
-	output, err := client.RPCs.Calculator().Procs.Add().Execute(context.Background(), gen.CalculatorAddInput{A: 10, B: 32})
-	if err != nil {
+
+	if _, err := client.RPCs.A().Procs.X().Execute(context.Background(), gen.AXInput{}); err != nil {
 		panic(err)
 	}
-	if output.Sum != 42 {
-		panic(fmt.Sprintf("expected 42, got %d", output.Sum))
+	if _, err := client.RPCs.B().Procs.Y().Execute(context.Background(), gen.BYInput{}); err != nil {
+		panic(err)
 	}
 
 	fmt.Println("Success")

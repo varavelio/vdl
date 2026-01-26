@@ -1,0 +1,8 @@
+rpc Service {
+  stream Data {
+    input {}
+    output {
+      payload: string
+    }
+  }
+}
