@@ -52,13 +52,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		return b
 	}
 
-	// Core Types (types_core.go)
+	// Core Types (core_types.go)
 	code, err := generateCoreTypes(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("types_core.go")
+		b := getBuilder("core_types.go")
 		b.Raw(code)
 		b.Break()
 	}

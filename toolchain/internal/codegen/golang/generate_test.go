@@ -47,7 +47,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, optional.go, rpc_server.go, rpc_client.go AND types.go
+	// Expect core_types.go, optional.go, rpc_server.go, rpc_client.go AND types.go
 	// types.go is generated because it contains VDLProcedureNames and VDLStreamNames variables.
 	require.Len(t, files, 5)
 
@@ -56,8 +56,8 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	require.Contains(t, fileMap, "types_core.go")
-	assert.Contains(t, fileMap["types_core.go"], "package api")
+	require.Contains(t, fileMap, "core_types.go")
+	assert.Contains(t, fileMap["core_types.go"], "package api")
 	require.Contains(t, fileMap, "optional.go")
 	require.Contains(t, fileMap, "rpc_server.go")
 	require.Contains(t, fileMap, "rpc_client.go")
@@ -91,7 +91,7 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, types.go, optional.go, rpc_server.go, rpc_client.go
+	// Expect core_types.go, types.go, optional.go, rpc_server.go, rpc_client.go
 	require.Len(t, files, 5)
 
 	fileMap := make(map[string]string)
@@ -99,7 +99,7 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	require.Contains(t, fileMap, "types_core.go")
+	require.Contains(t, fileMap, "core_types.go")
 	require.Contains(t, fileMap, "types.go")
 	content := fileMap["types.go"]
 	assert.Contains(t, content, "type User struct")
@@ -134,7 +134,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, types.go and optional.go
+	// Expect core_types.go, types.go and optional.go
 	require.Len(t, files, 3)
 
 	fileMap := make(map[string]string)
@@ -142,7 +142,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	require.Contains(t, fileMap, "types_core.go")
+	require.Contains(t, fileMap, "core_types.go")
 	require.Contains(t, fileMap, "types.go")
 	content := fileMap["types.go"]
 
@@ -177,7 +177,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, optional.go, consts.go and types.go
+	// Expect core_types.go, optional.go, consts.go and types.go
 	require.Len(t, files, 4)
 
 	// Find consts.go
@@ -213,7 +213,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, optional.go, patterns.go and types.go
+	// Expect core_types.go, optional.go, patterns.go and types.go
 	require.Len(t, files, 4)
 
 	var patternsFile File
@@ -269,8 +269,8 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	// Check types_core.go
-	require.Contains(t, fileMap, "types_core.go")
+	// Check core_types.go
+	require.Contains(t, fileMap, "core_types.go")
 
 	// Check types.go
 	require.Contains(t, fileMap, "types.go")
@@ -336,8 +336,8 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	// Check types_core.go
-	require.Contains(t, fileMap, "types_core.go")
+	// Check core_types.go
+	require.Contains(t, fileMap, "core_types.go")
 
 	// Check types.go
 	require.Contains(t, fileMap, "types.go")
@@ -390,7 +390,7 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect types_core.go, types.go and optional.go
+	// Expect core_types.go, types.go and optional.go
 	require.Len(t, files, 3)
 
 	fileMap := make(map[string]string)
@@ -398,7 +398,7 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 		fileMap[f.RelativePath] = string(f.Content)
 	}
 
-	require.Contains(t, fileMap, "types_core.go")
+	require.Contains(t, fileMap, "core_types.go")
 	require.Contains(t, fileMap, "types.go")
 	content := fileMap["types.go"]
 
