@@ -295,20 +295,25 @@ func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fiel
 
 	case ir.TypeKindMap:
 		if needsPreType(*tr.MapValue) {
-			g.Linef("for key, value := range %s {", source)
-			g.Block(func() {
-				// Optimization: if it's a direct object, use the key in the error message
-				if tr.MapValue.Kind == ir.TypeKindType || tr.MapValue.Kind == ir.TypeKindObject {
+			// Use key in error message only for direct object types
+			if tr.MapValue.Kind == ir.TypeKindType || tr.MapValue.Kind == ir.TypeKindObject {
+				g.Linef("for key, value := range %s {", source)
+				g.Block(func() {
 					g.Line("if err := value.validate(); err != nil {")
 					g.Block(func() {
 						g.Linef("return errorMissingRequiredField(\"field %s[\" + key + \"]: \" + err.Error())", fieldName)
 					})
 					g.Line("}")
-				} else {
+				})
+				g.Line("}")
+			} else {
+				// For nested types (arrays, maps), we don't include the key in error messages
+				g.Linef("for _, value := range %s {", source)
+				g.Block(func() {
 					renderNestedValidation(g, "value", *tr.MapValue, fieldName)
-				}
-			})
-			g.Line("}")
+				})
+				g.Line("}")
+			}
 		}
 	}
 }
