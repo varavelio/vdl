@@ -59,6 +59,9 @@ When updating this document, do so with the context of the entire document in mi
     - `codegen/`: Code Generators (Go, TS, Dart, etc.).
     - `cmd/schemagen/`: Internal tool to generate JSON schemas for IR and Config.
     - `util/`: Shared Utilities (strings, paths, debug).
+  - `tests/`: End-to-End (E2E) test suite.
+    - Structure reflects future multi-language support (currently `golang/` only, planned: `typescript/`, `openapi/`, `dart/`, etc.).
+    - Each test case in `testdata` contains a schema, config, and a consumer program to verify generated code.
   - `dist/`: Build artifacts (e.g., `vdl.wasm`).
 - **Integration**: Compiles to `dist/vdl.wasm` which is copied to the playground.
 
@@ -81,6 +84,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Strategy**:
   - Unit tests for Go (`go test ./...`).
+  - End-to-End (E2E) tests in `toolchain/tests`: Verifies that generated code works correctly in target languages (Go, and future TS/Dart/etc).
   - Component/Logic tests for Frontend (`vitest`).
 - **Commands**: Run `task test` at the root to execute all suites.
 - **Linting**: Run `task lint` (Triggers `golangci-lint` for Go and `biome` for JS/TS).
