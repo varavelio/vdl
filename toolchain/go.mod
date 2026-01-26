@@ -7,6 +7,7 @@ replace github.com/varavelio/vdl/playground v0.0.0 => ../playground
 require (
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/alexflint/go-arg v1.6.1
+	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/invopop/jsonschema v0.13.0
 	github.com/kaptinlin/jsonschema v0.6.6
