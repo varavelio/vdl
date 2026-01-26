@@ -47,6 +47,20 @@ func main() {
 		}, nil
 	})
 
+	server.RPCs.Service().Procs.EchoInline().Handle(func(c *gen.ServiceEchoInlineHandlerContext[AppProps]) (gen.ServiceEchoInlineOutput, error) {
+		return gen.ServiceEchoInlineOutput{
+			Data:                     c.Input.Data,
+			InlineObjectPresent:      c.Input.Data.InlineObject.Present,
+			InlineArrayPresent:       c.Input.Data.InlineArray.Present,
+			InlineMapPresent:         c.Input.Data.InlineMap.Present,
+			NestedInlinePresent:      c.Input.Data.NestedInline.Present,
+			InlineMatrixPresent:      c.Input.Data.InlineMatrix.Present,
+			MapOfInlineArraysPresent: c.Input.Data.MapOfInlineArrays.Present,
+			ArrayOfInlineMapsPresent: c.Input.Data.ArrayOfInlineMaps.Present,
+			UltraComplexPresent:      c.Input.Data.UltraComplex.Present,
+		}, nil
+	})
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /rpc/{rpc}/{proc}", func(w http.ResponseWriter, r *http.Request) {
 		adapter := gen.NewNetHTTPAdapter(w, r)
@@ -70,6 +84,12 @@ func main() {
 	testComplexNestedMaps(client)
 	testDeepNesting(client)
 	testMatrixAndNestedStructures(client)
+
+	// Inline object tests
+	testInlineAllAbsent(client)
+	testInlineAllPresent(client)
+	testInlineNestedAndMatrix(client)
+	testInlineUltraComplex(client)
 
 	fmt.Println("Success")
 }
@@ -471,5 +491,239 @@ func testMatrixAndNestedStructures(client *gen.Client) {
 
 	if !reflect.DeepEqual(res.Data, input) {
 		panic("matrix and nested structures mismatch")
+	}
+}
+
+// ===== Inline object tests =====
+
+func testInlineAllAbsent(client *gen.Client) {
+	ctx := context.Background()
+
+	input := gen.ComplexOptional{Id: "inline-absent"}
+	res, err := client.RPCs.Service().Procs.EchoInline().Execute(ctx, gen.ServiceEchoInlineInput{Data: input})
+	if err != nil {
+		panic(fmt.Sprintf("EchoInline failed: %v", err))
+	}
+
+	// All inline fields should be absent
+	if res.InlineObjectPresent {
+		panic("expected InlineObject to be absent")
+	}
+	if res.InlineArrayPresent {
+		panic("expected InlineArray to be absent")
+	}
+	if res.InlineMapPresent {
+		panic("expected InlineMap to be absent")
+	}
+	if res.NestedInlinePresent {
+		panic("expected NestedInline to be absent")
+	}
+	if res.InlineMatrixPresent {
+		panic("expected InlineMatrix to be absent")
+	}
+	if res.MapOfInlineArraysPresent {
+		panic("expected MapOfInlineArrays to be absent")
+	}
+	if res.ArrayOfInlineMapsPresent {
+		panic("expected ArrayOfInlineMaps to be absent")
+	}
+	if res.UltraComplexPresent {
+		panic("expected UltraComplex to be absent")
+	}
+}
+
+func testInlineAllPresent(client *gen.Client) {
+	ctx := context.Background()
+
+	input := gen.ComplexOptional{
+		Id: "inline-present",
+		InlineObject: gen.Some(gen.ComplexOptionalInlineObject{
+			Label: "test-label",
+			Count: 42,
+		}),
+		InlineArray: gen.Some([]gen.ComplexOptionalInlineArray{
+			{Name: "item1", Active: true},
+			{Name: "item2", Active: false},
+		}),
+		InlineMap: gen.Some(map[string]gen.ComplexOptionalInlineMap{
+			"key1": {Key: "k1", Value: 100},
+			"key2": {Key: "k2", Value: 200},
+		}),
+		NestedInline: gen.Some(gen.ComplexOptionalNestedInline{
+			Outer: "outer-value",
+			Inner: gen.ComplexOptionalNestedInlineInner{
+				Deep:  "deep-value",
+				Score: 3.14,
+			},
+		}),
+	}
+
+	res, err := client.RPCs.Service().Procs.EchoInline().Execute(ctx, gen.ServiceEchoInlineInput{Data: input})
+	if err != nil {
+		panic(fmt.Sprintf("EchoInline failed: %v", err))
+	}
+
+	// All specified inline fields should be present
+	if !res.InlineObjectPresent {
+		panic("expected InlineObject to be present")
+	}
+	if !res.InlineArrayPresent {
+		panic("expected InlineArray to be present")
+	}
+	if !res.InlineMapPresent {
+		panic("expected InlineMap to be present")
+	}
+	if !res.NestedInlinePresent {
+		panic("expected NestedInline to be present")
+	}
+
+	// Verify data integrity
+	if res.Data.InlineObject.Value.Label != "test-label" {
+		panic("InlineObject.Label mismatch")
+	}
+	if res.Data.InlineObject.Value.Count != 42 {
+		panic("InlineObject.Count mismatch")
+	}
+	if len(res.Data.InlineArray.Value) != 2 {
+		panic("InlineArray length mismatch")
+	}
+	if res.Data.NestedInline.Value.Inner.Deep != "deep-value" {
+		panic("NestedInline.Inner.Deep mismatch")
+	}
+}
+
+func testInlineNestedAndMatrix(client *gen.Client) {
+	ctx := context.Background()
+
+	input := gen.ComplexOptional{
+		Id: "inline-matrix",
+		InlineMatrix: gen.Some([][]gen.ComplexOptionalInlineMatrix{
+			{{X: 0, Y: 0}, {X: 0, Y: 1}},
+			{{X: 1, Y: 0}, {X: 1, Y: 1}},
+			{{X: 2, Y: 0}},
+		}),
+		MapOfInlineArrays: gen.Some(map[string][]gen.ComplexOptionalMapOfInlineArrays{
+			"high": {{Item: "urgent", Priority: 1}, {Item: "critical", Priority: 0}},
+			"low":  {{Item: "later", Priority: 10}},
+		}),
+		ArrayOfInlineMaps: gen.Some([]map[string]gen.ComplexOptionalArrayOfInlineMaps{
+			{"first": {Data: "data1"}, "second": {Data: "data2"}},
+			{"third": {Data: "data3"}},
+		}),
+	}
+
+	res, err := client.RPCs.Service().Procs.EchoInline().Execute(ctx, gen.ServiceEchoInlineInput{Data: input})
+	if err != nil {
+		panic(fmt.Sprintf("EchoInline failed: %v", err))
+	}
+
+	if !res.InlineMatrixPresent {
+		panic("expected InlineMatrix to be present")
+	}
+	if !res.MapOfInlineArraysPresent {
+		panic("expected MapOfInlineArrays to be present")
+	}
+	if !res.ArrayOfInlineMapsPresent {
+		panic("expected ArrayOfInlineMaps to be present")
+	}
+
+	// Verify matrix dimensions
+	if len(res.Data.InlineMatrix.Value) != 3 {
+		panic("InlineMatrix row count mismatch")
+	}
+	if len(res.Data.InlineMatrix.Value[0]) != 2 {
+		panic("InlineMatrix first row column count mismatch")
+	}
+	if res.Data.InlineMatrix.Value[1][1].X != 1 || res.Data.InlineMatrix.Value[1][1].Y != 1 {
+		panic("InlineMatrix[1][1] values mismatch")
+	}
+
+	// Verify map of inline arrays
+	highPriority := res.Data.MapOfInlineArrays.Value["high"]
+	if len(highPriority) != 2 {
+		panic("MapOfInlineArrays['high'] length mismatch")
+	}
+	if highPriority[0].Priority != 1 {
+		panic("MapOfInlineArrays['high'][0].Priority mismatch")
+	}
+
+	// Verify array of inline maps
+	if len(res.Data.ArrayOfInlineMaps.Value) != 2 {
+		panic("ArrayOfInlineMaps length mismatch")
+	}
+	if res.Data.ArrayOfInlineMaps.Value[0]["first"].Data != "data1" {
+		panic("ArrayOfInlineMaps[0]['first'].Data mismatch")
+	}
+}
+
+func testInlineUltraComplex(client *gen.Client) {
+	ctx := context.Background()
+
+	input := gen.ComplexOptional{
+		Id: "inline-ultra",
+		UltraComplex: gen.Some(map[string][]gen.ComplexOptionalUltraComplex{
+			"group1": {
+				{
+					Level1: "g1-item1",
+					Nested: gen.ComplexOptionalUltraComplexNested{
+						Level2: 100,
+						Items:  []string{"a", "b", "c"},
+					},
+				},
+				{
+					Level1: "g1-item2",
+					Nested: gen.ComplexOptionalUltraComplexNested{
+						Level2: 200,
+						Items:  []string{"d", "e"},
+					},
+				},
+			},
+			"group2": {
+				{
+					Level1: "g2-item1",
+					Nested: gen.ComplexOptionalUltraComplexNested{
+						Level2: 300,
+						Items:  []string{"x", "y", "z"},
+					},
+				},
+			},
+		}),
+	}
+
+	res, err := client.RPCs.Service().Procs.EchoInline().Execute(ctx, gen.ServiceEchoInlineInput{Data: input})
+	if err != nil {
+		panic(fmt.Sprintf("EchoInline failed: %v", err))
+	}
+
+	if !res.UltraComplexPresent {
+		panic("expected UltraComplex to be present")
+	}
+
+	// Verify the ultra complex structure
+	group1 := res.Data.UltraComplex.Value["group1"]
+	if len(group1) != 2 {
+		panic("UltraComplex['group1'] length mismatch")
+	}
+	if group1[0].Level1 != "g1-item1" {
+		panic("UltraComplex['group1'][0].Level1 mismatch")
+	}
+	if group1[0].Nested.Level2 != 100 {
+		panic("UltraComplex['group1'][0].Nested.Level2 mismatch")
+	}
+	if len(group1[0].Nested.Items) != 3 {
+		panic("UltraComplex['group1'][0].Nested.Items length mismatch")
+	}
+
+	group2 := res.Data.UltraComplex.Value["group2"]
+	if len(group2) != 1 {
+		panic("UltraComplex['group2'] length mismatch")
+	}
+	if !reflect.DeepEqual(group2[0].Nested.Items, []string{"x", "y", "z"}) {
+		panic("UltraComplex['group2'][0].Nested.Items mismatch")
+	}
+
+	// Verify round-trip
+	if !reflect.DeepEqual(res.Data.UltraComplex.Value, input.UltraComplex.Value) {
+		panic("UltraComplex round-trip mismatch")
 	}
 }

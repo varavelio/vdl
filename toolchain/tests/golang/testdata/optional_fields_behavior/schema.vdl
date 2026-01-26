@@ -70,6 +70,61 @@ type ComplexOptional {
 
   // Optional map of arrays of objects
   mapOfObjectArrays?: map<Level3Data[]>
+
+  // ===== EDGE CASE: Inline (anonymous) objects in optional fields =====
+
+  // Optional inline object
+  inlineObject?: {
+    label: string
+    count: int
+  }
+
+  // Optional array of inline objects
+  inlineArray?: {
+    name: string
+    active: bool
+  }[]
+
+  // Optional map of inline objects
+  inlineMap?: map<{
+    key: string
+    value: int
+  }>
+
+  // Optional nested inline (inline inside inline)
+  nestedInline?: {
+    outer: string
+    inner: {
+      deep: string
+      score: float
+    }
+  }
+
+  // Optional array of arrays of inline objects (matrix of inline)
+  inlineMatrix?: {
+    x: int
+    y: int
+  }[][]
+
+  // Optional map of arrays of inline objects
+  mapOfInlineArrays?: map<{
+    item: string
+    priority: int
+  }[]>
+
+  // Optional array of maps of inline objects
+  arrayOfInlineMaps?: map<{
+    data: string
+  }>[]
+
+  // Ultra complex: optional map of arrays of inline with nested inline
+  ultraComplex?: map<{
+    level1: string
+    nested: {
+      level2: int
+      items: string[]
+    }
+  }[]>
 }
 
 rpc Service {
@@ -114,6 +169,26 @@ rpc Service {
     output {
       wrapper?: Level1Wrapper
       wasPresent: bool
+    }
+  }
+
+  // Inline objects in optional fields test
+  proc EchoInline {
+    input {
+      data: ComplexOptional
+    }
+
+    output {
+      data: ComplexOptional
+      // Track which inline optional fields were present
+      inlineObjectPresent: bool
+      inlineArrayPresent: bool
+      inlineMapPresent: bool
+      nestedInlinePresent: bool
+      inlineMatrixPresent: bool
+      mapOfInlineArraysPresent: bool
+      arrayOfInlineMapsPresent: bool
+      ultraComplexPresent: bool
     }
   }
 }

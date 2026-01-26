@@ -175,4 +175,128 @@ rpc Service {
       order: Order
     }
   }
+
+  // Spread directly in input block
+  proc SpreadInInput {
+    input {
+      ...Identifiable
+      ...Timestamps
+      customField: string
+    }
+
+    output {
+      id: string
+      createdAt: datetime
+      updatedAt: datetime
+      customField: string
+    }
+  }
+
+  // Spread directly in output block
+  proc SpreadInOutput {
+    input {
+      id: string
+      name: string
+    }
+
+    output {
+      ...Identifiable
+      ...Timestamps
+      ...Taggable
+      name: string
+      processed: bool
+    }
+  }
+
+  // Spread in nested anonymous object within input
+  proc SpreadInNestedAnonymous {
+    input {
+      wrapper: {
+        ...Identifiable
+        data: {
+          ...Timestamps
+          ...Taggable
+          value: string
+        }
+      }
+    }
+
+    output {
+      wrapper: {
+        ...Identifiable
+        data: {
+          ...Timestamps
+          ...Taggable
+          value: string
+        }
+      }
+    }
+  }
+
+  // Multiple spreads in deeply nested anonymous objects
+  proc DeepNestedSpreads {
+    input {
+      level1: {
+        ...Identifiable
+        level2: {
+          ...Timestamps
+          level3: {
+            ...Taggable
+            deepValue: string
+          }
+        }
+      }
+    }
+
+    output {
+      level1: {
+        ...Identifiable
+        level2: {
+          ...Timestamps
+          level3: {
+            ...Taggable
+            deepValue: string
+          }
+        }
+      }
+    }
+  }
+
+  // Spread in anonymous object inside array
+  proc SpreadInArrayAnonymous {
+    input {
+      items: {
+        ...Identifiable
+        ...Timestamps
+        name: string
+      }[]
+    }
+
+    output {
+      items: {
+        ...Identifiable
+        ...Timestamps
+        name: string
+      }[]
+      count: int
+    }
+  }
+
+  // Spread in anonymous object inside map
+  proc SpreadInMapAnonymous {
+    input {
+      entries: map<{
+        ...Auditable
+        value: string
+      }>
+    }
+
+    output {
+      entries: map<{
+        ...Auditable
+        value: string
+      }>
+      keys: string[]
+    }
+  }
 }
