@@ -51,7 +51,7 @@ tasks:
 
   test:
     desc: Run tests
-    cmd: go test ./...
+    cmd: go test -race ./...
 
   lint:
     desc: Run linter
