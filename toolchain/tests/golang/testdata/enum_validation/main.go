@@ -32,6 +32,12 @@ func main() {
 		}, nil
 	})
 
+	server.RPCs.Service().Procs.EchoLogLevel().Handle(func(c *gen.ServiceEchoLogLevelHandlerContext[AppProps]) (gen.ServiceEchoLogLevelOutput, error) {
+		return gen.ServiceEchoLogLevelOutput{
+			Level: c.Input.Level,
+		}, nil
+	})
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /rpc/{rpc}/{proc}", func(w http.ResponseWriter, r *http.Request) {
 		adapter := gen.NewNetHTTPAdapter(w, r)
@@ -60,6 +66,13 @@ func main() {
 
 	// Test optional enum fields
 	testOptionalEnums(client)
+
+	// Test explicit-value enum validation
+	testExplicitValueIsValid()
+	testExplicitValueMarshal()
+	testExplicitValueUnmarshal()
+	testExplicitValueServerRejects(ts.URL)
+	testExplicitValueRoundTrip(client)
 
 	fmt.Println("Success")
 }
@@ -289,5 +302,201 @@ func testOptionalEnums(client *gen.Client) {
 	}
 	if res2.Container.Priority.Value != gen.PriorityHigh {
 		panic(fmt.Sprintf("expected PriorityHigh, got %d", res2.Container.Priority.Value))
+	}
+
+	// Test optional explicit-value enum
+	res3, err := client.RPCs.Service().Procs.EchoOptional().Execute(ctx, gen.ServiceEchoOptionalInput{
+		Container: gen.Container{
+			LogLevel: gen.Some(gen.LogLevelWarning),
+		},
+	})
+	if err != nil {
+		panic(fmt.Sprintf("EchoOptional with LogLevel failed: %v", err))
+	}
+	if !res3.Container.LogLevel.Present {
+		panic("logLevel should be present")
+	}
+	if res3.Container.LogLevel.Value != gen.LogLevelWarning {
+		panic(fmt.Sprintf("expected LogLevelWarning (WARN), got %s", res3.Container.LogLevel.Value))
+	}
+}
+
+// ===== Explicit-value enum tests (LogLevel: name != value) =====
+
+func testExplicitValueIsValid() {
+	// Valid explicit-value enum members
+	if !gen.LogLevelDebug.IsValid() {
+		panic("LogLevelDebug should be valid")
+	}
+	if !gen.LogLevelInfo.IsValid() {
+		panic("LogLevelInfo should be valid")
+	}
+	if !gen.LogLevelWarning.IsValid() {
+		panic("LogLevelWarning should be valid")
+	}
+	if !gen.LogLevelError.IsValid() {
+		panic("LogLevelError should be valid")
+	}
+	if !gen.LogLevelCritical.IsValid() {
+		panic("LogLevelCritical should be valid")
+	}
+
+	// Invalid: using name instead of value
+	invalidByName := gen.LogLevel("Warning")
+	if invalidByName.IsValid() {
+		panic("LogLevel('Warning') should be invalid - must use 'WARN'")
+	}
+
+	// Invalid: random value
+	invalid := gen.LogLevel("INVALID")
+	if invalid.IsValid() {
+		panic("LogLevel('INVALID') should be invalid")
+	}
+
+	// Invalid: empty
+	empty := gen.LogLevel("")
+	if empty.IsValid() {
+		panic("LogLevel('') should be invalid")
+	}
+
+	// Valid: using actual value
+	validByValue := gen.LogLevel("WARN")
+	if !validByValue.IsValid() {
+		panic("LogLevel('WARN') should be valid")
+	}
+}
+
+func testExplicitValueMarshal() {
+	// Valid values should marshal to the VALUE (not name)
+	data, err := json.Marshal(gen.LogLevelWarning)
+	if err != nil {
+		panic(fmt.Sprintf("marshaling LogLevelWarning failed: %v", err))
+	}
+	if string(data) != `"WARN"` {
+		panic(fmt.Sprintf("expected \"WARN\", got %s", string(data)))
+	}
+
+	data, err = json.Marshal(gen.LogLevelError)
+	if err != nil {
+		panic(fmt.Sprintf("marshaling LogLevelError failed: %v", err))
+	}
+	if string(data) != `"ERROR"` {
+		panic(fmt.Sprintf("expected \"ERROR\", got %s", string(data)))
+	}
+
+	// Invalid: using name as value should fail
+	invalidByName := gen.LogLevel("Warning")
+	_, err = json.Marshal(invalidByName)
+	if err == nil {
+		panic("marshaling LogLevel('Warning') should fail - not a valid value")
+	}
+	if !strings.Contains(err.Error(), "Warning") {
+		panic(fmt.Sprintf("error should mention invalid value, got: %v", err))
+	}
+}
+
+func testExplicitValueUnmarshal() {
+	var level gen.LogLevel
+
+	// Valid: unmarshal using VALUE
+	err := json.Unmarshal([]byte(`"WARN"`), &level)
+	if err != nil {
+		panic(fmt.Sprintf("unmarshaling 'WARN' failed: %v", err))
+	}
+	if level != gen.LogLevelWarning {
+		panic(fmt.Sprintf("expected LogLevelWarning, got %s", level))
+	}
+
+	// Invalid: using NAME instead of value should fail
+	err = json.Unmarshal([]byte(`"Warning"`), &level)
+	if err == nil {
+		panic("unmarshaling 'Warning' should fail - must use 'WARN'")
+	}
+	if !strings.Contains(err.Error(), "Warning") {
+		panic(fmt.Sprintf("error should mention invalid value, got: %v", err))
+	}
+
+	// Invalid: random value
+	err = json.Unmarshal([]byte(`"INVALID"`), &level)
+	if err == nil {
+		panic("unmarshaling 'INVALID' should fail")
+	}
+}
+
+func testExplicitValueServerRejects(baseURL string) {
+	// Valid: using VALUE should work
+	payload := `{"level": "ERROR"}`
+	resp, err := http.Post(baseURL+"/rpc/Service/EchoLogLevel", "application/json", bytes.NewBufferString(payload))
+	if err != nil {
+		panic(fmt.Sprintf("request failed: %v", err))
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	var result map[string]any
+	if err := json.Unmarshal(body, &result); err != nil {
+		panic(fmt.Sprintf("failed to unmarshal: %v", err))
+	}
+
+	if result["ok"] != true {
+		panic(fmt.Sprintf("expected ok=true for valid value 'ERROR', got: %s", string(body)))
+	}
+
+	output := result["output"].(map[string]any)
+	if output["level"] != "ERROR" {
+		panic(fmt.Sprintf("expected level='ERROR', got: %v", output["level"]))
+	}
+
+	// Invalid: using NAME instead of value should be rejected
+	payload = `{"level": "Error"}`
+	resp2, err := http.Post(baseURL+"/rpc/Service/EchoLogLevel", "application/json", bytes.NewBufferString(payload))
+	if err != nil {
+		panic(fmt.Sprintf("request failed: %v", err))
+	}
+	defer resp2.Body.Close()
+
+	body2, _ := io.ReadAll(resp2.Body)
+	var result2 map[string]any
+	if err := json.Unmarshal(body2, &result2); err != nil {
+		panic(fmt.Sprintf("failed to unmarshal: %v", err))
+	}
+
+	if result2["ok"] == true {
+		panic("server should reject 'Error' - must use 'ERROR'")
+	}
+}
+
+func testExplicitValueRoundTrip(client *gen.Client) {
+	ctx := context.Background()
+
+	testCases := []struct {
+		level         gen.LogLevel
+		expectedValue string
+	}{
+		{gen.LogLevelDebug, "DEBUG"},
+		{gen.LogLevelInfo, "INFO"},
+		{gen.LogLevelWarning, "WARN"},
+		{gen.LogLevelError, "ERROR"},
+		{gen.LogLevelCritical, "CRITICAL"},
+	}
+
+	for _, tc := range testCases {
+		res, err := client.RPCs.Service().Procs.EchoLogLevel().Execute(ctx, gen.ServiceEchoLogLevelInput{
+			Level: tc.level,
+		})
+		if err != nil {
+			panic(fmt.Sprintf("EchoLogLevel failed for %s: %v", tc.level, err))
+		}
+		if res.Level != tc.level {
+			panic(fmt.Sprintf("round-trip failed: expected %v, got %v", tc.level, res.Level))
+		}
+		// Verify constant value matches expected wire format
+		if string(tc.level) != tc.expectedValue {
+			panic(fmt.Sprintf("value mismatch: expected %q, got %q", tc.expectedValue, string(tc.level)))
+		}
+		// Verify String() returns value, not name
+		if tc.level.String() != tc.expectedValue {
+			panic(fmt.Sprintf("String() mismatch: expected %q, got %q", tc.expectedValue, tc.level.String()))
+		}
 	}
 }

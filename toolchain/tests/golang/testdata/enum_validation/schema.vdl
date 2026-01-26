@@ -1,4 +1,4 @@
-// String enum for testing
+// String enum with implicit values (name = value)
 enum Color {
   Red
   Green
@@ -12,10 +12,20 @@ enum Priority {
   High = 3
 }
 
+// String enum with explicit values (name != value)
+enum LogLevel {
+  Debug = "DEBUG"
+  Info = "INFO"
+  Warning = "WARN"
+  Error = "ERROR"
+  Critical = "CRITICAL"
+}
+
 // Container type for optional enum fields
 type Container {
   color?: Color
   priority?: Priority
+  logLevel?: LogLevel
 }
 
 rpc Service {
@@ -40,6 +50,17 @@ rpc Service {
 
     output {
       container: Container
+    }
+  }
+
+  // Test explicit-value enum
+  proc EchoLogLevel {
+    input {
+      level: LogLevel
+    }
+
+    output {
+      level: LogLevel
     }
   }
 }

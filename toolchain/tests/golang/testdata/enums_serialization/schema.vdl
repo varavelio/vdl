@@ -1,14 +1,25 @@
+// Implicit values: name equals value
 enum Color {
   Red
   Green
   Blue
 }
 
+// Implicit values: name equals value
 enum Status {
   Pending
   Active
   Completed
   Cancelled
+}
+
+// Explicit values: value differs from name (common for API compatibility)
+enum HttpStatus {
+  Ok = "OK"
+  Created = "CREATED"
+  BadRequest = "BAD_REQUEST"
+  NotFound = "NOT_FOUND"
+  InternalError = "INTERNAL_SERVER_ERROR"
 }
 
 rpc Service {
@@ -30,6 +41,17 @@ rpc Service {
     output {
       color: Color
       status: Status
+    }
+  }
+
+  // Test explicit-value enum serialization
+  proc EchoHttpStatus {
+    input {
+      status: HttpStatus
+    }
+
+    output {
+      status: HttpStatus
     }
   }
 }
