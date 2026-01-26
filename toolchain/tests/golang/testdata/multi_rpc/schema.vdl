@@ -1,6 +1,7 @@
 rpc A {
   proc X {
     input {}
+
     output {}
   }
 }
@@ -8,6 +9,7 @@ rpc A {
 rpc B {
   proc Y {
     input {}
+
     output {}
   }
 }

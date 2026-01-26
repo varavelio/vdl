@@ -15,6 +15,7 @@ rpc Service {
       c: Color
       p: Priority
     }
+
     output {
       c: Color
       p: Priority

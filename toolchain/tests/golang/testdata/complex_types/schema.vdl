@@ -13,15 +13,51 @@ type User {
   address?: Address
 }
 
+type Level3 {
+  value: string
+}
+
+type Level2 {
+  name: string
+  level3: Level3
+}
+
+type Level1 {
+  id: int
+  level2: Level2
+}
+
+type Point {
+  x: int
+  y: int
+}
+
+type Score {
+  name: string
+  value: float
+}
+
+type Container {
+  user: User
+  matrix: int[][]
+  nestedArrays: string[][][]
+  mapOfArrays: map<int[]>
+  arrayOfMaps: map<string>[]
+  mapOfObjects: map<User>
+  deepNest: Level1
+  points: Point[]
+  scores: map<Score>
+  arrayOfMapOfArrays: map<int[]>[]
+}
+
 rpc Service {
   proc Echo {
     input {
-      user: User
-      matrix: int[][]
+      data: Container
     }
+
     output {
-      user: User
-      matrix: int[][]
+      data: Container
     }
   }
 }

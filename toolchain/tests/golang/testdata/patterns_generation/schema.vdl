@@ -1,0 +1,12 @@
+pattern UserEventSubject = "events.users.{userId}.{eventType}"
+pattern SessionCacheKey = "cache:session:{sessionId}"
+pattern TopicChannel = "channels.{channelId}.messages.{messageId}"
+pattern SimpleKey = "static-key"
+
+rpc Service {
+  proc Echo {
+    input {}
+
+    output {}
+  }
+}

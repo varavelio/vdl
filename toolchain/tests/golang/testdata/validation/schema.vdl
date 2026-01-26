@@ -1,12 +1,62 @@
-type Data {
-  required: string
+type Address {
+  street: string
+  city: string
+}
+
+type Person {
+  name: string
+  address: Address
+}
+
+type Team {
+  leader: Person
+  members: Person[]
+}
+
+type Organization {
+  name: string
+  teams: Team[]
+  contacts: map<Person>
 }
 
 rpc Service {
-  proc Send {
+  proc ValidatePerson {
     input {
-      data: Data
+      person: Person
     }
+
+    output {}
+  }
+
+  proc ValidateTeam {
+    input {
+      team: Team
+    }
+
+    output {}
+  }
+
+  proc ValidateOrganization {
+    input {
+      org: Organization
+    }
+
+    output {}
+  }
+
+  proc ValidateArray {
+    input {
+      people: Person[]
+    }
+
+    output {}
+  }
+
+  proc ValidateMap {
+    input {
+      contacts: map<Address>
+    }
+
     output {}
   }
 }

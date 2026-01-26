@@ -7,6 +7,7 @@ rpc Service {
       s: string
       d: datetime
     }
+
     output {
       i: int
       f: float

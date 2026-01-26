@@ -1,0 +1,35 @@
+enum Color {
+  Red
+  Green
+  Blue
+}
+
+enum Status {
+  Pending
+  Active
+  Completed
+  Cancelled
+}
+
+rpc Service {
+  proc Echo {
+    input {
+      color: Color
+      status: Status
+    }
+
+    output {
+      color: Color
+      status: Status
+    }
+  }
+
+  proc GetDefaults {
+    input {}
+
+    output {
+      color: Color
+      status: Status
+    }
+  }
+}

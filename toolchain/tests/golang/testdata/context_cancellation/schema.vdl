@@ -1,9 +1,9 @@
 rpc Service {
-  proc Get {
+  stream Counter {
     input {}
 
     output {
-      val: string
+      count: int
     }
   }
 }

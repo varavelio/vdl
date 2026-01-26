@@ -1,0 +1,20 @@
+rpc Service {
+  proc Echo {
+    input {
+      required: string
+      optional?: string
+      optionalInt?: int
+      optionalBool?: bool
+    }
+
+    output {
+      required: string
+      optional?: string
+      optionalInt?: int
+      optionalBool?: bool
+      wasOptionalPresent: bool
+      wasOptionalIntPresent: bool
+      wasOptionalBoolPresent: bool
+    }
+  }
+}

@@ -1,6 +1,25 @@
-rpc Service {
-  proc Test {
+rpc ServiceA {
+  proc Proc1 {
     input {}
+
+    output {
+      trace: string[]
+    }
+  }
+
+  proc Proc2 {
+    input {}
+
+    output {
+      trace: string[]
+    }
+  }
+}
+
+rpc ServiceB {
+  proc Proc1 {
+    input {}
+
     output {
       trace: string[]
     }

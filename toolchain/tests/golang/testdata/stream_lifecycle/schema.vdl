@@ -1,6 +1,7 @@
 rpc Service {
   stream Events {
     input {}
+
     output {}
   }
 }

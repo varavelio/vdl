@@ -1,9 +1,9 @@
 rpc Service {
-  proc Get {
+  stream Events {
     input {}
 
     output {
-      val: string
+      message: string
     }
   }
 }
