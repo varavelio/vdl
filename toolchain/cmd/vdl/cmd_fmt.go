@@ -3,14 +3,15 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
+	"strings"
 	"time"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/varavelio/vdl/toolchain/internal/formatter"
 )
 
 type cmdFmtArgs struct {
-	Pattern string `arg:"positional" help:"The file pattern to format (support globs e.g. './rpc/**/*.vdl')"`
+	Pattern string `arg:"positional" help:"The file pattern to format (supports recursive globs e.g. './**/*.vdl')"`
 	Verbose bool   `arg:"-v,--verbose" help:"Verbose output prints all formatted files"`
 }
 
@@ -19,12 +20,16 @@ func cmdFmt(args *cmdFmtArgs) {
 	var err error
 	startTime := time.Now()
 
-	matches, err = filepath.Glob(args.Pattern)
+	matches, err = doublestar.FilepathGlob(args.Pattern)
 	if err != nil {
 		log.Fatalf("VDL: failed to glob pattern: %s", err)
 	}
 
 	for _, match := range matches {
+		if !strings.HasSuffix(match, ".vdl") {
+			continue
+		}
+
 		fileBytes, err := os.ReadFile(match)
 		if err != nil {
 			log.Fatalf("VDL: failed to read file: %s", err)
