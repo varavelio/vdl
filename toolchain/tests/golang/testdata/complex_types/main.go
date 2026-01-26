@@ -1,5 +1,5 @@
 // Verifies complex type serialization: deeply nested structures, maps of arrays,
-// arrays of maps, nested objects, and multi-dimensional arrays.
+// arrays of maps, nested objects, multi-dimensional arrays, and inline object definitions.
 package main
 
 import (
@@ -20,6 +20,10 @@ func main() {
 		return gen.ServiceEchoOutput{Data: c.Input.Data}, nil
 	})
 
+	server.RPCs.Service().Procs.EchoInline().Handle(func(c *gen.ServiceEchoInlineHandlerContext[AppProps]) (gen.ServiceEchoInlineOutput, error) {
+		return gen.ServiceEchoInlineOutput{Data: c.Input.Data}, nil
+	})
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /rpc/{rpc}/{proc}", func(w http.ResponseWriter, r *http.Request) {
 		adapter := gen.NewNetHTTPAdapter(w, r)
@@ -31,6 +35,16 @@ func main() {
 
 	client := gen.NewClient(ts.URL + "/rpc").Build()
 
+	// Test 1: Original complex types
+	testOriginalComplexTypes(client)
+
+	// Test 2: Inline object types
+	testInlineTypes(client)
+
+	fmt.Println("Success")
+}
+
+func testOriginalComplexTypes(client *gen.Client) {
 	input := buildComplexInput()
 	res, err := client.RPCs.Service().Procs.Echo().Execute(context.Background(), gen.ServiceEchoInput{Data: input})
 	if err != nil {
@@ -40,8 +54,18 @@ func main() {
 	if !reflect.DeepEqual(res.Data, input) {
 		panic(fmt.Sprintf("data mismatch:\nsent: %+v\ngot:  %+v", input, res.Data))
 	}
+}
 
-	fmt.Println("Success")
+func testInlineTypes(client *gen.Client) {
+	input := buildInlineInput()
+	res, err := client.RPCs.Service().Procs.EchoInline().Execute(context.Background(), gen.ServiceEchoInlineInput{Data: input})
+	if err != nil {
+		panic(fmt.Sprintf("inline types failed: %v", err))
+	}
+
+	if !reflect.DeepEqual(res.Data, input) {
+		panic(fmt.Sprintf("inline data mismatch:\nsent: %+v\ngot:  %+v", input, res.Data))
+	}
 }
 
 func buildComplexInput() gen.Container {
@@ -95,6 +119,85 @@ func buildComplexInput() gen.Container {
 		ArrayOfMapOfArrays: []map[string][]int64{
 			{"set1": {1, 2, 3}, "set2": {4, 5}},
 			{"set3": {6, 7, 8, 9}},
+		},
+	}
+}
+
+func buildInlineInput() gen.InlineContainer {
+	return gen.InlineContainer{
+		// Simple inline object
+		SimpleInline: gen.InlineContainerSimpleInline{
+			Name:  "test",
+			Value: 42,
+		},
+
+		// Array of inline objects
+		ArrayOfInline: []gen.InlineContainerArrayOfInline{
+			{Id: 1, Label: "first"},
+			{Id: 2, Label: "second"},
+			{Id: 3, Label: "third"},
+		},
+
+		// Map of inline objects
+		MapOfInline: map[string]gen.InlineContainerMapOfInline{
+			"alpha": {Code: "A", Active: true},
+			"beta":  {Code: "B", Active: false},
+		},
+
+		// Nested inline objects (inline within inline)
+		NestedInline: gen.InlineContainerNestedInline{
+			Outer: "outer-value",
+			Inner: gen.InlineContainerNestedInlineInner{
+				Deep: "deep-value",
+				Deeper: gen.InlineContainerNestedInlineInnerDeeper{
+					Deepest: "deepest-value",
+				},
+			},
+		},
+
+		// Array of arrays of inline objects (matrix)
+		MatrixOfInline: [][]gen.InlineContainerMatrixOfInline{
+			{{X: 0, Y: 0}, {X: 1, Y: 0}},
+			{{X: 0, Y: 1}, {X: 1, Y: 1}},
+		},
+
+		// Map of arrays of inline objects
+		MapOfArrayOfInline: map[string][]gen.InlineContainerMapOfArrayOfInline{
+			"group1": {{Item: "a", Count: 1}, {Item: "b", Count: 2}},
+			"group2": {{Item: "c", Count: 3}},
+		},
+
+		// Array of maps of inline objects
+		ArrayOfMapOfInline: []map[string]gen.InlineContainerArrayOfMapOfInline{
+			{
+				"entry1": {Key: "k1", Data: gen.InlineContainerArrayOfMapOfInlineData{Nested: "n1"}},
+				"entry2": {Key: "k2", Data: gen.InlineContainerArrayOfMapOfInlineData{Nested: "n2"}},
+			},
+			{
+				"entry3": {Key: "k3", Data: gen.InlineContainerArrayOfMapOfInlineData{Nested: "n3"}},
+			},
+		},
+
+		// Complex: map of arrays of arrays of inline objects with nested inline
+		UltraComplex: []map[string][][]gen.InlineContainerUltraComplex{
+			{
+				"dimension1": {
+					{
+						{Level1: gen.InlineContainerUltraComplexLevel1{Level2: "a1"}},
+						{Level1: gen.InlineContainerUltraComplexLevel1{Level2: "a2"}},
+					},
+					{
+						{Level1: gen.InlineContainerUltraComplexLevel1{Level2: "b1"}},
+					},
+				},
+			},
+			{
+				"dimension2": {
+					{
+						{Level1: gen.InlineContainerUltraComplexLevel1{Level2: "c1"}},
+					},
+				},
+			},
 		},
 	}
 }

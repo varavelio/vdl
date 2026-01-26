@@ -50,6 +50,67 @@ type Container {
   arrayOfMapOfArrays: map<int[]>[]
 }
 
+// InlineContainer tests deeply nested inline object definitions
+// These structures exercise the code generator's ability to handle
+// anonymous types at arbitrary nesting levels
+type InlineContainer {
+  // Simple inline object
+  simpleInline: {
+    name: string
+    value: int
+  }
+
+  // Array of inline objects
+  arrayOfInline: {
+    id: int
+    label: string
+  }[]
+
+  // Map of inline objects
+  mapOfInline: map<{
+    code: string
+    active: bool
+  }>
+
+  // Nested inline objects (inline within inline)
+  nestedInline: {
+    outer: string
+    inner: {
+      deep: string
+      deeper: {
+        deepest: string
+      }
+    }
+  }
+
+  // Array of arrays of inline objects
+  matrixOfInline: {
+    x: int
+    y: int
+  }[][]
+
+  // Map of arrays of inline objects
+  mapOfArrayOfInline: map<{
+    item: string
+    count: int
+  }[]>
+
+  // Array of maps of inline objects
+  arrayOfMapOfInline: map<{
+    key: string
+    data: {
+      nested: string
+    }
+  }>[]
+
+  // Complex: map of arrays of arrays of inline objects with nested inline
+  ultraComplex: map<{
+    level1: {
+      level2: string
+    }
+  }[][]>[]
+}
+
 rpc Service {
   proc Echo {
     input {
@@ -58,6 +119,16 @@ rpc Service {
 
     output {
       data: Container
+    }
+  }
+
+  proc EchoInline {
+    input {
+      data: InlineContainer
+    }
+
+    output {
+      data: InlineContainer
     }
   }
 }
