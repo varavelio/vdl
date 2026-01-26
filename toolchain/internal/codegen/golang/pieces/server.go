@@ -718,11 +718,16 @@ func (s *internalServer[T]) handleStreamRequest(
 	}
 	c.Input = typedInput
 
-	// We need to synchronize writes to the httpAdapter because pings run in a separate goroutine
+	// We need to synchronize writes to the httpAdapter because pings run in a separate goroutine.
+	// The closed flag prevents writes after the handler returns (when the response writer is invalid).
 	var writeMu sync.Mutex
+	var closed bool
 	safeWrite := func(parts ...[]byte) error {
 		writeMu.Lock()
 		defer writeMu.Unlock()
+		if closed {
+			return nil
+		}
 		for _, part := range parts {
 			if _, err := httpAdapter.Write(part); err != nil {
 				return err
@@ -731,11 +736,12 @@ func (s *internalServer[T]) handleStreamRequest(
 		return httpAdapter.Flush()
 	}
 
-	// Start Ping Loop
+	// Start Ping Loop, use a done channel to wait for goroutine exit before returning
 	ctx, cancel := context.WithCancel(c.Context)
-	defer cancel()
+	pingDone := make(chan struct{})
 
 	go func() {
+		defer close(pingDone)
 		ticker := time.NewTicker(pingInterval)
 		defer ticker.Stop()
 		for {
@@ -746,6 +752,15 @@ func (s *internalServer[T]) handleStreamRequest(
 				_ = safeWrite([]byte(": ping\n\n"))
 			}
 		}
+	}()
+
+	// Ensure ping goroutine exits and mark response as closed before handler returns
+	defer func() {
+		cancel()
+		<-pingDone
+		writeMu.Lock()
+		closed = true
+		writeMu.Unlock()
 	}()
 
 	// Base emit writes SSE envelope with {ok:true, output}
