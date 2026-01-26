@@ -50,5 +50,15 @@ func main() {
 		panic(fmt.Sprintf("UserEventSubject with special chars: expected %q, got %q", expected, result))
 	}
 
+	// Test duplicated segments
+	// Pattern: "events.users.{userId}.{eventType}.{userId}"
+	// Expected function signature: DuplicatedSegment(userId string, eventType string) string
+	// Notice that userId appears twice in the pattern but only once in the arguments.
+	result = gen.DuplicatedSegment("user123", "login")
+	expected = "events.users.user123.login.user123"
+	if result != expected {
+		panic(fmt.Sprintf("DuplicatedSegment: expected %q, got %q", expected, result))
+	}
+
 	fmt.Println("Success")
 }
