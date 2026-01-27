@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
@@ -20,6 +21,40 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/formatter"
 	"github.com/varavelio/vdl/toolchain/internal/util/filepathutil"
 )
+
+// GeneratedFile represents a file produced by a generator.
+type GeneratedFile struct {
+	Path    string
+	Content []byte
+}
+
+// prepareOutputDir cleans (if requested) and creates the output directory.
+func prepareOutputDir(outputDir string, clean bool) error {
+	if clean {
+		if err := os.RemoveAll(outputDir); err != nil {
+			return fmt.Errorf("failed to clean output directory: %w", err)
+		}
+	}
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return fmt.Errorf("failed to create output directory: %w", err)
+	}
+	return nil
+}
+
+// writeGeneratedFiles writes a slice of generated files to the output directory.
+func writeGeneratedFiles(outputDir string, files []GeneratedFile) error {
+	for _, file := range files {
+		outPath := filepath.Join(outputDir, file.Path)
+		outDir := filepath.Dir(outPath)
+		if err := os.MkdirAll(outDir, 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+		}
+	}
+	return nil
+}
 
 // Run runs the code generator and returns an error if one occurred.
 func Run(configPath string) error {
@@ -133,53 +168,28 @@ func Run(configPath string) error {
 	return nil
 }
 
-func runPlugin(ctx context.Context, absConfigDir string, config *config.PluginConfig, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.Output)
-
-	// Clean output directory if requested
-	if config.Clean {
-		if err := os.RemoveAll(outputDir); err != nil {
-			return fmt.Errorf("failed to clean output directory: %w", err)
-		}
+func runPlugin(ctx context.Context, absConfigDir string, cfg *config.PluginConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
-	}
-
-	// Generate the code using new Generator interface
-	gen := plugin.New(config)
+	gen := plugin.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	// Write the generated files
-	for _, file := range files {
-		outPath := filepath.Join(outputDir, file.Path)
-		outDir := filepath.Dir(outPath)
-		if err := os.MkdirAll(outDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
-		}
-		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated code to file: %w", err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.Path, Content: f.Content}
 	}
-
-	return nil
+	return writeGeneratedFiles(outputDir, generatedFiles)
 }
 
 // joinErrors joins multiple error messages with newlines.
 func joinErrors(errs []string) string {
-	result := ""
-	for i, e := range errs {
-		if i > 0 {
-			result += "\n"
-		}
-		result += e
-	}
-	return result
+	return strings.Join(errs, "\n")
 }
 
 // getFormattedSchema reads and formats the schema file.
@@ -195,75 +205,58 @@ func getFormattedSchema(fs *vfs.FileSystem, absSchemaPath string) string {
 	return formatted
 }
 
-func runOpenAPI(ctx context.Context, absConfigDir string, config *config.OpenAPIConfig, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.Output)
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func runOpenAPI(ctx context.Context, absConfigDir string, cfg *config.OpenAPIConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Generate the code using new Generator interface
-	gen := openapi.New(config)
+	gen := openapi.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	// Write the generated files
-	for _, file := range files {
-		outPath := filepath.Join(outputDir, file.RelativePath)
-		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated code to file: %w", err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
 	}
-
-	return nil
+	return writeGeneratedFiles(outputDir, generatedFiles)
 }
 
-func runPlayground(ctx context.Context, absConfigDir string, playgroundConfig *config.PlaygroundConfig, schema *ir.Schema, formattedSchema string) error {
-	outputDir := filepath.Join(absConfigDir, playgroundConfig.Output)
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func runPlayground(ctx context.Context, absConfigDir string, cfg *config.PlaygroundConfig, schema *ir.Schema, formattedSchema string) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Generate the playground using new Generator interface
-	gen := playground.New(playgroundConfig, formattedSchema)
+	gen := playground.New(cfg, formattedSchema)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate playground: %w", err)
 	}
 
-	// Write all generated files
-	for _, file := range files {
-		outPath := filepath.Join(outputDir, file.RelativePath)
-		outDir := filepath.Dir(outPath)
-		if err := os.MkdirAll(outDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
-		}
-		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated file %s: %w", outPath, err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
+	}
+	if err := writeGeneratedFiles(outputDir, generatedFiles); err != nil {
+		return err
 	}
 
 	// Generate the openapi.yaml file for the playground
-	// Synthesize an OpenAPI config
 	openAPIConfig := &config.OpenAPIConfig{
 		CommonConfig: config.CommonConfig{
-			Output: playgroundConfig.Output,
-			Schema: playgroundConfig.Schema,
+			Output: cfg.Output,
+			Schema: cfg.Schema,
+			Clean:  false, // Don't clean again, we already cleaned above
 		},
 		Filename: "openapi.yaml",
 		Title:    "VDL API",
 		Version:  "1.0.0",
-		BaseURL:  playgroundConfig.DefaultBaseURL,
+		BaseURL:  cfg.DefaultBaseURL,
 	}
 
-	// Re-use runOpenAPI logic? No, runOpenAPI calculates path relative to absConfigDir.
-	// Here playgroundConfig.Output is already relative to absConfigDir.
-	// So we can call runOpenAPI directly!
 	if err := runOpenAPI(ctx, absConfigDir, openAPIConfig, schema); err != nil {
 		return fmt.Errorf("failed to generate openapi.yaml for playground: %w", err)
 	}
@@ -271,124 +264,78 @@ func runPlayground(ctx context.Context, absConfigDir string, playgroundConfig *c
 	return nil
 }
 
-func runGolang(ctx context.Context, absConfigDir string, config *config.GoConfig, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.Output)
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func runGolang(ctx context.Context, absConfigDir string, cfg *config.GoConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Generate the code using new Generator interface
-	gen := golang.New(config)
+	gen := golang.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	// Write the generated files
-	for _, file := range files {
-		outPath := filepath.Join(outputDir, file.RelativePath)
-		outDir := filepath.Dir(outPath)
-		if err := os.MkdirAll(outDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
-		}
-		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated code to file: %w", err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
 	}
-
-	return nil
+	return writeGeneratedFiles(outputDir, generatedFiles)
 }
 
-func runTypeScript(ctx context.Context, absConfigDir string, config *config.TypeScriptConfig, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.Output)
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func runTypeScript(ctx context.Context, absConfigDir string, cfg *config.TypeScriptConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Generate the code using new Generator interface
-	gen := typescript.New(config)
+	gen := typescript.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	// Write the generated files
-	for _, file := range files {
-		outPath := filepath.Join(outputDir, file.RelativePath)
-		outDir := filepath.Dir(outPath)
-		if err := os.MkdirAll(outDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
-		}
-		if err := os.WriteFile(outPath, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated code to file: %w", err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
 	}
-
-	return nil
+	return writeGeneratedFiles(outputDir, generatedFiles)
 }
 
-func runDart(ctx context.Context, absConfigDir string, config *config.DartConfig, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.Output)
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func runDart(ctx context.Context, absConfigDir string, cfg *config.DartConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Generate the code using new Generator interface
-	gen := dart.New(config)
+	gen := dart.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	// Write the generated files
-	for _, file := range files {
-		outputFile := filepath.Join(outputDir, file.RelativePath)
-		outputFileDir := filepath.Dir(outputFile)
-		if err := os.MkdirAll(outputFileDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
-		}
-
-		if err := os.WriteFile(outputFile, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated code to file %s: %w", outputFile, err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
 	}
-
-	return nil
+	return writeGeneratedFiles(outputDir, generatedFiles)
 }
 
-func runJSONSchema(ctx context.Context, absConfigDir string, config *config.JSONSchemaConfig, schema *ir.Schema) error {
-	outputDir := filepath.Join(absConfigDir, config.Output)
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func runJSONSchema(ctx context.Context, absConfigDir string, cfg *config.JSONSchemaConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
 	}
 
-	// Generate the code using new Generator interface
-	gen := jsonschema.New(config)
+	gen := jsonschema.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)
 	}
 
-	// Write the generated files
-	for _, file := range files {
-		outputFile := filepath.Join(outputDir, file.RelativePath)
-		outputFileDir := filepath.Dir(outputFile)
-		if err := os.MkdirAll(outputFileDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
-		}
-
-		if err := os.WriteFile(outputFile, file.Content, 0644); err != nil {
-			return fmt.Errorf("failed to write generated code to file %s: %w", outputFile, err)
-		}
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
 	}
-
-	return nil
+	return writeGeneratedFiles(outputDir, generatedFiles)
 }
