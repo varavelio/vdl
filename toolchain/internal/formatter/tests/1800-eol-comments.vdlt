@@ -1,0 +1,187 @@
+// =============================================================================
+// EOL Comments Test File
+// =============================================================================
+// Tests that end-of-line comments are preserved in all contexts.
+// EOL comments can use // or /* */ syntax and appear at the end of any line.
+
+// --- ENUM WITH EOL COMMENTS ---
+
+enum OrderStatus {
+  Pending // EOL comment on enum member
+  Shipped /* block EOL comment */
+  Delivered
+  Cancelled // another comment
+}
+
+enum Priority {
+  Low = 1 // low priority
+  Medium = 2 /* medium priority */
+  High = 3 // high priority
+}
+
+enum HttpMethod {
+  Get = "GET" // HTTP GET method
+  Post = "POST" /* HTTP POST method */
+  Put = "PUT"
+  Delete = "DELETE" // HTTP DELETE method
+}
+
+// --- TYPE WITH EOL COMMENTS ---
+
+type User {
+  id: string // user identifier
+  name: string /* user name */
+  email?: string // optional email
+  metadata: {
+    createdAt: datetime // creation timestamp
+    updatedAt: datetime /* last update */
+  }
+}
+
+// --- CONST WITH EOL COMMENTS ---
+
+const MAX_RETRIES = 3 // maximum retry count
+const API_VERSION = "v1" /* current API version */
+const TIMEOUT_MS = 5000 // timeout in milliseconds
+
+// --- PATTERN WITH EOL COMMENTS ---
+
+pattern Email = "email-pattern" // email regex
+pattern Phone = "phone-pattern" /* phone pattern */
+
+// --- INCLUDE WITH EOL COMMENTS ---
+
+include "common.vdl" // common types
+include "auth.vdl" /* auth module */
+
+// --- RPC WITH EOL COMMENTS ---
+
+rpc UserService {
+  proc GetUser { // get user procedure
+    input { // input block
+      userId: string // the user ID
+      options?: { // optional config
+        includeDeleted: bool /* include soft deleted */
+      }
+    }
+
+    output { /* output block */
+      user: { // user data
+        id: string // identifier
+        name: string /* display name */
+      }
+      found: bool // whether found
+    }
+  }
+
+  stream WatchUsers { // watch users stream
+    input { /* stream input */
+      filter?: string // optional filter
+    }
+
+    output { // stream output
+      event: string /* event type */
+      userId: string // affected user
+    }
+  }
+}
+
+// --- STANDALONE COMMENTS (not EOL) ---
+
+// This is a standalone comment
+/* This is a block comment */
+
+// >>>>
+
+// =============================================================================
+// EOL Comments Test File
+// =============================================================================
+// Tests that end-of-line comments are preserved in all contexts.
+// EOL comments can use // or /* */ syntax and appear at the end of any line.
+
+// --- ENUM WITH EOL COMMENTS ---
+
+enum OrderStatus {
+  Pending // EOL comment on enum member
+  Shipped /* block EOL comment */
+  Delivered
+  Cancelled // another comment
+}
+
+enum Priority {
+  Low = 1 // low priority
+  Medium = 2 /* medium priority */
+  High = 3 // high priority
+}
+
+enum HttpMethod {
+  Get = "GET" // HTTP GET method
+  Post = "POST" /* HTTP POST method */
+  Put = "PUT"
+  Delete = "DELETE" // HTTP DELETE method
+}
+
+// --- TYPE WITH EOL COMMENTS ---
+
+type User {
+  id: string // user identifier
+  name: string /* user name */
+  email?: string // optional email
+  metadata: {
+    createdAt: datetime // creation timestamp
+    updatedAt: datetime /* last update */
+  }
+}
+
+// --- CONST WITH EOL COMMENTS ---
+
+const MAX_RETRIES = 3 // maximum retry count
+const API_VERSION = "v1" /* current API version */
+const TIMEOUT_MS = 5000 // timeout in milliseconds
+
+// --- PATTERN WITH EOL COMMENTS ---
+
+pattern Email = "email-pattern" // email regex
+pattern Phone = "phone-pattern" /* phone pattern */
+
+// --- INCLUDE WITH EOL COMMENTS ---
+
+include "common.vdl" // common types
+include "auth.vdl" /* auth module */
+
+// --- RPC WITH EOL COMMENTS ---
+
+rpc UserService {
+  proc GetUser { // get user procedure
+    input { // input block
+      userId: string // the user ID
+      options?: { // optional config
+        includeDeleted: bool /* include soft deleted */
+      }
+    }
+
+    output { /* output block */
+      user: { // user data
+        id: string // identifier
+        name: string /* display name */
+      }
+      found: bool // whether found
+    }
+  }
+
+  stream WatchUsers { // watch users stream
+    input { /* stream input */
+      filter?: string // optional filter
+    }
+
+    output { // stream output
+      event: string /* event type */
+      userId: string // affected user
+    }
+  }
+}
+
+// --- STANDALONE COMMENTS (not EOL) ---
+
+// This is a standalone comment
+/* This is a block comment */

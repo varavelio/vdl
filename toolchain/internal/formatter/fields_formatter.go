@@ -153,6 +153,7 @@ func (f *typeBodyFormatter) LineAndComment(content string) {
 		if next.Comment.Block != nil {
 			f.g.Inlinef(" %s", *next.Comment.Block)
 		}
+		f.g.Break()
 
 		f.loadNextChild()
 		return
@@ -198,20 +199,41 @@ func (f *typeBodyFormatter) format() *gen.Generator {
 
 func (f *typeBodyFormatter) formatChild() {
 	// Determine spacing
-	_, prevLineDiff, prevEOF := f.peekChild(-1)
+	prev, prevLineDiff, prevEOF := f.peekChild(-1)
+	prevPrev, prevPrevLineDiff, prevPrevEOF := f.peekChildAt(-2)
+	_ = prevPrev // Used only for inline comment detection via prevPrevLineDiff
 	shouldBreak := false
 
 	if !prevEOF {
-		// General rule: preserve blank lines
-		if prevLineDiff.EndToStart > 1 {
-			// fmt.Printf("DEBUG: Break because EndToStart %d > 1\n", prevLineDiff.EndToStart)
+		// Check if previous was an inline/EOL comment (comment on same line as element before it)
+		prevWasInlineComment := false
+		if prev.Comment != nil && !prevPrevEOF {
+			// If the comment was on the same line as the element before it, it was an EOL comment
+			if prevPrevLineDiff.EndToStart == 0 {
+				prevWasInlineComment = true
+			}
+		}
+
+		// General rule: preserve blank lines from source
+		// But if the previous was an inline comment, we already added a newline, so only add break
+		// if there are MORE than 2 lines of separation (to account for the consumed comment)
+		if prev.Comment != nil {
+			if prevWasInlineComment {
+				// The inline comment was already processed; spacing is relative to the comment
+				// We don't add extra breaks after inline comments
+			} else if prevLineDiff.EndToStart > 1 {
+				shouldBreak = true
+			}
+		} else if prevLineDiff.EndToStart > 1 {
 			shouldBreak = true
 		}
 
-		// If current is docstring/field with docstring, ensure break?
-		// formatField handles docstring break internally usually, but we check here too.
+		// If current field has a docstring AND previous was not a comment,
+		// add a blank line for visual separation.
 		if f.currentIndexChild.Field != nil && f.currentIndexChild.Field.Docstring != nil {
-			shouldBreak = true
+			if prev.Comment == nil {
+				shouldBreak = true
+			}
 		}
 	}
 
@@ -224,6 +246,25 @@ func (f *typeBodyFormatter) formatChild() {
 		formatField(f.g, f.currentIndexChild.Field, shouldBreak, f)
 		f.LineAndComment("")
 	}
+}
+
+// peekChildAt returns information about the child at the specified index.
+func (f *typeBodyFormatter) peekChildAt(index int) (ast.TypeDeclChild, ast.LineDiff, bool) {
+	actualIndex := f.currentIndex + index
+	outOfBounds := actualIndex < 0 || actualIndex > f.maxIndex
+	child := ast.TypeDeclChild{}
+	lineDiff := ast.LineDiff{}
+
+	if !outOfBounds {
+		child = *f.children[actualIndex]
+		// Get line diff between the peeked child and the one after it (for inline comment detection)
+		if actualIndex+1 <= f.maxIndex {
+			nextChild := *f.children[actualIndex+1]
+			lineDiff = ast.GetLineDiff(child, nextChild)
+		}
+	}
+
+	return child, lineDiff, outOfBounds
 }
 
 // If current is docstring/field with docstring, ensure break?
@@ -302,6 +343,7 @@ func (f *ioBodyFormatter) LineAndComment(content string) {
 		if next.Comment.Block != nil {
 			f.g.Inlinef(" %s", *next.Comment.Block)
 		}
+		f.g.Break()
 
 		f.loadNextChild()
 		return
@@ -345,16 +387,39 @@ func (f *ioBodyFormatter) format() *gen.Generator {
 }
 
 func (f *ioBodyFormatter) formatChild() {
-	_, prevLineDiff, prevEOF := f.peekChild(-1)
+	prev, prevLineDiff, prevEOF := f.peekChild(-1)
+	prevPrev, prevPrevLineDiff, prevPrevEOF := f.peekChildAt(-2)
+	_ = prevPrev // Used only for inline comment detection via prevPrevLineDiff
 	shouldBreak := false
 
 	if !prevEOF {
-		if prevLineDiff.EndToStart > 1 {
+		// Check if previous was an inline/EOL comment (comment on same line as element before it)
+		prevWasInlineComment := false
+		if prev.Comment != nil && !prevPrevEOF {
+			// If the comment was on the same line as the element before it, it was an EOL comment
+			if prevPrevLineDiff.EndToStart == 0 {
+				prevWasInlineComment = true
+			}
+		}
+
+		// General rule: preserve blank lines from source
+		// But if the previous was an inline comment, we already added a newline
+		if prev.Comment != nil {
+			if prevWasInlineComment {
+				// The inline comment was already processed; we don't add extra breaks
+			} else if prevLineDiff.EndToStart > 1 {
+				shouldBreak = true
+			}
+		} else if prevLineDiff.EndToStart > 1 {
 			shouldBreak = true
 		}
 
+		// If current field has a docstring AND previous was not a comment,
+		// add a blank line for visual separation.
 		if f.currentIndexChild.Field != nil && f.currentIndexChild.Field.Docstring != nil {
-			shouldBreak = true
+			if prev.Comment == nil {
+				shouldBreak = true
+			}
 		}
 	}
 
@@ -367,4 +432,23 @@ func (f *ioBodyFormatter) formatChild() {
 		formatField(f.g, f.currentIndexChild.Field, shouldBreak, f)
 		f.LineAndComment("")
 	}
+}
+
+// peekChildAt returns information about the child at the specified index.
+func (f *ioBodyFormatter) peekChildAt(index int) (ast.InputOutputChild, ast.LineDiff, bool) {
+	actualIndex := f.currentIndex + index
+	outOfBounds := actualIndex < 0 || actualIndex > f.maxIndex
+	child := ast.InputOutputChild{}
+	lineDiff := ast.LineDiff{}
+
+	if !outOfBounds {
+		child = *f.children[actualIndex]
+		// Get line diff between the peeked child and the one after it (for inline comment detection)
+		if actualIndex+1 <= f.maxIndex {
+			nextChild := *f.children[actualIndex+1]
+			lineDiff = ast.GetLineDiff(child, nextChild)
+		}
+	}
+
+	return child, lineDiff, outOfBounds
 }
