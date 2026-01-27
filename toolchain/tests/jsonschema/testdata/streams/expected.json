@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "Event": {
+      "properties": {
+        "eventType": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": ["eventType", "id", "payload", "timestamp"],
+      "type": "object"
+    },
+    "EventServiceGetEventInput": {
+      "description": "Input for EventService/GetEvent procedure",
+      "properties": {
+        "eventId": {
+          "type": "string"
+        }
+      },
+      "required": ["eventId"],
+      "type": "object"
+    },
+    "EventServiceGetEventOutput": {
+      "description": "Output for EventService/GetEvent procedure",
+      "properties": {
+        "event": {
+          "$ref": "#/$defs/Event"
+        }
+      },
+      "required": ["event"],
+      "type": "object"
+    },
+    "EventServiceStreamLogsInput": {
+      "description": "Input for EventService/StreamLogs stream",
+      "properties": {
+        "level": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "EventServiceStreamLogsOutput": {
+      "description": "Output for EventService/StreamLogs stream",
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/LogEntry"
+        }
+      },
+      "required": ["entry"],
+      "type": "object"
+    },
+    "EventServiceSubscribeEventsInput": {
+      "description": "Input for EventService/SubscribeEvents stream",
+      "properties": {
+        "eventTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "startFrom": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": ["eventTypes"],
+      "type": "object"
+    },
+    "EventServiceSubscribeEventsOutput": {
+      "description": "Output for EventService/SubscribeEvents stream",
+      "properties": {
+        "event": {
+          "$ref": "#/$defs/Event"
+        }
+      },
+      "required": ["event"],
+      "type": "object"
+    },
+    "EventServiceWatchChangesInput": {
+      "description": "Input for EventService/WatchChanges stream",
+      "properties": {
+        "includeMetadata": {
+          "type": "boolean"
+        },
+        "resourceId": {
+          "type": "string"
+        }
+      },
+      "required": ["resourceId"],
+      "type": "object"
+    },
+    "EventServiceWatchChangesOutput": {
+      "description": "Output for EventService/WatchChanges stream",
+      "properties": {
+        "changeType": {
+          "type": "string"
+        },
+        "changedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "newValue": {
+          "type": "string"
+        },
+        "oldValue": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        }
+      },
+      "required": ["changeType", "changedAt", "resourceId"],
+      "type": "object"
+    },
+    "LogEntry": {
+      "properties": {
+        "level": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": ["level", "message", "timestamp"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

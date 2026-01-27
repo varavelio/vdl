@@ -1,0 +1,84 @@
+{
+  "$defs": {
+    "ServiceCreateUserInput": {
+      "description": "Input for Service/CreateUser procedure",
+      "properties": {
+        "age": {
+          "type": "integer"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number"
+        }
+      },
+      "required": ["age", "isActive", "name", "score"],
+      "type": "object"
+    },
+    "ServiceCreateUserOutput": {
+      "description": "Output for Service/CreateUser procedure",
+      "properties": {
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["createdAt", "id"],
+      "type": "object"
+    },
+    "ServiceGetUserInput": {
+      "description": "Input for Service/GetUser procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "ServiceGetUserOutput": {
+      "description": "Output for Service/GetUser procedure",
+      "properties": {
+        "user": {
+          "$ref": "#/$defs/User"
+        }
+      },
+      "required": ["user"],
+      "type": "object"
+    },
+    "User": {
+      "properties": {
+        "age": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number"
+        }
+      },
+      "required": ["age", "createdAt", "id", "isActive", "name", "score"],
+      "type": "object"
+    }
+  },
+  "$id": "https://example.com/basic-types.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

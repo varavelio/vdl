@@ -1,0 +1,65 @@
+// Tests optional fields at various levels
+
+type UserProfile {
+  id: string
+  username: string
+  email?: string
+  phone?: string
+  bio?: string
+  avatar?: string
+  settings?: {
+    theme?: string
+    language?: string
+    notifications?: bool
+  }
+}
+
+type SearchFilters {
+  query: string
+  category?: string
+  minPrice?: float
+  maxPrice?: float
+  tags?: string[]
+  sortBy?: string
+  sortOrder?: string
+}
+
+type ApiResponse {
+  success: bool
+  data?: {
+    items?: {
+      id: string
+      value?: string
+    }[]
+    total?: int
+    page?: int
+  }
+  error?: {
+    code: string
+    message: string
+    details?: string
+  }
+}
+
+rpc UserService {
+  proc GetProfile {
+    input {
+      userId: string
+      includeSettings?: bool
+    }
+
+    output {
+      profile: UserProfile
+    }
+  }
+
+  proc Search {
+    input {
+      filters: SearchFilters
+    }
+
+    output {
+      response: ApiResponse
+    }
+  }
+}

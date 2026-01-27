@@ -1,0 +1,68 @@
+// Tests complex nested types with inline objects
+
+type Address {
+  street: string
+  city: string
+  country: string
+  zipCode: string
+}
+
+type Contact {
+  email: string
+  phone: string
+  address: Address
+}
+
+type Company {
+  name: string
+  contact: Contact
+  departments: {
+    name: string
+    headCount: int
+    manager: {
+      name: string
+      email: string
+    }
+  }[]
+}
+
+type Employee {
+  id: string
+  name: string
+  contact: Contact
+  company: Company
+  metadata: {
+    hireDate: datetime
+    department: string
+    skills: string[]
+    certifications: {
+      name: string
+      issuedAt: datetime
+      expiresAt?: datetime
+    }[]
+  }
+}
+
+rpc EmployeeService {
+  proc GetEmployee {
+    input {
+      id: string
+    }
+
+    output {
+      employee: Employee
+    }
+  }
+
+  proc CreateEmployee {
+    input {
+      name: string
+      contact: Contact
+      department: string
+    }
+
+    output {
+      employee: Employee
+    }
+  }
+}

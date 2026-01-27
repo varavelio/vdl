@@ -1,0 +1,107 @@
+{
+  "$defs": {
+    "OperationStatus": {
+      "description": "Represents the status of an operation.\nCan be used to track the progress of async tasks.",
+      "enum": ["pending", "running", "completed", "failed"],
+      "type": "string"
+    },
+    "RequestConfig": {
+      "description": "Contains configuration for API requests",
+      "properties": {
+        "headers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom headers to include",
+          "type": "object"
+        },
+        "retries": {
+          "description": "Maximum number of retry attempts",
+          "type": "integer"
+        },
+        "timeout": {
+          "description": "The timeout in milliseconds",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "User": {
+      "description": "Represents a user in the system",
+      "properties": {
+        "createdAt": {
+          "description": "When the user was created",
+          "format": "date-time",
+          "type": "string"
+        },
+        "email": {
+          "description": "The user's email address (must be unique)",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier for the user",
+          "type": "string"
+        },
+        "isActive": {
+          "description": "Whether the user account is active",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "The user's display name",
+          "type": "string"
+        }
+      },
+      "required": ["createdAt", "email", "id", "isActive", "name"],
+      "type": "object"
+    },
+    "UserServiceGetUserInput": {
+      "description": "Input for UserService/GetUser procedure",
+      "properties": {
+        "config": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/RequestConfig"
+            },
+            {
+              "description": "Optional configuration for the request"
+            }
+          ]
+        },
+        "userId": {
+          "description": "The ID of the user to retrieve",
+          "type": "string"
+        }
+      },
+      "required": ["userId"],
+      "type": "object"
+    },
+    "UserServiceGetUserOutput": {
+      "description": "Output for UserService/GetUser procedure",
+      "properties": {
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/OperationStatus"
+            },
+            {
+              "description": "The status of the retrieval operation"
+            }
+          ]
+        },
+        "user": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/User"
+            },
+            {
+              "description": "The retrieved user"
+            }
+          ]
+        }
+      },
+      "required": ["status", "user"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

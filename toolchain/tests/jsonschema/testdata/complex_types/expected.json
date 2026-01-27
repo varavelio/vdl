@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "Address": {
+      "properties": {
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string"
+        }
+      },
+      "required": ["city", "country", "street", "zipCode"],
+      "type": "object"
+    },
+    "Company": {
+      "properties": {
+        "contact": {
+          "$ref": "#/$defs/Contact"
+        },
+        "departments": {
+          "items": {
+            "properties": {
+              "headCount": {
+                "type": "integer"
+              },
+              "manager": {
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "name"],
+                "type": "object"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["headCount", "manager", "name"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["contact", "departments", "name"],
+      "type": "object"
+    },
+    "Contact": {
+      "properties": {
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      },
+      "required": ["address", "email", "phone"],
+      "type": "object"
+    },
+    "Employee": {
+      "properties": {
+        "company": {
+          "$ref": "#/$defs/Company"
+        },
+        "contact": {
+          "$ref": "#/$defs/Contact"
+        },
+        "id": {
+          "type": "string"
+        },
+        "metadata": {
+          "properties": {
+            "certifications": {
+              "items": {
+                "properties": {
+                  "expiresAt": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "issuedAt": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["issuedAt", "name"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "department": {
+              "type": "string"
+            },
+            "hireDate": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "skills": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": ["certifications", "department", "hireDate", "skills"],
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["company", "contact", "id", "metadata", "name"],
+      "type": "object"
+    },
+    "EmployeeServiceCreateEmployeeInput": {
+      "description": "Input for EmployeeService/CreateEmployee procedure",
+      "properties": {
+        "contact": {
+          "$ref": "#/$defs/Contact"
+        },
+        "department": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["contact", "department", "name"],
+      "type": "object"
+    },
+    "EmployeeServiceCreateEmployeeOutput": {
+      "description": "Output for EmployeeService/CreateEmployee procedure",
+      "properties": {
+        "employee": {
+          "$ref": "#/$defs/Employee"
+        }
+      },
+      "required": ["employee"],
+      "type": "object"
+    },
+    "EmployeeServiceGetEmployeeInput": {
+      "description": "Input for EmployeeService/GetEmployee procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "EmployeeServiceGetEmployeeOutput": {
+      "description": "Output for EmployeeService/GetEmployee procedure",
+      "properties": {
+        "employee": {
+          "$ref": "#/$defs/Employee"
+        }
+      },
+      "required": ["employee"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,87 @@
+// Tests arrays and maps with various types
+
+type Point {
+  x: float
+  y: float
+}
+
+type DataContainer {
+  // Simple arrays
+  tags: string[]
+  scores: int[]
+  values: float[]
+  flags: bool[]
+  timestamps: datetime[]
+
+  // Multi-dimensional arrays
+  matrix: int[][]
+  cube: float[][][]
+  deepArray: string[][][][]
+
+  // Arrays of custom types
+  points: Point[]
+  pointMatrix: Point[][]
+
+  // Simple maps
+  metadata: map<string>
+  counts: map<int>
+  ratings: map<float>
+
+  // Maps of arrays
+  tagGroups: map<string[]>
+  scoresByCategory: map<int[]>
+
+  // Maps of custom types
+  pointsByName: map<Point>
+
+  // Complex combinations
+  matrixByName: map<int[][]>
+  complexData: map<{
+    items: string[]
+    count: int
+  }>
+}
+
+type NestedMaps {
+  level1: map<map<string>>
+  level2: map<map<map<int>>>
+  mixed: map<{
+    inner: map<string[]>
+  }>
+}
+
+rpc DataService {
+  proc ProcessArrays {
+    input {
+      items: string[]
+      matrix: int[][]
+      points: Point[]
+    }
+
+    output {
+      processed: bool
+      count: int
+    }
+  }
+
+  proc ProcessMaps {
+    input {
+      data: map<string>
+      nested: map<map<int>>
+    }
+
+    output {
+      result: map<string>
+    }
+  }
+
+  proc GetContainer {
+    input {
+      id: string
+    }
+
+    output {
+      container: DataContainer
+    }
+  }
+}

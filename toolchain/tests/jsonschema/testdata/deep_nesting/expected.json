@@ -1,0 +1,339 @@
+{
+  "$defs": {
+    "ArraysInNesting": {
+      "properties": {
+        "groups": {
+          "items": {
+            "properties": {
+              "members": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "permissions": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": ["name", "permissions"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["id", "roles"],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["members", "name"],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["groups"],
+      "type": "object"
+    },
+    "ComplexNesting": {
+      "properties": {
+        "config": {
+          "properties": {
+            "cache": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "servers": {
+                  "properties": {
+                    "primary": {
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": ["host", "port"],
+                      "type": "object"
+                    },
+                    "secondary": {
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": ["host", "port"],
+                      "type": "object"
+                    }
+                  },
+                  "required": ["primary"],
+                  "type": "object"
+                },
+                "ttl": {
+                  "type": "integer"
+                }
+              },
+              "required": ["enabled", "servers", "ttl"],
+              "type": "object"
+            },
+            "database": {
+              "properties": {
+                "credentials": {
+                  "properties": {
+                    "options": {
+                      "properties": {
+                        "ssl": {
+                          "type": "boolean"
+                        },
+                        "timeout": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": ["ssl"],
+                      "type": "object"
+                    },
+                    "password": {
+                      "type": "string"
+                    },
+                    "username": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["password", "username"],
+                  "type": "object"
+                },
+                "host": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                }
+              },
+              "required": ["credentials", "host", "port"],
+              "type": "object"
+            }
+          },
+          "required": ["cache", "database"],
+          "type": "object"
+        }
+      },
+      "required": ["config"],
+      "type": "object"
+    },
+    "DeepStructure": {
+      "properties": {
+        "level1": {
+          "properties": {
+            "level2": {
+              "properties": {
+                "level3": {
+                  "properties": {
+                    "flag": {
+                      "type": "boolean"
+                    },
+                    "level4": {
+                      "properties": {
+                        "level5": {
+                          "properties": {
+                            "data": {
+                              "type": "string"
+                            },
+                            "level6": {
+                              "properties": {
+                                "count": {
+                                  "type": "integer"
+                                },
+                                "finalValue": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": ["count", "finalValue"],
+                              "type": "object"
+                            }
+                          },
+                          "required": ["data", "level6"],
+                          "type": "object"
+                        },
+                        "timestamp": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": ["level5", "timestamp"],
+                      "type": "object"
+                    }
+                  },
+                  "required": ["flag", "level4"],
+                  "type": "object"
+                },
+                "value": {
+                  "type": "integer"
+                }
+              },
+              "required": ["level3", "value"],
+              "type": "object"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["level2", "name"],
+          "type": "object"
+        }
+      },
+      "required": ["level1"],
+      "type": "object"
+    },
+    "MapsInNesting": {
+      "properties": {
+        "regions": {
+          "additionalProperties": {
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "zones": {
+                "additionalProperties": {
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "servers": {
+                      "additionalProperties": {
+                        "properties": {
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["host", "port", "status"],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": ["id", "servers"],
+                  "type": "object"
+                },
+                "type": "object"
+              }
+            },
+            "required": ["name", "zones"],
+            "type": "object"
+          },
+          "type": "object"
+        }
+      },
+      "required": ["regions"],
+      "type": "object"
+    },
+    "NestedServiceGetComplexConfigInput": {
+      "description": "Input for NestedService/GetComplexConfig procedure",
+      "properties": {
+        "environment": {
+          "type": "string"
+        }
+      },
+      "required": ["environment"],
+      "type": "object"
+    },
+    "NestedServiceGetComplexConfigOutput": {
+      "description": "Output for NestedService/GetComplexConfig procedure",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/ComplexNesting"
+        }
+      },
+      "required": ["config"],
+      "type": "object"
+    },
+    "NestedServiceGetDeepStructureInput": {
+      "description": "Input for NestedService/GetDeepStructure procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "NestedServiceGetDeepStructureOutput": {
+      "description": "Output for NestedService/GetDeepStructure procedure",
+      "properties": {
+        "structure": {
+          "$ref": "#/$defs/DeepStructure"
+        }
+      },
+      "required": ["structure"],
+      "type": "object"
+    },
+    "NestedServiceProcessNestedInput": {
+      "description": "Input for NestedService/ProcessNested procedure",
+      "properties": {
+        "data": {
+          "properties": {
+            "outer": {
+              "properties": {
+                "middle": {
+                  "properties": {
+                    "inner": {
+                      "properties": {
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["value"],
+                      "type": "object"
+                    }
+                  },
+                  "required": ["inner"],
+                  "type": "object"
+                }
+              },
+              "required": ["middle"],
+              "type": "object"
+            }
+          },
+          "required": ["outer"],
+          "type": "object"
+        }
+      },
+      "required": ["data"],
+      "type": "object"
+    },
+    "NestedServiceProcessNestedOutput": {
+      "description": "Output for NestedService/ProcessNested procedure",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": ["success"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

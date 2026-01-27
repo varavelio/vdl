@@ -1,0 +1,133 @@
+// Tests multiple RPC blocks
+
+type Product {
+  id: string
+  name: string
+  price: float
+}
+
+type Order {
+  id: string
+  productId: string
+  quantity: int
+  total: float
+}
+
+type Customer {
+  id: string
+  name: string
+  email: string
+}
+
+type Review {
+  id: string
+  productId: string
+  rating: int
+  comment: string
+}
+
+rpc ProductService {
+  proc GetProduct {
+    input {
+      productId: string
+    }
+
+    output {
+      product: Product
+    }
+  }
+
+  proc ListProducts {
+    input {
+      limit?: int
+      offset?: int
+    }
+
+    output {
+      products: Product[]
+      total: int
+    }
+  }
+}
+
+rpc OrderService {
+  proc CreateOrder {
+    input {
+      customerId: string
+      productId: string
+      quantity: int
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  proc GetOrder {
+    input {
+      orderId: string
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  stream WatchOrders {
+    input {
+      customerId: string
+    }
+
+    output {
+      order: Order
+      eventType: string
+    }
+  }
+}
+
+rpc CustomerService {
+  proc GetCustomer {
+    input {
+      customerId: string
+    }
+
+    output {
+      customer: Customer
+    }
+  }
+
+  proc CreateCustomer {
+    input {
+      name: string
+      email: string
+    }
+
+    output {
+      customer: Customer
+    }
+  }
+}
+
+rpc ReviewService {
+  proc AddReview {
+    input {
+      productId: string
+      rating: int
+      comment: string
+    }
+
+    output {
+      review: Review
+    }
+  }
+
+  proc GetReviews {
+    input {
+      productId: string
+    }
+
+    output {
+      reviews: Review[]
+    }
+  }
+}

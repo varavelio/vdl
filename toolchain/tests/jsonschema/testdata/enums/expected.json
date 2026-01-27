@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "HttpStatus": {
+      "description": "HTTP status codes",
+      "enum": [200, 201, 400, 404, 500],
+      "type": "integer"
+    },
+    "Order": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "status": {
+          "$ref": "#/$defs/OrderStatus"
+        }
+      },
+      "required": ["id", "priority", "status"],
+      "type": "object"
+    },
+    "OrderServiceGetOrderInput": {
+      "description": "Input for OrderService/GetOrder procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "OrderServiceGetOrderOutput": {
+      "description": "Output for OrderService/GetOrder procedure",
+      "properties": {
+        "httpStatus": {
+          "$ref": "#/$defs/HttpStatus"
+        },
+        "order": {
+          "$ref": "#/$defs/Order"
+        }
+      },
+      "required": ["httpStatus", "order"],
+      "type": "object"
+    },
+    "OrderServiceUpdateStatusInput": {
+      "description": "Input for OrderService/UpdateStatus procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/OrderStatus"
+        }
+      },
+      "required": ["id", "status"],
+      "type": "object"
+    },
+    "OrderServiceUpdateStatusOutput": {
+      "description": "Output for OrderService/UpdateStatus procedure",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": ["success"],
+      "type": "object"
+    },
+    "OrderStatus": {
+      "description": "Status of an order",
+      "enum": ["pending", "processing", "shipped", "delivered", "cancelled"],
+      "type": "string"
+    },
+    "Priority": {
+      "description": "Priority levels",
+      "enum": [1, 2, 3, 4],
+      "type": "integer"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

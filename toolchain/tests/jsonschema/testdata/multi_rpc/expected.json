@@ -1,0 +1,280 @@
+{
+  "$defs": {
+    "Customer": {
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["email", "id", "name"],
+      "type": "object"
+    },
+    "CustomerServiceCreateCustomerInput": {
+      "description": "Input for CustomerService/CreateCustomer procedure",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["email", "name"],
+      "type": "object"
+    },
+    "CustomerServiceCreateCustomerOutput": {
+      "description": "Output for CustomerService/CreateCustomer procedure",
+      "properties": {
+        "customer": {
+          "$ref": "#/$defs/Customer"
+        }
+      },
+      "required": ["customer"],
+      "type": "object"
+    },
+    "CustomerServiceGetCustomerInput": {
+      "description": "Input for CustomerService/GetCustomer procedure",
+      "properties": {
+        "customerId": {
+          "type": "string"
+        }
+      },
+      "required": ["customerId"],
+      "type": "object"
+    },
+    "CustomerServiceGetCustomerOutput": {
+      "description": "Output for CustomerService/GetCustomer procedure",
+      "properties": {
+        "customer": {
+          "$ref": "#/$defs/Customer"
+        }
+      },
+      "required": ["customer"],
+      "type": "object"
+    },
+    "Order": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "productId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "number"
+        }
+      },
+      "required": ["id", "productId", "quantity", "total"],
+      "type": "object"
+    },
+    "OrderServiceCreateOrderInput": {
+      "description": "Input for OrderService/CreateOrder procedure",
+      "properties": {
+        "customerId": {
+          "type": "string"
+        },
+        "productId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer"
+        }
+      },
+      "required": ["customerId", "productId", "quantity"],
+      "type": "object"
+    },
+    "OrderServiceCreateOrderOutput": {
+      "description": "Output for OrderService/CreateOrder procedure",
+      "properties": {
+        "order": {
+          "$ref": "#/$defs/Order"
+        }
+      },
+      "required": ["order"],
+      "type": "object"
+    },
+    "OrderServiceGetOrderInput": {
+      "description": "Input for OrderService/GetOrder procedure",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        }
+      },
+      "required": ["orderId"],
+      "type": "object"
+    },
+    "OrderServiceGetOrderOutput": {
+      "description": "Output for OrderService/GetOrder procedure",
+      "properties": {
+        "order": {
+          "$ref": "#/$defs/Order"
+        }
+      },
+      "required": ["order"],
+      "type": "object"
+    },
+    "OrderServiceWatchOrdersInput": {
+      "description": "Input for OrderService/WatchOrders stream",
+      "properties": {
+        "customerId": {
+          "type": "string"
+        }
+      },
+      "required": ["customerId"],
+      "type": "object"
+    },
+    "OrderServiceWatchOrdersOutput": {
+      "description": "Output for OrderService/WatchOrders stream",
+      "properties": {
+        "eventType": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/$defs/Order"
+        }
+      },
+      "required": ["eventType", "order"],
+      "type": "object"
+    },
+    "Product": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        }
+      },
+      "required": ["id", "name", "price"],
+      "type": "object"
+    },
+    "ProductServiceGetProductInput": {
+      "description": "Input for ProductService/GetProduct procedure",
+      "properties": {
+        "productId": {
+          "type": "string"
+        }
+      },
+      "required": ["productId"],
+      "type": "object"
+    },
+    "ProductServiceGetProductOutput": {
+      "description": "Output for ProductService/GetProduct procedure",
+      "properties": {
+        "product": {
+          "$ref": "#/$defs/Product"
+        }
+      },
+      "required": ["product"],
+      "type": "object"
+    },
+    "ProductServiceListProductsInput": {
+      "description": "Input for ProductService/ListProducts procedure",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "ProductServiceListProductsOutput": {
+      "description": "Output for ProductService/ListProducts procedure",
+      "properties": {
+        "products": {
+          "items": {
+            "$ref": "#/$defs/Product"
+          },
+          "type": "array"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": ["products", "total"],
+      "type": "object"
+    },
+    "Review": {
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "productId": {
+          "type": "string"
+        },
+        "rating": {
+          "type": "integer"
+        }
+      },
+      "required": ["comment", "id", "productId", "rating"],
+      "type": "object"
+    },
+    "ReviewServiceAddReviewInput": {
+      "description": "Input for ReviewService/AddReview procedure",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "productId": {
+          "type": "string"
+        },
+        "rating": {
+          "type": "integer"
+        }
+      },
+      "required": ["comment", "productId", "rating"],
+      "type": "object"
+    },
+    "ReviewServiceAddReviewOutput": {
+      "description": "Output for ReviewService/AddReview procedure",
+      "properties": {
+        "review": {
+          "$ref": "#/$defs/Review"
+        }
+      },
+      "required": ["review"],
+      "type": "object"
+    },
+    "ReviewServiceGetReviewsInput": {
+      "description": "Input for ReviewService/GetReviews procedure",
+      "properties": {
+        "productId": {
+          "type": "string"
+        }
+      },
+      "required": ["productId"],
+      "type": "object"
+    },
+    "ReviewServiceGetReviewsOutput": {
+      "description": "Output for ReviewService/GetReviews procedure",
+      "properties": {
+        "reviews": {
+          "items": {
+            "$ref": "#/$defs/Review"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["reviews"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
