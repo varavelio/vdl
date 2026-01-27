@@ -1,5 +1,7 @@
 # The following directories should have their own formatting mechanisms
 # so they are not formatted by the root formatter and instead the
 # task fmt command should call the formatter for each directory.
-toolchain/
 playground/
+
+*.schema.json
+toolchain/tests/**/gen/

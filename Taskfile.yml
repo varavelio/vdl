@@ -46,7 +46,7 @@ tasks:
   fmt:
     desc: Run all repository code formatters
     cmds:
-      - prettier . --write # <- Default formatter for the root directory
+      - prettier . --write --config ./.prettierrc --ignore-path ./.prettierignore --log-level warn # <- Default formatter for the root directory
       # The following commands are specific to each directory that has its
       # own formatter
       - cd ./toolchain && task fmt

@@ -62,7 +62,7 @@ tasks:
   fmt:
     desc: Run code formatter
     cmds:
-      - prettier . --write # Format non-go files
+      - prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --log-level warn # Format non-go files
       - go fmt ./...
       - go run ./cmd/vdl/. fmt ./**/*.vdl # Format .vdl files using the current fmt command
 
