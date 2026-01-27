@@ -64,7 +64,7 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("//   s := NewServer[AppProps]()")
 	g.Line("func NewServer[T any]() *Server[T] {")
 	g.Block(func() {
-		g.Line("intServer := newInternalServer[T](VDLProcedureNames, VDLStreamNames)")
+		g.Line("intServer := newInternalServer[T](VDLProcedures, VDLStreams)")
 		g.Line("return &Server[T]{")
 		g.Block(func() {
 			g.Line("intServer: intServer,")

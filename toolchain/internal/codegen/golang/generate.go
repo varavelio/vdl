@@ -105,6 +105,17 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b.Break()
 	}
 
+	// RPC Catalog (rpc_catalog.go)
+	code, err = generateRPCCatalog(schema, g.config)
+	if err != nil {
+		return nil, err
+	}
+	if code = strings.TrimSpace(code); code != "" {
+		b := getBuilder("rpc_catalog.go")
+		b.Raw(code)
+		b.Break()
+	}
+
 	// Patterns (patterns.go)
 	code, err = generatePatterns(schema, g.config)
 	if err != nil {

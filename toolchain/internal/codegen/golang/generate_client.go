@@ -155,7 +155,7 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 	g.Line("// Build constructs the *Client using the configured options.")
 	g.Line("func (b *clientBuilder) Build() *Client {")
 	g.Block(func() {
-		g.Line("intClient := newInternalClient(b.baseURL, VDLProcedureNames, VDLStreamNames, b.opts...)")
+		g.Line("intClient := newInternalClient(b.baseURL, VDLProcedures, VDLStreams, b.opts...)")
 		g.Line("return &Client{RPCs: &clientRPCRegistry{intClient: intClient}}")
 	})
 	g.Line("}")

@@ -27,6 +27,11 @@ type OperationDefinition struct {
 	Type    OperationType
 }
 
+// Path returns the URL path for the operation.
+func (o OperationDefinition) Path() string {
+	return "/" + o.RPCName + "/" + o.Name
+}
+
 // Response represents the response of a VDL call.
 type Response[T any] struct {
 	Ok     bool  `json:"ok"`
