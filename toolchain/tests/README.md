@@ -1,54 +1,38 @@
-# VDL e2e Tests
+# VDL E2E Tests
 
-This directory contains End-to-End (E2E) tests for the VDL toolchain. These tests verify that the **generated code** compiles and runs correctly in a real environment.
+This directory contains End-to-End (E2E) tests for the VDL toolchain, organized by the target output (language or format).
 
 ## Structure
 
-- `e2e_test.go`: The test runner. It builds the VDL binary and executes scenarios found in `testdata/`.
-- `testdata/`: Contains individual test scenarios (folders).
+Tests are categorized by the target they verify:
+
+- `golang/`: Verifies Go code generation.
+- `jsonschema/`: Verifies JSON Schema generation.
+- `openapi/`: Verifies OpenAPI (Swagger) generation.
+- `playground/`: Verifies the WebAssembly/Playground asset generation.
+- `plugin/`: Verifies the plugin system integration.
+
+Future targets (e.g., `typescript`, `dart`, `python`) will follow this pattern.
 
 ## How it works
 
-For each test case (e.g., `testdata/simple_rpc`), the runner:
+Each category directory contains its own `e2e_test.go` runner and a `testdata/` folder.
 
-1.  **Builds** the VDL binary from the current source.
-2.  **Generates** code inside the test case folder (`vdl generate`).
-3.  **Runs** the `main.go` file using `go run`.
+1. **Test Runner**: The Go test runner builds a temporary `vdl` binary from the current source code.
+2. **Execution**: It iterates through folders in `testdata/` and runs `vdl generate`.
+3. **Verification**:
+   - **Code Generation (e.g., Golang)**: It executes the generated code (e.g., `go run .`). The test passes if the program exits successfully (0) and fails if it panics or errors.
+   - **Schema/Docs (e.g., OpenAPI, JSONSchema)**: It compares the generated output file against a "golden" expected file (e.g., `expected.json`).
+   - **Plugins**: It executes the plugin and verifies the JSON output or standard output/error.
 
-If `main.go` runs successfully (exit code 0), the test passes. If it panics or fails, the test fails.
+## Adding a Test Case
 
-## Adding a test case
+Read one or two tests to see how it works but in general this is the process:
 
-1.  Create a folder in `tests/golang/testdata/<case_name>`.
-2.  Add these 4 files:
-
-    - `go.mod`:
-      ```go
-      module e2e
-      go 1.23
-      ```
-    - `vdl.yaml`: Config pointing output to `gen/vdl.go`.
-    - `schema.vdl`: Your VDL definitions.
-    - `main.go`: The test logic. Must implement server/client, run the flow, and **panic** on failure.
-
-    **Example `main.go`:**
-
-    ```go
-    package main
-
-    import (
-        "fmt"
-        "e2e/gen" // Import the generated package
-    )
-
-    func main() {
-        // 1. Setup Server
-        // 2. Setup Client
-        // 3. Execute RPC
-
-        // Panic if something is wrong
-        // if err != nil { panic(err) }
-
-        fmt.Println("Success")
-    }
-    ```
+1. Go to the relevant subdirectory (e.g., `golang/testdata` or `openapi/testdata`).
+2. Create a new folder for your case.
+3. Add `vdl.yaml` and `schema.vdl`.
+4. Add verification files:
+   - For **Code**: A `main.go` (or equivalent) that uses the generated code and panics on failure.
+   - For **Schemas**: An `expected.json` or `expected.yaml` file to match against.
+ 
