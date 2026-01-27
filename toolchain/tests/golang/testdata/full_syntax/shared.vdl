@@ -1,6 +1,4 @@
-"""
-Shared type for all test entities.
-"""
+""" ./doc.md """
 type Meta {
   id: string
   createdAt: datetime

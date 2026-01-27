@@ -50,6 +50,7 @@ components:
         - Inactive
       type: string
     User:
+      description: User type documentation loaded from external file.
       properties:
         email:
           type: string

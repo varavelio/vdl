@@ -1,5 +1,6 @@
 // Shared types used across the schema
 
+""" ./doc.md """
 type User {
   id: string
   name: string

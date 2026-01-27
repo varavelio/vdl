@@ -9,9 +9,7 @@ type BaseEntity {
   updatedAt: datetime
 }
 
-"""
-Represents a user in the system.
-"""
+""" ./doc.md """
 type User {
   ...BaseEntity
   username: string
