@@ -147,7 +147,7 @@ export function asError(err: unknown): VdlError {
 /**
  * Convenience helper for missing-field validation errors.
  */
-function errorMissingRequiredField(message: string): VdlError {
+export function errorMissingRequiredField(message: string): VdlError {
   return new VdlError({
     message,
     category: "ValidationError",
@@ -158,6 +158,6 @@ function errorMissingRequiredField(message: string): VdlError {
 /**
  * Sleep for the given number of milliseconds.
  */
-function sleep(ms: number): Promise<void> {
+export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

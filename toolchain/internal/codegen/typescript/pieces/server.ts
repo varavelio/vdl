@@ -1,4 +1,13 @@
-import { Response, VdlError, asError, OperationDefinition, OperationType } from "./core_types.ts";
+// This imports are just to prevent errors in the IDE when developing, this imports
+// are handled in the generator for the generated code
+
+import {
+  Response,
+  VdlError,
+  asError,
+  OperationDefinition,
+  OperationType,
+} from "./coreTypes";
 
 /** START FROM HERE **/
 
@@ -408,7 +417,7 @@ export class InternalServer<T> {
     if (this.globalErrorHandler) return this.globalErrorHandler;
 
     // Default passthrough
-    return (c, err) => asError(err);
+    return (_, err) => asError(err);
   }
 
   private async handleProcRequest(
@@ -481,6 +490,7 @@ export class InternalServer<T> {
 
     // Config
     let pingInterval = this.globalStreamConfig.pingIntervalMs || 30000;
+    pingInterval = pingInterval <= 0 ? 3000 : pingInterval;
     const rpcCfg = this.rpcStreamConfigs.get(rpcName);
     if (rpcCfg?.pingIntervalMs) pingInterval = rpcCfg.pingIntervalMs;
     const streamCfg = this.streamConfigs.get(rpcName)?.get(streamName);

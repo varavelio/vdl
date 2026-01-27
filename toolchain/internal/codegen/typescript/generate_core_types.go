@@ -9,13 +9,13 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-//go:embed pieces/core_types.ts
+//go:embed pieces/coreTypes.ts
 var coreTypesRawPiece string
 
 func generateCoreTypes(_ *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
 	piece := strutil.GetStrAfter(coreTypesRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
-		return "", fmt.Errorf("core_types.ts: could not find start delimiter")
+		return "", fmt.Errorf("coreTypes.ts: could not find start delimiter")
 	}
 	return piece, nil
 }

@@ -47,12 +47,12 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		})
 	}
 
-	// 1. core.ts
+	// 1. coreTypes.ts
 	coreContent, err := generateCoreTypes(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
-	addFile("core.ts", []byte(coreContent))
+	addFile("coreTypes.ts", []byte(coreContent))
 
 	// 2. types.ts
 	typesBuilder := gen.New().WithSpaces(2)

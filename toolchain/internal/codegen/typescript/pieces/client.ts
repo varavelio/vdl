@@ -1,12 +1,7 @@
-import { Response, VdlError, asError } from "./core_types.ts";
+// This imports are just to prevent errors in the IDE when developing, this imports
+// are handled in the generator for the generated code
 
-/**
- * Mocks for the parts that are generated but not exported
- */
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { Response, VdlError, asError, sleep } from "./coreTypes";
 
 /** START FROM HERE **/
 
@@ -18,13 +13,13 @@ function sleep(ms: number): Promise<void> {
  * Configuration for automatic retry behavior in procedures.
  */
 interface RetryConfig {
-  /** Maximum number of retry attempts (default: 3) */
+  /** Maximum number of retry attempts (default: 1) */
   maxAttempts: number;
-  /** Initial delay between retries in milliseconds (default: 1000) */
+  /** Initial delay between retries in milliseconds (default: 0) */
   initialDelayMs: number;
-  /** Maximum delay between retries in milliseconds (default: 5000) */
+  /** Maximum delay between retries in milliseconds (default: 0) */
   maxDelayMs: number;
-  /** Multiplier for exponential backoff (default: 2.0) */
+  /** Multiplier for exponential backoff (default: 1.0) */
   delayMultiplier: number;
 }
 
