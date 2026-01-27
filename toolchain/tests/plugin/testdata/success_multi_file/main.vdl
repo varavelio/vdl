@@ -1,0 +1,11 @@
+// Main entry point that includes all other files
+include "./types.vdl"
+include "./enums.vdl"
+include "./services.vdl"
+
+"""
+Application configuration constants.
+"""
+const APP_NAME = "MultiFileTest"
+
+const APP_VERSION = "2.0.0"

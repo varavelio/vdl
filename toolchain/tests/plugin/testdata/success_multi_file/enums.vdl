@@ -1,0 +1,32 @@
+// Enum definitions
+
+"""
+Possible user roles.
+"""
+enum UserRole {
+  Admin
+  Moderator
+  Member
+  Guest
+}
+
+"""
+Order status values.
+"""
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+"""
+Priority levels with integer values.
+"""
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 4
+}

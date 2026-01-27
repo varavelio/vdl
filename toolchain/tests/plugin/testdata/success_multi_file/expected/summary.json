@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "multi_file_test": true,
+  "files_merged": ["main.vdl", "types.vdl", "enums.vdl", "services.vdl"],
+  "counts": {
+    "types": 5,
+    "enums": 3,
+    "rpcs": 2,
+    "procedures": 4,
+    "streams": 2,
+    "constants": 2
+  },
+  "validated": {
+    "types": ["BaseEntity", "Order", "OrderItem", "User", "UserProfile"],
+    "enums": ["OrderStatus", "Priority", "UserRole"],
+    "rpcs": ["OrderService", "UserService"],
+    "procedures": ["CreateOrder", "GetOrder", "CreateUser", "GetUser"],
+    "streams": ["OrderUpdates", "UserActivity"],
+    "constants": ["APP_NAME", "APP_VERSION"]
+  }
+}

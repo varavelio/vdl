@@ -1,0 +1,51 @@
+// Shared types used across the application
+
+"""
+Base metadata for all entities.
+"""
+type BaseEntity {
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+"""
+Represents a user in the system.
+"""
+type User {
+  ...BaseEntity
+  username: string
+  email: string
+  role: UserRole
+  profile?: UserProfile
+}
+
+"""
+User profile information.
+"""
+type UserProfile {
+  firstName: string
+  lastName: string
+  bio?: string
+  avatarUrl?: string
+}
+
+"""
+Represents an order in the system.
+"""
+type Order {
+  ...BaseEntity
+  userId: string
+  items: OrderItem[]
+  status: OrderStatus
+  total: float
+}
+
+"""
+Single item in an order.
+"""
+type OrderItem {
+  productId: string
+  quantity: int
+  price: float
+}
