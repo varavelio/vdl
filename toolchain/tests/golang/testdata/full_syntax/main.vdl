@@ -1,0 +1,129 @@
+include "./shared.vdl"
+
+// ============================================================================
+// Patterns
+// ============================================================================
+
+"""
+Topic pattern for user events.
+"""
+pattern UserTopic = "events.users.{userId}.{action}"
+
+// ============================================================================
+// Types
+// ============================================================================
+
+"""
+Represents a user in the system.
+"""
+type User {
+  ...Meta
+  username: string
+  email: string
+  status: Status
+
+  """
+  Optional user bio.
+  """
+  bio?: string
+
+  """
+  User roles.
+  """
+  roles: string[]
+
+  """
+  User preferences map.
+  """
+  preferences: map<string>
+
+  """
+  Inline address structure.
+  """
+  address: {
+    street: string
+    city: string
+    zip: string
+  }
+}
+
+"""
+Represents a paginated list of users.
+"""
+type UserList {
+  items: User[]
+  total: int
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+"""
+Integer-based priority enum.
+"""
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}
+
+// ============================================================================
+// Deprecation
+// ============================================================================
+
+deprecated("Use NewUser instead")
+type OldUser {
+  name: string
+}
+
+// ============================================================================
+// RPC Service
+// ============================================================================
+
+"""
+Main service for user operations.
+"""
+rpc UserService {
+  """
+  Retrieves a user by ID.
+  """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """
+  Lists users with pagination.
+  """
+  deprecated("Use SearchUsers instead")
+  proc ListUsers {
+    input {
+      ...Pagination
+      status?: Status
+    }
+
+    output {
+      ...UserList
+    }
+  }
+
+  """
+  Stream of user activity events.
+  """
+  stream UserActivity {
+    input {
+      userId: string
+    }
+
+    output {
+      action: string
+      timestamp: datetime
+    }
+  }
+}
