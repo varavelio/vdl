@@ -59,9 +59,14 @@ When updating this document, do so with the context of the entire document in mi
     - `codegen/`: Code Generators (Go, TS, Dart, etc.).
     - `cmd/schemagen/`: Internal tool to generate JSON schemas for IR and Config.
     - `util/`: Shared Utilities (strings, paths, debug).
-  - `tests/`: End-to-End (E2E) test suite.
-    - Structure reflects future multi-language support (currently `golang/` only, planned: `typescript/`, `openapi/`, `dart/`, etc.).
-    - Each test case in `testdata` contains a schema, config, and a consumer program to verify generated code.
+  - `tests/`: End-to-End (E2E) test suite, organized by target language/format.
+    - `golang/`: E2E tests for Go code generation (verifies client/server behavior via `go run`).
+    - `jsonschema/`: E2E tests for JSON Schema generation (verifies output against expected JSON).
+    - `openapi/`: E2E tests for OpenAPI generation (verifies output against expected YAML/JSON).
+    - `playground/`: E2E tests for Playground assets generation.
+    - `plugin/`: E2E tests for the Plugin system (verifies Python plugin integration).
+    - `dart/`, `typescript/`, `python/`: Structure present for future language support.
+    - Each test case in `testdata` contains a schema, config, and verification assets (consumer program or expected output).
   - `dist/`: Build artifacts (e.g., `vdl.wasm`).
 - **Integration**: Compiles to `dist/vdl.wasm` which is copied to the playground.
 
@@ -82,12 +87,34 @@ When updating this document, do so with the context of the entire document in mi
 
 ## 4. Testing & Quality
 
-- **Strategy**:
-  - Unit tests for Go (`go test ./...`).
-  - End-to-End (E2E) tests in `toolchain/tests`: Verifies that generated code works correctly in target languages (Go, and future TS/Dart/etc).
-  - Component/Logic tests for Frontend (`vitest`).
-- **Commands**: Run `task test` at the root to execute all suites.
-- **Linting**: Run `task lint` (Triggers `golangci-lint` for Go and `biome` for JS/TS).
+### Strategy
+
+- **Unit Tests**: Standard Go tests (`go test ./...`) for internal logic.
+- **E2E Tests (`toolchain/tests/*`)**:
+  - These are **integration tests** wrapped in Go test runners (`e2e_test.go`) located in each subdirectory.
+  - **Mechanism**: The runner builds a temporary `vdl` binary from the current source, then for each case in `testdata/`:
+    1.  Runs `vdl generate` in the test case folder.
+    2.  **Verification**:
+        - For **Go**: Executes `go run .`. The consumer code must **panic** or exit with non-zero status on failure.
+        - For **Schemas/Docs** (JSONSchema, OpenAPI): Compares the generated output against a "golden" expected file.
+        - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
+- **Frontend Tests**: Component/Logic tests using `vitest`.
+
+### Adding a New E2E Test Case
+
+1.  Navigate to `toolchain/tests/<category>/testdata`.
+2.  Create a new directory for your case (e.g., `my_feature`).
+3.  Add the required files:
+    - `vdl.yaml`: Configuration for generation.
+    - `schema.vdl`: The schema to test.
+    - **For Code Gen**: `main.go` (or equivalent) to import and verify generated code.
+    - **For Schemas**: `expected.json` or `expected.yaml` to match against.
+
+### Commands
+
+- **Run All Tests**: `task test` (Root).
+- **Run Go/E2E Only**: `cd toolchain && task test`.
+- **Lint**: `task lint` (Triggers `golangci-lint` for Go and `biome` for JS/TS).
 
 ## 5. Tech Stack & Conventions
 
