@@ -1,0 +1,343 @@
+// Tests extreme nesting and complex type combinations
+
+// Base types for spreading in extreme scenarios
+type BaseA {
+  fieldA: string
+  valueA: int
+}
+
+type BaseB {
+  fieldB: float
+  flagB: bool
+}
+
+type BaseC {
+  fieldC: datetime
+  listC: string[]
+}
+
+// Extremely deep inline nesting
+type DeepNesting {
+  level1: {
+    a: string
+    level2: {
+      b: int
+      level3: {
+        c: float
+        level4: {
+          d: bool
+          level5: {
+            e: datetime
+            level6: {
+              f: string
+              level7: {
+                g: int
+                level8: {
+                  h: float
+                  finalValue: string
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Multi-dimensional arrays with inline objects
+type MatrixMadness {
+  // 3D array of inline objects
+  cube: {
+    x: int
+    y: int
+    z: int
+    value: float
+  }[][][]
+
+  // 4D array of primitives
+  hyperCube: int[][][][]
+
+  // 2D array of complex inline
+  grid: {
+    cell: {
+      row: int
+      col: int
+      data: {
+        content: string
+        metadata: map<string>
+      }
+    }
+  }[][]
+}
+
+// Nested maps with inline objects
+type MapCeption {
+  // Map of maps
+  level1: map<map<string>>
+
+  // Map of maps of inline objects
+  level2: map<map<{
+    value: int
+    label: string
+  }>>
+
+  // Map of arrays of maps
+  mixed1: map<map<int>[]>
+
+  // Array of maps of arrays
+  mixed2: map<int[]>[]
+}
+
+// Extreme optional combinations
+type OptionalMaze {
+  required: string
+  opt1?: {
+    opt2?: {
+      opt3?: {
+        opt4?: {
+          opt5?: {
+            deepValue?: string
+          }
+        }
+      }
+    }
+  }
+  optArray?: {
+    optInner?: {
+      value?: int
+    }[]
+  }[]
+  optMap?: map<{
+    optMapInner?: {
+      data?: string
+    }
+  }>
+}
+
+// The ultimate stress test: combining everything
+type UltimateStressTest {
+  // Optional map of arrays of arrays of inline objects with spreads
+  chaos1?: map<{
+    ...BaseA
+    nested: {
+      ...BaseB
+      items: {
+        ...BaseC
+        data: map<{
+          ...BaseA
+          value: int
+        }>[][]
+      }[]
+    }[]
+  }[][]>[][]
+
+  // Deep inline with optional at every level
+  chaos2?: {
+    level1?: {
+      ...BaseA
+      level2?: {
+        ...BaseB
+        level3?: {
+          ...BaseC
+          level4?: {
+            final: map<{
+              ...BaseA
+              ...BaseB
+              ...BaseC
+              data: string[][][]
+            }[]>
+          }
+        }
+      }
+    }
+  }
+
+  // Array of maps of arrays of maps of inline
+  chaos3: map<{
+    inner: map<{
+      value: int
+      nested: {
+        a: string
+        b: int
+      }[]
+    }[]>
+  }[]>[]
+}
+
+// Non-recursive deeply nested type
+type DeepMetadata {
+  id: string
+  tags: string[]
+  metadata?: {
+    ...BaseA
+    nested: {
+      ...BaseB
+      deepData: map<{
+        ...BaseC
+        value: int
+      }[]>
+    }
+  }
+}
+
+// Combining all collection types
+type CollectionHell {
+  // Array of maps of arrays of maps of arrays
+  level1: map<map<{
+    items: map<{
+      values: int[][]
+    }[]>[]
+  }[]>[]>[]
+
+  // Inline with every possible combination
+  complex: {
+    arrays: int[][][]
+    maps: map<map<map<string>>>
+    mixed: map<{
+      arr: {
+        m: map<int[]>
+      }[][]
+    }>[]
+  }
+}
+
+rpc ExtremeService {
+  proc ProcessDeep {
+    input {
+      data: DeepNesting
+    }
+
+    output {
+      processed: DeepNesting
+    }
+  }
+
+  proc HandleMatrices {
+    input {
+      matrices: MatrixMadness
+    }
+
+    output {
+      result: MatrixMadness
+    }
+  }
+
+  proc QueryMaps {
+    input {
+      query: MapCeption
+    }
+
+    output {
+      results: MapCeption
+    }
+  }
+
+  proc OptionalLabyrinth {
+    input {
+      maze: OptionalMaze
+    }
+
+    output {
+      solved?: OptionalMaze
+    }
+  }
+
+  proc StressTest {
+    input {
+      stress: UltimateStressTest
+    }
+
+    output {
+      result: UltimateStressTest
+      status: string
+    }
+  }
+
+  proc DeepMetadataTest {
+    input {
+      root: DeepMetadata
+      maxDepth?: int
+    }
+
+    output {
+      processed: DeepMetadata
+      depth: int
+    }
+  }
+
+  proc CollectionTest {
+    input {
+      data: CollectionHell
+    }
+
+    output {
+      processed: CollectionHell
+    }
+  }
+
+  // Extreme inline in input/output directly
+  proc InlineExtreme {
+    input {
+      crazy: {
+        ...BaseA
+        level1: {
+          ...BaseB
+          arrays: {
+            ...BaseC
+            data: map<{
+              nested: {
+                deep: int[][][]
+              }[][]
+            }>[]
+          }[][]
+        }
+      }
+    }
+
+    output {
+      result: {
+        status: bool
+        data?: {
+          ...BaseA
+          ...BaseB
+          ...BaseC
+          processed: map<{
+            value: string
+            meta: {
+              tags: string[][]
+            }
+          }[][]>
+        }
+      }
+    }
+  }
+
+  // Stream with extreme types
+  stream ExtremeStream {
+    input {
+      config: {
+        ...BaseA
+        filters: map<{
+          conditions: {
+            field: string
+            values: int[]
+          }[]
+        }>
+      }
+    }
+
+    output {
+      event: {
+        ...BaseA
+        ...BaseB
+        ...BaseC
+        payload: map<{
+          data: {
+            nested: string[][]
+          }[]
+        }>
+      }
+    }
+  }
+}

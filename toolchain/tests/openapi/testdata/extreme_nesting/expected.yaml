@@ -1,0 +1,1292 @@
+openapi: 3.0.0
+info:
+  title: Extreme Nesting API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: ExtremeServiceProcedures
+    description: Procedures for ExtremeService
+  - name: ExtremeServiceStreams
+    description: Streams for ExtremeService
+paths:
+  /ExtremeService/CollectionTest:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceCollectionTestInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceCollectionTestOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/DeepMetadataTest:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceDeepMetadataTestInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceDeepMetadataTestOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/ExtremeStream:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceExtremeStreamInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceExtremeStreamOutput"
+      tags:
+        - ExtremeServiceStreams
+  /ExtremeService/HandleMatrices:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceHandleMatricesInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceHandleMatricesOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/InlineExtreme:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceInlineExtremeInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceInlineExtremeOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/OptionalLabyrinth:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceOptionalLabyrinthInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceOptionalLabyrinthOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/ProcessDeep:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceProcessDeepInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceProcessDeepOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/QueryMaps:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceQueryMapsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceQueryMapsOutput"
+      tags:
+        - ExtremeServiceProcedures
+  /ExtremeService/StressTest:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ExtremeServiceStressTestInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ExtremeServiceStressTestOutput"
+      tags:
+        - ExtremeServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    BaseA:
+      properties:
+        fieldA:
+          type: string
+        valueA:
+          type: integer
+      required:
+        - fieldA
+        - valueA
+      type: object
+    BaseB:
+      properties:
+        fieldB:
+          type: number
+        flagB:
+          type: boolean
+      required:
+        - fieldB
+        - flagB
+      type: object
+    BaseC:
+      properties:
+        fieldC:
+          format: date-time
+          type: string
+        listC:
+          items:
+            type: string
+          type: array
+      required:
+        - fieldC
+        - listC
+      type: object
+    CollectionHell:
+      properties:
+        complex:
+          properties:
+            arrays:
+              items:
+                items:
+                  items:
+                    type: integer
+                  type: array
+                type: array
+              type: array
+            maps:
+              additionalProperties:
+                additionalProperties:
+                  additionalProperties:
+                    type: string
+                  type: object
+                type: object
+              type: object
+            mixed:
+              items:
+                additionalProperties:
+                  properties:
+                    arr:
+                      items:
+                        items:
+                          properties:
+                            m:
+                              additionalProperties:
+                                items:
+                                  type: integer
+                                type: array
+                              type: object
+                          required:
+                            - m
+                          type: object
+                        type: array
+                      type: array
+                  required:
+                    - arr
+                  type: object
+                type: object
+              type: array
+          required:
+            - arrays
+            - maps
+            - mixed
+          type: object
+        level1:
+          items:
+            additionalProperties:
+              items:
+                additionalProperties:
+                  items:
+                    properties:
+                      items:
+                        items:
+                          additionalProperties:
+                            items:
+                              properties:
+                                values:
+                                  items:
+                                    items:
+                                      type: integer
+                                    type: array
+                                  type: array
+                              required:
+                                - values
+                              type: object
+                            type: array
+                          type: object
+                        type: array
+                    required:
+                      - items
+                    type: object
+                  type: array
+                type: object
+              type: array
+            type: object
+          type: array
+      required:
+        - level1
+        - complex
+      type: object
+    DeepMetadata:
+      properties:
+        id:
+          type: string
+        metadata:
+          properties:
+            fieldA:
+              type: string
+            nested:
+              properties:
+                deepData:
+                  additionalProperties:
+                    items:
+                      properties:
+                        fieldC:
+                          format: date-time
+                          type: string
+                        listC:
+                          items:
+                            type: string
+                          type: array
+                        value:
+                          type: integer
+                      required:
+                        - fieldC
+                        - listC
+                        - value
+                      type: object
+                    type: array
+                  type: object
+                fieldB:
+                  type: number
+                flagB:
+                  type: boolean
+              required:
+                - fieldB
+                - flagB
+                - deepData
+              type: object
+            valueA:
+              type: integer
+          required:
+            - fieldA
+            - valueA
+            - nested
+          type: object
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+        - id
+        - tags
+      type: object
+    DeepNesting:
+      properties:
+        level1:
+          properties:
+            a:
+              type: string
+            level2:
+              properties:
+                b:
+                  type: integer
+                level3:
+                  properties:
+                    c:
+                      type: number
+                    level4:
+                      properties:
+                        d:
+                          type: boolean
+                        level5:
+                          properties:
+                            e:
+                              format: date-time
+                              type: string
+                            level6:
+                              properties:
+                                f:
+                                  type: string
+                                level7:
+                                  properties:
+                                    g:
+                                      type: integer
+                                    level8:
+                                      properties:
+                                        finalValue:
+                                          type: string
+                                        h:
+                                          type: number
+                                      required:
+                                        - h
+                                        - finalValue
+                                      type: object
+                                  required:
+                                    - g
+                                    - level8
+                                  type: object
+                              required:
+                                - f
+                                - level7
+                              type: object
+                          required:
+                            - e
+                            - level6
+                          type: object
+                      required:
+                        - d
+                        - level5
+                      type: object
+                  required:
+                    - c
+                    - level4
+                  type: object
+              required:
+                - b
+                - level3
+              type: object
+          required:
+            - a
+            - level2
+          type: object
+      required:
+        - level1
+      type: object
+    MapCeption:
+      properties:
+        level1:
+          additionalProperties:
+            additionalProperties:
+              type: string
+            type: object
+          type: object
+        level2:
+          additionalProperties:
+            additionalProperties:
+              properties:
+                label:
+                  type: string
+                value:
+                  type: integer
+              required:
+                - value
+                - label
+              type: object
+            type: object
+          type: object
+        mixed1:
+          additionalProperties:
+            items:
+              additionalProperties:
+                type: integer
+              type: object
+            type: array
+          type: object
+        mixed2:
+          items:
+            additionalProperties:
+              items:
+                type: integer
+              type: array
+            type: object
+          type: array
+      required:
+        - level1
+        - level2
+        - mixed1
+        - mixed2
+      type: object
+    MatrixMadness:
+      properties:
+        cube:
+          items:
+            items:
+              items:
+                properties:
+                  value:
+                    type: number
+                  x:
+                    type: integer
+                  "y":
+                    type: integer
+                  z:
+                    type: integer
+                required:
+                  - x
+                  - "y"
+                  - z
+                  - value
+                type: object
+              type: array
+            type: array
+          type: array
+        grid:
+          items:
+            items:
+              properties:
+                cell:
+                  properties:
+                    col:
+                      type: integer
+                    data:
+                      properties:
+                        content:
+                          type: string
+                        metadata:
+                          additionalProperties:
+                            type: string
+                          type: object
+                      required:
+                        - content
+                        - metadata
+                      type: object
+                    row:
+                      type: integer
+                  required:
+                    - row
+                    - col
+                    - data
+                  type: object
+              required:
+                - cell
+              type: object
+            type: array
+          type: array
+        hyperCube:
+          items:
+            items:
+              items:
+                items:
+                  type: integer
+                type: array
+              type: array
+            type: array
+          type: array
+      required:
+        - cube
+        - hyperCube
+        - grid
+      type: object
+    OptionalMaze:
+      properties:
+        opt1:
+          properties:
+            opt2:
+              properties:
+                opt3:
+                  properties:
+                    opt4:
+                      properties:
+                        opt5:
+                          properties:
+                            deepValue:
+                              type: string
+                          type: object
+                      type: object
+                  type: object
+              type: object
+          type: object
+        optArray:
+          items:
+            properties:
+              optInner:
+                items:
+                  properties:
+                    value:
+                      type: integer
+                  type: object
+                type: array
+            type: object
+          type: array
+        optMap:
+          additionalProperties:
+            properties:
+              optMapInner:
+                properties:
+                  data:
+                    type: string
+                type: object
+            type: object
+          type: object
+        required:
+          type: string
+      required:
+        - required
+      type: object
+    UltimateStressTest:
+      properties:
+        chaos1:
+          items:
+            items:
+              additionalProperties:
+                items:
+                  items:
+                    properties:
+                      fieldA:
+                        type: string
+                      nested:
+                        items:
+                          properties:
+                            fieldB:
+                              type: number
+                            flagB:
+                              type: boolean
+                            items:
+                              items:
+                                properties:
+                                  data:
+                                    items:
+                                      items:
+                                        additionalProperties:
+                                          properties:
+                                            fieldA:
+                                              type: string
+                                            value:
+                                              type: integer
+                                            valueA:
+                                              type: integer
+                                          required:
+                                            - fieldA
+                                            - valueA
+                                            - value
+                                          type: object
+                                        type: object
+                                      type: array
+                                    type: array
+                                  fieldC:
+                                    format: date-time
+                                    type: string
+                                  listC:
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                  - fieldC
+                                  - listC
+                                  - data
+                                type: object
+                              type: array
+                          required:
+                            - fieldB
+                            - flagB
+                            - items
+                          type: object
+                        type: array
+                      valueA:
+                        type: integer
+                    required:
+                      - fieldA
+                      - valueA
+                      - nested
+                    type: object
+                  type: array
+                type: array
+              type: object
+            type: array
+          type: array
+        chaos2:
+          properties:
+            level1:
+              properties:
+                fieldA:
+                  type: string
+                level2:
+                  properties:
+                    fieldB:
+                      type: number
+                    flagB:
+                      type: boolean
+                    level3:
+                      properties:
+                        fieldC:
+                          format: date-time
+                          type: string
+                        level4:
+                          properties:
+                            final:
+                              additionalProperties:
+                                items:
+                                  properties:
+                                    data:
+                                      items:
+                                        items:
+                                          items:
+                                            type: string
+                                          type: array
+                                        type: array
+                                      type: array
+                                    fieldA:
+                                      type: string
+                                    fieldB:
+                                      type: number
+                                    fieldC:
+                                      format: date-time
+                                      type: string
+                                    flagB:
+                                      type: boolean
+                                    listC:
+                                      items:
+                                        type: string
+                                      type: array
+                                    valueA:
+                                      type: integer
+                                  required:
+                                    - fieldA
+                                    - valueA
+                                    - fieldB
+                                    - flagB
+                                    - fieldC
+                                    - listC
+                                    - data
+                                  type: object
+                                type: array
+                              type: object
+                          required:
+                            - final
+                          type: object
+                        listC:
+                          items:
+                            type: string
+                          type: array
+                      required:
+                        - fieldC
+                        - listC
+                      type: object
+                  required:
+                    - fieldB
+                    - flagB
+                  type: object
+                valueA:
+                  type: integer
+              required:
+                - fieldA
+                - valueA
+              type: object
+          type: object
+        chaos3:
+          items:
+            additionalProperties:
+              items:
+                properties:
+                  inner:
+                    additionalProperties:
+                      items:
+                        properties:
+                          nested:
+                            items:
+                              properties:
+                                a:
+                                  type: string
+                                b:
+                                  type: integer
+                              required:
+                                - a
+                                - b
+                              type: object
+                            type: array
+                          value:
+                            type: integer
+                        required:
+                          - value
+                          - nested
+                        type: object
+                      type: array
+                    type: object
+                required:
+                  - inner
+                type: object
+              type: array
+            type: object
+          type: array
+      required:
+        - chaos3
+      type: object
+  requestBodies:
+    ExtremeServiceCollectionTestInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                $ref: "#/components/schemas/CollectionHell"
+            required:
+              - data
+            type: object
+      description: Request body for ExtremeService/CollectionTest procedure
+    ExtremeServiceDeepMetadataTestInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              maxDepth:
+                type: integer
+              root:
+                $ref: "#/components/schemas/DeepMetadata"
+            required:
+              - root
+            type: object
+      description: Request body for ExtremeService/DeepMetadataTest procedure
+    ExtremeServiceExtremeStreamInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              config:
+                properties:
+                  fieldA:
+                    type: string
+                  filters:
+                    additionalProperties:
+                      properties:
+                        conditions:
+                          items:
+                            properties:
+                              field:
+                                type: string
+                              values:
+                                items:
+                                  type: integer
+                                type: array
+                            required:
+                              - field
+                              - values
+                            type: object
+                          type: array
+                      required:
+                        - conditions
+                      type: object
+                    type: object
+                  valueA:
+                    type: integer
+                required:
+                  - fieldA
+                  - valueA
+                  - filters
+                type: object
+            required:
+              - config
+            type: object
+      description: Request body for ExtremeService/ExtremeStream stream subscription
+    ExtremeServiceHandleMatricesInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              matrices:
+                $ref: "#/components/schemas/MatrixMadness"
+            required:
+              - matrices
+            type: object
+      description: Request body for ExtremeService/HandleMatrices procedure
+    ExtremeServiceInlineExtremeInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              crazy:
+                properties:
+                  fieldA:
+                    type: string
+                  level1:
+                    properties:
+                      arrays:
+                        items:
+                          items:
+                            properties:
+                              data:
+                                items:
+                                  additionalProperties:
+                                    properties:
+                                      nested:
+                                        items:
+                                          items:
+                                            properties:
+                                              deep:
+                                                items:
+                                                  items:
+                                                    items:
+                                                      type: integer
+                                                    type: array
+                                                  type: array
+                                                type: array
+                                            required:
+                                              - deep
+                                            type: object
+                                          type: array
+                                        type: array
+                                    required:
+                                      - nested
+                                    type: object
+                                  type: object
+                                type: array
+                              fieldC:
+                                format: date-time
+                                type: string
+                              listC:
+                                items:
+                                  type: string
+                                type: array
+                            required:
+                              - fieldC
+                              - listC
+                              - data
+                            type: object
+                          type: array
+                        type: array
+                      fieldB:
+                        type: number
+                      flagB:
+                        type: boolean
+                    required:
+                      - fieldB
+                      - flagB
+                      - arrays
+                    type: object
+                  valueA:
+                    type: integer
+                required:
+                  - fieldA
+                  - valueA
+                  - level1
+                type: object
+            required:
+              - crazy
+            type: object
+      description: Request body for ExtremeService/InlineExtreme procedure
+    ExtremeServiceOptionalLabyrinthInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              maze:
+                $ref: "#/components/schemas/OptionalMaze"
+            required:
+              - maze
+            type: object
+      description: Request body for ExtremeService/OptionalLabyrinth procedure
+    ExtremeServiceProcessDeepInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                $ref: "#/components/schemas/DeepNesting"
+            required:
+              - data
+            type: object
+      description: Request body for ExtremeService/ProcessDeep procedure
+    ExtremeServiceQueryMapsInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              query:
+                $ref: "#/components/schemas/MapCeption"
+            required:
+              - query
+            type: object
+      description: Request body for ExtremeService/QueryMaps procedure
+    ExtremeServiceStressTestInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              stress:
+                $ref: "#/components/schemas/UltimateStressTest"
+            required:
+              - stress
+            type: object
+      description: Request body for ExtremeService/StressTest procedure
+  responses:
+    ExtremeServiceCollectionTestOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  processed:
+                    $ref: "#/components/schemas/CollectionHell"
+                required:
+                  - processed
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/CollectionTest procedure
+    ExtremeServiceDeepMetadataTestOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  depth:
+                    type: integer
+                  processed:
+                    $ref: "#/components/schemas/DeepMetadata"
+                required:
+                  - processed
+                  - depth
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/DeepMetadataTest procedure
+    ExtremeServiceExtremeStreamOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  event:
+                    properties:
+                      fieldA:
+                        type: string
+                      fieldB:
+                        type: number
+                      fieldC:
+                        format: date-time
+                        type: string
+                      flagB:
+                        type: boolean
+                      listC:
+                        items:
+                          type: string
+                        type: array
+                      payload:
+                        additionalProperties:
+                          properties:
+                            data:
+                              items:
+                                properties:
+                                  nested:
+                                    items:
+                                      items:
+                                        type: string
+                                      type: array
+                                    type: array
+                                required:
+                                  - nested
+                                type: object
+                              type: array
+                          required:
+                            - data
+                          type: object
+                        type: object
+                      valueA:
+                        type: integer
+                    required:
+                      - fieldA
+                      - valueA
+                      - fieldB
+                      - flagB
+                      - fieldC
+                      - listC
+                      - payload
+                    type: object
+                required:
+                  - event
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for ExtremeService/ExtremeStream stream
+    ExtremeServiceHandleMatricesOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  result:
+                    $ref: "#/components/schemas/MatrixMadness"
+                required:
+                  - result
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/HandleMatrices procedure
+    ExtremeServiceInlineExtremeOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  result:
+                    properties:
+                      data:
+                        properties:
+                          fieldA:
+                            type: string
+                          fieldB:
+                            type: number
+                          fieldC:
+                            format: date-time
+                            type: string
+                          flagB:
+                            type: boolean
+                          listC:
+                            items:
+                              type: string
+                            type: array
+                          processed:
+                            additionalProperties:
+                              items:
+                                items:
+                                  properties:
+                                    meta:
+                                      properties:
+                                        tags:
+                                          items:
+                                            items:
+                                              type: string
+                                            type: array
+                                          type: array
+                                      required:
+                                        - tags
+                                      type: object
+                                    value:
+                                      type: string
+                                  required:
+                                    - value
+                                    - meta
+                                  type: object
+                                type: array
+                              type: array
+                            type: object
+                          valueA:
+                            type: integer
+                        required:
+                          - fieldA
+                          - valueA
+                          - fieldB
+                          - flagB
+                          - fieldC
+                          - listC
+                          - processed
+                        type: object
+                      status:
+                        type: boolean
+                    required:
+                      - status
+                    type: object
+                required:
+                  - result
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/InlineExtreme procedure
+    ExtremeServiceOptionalLabyrinthOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  solved:
+                    $ref: "#/components/schemas/OptionalMaze"
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/OptionalLabyrinth procedure
+    ExtremeServiceProcessDeepOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  processed:
+                    $ref: "#/components/schemas/DeepNesting"
+                required:
+                  - processed
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/ProcessDeep procedure
+    ExtremeServiceQueryMapsOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  results:
+                    $ref: "#/components/schemas/MapCeption"
+                required:
+                  - results
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/QueryMaps procedure
+    ExtremeServiceStressTestOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  result:
+                    $ref: "#/components/schemas/UltimateStressTest"
+                  status:
+                    type: string
+                required:
+                  - result
+                  - status
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ExtremeService/StressTest procedure

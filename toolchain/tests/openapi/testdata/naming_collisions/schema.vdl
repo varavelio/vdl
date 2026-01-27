@@ -1,0 +1,160 @@
+// Tests field names that could conflict with OpenAPI/JSON Schema keywords
+
+type OpenApiKeywords {
+  // OpenAPI schema keywords as field names
+  properties: int
+  required: bool
+  items: string
+  allOf: int
+  oneOf: string
+  anyOf: float
+  additionalProperties: bool
+
+  // JSON Schema keywords
+  definitions: string
+  schema: int
+  ref: string
+
+  // Common OpenAPI reserved words
+  default: string
+  format: string
+  minimum: int
+  maximum: int
+  minLength: int
+  maxLength: int
+  minItems: int
+  maxItems: int
+  uniqueItems: bool
+
+  // HTTP/API keywords
+  get: string
+  post: string
+  put: string
+  delete: string
+  patch: string
+  options: string
+  head: string
+
+  // Response keywords
+  description: string
+  content: string
+  headers: string
+
+  // Security keywords
+  security: string
+  securitySchemes: string
+
+  // Path keywords
+  parameters: string
+  requestBody: string
+  responses: string
+  callbacks: string
+
+  // OpenAPI-specific keywords
+  operationId: string
+  isDeprecated: bool
+  servers: string
+  externalDocs: string
+  discriminator: string
+  readOnly: bool
+  writeOnly: bool
+  nullable: bool
+  example: string
+  examples: string
+}
+
+type EdgeCaseNames {
+  // Special characters that should work
+  camelCase: string
+  pascalCase: int
+  snakeCase: float
+
+  // Numbers in names
+  field1: string
+  field2With3Numbers4: int
+
+  // Single character
+  a: string
+  b: int
+  x: float
+  y: bool
+  z: datetime
+
+  // Acronyms
+  id: string
+  url: string
+  uri: string
+  api: string
+  http: string
+  html: string
+  xml: string
+  json: string
+  uuid: string
+
+  // Very long name
+  thisIsAnExtremelyLongFieldNameThatShouldStillWorkCorrectlyInTheGeneratedOpenApiSpec: string
+}
+
+// Type name that looks like OpenAPI keyword
+type Schema {
+  value: string
+}
+
+type Properties {
+  data: int
+}
+
+type Items {
+  list: string[]
+}
+
+type Responses {
+  success: bool
+}
+
+rpc KeywordService {
+  proc TestKeywords {
+    input {
+      keywords: OpenApiKeywords
+      edgeCases: EdgeCaseNames
+    }
+
+    output {
+      schema: Schema
+      properties: Properties
+      items: Items
+      responses: Responses
+    }
+  }
+
+  // Procedure name that looks like HTTP method
+  proc Get {
+    input {
+      id: string
+    }
+
+    output {
+      data: string
+    }
+  }
+
+  proc Post {
+    input {
+      data: string
+    }
+
+    output {
+      id: string
+    }
+  }
+
+  proc Delete {
+    input {
+      id: string
+    }
+
+    output {
+      deleted: bool
+    }
+  }
+}

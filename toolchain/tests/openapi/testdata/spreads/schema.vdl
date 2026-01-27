@@ -1,0 +1,220 @@
+// Tests spread operator in various contexts
+
+// Base types for spreading
+type Timestamps {
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type Identifiable {
+  id: string
+}
+
+type Metadata {
+  version: int
+  tags: string[]
+  metadata: map<string>
+}
+
+type Pagination {
+  page: int
+  limit: int
+  offset?: int
+}
+
+type PaginatedResult {
+  total: int
+  hasMore: bool
+}
+
+// Simple spread in type
+type User {
+  ...Identifiable
+  ...Timestamps
+  name: string
+  email: string
+}
+
+// Multiple spreads with additional fields
+type Article {
+  ...Identifiable
+  ...Timestamps
+  ...Metadata
+  title: string
+  body: string
+  authorId: string
+}
+
+// Spread in nested type
+type Comment {
+  ...Identifiable
+  ...Timestamps
+  text: string
+  author: {
+    ...Identifiable
+    name: string
+    avatar?: string
+  }
+}
+
+// Spread with optional fields
+type OptionalSpread {
+  ...Identifiable
+  requiredField: string
+  optionalField?: int
+  optionalObject?: {
+    ...Timestamps
+    data: string
+  }
+}
+
+// Spread in arrays
+type Collection {
+  ...Metadata
+  items: {
+    ...Identifiable
+    value: string
+  }[]
+}
+
+// Spread in maps
+type Registry {
+  ...Metadata
+  entries: map<{
+    ...Identifiable
+    ...Timestamps
+    data: string
+  }>
+}
+
+// Deep nesting with spreads
+type DeepSpread {
+  level1: {
+    ...Identifiable
+    level2: {
+      ...Timestamps
+      level3: {
+        ...Metadata
+        value: string
+      }
+    }
+  }
+}
+
+// Spread in arrays of inline objects
+type SpreadInArrays {
+  items: {
+    ...Identifiable
+    ...Timestamps
+    data: string
+  }[]
+  matrix: {
+    ...Identifiable
+    x: int
+    y: int
+  }[][]
+}
+
+// Spread in maps of inline objects
+type SpreadInMaps {
+  lookup: map<{
+    ...Identifiable
+    value: int
+  }>
+  nested: map<{
+    ...Timestamps
+    entries: {
+      ...Identifiable
+      data: string
+    }[]
+  }>
+}
+
+rpc SpreadService {
+  // Spread in input
+  proc ListItems {
+    input {
+      ...Pagination
+      filter?: string
+      sortBy?: string
+    }
+
+    output {
+      ...PaginatedResult
+      items: Article[]
+    }
+  }
+
+  // Spread in both input and output
+  proc CreateUser {
+    input {
+      ...Timestamps
+      name: string
+      email: string
+    }
+
+    output {
+      ...Identifiable
+      ...Timestamps
+      name: string
+      email: string
+    }
+  }
+
+  // Multiple spreads in input
+  proc SearchWithMetadata {
+    input {
+      ...Pagination
+      ...Metadata
+      query: string
+    }
+
+    output {
+      ...PaginatedResult
+      results: {
+        ...Identifiable
+        score: float
+        data: string
+      }[]
+    }
+  }
+
+  // Spread in inline objects within input/output
+  proc ComplexSpread {
+    input {
+      request: {
+        ...Identifiable
+        ...Timestamps
+        payload: {
+          ...Metadata
+          data: string
+        }
+      }
+    }
+
+    output {
+      response: {
+        ...Identifiable
+        result: {
+          ...Timestamps
+          success: bool
+        }
+      }
+    }
+  }
+
+  // Stream with spreads
+  stream EventStream {
+    input {
+      ...Pagination
+      eventTypes: string[]
+    }
+
+    output {
+      ...Identifiable
+      ...Timestamps
+      eventType: string
+      payload: string
+    }
+  }
+}
