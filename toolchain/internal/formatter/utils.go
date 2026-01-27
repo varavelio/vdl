@@ -39,26 +39,39 @@ func normalizeDocstring(s string) string {
 // If the docstring is multi-line, it writes it to the generator and returns true.
 // If it is single-line, it returns the normalized string and false, allowing the caller
 // to handle printing (e.g. for inline comments).
+//
+// Formatting rules:
+//   - Single line: """ content """
+//   - Multi-line:
+//     """
+//     line 1
+//     line 2
+//     """
 func FormatDocstring(g *gen.Generator, raw string) (string, bool) {
 	normalized := normalizeDocstring(raw)
 
 	if strings.Contains(normalized, "\n") {
 		lines := strings.Split(normalized, "\n")
 
-		g.Inline(`"""`)
-		if lines[0] != "" {
-			g.Raw(lines[0])
-		}
-		g.Break()
+		// Always start multiline docstrings with """ on its own line
+		g.Line(`"""`)
 
-		for i := 1; i < len(lines)-1; i++ {
+		// Skip leading empty line if present (content started with \n)
+		startIdx := 0
+		if lines[0] == "" {
+			startIdx = 1
+		}
+
+		// Skip trailing empty line if present (content ended with \n)
+		endIdx := len(lines)
+		if endIdx > 0 && lines[endIdx-1] == "" {
+			endIdx--
+		}
+
+		for i := startIdx; i < endIdx; i++ {
 			g.Line(lines[i])
 		}
 
-		last := lines[len(lines)-1]
-		if last != "" {
-			g.Line(last)
-		}
 		g.Line(`"""`)
 		return "", true
 	}
