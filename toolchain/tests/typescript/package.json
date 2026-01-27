@@ -1,0 +1,10 @@
+{
+  "name": "vdl-ts-e2e",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.0"
+  }
+}

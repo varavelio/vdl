@@ -9,53 +9,39 @@ import (
 )
 
 func generateStreamTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
-	if len(schema.Streams) == 0 {
-		return "", nil
-	}
-
 	g := gen.New().WithSpaces(2)
 
-	g.Line("// -----------------------------------------------------------------------------")
-	g.Line("// Stream Types")
-	g.Line("// -----------------------------------------------------------------------------")
-	g.Break()
-
-	for _, stream := range schema.Streams {
-		fullName := stream.FullName()
-
-		inputName := fmt.Sprintf("%sInput", fullName)
-		outputName := fmt.Sprintf("%sOutput", fullName)
-		responseName := fmt.Sprintf("%sResponse", fullName)
-
-		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s stream.", inputName, fullName)
-		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, fullName)
-		responseDesc := fmt.Sprintf("%s represents the response for the %s stream.", responseName, fullName)
-
-		g.Line(renderType("", inputName, inputDesc, stream.Input))
+	if len(schema.Streams) > 0 {
+		g.Line("// -----------------------------------------------------------------------------")
+		g.Line("// Stream Types")
+		g.Line("// -----------------------------------------------------------------------------")
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, stream.Output))
-		g.Break()
-
-		g.Line(renderHydrateType("", outputName, stream.Output))
-		g.Break()
-
-		g.Linef("// %s", responseDesc)
-		g.Linef("export type %s = Response<%s>", responseName, outputName)
-		g.Break()
-	}
-
-	// Generate stream names list
-	g.Line("// vdlStreamNames is a list of all stream names.")
-	g.Line("const vdlStreamNames: string[] = [")
-	g.Block(func() {
 		for _, stream := range schema.Streams {
-			path := stream.Path()
-			g.Linef("\"%s\",", path)
+			fullName := stream.FullName()
+
+			inputName := fmt.Sprintf("%sInput", fullName)
+			outputName := fmt.Sprintf("%sOutput", fullName)
+			responseName := fmt.Sprintf("%sResponse", fullName)
+
+			inputDesc := fmt.Sprintf("%s represents the input parameters for the %s stream.", inputName, fullName)
+			outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, fullName)
+			responseDesc := fmt.Sprintf("%s represents the response for the %s stream.", responseName, fullName)
+
+			g.Line(renderType("", inputName, inputDesc, stream.Input))
+			g.Break()
+
+			g.Line(renderType("", outputName, outputDesc, stream.Output))
+			g.Break()
+
+			g.Line(renderHydrateType("", outputName, stream.Output))
+			g.Break()
+
+			g.Linef("// %s", responseDesc)
+			g.Linef("export type %s = Response<%s>", responseName, outputName)
+			g.Break()
 		}
-	})
-	g.Line("]")
-	g.Break()
+	}
 
 	return g.String(), nil
 }

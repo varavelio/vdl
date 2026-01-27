@@ -1,0 +1,11 @@
+rpc Streamer {
+  stream Counter {
+    input {
+      count: int
+    }
+
+    output {
+      value: int
+    }
+  }
+}

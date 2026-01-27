@@ -263,7 +263,7 @@ func renderHydrateType(parentName string, name string, fields []ir.Field) string
 	fullName := parentName + name
 
 	g := gen.New().WithSpaces(2)
-	g.Linef("function hydrate%s(input: %s): %s {", fullName, fullName, fullName)
+	g.Linef("export function hydrate%s(input: %s): %s {", fullName, fullName, fullName)
 	g.Block(func() {
 		for _, field := range fields {
 			g.Line(renderHydrateField(fullName, field))

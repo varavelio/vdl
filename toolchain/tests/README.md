@@ -35,4 +35,3 @@ Read one or two tests to see how it works but in general this is the process:
 4. Add verification files:
    - For **Code**: A `main.go` (or equivalent) that uses the generated code and panics on failure.
    - For **Schemas**: An `expected.json` or `expected.yaml` file to match against.
- 

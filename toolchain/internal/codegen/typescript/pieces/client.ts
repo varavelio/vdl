@@ -1,12 +1,8 @@
-import { Response, UfoError } from "./core_types";
+import { Response, VdlError, asError } from "./core_types.ts";
 
 /**
  * Mocks for the parts that are generated but not exported
  */
-
-function asError(err: unknown): UfoError {
-  return err as UfoError;
-}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -156,7 +152,7 @@ class internalClient {
     if (!this.procSet.has(name)) {
       return {
         ok: false,
-        error: new UfoError({
+        error: new VdlError({
           message: `${name} procedure not found in schema`,
           category: "ClientError",
           code: "INVALID_PROC",
@@ -182,7 +178,7 @@ class internalClient {
       ...headers,
     };
 
-    let lastError: UfoError | null = null;
+    let lastError: VdlError | null = null;
     for (let attempt = 1; attempt <= retryConf.maxAttempts; attempt++) {
       // Create AbortController for this attempt's timeout
       const abortController = new AbortController();
@@ -209,7 +205,7 @@ class internalClient {
         }
 
         if (!fetchResp.ok) {
-          const error = new UfoError({
+          const error = new VdlError({
             message: `Unexpected HTTP status: ${fetchResp.status}`,
             category: "HTTPError",
             code: "BAD_STATUS",
@@ -246,7 +242,7 @@ class internalClient {
 
         // Check if this was a timeout error
         if (abortController.signal.aborted && timeoutConf?.timeoutMs) {
-          const timeoutError = new UfoError({
+          const timeoutError = new VdlError({
             message: `Request timeout after ${timeoutConf.timeoutMs}ms`,
             category: "TimeoutError",
             code: "REQUEST_TIMEOUT",
@@ -289,7 +285,7 @@ class internalClient {
       ok: false,
       error:
         lastError ||
-        new UfoError({
+        new VdlError({
           message: "Unknown error",
           category: "ClientError",
           code: "UNKNOWN",
@@ -326,7 +322,7 @@ class internalClient {
       if (!self.streamSet.has(name)) {
         yield {
           ok: false,
-          error: new UfoError({
+          error: new VdlError({
             message: `${name} stream not found in schema`,
             category: "ClientError",
             code: "INVALID_STREAM",
@@ -364,7 +360,7 @@ class internalClient {
           });
 
           if (!fetchResp.ok) {
-            const error = new UfoError({
+            const error = new VdlError({
               message: `Unexpected HTTP status: ${fetchResp.status}`,
               category: "HTTPError",
               code: "BAD_STATUS",
@@ -395,7 +391,7 @@ class internalClient {
           }
 
           if (!fetchResp.body) {
-            const error = new UfoError({
+            const error = new VdlError({
               message: "Missing response body for stream",
               category: "ConnectionError",
               code: "STREAM_CONNECT_FAILED",
@@ -451,7 +447,7 @@ class internalClient {
             ) {
               yield {
                 ok: false,
-                error: new UfoError({
+                error: new VdlError({
                   message: `Stream connection lost, attempting reconnect (${
                     reconnectAttempt + 1
                   }/${reconnectConf.maxAttempts})`,
@@ -487,7 +483,7 @@ class internalClient {
           ) {
             yield {
               ok: false,
-              error: new UfoError({
+              error: new VdlError({
                 message: `Failed to connect to stream, attempting reconnect (${
                   reconnectAttempt + 1
                 }/${reconnectConf.maxAttempts})`,
