@@ -87,11 +87,12 @@ type GoConfig struct {
 
 // TypeScriptConfig contains configuration for the TypeScript target.
 type TypeScriptConfig struct {
-	CommonConfig   `yaml:",inline" json:",inline"`
-	PatternsConfig `yaml:",inline" json:",inline"`
-	ConstsConfig   `yaml:",inline" json:",inline"`
-	ClientConfig   `yaml:",inline" json:",inline"`
-	ServerConfig   `yaml:",inline" json:",inline"`
+	CommonConfig    `yaml:",inline" json:",inline"`
+	PatternsConfig  `yaml:",inline" json:",inline"`
+	ConstsConfig    `yaml:",inline" json:",inline"`
+	ClientConfig    `yaml:",inline" json:",inline"`
+	ServerConfig    `yaml:",inline" json:",inline"`
+	ImportExtension string `yaml:"import_extension,omitempty" json:"import_extension,omitempty" jsonschema:"enum=none,enum=.js,enum=.ts,default=none,description=Explicit file extension to append to import paths."`
 }
 
 // DartConfig contains configuration for the Dart target.

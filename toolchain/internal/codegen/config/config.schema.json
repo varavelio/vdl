@@ -310,6 +310,16 @@
           "type": "boolean",
           "description": "Generate RPC server interfaces and handlers.",
           "default": false
+        },
+        "import_extension": {
+          "type": "string",
+          "enum": [
+            "none",
+            ".js",
+            ".ts"
+          ],
+          "description": "Explicit file extension to append to import paths.",
+          "default": "none"
         }
       },
       "additionalProperties": false,
