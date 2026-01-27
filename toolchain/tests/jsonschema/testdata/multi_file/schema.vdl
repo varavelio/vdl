@@ -1,0 +1,25 @@
+// Main entry point - includes shared types
+include "./types.vdl"
+
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc ListUsers {
+    input {
+      ...Pagination
+    }
+
+    output {
+      users: User[]
+      total: int
+    }
+  }
+}
