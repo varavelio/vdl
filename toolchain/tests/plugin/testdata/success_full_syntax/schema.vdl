@@ -1,0 +1,199 @@
+// This schema tests all VDL syntax elements for complete IR coverage.
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const API_VERSION = "1.0.0"
+const MAX_RETRIES = 3
+const TIMEOUT_SECONDS = 30.5
+const DEBUG_MODE = true
+
+// ============================================================================
+// PATTERNS
+// ============================================================================
+
+pattern UserProfileUrl = "/users/{userId}/profile"
+pattern OrderItemUrl = "/orders/{orderId}/items/{itemId}"
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+""" String enum for user roles. """
+enum Role {
+  Admin = "admin"
+  User = "user"
+  Guest = "guest"
+}
+
+""" Integer enum for priority levels. """
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 4
+}
+
+deprecated("Use Role instead")
+enum LegacyStatus {
+  Active = "active"
+  Inactive = "inactive"
+}
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+""" Base type for entities with ID. """
+type BaseEntity {
+  id: string
+  createdAt: datetime
+}
+
+""" Address type with optional fields. """
+type Address {
+  street: string
+  city: string
+  country: string
+  zipCode?: string
+}
+
+"""
+User type with spreads, optionals, arrays, maps, and nested objects.
+"""
+deprecated("Use UserV2 instead")
+type User {
+  ...BaseEntity
+
+  """ User's name. """
+  name: string
+
+  """ User's email (optional). """
+  email?: string
+
+  """ User's role. """
+  role: Role
+
+  """ User's priority level. """
+  priority: Priority
+
+  """ Tags for the user. """
+  tags: string[]
+
+  """ Nested array (matrix). """
+  scores: int[][]
+
+  """ Map of metadata. """
+  metadata: map<string>
+
+  """ Inline object for preferences. """
+  preferences: {
+    theme: string
+    notifications?: bool
+  }
+
+  """ Optional address. """
+  address?: Address
+}
+
+""" Type referencing another type. """
+type UserWithFriends {
+  user: User
+  friends: User[]
+}
+
+// ============================================================================
+// RPC SERVICES
+// ============================================================================
+
+""" User management service. """
+rpc UserService {
+  """ Get user by ID. """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+      found: bool
+    }
+  }
+
+  deprecated("Use CreateUserV2 instead")
+  proc CreateUser {
+    input {
+      name: string
+      email?: string
+      role: Role
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """ List users with pagination. """
+  proc ListUsers {
+    input {
+      page: int
+      pageSize: int
+      filters?: {
+        role?: Role
+        active?: bool
+      }
+    }
+
+    output {
+      users: User[]
+      total: int
+      hasMore: bool
+    }
+  }
+
+  """ Stream user updates. """
+  stream UserUpdates {
+    input {
+      userId: string
+    }
+
+    output {
+      user: User
+      updateType: string
+      timestamp: datetime
+    }
+  }
+}
+
+""" Order service with streams. """
+rpc OrderService {
+  """ Get order details. """
+  proc GetOrder {
+    input {
+      orderId: string
+    }
+
+    output {
+      orderId: string
+      items: {
+        productId: string
+        quantity: int
+        price: float
+      }[]
+      status: string
+    }
+  }
+
+  """ Stream order status changes. """
+  stream OrderStatus {
+    input {
+      orderId: string
+    }
+
+    output {
+      status: string
+      updatedAt: datetime
+    }
+  }
+}

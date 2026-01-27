@@ -1,0 +1,20 @@
+""" A simple user type for testing. """
+type User {
+  id: string
+  name: string
+  email?: string
+}
+
+""" User service RPC. """
+rpc UserService {
+  """ Get a user by ID. """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+}

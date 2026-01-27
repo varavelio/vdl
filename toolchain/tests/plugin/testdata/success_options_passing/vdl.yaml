@@ -1,0 +1,15 @@
+version: 1
+schema: schema.vdl
+targets:
+  - plugin:
+      output: gen
+      command: ["python3", "plugin.py"]
+      options:
+        language: python
+        version: "3.11"
+        features:
+          - async
+          - dataclasses
+        config:
+          indent: 4
+          use_slots: true
