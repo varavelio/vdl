@@ -1,0 +1,14 @@
+{
+  "requiredFiles": ["index.html", "schema.vdl"],
+  "forbiddenFiles": ["config.json", ".gitkeep"],
+  "contentContains": {
+    "schema.vdl": [
+      "include \"./types.vdl\"",
+      "rpc OrderService",
+      "proc GetOrder",
+      "proc ListOrders",
+      "Order",
+      "OrderStatus"
+    ]
+  }
+}

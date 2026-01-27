@@ -1,0 +1,14 @@
+{
+  "requiredFiles": ["index.html", "schema.vdl", "config.json"],
+  "forbiddenFiles": [".gitkeep"],
+  "contentContains": {
+    "schema.vdl": ["type Product", "rpc ProductService"],
+    "config.json": [
+      "https://api.example.com",
+      "Authorization",
+      "Bearer token123",
+      "X-API-Version",
+      "v2"
+    ]
+  }
+}

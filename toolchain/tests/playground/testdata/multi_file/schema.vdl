@@ -1,0 +1,23 @@
+include "./types.vdl"
+
+rpc OrderService {
+  proc GetOrder {
+    input {
+      id: string
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  proc ListOrders {
+    input {
+      status: OrderStatus
+    }
+
+    output {
+      orders: Order[]
+    }
+  }
+}

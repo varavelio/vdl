@@ -1,0 +1,12 @@
+type Order {
+  id: string
+  userId: string
+  total: float
+  status: OrderStatus
+}
+
+enum OrderStatus {
+  Pending
+  Shipped
+  Delivered
+}
