@@ -1,0 +1,66 @@
+// Tests stream endpoints (SSE)
+
+type Message {
+  id: string
+  text: string
+  userId: string
+  timestamp: datetime
+}
+
+type Notification {
+  id: string
+  kind: string
+  payload: string
+  createdAt: datetime
+}
+
+rpc ChatService {
+  proc SendMessage {
+    input {
+      chatId: string
+      text: string
+    }
+
+    output {
+      message: Message
+    }
+  }
+
+  """ Subscribe to new messages in a chat. """
+  stream NewMessages {
+    input {
+      chatId: string
+      since?: datetime
+    }
+
+    output {
+      message: Message
+    }
+  }
+
+  """ Subscribe to typing indicators. """
+  stream TypingIndicator {
+    input {
+      chatId: string
+    }
+
+    output {
+      userId: string
+      isTyping: bool
+    }
+  }
+}
+
+rpc NotificationService {
+  """ Subscribe to user notifications. """
+  stream UserNotifications {
+    input {
+      userId: string
+      types?: string[]
+    }
+
+    output {
+      notification: Notification
+    }
+  }
+}

@@ -1,0 +1,47 @@
+// Tests deprecated annotations
+
+deprecated("Use UserV2 instead")
+type User {
+  id: string
+  name: string
+}
+
+type UserV2 {
+  id: string
+  displayName: string
+  email: string
+}
+
+rpc UserService {
+  deprecated("Use GetUserV2 instead")
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc GetUserV2 {
+    input {
+      id: string
+    }
+
+    output {
+      user: UserV2
+    }
+  }
+
+  deprecated("Will be removed in v3.0")
+  proc DeleteUser {
+    input {
+      id: string
+    }
+
+    output {
+      deleted: bool
+    }
+  }
+}

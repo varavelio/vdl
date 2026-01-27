@@ -1,0 +1,12 @@
+version: 1
+schema: schema.vdl
+targets:
+  - openapi:
+      output: gen
+      title: My Custom API
+      version: 2.5.0
+      description: This is a custom API with full configuration.
+      base_url: https://api.example.com/v2
+      contact_name: API Team
+      contact_email: api@example.com
+      license_name: MIT

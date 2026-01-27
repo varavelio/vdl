@@ -1,0 +1,39 @@
+// Tests optional field handling
+
+type Profile {
+  id: string
+  name: string
+  bio?: string
+  age?: int
+  tags?: string[]
+  metadata?: map<string>
+}
+
+rpc ProfileService {
+  proc GetProfile {
+    input {
+      id: string
+      includeDetails?: bool
+    }
+
+    output {
+      profile: Profile
+      cached?: bool
+    }
+  }
+
+  proc UpdateProfile {
+    input {
+      id: string
+      name?: string
+      bio?: string
+      age?: int
+      tags?: string[]
+    }
+
+    output {
+      updated: bool
+      profile?: Profile
+    }
+  }
+}

@@ -1,0 +1,47 @@
+// Tests string and integer enums
+
+""" User role in the system. """
+enum Role {
+  Admin
+  User
+  Guest
+}
+
+""" Priority levels for tasks. """
+enum Priority {
+  Low = 1
+  Medium = 5
+  High = 10
+  Critical = 100
+}
+
+type Task {
+  id: string
+  title: string
+  priority: Priority
+  assigneeRole: Role
+}
+
+rpc TaskService {
+  proc CreateTask {
+    input {
+      title: string
+      priority: Priority
+      assigneeRole: Role
+    }
+
+    output {
+      task: Task
+    }
+  }
+
+  proc GetTasksByPriority {
+    input {
+      priority: Priority
+    }
+
+    output {
+      tasks: Task[]
+    }
+  }
+}

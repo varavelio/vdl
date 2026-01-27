@@ -1,0 +1,7 @@
+version: 1
+schema: schema.vdl
+targets:
+  - openapi:
+      output: gen
+      title: Deprecated API
+      version: 2.0.0

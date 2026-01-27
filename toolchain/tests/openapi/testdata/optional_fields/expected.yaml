@@ -1,0 +1,164 @@
+openapi: 3.0.0
+info:
+  title: Optional Fields API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: ProfileServiceProcedures
+    description: Procedures for ProfileService
+paths:
+  /ProfileService/GetProfile:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ProfileServiceGetProfileInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProfileServiceGetProfileOutput"
+      tags:
+        - ProfileServiceProcedures
+  /ProfileService/UpdateProfile:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ProfileServiceUpdateProfileInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProfileServiceUpdateProfileOutput"
+      tags:
+        - ProfileServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Profile:
+      properties:
+        age:
+          type: integer
+        bio:
+          type: string
+        id:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        name:
+          type: string
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+        - id
+        - name
+      type: object
+  requestBodies:
+    ProfileServiceGetProfileInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+              includeDetails:
+                type: boolean
+            required:
+              - id
+            type: object
+      description: Request body for ProfileService/GetProfile procedure
+    ProfileServiceUpdateProfileInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              age:
+                type: integer
+              bio:
+                type: string
+              id:
+                type: string
+              name:
+                type: string
+              tags:
+                items:
+                  type: string
+                type: array
+            required:
+              - id
+            type: object
+      description: Request body for ProfileService/UpdateProfile procedure
+  responses:
+    ProfileServiceGetProfileOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  cached:
+                    type: boolean
+                  profile:
+                    $ref: "#/components/schemas/Profile"
+                required:
+                  - profile
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ProfileService/GetProfile procedure
+    ProfileServiceUpdateProfileOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  profile:
+                    $ref: "#/components/schemas/Profile"
+                  updated:
+                    type: boolean
+                required:
+                  - updated
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ProfileService/UpdateProfile procedure

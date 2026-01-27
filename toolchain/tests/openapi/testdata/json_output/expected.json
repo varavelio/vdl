@@ -1,0 +1,122 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "JSON Format API",
+    "version": "1.0.0"
+  },
+  "security": [
+    {
+      "AuthToken": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "EntityServiceProcedures",
+      "description": "Procedures for EntityService"
+    }
+  ],
+  "paths": {
+    "/EntityService/GetEntity": {
+      "post": {
+        "requestBody": {
+          "$ref": "#/components/requestBodies/EntityServiceGetEntityInput"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EntityServiceGetEntityOutput"
+          }
+        },
+        "tags": ["EntityServiceProcedures"]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "AuthToken": {
+        "description": "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)",
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      }
+    },
+    "schemas": {
+      "Entity": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer"
+          }
+        },
+        "required": ["id", "value"],
+        "type": "object"
+      }
+    },
+    "requestBodies": {
+      "EntityServiceGetEntityInput": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": ["id"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Request body for EntityService/GetEntity procedure"
+      }
+    },
+    "responses": {
+      "EntityServiceGetEntityOutput": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "error": {
+                  "properties": {
+                    "category": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "details": {
+                      "additionalProperties": true,
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "output": {
+                  "properties": {
+                    "entity": {
+                      "$ref": "#/components/schemas/Entity"
+                    }
+                  },
+                  "required": ["entity"],
+                  "type": "object"
+                }
+              },
+              "required": ["ok"],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Response for EntityService/GetEntity procedure"
+      }
+    }
+  }
+}

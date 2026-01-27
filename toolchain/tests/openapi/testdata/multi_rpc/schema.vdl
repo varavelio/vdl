@@ -1,0 +1,92 @@
+// Tests multiple RPC blocks
+
+type User {
+  id: string
+  name: string
+}
+
+type Product {
+  id: string
+  name: string
+  price: float
+}
+
+type Order {
+  id: string
+  userId: string
+  productIds: string[]
+  total: float
+}
+
+""" User management service. """
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc ListUsers {
+    input {
+      limit: int
+      offset: int
+    }
+
+    output {
+      users: User[]
+      total: int
+    }
+  }
+}
+
+""" Product catalog service. """
+rpc ProductService {
+  proc GetProduct {
+    input {
+      id: string
+    }
+
+    output {
+      product: Product
+    }
+  }
+
+  proc SearchProducts {
+    input {
+      query: string
+      maxPrice?: float
+    }
+
+    output {
+      products: Product[]
+    }
+  }
+}
+
+""" Order management service. """
+rpc OrderService {
+  proc CreateOrder {
+    input {
+      userId: string
+      productIds: string[]
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  proc GetOrdersByUser {
+    input {
+      userId: string
+    }
+
+    output {
+      orders: Order[]
+    }
+  }
+}

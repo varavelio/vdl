@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: Streams API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: ChatServiceProcedures
+    description: Procedures for ChatService
+  - name: ChatServiceStreams
+    description: Streams for ChatService
+  - name: NotificationServiceStreams
+    description: Streams for NotificationService
+paths:
+  /ChatService/NewMessages:
+    post:
+      description: Subscribe to new messages in a chat.
+      requestBody:
+        $ref: "#/components/requestBodies/ChatServiceNewMessagesInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatServiceNewMessagesOutput"
+      tags:
+        - ChatServiceStreams
+  /ChatService/SendMessage:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ChatServiceSendMessageInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatServiceSendMessageOutput"
+      tags:
+        - ChatServiceProcedures
+  /ChatService/TypingIndicator:
+    post:
+      description: Subscribe to typing indicators.
+      requestBody:
+        $ref: "#/components/requestBodies/ChatServiceTypingIndicatorInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatServiceTypingIndicatorOutput"
+      tags:
+        - ChatServiceStreams
+  /NotificationService/UserNotifications:
+    post:
+      description: Subscribe to user notifications.
+      requestBody:
+        $ref: "#/components/requestBodies/NotificationServiceUserNotificationsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/NotificationServiceUserNotificationsOutput"
+      tags:
+        - NotificationServiceStreams
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Message:
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+        userId:
+          type: string
+      required:
+        - id
+        - text
+        - userId
+        - timestamp
+      type: object
+    Notification:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          type: string
+        kind:
+          type: string
+        payload:
+          type: string
+      required:
+        - id
+        - kind
+        - payload
+        - createdAt
+      type: object
+  requestBodies:
+    ChatServiceNewMessagesInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              chatId:
+                type: string
+              since:
+                format: date-time
+                type: string
+            required:
+              - chatId
+            type: object
+      description: Request body for ChatService/NewMessages stream subscription
+    ChatServiceSendMessageInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              chatId:
+                type: string
+              text:
+                type: string
+            required:
+              - chatId
+              - text
+            type: object
+      description: Request body for ChatService/SendMessage procedure
+    ChatServiceTypingIndicatorInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              chatId:
+                type: string
+            required:
+              - chatId
+            type: object
+      description: Request body for ChatService/TypingIndicator stream subscription
+    NotificationServiceUserNotificationsInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              types:
+                items:
+                  type: string
+                type: array
+              userId:
+                type: string
+            required:
+              - userId
+            type: object
+      description: Request body for NotificationService/UserNotifications stream subscription
+  responses:
+    ChatServiceNewMessagesOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  message:
+                    $ref: "#/components/schemas/Message"
+                required:
+                  - message
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for ChatService/NewMessages stream
+    ChatServiceSendMessageOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  message:
+                    $ref: "#/components/schemas/Message"
+                required:
+                  - message
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ChatService/SendMessage procedure
+    ChatServiceTypingIndicatorOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  isTyping:
+                    type: boolean
+                  userId:
+                    type: string
+                required:
+                  - userId
+                  - isTyping
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for ChatService/TypingIndicator stream
+    NotificationServiceUserNotificationsOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  notification:
+                    $ref: "#/components/schemas/Notification"
+                required:
+                  - notification
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for NotificationService/UserNotifications stream
