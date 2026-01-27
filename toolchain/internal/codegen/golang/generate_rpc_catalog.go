@@ -21,6 +21,8 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 
 	// VDLProcedures
 	g.Line("// VDLProcedures is a list of all procedure definitions.")
+	g.Line("//")
+	g.Line("// It allows introspection of RPC procedures at runtime.")
 	g.Line("var VDLProcedures = []OperationDefinition{")
 	g.Block(func() {
 		for _, rpc := range schema.RPCs {
@@ -34,6 +36,8 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 
 	// VDLStreams
 	g.Line("// VDLStreams is a list of all stream definitions.")
+	g.Line("//")
+	g.Line("// It allows introspection of RPC streams at runtime.")
 	g.Line("var VDLStreams = []OperationDefinition{")
 	g.Block(func() {
 		for _, rpc := range schema.RPCs {
@@ -47,6 +51,8 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 
 	// VDLPaths
 	g.Line("// VDLPaths holds the URL paths for all RPCs and their operations.")
+	g.Line("//")
+	g.Line("// It provides type-safe access to the URL paths.")
 	g.Line("var VDLPaths = struct {")
 	g.Block(func() {
 		for _, rpc := range schema.RPCs {

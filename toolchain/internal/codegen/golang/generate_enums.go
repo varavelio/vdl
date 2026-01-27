@@ -35,7 +35,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 		doc := enum.Doc
 		renderMultilineComment(g, doc)
 	} else {
-		g.Linef("// %s is an enumeration type.", enum.Name)
+		g.Linef("// %s is an enumeration of values.", enum.Name)
 	}
 
 	// Deprecation

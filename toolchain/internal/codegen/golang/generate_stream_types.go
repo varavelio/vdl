@@ -30,6 +30,11 @@ func generateStreamTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) 
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s stream.", outputName, stream.RPCName, stream.Name)
 		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s stream.", responseName, stream.RPCName, stream.Name)
 
+		if stream.Doc != "" {
+			inputDesc += "\n\n" + stream.Doc
+			outputDesc += "\n\n" + stream.Doc
+		}
+
 		g.Line(renderType("", inputName, inputDesc, stream.Input))
 		g.Break()
 

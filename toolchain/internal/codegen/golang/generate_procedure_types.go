@@ -30,6 +30,11 @@ func generateProcedureTypes(schema *ir.Schema, _ *config.GoConfig) (string, erro
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s.%s procedure.", outputName, proc.RPCName, proc.Name)
 		responseDesc := fmt.Sprintf("%s represents the response for the %s.%s procedure.", responseName, proc.RPCName, proc.Name)
 
+		if proc.Doc != "" {
+			inputDesc += "\n\n" + proc.Doc
+			outputDesc += "\n\n" + proc.Doc
+		}
+
 		g.Line(renderType("", inputName, inputDesc, proc.Input))
 		g.Break()
 

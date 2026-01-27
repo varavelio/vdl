@@ -34,6 +34,8 @@ func generateConstant(g *gen.Generator, constant ir.Constant) {
 	// Documentation
 	if constant.Doc != "" {
 		renderMultilineComment(g, constant.Doc)
+	} else {
+		g.Linef("// %s represents the constant %q.", constant.Name, constant.Value)
 	}
 
 	// Deprecation

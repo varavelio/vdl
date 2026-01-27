@@ -36,9 +36,16 @@ func generatePattern(g *gen.Generator, pattern ir.Pattern) {
 	// Documentation
 	if pattern.Doc != "" {
 		doc := pattern.Doc
+		if pattern.Template != "" {
+			doc += "\n\nTemplate: " + pattern.Template
+		}
 		renderMultilineComment(g, doc)
 	} else {
 		g.Linef("// %s generates a string from the pattern template.", pattern.Name)
+		if pattern.Template != "" {
+			g.Linef("//")
+			g.Linef("// Template: %s", pattern.Template)
+		}
 	}
 
 	// Deprecation
