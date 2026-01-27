@@ -149,6 +149,10 @@ type GlobalMiddlewareFunc[T any] func(
 ) GlobalHandlerFunc[T]
 
 // ProcHandlerFunc is the signature of the final business handler for a proc.
+//
+//   - T: Application-defined context type (props).
+//   - I: Input payload type for the procedure.
+//   - O: Output payload type for the procedure.
 type ProcHandlerFunc[T any, I any, O any] func(
 	c *HandlerContext[T, I],
 ) (O, error)
@@ -157,28 +161,48 @@ type ProcHandlerFunc[T any, I any, O any] func(
 // It uses a wrapper pattern for a clean composition.
 //
 // This is the same as [GlobalMiddlewareFunc] but for specific procedures and with types.
+//
+//   - T: Application-defined context type (props).
+//   - I: Input payload type for the procedure.
+//   - O: Output payload type for the procedure.
 type ProcMiddlewareFunc[T any, I any, O any] func(
 	next ProcHandlerFunc[T, I, O],
 ) ProcHandlerFunc[T, I, O]
 
 // StreamHandlerFunc is the signature of the main handler that initializes a stream.
+//
+//   - T: Application-defined context type (props).
+//   - I: Input payload type for the stream (subscription parameters).
+//   - O: Output payload type for the stream (event data).
 type StreamHandlerFunc[T any, I any, O any] func(
 	c *HandlerContext[T, I],
 	emit EmitFunc[T, I, O],
 ) error
 
 // StreamMiddlewareFunc is the signature for a middleware that wraps the main stream handler.
+//
+//   - T: Application-defined context type (props).
+//   - I: Input payload type for the stream.
+//   - O: Output payload type for the stream.
 type StreamMiddlewareFunc[T any, I any, O any] func(
 	next StreamHandlerFunc[T, I, O],
 ) StreamHandlerFunc[T, I, O]
 
 // EmitFunc is the signature for emitting events from a stream.
+//
+//   - T: Application-defined context type (props).
+//   - I: Input payload type for the stream.
+//   - O: Output payload type for the stream.
 type EmitFunc[T any, I any, O any] func(
 	c *HandlerContext[T, I],
 	output O,
 ) error
 
 // EmitMiddlewareFunc is the signature for a middleware that wraps each call to emit.
+//
+//   - T: Application-defined context type (props).
+//   - I: Input payload type for the stream.
+//   - O: Output payload type for the stream.
 type EmitMiddlewareFunc[T any, I any, O any] func(
 	next EmitFunc[T, I, O],
 ) EmitFunc[T, I, O]
