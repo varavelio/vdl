@@ -130,11 +130,9 @@ func runWasm(opts RunWasmOptions) (RunWasmOutput, error) {
 			return RunWasmOutput{}, fmt.Errorf("dart generator requires 'packageName'")
 		}
 		cfg := &config.DartConfig{
-			Package: opts.PackageName,
 			CommonConfig: config.CommonConfig{
 				Output: "lib",
 			},
-			ClientConfig: config.ClientConfig{GenClient: true},
 		}
 		gen := dart.New(cfg)
 		files, err := gen.Generate(ctx, schema)
