@@ -18,7 +18,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
-	"github.com/varavelio/vdl/toolchain/internal/formatter"
+	"github.com/varavelio/vdl/toolchain/internal/transform"
 	"github.com/varavelio/vdl/toolchain/internal/util/filepathutil"
 )
 
@@ -70,16 +70,17 @@ func Run(configPath string) error {
 		return err
 	}
 
-	// Cache for parsed schemas to avoid reparsing the same file multiple times
+	// Cache for parsed schemas and programs to avoid reparsing the same file multiple times
 	schemaCache := make(map[string]*ir.Schema)
+	programCache := make(map[string]*analysis.Program)
 	fs := vfs.New()
 
-	// Helper to get or parse schema
-	getSchema := func(schemaPath string) (*ir.Schema, *vfs.FileSystem, error) {
+	// Helper to get or parse schema (returns IR schema and program for advanced uses)
+	getSchema := func(schemaPath string) (*ir.Schema, *analysis.Program, error) {
 		// Schema path is relative to the config file
 		absSchemaPath := filepath.Join(absConfigDir, schemaPath)
 		if cached, ok := schemaCache[absSchemaPath]; ok {
-			return cached, fs, nil
+			return cached, programCache[absSchemaPath], nil
 		}
 
 		program, diagnostics := analysis.Analyze(fs, absSchemaPath)
@@ -93,7 +94,8 @@ func Run(configPath string) error {
 
 		schema := ir.FromProgram(program)
 		schemaCache[absSchemaPath] = schema
-		return schema, fs, nil
+		programCache[absSchemaPath] = program
+		return schema, program, nil
 	}
 
 	ctx := context.Background()
@@ -143,13 +145,12 @@ func Run(configPath string) error {
 				return fmt.Errorf("target #%d (openapi): %w", i, err)
 			}
 		} else if target.Playground != nil {
-			schema, fsRef, err := getSchema(target.Playground.Schema)
+			schema, program, err := getSchema(target.Playground.Schema)
 			if err != nil {
 				return err
 			}
-			// Playground needs formatted schema
-			absSchemaPath := filepath.Join(absConfigDir, target.Playground.Schema)
-			formatted := getFormattedSchema(fsRef, absSchemaPath)
+			// Playground needs merged and formatted schema (all includes resolved into one file)
+			formatted := transform.MergeAndFormat(program)
 
 			if err := runPlayground(ctx, absConfigDir, target.Playground, schema, formatted); err != nil {
 				return fmt.Errorf("target #%d (playground): %w", i, err)
@@ -190,19 +191,6 @@ func runPlugin(ctx context.Context, absConfigDir string, cfg *config.PluginConfi
 // joinErrors joins multiple error messages with newlines.
 func joinErrors(errs []string) string {
 	return strings.Join(errs, "\n")
-}
-
-// getFormattedSchema reads and formats the schema file.
-func getFormattedSchema(fs *vfs.FileSystem, absSchemaPath string) string {
-	content, err := fs.ReadFile(absSchemaPath)
-	if err != nil {
-		return ""
-	}
-	formatted, err := formatter.Format(absSchemaPath, string(content))
-	if err != nil {
-		return string(content) // Return original if formatting fails
-	}
-	return formatted
 }
 
 func runOpenAPI(ctx context.Context, absConfigDir string, cfg *config.OpenAPIConfig, schema *ir.Schema) error {
