@@ -3,12 +3,16 @@
   "forbiddenFiles": ["config.json", ".gitkeep"],
   "contentContains": {
     "schema.vdl": [
-      "include \"./types.vdl\"",
       "rpc OrderService",
       "proc GetOrder",
       "proc ListOrders",
-      "Order",
-      "OrderStatus"
+      "type Order",
+      "enum OrderStatus",
+      "/* Comment */",
+      "\"\"\" OrderService Docs \"\"\"",
+      "\"\"\" OrderStatus docs \"\"\"",
+      "// EOL Comment",
+      "External documentation"
     ]
   }
 }

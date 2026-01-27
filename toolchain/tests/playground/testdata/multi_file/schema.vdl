@@ -1,5 +1,6 @@
-include "./types.vdl"
+/* Comment */
 
+""" OrderService Docs """
 rpc OrderService {
   proc GetOrder {
     input {
@@ -21,3 +22,5 @@ rpc OrderService {
     }
   }
 }
+
+include "./types.vdl"

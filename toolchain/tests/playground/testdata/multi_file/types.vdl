@@ -1,3 +1,5 @@
+""" ./doc.md """
+
 type Order {
   id: string
   userId: string
@@ -5,8 +7,9 @@ type Order {
   status: OrderStatus
 }
 
+""" OrderStatus docs """
 enum OrderStatus {
-  Pending
+  Pending // EOL Comment
   Shipped
   Delivered
 }
