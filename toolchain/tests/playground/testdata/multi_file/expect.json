@@ -12,6 +12,7 @@
       "\"\"\" OrderService Docs \"\"\"",
       "\"\"\" OrderStatus docs \"\"\"",
       "// EOL Comment",
+      "# Test external",
       "External documentation"
     ]
   }
