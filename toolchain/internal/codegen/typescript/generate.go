@@ -113,7 +113,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		clientBuilder := gen.New().WithSpaces(2)
-		clientBuilder.Line(formatImport("{ Response, VdlError, asError }", "./coreTypes", g.config))
+		clientBuilder.Line(formatImport("{ Response, VdlError, asError, OperationType, OperationDefinition, sleep }", "./coreTypes", g.config))
 
 		typeNames := collectAllTypeNames(schema)
 		sort.Strings(typeNames)
