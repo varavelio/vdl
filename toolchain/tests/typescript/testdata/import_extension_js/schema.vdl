@@ -1,0 +1,12 @@
+// Tests that generated imports work with import_extension: ".js"
+rpc Echo {
+  proc Say {
+    input {
+      message: string
+    }
+
+    output {
+      message: string
+    }
+  }
+}
