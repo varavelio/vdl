@@ -165,6 +165,20 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		serverBuilder.Raw(serverContent)
 
 		addFile("server.ts", []byte(serverBuilder.String()))
+
+		// 7.1 adapters/fetch.ts - Universal Web Standards adapter
+		fetchAdapterContent, err := generateFetchAdapter(g.config)
+		if err != nil {
+			return nil, err
+		}
+		addFile("adapters/fetch.ts", []byte(fetchAdapterContent))
+
+		// 7.2 adapters/node.ts - Node.js adapter
+		nodeAdapterContent, err := generateNodeAdapter(g.config)
+		if err != nil {
+			return nil, err
+		}
+		addFile("adapters/node.ts", []byte(nodeAdapterContent))
 	}
 
 	// 8. index.ts (Exports everything)
