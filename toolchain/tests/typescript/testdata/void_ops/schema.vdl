@@ -1,0 +1,7 @@
+rpc Service {
+  proc Ping {
+    input {}
+
+    output {}
+  }
+}

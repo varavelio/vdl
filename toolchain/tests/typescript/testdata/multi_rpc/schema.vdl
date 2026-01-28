@@ -1,0 +1,15 @@
+rpc A {
+  proc X {
+    input {}
+
+    output {}
+  }
+}
+
+rpc B {
+  proc Y {
+    input {}
+
+    output {}
+  }
+}
