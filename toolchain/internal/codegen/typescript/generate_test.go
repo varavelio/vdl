@@ -149,13 +149,17 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
+	require.Len(t, files, 5) // coreTypes.ts, types.ts, constants.ts, catalog.ts, index.ts
 
-	content := findFile(files, "types.ts")
+	content := findFile(files, "constants.ts")
 	assert.Contains(t, content, "export const MAX_PAGE_SIZE: number = 100;")
 	assert.Contains(t, content, `export const API_VERSION: string = "1.0.0";`)
 	assert.Contains(t, content, "export const DEFAULT_RATE: number = 0.21;")
 	assert.Contains(t, content, "export const ENABLED: boolean = true;")
+
+	// Verify constants are exported in index.ts
+	indexContent := findFile(files, "index.ts")
+	assert.Contains(t, indexContent, `export * from "./constants"`)
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
@@ -173,13 +177,17 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
+	require.Len(t, files, 5) // coreTypes.ts, types.ts, patterns.ts, catalog.ts, index.ts
 
-	content := findFile(files, "types.ts")
+	content := findFile(files, "patterns.ts")
 	assert.Contains(t, content, "export function UserEventSubject(userId: string, eventType: string): string")
 	assert.Contains(t, content, "return `events.users.${userId}.${eventType}`")
 	assert.Contains(t, content, "export function CacheKey(key: string): string")
 	assert.Contains(t, content, "return `cache:${key}`")
+
+	// Verify patterns are exported in index.ts
+	indexContent := findFile(files, "index.ts")
+	assert.Contains(t, indexContent, `export * from "./patterns"`)
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
