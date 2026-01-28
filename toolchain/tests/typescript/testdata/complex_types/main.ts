@@ -1,6 +1,7 @@
 // Verifies complex type serialization: deeply nested structures, maps of arrays,
 // arrays of maps, nested objects, and multi-dimensional arrays.
-import { Server, NewClient, HTTPAdapter } from "./gen/index.ts";
+import { Server, NewClient } from "./gen/index.ts";
+import { createNodeHandler } from "./gen/adapters/node.ts";
 import type {
   Container,
   User,
@@ -12,29 +13,6 @@ import type {
   Score,
 } from "./gen/index.ts";
 import { createServer } from "http";
-
-class NodeAdapter implements HTTPAdapter {
-  constructor(
-    private req: any,
-    private res: any,
-    private body: any,
-  ) {}
-  async json() {
-    return this.body;
-  }
-  setHeader(k: string, v: string) {
-    this.res.setHeader(k, v);
-  }
-  write(d: string) {
-    this.res.write(d);
-  }
-  end() {
-    this.res.end();
-  }
-  onClose(cb: () => void) {
-    this.req.on("close", cb);
-  }
-}
 
 function deepEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -127,6 +105,8 @@ async function main() {
       return { data: input.data };
     });
 
+  const handler = createNodeHandler(server, undefined, { prefix: "/rpc" });
+
   const httpServer = createServer(async (req, res) => {
     if (req.method !== "POST") {
       res.writeHead(405);
@@ -134,48 +114,40 @@ async function main() {
       return;
     }
 
-    const buffers: Buffer[] = [];
-    for await (const chunk of req) buffers.push(chunk);
-    const bodyStr = Buffer.concat(buffers).toString();
-    const body = bodyStr ? JSON.parse(bodyStr) : {};
-
-    const parts = req.url?.split("/") || [];
-    const service = parts[2];
-    const method = parts[3];
-
-    const adapter = new NodeAdapter(req, res, body);
-    await server.handleRequest({}, service, method, adapter);
+    await handler(req, res);
   });
 
-  httpServer.listen(0, async () => {
-    const addr = httpServer.address() as any;
-    const port = addr.port;
-    const baseUrl = `http://localhost:${port}/rpc`;
+  await new Promise<void>((resolve) => {
+    httpServer.listen(0, resolve);
+  });
 
-    const client = NewClient(baseUrl).build();
+  const addr = httpServer.address() as any;
+  const port = addr.port;
+  const baseUrl = `http://localhost:${port}/rpc`;
 
-    try {
-      const complexInput = buildComplexInput();
-      const response = await client.procs
-        .serviceEcho()
-        .execute({ data: complexInput });
+  const client = NewClient(baseUrl).build();
 
-      if (!deepEqual(response.data, complexInput)) {
-        console.error("Complex types mismatch");
-        console.error("Sent:", JSON.stringify(complexInput, null, 2));
-        console.error("Got:", JSON.stringify(response.data, null, 2));
-        process.exit(1);
-      }
+  try {
+    const complexInput = buildComplexInput();
+    const response = await client.procs
+      .serviceEcho()
+      .execute({ data: complexInput });
 
-      console.log("Success");
-    } catch (e) {
-      console.error("Error:", e);
+    if (!deepEqual(response.data, complexInput)) {
+      console.error("Complex types mismatch");
+      console.error("Sent:", JSON.stringify(complexInput, null, 2));
+      console.error("Got:", JSON.stringify(response.data, null, 2));
       process.exit(1);
     }
 
-    httpServer.close();
-    process.exit(0);
-  });
+    console.log("Success");
+  } catch (e) {
+    console.error("Error:", e);
+    process.exit(1);
+  }
+
+  httpServer.close();
+  process.exit(0);
 }
 
 main().catch((err) => {
