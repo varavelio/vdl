@@ -657,6 +657,7 @@ class internalClient {
    * @param opHeaderProviders - Operation-specific header providers.
    * @param opRetryConf - Operation-specific retry configuration (optional).
    * @param opTimeoutConf - Operation-specific timeout configuration (optional).
+   * @param opSignal - External AbortSignal for cancellation (optional).
    * @returns The response from the server.
    */
   async callProc(
@@ -666,7 +667,20 @@ class internalClient {
     opHeaderProviders: HeaderProvider[],
     opRetryConf?: RetryConfig,
     opTimeoutConf?: TimeoutConfig,
+    opSignal?: AbortSignal,
   ): Promise<Response<any>> {
+    // Check if already aborted before starting
+    if (opSignal?.aborted) {
+      return {
+        ok: false,
+        error: new VdlError({
+          message: "Request aborted",
+          category: "ClientError",
+          code: "ABORTED",
+        }),
+      };
+    }
+
     const reqInfo: RequestInfo = {
       rpcName,
       operationName: procName,
@@ -717,8 +731,26 @@ class internalClient {
 
       // Retry loop
       for (let attempt = 1; attempt <= retryConf.maxAttempts; attempt++) {
+        // Check external signal before each attempt
+        if (opSignal?.aborted) {
+          return {
+            ok: false,
+            error: new VdlError({
+              message: "Request aborted",
+              category: "ClientError",
+              code: "ABORTED",
+            }),
+          };
+        }
+
         const abortController = new AbortController();
         let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+        // Link external signal to internal controller
+        const onExternalAbort = () => abortController.abort();
+        if (opSignal) {
+          opSignal.addEventListener("abort", onExternalAbort);
+        }
 
         try {
           // Set up request timeout
@@ -739,6 +771,8 @@ class internalClient {
             await this.applyHeaders(req.rpcName, hdrs, opHeaderProviders);
           } catch (err) {
             if (timeoutId !== undefined) clearTimeout(timeoutId);
+            if (opSignal)
+              opSignal.removeEventListener("abort", onExternalAbort);
             return { ok: false, error: asError(err) };
           }
 
@@ -751,6 +785,7 @@ class internalClient {
           });
 
           if (timeoutId !== undefined) clearTimeout(timeoutId);
+          if (opSignal) opSignal.removeEventListener("abort", onExternalAbort);
 
           // Server error (5xx): retry if attempts remaining
           if (fetchResp.status >= 500) {
@@ -798,6 +833,19 @@ class internalClient {
           }
         } catch (err) {
           if (timeoutId !== undefined) clearTimeout(timeoutId);
+          if (opSignal) opSignal.removeEventListener("abort", onExternalAbort);
+
+          // External abort: don't retry, return immediately
+          if (opSignal?.aborted) {
+            return {
+              ok: false,
+              error: new VdlError({
+                message: "Request aborted",
+                category: "ClientError",
+                code: "ABORTED",
+              }),
+            };
+          }
 
           // Timeout error: retry if attempts remaining
           if (abortController.signal.aborted && timeoutConf.timeoutMs > 0) {
@@ -865,6 +913,7 @@ class internalClient {
    * @param onConnect - Called when the stream successfully connects.
    * @param onDisconnect - Called when the stream permanently disconnects.
    * @param onReconnect - Called before each reconnection attempt.
+   * @param opSignal - External AbortSignal for cancellation (optional).
    * @returns An object with the stream generator and a cancel function.
    */
   callStream(
@@ -877,6 +926,7 @@ class internalClient {
     onConnect?: () => void,
     onDisconnect?: (error: Error | null) => void,
     onReconnect?: (attempt: number, delayMs: number) => void,
+    opSignal?: AbortSignal,
   ): {
     stream: AsyncGenerator<Response<any>, void, unknown>;
     cancel: () => void;
@@ -890,6 +940,18 @@ class internalClient {
       isCancelled = true;
       currentAbortController?.abort();
     };
+
+    // Link external signal to internal cancellation
+    if (opSignal) {
+      if (opSignal.aborted) {
+        isCancelled = true;
+      } else {
+        opSignal.addEventListener("abort", () => {
+          isCancelled = true;
+          currentAbortController?.abort();
+        });
+      }
+    }
 
     const reqInfo: RequestInfo = {
       rpcName,
@@ -1327,7 +1389,7 @@ class clientBuilder {
 /**
  * Fluent builder for configuring a single procedure call.
  *
- * Allows per-call customization of headers, retry, and timeout settings.
+ * Allows per-call customization of headers, retry, timeout, and cancellation.
  *
  * @example
  * ```ts
@@ -1336,6 +1398,19 @@ class clientBuilder {
  *   .withRetryConfig({ maxAttempts: 5, ... })
  *   .withTimeoutConfig({ timeoutMs: 60000 })
  *   .execute();
+ * ```
+ *
+ * @example
+ * ```ts
+ * // React useEffect cleanup pattern
+ * useEffect(() => {
+ *   const controller = new AbortController();
+ *   client.someRpc.someProc({ id: 123 })
+ *     .withSignal(controller.signal)
+ *     .execute()
+ *     .then(setData);
+ *   return () => controller.abort();
+ * }, [id]);
  * ```
  */
 class procCallBuilder {
@@ -1346,6 +1421,7 @@ class procCallBuilder {
   private headerProviders: HeaderProvider[] = [];
   private retryConf?: RetryConfig;
   private timeoutConf?: TimeoutConfig;
+  private signal?: AbortSignal;
 
   constructor(
     client: internalClient,
@@ -1385,6 +1461,20 @@ class procCallBuilder {
     return this;
   }
 
+  /**
+   * Sets an external AbortSignal to cancel this request.
+   *
+   * Useful for React useEffect cleanup, user-initiated cancellation,
+   * or implementing request racing patterns.
+   *
+   * When the signal is aborted, the request is immediately cancelled
+   * and returns an error with code "ABORTED". Retries are also stopped.
+   */
+  withSignal(signal: AbortSignal): procCallBuilder {
+    this.signal = signal;
+    return this;
+  }
+
   /** Executes the procedure call and returns the response. */
   execute(): Promise<Response<any>> {
     return this.client.callProc(
@@ -1394,6 +1484,7 @@ class procCallBuilder {
       this.headerProviders,
       this.retryConf,
       this.timeoutConf,
+      this.signal,
     );
   }
 }
@@ -1405,7 +1496,7 @@ class procCallBuilder {
 /**
  * Fluent builder for configuring a single stream connection.
  *
- * Allows per-stream customization of headers, reconnection, and callbacks.
+ * Allows per-stream customization of headers, reconnection, callbacks, and cancellation.
  *
  * @example
  * ```ts
@@ -1420,6 +1511,25 @@ class procCallBuilder {
  *   console.log(event);
  * }
  * ```
+ *
+ * @example
+ * ```ts
+ * // React useEffect cleanup pattern
+ * useEffect(() => {
+ *   const controller = new AbortController();
+ *   const { stream } = client.someRpc.someStream({ filter: "all" })
+ *     .withSignal(controller.signal)
+ *     .execute();
+ *
+ *   (async () => {
+ *     for await (const event of stream) {
+ *       setData(event);
+ *     }
+ *   })();
+ *
+ *   return () => controller.abort();
+ * }, []);
+ * ```
  */
 class streamCallBuilder {
   private client: internalClient;
@@ -1432,6 +1542,7 @@ class streamCallBuilder {
   private onConnectCb?: () => void;
   private onDisconnectCb?: (error: Error | null) => void;
   private onReconnectCb?: (attempt: number, delayMs: number) => void;
+  private signal?: AbortSignal;
 
   constructor(
     client: internalClient,
@@ -1491,6 +1602,18 @@ class streamCallBuilder {
     return this;
   }
 
+  /**
+   * Sets an external AbortSignal to cancel this stream.
+   *
+   * Useful for React useEffect cleanup, user-initiated cancellation,
+   * or component unmounting. When the signal is aborted, the stream
+   * is immediately closed and no further reconnection attempts are made.
+   */
+  withSignal(signal: AbortSignal): streamCallBuilder {
+    this.signal = signal;
+    return this;
+  }
+
   /** Opens the stream and returns the event generator and cancel function. */
   execute(): {
     stream: AsyncGenerator<Response<any>, void, unknown>;
@@ -1506,6 +1629,7 @@ class streamCallBuilder {
       this.onConnectCb,
       this.onDisconnectCb,
       this.onReconnectCb,
+      this.signal,
     );
   }
 }
