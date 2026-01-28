@@ -1,0 +1,9 @@
+rpc Service {
+  stream Events {
+    input {}
+
+    output {
+      message: string
+    }
+  }
+}
