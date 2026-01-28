@@ -210,13 +210,18 @@ func buildMapHydration(parentTypeName string, field ir.Field) string {
 
 	valueExpr := getItemHydrationExpr(parentTypeName, field.Name, valueType)
 
-	if valueExpr == "v" {
+	if valueExpr == "el" {
 		// No transformation needed
 		return fmt.Sprintf("input.%s", nameCamel)
 	}
 
-	return fmt.Sprintf("Object.fromEntries(Object.entries(input.%s).map(([k, v]) => [k, %s]))",
-		nameCamel, valueExpr)
+	// Replace 'el' with 'v' for map value context
+	valueExprForMap := strings.ReplaceAll(valueExpr, "el", "v")
+
+	return fmt.Sprintf(
+		"Object.fromEntries(Object.entries(input.%s).map(([k, v]) => [k, %s]))",
+		nameCamel, valueExprForMap,
+	)
 }
 
 // getItemHydrationExpr returns the hydration expression for an array/map item.
@@ -305,8 +310,8 @@ func renderMultilineComment(g *gen.Generator, text string) {
 
 // renderPartialMultilineComment renders text as a partial multiline comment.
 func renderPartialMultilineComment(g *gen.Generator, text string) {
-	lines := strings.Split(text, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(text, "\n")
+	for line := range lines {
 		g.Linef(" * %s", line)
 	}
 }

@@ -820,7 +820,20 @@ class internalClient {
 
           // Parse and return the response
           try {
-            return await fetchResp.json();
+            const json = await fetchResp.json();
+            // Hydrate error into VdlError instance if response is not ok
+            if (!json.ok && json.error) {
+              return {
+                ok: false,
+                error: new VdlError({
+                  message: json.error.message ?? "Unknown error",
+                  category: json.error.category,
+                  code: json.error.code,
+                  details: json.error.details,
+                }),
+              };
+            }
+            return json;
           } catch (parseErr) {
             return {
               ok: false,
