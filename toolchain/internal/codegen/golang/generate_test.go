@@ -177,19 +177,19 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect core_types.go, optional.go, consts.go
+	// Expect core_types.go, optional.go, constants.go
 	// types.go is NOT generated because there are no types/procs/streams.
 	require.Len(t, files, 3)
 
-	// Find consts.go
+	// Find constants.go
 	var constsFile File
 	for _, f := range files {
-		if f.RelativePath == "consts.go" {
+		if f.RelativePath == "constants.go" {
 			constsFile = f
 			break
 		}
 	}
-	require.NotEmpty(t, constsFile.RelativePath, "consts.go not found")
+	require.NotEmpty(t, constsFile.RelativePath, "constants.go not found")
 
 	content := string(constsFile.Content)
 	assert.Contains(t, content, "const MAX_PAGE_SIZE = 100")

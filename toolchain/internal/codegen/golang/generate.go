@@ -94,13 +94,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		}
 	}
 
-	// Constants (consts.go)
+	// Constants (constants.go)
 	code, err = generateConstants(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("consts.go")
+		b := getBuilder("constants.go")
 		b.Raw(code)
 		b.Break()
 	}
