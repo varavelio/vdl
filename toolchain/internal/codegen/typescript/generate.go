@@ -56,7 +56,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// 2. types.ts
 	typesBuilder := gen.New().WithSpaces(2)
-	typesBuilder.Line("import { Response } from \"./core\";")
+	typesBuilder.Line(formatImport("{ Response }", "./coreTypes", g.config))
 	typesBuilder.Break()
 
 	// Helper to append content if not empty
@@ -78,6 +78,9 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	if err := appendContent(generateConstants); err != nil {
 		return nil, err
 	}
+	if err := appendContent(generatePatterns); err != nil {
+		return nil, err
+	}
 	if err := appendContent(generateDomainTypes); err != nil {
 		return nil, err
 	}
@@ -97,7 +100,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 	// Add imports to catalog
 	catalogBuilder := gen.New().WithSpaces(2)
-	catalogBuilder.Line("import { OperationDefinition } from \"./core\";")
+	catalogBuilder.Line(formatImport("{ OperationDefinition }", "./coreTypes", g.config))
 	catalogBuilder.Break()
 	catalogBuilder.Raw(catalogContent)
 
@@ -110,15 +113,15 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		clientBuilder := gen.New().WithSpaces(2)
-		clientBuilder.Line("import { Response, VdlError, asError } from \"./core\";")
+		clientBuilder.Line(formatImport("{ Response, VdlError, asError }", "./coreTypes", g.config))
 
 		typeNames := collectAllTypeNames(schema)
 		sort.Strings(typeNames)
 		if len(typeNames) > 0 {
-			clientBuilder.Linef("import { %s } from \"./types\";", strings.Join(typeNames, ", "))
+			clientBuilder.Line(formatImport(fmt.Sprintf("{ %s }", strings.Join(typeNames, ", ")), "./types", g.config))
 		}
 
-		clientBuilder.Line("import { vdlProcedureNames, vdlStreamNames } from \"./catalog\";")
+		clientBuilder.Line(formatImport("{ VDLProcedures, VDLStreams }", "./catalog", g.config))
 		clientBuilder.Break()
 		clientBuilder.Raw(clientContent)
 
@@ -132,13 +135,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		serverBuilder := gen.New().WithSpaces(2)
-		serverBuilder.Line("import { Response, VdlError, asError, OperationDefinition, OperationType } from \"./core\";")
-		serverBuilder.Line("import { VDLProcedures, VDLStreams } from \"./catalog\";")
+		serverBuilder.Line(formatImport("{ Response, VdlError, asError, OperationDefinition, OperationType }", "./coreTypes", g.config))
+		serverBuilder.Line(formatImport("{ VDLProcedures, VDLStreams }", "./catalog", g.config))
 
 		typeNames := collectAllTypeNames(schema)
 		sort.Strings(typeNames)
 		if len(typeNames) > 0 {
-			serverBuilder.Linef("import { %s } from \"./types\";", strings.Join(typeNames, ", "))
+			serverBuilder.Line(formatImport(fmt.Sprintf("{ %s }", strings.Join(typeNames, ", ")), "./types", g.config))
 		}
 		serverBuilder.Break()
 		serverBuilder.Raw(serverContent)
@@ -148,14 +151,14 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// 6. index.ts (Exports everything)
 	indexBuilder := gen.New().WithSpaces(2)
-	indexBuilder.Line("export * from \"./core\";")
-	indexBuilder.Line("export * from \"./types\";")
-	indexBuilder.Line("export * from \"./catalog\";")
+	indexBuilder.Line(formatExport("./coreTypes", g.config))
+	indexBuilder.Line(formatExport("./types", g.config))
+	indexBuilder.Line(formatExport("./catalog", g.config))
 	if g.config.GenClient {
-		indexBuilder.Line("export * from \"./client\";")
+		indexBuilder.Line(formatExport("./client", g.config))
 	}
 	if g.config.GenServer {
-		indexBuilder.Line("export * from \"./server\";")
+		indexBuilder.Line(formatExport("./server", g.config))
 	}
 
 	addFile("index.ts", []byte(indexBuilder.String()))

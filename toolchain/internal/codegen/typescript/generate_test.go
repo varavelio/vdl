@@ -28,10 +28,20 @@ func parseAndBuildIR(t *testing.T, content string) *ir.Schema {
 	return ir.FromProgram(program)
 }
 
+// findFile returns the content of a file with the given name from the generated files.
+func findFile(files []File, name string) string {
+	for _, f := range files {
+		if f.RelativePath == name {
+			return string(f.Content)
+		}
+	}
+	return ""
+}
+
 func TestGenerator_Generate_Empty(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 		ClientConfig: config.ClientConfig{
 			GenClient: true,
@@ -42,16 +52,17 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
-	assert.Equal(t, "api.ts", files[0].RelativePath)
-	// Core types should still be included
-	assert.Contains(t, string(files[0].Content), "export type Response<T>")
+	// Expect: coreTypes.ts, types.ts, catalog.ts, client.ts, index.ts
+	require.Len(t, files, 5)
+
+	coreContent := findFile(files, "coreTypes.ts")
+	assert.Contains(t, coreContent, "export type Response<T>")
 }
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 		ClientConfig: config.ClientConfig{
 			GenClient: true,
@@ -70,9 +81,9 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 5) // coreTypes.ts, types.ts, catalog.ts, client.ts, index.ts
 
-	content := string(files[0].Content)
+	content := findFile(files, "types.ts")
 	assert.Contains(t, content, "export type User = {")
 	assert.Contains(t, content, "id: string")
 	assert.Contains(t, content, "email: string")
@@ -82,7 +93,7 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 func TestGenerator_Generate_WithEnums(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 	})
 
@@ -103,9 +114,9 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
 
-	content := string(files[0].Content)
+	content := findFile(files, "types.ts")
 
 	// String enum
 	assert.Contains(t, content, `export type OrderStatus = "pending" | "shipped" | "delivered";`)
@@ -124,7 +135,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 func TestGenerator_Generate_WithConstants(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 	})
 
@@ -138,9 +149,9 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
 
-	content := string(files[0].Content)
+	content := findFile(files, "types.ts")
 	assert.Contains(t, content, "export const MAX_PAGE_SIZE: number = 100;")
 	assert.Contains(t, content, `export const API_VERSION: string = "1.0.0";`)
 	assert.Contains(t, content, "export const DEFAULT_RATE: number = 0.21;")
@@ -150,7 +161,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 	})
 
@@ -162,9 +173,9 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
 
-	content := string(files[0].Content)
+	content := findFile(files, "types.ts")
 	assert.Contains(t, content, "export function UserEventSubject(userId: string, eventType: string): string")
 	assert.Contains(t, content, "return `events.users.${userId}.${eventType}`")
 	assert.Contains(t, content, "export function CacheKey(key: string): string")
@@ -174,7 +185,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 		ClientConfig: config.ClientConfig{
 			GenClient: true,
@@ -198,27 +209,29 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 5) // coreTypes.ts, types.ts, catalog.ts, client.ts, index.ts
 
-	content := string(files[0].Content)
+	typesContent := findFile(files, "types.ts")
+	catalogContent := findFile(files, "catalog.ts")
+	clientContent := findFile(files, "client.ts")
 
 	// Check procedure types (with RPC prefix)
-	assert.Contains(t, content, "export type UsersGetUserInput = {")
-	assert.Contains(t, content, "export type UsersGetUserOutput = {")
-	assert.Contains(t, content, "export type UsersGetUserResponse = Response<UsersGetUserOutput>")
+	assert.Contains(t, typesContent, "export type UsersGetUserInput = {")
+	assert.Contains(t, typesContent, "export type UsersGetUserOutput = {")
+	assert.Contains(t, typesContent, "export type UsersGetUserResponse = Response<UsersGetUserOutput>")
 
 	// Check procedure names list
-	assert.Contains(t, content, `"Users/GetUser"`)
+	assert.Contains(t, catalogContent, `"/Users/GetUser"`)
 
 	// Check client implementation
-	assert.Contains(t, content, "class builderUsersGetUser")
-	assert.Contains(t, content, "async execute(input: UsersGetUserInput): Promise<UsersGetUserOutput>")
+	assert.Contains(t, clientContent, "class builderUsersGetUser")
+	assert.Contains(t, clientContent, "async execute(input: UsersGetUserInput): Promise<UsersGetUserOutput>")
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 		ClientConfig: config.ClientConfig{
 			GenClient: true,
@@ -242,27 +255,29 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 5) // coreTypes.ts, types.ts, catalog.ts, client.ts, index.ts
 
-	content := string(files[0].Content)
+	typesContent := findFile(files, "types.ts")
+	catalogContent := findFile(files, "catalog.ts")
+	clientContent := findFile(files, "client.ts")
 
 	// Check stream types (with RPC prefix)
-	assert.Contains(t, content, "export type ChatMessagesInput = {")
-	assert.Contains(t, content, "export type ChatMessagesOutput = {")
-	assert.Contains(t, content, "export type ChatMessagesResponse = Response<ChatMessagesOutput>")
+	assert.Contains(t, typesContent, "export type ChatMessagesInput = {")
+	assert.Contains(t, typesContent, "export type ChatMessagesOutput = {")
+	assert.Contains(t, typesContent, "export type ChatMessagesResponse = Response<ChatMessagesOutput>")
 
 	// Check stream names list
-	assert.Contains(t, content, `"Chat/Messages"`)
+	assert.Contains(t, catalogContent, `"/Chat/Messages"`)
 
 	// Check client implementation
-	assert.Contains(t, content, "class builderChatMessagesStream")
-	assert.Contains(t, content, "execute(input: ChatMessagesInput)")
+	assert.Contains(t, clientContent, "class builderChatMessagesStream")
+	assert.Contains(t, clientContent, "execute(input: ChatMessagesInput)")
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 	})
 
@@ -286,9 +301,9 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
 
-	content := string(files[0].Content)
+	content := findFile(files, "types.ts")
 
 	// Arrays
 	assert.Contains(t, content, "tags: string[]")
@@ -450,7 +465,7 @@ func TestConvertPatternToTemplateLiteral(t *testing.T) {
 func TestGenerator_Generate_NoClient(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 		ClientConfig: config.ClientConfig{
 			GenClient: false,
@@ -474,23 +489,23 @@ func TestGenerator_Generate_NoClient(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
+	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts (no client.ts)
 
-	content := string(files[0].Content)
+	typesContent := findFile(files, "types.ts")
+	clientContent := findFile(files, "client.ts")
 
 	// Procedure types should still be generated
-	assert.Contains(t, content, "export type UsersGetUserInput")
-	assert.Contains(t, content, "export type UsersGetUserOutput")
+	assert.Contains(t, typesContent, "export type UsersGetUserInput")
+	assert.Contains(t, typesContent, "export type UsersGetUserOutput")
 
-	// But client code should NOT be generated
-	assert.NotContains(t, content, "class ClientBuilder")
-	assert.NotContains(t, content, "class builderUsersGetUser")
+	// But client file should NOT exist
+	assert.Empty(t, clientContent)
 }
 
 func TestGenerator_Generate_WithDeprecation(t *testing.T) {
 	g := New(&config.TypeScriptConfig{
 		CommonConfig: config.CommonConfig{
-			Output: "api.ts",
+			Output: "out",
 		},
 	})
 
@@ -511,7 +526,62 @@ func TestGenerator_Generate_WithDeprecation(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	content := string(files[0].Content)
+	content := findFile(files, "types.ts")
 	assert.Contains(t, content, "@deprecated Use NewUser instead")
 	assert.Contains(t, content, "@deprecated")
+}
+
+func TestGenerator_Generate_ImportExtension(t *testing.T) {
+	tests := []struct {
+		name      string
+		extension string
+		expected  string
+	}{
+		{
+			name:      "none (default)",
+			extension: "",
+			expected:  `from "./coreTypes";`,
+		},
+		{
+			name:      "explicit none",
+			extension: "none",
+			expected:  `from "./coreTypes";`,
+		},
+		{
+			name:      ".js extension",
+			extension: ".js",
+			expected:  `from "./coreTypes.js";`,
+		},
+		{
+			name:      ".ts extension",
+			extension: ".ts",
+			expected:  `from "./coreTypes.ts";`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := New(&config.TypeScriptConfig{
+				CommonConfig: config.CommonConfig{
+					Output: "out",
+				},
+				ImportExtension: tt.extension,
+			})
+
+			schema := parseAndBuildIR(t, "type User { id: string }")
+
+			files, err := g.Generate(context.Background(), schema)
+			require.NoError(t, err)
+
+			typesContent := findFile(files, "types.ts")
+			assert.Contains(t, typesContent, tt.expected)
+
+			indexContent := findFile(files, "index.ts")
+			if tt.extension == "" || tt.extension == "none" {
+				assert.Contains(t, indexContent, `export * from "./coreTypes";`)
+			} else {
+				assert.Contains(t, indexContent, `export * from "./coreTypes`+tt.extension+`";`)
+			}
+		})
+	}
 }

@@ -36,22 +36,6 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.TypeScriptConfig) (string, 
 	g.Line("];")
 	g.Break()
 
-	// VDLProcedureNames
-	g.Line("/**")
-	g.Line(" * vdlProcedureNames is a list of all procedure names.")
-	g.Line(" */")
-	g.Line("export const vdlProcedureNames: string[] = [")
-	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, proc := range rpc.Procs {
-				path := proc.Path()
-				g.Linef("\"%s\",", path)
-			}
-		}
-	})
-	g.Line("];")
-	g.Break()
-
 	// VDLStreams
 	g.Line("/**")
 	g.Line(" * VDLStreams is a list of all stream definitions.")
@@ -64,20 +48,6 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.TypeScriptConfig) (string, 
 			for _, stream := range rpc.Streams {
 				g.Linef("{ rpcName: \"%s\", name: \"%s\", type: \"stream\" },", rpc.Name, stream.Name)
 			}
-		}
-	})
-	g.Line("];")
-	g.Break()
-
-	// VDLStreamNames
-	g.Line("/**")
-	g.Line(" * vdlStreamNames is a list of all stream names.")
-	g.Line(" */")
-	g.Line("export const vdlStreamNames: string[] = [")
-	g.Block(func() {
-		for _, stream := range schema.Streams {
-			path := stream.Path()
-			g.Linef("\"%s\",", path)
 		}
 	})
 	g.Line("];")
