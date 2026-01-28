@@ -64,8 +64,8 @@ export interface HTTPAdapter {
  * HandlerContext is the unified container for all request information and state
  * that flows through the entire request processing pipeline.
  *
- * @typeParam T - The application context type (props).
- * @typeParam I - The input type.
+ * @typeParam T - The application context type containing dependencies and request-scoped data.
+ * @typeParam I - The input payload type for this operation.
  */
 export class HandlerContext<T, I> {
   /** User-defined container for application dependencies and request data. */
@@ -107,49 +107,121 @@ export class HandlerContext<T, I> {
 // Middleware Types
 // -----------------------------------------------------------------------------
 
+/**
+ * A handler function for global middleware.
+ * At this level, input and output types are unknown.
+ *
+ * @typeParam T - The application context type (props).
+ */
 export type GlobalHandlerFunc<T> = (
   c: HandlerContext<T, unknown>,
 ) => Promise<unknown>;
 
+/**
+ * Middleware that applies to all requests (Procs and Streams).
+ * Wraps the next handler in the chain.
+ *
+ * @typeParam T - The application context type (props).
+ */
 export type GlobalMiddlewareFunc<T> = (
   next: GlobalHandlerFunc<T>,
 ) => GlobalHandlerFunc<T>;
 
+/**
+ * The core logic for a Procedure.
+ * Receives context with typed input and returns a Promise with typed output.
+ *
+ * @typeParam T - The application context type (props).
+ * @typeParam I - The input payload type.
+ * @typeParam O - The output payload type.
+ */
 export type ProcHandlerFunc<T, I, O> = (c: HandlerContext<T, I>) => Promise<O>;
 
+/**
+ * Middleware specific to Procedures.
+ * Can inspect/modify typed input and output.
+ *
+ * @typeParam T - The application context type (props).
+ * @typeParam I - The input payload type.
+ * @typeParam O - The output payload type.
+ */
 export type ProcMiddlewareFunc<T, I, O> = (
   next: ProcHandlerFunc<T, I, O>,
 ) => ProcHandlerFunc<T, I, O>;
 
+/**
+ * Function to emit an event to a stream.
+ *
+ * @typeParam T - The application context type (props).
+ * @typeParam I - The input payload type of the stream.
+ * @typeParam O - The output payload type of the emitted event.
+ */
 export type EmitFunc<T, I, O> = (
   c: HandlerContext<T, I>,
   output: O,
 ) => Promise<void>;
 
+/**
+ * Middleware that wraps the emit function of a stream.
+ * Can be used to transform outgoing events or handle backpressure.
+ *
+ * @typeParam T - The application context type (props).
+ * @typeParam I - The input payload type of the stream.
+ * @typeParam O - The output payload type of the emitted event.
+ */
 export type EmitMiddlewareFunc<T, I, O> = (
   next: EmitFunc<T, I, O>,
 ) => EmitFunc<T, I, O>;
 
+/**
+ * The core logic for a Stream.
+ * Receives context with typed input and an emit function to send events.
+ *
+ * @typeParam T - The application context type (props).
+ * @typeParam I - The input payload type.
+ * @typeParam O - The output event type.
+ */
 export type StreamHandlerFunc<T, I, O> = (
   c: HandlerContext<T, I>,
   emit: EmitFunc<T, I, O>,
 ) => Promise<void>;
 
+/**
+ * Middleware specific to Stream handlers.
+ * Wraps the execution of the stream function itself.
+ *
+ * @typeParam T - The application context type (props).
+ * @typeParam I - The input payload type.
+ * @typeParam O - The output event type.
+ */
 export type StreamMiddlewareFunc<T, I, O> = (
   next: StreamHandlerFunc<T, I, O>,
 ) => StreamHandlerFunc<T, I, O>;
 
+/**
+ * Internal function to deserialize raw input (JSON) into typed objects.
+ */
 export type DeserializerFunc = (raw: unknown) => Promise<unknown>;
 
+/**
+ * Custom error handler to transform errors into VdlError responses.
+ *
+ * @typeParam T - The application context type (props).
+ */
 export type ErrorHandlerFunc<T> = (
   c: HandlerContext<T, unknown>,
   error: unknown,
 ) => VdlError;
 
+/**
+ * Configuration for stream behavior (Server-Sent Events).
+ */
 export interface StreamConfig {
   /**
    * Interval in milliseconds at which ping events are sent to the client.
-   * Defaults to 30000ms (30s).
+   * Used to keep the connection alive and detect disconnected clients.
+   *
+   * Default: 30000 (30s).
    */
   pingIntervalMs?: number;
 }
@@ -158,6 +230,20 @@ export interface StreamConfig {
 // Server Internal Implementation
 // -----------------------------------------------------------------------------
 
+/**
+ * The core server engine used by generated VDL server wrappers.
+ *
+ * This class manages:
+ * - Request routing (RPCs, Procs, Streams)
+ * - Middleware execution chains
+ * - Input deserialization
+ * - Error handling
+ * - Response formatting (JSON for Procs, SSE for Streams)
+ *
+ * **Do not instantiate directly.** Use the generated `NewServer` function.
+ *
+ * @typeParam T - The application context type (props) containing dependencies.
+ */
 export class InternalServer<T> {
   private operationDefs: Map<string, Map<string, OperationType>>;
 
@@ -193,6 +279,12 @@ export class InternalServer<T> {
   private globalErrorHandler?: ErrorHandlerFunc<T>;
   private rpcErrorHandlers: Map<string, ErrorHandlerFunc<T>>;
 
+  /**
+   * Creates a new internal server.
+   *
+   * @param procDefs - Procedure definitions from the schema.
+   * @param streamDefs - Stream definitions from the schema.
+   */
   constructor(
     procDefs: OperationDefinition[],
     streamDefs: OperationDefinition[],
@@ -239,15 +331,19 @@ export class InternalServer<T> {
   }
 
   // Registration Methods
+
+  /** Registers a global middleware applied to all requests. */
   addGlobalMiddleware(mw: GlobalMiddlewareFunc<T>) {
     this.globalMiddlewares.push(mw);
   }
 
+  /** Registers a middleware applied to all requests within a specific RPC group. */
   addRPCMiddleware(rpcName: string, mw: GlobalMiddlewareFunc<T>) {
     const list = this.rpcMiddlewares.get(rpcName);
     if (list) list.push(mw);
   }
 
+  /** Registers a middleware for a specific procedure. */
   addProcMiddleware(
     rpcName: string,
     procName: string,
@@ -260,6 +356,7 @@ export class InternalServer<T> {
     }
   }
 
+  /** Registers a middleware for a specific stream handler. */
   addStreamMiddleware(
     rpcName: string,
     streamName: string,
@@ -272,6 +369,7 @@ export class InternalServer<T> {
     }
   }
 
+  /** Registers a middleware for a specific stream's emit function. */
   addStreamEmitMiddleware(
     rpcName: string,
     streamName: string,
@@ -284,6 +382,7 @@ export class InternalServer<T> {
     }
   }
 
+  /** Sets the global configuration for streams. */
   setGlobalStreamConfig(cfg: StreamConfig) {
     this.globalStreamConfig = { ...this.globalStreamConfig, ...cfg };
     if (
@@ -294,23 +393,31 @@ export class InternalServer<T> {
     }
   }
 
+  /** Sets the stream configuration for a specific RPC group. */
   setRPCStreamConfig(rpcName: string, cfg: StreamConfig) {
     this.rpcStreamConfigs.set(rpcName, cfg);
   }
 
+  /** Sets the configuration for a specific stream. */
   setStreamConfig(rpcName: string, streamName: string, cfg: StreamConfig) {
     const rpcMap = this.streamConfigs.get(rpcName);
     if (rpcMap) rpcMap.set(streamName, cfg);
   }
 
+  /** Sets a custom global error handler. */
   setGlobalErrorHandler(handler: ErrorHandlerFunc<T>) {
     this.globalErrorHandler = handler;
   }
 
+  /** Sets a custom error handler for a specific RPC group. */
   setRPCErrorHandler(rpcName: string, handler: ErrorHandlerFunc<T>) {
     this.rpcErrorHandlers.set(rpcName, handler);
   }
 
+  /**
+   * Registers a handler implementation for a procedure.
+   * Called by the generated code.
+   */
   setProcHandler(
     rpcName: string,
     procName: string,
@@ -330,6 +437,10 @@ export class InternalServer<T> {
     if (rpcDeserializers) rpcDeserializers.set(procName, deserializer);
   }
 
+  /**
+   * Registers a handler implementation for a stream.
+   * Called by the generated code.
+   */
   setStreamHandler(
     rpcName: string,
     streamName: string,
@@ -351,6 +462,15 @@ export class InternalServer<T> {
 
   // Runtime Logic
 
+  /**
+   * Main entry point for handling an incoming HTTP request.
+   *
+   * 1. Validates the request path (RPC/Operation).
+   * 2. Deserializes the input.
+   * 3. Executes the middleware chain.
+   * 4. Invokes the registered handler.
+   * 5. Writes the response via the adapter.
+   */
   async handleRequest(
     props: T,
     rpcName: string,
@@ -411,6 +531,10 @@ export class InternalServer<T> {
     return this.writeProcResponse(adapter, response);
   }
 
+  /**
+   * Resolves the appropriate error handler for an RPC group.
+   * Priority: RPC-specific > Global > Default.
+   */
   private resolveErrorHandler(rpcName: string): ErrorHandlerFunc<T> {
     const rpcHandler = this.rpcErrorHandlers.get(rpcName);
     if (rpcHandler) return rpcHandler;
@@ -420,6 +544,9 @@ export class InternalServer<T> {
     return (_, err) => asError(err);
   }
 
+  /**
+   * Executes a procedure call including all middleware layers.
+   */
   private async handleProcRequest(
     c: HandlerContext<T, unknown>,
     rpcName: string,
@@ -476,6 +603,9 @@ export class InternalServer<T> {
     return next(c);
   }
 
+  /**
+   * Executes a stream request including connection setup, pings, and middleware.
+   */
   private async handleStreamRequest(
     c: HandlerContext<T, unknown>,
     rpcName: string,
@@ -618,6 +748,9 @@ export class InternalServer<T> {
     }
   }
 
+  /**
+   * Helper to write a standard JSON response for procedures.
+   */
   private writeProcResponse(adapter: HTTPAdapter, response: Response<unknown>) {
     adapter.setHeader("Content-Type", "application/json");
     adapter.write(JSON.stringify(response));
