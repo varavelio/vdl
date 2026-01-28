@@ -46,7 +46,7 @@ func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 
 	if pattern.Template != "" {
 		g.Line(" *")
-		g.Linef(" * Template: %s", pattern.Template)
+		g.Linef(" * Template: `%s`", pattern.Template)
 	}
 
 	renderDeprecated(g, pattern.Deprecated)
