@@ -1,0 +1,7 @@
+rpc Service {
+  proc Flaky {
+    input {}
+
+    output {}
+  }
+}
