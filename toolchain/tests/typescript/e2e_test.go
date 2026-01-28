@@ -100,6 +100,18 @@ func runTestCase(t *testing.T, caseDir string) {
 	outGen, err := cmdGen.CombinedOutput()
 	require.NoError(t, err, "vdl generate failed:\n%s", string(outGen))
 
+	// Type-check with tsc before running (use sh -c to expand globs)
+	ctxTsc, cancelTsc := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancelTsc()
+
+	tscCmd := "npx tsc ./*.ts ./gen/*.ts --noEmit --moduleResolution node --target es2022 --skipLibCheck --allowImportingTsExtensions"
+	cmdTsc := exec.CommandContext(ctxTsc, "sh", "-c", tscCmd)
+	cmdTsc.Dir = caseDir
+	outTsc, err := cmdTsc.CombinedOutput()
+	if err != nil {
+		t.Fatalf("tsc type-check failed:\nOutput:\n%s\nError: %v", string(outTsc), err)
+	}
+
 	// Run TypeScript verification
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
