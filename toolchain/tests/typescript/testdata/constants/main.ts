@@ -1,4 +1,5 @@
-// Verifies constants are generated correctly.
+// Verifies constants are generated correctly in a separate constants.ts file.
+// Import directly from constants.ts to verify the file exists
 import {
   VERSION,
   MAX_RETRIES,
@@ -6,7 +7,10 @@ import {
   PI,
   IS_ENABLED,
   GREETING,
-} from "./gen/index.ts";
+} from "./gen/constants.ts";
+
+// Also verify constants are exported via index.ts
+import * as gen from "./gen/index.ts";
 
 function fail(name: string, expected: unknown, actual: unknown): never {
   console.error(
@@ -40,6 +44,14 @@ function main() {
   // Verify Bool constant
   if (IS_ENABLED !== true) {
     fail("IS_ENABLED", true, IS_ENABLED);
+  }
+
+  // Verify constants are exported via index.ts
+  if (gen.VERSION !== "1.2.3") {
+    fail("gen.VERSION", "1.2.3", gen.VERSION);
+  }
+  if (gen.MAX_RETRIES !== 5) {
+    fail("gen.MAX_RETRIES", 5, gen.MAX_RETRIES);
   }
 
   console.log("Constants verification successful");
