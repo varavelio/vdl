@@ -45,15 +45,24 @@ func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 	}
 
 	// Generate function signature with parameters
-	params := make([]string, len(pattern.Placeholders))
-	for i, placeholder := range pattern.Placeholders {
-		params[i] = fmt.Sprintf("%s: string", placeholder)
+	// Deduplicate placeholders while preserving order
+	seen := make(map[string]bool)
+	var params []string
+	var uniquePlaceholders []string
+
+	for _, placeholder := range pattern.Placeholders {
+		if !seen[placeholder] {
+			seen[placeholder] = true
+			uniquePlaceholders = append(uniquePlaceholders, placeholder)
+			params = append(params, fmt.Sprintf("%s: string", placeholder))
+		}
 	}
 
 	g.Linef("export function %s(%s): string {", pattern.Name, strings.Join(params, ", "))
 	g.Block(func() {
 		// Convert template to TypeScript template literal
-		templateLiteral := convertPatternToTemplateLiteral(pattern.Template, pattern.Placeholders)
+		// We pass uniquePlaceholders because strings.ReplaceAll replaces all occurrences anyway
+		templateLiteral := convertPatternToTemplateLiteral(pattern.Template, uniquePlaceholders)
 		g.Linef("return %s;", templateLiteral)
 	})
 	g.Line("}")
