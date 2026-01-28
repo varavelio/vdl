@@ -954,16 +954,15 @@ class internalClient {
       currentAbortController?.abort();
     };
 
-    // Link external signal to internal cancellation
-    if (opSignal) {
-      if (opSignal.aborted) {
-        isCancelled = true;
-      } else {
-        opSignal.addEventListener("abort", () => {
-          isCancelled = true;
-          currentAbortController?.abort();
-        });
-      }
+    // Handler for external abort signal - defined here to reference in removeEventListener
+    const onExternalAbort = () => {
+      isCancelled = true;
+      currentAbortController?.abort();
+    };
+
+    // Check if already aborted before starting
+    if (opSignal?.aborted) {
+      isCancelled = true;
     }
 
     const reqInfo: RequestInfo = {
@@ -978,6 +977,11 @@ class internalClient {
      */
     async function* generator(): AsyncGenerator<Response<any>, void, unknown> {
       let finalError: Error | null = null;
+
+      // Add the external abort listener when the generator starts
+      if (opSignal && !opSignal.aborted) {
+        opSignal.addEventListener("abort", onExternalAbort);
+      }
 
       try {
         // Validate that the stream exists in the schema
@@ -1211,6 +1215,12 @@ class internalClient {
           }
         }
       } finally {
+        // Remove the external abort listener when the generator dies
+        // This prevents memory leaks when opSignal comes from a long-lived parent context
+        if (opSignal) {
+          opSignal.removeEventListener("abort", onExternalAbort);
+        }
+
         // Always call onDisconnect when the stream ends
         if (onDisconnect) onDisconnect(finalError);
       }
