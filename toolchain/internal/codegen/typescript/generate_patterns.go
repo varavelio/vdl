@@ -36,13 +36,21 @@ func generatePatterns(schema *ir.Schema, config *config.TypeScriptConfig) (strin
 // renderPattern renders a single pattern template function.
 func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 	// Generate doc comment
-	if pattern.Doc != "" {
-		renderMultilineComment(g, pattern.Doc)
-	} else if pattern.Deprecated != nil {
-		g.Linef("/**")
-		renderDeprecated(g, pattern.Deprecated)
-		g.Linef(" */")
+	g.Line("/**")
+
+	doc := pattern.Doc
+	if doc == "" {
+		doc = fmt.Sprintf("%s generates a string from the pattern template.", pattern.Name)
 	}
+	renderPartialMultilineComment(g, doc)
+
+	if pattern.Template != "" {
+		g.Line(" *")
+		g.Linef(" * Template: %s", pattern.Template)
+	}
+
+	renderDeprecated(g, pattern.Deprecated)
+	g.Line(" */")
 
 	// Generate function signature with parameters
 	// Deduplicate placeholders while preserving order
