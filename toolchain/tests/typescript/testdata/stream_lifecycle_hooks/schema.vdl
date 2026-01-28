@@ -1,0 +1,11 @@
+rpc Events {
+  stream Watch {
+    input {
+      count: int
+    }
+
+    output {
+      value: int
+    }
+  }
+}
