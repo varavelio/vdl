@@ -1,0 +1,34 @@
+rpc Greeter {
+  proc Hello {
+    input {
+      name: string
+    }
+
+    output {
+      greeting: string
+    }
+  }
+
+  proc Echo {
+    input {
+      message: string
+    }
+
+    output {
+      message: string
+    }
+  }
+}
+
+rpc Calculator {
+  proc Add {
+    input {
+      a: int
+      b: int
+    }
+
+    output {
+      result: int
+    }
+  }
+}
