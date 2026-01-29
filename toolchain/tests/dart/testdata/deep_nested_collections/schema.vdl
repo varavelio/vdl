@@ -1,0 +1,27 @@
+// Test case G: Deep Nested Collections
+// Verifies multi-dimensional arrays and nested maps serialize/deserialize correctly
+
+type Matrix3D {
+  // 3D array of integers
+  data: int[][][]
+}
+
+type NestedMaps {
+  // Map of maps (map<X> means map<string, X>)
+  lookup: map<map<int>>
+}
+
+type ComplexNested {
+  // Map containing arrays
+  arrayMap: map<int[]>
+  // Array of maps
+  mapArray: map<string>[]
+  // Deeply nested: map of map of arrays
+  deepMap: map<map<string[]>>
+}
+
+type MixedDeep {
+  // Optional nested collections
+  optionalMatrix?: int[][]
+  optionalNestedMap?: map<map<int>>
+}
