@@ -67,6 +67,18 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	g.Line(")")
 	g.Break()
 
+	// List variable with all enum values
+	g.Linef("// %sList contains all valid %s values.", enum.Name, enum.Name)
+	g.Linef("var %sList = []%s{", enum.Name, enum.Name)
+	g.Block(func() {
+		for _, member := range enum.Members {
+			constName := enum.Name + member.Name
+			g.Linef("%s,", constName)
+		}
+	})
+	g.Line("}")
+	g.Break()
+
 	// String() method for the enum
 	g.Linef("// String returns the string representation of %s.", enum.Name)
 	g.Linef("func (e %s) String() string {", enum.Name)
