@@ -1,0 +1,6 @@
+version: 1
+targets:
+  - go:
+      package: "schema_override"
+      output: "./gen"
+      schema: "override.vdl"
