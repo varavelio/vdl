@@ -488,14 +488,260 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 	g.Line("}")
 	g.Break()
 
-	// Children inline types
-	for _, field := range fields {
-		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
-			childName := fullName + strutil.ToPascalCase(field.Name)
-			childDesc := field.Doc
-			g.Line(renderDartType("", childName, childDesc, field.Type.Object.Fields))
+	// Children inline types - recursively extract from arrays, maps, and nested objects
+	inlineTypes := extractAllInlineTypes(fullName, fields)
+	for _, inlineType := range inlineTypes {
+		g.Line(renderInlineType(inlineType.name, inlineType.doc, inlineType.fields))
+	}
+
+	return g.String()
+}
+
+// =============================================================================
+// Inline Type Extraction
+// =============================================================================
+
+// inlineTypeInfo represents an inline type that needs to be generated.
+type inlineTypeInfo struct {
+	name   string
+	doc    string
+	fields []ir.Field
+}
+
+// extractInlineTypes recursively extracts all inline object types from a TypeRef.
+// parentName is the full name prefix for the inline type.
+func extractInlineTypes(parentName string, tr ir.TypeRef) []inlineTypeInfo {
+	var result []inlineTypeInfo
+
+	switch tr.Kind {
+	case ir.TypeKindObject:
+		if tr.Object != nil {
+			result = append(result, inlineTypeInfo{
+				name:   parentName,
+				doc:    "",
+				fields: tr.Object.Fields,
+			})
+			// Recursively extract from child fields
+			for _, f := range tr.Object.Fields {
+				childName := parentName + strutil.ToPascalCase(f.Name)
+				result = append(result, extractInlineTypes(childName, f.Type)...)
+			}
+		}
+
+	case ir.TypeKindArray:
+		if tr.ArrayItem != nil {
+			// For arrays, the inline type name is the same as parentName
+			result = append(result, extractInlineTypes(parentName, *tr.ArrayItem)...)
+		}
+
+	case ir.TypeKindMap:
+		if tr.MapValue != nil {
+			// For maps, the inline type name is the same as parentName
+			result = append(result, extractInlineTypes(parentName, *tr.MapValue)...)
 		}
 	}
+
+	return result
+}
+
+// extractAllInlineTypes extracts all inline types from a list of fields.
+func extractAllInlineTypes(parentName string, fields []ir.Field) []inlineTypeInfo {
+	var result []inlineTypeInfo
+	for _, field := range fields {
+		childName := parentName + strutil.ToPascalCase(field.Name)
+		inlines := extractInlineTypes(childName, field.Type)
+		result = append(result, inlines...)
+	}
+	return result
+}
+
+// renderInlineType renders a single inline type class without recursively rendering children
+// (since extractAllInlineTypes already flattens the hierarchy).
+func renderInlineType(name, desc string, fields []ir.Field) string {
+	g := gen.New().WithSpaces(2)
+	if desc != "" {
+		g.Line("/// " + strings.ReplaceAll(desc, "\n", "\n/// "))
+	}
+	g.Linef("class %s {", name)
+	g.Block(func() {
+		// Fields
+		for _, field := range fields {
+			fieldName := strutil.ToCamelCase(field.Name)
+			inlineTypeName := name + strutil.ToPascalCase(field.Name)
+			typeLit := typeRefToDart(inlineTypeName, field.Type)
+			if field.Optional {
+				typeLit = typeLit + "?"
+			}
+			if field.Doc != "" {
+				g.Line("/// " + strings.ReplaceAll(strings.TrimSpace(field.Doc), "\n", "\n/// "))
+			}
+			g.Linef("final %s %s;", typeLit, fieldName)
+		}
+		g.Break()
+
+		// Constructor
+		g.Linef("/// Creates a new [%s] instance.", name)
+		if len(fields) == 0 {
+			g.Linef("const %s();", name)
+		} else {
+			g.Linef("const %s({", name)
+			g.Block(func() {
+				for _, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					isRequired := !field.Optional
+					if isRequired {
+						g.Linef("required this.%s,", fieldName)
+					} else {
+						g.Linef("this.%s,", fieldName)
+					}
+				}
+			})
+			g.Line("});")
+		}
+
+		g.Break()
+
+		// fromJson factory
+		g.Linef("/// Creates a [%s] from a JSON map.", name)
+		g.Linef("factory %s.fromJson(Map<String, dynamic> json) {", name)
+		g.Block(func() {
+			for _, field := range fields {
+				fieldName := strutil.ToCamelCase(field.Name)
+				jsonKey := strutil.ToCamelCase(field.Name)
+				jsonAccessor := fmt.Sprintf("json['%s']", jsonKey)
+				parseExpr := dartFromJsonExpr(name, field, jsonAccessor)
+				if field.Optional {
+					g.Linef("final %s = json.containsKey('%s') && %s != null ? %s : null;", fieldName, jsonKey, jsonAccessor, parseExpr)
+				} else {
+					g.Linef("final %s = %s;", fieldName, parseExpr)
+				}
+			}
+			g.Linef("return %s(", name)
+			g.Block(func() {
+				for _, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					g.Linef("%s: %s,", fieldName, fieldName)
+				}
+			})
+			g.Line(");")
+		})
+		g.Line("}")
+		g.Break()
+
+		// toJson method
+		g.Linef("/// Converts this [%s] to a JSON map.", name)
+		g.Line("Map<String, dynamic> toJson() {")
+		g.Block(func() {
+			g.Line("final _data = <String, dynamic>{};")
+			for _, field := range fields {
+				fieldName := strutil.ToCamelCase(field.Name)
+				jsonKey := strutil.ToCamelCase(field.Name)
+				if field.Optional {
+					local := "__v_" + fieldName
+					g.Linef("final %s = %s;", local, fieldName)
+					ser := dartToJsonExpr(field, local)
+					g.Linef("if (%s != null) _data['%s'] = %s;", local, jsonKey, ser)
+				} else {
+					ser := dartToJsonExpr(field, fieldName)
+					g.Linef("_data['%s'] = %s;", jsonKey, ser)
+				}
+			}
+			g.Line("return _data;")
+		})
+		g.Line("}")
+		g.Break()
+
+		// copyWith method
+		if len(fields) > 0 {
+			g.Linef("/// Creates a copy of this [%s] with the given fields replaced.", name)
+			g.Linef("%s copyWith({", name)
+			g.Block(func() {
+				for _, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					inlineTypeName := name + strutil.ToPascalCase(field.Name)
+					typeLit := typeRefToDart(inlineTypeName, field.Type)
+					g.Linef("%s? %s,", typeLit, fieldName)
+				}
+			})
+			g.Line("}) {")
+			g.Block(func() {
+				g.Linef("return %s(", name)
+				g.Block(func() {
+					for _, field := range fields {
+						fieldName := strutil.ToCamelCase(field.Name)
+						g.Linef("%s: %s ?? this.%s,", fieldName, fieldName, fieldName)
+					}
+				})
+				g.Line(");")
+			})
+			g.Line("}")
+			g.Break()
+		}
+
+		// == operator
+		g.Line("@override")
+		g.Line("bool operator ==(Object other) {")
+		g.Block(func() {
+			g.Line("if (identical(this, other)) return true;")
+			g.Linef("return other is %s", name)
+			if len(fields) > 0 {
+				for i, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					if i == len(fields)-1 {
+						g.Linef("    && %s == other.%s;", fieldName, fieldName)
+					} else {
+						g.Linef("    && %s == other.%s", fieldName, fieldName)
+					}
+				}
+			} else {
+				g.Line(";")
+			}
+		})
+		g.Line("}")
+		g.Break()
+
+		// hashCode
+		g.Line("@override")
+		if len(fields) == 0 {
+			g.Line("int get hashCode => 0;")
+		} else if len(fields) == 1 {
+			fieldName := strutil.ToCamelCase(fields[0].Name)
+			g.Linef("int get hashCode => %s.hashCode;", fieldName)
+		} else {
+			g.Line("int get hashCode => Object.hash(")
+			g.Block(func() {
+				for _, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					g.Linef("%s,", fieldName)
+				}
+			})
+			g.Line(");")
+		}
+		g.Break()
+
+		// toString
+		g.Line("@override")
+		if len(fields) == 0 {
+			g.Linef("String toString() => '%s()';", name)
+		} else {
+			g.Linef("String toString() {")
+			g.Block(func() {
+				g.Linef("return '%s('", name)
+				for i, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					if i == len(fields)-1 {
+						g.Linef("    '%s: $%s'", fieldName, fieldName)
+					} else {
+						g.Linef("    '%s: $%s, '", fieldName, fieldName)
+					}
+				}
+				g.Line("    ')';")
+			})
+			g.Line("}")
+		}
+	})
+	g.Line("}")
+	g.Break()
 
 	return g.String()
 }
