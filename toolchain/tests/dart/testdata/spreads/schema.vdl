@@ -1,0 +1,262 @@
+// Test case: SPREADS
+// Tests spread operator (...) in all possible contexts
+
+// Base types for composition
+type Timestamps {
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type Identifiable {
+  id: string
+}
+
+type Metadata {
+  tags: string[]
+  labels: map<string>
+}
+
+// Spread chain: Auditable -> Timestamps
+type Auditable {
+  ...Timestamps
+  createdBy: string
+  updatedBy: string
+}
+
+// Single spread
+type Entity {
+  ...Identifiable
+  name: string
+}
+
+// Multiple spreads
+type TrackedEntity {
+  ...Identifiable
+  ...Timestamps
+  ...Metadata
+  name: string
+  active: bool
+}
+
+// Chained spread (Auditable already has Timestamps)
+type AuditedRecord {
+  ...Auditable
+  recordType: string
+  data: string
+}
+
+// Spread with nested objects
+type Address {
+  street: string
+  city: string
+}
+
+type PersonBase {
+  ...Identifiable
+  ...Timestamps
+  name: string
+}
+
+type Person {
+  ...PersonBase
+  email: string
+  address: Address
+}
+
+// Spread with arrays and maps
+type TaggableContent {
+  ...Identifiable
+  ...Metadata
+  content: string
+}
+
+// Deep spread chain: Level3 -> Level2 -> Level1
+type Level1 {
+  field1: string
+}
+
+type Level2 {
+  ...Level1
+  field2: int
+}
+
+type Level3 {
+  ...Level2
+  field3: bool
+}
+
+// Spread with optional fields
+type OptionalBase {
+  required: string
+  optional?: int
+}
+
+type ExtendedOptional {
+  ...OptionalBase
+  anotherRequired: string
+  anotherOptional?: bool
+}
+
+rpc Service {
+  // Simple spread
+  proc EchoEntity {
+    input {
+      entity: Entity
+    }
+
+    output {
+      entity: Entity
+    }
+  }
+
+  // Multiple spreads
+  proc EchoTracked {
+    input {
+      entity: TrackedEntity
+    }
+
+    output {
+      entity: TrackedEntity
+    }
+  }
+
+  // Chained spread
+  proc EchoAudited {
+    input {
+      record: AuditedRecord
+    }
+
+    output {
+      record: AuditedRecord
+    }
+  }
+
+  // Spread in nested
+  proc EchoPerson {
+    input {
+      person: Person
+    }
+
+    output {
+      person: Person
+    }
+  }
+
+  // Deep chain
+  proc EchoLevel3 {
+    input {
+      level: Level3
+    }
+
+    output {
+      level: Level3
+    }
+  }
+
+  // Spread directly in input/output
+  proc SpreadInIo {
+    input {
+      ...Identifiable
+      ...Timestamps
+      customField: string
+    }
+
+    output {
+      ...Identifiable
+      ...Timestamps
+      customField: string
+      processed: bool
+    }
+  }
+
+  // Spread in nested anonymous objects
+  proc SpreadInAnonymous {
+    input {
+      wrapper: {
+        ...Identifiable
+        inner: {
+          ...Timestamps
+          ...Metadata
+          value: string
+        }
+      }
+    }
+
+    output {
+      wrapper: {
+        ...Identifiable
+        inner: {
+          ...Timestamps
+          ...Metadata
+          value: string
+        }
+      }
+    }
+  }
+
+  // Spread in array items
+  proc SpreadInArray {
+    input {
+      items: {
+        ...Identifiable
+        ...Timestamps
+        name: string
+      }[]
+    }
+
+    output {
+      items: {
+        ...Identifiable
+        ...Timestamps
+        name: string
+      }[]
+      count: int
+    }
+  }
+
+  // Spread in map values
+  proc SpreadInMap {
+    input {
+      entries: map<{
+        ...Auditable
+        value: int
+      }>
+    }
+
+    output {
+      entries: map<{
+        ...Auditable
+        value: int
+      }>
+    }
+  }
+
+  // Deep nested spreads
+  proc DeepSpreads {
+    input {
+      level1: {
+        ...Identifiable
+        level2: {
+          ...Timestamps
+          level3: {
+            ...Metadata
+            deepValue: string
+          }
+        }
+      }
+    }
+
+    output {
+      level1: {
+        ...Identifiable
+        level2: {
+          ...Timestamps
+          level3: {
+            ...Metadata
+            deepValue: string
+          }
+        }
+      }
+    }
+  }
+}
