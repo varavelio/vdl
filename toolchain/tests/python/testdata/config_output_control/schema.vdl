@@ -1,0 +1,12 @@
+// Test schema for config output control
+// This schema has constants and patterns that can be disabled
+
+const VERSION = "1.0"
+const MAX_SIZE = 100
+
+pattern CacheKey = "cache:{key}"
+
+type SimpleType {
+  id: string
+  name: string
+}
