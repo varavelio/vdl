@@ -1,0 +1,78 @@
+""" Simple nested type. """
+type Address {
+  street: string
+  city: string
+  country: string
+}
+
+""" Type with arrays. """
+type ArrayContainer {
+  """ Simple array of strings. """
+  tags: string[]
+
+  """ Array of integers. """
+  numbers: int[]
+
+  """ 2D array (matrix). """
+  matrix: int[][]
+
+  """ Array of custom types. """
+  addresses: Address[]
+}
+
+""" Type with maps. """
+type MapContainer {
+  """ Map of string values. """
+  stringMap: map<string>
+
+  """ Map of integer values. """
+  intMap: map<int>
+
+  """ Map of custom types. """
+  addressMap: map<Address>
+}
+
+""" Type with inline object. """
+type UserProfile {
+  name: string
+
+  """ Inline address object. """
+  primaryAddress: {
+    street: string
+    city: string
+    zip: string
+  }
+
+  """ Optional inline object. """
+  metadata?: {
+    createdAt: datetime
+    tags: string[]
+  }
+}
+
+""" Type with nested custom type. """
+type Order {
+  id: string
+  shippingAddress: Address
+  billingAddress?: Address
+  items: OrderItem[]
+}
+
+""" Order item type. """
+type OrderItem {
+  productId: string
+  quantity: int
+  price: float
+}
+
+rpc Service {
+  proc GetOrder {
+    input {
+      orderId: string
+    }
+
+    output {
+      order: Order
+    }
+  }
+}
