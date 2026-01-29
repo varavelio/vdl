@@ -36,9 +36,14 @@ func generatePatterns(schema *ir.Schema, config *config.DartConfig) (string, err
 // renderDartPattern renders a single Dart pattern template function.
 func renderDartPattern(g *gen.Generator, pattern ir.Pattern) {
 	// Generate doc comment
-	if pattern.Doc != "" {
-		doc := strings.TrimSpace(pattern.Doc)
-		renderMultilineCommentDart(g, doc)
+	doc := pattern.Doc
+	if doc == "" {
+		doc = fmt.Sprintf("%s generates a string from the pattern template.", pattern.Name)
+	}
+	renderMultilineCommentDart(g, doc)
+	if pattern.Template != "" {
+		renderMultilineCommentDart(g, "")
+		renderMultilineCommentDart(g, fmt.Sprintf("Template: `%s`", pattern.Template))
 	}
 	if pattern.Deprecated != nil {
 		renderDeprecatedDart(g, pattern.Deprecated)
