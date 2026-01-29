@@ -1,0 +1,11 @@
+rpc Greeter {
+  proc Greet {
+    input {
+      name: string
+    }
+
+    output {
+      message: string
+    }
+  }
+}
