@@ -54,12 +54,10 @@ func renderDartPattern(g *gen.Generator, pattern ir.Pattern) {
 	// Deduplicate placeholders while preserving order
 	seen := make(map[string]bool)
 	var params []string
-	var uniquePlaceholders []string
 
 	for _, placeholder := range pattern.Placeholders {
 		if !seen[placeholder] {
 			seen[placeholder] = true
-			uniquePlaceholders = append(uniquePlaceholders, placeholder)
 			params = append(params, fmt.Sprintf("String %s", placeholder))
 		}
 	}
