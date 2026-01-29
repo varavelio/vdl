@@ -9,6 +9,7 @@ import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
 )
 
@@ -200,6 +201,15 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	addFile("index.ts", []byte(indexBuilder.String()))
+
+	// Pseudo format generated files
+	for i := range files {
+		content := string(files[i].Content)
+		content = strings.TrimSpace(content)
+		content = strutil.LimitConsecutiveNewlines(content, 2)
+		content += "\n"
+		files[i].Content = []byte(content)
+	}
 
 	return files, nil
 }
