@@ -1,0 +1,6 @@
+version: 1
+schema: schema.vdl
+targets:
+  - python:
+      output: gen
+      clean: true
