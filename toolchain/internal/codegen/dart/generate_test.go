@@ -28,6 +28,16 @@ func parseAndBuildIR(t *testing.T, content string) *ir.Schema {
 	return ir.FromProgram(program)
 }
 
+// findFileContent finds a file by name and returns its content.
+func findFileContent(files []File, name string) string {
+	for _, f := range files {
+		if f.RelativePath == name {
+			return string(f.Content)
+		}
+	}
+	return ""
+}
+
 func TestGenerator_Generate_Empty(t *testing.T) {
 	g := New(&config.DartConfig{
 		CommonConfig: config.CommonConfig{
@@ -39,17 +49,18 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 1) // client.dart
+	require.Len(t, files, 2) // core_types.dart and index.dart
 
-	// Find client.dart
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
-	require.NotEmpty(t, clientContent)
+	// Check core_types.dart exists
+	coreContent := findFileContent(files, "core_types.dart")
+	require.NotEmpty(t, coreContent)
+	assert.Contains(t, coreContent, "class Response<T>")
+	assert.Contains(t, coreContent, "class VdlError")
+
+	// Check index.dart exists
+	indexContent := findFileContent(files, "index.dart")
+	require.NotEmpty(t, indexContent)
+	assert.Contains(t, indexContent, "export 'core_types.dart';")
 }
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
@@ -72,20 +83,30 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	typesContent := findFileContent(files, "types.dart")
+	require.NotEmpty(t, typesContent, "types.dart should be generated")
 
-	assert.Contains(t, clientContent, "class User {")
-	assert.Contains(t, clientContent, "final String id;")
-	assert.Contains(t, clientContent, "final String email;")
-	assert.Contains(t, clientContent, "final int? age;")
-	assert.Contains(t, clientContent, "factory User.fromJson")
-	assert.Contains(t, clientContent, "Map<String, dynamic> toJson()")
+	// Basic class structure
+	assert.Contains(t, typesContent, "class User {")
+	assert.Contains(t, typesContent, "final String id;")
+	assert.Contains(t, typesContent, "final String email;")
+	assert.Contains(t, typesContent, "final int? age;")
+	assert.Contains(t, typesContent, "factory User.fromJson")
+	assert.Contains(t, typesContent, "Map<String, dynamic> toJson()")
+
+	// copyWith method
+	assert.Contains(t, typesContent, "User copyWith({")
+
+	// == operator and hashCode
+	assert.Contains(t, typesContent, "bool operator ==(Object other)")
+	assert.Contains(t, typesContent, "int get hashCode")
+
+	// toString
+	assert.Contains(t, typesContent, "String toString()")
+
+	// Check index exports types.dart
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'types.dart';")
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
@@ -113,26 +134,27 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	// Enums are now in types.dart
+	typesContent := findFileContent(files, "types.dart")
+	require.NotEmpty(t, typesContent, "types.dart should be generated")
 
 	// String enum
-	assert.Contains(t, clientContent, "enum OrderStatus {")
-	assert.Contains(t, clientContent, "Pending('pending')")
-	assert.Contains(t, clientContent, "Shipped('shipped')")
-	assert.Contains(t, clientContent, "final String value;")
-	assert.Contains(t, clientContent, "static OrderStatus? fromValue(String value)")
+	assert.Contains(t, typesContent, "enum OrderStatus {")
+	assert.Contains(t, typesContent, "Pending('pending')")
+	assert.Contains(t, typesContent, "Shipped('shipped')")
+	assert.Contains(t, typesContent, "final String value;")
+	assert.Contains(t, typesContent, "static OrderStatus? fromValue(String value)")
 
 	// Int enum
-	assert.Contains(t, clientContent, "enum Priority {")
-	assert.Contains(t, clientContent, "Low(1)")
-	assert.Contains(t, clientContent, "Medium(2)")
-	assert.Contains(t, clientContent, "final int value;")
+	assert.Contains(t, typesContent, "enum Priority {")
+	assert.Contains(t, typesContent, "Low(1)")
+	assert.Contains(t, typesContent, "Medium(2)")
+	assert.Contains(t, typesContent, "final int value;")
+
+	// Check index exports types.dart (not enums.dart)
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'types.dart';")
+	assert.NotContains(t, indexContent, "export 'enums.dart';")
 }
 
 func TestGenerator_Generate_WithConstants(t *testing.T) {
@@ -153,18 +175,17 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	constantsContent := findFileContent(files, "constants.dart")
+	require.NotEmpty(t, constantsContent, "constants.dart should be generated")
 
-	assert.Contains(t, clientContent, "const int MAX_PAGE_SIZE = 100;")
-	assert.Contains(t, clientContent, "const String API_VERSION = '1.0.0';")
-	assert.Contains(t, clientContent, "const double DEFAULT_RATE = 0.21;")
-	assert.Contains(t, clientContent, "const bool ENABLED = true;")
+	assert.Contains(t, constantsContent, "const int MAX_PAGE_SIZE = 100;")
+	assert.Contains(t, constantsContent, "const String API_VERSION = '1.0.0';")
+	assert.Contains(t, constantsContent, "const double DEFAULT_RATE = 0.21;")
+	assert.Contains(t, constantsContent, "const bool ENABLED = true;")
+
+	// Check index exports constants.dart
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'constants.dart';")
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
@@ -183,18 +204,17 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	patternsContent := findFileContent(files, "patterns.dart")
+	require.NotEmpty(t, patternsContent, "patterns.dart should be generated")
 
-	assert.Contains(t, clientContent, "String UserEventSubject(String userId, String eventType)")
-	assert.Contains(t, clientContent, "return 'events.users.$userId.$eventType';")
-	assert.Contains(t, clientContent, "String CacheKey(String key)")
-	assert.Contains(t, clientContent, "return 'cache:$key';")
+	assert.Contains(t, patternsContent, "String UserEventSubject(String userId, String eventType)")
+	assert.Contains(t, patternsContent, "return 'events.users.$userId.$eventType';")
+	assert.Contains(t, patternsContent, "String CacheKey(String key)")
+	assert.Contains(t, patternsContent, "return 'cache:$key';")
+
+	// Check index exports patterns.dart
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'patterns.dart';")
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
@@ -222,25 +242,26 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	// Procedures are now in types.dart
+	typesContent := findFileContent(files, "types.dart")
+	require.NotEmpty(t, typesContent, "types.dart should be generated")
 
 	// Check procedure types (with RPC prefix)
-	assert.Contains(t, clientContent, "class UsersGetUserInput {")
-	assert.Contains(t, clientContent, "class UsersGetUserOutput {")
-	assert.Contains(t, clientContent, "typedef UsersGetUserResponse = Response<UsersGetUserOutput>;")
+	assert.Contains(t, typesContent, "class UsersGetUserInput {")
+	assert.Contains(t, typesContent, "class UsersGetUserOutput {")
+	assert.Contains(t, typesContent, "typedef UsersGetUserResponse = Response<UsersGetUserOutput>;")
 
 	// Check procedure path in metadata
-	assert.Contains(t, clientContent, "'Users/GetUser'")
+	assert.Contains(t, typesContent, "'Users/GetUser'")
 
 	// Check client implementation is NOT present
-	assert.NotContains(t, clientContent, "class _BuilderUsersGetUser")
-	assert.NotContains(t, clientContent, "Future<UsersGetUserOutput> execute(UsersGetUserInput input)")
+	assert.NotContains(t, typesContent, "class _BuilderUsersGetUser")
+	assert.NotContains(t, typesContent, "Future<UsersGetUserOutput> execute(UsersGetUserInput input)")
+
+	// Check index exports types.dart (not procedures.dart)
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'types.dart';")
+	assert.NotContains(t, indexContent, "export 'procedures.dart';")
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
@@ -268,25 +289,21 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	// Streams are now in types.dart
+	typesContent := findFileContent(files, "types.dart")
+	require.NotEmpty(t, typesContent, "types.dart should be generated for streams")
 
 	// Check stream types (with RPC prefix)
-	assert.Contains(t, clientContent, "class ChatMessagesInput {")
-	assert.Contains(t, clientContent, "class ChatMessagesOutput {")
-	assert.Contains(t, clientContent, "typedef ChatMessagesResponse = Response<ChatMessagesOutput>;")
+	assert.Contains(t, typesContent, "class ChatMessagesInput {")
+	assert.Contains(t, typesContent, "class ChatMessagesOutput {")
+	assert.Contains(t, typesContent, "typedef ChatMessagesResponse = Response<ChatMessagesOutput>;")
 
 	// Check stream path in metadata
-	assert.Contains(t, clientContent, "'Chat/Messages'")
+	assert.Contains(t, typesContent, "'Chat/Messages'")
 
 	// Check client implementation is NOT present
-	assert.NotContains(t, clientContent, "class _BuilderChatMessagesStream")
-	assert.NotContains(t, clientContent, "_StreamHandle<ChatMessagesOutput> execute(ChatMessagesInput input)")
+	assert.NotContains(t, typesContent, "class _BuilderChatMessagesStream")
+	assert.NotContains(t, typesContent, "_StreamHandle<ChatMessagesOutput> execute(ChatMessagesInput input)")
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
@@ -317,38 +334,198 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	var clientContent string
-	for _, f := range files {
-		if f.RelativePath == "client.dart" {
-			clientContent = string(f.Content)
-			break
-		}
-	}
+	typesContent := findFileContent(files, "types.dart")
+	require.NotEmpty(t, typesContent, "types.dart should be generated")
 
 	// Arrays
-	assert.Contains(t, clientContent, "List<String> tags")
+	assert.Contains(t, typesContent, "List<String> tags")
 
 	// Multi-dimensional arrays
-	assert.Contains(t, clientContent, "List<List<int>> matrix")
+	assert.Contains(t, typesContent, "List<List<int>> matrix")
 
 	// Maps
-	assert.Contains(t, clientContent, "Map<String, String> metadata")
+	assert.Contains(t, typesContent, "Map<String, String> metadata")
 
 	// Custom type
-	assert.Contains(t, clientContent, "User owner")
+	assert.Contains(t, typesContent, "User owner")
 
 	// Inline object - should generate a separate class
-	assert.Contains(t, clientContent, "class ProductAddress {")
-	assert.Contains(t, clientContent, "ProductAddress address")
+	assert.Contains(t, typesContent, "class ProductAddress {")
+	assert.Contains(t, typesContent, "ProductAddress address")
+}
+
+func TestGenerator_Generate_WithRPCCatalog(t *testing.T) {
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+	})
+
+	vdl := `
+		rpc Users {
+			proc GetUser {
+				input { userId: string }
+				output { id: string name: string }
+			}
+			stream UserUpdates {
+				input { userId: string }
+				output { status: string }
+			}
+		}
+		rpc Products {
+			proc ListProducts {
+				input { page: int }
+				output { items: string[] }
+			}
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
+
+	files, err := g.Generate(context.Background(), schema)
+	require.NoError(t, err)
+
+	catalogContent := findFileContent(files, "rpc_catalog.dart")
+	require.NotEmpty(t, catalogContent, "rpc_catalog.dart should be generated")
+
+	// Check OperationType enum
+	assert.Contains(t, catalogContent, "enum OperationType {")
+	assert.Contains(t, catalogContent, "proc,")
+	assert.Contains(t, catalogContent, "stream;")
+
+	// Check OperationDefinition class
+	assert.Contains(t, catalogContent, "class OperationDefinition {")
+
+	// Check VDLProcedures list
+	assert.Contains(t, catalogContent, "const List<OperationDefinition> vdlProcedures = [")
+	assert.Contains(t, catalogContent, "rpcName: 'Users', name: 'GetUser', type: OperationType.proc")
+	assert.Contains(t, catalogContent, "rpcName: 'Products', name: 'ListProducts', type: OperationType.proc")
+
+	// Check VDLStreams list
+	assert.Contains(t, catalogContent, "const List<OperationDefinition> vdlStreams = [")
+	assert.Contains(t, catalogContent, "rpcName: 'Users', name: 'UserUpdates', type: OperationType.stream")
+
+	// Check VDLPaths
+	assert.Contains(t, catalogContent, "abstract class VDLPaths {")
+	assert.Contains(t, catalogContent, "static const users = _UsersPaths._();")
+	assert.Contains(t, catalogContent, "class _UsersPaths {")
+	assert.Contains(t, catalogContent, "String get getUser => '/Users/GetUser';")
+	assert.Contains(t, catalogContent, "String get userUpdates => '/Users/UserUpdates';")
+
+	// Check index exports rpc_catalog.dart
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'rpc_catalog.dart';")
+}
+
+func TestGenerator_Generate_WithEnumInType(t *testing.T) {
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+	})
+
+	vdl := `
+		enum Status {
+			Active = "active"
+			Inactive = "inactive"
+		}
+
+		type User {
+			name: string
+			status: Status
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
+
+	files, err := g.Generate(context.Background(), schema)
+	require.NoError(t, err)
+
+	typesContent := findFileContent(files, "types.dart")
+	require.NotEmpty(t, typesContent, "types.dart should be generated")
+
+	// Check that enum JSON conversion is used in fromJson
+	assert.Contains(t, typesContent, "StatusJson.fromJson(json['status']")
+
+	// Check that enum toJson is used
+	assert.Contains(t, typesContent, "status.toJson()")
+
+	// Enums are now in the same file, so no import needed
+	assert.NotContains(t, typesContent, "import 'enums.dart';")
+}
+
+func TestGenerator_Generate_MultipleFiles(t *testing.T) {
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+	})
+
+	vdl := `
+		enum Status { Active = "active" }
+		const VERSION = "1.0"
+		pattern Key = "key:{id}"
+		type User { id: string status: Status }
+		rpc Users {
+			proc Get { input { id: string } output { user: User } }
+		}
+	`
+	schema := parseAndBuildIR(t, vdl)
+
+	files, err := g.Generate(context.Background(), schema)
+	require.NoError(t, err)
+
+	// Should generate 6 files:
+	// core_types.dart, constants.dart, patterns.dart, types.dart, rpc_catalog.dart, index.dart
+	// (enums and procedures are now in types.dart)
+	require.Len(t, files, 6)
+
+	// Verify each file exists
+	assert.NotEmpty(t, findFileContent(files, "core_types.dart"))
+	assert.NotEmpty(t, findFileContent(files, "constants.dart"))
+	assert.NotEmpty(t, findFileContent(files, "patterns.dart"))
+	assert.NotEmpty(t, findFileContent(files, "types.dart"))
+	assert.NotEmpty(t, findFileContent(files, "rpc_catalog.dart"))
+	assert.NotEmpty(t, findFileContent(files, "index.dart"))
+
+	// Verify enums.dart and procedures.dart do NOT exist
+	assert.Empty(t, findFileContent(files, "enums.dart"))
+	assert.Empty(t, findFileContent(files, "procedures.dart"))
+
+	// Verify index exports all files (except enums.dart and procedures.dart)
+	indexContent := findFileContent(files, "index.dart")
+	assert.Contains(t, indexContent, "export 'core_types.dart';")
+	assert.Contains(t, indexContent, "export 'constants.dart';")
+	assert.Contains(t, indexContent, "export 'patterns.dart';")
+	assert.Contains(t, indexContent, "export 'types.dart';")
+	assert.Contains(t, indexContent, "export 'rpc_catalog.dart';")
+	assert.NotContains(t, indexContent, "export 'enums.dart';")
+	assert.NotContains(t, indexContent, "export 'procedures.dart';")
+}
+
+func TestGenerator_Generate_FileHeader(t *testing.T) {
+	g := New(&config.DartConfig{
+		CommonConfig: config.CommonConfig{
+			Output: "output",
+		},
+	})
+
+	schema := parseAndBuildIR(t, "type User { id: string }")
+
+	files, err := g.Generate(context.Background(), schema)
+	require.NoError(t, err)
+
+	// Check all files have the correct header
+	for _, f := range files {
+		content := string(f.Content)
+		assert.Contains(t, content, "// Code generated by VDL v", "file %s should have version header", f.RelativePath)
+		assert.Contains(t, content, "DO NOT EDIT", "file %s should have DO NOT EDIT warning", f.RelativePath)
+		assert.Contains(t, content, "https://vdl.varavel.com", "file %s should have VDL URL", f.RelativePath)
+		// Should NOT contain license info
+		assert.NotContains(t, content, "MIT License", "file %s should not have license", f.RelativePath)
+		assert.NotContains(t, content, "COPYRIGHT", "file %s should not have copyright", f.RelativePath)
+	}
 }
 
 func TestTypeRefToDart(t *testing.T) {
-	// ... (rest of the tests using TypeRef directly can remain as they test low-level logic)
-	// But since this is a unit test for a private function (if it were private),
-	// or specific type conversion logic, we might want to keep it.
-	// Since typeRefToDart is not exported, it's testing internal logic.
-	// We can keep it as is, or remove it if we rely on full generation tests.
-	// For now I'll keep it but fix imports if needed.
 	tests := []struct {
 		name   string
 		tr     ir.TypeRef

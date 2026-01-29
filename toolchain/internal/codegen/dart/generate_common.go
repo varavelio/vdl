@@ -83,8 +83,8 @@ func buildFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, jsonAcce
 		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.Type, jsonAccessor)
 
 	case ir.TypeKindEnum:
-		// Enums are just the raw value in Dart
-		return jsonAccessor
+		// Enums need to be converted from JSON value using the extension's fromJson method
+		return fmt.Sprintf("%sJson.fromJson(%s)", tr.Enum, jsonAccessor)
 
 	case ir.TypeKindArray:
 		return buildArrayFromJson(parentTypeName, fieldName, tr, jsonAccessor)
@@ -162,7 +162,8 @@ func buildItemFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, varN
 		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.Type, varName)
 
 	case ir.TypeKindEnum:
-		return varName
+		// Enums need to be converted using the extension's fromJson method
+		return fmt.Sprintf("%sJson.fromJson(%s)", tr.Enum, varName)
 
 	case ir.TypeKindObject:
 		inlineName := parentTypeName + strutil.ToPascalCase(fieldName)
@@ -208,7 +209,8 @@ func buildToJsonExpr(tr ir.TypeRef, varName string) string {
 		return fmt.Sprintf("%s.toJson()", varName)
 
 	case ir.TypeKindEnum:
-		return varName
+		// Enums use the toJson method from the extension
+		return fmt.Sprintf("%s.toJson()", varName)
 
 	case ir.TypeKindArray:
 		itemExpr := buildItemToJsonExpr(*tr.ArrayItem, "e")
@@ -241,7 +243,8 @@ func buildItemToJsonExpr(tr ir.TypeRef, varName string) string {
 		return fmt.Sprintf("%s.toJson()", varName)
 
 	case ir.TypeKindEnum:
-		return varName
+		// Enums use the toJson method from the extension
+		return fmt.Sprintf("%s.toJson()", varName)
 
 	case ir.TypeKindArray:
 		innerExpr := buildItemToJsonExpr(*tr.ArrayItem, "inner")
@@ -293,7 +296,7 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 		g.Break()
 
 		// Constructor
-		g.Linef("/// Creates a new %s instance.", fullName)
+		g.Linef("/// Creates a new [%s] instance.", fullName)
 		if len(fields) == 0 {
 			g.Linef("const %s();", fullName)
 		} else {
@@ -315,7 +318,7 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 		g.Break()
 
 		// fromJson factory
-		g.Linef("/// Hydrates a %s from a JSON map.", fullName)
+		g.Linef("/// Creates a [%s] from a JSON map.", fullName)
 		g.Linef("factory %s.fromJson(Map<String, dynamic> json) {", fullName)
 		g.Block(func() {
 			for _, field := range fields {
@@ -343,7 +346,7 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 		g.Break()
 
 		// toJson method
-		g.Linef("/// Serialises this %s to a JSON map compatible with the server.", fullName)
+		g.Linef("/// Converts this [%s] to a JSON map.", fullName)
 		g.Line("Map<String, dynamic> toJson() {")
 		g.Block(func() {
 			g.Line("final _data = <String, dynamic>{};")
@@ -363,6 +366,101 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 			g.Line("return _data;")
 		})
 		g.Line("}")
+		g.Break()
+
+		// copyWith method
+		if len(fields) > 0 {
+			g.Linef("/// Creates a copy of this [%s] with the given fields replaced.", fullName)
+			g.Linef("%s copyWith({", fullName)
+			g.Block(func() {
+				for _, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					inlineTypeName := fullName + strutil.ToPascalCase(field.Name)
+					typeLit := typeRefToDart(inlineTypeName, field.Type)
+					// All fields are optional in copyWith
+					g.Linef("%s? %s,", typeLit, fieldName)
+				}
+			})
+			g.Line("}) {")
+			g.Block(func() {
+				g.Linef("return %s(", fullName)
+				g.Block(func() {
+					for _, field := range fields {
+						fieldName := strutil.ToCamelCase(field.Name)
+						g.Linef("%s: %s ?? this.%s,", fieldName, fieldName, fieldName)
+					}
+				})
+				g.Line(");")
+			})
+			g.Line("}")
+			g.Break()
+		}
+
+		// == operator
+		g.Line("@override")
+		g.Line("bool operator ==(Object other) {")
+		g.Block(func() {
+			g.Line("if (identical(this, other)) return true;")
+			g.Linef("return other is %s", fullName)
+			if len(fields) > 0 {
+				for i, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					if i == len(fields)-1 {
+						g.Linef("    && %s == other.%s;", fieldName, fieldName)
+					} else {
+						g.Linef("    && %s == other.%s", fieldName, fieldName)
+					}
+				}
+			} else {
+				g.Line(";")
+			}
+		})
+		g.Line("}")
+		g.Break()
+
+		// hashCode
+		g.Line("@override")
+		if len(fields) == 0 {
+			g.Line("int get hashCode => 0;")
+		} else if len(fields) == 1 {
+			fieldName := strutil.ToCamelCase(fields[0].Name)
+			g.Linef("int get hashCode => %s.hashCode;", fieldName)
+		} else {
+			g.Line("int get hashCode => Object.hash(")
+			g.Block(func() {
+				for i, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					if i == len(fields)-1 {
+						g.Linef("%s,", fieldName)
+					} else {
+						g.Linef("%s,", fieldName)
+					}
+				}
+			})
+			g.Line(");")
+		}
+		g.Break()
+
+		// toString
+		g.Line("@override")
+		if len(fields) == 0 {
+			g.Linef("String toString() => '%s()';", fullName)
+		} else {
+			g.Linef("String toString() {")
+			g.Block(func() {
+				g.Linef("return '%s('", fullName)
+				for i, field := range fields {
+					fieldName := strutil.ToCamelCase(field.Name)
+					if i == len(fields)-1 {
+						g.Linef("    '%s: $%s'", fieldName, fieldName)
+					} else {
+						g.Linef("    '%s: $%s, '", fieldName, fieldName)
+					}
+				}
+				g.Line("    ')';")
+			})
+			g.Line("}")
+		}
 	})
 	g.Line("}")
 	g.Break()
@@ -402,8 +500,8 @@ func renderDeprecatedDart(g *gen.Generator, deprecated *ir.Deprecation) {
 
 // renderMultilineCommentDart renders a complete multiline comment for Dart.
 func renderMultilineCommentDart(g *gen.Generator, text string) {
-	lines := strings.Split(text, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(text, "\n")
+	for line := range lines {
 		g.Linef("/// %s", line)
 	}
 }
