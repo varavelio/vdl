@@ -97,7 +97,7 @@ func runTestCase(t *testing.T, caseDir string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	cmdRun := exec.CommandContext(ctx, "dart", "run", "main.dart")
+	cmdRun := exec.CommandContext(ctx, "dart", "run", "--enable-asserts", "main.dart")
 	cmdRun.Dir = caseDir
 	outRun, err := cmdRun.CombinedOutput()
 	if err != nil {
