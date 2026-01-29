@@ -1,0 +1,18 @@
+// @expect: E901
+// Type collides with auto-generated WatchUpdatesInput from stream WatchUpdates
+
+rpc Events {
+  stream WatchUpdates {
+    input {
+      filter: string
+    }
+
+    output {
+      event: string
+    }
+  }
+}
+
+type WatchUpdatesInput {
+  channel: string
+}

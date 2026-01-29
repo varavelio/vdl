@@ -77,6 +77,11 @@ const (
 	CodeDuplicateName    = "E805" // Cross-category name collision
 )
 
+// Synthetic name collision errors (E90x)
+const (
+	CodeSyntheticNameCollision = "E901" // User-defined name collides with auto-generated synthetic name
+)
+
 // Diagnostic represents an error found during semantic analysis.
 // It provides precise location information for IDE/LSP integration.
 type Diagnostic struct {

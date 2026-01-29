@@ -1,0 +1,12 @@
+// @expect: E901
+// Type collides with auto-generated PriorityValue from enum Priority
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+type PriorityValue {
+  level: int
+}
