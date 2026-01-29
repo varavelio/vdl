@@ -1,13 +1,6 @@
 // Verifies enum serialization and round-trip: both string enums and int enums
 // are echoed correctly through client/server communication.
-import {
-  Server,
-  NewClient,
-  Client,
-  ColorValues,
-  PriorityValues,
-  LogLevelValues,
-} from "./gen/index.ts";
+import { Server, NewClient, Client } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
 import type { Color, Priority, LogLevel } from "./gen/index.ts";
 import { createServer } from "http";
@@ -87,9 +80,9 @@ async function main() {
 
 async function testValidEnumRoundTrip(client: Client) {
   const testCases: { color: Color; priority: Priority }[] = [
-    { color: ColorValues.Red, priority: PriorityValues.Low },
-    { color: ColorValues.Green, priority: PriorityValues.Medium },
-    { color: ColorValues.Blue, priority: PriorityValues.High },
+    { color: "Red", priority: 1 },
+    { color: "Green", priority: 2 },
+    { color: "Blue", priority: 3 },
   ];
 
   for (const tc of testCases) {
@@ -123,41 +116,37 @@ async function testOptionalEnums(client: Client) {
   // Test with present valid optional enums
   const res2 = await client.procs.serviceEchoOptional().execute({
     container: {
-      color: ColorValues.Blue,
-      priority: PriorityValues.High,
+      color: "Blue",
+      priority: 3,
     },
   });
 
-  if (res2.container.color !== ColorValues.Blue) {
-    throw new Error(`expected ColorValues.Blue, got ${res2.container.color}`);
+  if (res2.container.color !== "Blue") {
+    throw new Error(`expected "Blue", got ${res2.container.color}`);
   }
-  if (res2.container.priority !== PriorityValues.High) {
-    throw new Error(
-      `expected PriorityValues.High, got ${res2.container.priority}`,
-    );
+  if (res2.container.priority !== 3) {
+    throw new Error(`expected 3, got ${res2.container.priority}`);
   }
 
   // Test optional explicit-value enum
   const res3 = await client.procs.serviceEchoOptional().execute({
     container: {
-      logLevel: LogLevelValues.Warning,
+      logLevel: "WARN",
     },
   });
 
-  if (res3.container.logLevel !== LogLevelValues.Warning) {
-    throw new Error(
-      `expected LogLevelValues.Warning, got ${res3.container.logLevel}`,
-    );
+  if (res3.container.logLevel !== "WARN") {
+    throw new Error(`expected "WARN", got ${res3.container.logLevel}`);
   }
 }
 
 async function testExplicitValueRoundTrip(client: Client) {
   const testCases: { level: LogLevel; expectedValue: string }[] = [
-    { level: LogLevelValues.Debug, expectedValue: "DEBUG" },
-    { level: LogLevelValues.Info, expectedValue: "INFO" },
-    { level: LogLevelValues.Warning, expectedValue: "WARN" },
-    { level: LogLevelValues.Error, expectedValue: "ERROR" },
-    { level: LogLevelValues.Critical, expectedValue: "CRITICAL" },
+    { level: "DEBUG", expectedValue: "DEBUG" },
+    { level: "INFO", expectedValue: "INFO" },
+    { level: "WARN", expectedValue: "WARN" },
+    { level: "ERROR", expectedValue: "ERROR" },
+    { level: "CRITICAL", expectedValue: "CRITICAL" },
   ];
 
   for (const tc of testCases) {

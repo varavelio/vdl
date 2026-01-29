@@ -2,8 +2,8 @@
 import {
   MAX_PAGE_SIZE,
   API_VERSION,
-  StatusValues,
-  PriorityValues,
+  isStatus,
+  isPriority,
   UserTopic,
   VDLPaths,
   User,
@@ -12,6 +12,7 @@ import {
   UserServiceUserActivityInput,
   UserServiceUserActivityOutput,
 } from "./gen/index.ts";
+import type { Status, Priority } from "./gen/index.ts";
 
 function fail(name: string, expected: unknown, actual: unknown): never {
   console.error(
@@ -41,15 +42,21 @@ function verifyConstants() {
 
 function verifyEnums() {
   // String enum
-  const s = StatusValues.Active;
+  const s: Status = "Active";
   if (s !== "Active") {
-    fail("StatusValues.Active", "Active", s);
+    fail("Status Active", "Active", s);
+  }
+  if (!isStatus(s)) {
+    fail("isStatus('Active')", true, false);
   }
 
   // Int enum
-  const p = PriorityValues.High;
+  const p: Priority = 3;
   if (p !== 3) {
-    fail("PriorityValues.High", 3, p);
+    fail("Priority High", 3, p);
+  }
+  if (!isPriority(p)) {
+    fail("isPriority(3)", true, false);
   }
 }
 
@@ -69,7 +76,7 @@ function verifyTypes() {
     updatedAt: new Date(),
     username: "alice",
     email: "alice@example.com",
-    status: StatusValues.Active,
+    status: "Active",
     roles: ["admin"],
     preferences: { theme: "dark" },
     address: {
@@ -111,7 +118,7 @@ function verifyRPCs() {
       updatedAt: new Date(),
       username: "bob",
       email: "bob@example.com",
-      status: StatusValues.Active,
+      status: "Active",
       roles: [],
       preferences: {},
       address: { street: "", city: "", zip: "" },

@@ -1,5 +1,5 @@
 // Verifies enum serialization: both string enums and int enums are echoed correctly.
-import { Server, NewClient, ColorValues, PriorityValues } from "./gen/index.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
 import type { Color, Priority } from "./gen/index.ts";
 import { createServer } from "http";
@@ -38,8 +38,8 @@ async function main() {
 
   try {
     const testCases: { color: Color; priority: Priority }[] = [
-      { color: ColorValues.Red, priority: PriorityValues.High },
-      { color: ColorValues.Blue, priority: PriorityValues.Low },
+      { color: "Red", priority: 2 },
+      { color: "Blue", priority: 1 },
     ];
 
     for (const tc of testCases) {

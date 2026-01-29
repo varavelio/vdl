@@ -1,14 +1,7 @@
 // Verifies enum serialization: enums should be transmitted as strings on the wire,
 // and round-trip correctly through client->server->client.
 // Tests both implicit-value enums (name=value) and explicit-value enums (name!=value).
-import {
-  Server,
-  NewClient,
-  Client,
-  ColorValues,
-  StatusValues,
-  HttpStatusValues,
-} from "./gen/index.ts";
+import { Server, NewClient, Client } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
 import type { Color, Status, HttpStatus } from "./gen/index.ts";
 import { createServer } from "http";
@@ -31,8 +24,8 @@ async function main() {
     .procs.GetDefaults()
     .handle(async () => {
       return {
-        color: ColorValues.Red,
-        status: StatusValues.Pending,
+        color: "Red",
+        status: "Pending",
       };
     });
 
@@ -116,30 +109,21 @@ async function testWireFormat(baseUrl: string) {
 
 async function testGeneratedClient(client: Client) {
   const result = await client.procs.serviceEcho().execute({
-    color: ColorValues.Green,
-    status: StatusValues.Completed,
+    color: "Green",
+    status: "Completed",
   });
 
-  if (result.color !== ColorValues.Green) {
-    throw new Error(`expected ColorValues.Green, got: ${result.color}`);
+  if (result.color !== "Green") {
+    throw new Error(`expected "Green", got: ${result.color}`);
   }
-  if (result.status !== StatusValues.Completed) {
-    throw new Error(`expected StatusValues.Completed, got: ${result.status}`);
+  if (result.status !== "Completed") {
+    throw new Error(`expected "Completed", got: ${result.status}`);
   }
 }
 
 async function testAllEnumValues(client: Client) {
-  const colors: Color[] = [
-    ColorValues.Red,
-    ColorValues.Green,
-    ColorValues.Blue,
-  ];
-  const statuses: Status[] = [
-    StatusValues.Pending,
-    StatusValues.Active,
-    StatusValues.Completed,
-    StatusValues.Cancelled,
-  ];
+  const colors: Color[] = ["Red", "Green", "Blue"];
+  const statuses: Status[] = ["Pending", "Active", "Completed", "Cancelled"];
 
   for (const color of colors) {
     for (const status of statuses) {
@@ -195,12 +179,12 @@ async function testExplicitValueWireFormat(baseUrl: string) {
 async function testExplicitValueClient(client: Client) {
   // Test each explicit-value enum member
   const testCases: { input: HttpStatus; expected: string }[] = [
-    { input: HttpStatusValues.Ok, expected: "OK" },
-    { input: HttpStatusValues.Created, expected: "CREATED" },
-    { input: HttpStatusValues.BadRequest, expected: "BAD_REQUEST" },
-    { input: HttpStatusValues.NotFound, expected: "NOT_FOUND" },
+    { input: "OK", expected: "OK" },
+    { input: "CREATED", expected: "CREATED" },
+    { input: "BAD_REQUEST", expected: "BAD_REQUEST" },
+    { input: "NOT_FOUND", expected: "NOT_FOUND" },
     {
-      input: HttpStatusValues.InternalError,
+      input: "INTERNAL_SERVER_ERROR",
       expected: "INTERNAL_SERVER_ERROR",
     },
   ];
@@ -227,11 +211,11 @@ async function testExplicitValueClient(client: Client) {
 // testExplicitValueAllMembers verifies all explicit-value enum members round-trip correctly.
 async function testExplicitValueAllMembers(client: Client) {
   const allStatuses: HttpStatus[] = [
-    HttpStatusValues.Ok,
-    HttpStatusValues.Created,
-    HttpStatusValues.BadRequest,
-    HttpStatusValues.NotFound,
-    HttpStatusValues.InternalError,
+    "OK",
+    "CREATED",
+    "BAD_REQUEST",
+    "NOT_FOUND",
+    "INTERNAL_SERVER_ERROR",
   ];
 
   for (const status of allStatuses) {
