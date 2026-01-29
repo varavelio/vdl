@@ -1,0 +1,6 @@
+{
+  "requiredFiles": ["schema.vdl"],
+  "contentContains": {
+    "schema.vdl": ["const OVERRIDE_WORKS = true"]
+  }
+}

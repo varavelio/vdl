@@ -1,0 +1,5 @@
+version: 1
+targets:
+  - playground:
+      output: "./gen"
+      schema: "override.vdl"
