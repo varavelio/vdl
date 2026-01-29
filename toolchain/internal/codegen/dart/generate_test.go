@@ -251,9 +251,6 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	assert.Contains(t, typesContent, "class UsersGetUserOutput {")
 	assert.Contains(t, typesContent, "typedef UsersGetUserResponse = Response<UsersGetUserOutput>;")
 
-	// Check procedure path in metadata
-	assert.Contains(t, typesContent, "'Users/GetUser'")
-
 	// Check client implementation is NOT present
 	assert.NotContains(t, typesContent, "class _BuilderUsersGetUser")
 	assert.NotContains(t, typesContent, "Future<UsersGetUserOutput> execute(UsersGetUserInput input)")
@@ -297,9 +294,6 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 	assert.Contains(t, typesContent, "class ChatMessagesInput {")
 	assert.Contains(t, typesContent, "class ChatMessagesOutput {")
 	assert.Contains(t, typesContent, "typedef ChatMessagesResponse = Response<ChatMessagesOutput>;")
-
-	// Check stream path in metadata
-	assert.Contains(t, typesContent, "'Chat/Messages'")
 
 	// Check client implementation is NOT present
 	assert.NotContains(t, typesContent, "class _BuilderChatMessagesStream")

@@ -42,16 +42,5 @@ func generateStreamTypes(schema *ir.Schema, _ *config.DartConfig) (string, error
 		g.Break()
 	}
 
-	g.Line("/// __vdlStreamNames lists all stream identifiers available in this client.")
-	g.Line("const List<String> __vdlStreamNames = [")
-	g.Block(func() {
-		for _, stream := range schema.Streams {
-			path := stream.Path()
-			g.Linef("'%s',", path)
-		}
-	})
-	g.Line("];")
-	g.Break()
-
 	return g.String(), nil
 }

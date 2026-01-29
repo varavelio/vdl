@@ -42,16 +42,5 @@ func generateProcedureTypes(schema *ir.Schema, _ *config.DartConfig) (string, er
 		g.Break()
 	}
 
-	g.Line("/// __vdlProcedureNames lists all procedure identifiers available in this client.")
-	g.Line("const List<String> __vdlProcedureNames = [")
-	g.Block(func() {
-		for _, proc := range schema.Procedures {
-			path := proc.Path()
-			g.Linef("'%s',", path)
-		}
-	})
-	g.Line("];")
-	g.Break()
-
 	return g.String(), nil
 }
