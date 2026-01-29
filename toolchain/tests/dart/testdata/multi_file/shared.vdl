@@ -1,0 +1,41 @@
+// shared.vdl - Shared types across multiple files
+
+// Base types
+type Timestamps {
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type Identifiable {
+  id: string
+}
+
+// Shared enums
+enum Status {
+  Active
+  Inactive
+  Pending
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+// Shared complex type
+type Address {
+  street: string
+  city: string
+  country: string
+  postalCode?: string
+}
+
+// Constants
+const API_VERSION = "v1"
+const MAX_RESULTS = 100
+const DEFAULT_TIMEOUT = 30.5
+
+// Patterns
+pattern UserTopic = "events.users.{userId}.{action}"
+pattern OrderTopic = "orders.{region}.{orderId}"
