@@ -1,0 +1,89 @@
+// users.vdl - User domain types and service
+include "./shared.vdl"
+
+type User {
+  ...Identifiable
+  ...Timestamps
+  username: string
+  email: string
+  status: Status
+  address?: Address
+  roles: string[]
+  metadata: map<string>
+}
+
+type UserList {
+  items: User[]
+  total: int
+  hasMore: bool
+}
+
+type CreateUserRequest {
+  username: string
+  email: string
+  address?: Address
+}
+
+type UpdateUserRequest {
+  ...Identifiable
+  username?: string
+  email?: string
+  status?: Status
+  address?: Address
+}
+
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc ListUsers {
+    input {
+      page?: int
+      limit?: int
+      status?: Status
+    }
+
+    output {
+      ...UserList
+    }
+  }
+
+  proc CreateUser {
+    input {
+      ...CreateUserRequest
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc UpdateUser {
+    input {
+      ...UpdateUserRequest
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  stream UserEvents {
+    input {
+      userId: string
+    }
+
+    output {
+      event: string
+      timestamp: datetime
+      data: map<string>
+    }
+  }
+}
