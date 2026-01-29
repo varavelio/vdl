@@ -14,6 +14,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/python"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
@@ -127,6 +128,14 @@ func Run(configPath string) error {
 			}
 			if err := runDart(ctx, absConfigDir, target.Dart, schema); err != nil {
 				return fmt.Errorf("target #%d (dart): %w", i, err)
+			}
+		} else if target.Python != nil {
+			schema, _, err := getSchema(target.Python.Schema)
+			if err != nil {
+				return err
+			}
+			if err := runPython(ctx, absConfigDir, target.Python, schema); err != nil {
+				return fmt.Errorf("target #%d (python): %w", i, err)
 			}
 		} else if target.JSONSchema != nil {
 			schema, _, err := getSchema(target.JSONSchema.Schema)
@@ -297,6 +306,25 @@ func runDart(ctx context.Context, absConfigDir string, cfg *config.DartConfig, s
 	}
 
 	gen := dart.New(cfg)
+	files, err := gen.Generate(ctx, schema)
+	if err != nil {
+		return fmt.Errorf("failed to generate code: %w", err)
+	}
+
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
+	}
+	return writeGeneratedFiles(outputDir, generatedFiles)
+}
+
+func runPython(ctx context.Context, absConfigDir string, cfg *config.PythonConfig, schema *ir.Schema) error {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+		return err
+	}
+
+	gen := python.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return fmt.Errorf("failed to generate code: %w", err)

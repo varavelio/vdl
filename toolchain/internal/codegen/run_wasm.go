@@ -9,6 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/python"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
@@ -141,6 +142,19 @@ func runWasm(opts RunWasmOptions) (RunWasmOutput, error) {
 		}
 		return convertDartFiles(files), nil
 
+	case "python":
+		cfg := &config.PythonConfig{
+			CommonConfig: config.CommonConfig{
+				Output: ".",
+			},
+		}
+		gen := python.New(cfg)
+		files, err := gen.Generate(ctx, schema)
+		if err != nil {
+			return RunWasmOutput{}, fmt.Errorf("failed to generate python code: %s", err)
+		}
+		return convertPythonFiles(files), nil
+
 	case "jsonschema":
 		cfg := &config.JSONSchemaConfig{
 			CommonConfig: config.CommonConfig{
@@ -174,6 +188,18 @@ func convertGolangFiles(files []golang.File) RunWasmOutput {
 
 // convertTypescriptFiles converts typescript.File slice to RunWasmOutput.
 func convertTypescriptFiles(files []typescript.File) RunWasmOutput {
+	outputFiles := make([]RunWasmOutputFile, len(files))
+	for i, file := range files {
+		outputFiles[i] = RunWasmOutputFile{
+			Path:    file.RelativePath,
+			Content: string(file.Content),
+		}
+	}
+	return RunWasmOutput{Files: outputFiles}
+}
+
+// convertPythonFiles converts python.File slice to RunWasmOutput.
+func convertPythonFiles(files []python.File) RunWasmOutput {
 	outputFiles := make([]RunWasmOutputFile, len(files))
 	for i, file := range files {
 		outputFiles[i] = RunWasmOutputFile{
