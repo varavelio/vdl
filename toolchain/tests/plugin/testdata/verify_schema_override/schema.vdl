@@ -1,0 +1,1 @@
+const SHOULD_NOT_BE_GENERATED = "I should not exist"
