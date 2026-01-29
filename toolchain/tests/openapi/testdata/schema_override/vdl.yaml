@@ -1,0 +1,7 @@
+version: 1
+targets:
+  - openapi:
+      output: "./gen"
+      schema: "override.vdl"
+      title: "Override Test"
+      version: "1.0.0"

@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: Override Test
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: ServiceProcedures
+    description: Procedures for Service
+paths:
+  /Service/Ping:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ServicePingInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ServicePingOutput"
+      tags:
+        - ServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  requestBodies:
+    ServicePingInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for Service/Ping procedure
+  responses:
+    ServicePingOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties: {}
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Service/Ping procedure
