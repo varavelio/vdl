@@ -2,7 +2,9 @@ package python
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -74,4 +76,28 @@ func needsDictCheck(t ir.TypeRef) bool {
 
 func needsListCheck(t ir.TypeRef) bool {
 	return t.Kind == ir.TypeKindArray
+}
+
+// renderDocstringPython renders a Python docstring.
+func renderDocstringPython(g *gen.Generator, doc string) {
+	if doc == "" {
+		return
+	}
+	g.Line("    \"\"\"")
+	lines := strings.Split(doc, "\n")
+	for _, line := range lines {
+		g.Linef("    %s", line)
+	}
+	g.Line("    \"\"\"")
+}
+
+// renderDeprecatedPython renders a deprecation notice for Python.
+func renderDeprecatedPython(g *gen.Generator, deprecated *ir.Deprecation) {
+	if deprecated == nil {
+		return
+	}
+	g.Line("    .. deprecated::")
+	if deprecated.Message != "" {
+		g.Linef("        %s", deprecated.Message)
+	}
 }
