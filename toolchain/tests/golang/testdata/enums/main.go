@@ -12,6 +12,28 @@ import (
 type AppProps struct{}
 
 func main() {
+	// Test ColorList contains all Color values
+	if len(gen.ColorList) != 3 {
+		panic(fmt.Sprintf("expected ColorList to have 3 elements, got %d", len(gen.ColorList)))
+	}
+	expectedColors := []gen.Color{gen.ColorRed, gen.ColorGreen, gen.ColorBlue}
+	for i, c := range gen.ColorList {
+		if c != expectedColors[i] {
+			panic(fmt.Sprintf("ColorList[%d]: expected %s, got %s", i, expectedColors[i], c))
+		}
+	}
+
+	// Test PriorityList contains all Priority values
+	if len(gen.PriorityList) != 2 {
+		panic(fmt.Sprintf("expected PriorityList to have 2 elements, got %d", len(gen.PriorityList)))
+	}
+	expectedPriorities := []gen.Priority{gen.PriorityLow, gen.PriorityHigh}
+	for i, p := range gen.PriorityList {
+		if p != expectedPriorities[i] {
+			panic(fmt.Sprintf("PriorityList[%d]: expected %d, got %d", i, expectedPriorities[i], p))
+		}
+	}
+
 	server := gen.NewServer[AppProps]()
 
 	server.RPCs.Service().Procs.Test().Handle(func(c *gen.ServiceTestHandlerContext[AppProps]) (gen.ServiceTestOutput, error) {

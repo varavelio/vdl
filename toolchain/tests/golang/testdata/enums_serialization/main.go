@@ -114,11 +114,9 @@ func testAllEnumValues(baseURL string) {
 	client := gen.NewClient(baseURL + "/rpc").Build()
 	ctx := context.Background()
 
-	colors := []gen.Color{gen.ColorRed, gen.ColorGreen, gen.ColorBlue}
-	statuses := []gen.Status{gen.StatusPending, gen.StatusActive, gen.StatusCompleted, gen.StatusCancelled}
-
-	for _, color := range colors {
-		for _, status := range statuses {
+	// Use the generated XXXList variables to iterate over all enum values
+	for _, color := range gen.ColorList {
+		for _, status := range gen.StatusList {
 			result, err := client.RPCs.Service().Procs.Echo().Execute(ctx, gen.ServiceEchoInput{
 				Color:  color,
 				Status: status,
@@ -221,15 +219,8 @@ func testExplicitValueAllMembers(baseURL string) {
 	client := gen.NewClient(baseURL + "/rpc").Build()
 	ctx := context.Background()
 
-	allStatuses := []gen.HttpStatus{
-		gen.HttpStatusOk,
-		gen.HttpStatusCreated,
-		gen.HttpStatusBadRequest,
-		gen.HttpStatusNotFound,
-		gen.HttpStatusInternalError,
-	}
-
-	for _, status := range allStatuses {
+	// Use the generated HttpStatusList to iterate over all enum values
+	for _, status := range gen.HttpStatusList {
 		result, err := client.RPCs.Service().Procs.EchoHttpStatus().Execute(ctx, gen.ServiceEchoHttpStatusInput{
 			Status: status,
 		})

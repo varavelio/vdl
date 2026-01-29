@@ -78,6 +78,34 @@ func main() {
 }
 
 func testIsValid() {
+	// Verify XXXList variables exist and contain correct values
+	if len(gen.ColorList) != 3 {
+		panic(fmt.Sprintf("expected ColorList to have 3 elements, got %d", len(gen.ColorList)))
+	}
+	if len(gen.PriorityList) != 3 {
+		panic(fmt.Sprintf("expected PriorityList to have 3 elements, got %d", len(gen.PriorityList)))
+	}
+	if len(gen.LogLevelList) != 5 {
+		panic(fmt.Sprintf("expected LogLevelList to have 5 elements, got %d", len(gen.LogLevelList)))
+	}
+
+	// Verify all values in XXXList are valid
+	for _, c := range gen.ColorList {
+		if !c.IsValid() {
+			panic(fmt.Sprintf("ColorList contains invalid value: %s", c))
+		}
+	}
+	for _, p := range gen.PriorityList {
+		if !p.IsValid() {
+			panic(fmt.Sprintf("PriorityList contains invalid value: %d", p))
+		}
+	}
+	for _, l := range gen.LogLevelList {
+		if !l.IsValid() {
+			panic(fmt.Sprintf("LogLevelList contains invalid value: %s", l))
+		}
+	}
+
 	// String enum - valid values
 	if !gen.ColorRed.IsValid() {
 		panic("ColorRed should be valid")
