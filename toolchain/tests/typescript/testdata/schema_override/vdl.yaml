@@ -1,0 +1,5 @@
+version: 1
+targets:
+  - typescript:
+      output: "./gen"
+      schema: "override.vdl"
