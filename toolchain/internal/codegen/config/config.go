@@ -26,6 +26,7 @@ type TargetConfig struct {
 	Go         *GoConfig         `yaml:"go,omitempty" json:"go,omitempty"`
 	TypeScript *TypeScriptConfig `yaml:"typescript,omitempty" json:"typescript,omitempty"`
 	Dart       *DartConfig       `yaml:"dart,omitempty" json:"dart,omitempty"`
+	Python     *PythonConfig     `yaml:"python,omitempty" json:"python,omitempty"`
 	JSONSchema *JSONSchemaConfig `yaml:"jsonschema,omitempty" json:"jsonschema,omitempty"`
 	OpenAPI    *OpenAPIConfig    `yaml:"openapi,omitempty" json:"openapi,omitempty"`
 	Playground *PlaygroundConfig `yaml:"playground,omitempty" json:"playground,omitempty"`
@@ -97,6 +98,13 @@ type TypeScriptConfig struct {
 
 // DartConfig contains configuration for the Dart target.
 type DartConfig struct {
+	CommonConfig   `yaml:",inline" json:",inline"`
+	PatternsConfig `yaml:",inline" json:",inline"`
+	ConstsConfig   `yaml:",inline" json:",inline"`
+}
+
+// PythonConfig contains configuration for the Python target.
+type PythonConfig struct {
 	CommonConfig   `yaml:",inline" json:",inline"`
 	PatternsConfig `yaml:",inline" json:",inline"`
 	ConstsConfig   `yaml:",inline" json:",inline"`
@@ -225,6 +233,10 @@ func (t *TargetConfig) validateAndSetDefaults(globalSchema string) error {
 	if t.Dart != nil {
 		count++
 		schema = &t.Dart.Schema
+	}
+	if t.Python != nil {
+		count++
+		schema = &t.Python.Schema
 	}
 	if t.JSONSchema != nil {
 		count++

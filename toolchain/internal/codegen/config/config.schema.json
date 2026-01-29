@@ -248,6 +248,39 @@
         "command"
       ]
     },
+    "PythonConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
     "TargetConfig": {
       "properties": {
         "go": {
@@ -258,6 +291,9 @@
         },
         "dart": {
           "$ref": "#/$defs/DartConfig"
+        },
+        "python": {
+          "$ref": "#/$defs/PythonConfig"
         },
         "jsonschema": {
           "$ref": "#/$defs/JSONSchemaConfig"
