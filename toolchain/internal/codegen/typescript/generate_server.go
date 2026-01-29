@@ -355,7 +355,14 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 				g.Break()
 				g.Line("const deserializer: DeserializerFunc = async (raw) => {")
 				g.Block(func() {
-					g.Line("return raw;") // TODO: Add validation
+					validateFnName := fmt.Sprintf("validate%sInput", proc.FullName())
+					g.Linef("const err = %s(raw);", validateFnName)
+					g.Line("if (err !== null) {")
+					g.Block(func() {
+						g.Line("throw new VdlError({ message: err, code: \"INVALID_INPUT\", category: \"ValidationError\" });")
+					})
+					g.Line("}")
+					g.Line("return raw;")
 				})
 				g.Line("};")
 				g.Break()
@@ -481,7 +488,14 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 				g.Break()
 				g.Line("const deserializer: DeserializerFunc = async (raw) => {")
 				g.Block(func() {
-					g.Line("return raw;") // TODO: Add validation
+					validateFnName := fmt.Sprintf("validate%sInput", stream.FullName())
+					g.Linef("const err = %s(raw);", validateFnName)
+					g.Line("if (err !== null) {")
+					g.Block(func() {
+						g.Line("throw new VdlError({ message: err, code: \"INVALID_INPUT\", category: \"ValidationError\" });")
+					})
+					g.Line("}")
+					g.Line("return raw;")
 				})
 				g.Line("};")
 				g.Break()

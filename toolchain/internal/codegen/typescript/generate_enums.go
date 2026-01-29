@@ -31,9 +31,8 @@ func generateEnums(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error
 // generateEnum generates TypeScript code for a single enum type.
 // It generates:
 // 1. A type definition (union of literal types)
-// 2. An object holding the values (as constant)
-// 3. An array of all values
-// 4. A type guard function
+// 2. An array of all values
+// 3. A type guard function
 func generateEnum(g *gen.Generator, enum ir.Enum) {
 	// Documentation
 	if enum.Doc != "" {
@@ -64,24 +63,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	}
 	g.Break()
 
-	// 2. Values object
-	// export const StatusValues = { Active: "active", Inactive: "inactive" } as const;
-	g.Linef("export const %sValues = {", enum.Name)
-	g.Block(func() {
-		for _, member := range enum.Members {
-			if enum.ValueType == ir.EnumValueTypeString {
-				g.Linef("%s: %q,", member.Name, member.Value)
-			} else {
-				// Integer value
-				intVal, _ := strconv.Atoi(member.Value)
-				g.Linef("%s: %d,", member.Name, intVal)
-			}
-		}
-	})
-	g.Line("} as const;")
-	g.Break()
-
-	// 3. List of values
+	// 2. List of values
 	// export const StatusList: Status[] = ["active", "inactive"];
 	g.Linef("export const %sList: %s[] = [", enum.Name, enum.Name)
 	g.Block(func() {
@@ -97,7 +79,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	g.Line("];")
 	g.Break()
 
-	// 4. Type guard
+	// 3. Type guard
 	// export function isStatus(value: unknown): value is Status { ... }
 	g.Linef("export function is%s(value: unknown): value is %s {", enum.Name, enum.Name)
 	g.Block(func() {

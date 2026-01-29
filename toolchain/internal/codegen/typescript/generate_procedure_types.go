@@ -37,6 +37,9 @@ func generateProcedureTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (stri
 			g.Line(renderHydrateType("", outputName, proc.Output))
 			g.Break()
 
+			g.Line(renderValidateType("", inputName, proc.Input))
+			g.Break()
+
 			g.Linef("// %s", responseDesc)
 			g.Linef("export type %s = Response<%s>", responseName, outputName)
 			g.Break()

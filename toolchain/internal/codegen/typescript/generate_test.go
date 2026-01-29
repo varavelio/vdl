@@ -120,15 +120,11 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	// String enum
 	assert.Contains(t, content, `export type OrderStatus = "pending" | "shipped" | "delivered";`)
-	assert.Contains(t, content, `OrderStatusValues`)
-	assert.Contains(t, content, `Pending: "pending"`)
 	assert.Contains(t, content, `OrderStatusList`)
 	assert.Contains(t, content, `function isOrderStatus(value: unknown): value is OrderStatus`)
 
 	// Int enum
 	assert.Contains(t, content, `export type Priority = 1 | 2 | 3;`)
-	assert.Contains(t, content, `PriorityValues`)
-	assert.Contains(t, content, `Low: 1`)
 	assert.Contains(t, content, `PriorityList`)
 }
 

@@ -332,3 +332,304 @@ func renderDeprecated(g *gen.Generator, deprecated *ir.Deprecation) {
 	g.Line(" *")
 	renderPartialMultilineComment(g, desc)
 }
+
+// =============================================================================
+// Validation Functions
+// =============================================================================
+
+// needsValidation returns true if a field type requires validation (has enums or nested types).
+func needsValidation(tr ir.TypeRef) bool {
+	switch tr.Kind {
+	case ir.TypeKindEnum:
+		return true
+	case ir.TypeKindType:
+		return true
+	case ir.TypeKindObject:
+		if tr.Object != nil {
+			for _, f := range tr.Object.Fields {
+				if needsValidation(f.Type) {
+					return true
+				}
+			}
+		}
+		return false
+	case ir.TypeKindArray:
+		if tr.ArrayItem != nil {
+			return needsValidation(*tr.ArrayItem)
+		}
+		return false
+	case ir.TypeKindMap:
+		if tr.MapValue != nil {
+			return needsValidation(*tr.MapValue)
+		}
+		return false
+	default:
+		return false
+	}
+}
+
+// fieldsNeedValidation returns true if any field in the list requires validation.
+func fieldsNeedValidation(fields []ir.Field) bool {
+	for _, field := range fields {
+		if needsValidation(field.Type) {
+			return true
+		}
+	}
+	return false
+}
+
+// renderValidateType renders a validation function for a type.
+// Returns empty string if no validation is needed.
+func renderValidateType(parentName string, name string, fields []ir.Field) string {
+	fullName := parentName + name
+
+	// Check if any field needs validation
+	if !fieldsNeedValidation(fields) {
+		// Generate a no-op validator that returns true
+		g := gen.New().WithSpaces(2)
+		g.Linef("export function validate%s(_input: unknown, _path = \"%s\"): string | null {", fullName, fullName)
+		g.Block(func() {
+			g.Line("return null;")
+		})
+		g.Line("}")
+		g.Break()
+		return g.String()
+	}
+
+	g := gen.New().WithSpaces(2)
+	g.Linef("export function validate%s(input: unknown, path = \"%s\"): string | null {", fullName, fullName)
+	g.Block(func() {
+		g.Line("if (input === null || input === undefined || typeof input !== \"object\") {")
+		g.Block(func() {
+			g.Line("return `${path}: expected object, got ${typeof input}`;")
+		})
+		g.Line("}")
+		g.Line("const obj = input as Record<string, unknown>;")
+		g.Break()
+
+		for _, field := range fields {
+			nameCamel := strutil.ToCamelCase(field.Name)
+
+			if !needsValidation(field.Type) {
+				continue
+			}
+
+			if field.Optional {
+				g.Linef("if (obj.%s !== undefined && obj.%s !== null) {", nameCamel, nameCamel)
+				g.Block(func() {
+					renderFieldValidation(g, fullName, field, "obj."+nameCamel, fmt.Sprintf("${path}.%s", nameCamel))
+				})
+				g.Line("}")
+			} else {
+				g.Linef("if (obj.%s === undefined || obj.%s === null) {", nameCamel, nameCamel)
+				g.Block(func() {
+					g.Linef("return `${path}.%s: required field is missing`;", nameCamel)
+				})
+				g.Line("}")
+				renderFieldValidation(g, fullName, field, "obj."+nameCamel, fmt.Sprintf("${path}.%s", nameCamel))
+			}
+		}
+
+		g.Line("return null;")
+	})
+	g.Line("}")
+	g.Break()
+
+	// Render children inline types validation functions
+	for _, field := range fields {
+		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
+			childName := fullName + strutil.ToPascalCase(field.Name)
+			g.Line(renderValidateType("", childName, field.Type.Object.Fields))
+		}
+	}
+
+	return g.String()
+}
+
+// renderFieldValidation generates validation code for a single field.
+func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Field, accessor string, pathExpr string) {
+	switch field.Type.Kind {
+	case ir.TypeKindEnum:
+		enumName := field.Type.Enum
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("if (!is%s(%s)) {", enumName, accessor)
+			g.Block(func() {
+				g.Linef("return `%s: invalid enum value '${%s}' for %s`;", pathExpr, accessor, enumName)
+			})
+			g.Line("}")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindType:
+		typeName := strutil.ToPascalCase(field.Type.Type)
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("const err = validate%s(%s, `%s`);", typeName, accessor, pathExpr)
+			g.Line("if (err !== null) return err;")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindObject:
+		fieldPascal := strutil.ToPascalCase(field.Name)
+		inlineTypeName := parentTypeName + fieldPascal
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("const err = validate%s(%s, `%s`);", inlineTypeName, accessor, pathExpr)
+			g.Line("if (err !== null) return err;")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindArray:
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("if (!Array.isArray(%s)) {", accessor)
+			g.Block(func() {
+				g.Linef("return `%s: expected array, got ${typeof %s}`;", pathExpr, accessor)
+			})
+			g.Line("}")
+			g.Linef("for (let i = 0; i < %s.length; i++) {", accessor)
+			g.Block(func() {
+				renderArrayItemValidation(g, parentTypeName, field.Name, *field.Type.ArrayItem, accessor+"[i]", pathExpr+"[${i}]")
+			})
+			g.Line("}")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindMap:
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("if (typeof %s !== \"object\" || %s === null) {", accessor, accessor)
+			g.Block(func() {
+				g.Linef("return `%s: expected object, got ${typeof %s}`;", pathExpr, accessor)
+			})
+			g.Line("}")
+			g.Linef("for (const [k, v] of Object.entries(%s)) {", accessor)
+			g.Block(func() {
+				renderMapValueValidation(g, parentTypeName, field.Name, *field.Type.MapValue, "v", pathExpr+"[${k}]")
+			})
+			g.Line("}")
+		})
+		g.Linef("}")
+	}
+}
+
+// renderArrayItemValidation generates validation code for array items.
+func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName string, tr ir.TypeRef, accessor, pathExpr string) {
+	switch tr.Kind {
+	case ir.TypeKindEnum:
+		enumName := tr.Enum
+		g.Linef("if (!is%s(%s)) {", enumName, accessor)
+		g.Block(func() {
+			g.Linef("return `%s: invalid enum value '${%s}' for %s`;", pathExpr, accessor, enumName)
+		})
+		g.Line("}")
+
+	case ir.TypeKindType:
+		typeName := strutil.ToPascalCase(tr.Type)
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("const err = validate%s(%s, `%s`);", typeName, accessor, pathExpr)
+			g.Line("if (err !== null) return err;")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindObject:
+		fieldPascal := strutil.ToPascalCase(fieldName)
+		inlineTypeName := parentTypeName + fieldPascal
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("const err = validate%s(%s, `%s`);", inlineTypeName, accessor, pathExpr)
+			g.Line("if (err !== null) return err;")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindArray:
+		if tr.ArrayItem != nil {
+			g.Linef("if (!Array.isArray(%s)) {", accessor)
+			g.Block(func() {
+				g.Linef("return `%s: expected array, got ${typeof %s}`;", pathExpr, accessor)
+			})
+			g.Line("}")
+			g.Linef("for (let j = 0; j < %s.length; j++) {", accessor)
+			g.Block(func() {
+				renderArrayItemValidation(g, parentTypeName, fieldName, *tr.ArrayItem, accessor+"[j]", pathExpr+"[${j}]")
+			})
+			g.Line("}")
+		}
+
+	case ir.TypeKindMap:
+		if tr.MapValue != nil {
+			g.Linef("if (typeof %s !== \"object\" || %s === null) {", accessor, accessor)
+			g.Block(func() {
+				g.Linef("return `%s: expected object, got ${typeof %s}`;", pathExpr, accessor)
+			})
+			g.Line("}")
+			g.Linef("for (const [mk, mv] of Object.entries(%s)) {", accessor)
+			g.Block(func() {
+				renderMapValueValidation(g, parentTypeName, fieldName, *tr.MapValue, "mv", pathExpr+"[${mk}]")
+			})
+			g.Line("}")
+		}
+	}
+}
+
+// renderMapValueValidation generates validation code for map values.
+func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string, tr ir.TypeRef, accessor, pathExpr string) {
+	switch tr.Kind {
+	case ir.TypeKindEnum:
+		enumName := tr.Enum
+		g.Linef("if (!is%s(%s)) {", enumName, accessor)
+		g.Block(func() {
+			g.Linef("return `%s: invalid enum value '${%s}' for %s`;", pathExpr, accessor, enumName)
+		})
+		g.Line("}")
+
+	case ir.TypeKindType:
+		typeName := strutil.ToPascalCase(tr.Type)
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("const err = validate%s(%s, `%s`);", typeName, accessor, pathExpr)
+			g.Line("if (err !== null) return err;")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindObject:
+		fieldPascal := strutil.ToPascalCase(fieldName)
+		inlineTypeName := parentTypeName + fieldPascal
+		g.Linef("{")
+		g.Block(func() {
+			g.Linef("const err = validate%s(%s, `%s`);", inlineTypeName, accessor, pathExpr)
+			g.Line("if (err !== null) return err;")
+		})
+		g.Linef("}")
+
+	case ir.TypeKindArray:
+		if tr.ArrayItem != nil {
+			g.Linef("if (!Array.isArray(%s)) {", accessor)
+			g.Block(func() {
+				g.Linef("return `%s: expected array, got ${typeof %s}`;", pathExpr, accessor)
+			})
+			g.Line("}")
+			g.Linef("for (let mi = 0; mi < %s.length; mi++) {", accessor)
+			g.Block(func() {
+				renderArrayItemValidation(g, parentTypeName, fieldName, *tr.ArrayItem, accessor+"[mi]", pathExpr+"[${mi}]")
+			})
+			g.Line("}")
+		}
+
+	case ir.TypeKindMap:
+		if tr.MapValue != nil {
+			g.Linef("if (typeof %s !== \"object\" || %s === null) {", accessor, accessor)
+			g.Block(func() {
+				g.Linef("return `%s: expected object, got ${typeof %s}`;", pathExpr, accessor)
+			})
+			g.Line("}")
+			g.Linef("for (const [nk, nv] of Object.entries(%s)) {", accessor)
+			g.Block(func() {
+				renderMapValueValidation(g, parentTypeName, fieldName, *tr.MapValue, "nv", pathExpr+"[${nk}]")
+			})
+			g.Line("}")
+		}
+	}
+}

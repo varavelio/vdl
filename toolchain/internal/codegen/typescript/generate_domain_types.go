@@ -41,6 +41,9 @@ func generateDomainTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string,
 
 		g.Line(renderHydrateType("", typeNode.Name, typeNode.Fields))
 		g.Break()
+
+		g.Line(renderValidateType("", typeNode.Name, typeNode.Fields))
+		g.Break()
 	}
 
 	return g.String(), nil

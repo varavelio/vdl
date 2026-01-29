@@ -33,32 +33,38 @@ func formatExport(path string, cfg *config.TypeScriptConfig) string {
 func collectAllTypeNames(schema *ir.Schema) []string {
 	names := make(map[string]bool)
 
-	// Domain Types
+	// Domain Types (with hydrate and validate)
 	for _, t := range schema.Types {
 		names[t.Name] = true
+		names["hydrate"+t.Name] = true
+		names["validate"+t.Name] = true
 	}
 
-	// Enums
+	// Enums (with isFn and list)
 	for _, e := range schema.Enums {
 		names[e.Name] = true
+		names["is"+e.Name] = true
+		names[e.Name+"List"] = true
 	}
 
-	// Procedure Types (Input, Output, Response, Hydrate)
+	// Procedure Types (Input, Output, Response, Hydrate, Validate)
 	for _, proc := range schema.Procedures {
 		fullName := proc.FullName()
 		names[fullName+"Input"] = true
 		names[fullName+"Output"] = true
 		names[fullName+"Response"] = true
 		names["hydrate"+fullName+"Output"] = true
+		names["validate"+fullName+"Input"] = true
 	}
 
-	// Stream Types (Input, Output, Response, Hydrate)
+	// Stream Types (Input, Output, Response, Hydrate, Validate)
 	for _, stream := range schema.Streams {
 		fullName := stream.FullName()
 		names[fullName+"Input"] = true
 		names[fullName+"Output"] = true
 		names[fullName+"Response"] = true
 		names["hydrate"+fullName+"Output"] = true
+		names["validate"+fullName+"Input"] = true
 	}
 
 	// Convert map to slice

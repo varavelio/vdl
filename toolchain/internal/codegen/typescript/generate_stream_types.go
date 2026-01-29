@@ -37,6 +37,9 @@ func generateStreamTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string,
 			g.Line(renderHydrateType("", outputName, stream.Output))
 			g.Break()
 
+			g.Line(renderValidateType("", inputName, stream.Input))
+			g.Break()
+
 			g.Linef("// %s", responseDesc)
 			g.Linef("export type %s = Response<%s>", responseName, outputName)
 			g.Break()
