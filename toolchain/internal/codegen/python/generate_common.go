@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 var reservedWords = map[string]bool{
@@ -22,10 +23,13 @@ func sanitizeIdentifier(name string) string {
 	if reservedWords[name] {
 		return name + "_"
 	}
+	if name == "id" {
+		return "id_"
+	}
 	return name
 }
 
-func toPythonType(t ir.TypeRef) string {
+func toPythonType(parentName, fieldName string, t ir.TypeRef) string {
 	switch t.Kind {
 	case ir.TypeKindPrimitive:
 		switch t.Primitive {
@@ -41,15 +45,33 @@ func toPythonType(t ir.TypeRef) string {
 			return "datetime.datetime"
 		}
 	case ir.TypeKindArray:
-		return fmt.Sprintf("List[%s]", toPythonType(*t.ArrayItem))
+		itemType := toPythonType(parentName, fieldName, *t.ArrayItem)
+		result := itemType
+		for i := 0; i < t.ArrayDimensions; i++ {
+			result = fmt.Sprintf("List[%s]", result)
+		}
+		return result
 	case ir.TypeKindMap:
-		return fmt.Sprintf("Dict[str, %s]", toPythonType(*t.MapValue))
+		return fmt.Sprintf("Dict[str, %s]", toPythonType(parentName, fieldName, *t.MapValue))
 	case ir.TypeKindType:
 		return t.Type
 	case ir.TypeKindEnum:
 		return t.Enum
 	case ir.TypeKindObject:
-		return "Dict[str, Any]" // Inline objects are not fully supported as named types yet, usually mapped to Dict or Any
+		inlineName := parentName + strutil.ToPascalCase(fieldName)
+		return inlineName
 	}
 	return "Any"
+}
+
+func needsDictCheck(t ir.TypeRef) bool {
+	switch t.Kind {
+	case ir.TypeKindType, ir.TypeKindObject:
+		return true
+	}
+	return false
+}
+
+func needsListCheck(t ir.TypeRef) bool {
+	return t.Kind == ir.TypeKindArray
 }

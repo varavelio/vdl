@@ -26,8 +26,12 @@ func generateStreamTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, e
 
 		g.Raw(GenerateDataclass(inputName, inputDesc, stream.Input))
 		g.Break()
+		g.Raw(renderInlineTypes(inputName, stream.Input))
+		g.Break()
 
 		g.Raw(GenerateDataclass(outputName, outputDesc, stream.Output))
+		g.Break()
+		g.Raw(renderInlineTypes(outputName, stream.Output))
 		g.Break()
 	}
 

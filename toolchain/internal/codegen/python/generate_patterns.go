@@ -20,10 +20,15 @@ func generatePatterns(schema *ir.Schema, cfg *config.PythonConfig) (string, erro
 			g.Linef("# %s", strings.ReplaceAll(p.Doc, "\n", "\n# "))
 		}
 		funcName := strutil.ToSnakeCase(p.Name)
+		seen := make(map[string]bool)
 		var args []string
 		for _, ph := range p.Placeholders {
 			argName := strutil.ToSnakeCase(ph)
 			argName = sanitizeIdentifier(argName)
+			if seen[argName] {
+				continue
+			}
+			seen[argName] = true
 			args = append(args, fmt.Sprintf("%s: Any", argName))
 		}
 

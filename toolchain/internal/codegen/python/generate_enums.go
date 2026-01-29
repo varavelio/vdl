@@ -33,6 +33,22 @@ func generateEnums(schema *ir.Schema, cfg *config.PythonConfig) (string, error) 
 			g.Linef("    %s = %s", memberName, val)
 		}
 		g.Break()
+		if e.ValueType == ir.EnumValueTypeString {
+			g.Line("    @classmethod")
+			g.Linef("    def from_value(cls, value: str) -> %s | None:", className)
+			g.Line("        try:")
+			g.Line("            return cls(value)")
+			g.Line("        except Exception:")
+			g.Line("            return None")
+		} else {
+			g.Line("    @classmethod")
+			g.Linef("    def from_value(cls, value: int) -> %s | None:", className)
+			g.Line("        try:")
+			g.Line("            return cls(value)")
+			g.Line("        except Exception:")
+			g.Line("            return None")
+		}
+		g.Break()
 	}
 
 	return g.String(), nil

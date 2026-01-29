@@ -26,8 +26,12 @@ func generateProcedureTypes(schema *ir.Schema, cfg *config.PythonConfig) (string
 
 		g.Raw(GenerateDataclass(inputName, inputDesc, proc.Input))
 		g.Break()
+		g.Raw(renderInlineTypes(inputName, proc.Input))
+		g.Break()
 
 		g.Raw(GenerateDataclass(outputName, outputDesc, proc.Output))
+		g.Break()
+		g.Raw(renderInlineTypes(outputName, proc.Output))
 		g.Break()
 
 		// Response Type Alias

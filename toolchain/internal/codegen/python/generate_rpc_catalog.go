@@ -10,6 +10,7 @@ import (
 func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
 	g := gen.New()
 	g.Line("from dataclasses import dataclass")
+	g.Line("from enum import Enum")
 	g.Line("from typing import Any, List, Type")
 	g.Break()
 
@@ -17,42 +18,52 @@ func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, er
 	g.Line("from .types import *")
 	g.Break()
 
+	g.Line("class OperationType(Enum):")
+	g.Line("    PROC = 'proc'")
+	g.Line("    STREAM = 'stream'")
+	g.Break()
+
 	g.Line("@dataclass")
 	g.Line("class OperationDefinition:")
+	g.Line("    rpc_name: str")
 	g.Line("    name: str")
-	g.Line("    path: str")
-	g.Line("    input_type: Type[Any]")
-	g.Line("    output_type: Type[Any]")
-	g.Line("    doc: str")
-	g.Line("    is_stream: bool")
+	g.Line("    type: OperationType")
+	g.Break()
+	g.Line("    @property")
+	g.Line("    def path(self) -> str:")
+	g.Line("        return f'/{self.rpc_name}/{self.name}'")
 	g.Break()
 
 	// VDLPaths
 	g.Line("class VDLPaths:")
-	if len(schema.Procedures) == 0 && len(schema.Streams) == 0 {
+	if len(schema.RPCs) == 0 {
 		g.Line("    pass")
 	}
-	for _, proc := range schema.Procedures {
-		pathName := strutil.ToPascalCase(proc.RPCName) + "_" + strutil.ToPascalCase(proc.Name)
-		g.Linef("    %s = %q", pathName, proc.Path())
+	for _, rpc := range schema.RPCs {
+		g.Linef("    class %s:", strutil.ToSnakeCase(rpc.Name))
+		for _, proc := range rpc.Procs {
+			g.Linef("        %s = %q", strutil.ToSnakeCase(proc.Name), "/"+proc.Path())
+		}
+		for _, stream := range rpc.Streams {
+			g.Linef("        %s = %q", strutil.ToSnakeCase(stream.Name), "/"+stream.Path())
+		}
+		g.Break()
 	}
-	for _, stream := range schema.Streams {
-		pathName := strutil.ToPascalCase(stream.RPCName) + "_" + strutil.ToPascalCase(stream.Name)
-		g.Linef("    %s = %q", pathName, stream.Path())
+	if len(schema.RPCs) > 0 {
+		for _, rpc := range schema.RPCs {
+			rpcName := strutil.ToSnakeCase(rpc.Name)
+			g.Linef("    %s = %s()", rpcName, rpcName)
+		}
 	}
 	g.Break()
 
 	// VDL_PROCEDURES
 	g.Line("VDL_PROCEDURES: List[OperationDefinition] = [")
 	for _, proc := range schema.Procedures {
-		fullName := proc.FullName()
 		g.Line("    OperationDefinition(")
-		g.Linef("        name=%q,", fullName)
-		g.Linef("        path=VDLPaths.%s_%s,", strutil.ToPascalCase(proc.RPCName), strutil.ToPascalCase(proc.Name))
-		g.Linef("        input_type=%sInput,", fullName)
-		g.Linef("        output_type=%sOutput,", fullName)
-		g.Linef("        doc=%q,", proc.Doc)
-		g.Line("        is_stream=False,")
+		g.Linef("        rpc_name=%q,", proc.RPCName)
+		g.Linef("        name=%q,", proc.Name)
+		g.Line("        type=OperationType.PROC,")
 		g.Line("    ),")
 	}
 	g.Line("]")
@@ -61,14 +72,10 @@ func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, er
 	// VDL_STREAMS
 	g.Line("VDL_STREAMS: List[OperationDefinition] = [")
 	for _, stream := range schema.Streams {
-		fullName := stream.FullName()
 		g.Line("    OperationDefinition(")
-		g.Linef("        name=%q,", fullName)
-		g.Linef("        path=VDLPaths.%s_%s,", strutil.ToPascalCase(stream.RPCName), strutil.ToPascalCase(stream.Name))
-		g.Linef("        input_type=%sInput,", fullName)
-		g.Linef("        output_type=%sOutput,", fullName)
-		g.Linef("        doc=%q,", stream.Doc)
-		g.Line("        is_stream=True,")
+		g.Linef("        rpc_name=%q,", stream.RPCName)
+		g.Linef("        name=%q,", stream.Name)
+		g.Line("        type=OperationType.STREAM,")
 		g.Line("    ),")
 	}
 	g.Line("]")
