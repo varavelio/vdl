@@ -1,0 +1,5 @@
+version: 1
+targets:
+  - dart:
+      output: "./gen"
+      schema: "override.vdl"
