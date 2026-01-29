@@ -17,6 +17,8 @@ var (
 	vdlBinaryPath string
 	toolchainRoot string
 	tsTestsRoot   string
+	tscPath       string
+	tsxPath       string
 )
 
 func TestMain(m *testing.M) {
@@ -25,6 +27,14 @@ func TestMain(m *testing.M) {
 	tsTestsRoot = filepath.Dir(filename)
 	toolchainRoot = filepath.Join(tsTestsRoot, "..", "..")
 	toolchainRoot, _ = filepath.Abs(toolchainRoot)
+
+	tscPath = filepath.Join(tsTestsRoot, "node_modules", ".bin", "tsc")
+	tsxPath = filepath.Join(tsTestsRoot, "node_modules", ".bin", "tsx")
+
+	if runtime.GOOS == "windows" {
+		tscPath += ".cmd"
+		tsxPath += ".cmd"
+	}
 
 	// Build VDL Binary
 	if err := buildVDLBinary(); err != nil {
@@ -60,6 +70,11 @@ func buildVDLBinary() error {
 }
 
 func installNPMDeps() error {
+	nodeModulesPath := filepath.Join(tsTestsRoot, "node_modules")
+	if _, err := os.Stat(nodeModulesPath); err == nil {
+		return nil
+	}
+
 	cmd := exec.Command("npm", "install")
 	cmd.Dir = tsTestsRoot
 	cmd.Stdout = os.Stdout
@@ -104,7 +119,9 @@ func runTestCase(t *testing.T, caseDir string) {
 	ctxTsc, cancelTsc := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancelTsc()
 
-	tscCmd := "npx tsc ./*.ts ./gen/*.ts --noEmit --moduleResolution node --target es2022 --skipLibCheck --allowImportingTsExtensions"
+	// Use the absolute path to tsc to avoid npx overhead
+	// We quote tscPath in case it contains spaces
+	tscCmd := fmt.Sprintf("'%s' ./*.ts ./gen/*.ts --noEmit --moduleResolution node --target es2022 --skipLibCheck --allowImportingTsExtensions", tscPath)
 	cmdTsc := exec.CommandContext(ctxTsc, "sh", "-c", tscCmd)
 	cmdTsc.Dir = caseDir
 	outTsc, err := cmdTsc.CombinedOutput()
@@ -116,7 +133,7 @@ func runTestCase(t *testing.T, caseDir string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	cmdRun := exec.CommandContext(ctx, "npx", "tsx", "main.ts")
+	cmdRun := exec.CommandContext(ctx, tsxPath, "main.ts")
 	cmdRun.Dir = caseDir
 	outRun, err := cmdRun.CombinedOutput()
 	if err != nil {
