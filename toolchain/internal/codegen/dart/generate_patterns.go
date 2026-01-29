@@ -46,13 +46,22 @@ func renderDartPattern(g *gen.Generator, pattern ir.Pattern) {
 		renderMultilineCommentDart(g, fmt.Sprintf("Template: `%s`", pattern.Template))
 	}
 	if pattern.Deprecated != nil {
+		renderMultilineCommentDart(g, "")
 		renderDeprecatedDart(g, pattern.Deprecated)
 	}
 
 	// Generate function signature with parameters
-	params := make([]string, len(pattern.Placeholders))
-	for i, placeholder := range pattern.Placeholders {
-		params[i] = fmt.Sprintf("String %s", placeholder)
+	// Deduplicate placeholders while preserving order
+	seen := make(map[string]bool)
+	var params []string
+	var uniquePlaceholders []string
+
+	for _, placeholder := range pattern.Placeholders {
+		if !seen[placeholder] {
+			seen[placeholder] = true
+			uniquePlaceholders = append(uniquePlaceholders, placeholder)
+			params = append(params, fmt.Sprintf("String %s", placeholder))
+		}
 	}
 
 	g.Linef("String %s(%s) {", pattern.Name, strings.Join(params, ", "))
