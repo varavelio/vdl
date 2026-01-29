@@ -1,0 +1,163 @@
+// Test case: EXTREME NESTING
+// The most edge-case scenario possible for nested structures
+// Tests: arrays of arrays of inline objects of maps with all primitives,
+// optional fields at every level, maps of maps, inline objects 5 levels deep
+
+// All primitives in one type for reference
+type AllPrimitives {
+  s: string
+  i: int
+  f: float
+  b: bool
+  d: datetime
+}
+
+// The nightmare type - absolute maximum complexity
+type Nightmare {
+  // 4D array of inline objects containing maps of arrays
+  hyperCube: {
+    coords: int[]
+    data: map<{
+      values: float[]
+      flags: bool[]
+    }>
+  }[][][][]
+
+  // Map of map of map with inline object containing optional datetime array
+  tripleNestedMap: map<map<map<{
+    timestamps?: datetime[]
+    active: bool
+  }>>>
+
+  // Array of maps of arrays of inline objects with all primitives
+  chaosArray: map<{
+    str: string
+    number: int
+    dec: float
+    flag: bool
+    time: datetime
+    nested?: {
+      deep: string
+      deeper?: {
+        deepest: int
+      }
+    }
+  }[]>[]
+
+  // Optional array of optional-field inline objects inside map
+  optionalMadness?: map<{
+    required: string
+    opt1?: int
+    opt2?: float
+    opt3?: bool
+    opt4?: datetime
+    optNested?: {
+      also?: string
+    }
+  }[]>
+
+  // Inline object 5 levels deep
+  abyss: {
+    level1: {
+      level2: {
+        level3: {
+          level4: {
+            level5: {
+              bottom: string
+              allTypes: AllPrimitives
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Matrix of maps of inline with arrays
+  matrixOfMapsOfArrays: map<{
+    items: {
+      id: int
+      tags: string[]
+    }[]
+  }>[][]
+
+  // Map containing every primitive as optional
+  primitiveMap: map<{
+    s?: string
+    i?: int
+    f?: float
+    b?: bool
+    d?: datetime
+  }>
+}
+
+// Simpler but still complex - for easier debugging
+type MediumComplex {
+  // 2D array of inline objects
+  grid: {
+    x: int
+    y: int
+    data: map<string>
+  }[][]
+
+  // Map of arrays of all primitives inline
+  catalog: map<{
+    name: string
+    count: int
+    price: float
+    available: bool
+    lastUpdate: datetime
+  }[]>
+
+  // Nested optional inline
+  config?: {
+    inner?: {
+      value: string
+    }
+  }
+}
+
+rpc Service {
+  proc EchoNightmare {
+    input {
+      data: Nightmare
+    }
+
+    output {
+      data: Nightmare
+    }
+  }
+
+  proc EchoMedium {
+    input {
+      data: MediumComplex
+    }
+
+    output {
+      data: MediumComplex
+    }
+  }
+
+  // Inline chaos directly in proc
+  proc InlineChaos {
+    input {
+      // Inline object with map of arrays of inline
+      wrapper: {
+        items: map<{
+          sub: {
+            values: int[][]
+          }
+        }[]>
+      }
+    }
+
+    output {
+      wrapper: {
+        items: map<{
+          sub: {
+            values: int[][]
+          }
+        }[]>
+      }
+    }
+  }
+}
