@@ -99,6 +99,15 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		Content:      []byte(indexContent),
 	})
 
+	// Pseudo format generated files
+	for i := range files {
+		content := string(files[i].Content)
+		content = strings.TrimSpace(content)
+		content = strutil.LimitConsecutiveNewlines(content, 2)
+		content += "\n"
+		files[i].Content = []byte(content)
+	}
+
 	return files, nil
 }
 
