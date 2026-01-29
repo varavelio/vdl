@@ -368,6 +368,21 @@ func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 			g.Line(" */")
 			g.Linef("async execute(input: %s): Promise<%s> {", inputType, outputType)
 			g.Block(func() {
+				// Add client-side input validation
+				validateFuncName := fmt.Sprintf("validate%s", inputType)
+				g.Linef("const validationError = %s(input);", validateFuncName)
+				g.Line("if (validationError !== null) {")
+				g.Block(func() {
+					g.Line("throw new VdlError({")
+					g.Block(func() {
+						g.Line("message: validationError,")
+						g.Line("code: \"INVALID_INPUT\",")
+					})
+					g.Line("});")
+				})
+				g.Line("}")
+				g.Break()
+
 				g.Line("const headerProvider: HeaderProvider = (h) => { Object.assign(h, this.headers); };")
 				g.Line("const rawResponse = await this.intClient.callProc(")
 				g.Block(func() {
@@ -698,6 +713,21 @@ func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 			})
 			g.Line("} {")
 			g.Block(func() {
+				// Add client-side input validation
+				validateFuncName := fmt.Sprintf("validate%s", inputType)
+				g.Linef("const validationError = %s(input);", validateFuncName)
+				g.Line("if (validationError !== null) {")
+				g.Block(func() {
+					g.Line("throw new VdlError({")
+					g.Block(func() {
+						g.Line("message: validationError,")
+						g.Line("code: \"INVALID_INPUT\",")
+					})
+					g.Line("});")
+				})
+				g.Line("}")
+				g.Break()
+
 				g.Line("const headerProvider: HeaderProvider = (h) => { Object.assign(h, this.headers); };")
 				g.Line("const { stream, cancel } = this.intClient.callStream(")
 				g.Block(func() {
