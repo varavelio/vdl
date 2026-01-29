@@ -61,11 +61,13 @@ When updating this document, do so with the context of the entire document in mi
     - `util/`: Shared Utilities (strings, paths, debug).
   - `tests/`: End-to-End (E2E) test suite, organized by target language/format.
     - `golang/`: E2E tests for Go code generation (verifies client/server behavior via `go run`).
+    - `typescript/`: E2E tests for TypeScript code generation (verifies client/server behavior via `tsx`).
+    - `dart/`: E2E tests for Dart code generation (verifies client/server behavior via `dart run`).
     - `jsonschema/`: E2E tests for JSON Schema generation (verifies output against expected JSON).
     - `openapi/`: E2E tests for OpenAPI generation (verifies output against expected YAML/JSON).
     - `playground/`: E2E tests for Playground assets generation.
     - `plugin/`: E2E tests for the Plugin system (verifies Python plugin integration).
-    - `dart/`, `typescript/`, `python/`: Structure present for future language support.
+    - `python/`: Structure present for future language support.
     - Each test case in `testdata` contains a schema, config, and verification assets (consumer program or expected output).
   - `dist/`: Build artifacts (e.g., `vdl.wasm`).
 - **Integration**: Compiles to `dist/vdl.wasm` which is copied to the playground.
@@ -95,7 +97,7 @@ When updating this document, do so with the context of the entire document in mi
   - **Mechanism**: The runner builds a temporary `vdl` binary from the current source, then for each case in `testdata/`:
     1.  Runs `vdl generate` in the test case folder.
     2.  **Verification**:
-        - For **Go**: Executes `go run .`. The consumer code must **panic** or exit with non-zero status on failure.
+        - For **Go/TS/Dart**: Executes the consumer program (`main.go`, `main.ts`, `main.dart`). The consumer code must **panic** or exit with non-zero status on failure.
         - For **Schemas/Docs** (JSONSchema, OpenAPI): Compares the generated output against a "golden" expected file.
         - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
 - **Frontend Tests**: Component/Logic tests using `vitest`.
@@ -107,7 +109,7 @@ When updating this document, do so with the context of the entire document in mi
 3.  Add the required files:
     - `vdl.yaml`: Configuration for generation.
     - `schema.vdl`: The schema to test.
-    - **For Code Gen**: `main.go` (or equivalent) to import and verify generated code.
+    - **For Code Gen**: `main.go`, `main.ts`, or `main.dart` (or equivalent) to import and verify generated code.
     - **For Schemas**: `expected.json` or `expected.yaml` to match against.
 
 ### Commands
