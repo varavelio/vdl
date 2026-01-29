@@ -1,0 +1,15 @@
+// Test schema for malformed JSON handling
+
+type RequiredFields {
+  name: string
+  age: int
+  active: bool
+}
+
+type NestedRequired {
+  child: RequiredFields
+}
+
+type WithList {
+  items: string[]
+}
