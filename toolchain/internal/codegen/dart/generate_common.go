@@ -191,6 +191,25 @@ func buildMapFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAcces
 // JSON Serialization Expressions
 // =============================================================================
 
+// buildNestedArrayToJson builds nested array serialization for multi-dimensional arrays.
+func buildNestedArrayToJson(itemType ir.TypeRef, remainingDims int, varName string) string {
+	if remainingDims == 1 {
+		// Base case: innermost dimension
+		itemExpr := buildItemToJsonExpr(itemType, "e")
+		if itemExpr == "e" {
+			return varName
+		}
+		return fmt.Sprintf("%s.map((e) => %s).toList()", varName, itemExpr)
+	}
+
+	// Recursive case: more dimensions to process
+	innerExpr := buildNestedArrayToJson(itemType, remainingDims-1, "inner")
+	if innerExpr == "inner" {
+		return varName
+	}
+	return fmt.Sprintf("%s.map((inner) => %s).toList()", varName, innerExpr)
+}
+
 // dartToJsonExpr returns the Dart expression to serialise a field to JSON.
 func dartToJsonExpr(field ir.Field, varName string) string {
 	return buildToJsonExpr(field.Type, varName)
@@ -213,6 +232,10 @@ func buildToJsonExpr(tr ir.TypeRef, varName string) string {
 		return fmt.Sprintf("%s.toJson()", varName)
 
 	case ir.TypeKindArray:
+		// For multi-dimensional arrays, we need nested maps
+		if tr.ArrayDimensions > 1 {
+			return buildNestedArrayToJson(*tr.ArrayItem, tr.ArrayDimensions, varName)
+		}
 		itemExpr := buildItemToJsonExpr(*tr.ArrayItem, "e")
 		if itemExpr == "e" {
 			return varName
