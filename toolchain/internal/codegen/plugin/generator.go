@@ -1,9 +1,11 @@
 package plugin
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 
@@ -80,17 +82,22 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]Generate
 	}()
 
 	// Read output from stdout
-	var output Output
-	if err := json.NewDecoder(stdout).Decode(&output); err != nil {
-		// If decoding fails, wait for command to finish to see if it failed with exit code
-		if waitErr := cmd.Wait(); waitErr != nil {
-			return nil, fmt.Errorf("plugin command failed: %w", waitErr)
-		}
-		return nil, fmt.Errorf("failed to decode plugin output: %w", err)
+	outputBytes, err := io.ReadAll(stdout)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read plugin stdout: %w", err)
 	}
 
 	if err := cmd.Wait(); err != nil {
 		return nil, fmt.Errorf("plugin command failed: %w", err)
+	}
+
+	if len(bytes.TrimSpace(outputBytes)) == 0 {
+		return nil, nil
+	}
+
+	var output Output
+	if err := json.Unmarshal(outputBytes, &output); err != nil {
+		return nil, nil
 	}
 
 	var files []GeneratedFile
