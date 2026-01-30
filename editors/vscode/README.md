@@ -65,6 +65,6 @@ The following snippets are available for `.vdl` files:
 
 Below are release notes for the last 10 versions, you can also see the entire [changelog](./CHANGELOG.md).
 
-### 0.1.0
+### v0.1.0 - 2026-01-29
 
 Initial release of VDL for VSCode (formerly UFO RPC).
