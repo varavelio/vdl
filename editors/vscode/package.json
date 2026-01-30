@@ -42,8 +42,8 @@
         ],
         "configuration": "./language/vdl.lang-config.json",
         "icon": {
-          "dark": "./assets/icon.png",
-          "light": "./assets/icon.png"
+          "dark": "./assets/file.png",
+          "light": "./assets/file.png"
         }
       }
     ],
