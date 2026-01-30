@@ -9,7 +9,7 @@
    viewBox="0 0 384 511.99999"
    sodipodi:docname="vdl-file-inkscape.svg"
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
-   inkscape:export-filename="vdl-file.svg"
+   inkscape:export-filename="/home/eduardo/Downloads/vdl-file.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -29,8 +29,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="true"
      inkscape:zoom="1"
-     inkscape:cx="-134"
-     inkscape:cy="150"
+     inkscape:cx="77"
+     inkscape:cy="211"
      inkscape:window-width="2560"
      inkscape:window-height="1011"
      inkscape:window-x="0"
@@ -57,17 +57,17 @@
      id="rect11"
      style="fill:#2962ff;stroke-width:8.35107"
      inkscape:label="Background"
-     d="m 23.142,0.05423441 c 93.55343,0.28884369 170.22798,-0.43718294 263.78058,0.0883933 L 384.25,97.43075 l -0.5,391.23148 c -0.0166,12.95916 -10.43283,23.39201 -23.392,23.39201 H 23.142 c -12.959168,0 -23.392,-10.43284 -23.392,-23.39201 V 23.446235 C -0.25,10.487067 10.182832,0.05423441 23.142,0.05423441 Z"
+     d="M 23.267,0.05423441 222.52408,0.01004519 383.99242,161.54081 383.875,488.66223 c -0.005,12.95917 -10.43283,23.39201 -23.392,23.39201 H 23.267 c -12.959168,0 -23.392,-10.43284 -23.392,-23.39201 V 23.446235 c 0,-12.959168 10.432832,-23.38912664 23.392,-23.39200059 z"
      sodipodi:nodetypes="sccssssss" />
   <path
-     style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.918462"
-     d="M 65.711539,242.00384 H 42.75 v -64.29231 h 133.17693 v 64.29231 h -22.96154 l 38.91333,123.2077 39.1559,-123.2077 h -22.96154 v -64.2923 H 341.25 v 64.29231 H 318.28847 L 258.58846,430.28846 H 125.41154 Z"
+     style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.986107"
+     d="M 56.410366,274.73898 H 31.757704 V 205.71153 H 174.74315 v 69.02745 h -24.65267 l 41.77931,132.28198 42.03975,-132.28198 H 209.25687 V 205.71154 H 352.2423 V 274.739 H 327.58965 L 263.49272,476.89081 H 120.50729 Z"
      id="path1"
      inkscape:label="V"
      sodipodi:nodetypes="cccccccccccccccc" />
   <path
-     style="fill:#ffffff;fill-opacity:0.70385;stroke:none;stroke-width:11.8568;stroke-dasharray:none;stroke-opacity:1"
-     d="M 283.17258,4.0883883 380.5,101.37651 307.5,102.5 c -20,0 -25,-7.999998 -25,-24.999998 z"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:17.6642;stroke-dasharray:none;stroke-opacity:1"
+     d="M 222.56451,14.400888 369.48438,161.51221 259.74491,162.7016 C 229.94897,162.7016 222.5,150.78324 222.5,125.45671 Z"
      id="path12"
      sodipodi:nodetypes="ccccc"
      inkscape:label="Ear" />
