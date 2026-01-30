@@ -14,25 +14,17 @@ targets:
   #     package: vdl
   #     gen_server: false
   #     gen_client: false
-  #     gen_patterns: true
-  #     gen_consts: true
 
   # - typescript:
   #     output: ./gen/ts
   #     gen_server: false
   #     gen_client: false
-  #     gen_patterns: true
-  #     gen_consts: true
 
   # - dart:
   #     output: ./gen/dart
-  #     gen_patterns: true
-  #     gen_consts: true
 
   # - python:
   #     output: ./gen/python
-  #     gen_patterns: true
-  #     gen_consts: true
 
   # - jsonschema:
   #     output: ./gen/jsonschema
@@ -42,6 +34,8 @@ targets:
   # - openapi:
   #     output: ./gen/openapi
   #     filename: openapi.yaml
+  #     title: VDL API
+  #     version: 1.0.0
 
   # - playground:
   #     output: ./gen/playground
@@ -49,4 +43,4 @@ targets:
 
   # - plugin:
   #     output: ./gen/plugin
-  #     command: ["echo", "foo"]
+  #     command: ["echo", "plugin_test"]
