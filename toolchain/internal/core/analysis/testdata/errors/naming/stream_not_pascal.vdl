@@ -1,0 +1,9 @@
+// fmt:off
+// @expect: E101
+
+rpc Users {
+	stream userUpdates {
+		input { id: string }
+		output { event: string }
+	}
+}

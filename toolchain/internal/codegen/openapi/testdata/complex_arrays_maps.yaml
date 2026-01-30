@@ -1,0 +1,313 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: DataProcessingProcedures
+    description: Procedures for DataProcessing
+paths:
+  /DataProcessing/ExtremeNesting:
+    post:
+      description: "Extreme nesting: array of maps of arrays of maps"
+      requestBody:
+        $ref: "#/components/requestBodies/DataProcessingExtremeNestingInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/DataProcessingExtremeNestingOutput"
+      tags:
+        - DataProcessingProcedures
+  /DataProcessing/ProcessMaps:
+    post:
+      description: Work with nested maps
+      requestBody:
+        $ref: "#/components/requestBodies/DataProcessingProcessMapsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/DataProcessingProcessMapsOutput"
+      tags:
+        - DataProcessingProcedures
+  /DataProcessing/ProcessMatrix:
+    post:
+      description: Process multi-dimensional data structures
+      requestBody:
+        $ref: "#/components/requestBodies/DataProcessingProcessMatrixInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/DataProcessingProcessMatrixOutput"
+      tags:
+        - DataProcessingProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Coordinate:
+      properties:
+        x:
+          type: number
+        "y":
+          type: number
+      required:
+        - x
+        - "y"
+      type: object
+    Matrix:
+      properties:
+        cols:
+          type: integer
+        data:
+          items:
+            items:
+              type: number
+            type: array
+          type: array
+        rows:
+          type: integer
+      required:
+        - rows
+        - cols
+        - data
+      type: object
+  requestBodies:
+    DataProcessingExtremeNestingInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              level1:
+                description: "map<string[]>[] - array of maps where values are string arrays"
+                items:
+                  additionalProperties:
+                    items:
+                      type: string
+                    type: array
+                  type: object
+                type: array
+              level2:
+                additionalProperties:
+                  items:
+                    additionalProperties:
+                      type: integer
+                    type: object
+                  type: array
+                description: "map<map<int>[]> - map where values are arrays of maps of ints"
+                type: object
+              level3:
+                description: "map<Coordinate[]>[] - array of maps of coordinate arrays"
+                items:
+                  additionalProperties:
+                    items:
+                      $ref: "#/components/schemas/Coordinate"
+                    type: array
+                  type: object
+                type: array
+            required:
+              - level1
+              - level2
+              - level3
+            type: object
+      description: Request body for DataProcessing/ExtremeNesting procedure
+    DataProcessingProcessMapsInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              counts:
+                additionalProperties:
+                  type: integer
+                description: Map of string to int
+                type: object
+              scores:
+                additionalProperties:
+                  additionalProperties:
+                    type: number
+                  type: object
+                description: Map of string to map of string to float (nested maps)
+                type: object
+              tags:
+                additionalProperties:
+                  items:
+                    type: string
+                  type: array
+                description: Map of string to array of strings
+                type: object
+              users:
+                additionalProperties:
+                  $ref: "#/components/schemas/Coordinate"
+                description: Map of string to custom type
+                type: object
+            required:
+              - counts
+              - tags
+              - scores
+              - users
+            type: object
+      description: Request body for DataProcessing/ProcessMaps procedure
+    DataProcessingProcessMatrixInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              matrix:
+                description: 2D array of integers
+                items:
+                  items:
+                    type: integer
+                  type: array
+                type: array
+              polygons:
+                description: Array of coordinate arrays (polygons)
+                items:
+                  items:
+                    $ref: "#/components/schemas/Coordinate"
+                  type: array
+                type: array
+              tensor:
+                description: 3D array of floats (e.g., RGB image data)
+                items:
+                  items:
+                    items:
+                      type: number
+                    type: array
+                  type: array
+                type: array
+            required:
+              - matrix
+              - tensor
+              - polygons
+            type: object
+      description: Request body for DataProcessing/ProcessMatrix procedure
+  responses:
+    DataProcessingExtremeNestingOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for DataProcessing/ExtremeNesting procedure
+    DataProcessingProcessMapsOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  grouped:
+                    additionalProperties:
+                      items:
+                        type: number
+                      type: array
+                    description: Map of arrays
+                    type: object
+                  results:
+                    description: Array of maps
+                    items:
+                      additionalProperties:
+                        type: integer
+                      type: object
+                    type: array
+                required:
+                  - results
+                  - grouped
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for DataProcessing/ProcessMaps procedure
+    DataProcessingProcessMatrixOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  result:
+                    $ref: "#/components/schemas/Matrix"
+                  stats:
+                    properties:
+                      dimensions:
+                        items:
+                          type: integer
+                        type: array
+                      max:
+                        type: number
+                      min:
+                        type: number
+                    required:
+                      - min
+                      - max
+                      - dimensions
+                    type: object
+                required:
+                  - result
+                  - stats
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for DataProcessing/ProcessMatrix procedure

@@ -1,0 +1,18 @@
+// @expect: E901
+// Type collides with auto-generated GetUserInput from proc GetUser
+
+rpc Users {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      name: string
+    }
+  }
+}
+
+type GetUserInput {
+  userId: string
+}

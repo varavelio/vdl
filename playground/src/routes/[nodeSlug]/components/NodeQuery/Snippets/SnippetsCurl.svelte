@@ -50,7 +50,7 @@
       client manually, or generate one with the urpc CLI if your language is
       supported.
       <br />
-      <a href="https://uforpc.uforg.dev/r/sse" target="_blank" class="link">
+      <a href="https://vdl.varavel.com/sse" target="_blank" class="link">
         Learn more here
       </a>
     </p>

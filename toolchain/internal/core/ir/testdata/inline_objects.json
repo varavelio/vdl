@@ -1,0 +1,133 @@
+{
+  "types": [
+    {
+      "name": "Address",
+      "fields": [
+        {
+          "name": "street",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "city",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "location",
+          "type": {
+            "kind": "object",
+            "object": {
+              "fields": [
+                {
+                  "name": "lat",
+                  "type": {
+                    "kind": "primitive",
+                    "primitive": "float"
+                  }
+                },
+                {
+                  "name": "lng",
+                  "type": {
+                    "kind": "primitive",
+                    "primitive": "float"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company",
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "headquarters",
+          "type": {
+            "kind": "object",
+            "object": {
+              "fields": [
+                {
+                  "name": "address",
+                  "type": {
+                    "kind": "primitive",
+                    "primitive": "string"
+                  }
+                },
+                {
+                  "name": "floors",
+                  "type": {
+                    "kind": "primitive",
+                    "primitive": "int"
+                  }
+                },
+                {
+                  "name": "amenities",
+                  "type": {
+                    "kind": "object",
+                    "object": {
+                      "fields": [
+                        {
+                          "name": "hasGym",
+                          "type": {
+                            "kind": "primitive",
+                            "primitive": "bool"
+                          }
+                        },
+                        {
+                          "name": "hasCafeteria",
+                          "type": {
+                            "kind": "primitive",
+                            "primitive": "bool"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location",
+      "fields": [
+        {
+          "name": "latitude",
+          "type": {
+            "kind": "primitive",
+            "primitive": "float"
+          }
+        },
+        {
+          "name": "longitude",
+          "type": {
+            "kind": "primitive",
+            "primitive": "float"
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "constants": [],
+  "patterns": [],
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
+}

@@ -1,0 +1,50 @@
+package typescript
+
+import (
+	"strings"
+
+	"github.com/varavelio/gen"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+)
+
+func generateDomainTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
+	if len(schema.Types) == 0 {
+		return "", nil
+	}
+
+	g := gen.New().WithSpaces(2)
+
+	g.Line("// -----------------------------------------------------------------------------")
+	g.Line("// Domain Types")
+	g.Line("// -----------------------------------------------------------------------------")
+	g.Break()
+
+	// Generate TypeScript types
+	for _, typeNode := range schema.Types {
+		desc := "is a domain type defined in VDL with no documentation."
+		if typeNode.Doc != "" {
+			desc = strings.TrimSpace(typeNode.Doc)
+		}
+
+		if typeNode.Deprecated != nil {
+			desc += "\n\n@deprecated "
+			if typeNode.Deprecated.Message == "" {
+				desc += "This type is deprecated and should not be used in new code."
+			} else {
+				desc += typeNode.Deprecated.Message
+			}
+		}
+
+		g.Line(renderType("", typeNode.Name, desc, typeNode.Fields))
+		g.Break()
+
+		g.Line(renderHydrateType("", typeNode.Name, typeNode.Fields))
+		g.Break()
+
+		g.Line(renderValidateType("", typeNode.Name, typeNode.Fields))
+		g.Break()
+	}
+
+	return g.String(), nil
+}

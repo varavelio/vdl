@@ -1,0 +1,17 @@
+// All primitive types
+
+type AllPrimitives {
+  stringField: string
+  intField: int
+  floatField: float
+  boolField: bool
+  datetimeField: datetime
+}
+
+type OptionalPrimitives {
+  stringField?: string
+  intField?: int
+  floatField?: float
+  boolField?: bool
+  datetimeField?: datetime
+}

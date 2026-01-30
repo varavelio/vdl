@@ -1,0 +1,6 @@
+const VERSION = "1.2.3"
+const MAX_RETRIES = 5
+const TIMEOUT_SECONDS = 30
+const PI = 3.14159
+const IS_ENABLED = true
+const GREETING = "Hello, VDL!"

@@ -1,0 +1,253 @@
+openapi: 3.0.0
+info:
+  title: Complex Types API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: DataServiceProcedures
+    description: Procedures for DataService
+paths:
+  /DataService/InlineTest:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/DataServiceInlineTestInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/DataServiceInlineTestOutput"
+      tags:
+        - DataServiceProcedures
+  /DataService/ProcessContainer:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/DataServiceProcessContainerInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/DataServiceProcessContainerOutput"
+      tags:
+        - DataServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Address:
+      properties:
+        city:
+          type: string
+        country:
+          type: string
+        street:
+          type: string
+      required:
+        - street
+        - city
+        - country
+      type: object
+    Contact:
+      properties:
+        address:
+          $ref: "#/components/schemas/Address"
+        email:
+          type: string
+        phone:
+          type: string
+      required:
+        - email
+        - phone
+        - address
+      type: object
+    Container:
+      properties:
+        counts:
+          additionalProperties:
+            items:
+              type: integer
+            type: array
+          type: object
+        lookup:
+          additionalProperties:
+            $ref: "#/components/schemas/User"
+          type: object
+        matrix:
+          items:
+            items:
+              type: integer
+            type: array
+          type: array
+        users:
+          items:
+            $ref: "#/components/schemas/User"
+          type: array
+      required:
+        - users
+        - matrix
+        - lookup
+        - counts
+      type: object
+    User:
+      properties:
+        contact:
+          $ref: "#/components/schemas/Contact"
+        id:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        name:
+          type: string
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+        - id
+        - name
+        - tags
+        - metadata
+        - contact
+      type: object
+  requestBodies:
+    DataServiceInlineTestInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              arrayOfInline:
+                items:
+                  properties:
+                    id:
+                      type: integer
+                    label:
+                      type: string
+                  required:
+                    - id
+                    - label
+                  type: object
+                type: array
+              mapOfInline:
+                additionalProperties:
+                  properties:
+                    active:
+                      type: boolean
+                    key:
+                      type: string
+                  required:
+                    - key
+                    - active
+                  type: object
+                type: object
+              nested:
+                properties:
+                  inner:
+                    properties:
+                      deep:
+                        type: string
+                    required:
+                      - deep
+                    type: object
+                  outer:
+                    type: string
+                required:
+                  - outer
+                  - inner
+                type: object
+              simple:
+                properties:
+                  name:
+                    type: string
+                  value:
+                    type: integer
+                required:
+                  - name
+                  - value
+                type: object
+            required:
+              - simple
+              - nested
+              - arrayOfInline
+              - mapOfInline
+            type: object
+      description: Request body for DataService/InlineTest procedure
+    DataServiceProcessContainerInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                $ref: "#/components/schemas/Container"
+            required:
+              - data
+            type: object
+      description: Request body for DataService/ProcessContainer procedure
+  responses:
+    DataServiceInlineTestOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for DataService/InlineTest procedure
+    DataServiceProcessContainerOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  processed:
+                    $ref: "#/components/schemas/Container"
+                required:
+                  - processed
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for DataService/ProcessContainer procedure

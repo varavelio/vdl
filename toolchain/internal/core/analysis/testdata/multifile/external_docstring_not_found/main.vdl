@@ -1,0 +1,6 @@
+// External docstring file not found test
+
+""" ./nonexistent.md """
+type User {
+  id: string
+}

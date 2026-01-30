@@ -1,0 +1,9 @@
+type Inner {
+  val: int
+}
+
+type Outer {
+  list: Inner[]
+  myMap: map<Inner>
+  inner: Inner
+}

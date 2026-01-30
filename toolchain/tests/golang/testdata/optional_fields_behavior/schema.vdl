@@ -1,0 +1,194 @@
+// Simple nested structures for basic optional tests
+type Address {
+  street: string
+  city: string
+}
+
+type Coordinates {
+  lat: float
+  lng: float
+}
+
+// Deeply nested structure for complex optional tests
+type Level3Data {
+  value: string
+  score: int
+}
+
+type Level2Container {
+  name: string
+  data: Level3Data
+  items?: Level3Data[]
+}
+
+type Level1Wrapper {
+  id: string
+  container: Level2Container
+  metadata?: map<string>
+}
+
+// Complex optional with arrays and maps
+type ComplexOptional {
+  // Required primitives
+  id: string
+
+  // Optional primitive
+  name?: string
+
+  // Optional array of primitives
+  tags?: string[]
+
+  // Optional map of primitives
+  metadata?: map<string>
+
+  // Optional nested object
+  address?: Address
+
+  // Optional array of objects
+  coordinates?: Coordinates[]
+
+  // Optional map of objects
+  locations?: map<Address>
+
+  // Optional deeply nested structure
+  wrapper?: Level1Wrapper
+
+  // Optional array of arrays (matrix)
+  matrix?: int[][]
+
+  // Optional map of arrays
+  mapOfArrays?: map<int[]>
+
+  // Optional array of maps
+  arrayOfMaps?: map<string>[]
+
+  // Optional array of arrays of objects
+  nestedObjectMatrix?: Level3Data[][]
+
+  // Optional map of map values
+  mapOfMaps?: map<map<string>>
+
+  // Optional map of arrays of objects
+  mapOfObjectArrays?: map<Level3Data[]>
+
+  // ===== EDGE CASE: Inline (anonymous) objects in optional fields =====
+
+  // Optional inline object
+  inlineObject?: {
+    label: string
+    count: int
+  }
+
+  // Optional array of inline objects
+  inlineArray?: {
+    name: string
+    active: bool
+  }[]
+
+  // Optional map of inline objects
+  inlineMap?: map<{
+    key: string
+    value: int
+  }>
+
+  // Optional nested inline (inline inside inline)
+  nestedInline?: {
+    outer: string
+    inner: {
+      deep: string
+      score: float
+    }
+  }
+
+  // Optional array of arrays of inline objects (matrix of inline)
+  inlineMatrix?: {
+    x: int
+    y: int
+  }[][]
+
+  // Optional map of arrays of inline objects
+  mapOfInlineArrays?: map<{
+    item: string
+    priority: int
+  }[]>
+
+  // Optional array of maps of inline objects
+  arrayOfInlineMaps?: map<{
+    data: string
+  }>[]
+
+  // Ultra complex: optional map of arrays of inline with nested inline
+  ultraComplex?: map<{
+    level1: string
+    nested: {
+      level2: int
+      items: string[]
+    }
+  }[]>
+}
+
+rpc Service {
+  // Original simple test
+  proc Echo {
+    input {
+      required: string
+      optional?: string
+      optionalInt?: int
+      optionalBool?: bool
+    }
+
+    output {
+      required: string
+      optional?: string
+      optionalInt?: int
+      optionalBool?: bool
+      wasOptionalPresent: bool
+      wasOptionalIntPresent: bool
+      wasOptionalBoolPresent: bool
+    }
+  }
+
+  // Complex nested optional test
+  proc EchoComplex {
+    input {
+      data: ComplexOptional
+    }
+
+    output {
+      data: ComplexOptional
+      presentFields: string[]
+    }
+  }
+
+  // Deep nesting test
+  proc EchoDeep {
+    input {
+      wrapper?: Level1Wrapper
+    }
+
+    output {
+      wrapper?: Level1Wrapper
+      wasPresent: bool
+    }
+  }
+
+  // Inline objects in optional fields test
+  proc EchoInline {
+    input {
+      data: ComplexOptional
+    }
+
+    output {
+      data: ComplexOptional
+      // Track which inline optional fields were present
+      inlineObjectPresent: bool
+      inlineArrayPresent: bool
+      inlineMapPresent: bool
+      nestedInlinePresent: bool
+      inlineMatrixPresent: bool
+      mapOfInlineArraysPresent: bool
+      arrayOfInlineMapsPresent: bool
+      ultraComplexPresent: bool
+    }
+  }
+}

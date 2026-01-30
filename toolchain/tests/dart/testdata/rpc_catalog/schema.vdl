@@ -1,0 +1,112 @@
+""" User data type. """
+type User {
+  id: string
+  name: string
+  email: string
+}
+
+""" Message data type. """
+type Message {
+  id: string
+  content: string
+  timestamp: datetime
+}
+
+""" User management RPC service. """
+rpc Users {
+  """ Create a new user. """
+  proc Create {
+    input {
+      name: string
+      email: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """ Get user by ID. """
+  proc Get {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """ List all users. """
+  proc List {
+    input {
+      limit?: int
+      offset?: int
+    }
+
+    output {
+      users: User[]
+      total: int
+    }
+  }
+
+  deprecated("Use Delete instead")
+  proc Remove {
+    input {
+      id: string
+    }
+
+    output {
+      success: bool
+    }
+  }
+
+  """ Delete a user. """
+  proc Delete {
+    input {
+      id: string
+    }
+
+    output {
+      success: bool
+    }
+  }
+}
+
+""" Chat service with streaming. """
+rpc Chat {
+  """ Send a message. """
+  proc Send {
+    input {
+      to: string
+      content: string
+    }
+
+    output {
+      message: Message
+    }
+  }
+
+  """ Subscribe to new messages. """
+  stream Messages {
+    input {
+      userId: string
+    }
+
+    output {
+      message: Message
+    }
+  }
+
+  """ Subscribe to typing indicators. """
+  stream Typing {
+    input {
+      chatId: string
+    }
+
+    output {
+      userId: string
+      isTyping: bool
+    }
+  }
+}

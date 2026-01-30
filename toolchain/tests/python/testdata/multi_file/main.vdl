@@ -1,0 +1,38 @@
+// main.vdl - Main entry point that ties everything together
+include "./users.vdl"
+include "./orders.vdl"
+
+// Additional type that uses types from both domains
+type UserOrderStats {
+  user: User
+  totalOrders: int
+  totalSpent: float
+  recentOrders: OrderSummary[]
+  favoriteAddress?: Address
+}
+
+// Cross-domain service
+rpc AnalyticsService {
+  proc GetUserStats {
+    input {
+      userId: string
+      includeRecentOrders?: bool
+    }
+
+    output {
+      stats: UserOrderStats
+    }
+  }
+
+  proc GetSystemStats {
+    input {
+      // Empty input - just constants check
+    }
+
+    output {
+      apiVersion: string
+      maxResults: int
+      defaultTimeout: float
+    }
+  }
+}

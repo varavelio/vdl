@@ -1,0 +1,38 @@
+""" Type that contains all primitive types. """
+type AllPrimitives {
+  """ A string field. """
+  stringField: string
+
+  """ An integer field. """
+  intField: int
+
+  """ A float field. """
+  floatField: float
+
+  """ A boolean field. """
+  boolField: bool
+
+  """ A datetime field. """
+  datetimeField: datetime
+}
+
+""" Type with optional primitive fields. """
+type OptionalPrimitives {
+  stringField?: string
+  intField?: int
+  floatField?: float
+  boolField?: bool
+  datetimeField?: datetime
+}
+
+rpc Service {
+  proc Echo {
+    input {
+      data: AllPrimitives
+    }
+
+    output {
+      data: AllPrimitives
+    }
+  }
+}

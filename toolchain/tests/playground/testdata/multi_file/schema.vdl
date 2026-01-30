@@ -1,0 +1,26 @@
+/* Comment */
+
+""" OrderService Docs """
+rpc OrderService {
+  proc GetOrder {
+    input {
+      id: string
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  proc ListOrders {
+    input {
+      status: OrderStatus
+    }
+
+    output {
+      orders: Order[]
+    }
+  }
+}
+
+include "./types.vdl"

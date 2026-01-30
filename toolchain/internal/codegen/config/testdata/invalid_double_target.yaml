@@ -1,0 +1,9 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - go:
+      output: ./gen/go
+      package: main
+    dart:
+      output: ./gen/dart
+      package: pkg

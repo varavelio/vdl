@@ -1,0 +1,14 @@
+// @expect: E202
+
+rpc Users {
+  proc CreateUser {
+    input {
+      ...UndefinedInput
+      name: string
+    }
+
+    output {
+      success: bool
+    }
+  }
+}

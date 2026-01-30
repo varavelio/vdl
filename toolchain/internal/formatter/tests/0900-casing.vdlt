@@ -1,0 +1,87 @@
+type my_type {
+  field_one: string
+  FieldTwo: int
+  FIELD_THREE: bool
+}
+
+type HTTPRequest {
+  JSONBody: string
+  id_field: int
+}
+
+rpc my_service {
+  proc get_user {
+    input {
+      user_id: string
+    }
+    output {
+      USER_DATA: my_type
+    }
+  }
+
+  stream user_updates {
+    input {
+      filter_by: string
+    }
+    output {
+      update_event: string
+    }
+  }
+}
+
+enum order_status {
+  pending
+  IN_PROGRESS
+  completed_fully
+}
+
+const max_page_size = 100
+const api_version = "v1"
+
+pattern user_event_subject = "events.users.{userId}"
+
+// >>>>
+
+type MyType {
+  fieldOne: string
+  fieldTwo: int
+  fieldThree: bool
+}
+
+type HttpRequest {
+  jsonBody: string
+  idField: int
+}
+
+rpc MyService {
+  proc GetUser {
+    input {
+      userId: string
+    }
+
+    output {
+      userData: MyType
+    }
+  }
+
+  stream UserUpdates {
+    input {
+      filterBy: string
+    }
+
+    output {
+      updateEvent: string
+    }
+  }
+}
+
+enum OrderStatus {
+  Pending
+  InProgress
+  CompletedFully
+}
+
+const MAX_PAGE_SIZE = 100
+const API_VERSION = "v1"
+
+pattern UserEventSubject = "events.users.{userId}"

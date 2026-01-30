@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: UsersProcedures
+    description: Procedures for Users
+paths:
+  /Users/CreateUser:
+    post:
+      description: Creates a new user.
+      requestBody:
+        $ref: "#/components/requestBodies/UsersCreateUserInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersCreateUserOutput"
+      tags:
+        - UsersProcedures
+  /Users/GetUser:
+    post:
+      description: Gets a user by ID.
+      requestBody:
+        $ref: "#/components/requestBodies/UsersGetUserInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersGetUserOutput"
+      tags:
+        - UsersProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    User:
+      properties:
+        email:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+      type: object
+  requestBodies:
+    UsersCreateUserInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              email:
+                type: string
+              name:
+                type: string
+            required:
+              - name
+              - email
+            type: object
+      description: Request body for Users/CreateUser procedure
+    UsersGetUserInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+            required:
+              - id
+            type: object
+      description: Request body for Users/GetUser procedure
+  responses:
+    UsersCreateUserOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - user
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Users/CreateUser procedure
+    UsersGetUserOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - user
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Users/GetUser procedure

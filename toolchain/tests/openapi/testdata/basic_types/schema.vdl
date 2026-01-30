@@ -1,0 +1,36 @@
+// Tests all primitive types and a basic custom type
+
+type User {
+  id: string
+  name: string
+  age: int
+  score: float
+  isActive: bool
+  createdAt: datetime
+}
+
+rpc Service {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc CreateUser {
+    input {
+      name: string
+      age: int
+      score: float
+      isActive: bool
+    }
+
+    output {
+      id: string
+      createdAt: datetime
+    }
+  }
+}

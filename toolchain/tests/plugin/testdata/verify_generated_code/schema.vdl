@@ -1,0 +1,83 @@
+// Comprehensive schema for code generation verification.
+// Plugin will generate Python code that can be syntax-checked.
+
+""" String enum for HTTP methods. """
+enum HttpMethod {
+  Get = "GET"
+  Post = "POST"
+  Put = "PUT"
+  Delete = "DELETE"
+}
+
+""" User type with various field types. """
+type User {
+  id: string
+  name: string
+  email?: string
+  age: int
+  balance: float
+  active: bool
+  roles: string[]
+  metadata: map<string>
+  createdAt: datetime
+}
+
+""" Product type. """
+type Product {
+  sku: string
+  name: string
+  price: float
+  quantity: int
+  tags: string[]
+}
+
+""" Order type with nested references. """
+type Order {
+  orderId: string
+  user: User
+  items: Product[]
+  total: float
+  createdAt: datetime
+}
+
+""" API Service. """
+rpc ApiService {
+  """ Get user by ID. """
+  proc GetUser {
+    input {
+      userId: string
+    }
+
+    output {
+      user: User
+      found: bool
+    }
+  }
+
+  """ Create a new order. """
+  proc CreateOrder {
+    input {
+      userId: string
+      items: {
+        productId: string
+        quantity: int
+      }[]
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  """ Stream order updates. """
+  stream OrderUpdates {
+    input {
+      orderId: string
+    }
+
+    output {
+      status: string
+      timestamp: datetime
+    }
+  }
+}

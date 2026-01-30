@@ -1,0 +1,106 @@
+// Tests spread operator in types
+
+type BaseInfo {
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type AuditInfo {
+  createdBy: string
+  updatedBy: string
+}
+
+type Metadata {
+  tags: string[]
+  version: int
+}
+
+// Simple spread
+type Document {
+  ...BaseInfo
+  title: string
+  content: string
+}
+
+// Multiple spreads
+type AuditedDocument {
+  ...BaseInfo
+  ...AuditInfo
+  title: string
+  content: string
+}
+
+// Spread with metadata
+type FullDocument {
+  ...BaseInfo
+  ...AuditInfo
+  ...Metadata
+  title: string
+  content: string
+  isPublished: bool
+}
+
+// Spread in nested context
+type Container {
+  document: {
+    ...BaseInfo
+    name: string
+    data: string
+  }
+  items: {
+    ...Metadata
+    value: string
+  }[]
+}
+
+// Deep spreads
+type Level1 {
+  a: string
+  b: int
+}
+
+type Level2 {
+  ...Level1
+  c: float
+  d: bool
+}
+
+type Level3 {
+  ...Level2
+  e: datetime
+  f: string[]
+}
+
+rpc DocumentService {
+  proc CreateDocument {
+    input {
+      title: string
+      content: string
+    }
+
+    output {
+      document: FullDocument
+    }
+  }
+
+  proc GetDocuments {
+    input {
+      limit?: int
+    }
+
+    output {
+      documents: AuditedDocument[]
+    }
+  }
+
+  proc GetContainer {
+    input {
+      id: string
+    }
+
+    output {
+      container: Container
+    }
+  }
+}

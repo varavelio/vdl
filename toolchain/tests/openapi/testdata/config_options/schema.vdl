@@ -1,0 +1,18 @@
+// Tests OpenAPI config options
+
+type Item {
+  id: string
+  name: string
+}
+
+rpc ItemService {
+  proc GetItem {
+    input {
+      id: string
+    }
+
+    output {
+      item: Item
+    }
+  }
+}

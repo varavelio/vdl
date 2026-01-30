@@ -1,0 +1,5 @@
+include "./a.vdl"
+
+type B {
+  id: string
+}

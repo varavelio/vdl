@@ -16,16 +16,16 @@ tasks:
     desc: Install all dependencies for the project
     cmds:
       - npm install
-      - cd ./urpc && go mod download
+      - cd ./toolchain && go mod download
       - cd ./playground && npm install
       - cd ./docs && npm install
 
   build:
-    desc: Builds the WASM binary, the Playground and the URPC binary
+    desc: Builds the WASM binary, the Playground and the VDL binary
     cmds:
-      - cd ./urpc && task build:wasm # <- Required by the playground
-      - cd ./playground && npm run build # <- Required by the final URPC binary
-      - cd ./urpc && task build:urpc
+      - cd ./toolchain && task build:wasm # <- Required by the playground
+      - cd ./playground && npm run build # <- Required by the final VDL binary
+      - cd ./toolchain && task build:vdl
 
   setversion:
     desc: Set the version from latest git tag in the relevant files
@@ -34,28 +34,27 @@ tasks:
   test:
     desc: Run all repository tests
     cmds:
-      - cd ./urpc && task test
+      - cd ./toolchain && task test
       - cd ./playground && npm run test
 
   lint:
     desc: Run all repository linters
     cmds:
-      - cd ./urpc && task lint
+      - cd ./toolchain && task lint
       - cd ./playground && npm run lint
 
   fmt:
     desc: Run all repository code formatters
     cmds:
-      - prettier . --write # <- Default formatter for the root directory
+      - prettier . --write --config ./.prettierrc --ignore-path ./.prettierignore --log-level warn # <- Default formatter for the root directory
       # The following commands are specific to each directory that has its
       # own formatter
-      - cd ./urpc && task fmt
+      - cd ./toolchain && task fmt
       - cd ./playground && npm run fmt
       - cd ./docs && npm run fmt
 
   fmt-check:
     desc: Run all repository code formatter checks
     cmds:
-      - cd ./urpc && task fmt-check
+      - cd ./toolchain && task fmt-check
       - cd ./playground && npm run fmt-check
-      - cd ./docs && npm run fmt-check

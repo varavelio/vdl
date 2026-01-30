@@ -1,0 +1,50 @@
+// Tests empty/void input and output operations
+
+rpc PingService {
+  // Completely empty input and output
+  proc Ping {
+    input {}
+
+    output {}
+  }
+
+  // Empty input, non-empty output
+  proc GetStatus {
+    input {}
+
+    output {
+      status: string
+      uptime: int
+    }
+  }
+
+  // Non-empty input, empty output
+  proc LogEvent {
+    input {
+      event: string
+      level: int
+    }
+
+    output {}
+  }
+}
+
+rpc HealthService {
+  // Empty stream input/output
+  stream Heartbeat {
+    input {}
+
+    output {}
+  }
+
+  // Empty input, streaming output
+  stream SystemMetrics {
+    input {}
+
+    output {
+      metric: string
+      value: float
+      timestamp: datetime
+    }
+  }
+}

@@ -1,0 +1,86 @@
+type PaginationParams {
+  page: int
+  limit: int
+}
+
+type PaginatedResponse {
+  totalItems: int
+  totalPages: int
+}
+
+type User {
+  id: string
+  name: string
+  email: string
+}
+
+""" User management service. """
+rpc Users {
+  """
+  # User Operations
+  The following procedures handle user lifecycle.
+  """
+
+  """ Creates a new user in the system. """
+  proc CreateUser {
+    input {
+      name: string
+      email: string
+    }
+
+    output {
+      user: User
+      success: bool
+    }
+  }
+
+  """ Retrieves a user by ID. """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """ Lists users with pagination. """
+  proc ListUsers {
+    input {
+      ...PaginationParams
+      filterByName?: string
+    }
+
+    output {
+      ...PaginatedResponse
+      users: User[]
+    }
+  }
+
+  """ Stream of user status updates. """
+  stream UserStatusUpdates {
+    input {
+      userId: string
+    }
+
+    output {
+      status: string
+      timestamp: datetime
+    }
+  }
+}
+
+""" Notification service. """
+rpc Notifications {
+  proc SendNotification {
+    input {
+      userId: string
+      message: string
+    }
+
+    output {
+      sent: bool
+    }
+  }
+}

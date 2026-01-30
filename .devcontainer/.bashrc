@@ -24,11 +24,3 @@ chmod -R 777 /workspaces
 # Configure Git to ignore ownership and file mode changes.
 git config --global --add safe.directory '*'
 git config core.fileMode false
-
-echo "
-───────────────────────────────────────────────
-── Github: https://github.com/uforg/uforpc ────
-───────────────────────────────────────────────
-── Development environment is ready to use! ───
-───────────────────────────────────────────────
-"

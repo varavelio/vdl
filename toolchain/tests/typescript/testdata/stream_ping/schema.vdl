@@ -1,0 +1,9 @@
+rpc Clock {
+  stream Ticks {
+    input {}
+
+    output {
+      iso: string
+    }
+  }
+}

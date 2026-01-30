@@ -1,0 +1,13 @@
+// fmt:off
+// @expect: E102
+
+rpc Users {
+	proc GetUser {
+		input {
+			UserId: string
+		}
+		output {
+			UserName: string
+		}
+	}
+}

@@ -1,0 +1,9 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - go:
+      output: ./gen/go
+      clean: true
+      gen_client: true
+      gen_server: true
+      package: mypkg

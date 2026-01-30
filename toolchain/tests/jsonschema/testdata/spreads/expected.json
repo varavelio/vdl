@@ -1,0 +1,334 @@
+{
+  "$defs": {
+    "AuditInfo": {
+      "properties": {
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "required": ["createdBy", "updatedBy"],
+      "type": "object"
+    },
+    "AuditedDocument": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "content",
+        "createdAt",
+        "createdBy",
+        "id",
+        "title",
+        "updatedAt",
+        "updatedBy"
+      ],
+      "type": "object"
+    },
+    "BaseInfo": {
+      "properties": {
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": ["createdAt", "id", "updatedAt"],
+      "type": "object"
+    },
+    "Container": {
+      "properties": {
+        "document": {
+          "properties": {
+            "createdAt": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "updatedAt": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          "required": ["createdAt", "data", "id", "name", "updatedAt"],
+          "type": "object"
+        },
+        "items": {
+          "items": {
+            "properties": {
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "value": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": ["tags", "value", "version"],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["document", "items"],
+      "type": "object"
+    },
+    "Document": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": ["content", "createdAt", "id", "title", "updatedAt"],
+      "type": "object"
+    },
+    "DocumentServiceCreateDocumentInput": {
+      "description": "Input for DocumentService/CreateDocument procedure",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": ["content", "title"],
+      "type": "object"
+    },
+    "DocumentServiceCreateDocumentOutput": {
+      "description": "Output for DocumentService/CreateDocument procedure",
+      "properties": {
+        "document": {
+          "$ref": "#/$defs/FullDocument"
+        }
+      },
+      "required": ["document"],
+      "type": "object"
+    },
+    "DocumentServiceGetContainerInput": {
+      "description": "Input for DocumentService/GetContainer procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "DocumentServiceGetContainerOutput": {
+      "description": "Output for DocumentService/GetContainer procedure",
+      "properties": {
+        "container": {
+          "$ref": "#/$defs/Container"
+        }
+      },
+      "required": ["container"],
+      "type": "object"
+    },
+    "DocumentServiceGetDocumentsInput": {
+      "description": "Input for DocumentService/GetDocuments procedure",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "DocumentServiceGetDocumentsOutput": {
+      "description": "Output for DocumentService/GetDocuments procedure",
+      "properties": {
+        "documents": {
+          "items": {
+            "$ref": "#/$defs/AuditedDocument"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["documents"],
+      "type": "object"
+    },
+    "FullDocument": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "content",
+        "createdAt",
+        "createdBy",
+        "id",
+        "isPublished",
+        "tags",
+        "title",
+        "updatedAt",
+        "updatedBy",
+        "version"
+      ],
+      "type": "object"
+    },
+    "Level1": {
+      "properties": {
+        "a": {
+          "type": "string"
+        },
+        "b": {
+          "type": "integer"
+        }
+      },
+      "required": ["a", "b"],
+      "type": "object"
+    },
+    "Level2": {
+      "properties": {
+        "a": {
+          "type": "string"
+        },
+        "b": {
+          "type": "integer"
+        },
+        "c": {
+          "type": "number"
+        },
+        "d": {
+          "type": "boolean"
+        }
+      },
+      "required": ["a", "b", "c", "d"],
+      "type": "object"
+    },
+    "Level3": {
+      "properties": {
+        "a": {
+          "type": "string"
+        },
+        "b": {
+          "type": "integer"
+        },
+        "c": {
+          "type": "number"
+        },
+        "d": {
+          "type": "boolean"
+        },
+        "e": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "f": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["a", "b", "c", "d", "e", "f"],
+      "type": "object"
+    },
+    "Metadata": {
+      "properties": {
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "version": {
+          "type": "integer"
+        }
+      },
+      "required": ["tags", "version"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

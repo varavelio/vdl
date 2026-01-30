@@ -1,0 +1,390 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: CatalogProcedures
+    description: Catalog service for managing products.
+  - name: ChatProcedures
+    description: Chat service for real-time messaging.
+  - name: ChatStreams
+    description: Chat service for real-time messaging.
+paths:
+  /Catalog/CreateProduct:
+    post:
+      description: Creates a new product.
+      requestBody:
+        $ref: "#/components/requestBodies/CatalogCreateProductInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/CatalogCreateProductOutput"
+      tags:
+        - CatalogProcedures
+  /Catalog/GetAllProducts:
+    post:
+      deprecated: true
+      requestBody:
+        $ref: "#/components/requestBodies/CatalogGetAllProductsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/CatalogGetAllProductsOutput"
+      tags:
+        - CatalogProcedures
+  /Catalog/ListProducts:
+    post:
+      description: Lists products with pagination.
+      requestBody:
+        $ref: "#/components/requestBodies/CatalogListProductsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/CatalogListProductsOutput"
+      tags:
+        - CatalogProcedures
+  /Chat/NewMessages:
+    post:
+      description: Stream of new messages.
+      requestBody:
+        $ref: "#/components/requestBodies/ChatNewMessagesInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatNewMessagesOutput"
+      tags:
+        - ChatStreams
+  /Chat/SendMessage:
+    post:
+      description: Sends a message.
+      requestBody:
+        $ref: "#/components/requestBodies/ChatSendMessageInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChatSendMessageOutput"
+      tags:
+        - ChatProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    OrderStatus:
+      description: Status of an order.
+      enum:
+        - Pending
+        - Processing
+        - Shipped
+        - Delivered
+      type: string
+    PaginatedResponse:
+      properties:
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - totalItems
+        - totalPages
+      type: object
+    PaginationParams:
+      properties:
+        limit:
+          type: integer
+        page:
+          type: integer
+      required:
+        - page
+        - limit
+      type: object
+    Priority:
+      description: Priority levels.
+      enum:
+        - 1
+        - 2
+        - 3
+      type: integer
+    Product:
+      description: A product in the catalog.
+      properties:
+        id:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        name:
+          type: string
+        price:
+          type: number
+        priority:
+          $ref: "#/components/schemas/Priority"
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+        - id
+        - name
+        - price
+        - status
+        - priority
+      type: object
+  requestBodies:
+    CatalogCreateProductInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              name:
+                type: string
+              price:
+                type: number
+              status:
+                $ref: "#/components/schemas/OrderStatus"
+            required:
+              - name
+              - price
+            type: object
+      description: Request body for Catalog/CreateProduct procedure
+    CatalogGetAllProductsInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for Catalog/GetAllProducts procedure
+    CatalogListProductsInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              filterByStatus:
+                $ref: "#/components/schemas/OrderStatus"
+              limit:
+                type: integer
+              page:
+                type: integer
+            required:
+              - page
+              - limit
+            type: object
+      description: Request body for Catalog/ListProducts procedure
+    ChatNewMessagesInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              chatId:
+                type: string
+            required:
+              - chatId
+            type: object
+      description: Request body for Chat/NewMessages stream subscription
+    ChatSendMessageInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              chatId:
+                type: string
+              text:
+                type: string
+            required:
+              - chatId
+              - text
+            type: object
+      description: Request body for Chat/SendMessage procedure
+  responses:
+    CatalogCreateProductOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  product:
+                    $ref: "#/components/schemas/Product"
+                required:
+                  - product
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Catalog/CreateProduct procedure
+    CatalogGetAllProductsOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  products:
+                    items:
+                      $ref: "#/components/schemas/Product"
+                    type: array
+                required:
+                  - products
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Catalog/GetAllProducts procedure
+    CatalogListProductsOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  products:
+                    items:
+                      $ref: "#/components/schemas/Product"
+                    type: array
+                  totalItems:
+                    type: integer
+                  totalPages:
+                    type: integer
+                required:
+                  - totalItems
+                  - totalPages
+                  - products
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Catalog/ListProducts procedure
+    ChatNewMessagesOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  id:
+                    type: string
+                  text:
+                    type: string
+                  timestamp:
+                    format: date-time
+                    type: string
+                  userId:
+                    type: string
+                required:
+                  - id
+                  - text
+                  - userId
+                  - timestamp
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for Chat/NewMessages stream
+    ChatSendMessageOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  messageId:
+                    type: string
+                  timestamp:
+                    format: date-time
+                    type: string
+                required:
+                  - messageId
+                  - timestamp
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Chat/SendMessage procedure

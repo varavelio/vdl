@@ -1,0 +1,46 @@
+# yaml-language-server: $schema={{config_schema_id}}
+
+# VDL code generator config file
+# Star the repo at https://github.com/varavelio/vdl
+# See all available options at https://vdl.varavel.com/config
+
+version: 1
+schema: "{{schema_path}}" # Schema for all targets
+
+# You can add as many targets as you want, including multiple for the same language.
+targets:
+  # - go:
+  #     output: ./gen/go
+  #     package: vdl
+  #     gen_server: false
+  #     gen_client: false
+
+  # - typescript:
+  #     output: ./gen/ts
+  #     gen_server: false
+  #     gen_client: false
+
+  # - dart:
+  #     output: ./gen/dart
+
+  # - python:
+  #     output: ./gen/python
+
+  # - jsonschema:
+  #     output: ./gen/jsonschema
+  #     filename: schema.json
+  #     id: https://example.com/schema.json
+
+  # - openapi:
+  #     output: ./gen/openapi
+  #     filename: openapi.yaml
+  #     title: VDL API
+  #     version: 1.0.0
+
+  # - playground:
+  #     output: ./gen/playground
+  #     default_base_url: http://localhost:8080/rpc
+
+  # - plugin:
+  #     output: ./gen/plugin
+  #     command: ["echo", "plugin_test"]

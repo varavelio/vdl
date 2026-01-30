@@ -1,0 +1,394 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vdl.varavel.com/schemas/v0/config.schema.json",
+  "$ref": "#/$defs/VDLConfig",
+  "$defs": {
+    "DartConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
+    "GoConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        },
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
+        },
+        "package": {
+          "type": "string",
+          "description": "The Go package name to use in generated files."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "package"
+      ]
+    },
+    "JSONSchemaConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "id": {
+          "type": "string",
+          "description": "The $id of the schema."
+        },
+        "filename": {
+          "type": "string",
+          "description": "The name of the output file.",
+          "default": "schema.json"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
+    "OpenAPIConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "filename": {
+          "type": "string",
+          "description": "The name of the output file (can be .yml, .yaml or .json).",
+          "default": "openapi.yaml"
+        },
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "contact_name": {
+          "type": "string"
+        },
+        "contact_email": {
+          "type": "string"
+        },
+        "license_name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "title",
+        "version"
+      ]
+    },
+    "PlaygroundConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "default_base_url": {
+          "type": "string"
+        },
+        "default_headers": {
+          "items": {
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "key",
+              "value"
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
+    "PluginConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "command": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "minItems": 1,
+          "description": "The command to execute the plugin (executable + args)."
+        },
+        "options": {
+          "type": "object",
+          "description": "Arbitrary options passed to the plugin."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output",
+        "command"
+      ]
+    },
+    "PythonConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
+    "TargetConfig": {
+      "properties": {
+        "go": {
+          "$ref": "#/$defs/GoConfig"
+        },
+        "typescript": {
+          "$ref": "#/$defs/TypeScriptConfig"
+        },
+        "dart": {
+          "$ref": "#/$defs/DartConfig"
+        },
+        "python": {
+          "$ref": "#/$defs/PythonConfig"
+        },
+        "jsonschema": {
+          "$ref": "#/$defs/JSONSchemaConfig"
+        },
+        "openapi": {
+          "$ref": "#/$defs/OpenAPIConfig"
+        },
+        "playground": {
+          "$ref": "#/$defs/PlaygroundConfig"
+        },
+        "plugin": {
+          "$ref": "#/$defs/PluginConfig"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TypeScriptConfig": {
+      "properties": {
+        "output": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The output directory where the generated files will be placed."
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "If true empties the output directory before generation.",
+          "default": false
+        },
+        "schema": {
+          "type": "string",
+          "description": "Optional override for the VDL schema file specific to this target."
+        },
+        "gen_patterns": {
+          "type": "boolean",
+          "description": "Generate helper functions for patterns.",
+          "default": true
+        },
+        "gen_consts": {
+          "type": "boolean",
+          "description": "Generate constant definitions.",
+          "default": true
+        },
+        "gen_client": {
+          "type": "boolean",
+          "description": "Generate RPC client code.",
+          "default": false
+        },
+        "gen_server": {
+          "type": "boolean",
+          "description": "Generate RPC server interfaces and handlers.",
+          "default": false
+        },
+        "import_extension": {
+          "type": "string",
+          "enum": [
+            "none",
+            ".js",
+            ".ts"
+          ],
+          "description": "Explicit file extension to append to import paths.",
+          "default": "none"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "output"
+      ]
+    },
+    "VDLConfig": {
+      "properties": {
+        "version": {
+          "type": "integer"
+        },
+        "schema": {
+          "type": "string",
+          "description": "Path to the default global VDL schema file."
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/TargetConfig"
+          },
+          "type": "array",
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "version",
+        "targets"
+      ]
+    }
+  },
+  "title": "VDL Config Schema",
+  "description": "JSON Schema for the VDL Config"
+}

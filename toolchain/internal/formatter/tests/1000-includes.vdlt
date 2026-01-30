@@ -1,0 +1,7 @@
+include "./foo.vdl"
+  include   "./bar.vdl"
+
+// >>>>
+
+include "./foo.vdl"
+include "./bar.vdl"

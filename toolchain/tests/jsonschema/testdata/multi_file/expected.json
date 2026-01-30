@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "Pagination": {
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "page": {
+          "type": "integer"
+        }
+      },
+      "required": ["limit", "page"],
+      "type": "object"
+    },
+    "Status": {
+      "enum": ["Active", "Inactive"],
+      "type": "string"
+    },
+    "User": {
+      "description": "User type documentation loaded from external file.",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/Status"
+        }
+      },
+      "required": ["email", "id", "name", "status"],
+      "type": "object"
+    },
+    "UserServiceGetUserInput": {
+      "description": "Input for UserService/GetUser procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "UserServiceGetUserOutput": {
+      "description": "Output for UserService/GetUser procedure",
+      "properties": {
+        "user": {
+          "$ref": "#/$defs/User"
+        }
+      },
+      "required": ["user"],
+      "type": "object"
+    },
+    "UserServiceListUsersInput": {
+      "description": "Input for UserService/ListUsers procedure",
+      "properties": {
+        "limit": {
+          "type": "integer"
+        },
+        "page": {
+          "type": "integer"
+        }
+      },
+      "required": ["limit", "page"],
+      "type": "object"
+    },
+    "UserServiceListUsersOutput": {
+      "description": "Output for UserService/ListUsers procedure",
+      "properties": {
+        "total": {
+          "type": "integer"
+        },
+        "users": {
+          "items": {
+            "$ref": "#/$defs/User"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["total", "users"],
+      "type": "object"
+    }
+  },
+  "$id": "https://example.com/multi-file.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

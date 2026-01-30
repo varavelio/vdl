@@ -1,0 +1,19 @@
+// Shared types used across the schema
+
+""" ./doc.md """
+type User {
+  id: string
+  name: string
+  email: string
+  status: Status
+}
+
+type Pagination {
+  page: int
+  limit: int
+}
+
+enum Status {
+  Active
+  Inactive
+}

@@ -26,7 +26,7 @@
 
     <div class="flex items-center justify-center space-x-2">
       <a
-        href="https://github.com/uforg/uforpc"
+        href="https://github.com/varavelio/vdl"
         target="_blank"
         class={{
           "btn btn-primary": true,
@@ -37,7 +37,7 @@
         View on GitHub
       </a>
       <a
-        href="https://uforpc.uforg.dev"
+        href="https://vdl.varavel.com"
         target="_blank"
         class={{
           "btn btn-outline": true,
@@ -64,17 +64,17 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/license-code"
+                href="https://vdl.varavel.com/license"
                 target="_blank"
                 class="link"
               >
-                UFO RPC Generator: AGPL-3.0
+                VDL Generator: MIT
               </a>
               - Ensures this project remains free and open source forever
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/license-gen"
+                href="https://vdl.varavel.com/license"
                 target="_blank"
                 class="link"
               >
@@ -85,28 +85,9 @@
           </ul>
 
           <p class="text-base-content/80 leading-relaxed">
-            <strong>What This Means</strong>
-          </p>
-
-          <ul class="list-inside list-disc">
-            <li>
-              ✅ For UFO RPC: Anyone who modifies UFO RPC must share their
-              changes with the community
-            </li>
-            <li>
-              ✅ For Your Code: Use generated code in any project (commercial,
-              private, open source)
-            </li>
-            <li>
-              ✅ Forever Free: No one can make UFO RPC proprietary or
-              closed-source
-            </li>
-          </ul>
-
-          <p class="text-base-content/80 leading-relaxed">
-            UFO RPC is provided "AS IS" without warranty of any kind. The
-            authors assume no responsibility for damages or losses from using
-            this software. You are responsible for testing generated code before
+            VDL is provided "AS IS" without warranty of any kind. The authors
+            assume no responsibility for damages or losses from using this
+            software. You are responsible for testing generated code before
             production use.
           </p>
         </div>
@@ -118,14 +99,13 @@
         <h2 class="card-title mb-4 text-2xl">Dependencies</h2>
         <div class="space-y-4">
           <p class="text-base-content/80 leading-relaxed">
-            UFO RPC is possible thanks to the following awesome open-source
-            projects
+            VDL is possible thanks to the following awesome open-source projects
           </p>
 
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://github.com/uforg/uforpc/blob/main/urpc/go.mod"
+                href="https://github.com/varavelio/vdl/blob/main/urpc/go.mod"
                 target="_blank"
                 class="link"
               >
@@ -134,7 +114,7 @@
             </li>
             <li>
               <a
-                href="https://github.com/uforg/uforpc/blob/main/playground/package.json"
+                href="https://github.com/varavelio/vdl/blob/main/playground/package.json"
                 target="_blank"
                 class="link"
               >
@@ -153,7 +133,7 @@
           <p class="text-base-content/80 leading-relaxed">
             This project was created and is maintained with ❤️ by
             <a
-              href="https://uforpc.uforg.dev/r/author/web"
+              href="https://vdl.varavel.com/author"
               target="_blank"
               class="link"
             >
@@ -164,7 +144,7 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/web"
+                href="https://vdl.varavel.com/author"
                 target="_blank"
                 class="link"
               >
@@ -173,7 +153,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/gh"
+                href="https://vdl.varavel.com/author/github"
                 target="_blank"
                 class="link"
               >
@@ -182,7 +162,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/linkedin"
+                href="https://vdl.varavel.com/author/linkedin"
                 target="_blank"
                 class="link"
               >
@@ -191,7 +171,7 @@
             </li>
             <li>
               <a
-                href="https://uforpc.uforg.dev/r/author/x"
+                href="https://vdl.varavel.com/author/x"
                 target="_blank"
                 class="link"
               >

@@ -1,0 +1,6 @@
+include "./common.vdl"
+
+type User {
+  ...BaseEntity
+  name: string
+}

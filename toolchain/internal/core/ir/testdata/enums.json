@@ -1,0 +1,117 @@
+{
+  "types": [
+    {
+      "name": "Order",
+      "fields": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "status",
+          "type": {
+            "kind": "enum",
+            "enum": "OrderStatus",
+            "enumInfo": {
+              "valueType": "string"
+            }
+          }
+        },
+        {
+          "name": "priority",
+          "type": {
+            "kind": "enum",
+            "enum": "Priority",
+            "enumInfo": {
+              "valueType": "int"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "HttpMethod",
+      "doc": "HTTP methods with explicit string values.",
+      "valueType": "string",
+      "members": [
+        {
+          "name": "Get",
+          "value": "GET"
+        },
+        {
+          "name": "Post",
+          "value": "POST"
+        },
+        {
+          "name": "Put",
+          "value": "PUT"
+        },
+        {
+          "name": "Delete",
+          "value": "DELETE"
+        }
+      ]
+    },
+    {
+      "name": "OrderStatus",
+      "doc": "Order status enum with implicit string values.",
+      "valueType": "string",
+      "members": [
+        {
+          "name": "Pending",
+          "value": "Pending"
+        },
+        {
+          "name": "Processing",
+          "value": "Processing"
+        },
+        {
+          "name": "Shipped",
+          "value": "Shipped"
+        },
+        {
+          "name": "Delivered",
+          "value": "Delivered"
+        },
+        {
+          "name": "Cancelled",
+          "value": "Cancelled"
+        }
+      ]
+    },
+    {
+      "name": "Priority",
+      "doc": "Priority levels with explicit int values.",
+      "valueType": "int",
+      "members": [
+        {
+          "name": "Low",
+          "value": "1"
+        },
+        {
+          "name": "Medium",
+          "value": "2"
+        },
+        {
+          "name": "High",
+          "value": "3"
+        },
+        {
+          "name": "Critical",
+          "value": "10"
+        }
+      ]
+    }
+  ],
+  "constants": [],
+  "patterns": [],
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
+}

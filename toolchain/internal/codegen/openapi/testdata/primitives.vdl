@@ -1,0 +1,73 @@
+""" Test for all primitive types and their combinations """
+
+rpc Primitives {
+  """ Test all primitive types """
+  proc AllPrimitives {
+    input {
+      stringField: string
+      intField: int
+      floatField: float
+      boolField: bool
+      datetimeField: datetime
+    }
+
+    output {
+      stringField: string
+      intField: int
+      floatField: float
+      boolField: bool
+      datetimeField: datetime
+    }
+  }
+
+  """ Test optional primitives """
+  proc OptionalPrimitives {
+    input {
+      requiredString: string
+      optionalString?: string
+      optionalInt?: int
+      optionalFloat?: float
+      optionalBool?: bool
+      optionalDatetime?: datetime
+    }
+
+    output {
+      allOptional?: {
+        a?: string
+        b?: int
+        c?: bool
+      }
+    }
+  }
+
+  """ Test arrays of primitives """
+  proc PrimitiveArrays {
+    input {
+      strings: string[]
+      ints: int[]
+      floats: float[]
+      bools: bool[]
+      datetimes: datetime[]
+    }
+
+    output {
+      stringMatrix: string[][]
+      intCube: int[][][]
+    }
+  }
+
+  """ Test maps of primitives """
+  proc PrimitiveMaps {
+    input {
+      stringMap: map<string>
+      intMap: map<int>
+      floatMap: map<float>
+      boolMap: map<bool>
+      datetimeMap: map<datetime>
+    }
+
+    output {
+      nestedStringMap: map<map<string>>
+    }
+  }
+}

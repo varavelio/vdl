@@ -1,0 +1,179 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: AnalyticsProcedures
+    description: Procedures for Analytics
+paths:
+  /Analytics/GetUserActivity:
+    post:
+      description: Get user activity with nested inline structures
+      requestBody:
+        $ref: "#/components/requestBodies/AnalyticsGetUserActivityInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/AnalyticsGetUserActivityOutput"
+      tags:
+        - AnalyticsProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  requestBodies:
+    AnalyticsGetUserActivityInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              filters:
+                properties:
+                  categories:
+                    items:
+                      type: string
+                    type: array
+                  dateRange:
+                    properties:
+                      end:
+                        format: date-time
+                        type: string
+                      start:
+                        format: date-time
+                        type: string
+                    required:
+                      - start
+                      - end
+                    type: object
+                  options:
+                    properties:
+                      includeDeleted:
+                        type: boolean
+                      pagination:
+                        properties:
+                          limit:
+                            type: integer
+                          page:
+                            type: integer
+                          sortBy:
+                            properties:
+                              direction:
+                                type: string
+                              field:
+                                type: string
+                            required:
+                              - field
+                              - direction
+                            type: object
+                        required:
+                          - page
+                          - limit
+                        type: object
+                    required:
+                      - includeDeleted
+                      - pagination
+                    type: object
+                required:
+                  - dateRange
+                  - options
+                type: object
+              userId:
+                type: string
+            required:
+              - userId
+              - filters
+            type: object
+      description: Request body for Analytics/GetUserActivity procedure
+  responses:
+    AnalyticsGetUserActivityOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  activities:
+                    items:
+                      properties:
+                        id:
+                          type: string
+                        metadata:
+                          properties:
+                            location:
+                              properties:
+                                address:
+                                  properties:
+                                    city:
+                                      type: string
+                                    country:
+                                      type: string
+                                    street:
+                                      type: string
+                                  required:
+                                    - street
+                                    - city
+                                    - country
+                                  type: object
+                                latitude:
+                                  type: number
+                                longitude:
+                                  type: number
+                              required:
+                                - latitude
+                                - longitude
+                              type: object
+                            source:
+                              type: string
+                            tags:
+                              items:
+                                type: string
+                              type: array
+                          required:
+                            - source
+                            - tags
+                          type: object
+                        timestamps:
+                          properties:
+                            created:
+                              format: date-time
+                              type: string
+                            updated:
+                              format: date-time
+                              type: string
+                          required:
+                            - created
+                          type: object
+                      required:
+                        - id
+                        - metadata
+                        - timestamps
+                      type: object
+                    type: array
+                required:
+                  - activities
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Analytics/GetUserActivity procedure

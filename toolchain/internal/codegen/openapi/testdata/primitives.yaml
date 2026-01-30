@@ -1,0 +1,340 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: PrimitivesProcedures
+    description: Procedures for Primitives
+paths:
+  /Primitives/AllPrimitives:
+    post:
+      description: Test all primitive types
+      requestBody:
+        $ref: "#/components/requestBodies/PrimitivesAllPrimitivesInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PrimitivesAllPrimitivesOutput"
+      tags:
+        - PrimitivesProcedures
+  /Primitives/OptionalPrimitives:
+    post:
+      description: Test optional primitives
+      requestBody:
+        $ref: "#/components/requestBodies/PrimitivesOptionalPrimitivesInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PrimitivesOptionalPrimitivesOutput"
+      tags:
+        - PrimitivesProcedures
+  /Primitives/PrimitiveArrays:
+    post:
+      description: Test arrays of primitives
+      requestBody:
+        $ref: "#/components/requestBodies/PrimitivesPrimitiveArraysInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PrimitivesPrimitiveArraysOutput"
+      tags:
+        - PrimitivesProcedures
+  /Primitives/PrimitiveMaps:
+    post:
+      description: Test maps of primitives
+      requestBody:
+        $ref: "#/components/requestBodies/PrimitivesPrimitiveMapsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PrimitivesPrimitiveMapsOutput"
+      tags:
+        - PrimitivesProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  requestBodies:
+    PrimitivesAllPrimitivesInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              boolField:
+                type: boolean
+              datetimeField:
+                format: date-time
+                type: string
+              floatField:
+                type: number
+              intField:
+                type: integer
+              stringField:
+                type: string
+            required:
+              - stringField
+              - intField
+              - floatField
+              - boolField
+              - datetimeField
+            type: object
+      description: Request body for Primitives/AllPrimitives procedure
+    PrimitivesOptionalPrimitivesInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              optionalBool:
+                type: boolean
+              optionalDatetime:
+                format: date-time
+                type: string
+              optionalFloat:
+                type: number
+              optionalInt:
+                type: integer
+              optionalString:
+                type: string
+              requiredString:
+                type: string
+            required:
+              - requiredString
+            type: object
+      description: Request body for Primitives/OptionalPrimitives procedure
+    PrimitivesPrimitiveArraysInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              bools:
+                items:
+                  type: boolean
+                type: array
+              datetimes:
+                items:
+                  format: date-time
+                  type: string
+                type: array
+              floats:
+                items:
+                  type: number
+                type: array
+              ints:
+                items:
+                  type: integer
+                type: array
+              strings:
+                items:
+                  type: string
+                type: array
+            required:
+              - strings
+              - ints
+              - floats
+              - bools
+              - datetimes
+            type: object
+      description: Request body for Primitives/PrimitiveArrays procedure
+    PrimitivesPrimitiveMapsInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              boolMap:
+                additionalProperties:
+                  type: boolean
+                type: object
+              datetimeMap:
+                additionalProperties:
+                  format: date-time
+                  type: string
+                type: object
+              floatMap:
+                additionalProperties:
+                  type: number
+                type: object
+              intMap:
+                additionalProperties:
+                  type: integer
+                type: object
+              stringMap:
+                additionalProperties:
+                  type: string
+                type: object
+            required:
+              - stringMap
+              - intMap
+              - floatMap
+              - boolMap
+              - datetimeMap
+            type: object
+      description: Request body for Primitives/PrimitiveMaps procedure
+  responses:
+    PrimitivesAllPrimitivesOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  boolField:
+                    type: boolean
+                  datetimeField:
+                    format: date-time
+                    type: string
+                  floatField:
+                    type: number
+                  intField:
+                    type: integer
+                  stringField:
+                    type: string
+                required:
+                  - stringField
+                  - intField
+                  - floatField
+                  - boolField
+                  - datetimeField
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Primitives/AllPrimitives procedure
+    PrimitivesOptionalPrimitivesOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  allOptional:
+                    properties:
+                      a:
+                        type: string
+                      b:
+                        type: integer
+                      c:
+                        type: boolean
+                    type: object
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Primitives/OptionalPrimitives procedure
+    PrimitivesPrimitiveArraysOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  intCube:
+                    items:
+                      items:
+                        items:
+                          type: integer
+                        type: array
+                      type: array
+                    type: array
+                  stringMatrix:
+                    items:
+                      items:
+                        type: string
+                      type: array
+                    type: array
+                required:
+                  - stringMatrix
+                  - intCube
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Primitives/PrimitiveArrays procedure
+    PrimitivesPrimitiveMapsOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  nestedStringMap:
+                    additionalProperties:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    type: object
+                required:
+                  - nestedStringMap
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Primitives/PrimitiveMaps procedure

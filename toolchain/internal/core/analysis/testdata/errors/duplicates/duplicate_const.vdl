@@ -1,0 +1,4 @@
+// @expect: E803
+
+const MAX_SIZE = 100
+const MAX_SIZE = 200

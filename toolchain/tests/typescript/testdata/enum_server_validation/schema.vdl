@@ -1,0 +1,153 @@
+// String enum with implicit values
+enum Color {
+  Red
+  Green
+  Blue
+}
+
+// Integer enum
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}
+
+// String enum with explicit values
+enum LogLevel {
+  Debug = "DEBUG"
+  Info = "INFO"
+  Warning = "WARN"
+  Error = "ERROR"
+}
+
+// Type containing enums
+type Settings {
+  color: Color
+  priority: Priority
+  logLevel: LogLevel
+}
+
+// Type with optional enums
+type OptionalSettings {
+  color?: Color
+  priority?: Priority
+}
+
+// Type with enum arrays
+type ColorPalette {
+  colors: Color[]
+  priorities: Priority[]
+}
+
+// Type with enum maps
+type ColorMap {
+  colorByName: map<Color>
+  priorityByTask: map<Priority>
+}
+
+// Nested type with enums
+type Nested {
+  settings: Settings
+  optSettings?: OptionalSettings
+}
+
+rpc Service {
+  // Test simple enum validation
+  proc EchoColor {
+    input {
+      color: Color
+    }
+
+    output {
+      color: Color
+    }
+  }
+
+  // Test integer enum validation
+  proc EchoPriority {
+    input {
+      priority: Priority
+    }
+
+    output {
+      priority: Priority
+    }
+  }
+
+  // Test explicit-value enum validation
+  proc EchoLogLevel {
+    input {
+      level: LogLevel
+    }
+
+    output {
+      level: LogLevel
+    }
+  }
+
+  // Test nested type with enums
+  proc EchoSettings {
+    input {
+      settings: Settings
+    }
+
+    output {
+      settings: Settings
+    }
+  }
+
+  // Test optional enums
+  proc EchoOptional {
+    input {
+      settings: OptionalSettings
+    }
+
+    output {
+      settings: OptionalSettings
+    }
+  }
+
+  // Test enum arrays
+  proc EchoPalette {
+    input {
+      palette: ColorPalette
+    }
+
+    output {
+      palette: ColorPalette
+    }
+  }
+
+  // Test enum maps
+  proc EchoColorMap {
+    input {
+      colorMap: ColorMap
+    }
+
+    output {
+      colorMap: ColorMap
+    }
+  }
+
+  // Test deeply nested type with enums
+  proc EchoNested {
+    input {
+      nested: Nested
+    }
+
+    output {
+      nested: Nested
+    }
+  }
+
+  // Test stream with enum validation
+  stream ColorStream {
+    input {
+      color: Color
+    }
+
+    output {
+      color: Color
+    }
+  }
+}

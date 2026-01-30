@@ -1,0 +1,7 @@
+{
+  "requiredFiles": ["index.html", "schema.vdl"],
+  "forbiddenFiles": ["config.json", ".gitkeep"],
+  "contentContains": {
+    "schema.vdl": ["type User", "rpc UserService", "proc GetUser"]
+  }
+}

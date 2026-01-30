@@ -1,0 +1,12 @@
+// Tests that generated imports work with import_extension: ".ts"
+rpc Echo {
+  proc Say {
+    input {
+      message: string
+    }
+
+    output {
+      message: string
+    }
+  }
+}

@@ -1,0 +1,25 @@
+type AuditFields {
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type User {
+  ...AuditFields
+  id: string
+  name: string
+}
+
+type Timestamps {
+  timestamp: datetime
+}
+
+type BaseEntity {
+  ...Timestamps
+  id: string
+}
+
+type NestedSpread {
+  ...BaseEntity
+  name: string
+  active: bool
+}

@@ -1,0 +1,108 @@
+""" Status of an order. """
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+}
+
+""" Priority levels. """
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}
+
+type PaginationParams {
+  page: int
+  limit: int
+}
+
+type PaginatedResponse {
+  totalItems: int
+  totalPages: int
+}
+
+""" A product in the catalog. """
+type Product {
+  id: string
+  name: string
+  price: float
+  status: OrderStatus
+  priority: Priority
+  tags?: string[]
+  metadata?: map<string>
+}
+
+""" Catalog service for managing products. """
+rpc Catalog {
+  """
+  # Product Management
+  Endpoints for product lifecycle.
+  """
+
+  """ Creates a new product. """
+  proc CreateProduct {
+    input {
+      name: string
+      price: float
+      status?: OrderStatus
+    }
+
+    output {
+      product: Product
+    }
+  }
+
+  """ Lists products with pagination. """
+  proc ListProducts {
+    input {
+      ...PaginationParams
+      filterByStatus?: OrderStatus
+    }
+
+    output {
+      ...PaginatedResponse
+      products: Product[]
+    }
+  }
+
+  deprecated("Use ListProducts instead")
+  proc GetAllProducts {
+    input {}
+
+    output {
+      products: Product[]
+    }
+  }
+}
+
+""" Chat service for real-time messaging. """
+rpc Chat {
+  """ Sends a message. """
+  proc SendMessage {
+    input {
+      chatId: string
+      text: string
+    }
+
+    output {
+      messageId: string
+      timestamp: datetime
+    }
+  }
+
+  """ Stream of new messages. """
+  stream NewMessages {
+    input {
+      chatId: string
+    }
+
+    output {
+      id: string
+      text: string
+      userId: string
+      timestamp: datetime
+    }
+  }
+}

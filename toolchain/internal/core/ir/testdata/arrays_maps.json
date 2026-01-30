@@ -1,0 +1,120 @@
+{
+  "types": [
+    {
+      "name": "Combined",
+      "fields": [
+        {
+          "name": "items",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "array",
+              "arrayItem": {
+                "kind": "primitive",
+                "primitive": "string"
+              },
+              "arrayDimensions": 1
+            }
+          }
+        },
+        {
+          "name": "lookup",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "map",
+              "mapValue": {
+                "kind": "primitive",
+                "primitive": "int"
+              }
+            },
+            "arrayDimensions": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "WithArrays",
+      "fields": [
+        {
+          "name": "tags",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "primitive",
+              "primitive": "string"
+            },
+            "arrayDimensions": 1
+          }
+        },
+        {
+          "name": "scores",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "primitive",
+              "primitive": "int"
+            },
+            "arrayDimensions": 1
+          }
+        },
+        {
+          "name": "matrix",
+          "type": {
+            "kind": "array",
+            "arrayItem": {
+              "kind": "primitive",
+              "primitive": "float"
+            },
+            "arrayDimensions": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "WithMaps",
+      "fields": [
+        {
+          "name": "metadata",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "primitive",
+              "primitive": "string"
+            }
+          }
+        },
+        {
+          "name": "counts",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "primitive",
+              "primitive": "int"
+            }
+          }
+        },
+        {
+          "name": "nested",
+          "type": {
+            "kind": "map",
+            "mapValue": {
+              "kind": "map",
+              "mapValue": {
+                "kind": "primitive",
+                "primitive": "bool"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "constants": [],
+  "patterns": [],
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
+}

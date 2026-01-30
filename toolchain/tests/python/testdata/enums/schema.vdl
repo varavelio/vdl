@@ -1,0 +1,43 @@
+""" String enum with explicit values. """
+enum Color {
+  Red = "red"
+  Green = "green"
+  Blue = "blue"
+}
+
+""" String enum with implicit values (member name used as value). """
+enum Status {
+  Pending
+  Active
+  Completed
+}
+
+""" Integer enum. """
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 10
+}
+
+""" Type that uses enums. """
+type Task {
+  name: string
+  status: Status
+  priority: Priority
+  color?: Color
+}
+
+rpc Service {
+  proc CreateTask {
+    input {
+      name: string
+      status: Status
+      priority: Priority
+    }
+
+    output {
+      task: Task
+    }
+  }
+}

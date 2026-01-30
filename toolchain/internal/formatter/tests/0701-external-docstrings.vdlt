@@ -1,0 +1,219 @@
+// Test: Single-line docstrings
+"""Single line doc"""
+type SingleLineType {}
+
+"""Const doc"""
+const CONST_VAL = "test"
+
+"""Pattern doc"""
+pattern PatternVal = "^test$"
+
+"""Enum doc"""
+enum EnumVal { A B }
+
+// Test: Multiline docstrings starting without leading newline (simulates external resolved)
+"""First line
+Second line"""
+type MultilineNoLeading {}
+
+"""Title here
+Body content
+More content"""
+const MULTI_CONST = 123
+
+"""Pattern title
+Pattern description"""
+pattern MultiPattern = "^[a-z]+$"
+
+"""Enum title
+Enum description"""
+enum MultiEnum { X Y }
+
+// Test: Multiline with leading newline
+"""
+With leading
+And trailing
+"""
+type MultilineWithLeading {}
+
+// Test: RPC with nested docstrings
+"""RPC doc
+with details"""
+rpc TestService {
+  """Proc doc
+multiline"""
+  proc TestProc {
+    input {
+      """Input field doc
+for testing"""
+      fieldA: string
+    }
+    output {
+      """Output doc
+multiline"""
+      result: int
+    }
+  }
+
+  """Stream doc
+streaming data"""
+  stream TestStream {
+    input {
+      """Stream input
+filter param"""
+      filter: string
+    }
+    output {
+      """Stream output
+event data"""
+      event: string
+    }
+  }
+}
+
+// Test: Type with nested fields
+"""Type with nesting
+complex structure"""
+type NestedFields {
+  """Level 1 field
+top level"""
+  level1: {
+    """Level 2 field
+nested once"""
+    level2: {
+      """Level 3 field
+deeply nested"""
+      value: string
+    }
+  }
+}
+
+// >>>>
+
+// Test: Single-line docstrings
+""" Single line doc """
+type SingleLineType {}
+
+""" Const doc """
+const CONST_VAL = "test"
+
+""" Pattern doc """
+pattern PatternVal = "^test$"
+
+""" Enum doc """
+enum EnumVal {
+  A
+  B
+}
+
+// Test: Multiline docstrings starting without leading newline (simulates external resolved)
+"""
+First line
+Second line
+"""
+type MultilineNoLeading {}
+
+"""
+Title here
+Body content
+More content
+"""
+const MULTI_CONST = 123
+
+"""
+Pattern title
+Pattern description
+"""
+pattern MultiPattern = "^[a-z]+$"
+
+"""
+Enum title
+Enum description
+"""
+enum MultiEnum {
+  X
+  Y
+}
+
+// Test: Multiline with leading newline
+"""
+With leading
+And trailing
+"""
+type MultilineWithLeading {}
+
+// Test: RPC with nested docstrings
+"""
+RPC doc
+with details
+"""
+rpc TestService {
+  """
+  Proc doc
+  multiline
+  """
+  proc TestProc {
+    input {
+      """
+      Input field doc
+      for testing
+      """
+      fieldA: string
+    }
+
+    output {
+      """
+      Output doc
+      multiline
+      """
+      result: int
+    }
+  }
+
+  """
+  Stream doc
+  streaming data
+  """
+  stream TestStream {
+    input {
+      """
+      Stream input
+      filter param
+      """
+      filter: string
+    }
+
+    output {
+      """
+      Stream output
+      event data
+      """
+      event: string
+    }
+  }
+}
+
+// Test: Type with nested fields
+"""
+Type with nesting
+complex structure
+"""
+type NestedFields {
+  """
+  Level 1 field
+  top level
+  """
+  level1: {
+    """
+    Level 2 field
+    nested once
+    """
+    level2: {
+      """
+      Level 3 field
+      deeply nested
+      """
+      value: string
+    }
+  }
+}

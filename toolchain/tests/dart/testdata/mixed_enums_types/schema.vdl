@@ -1,0 +1,59 @@
+// Test case H: Mixed Enums and Types
+// Verifies enums work correctly when used in List and Map containers
+
+enum Status {
+  Pending
+  Active
+  Completed
+  Cancelled
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+  Critical
+}
+
+enum Category {
+  Electronics = "ELECTRONICS"
+  Clothing = "CLOTHING"
+  Food = "FOOD"
+  Other = "OTHER"
+}
+
+type Task {
+  id: int
+  title: string
+  status: Status
+  priority: Priority
+}
+
+type TaskList {
+  // List of enums
+  statuses: Status[]
+  priorities: Priority[]
+  // Optional list of enums
+  categories?: Category[]
+}
+
+type StatusMap {
+  // Map with enum values
+  tasksByStatus: map<Status>
+  priorityByName: map<Priority>
+}
+
+type ComplexEnumContainers {
+  // Array of objects containing enums
+  tasks: Task[]
+  // Map of string to array of enums
+  statusGroups: map<Status[]>
+  // Optional complex structure
+  priorityMatrix?: Priority[][]
+}
+
+type EnumDefaults {
+  // Enums with defaults in containers
+  defaultStatuses: Status[]
+  defaultPriorities: Priority[]
+}

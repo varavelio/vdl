@@ -1,0 +1,10 @@
+rpc Service {
+  proc GetData {
+    input {}
+
+    output {
+      name: string
+      value: int
+    }
+  }
+}

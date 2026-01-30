@@ -1,3 +1,3 @@
-module github.com/uforg/uforpc/embedplayground
+module github.com/varavelio/vdl/playground
 
-go 1.24.2
+go 1.25

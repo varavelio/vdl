@@ -1,0 +1,74 @@
+rpc Service {
+  /* With docstring */          """
+  This is a test proc.
+  """deprecated("Deprecated")
+  stream 
+  Test   {    
+                      } 
+  
+  
+  deprecated stream ProcWithInput {input{
+    field1: string
+  }
+  }
+  
+  // With output
+  stream ProcWithOutput {
+    output
+    {  field1: datetime[
+  
+    ]""" Docstring """field2:string
+            // Comment
+  }
+  }
+  
+  
+  // With input and output
+  stream ProcFull {input{
+    field1: string
+  }
+  output
+    {  field1: datetime[
+  
+    ]
+  }         }
+}
+
+// >>>>
+
+rpc Service {
+  /* With docstring */
+  """
+  This is a test proc.
+  """
+  deprecated("Deprecated")
+  stream Test {}
+
+  deprecated stream ProcWithInput {
+    input {
+      field1: string
+    }
+  }
+
+  // With output
+  stream ProcWithOutput {
+    output {
+      field1: datetime[]
+
+      """ Docstring """
+      field2: string
+      // Comment
+    }
+  }
+
+  // With input and output
+  stream ProcFull {
+    input {
+      field1: string
+    }
+
+    output {
+      field1: datetime[]
+    }
+  }
+}

@@ -1,0 +1,30 @@
+// Tests custom filename and ID options
+
+type Config {
+  name: string
+  value: string
+  enabled: bool
+}
+
+rpc ConfigService {
+  proc GetConfig {
+    input {
+      key: string
+    }
+
+    output {
+      config: Config
+    }
+  }
+
+  proc SetConfig {
+    input {
+      key: string
+      value: string
+    }
+
+    output {
+      success: bool
+    }
+  }
+}

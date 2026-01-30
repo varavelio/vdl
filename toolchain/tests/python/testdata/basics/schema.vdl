@@ -1,0 +1,14 @@
+enum Status {
+  Active
+  Inactive
+}
+
+type User {
+  id: string
+  age: int
+  score: float
+  active: bool
+  status: Status
+  tags: string[]
+  meta: map<string>
+}

@@ -1,0 +1,64 @@
+{
+  "$defs": {
+    "Config": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["enabled", "name", "value"],
+      "type": "object"
+    },
+    "ConfigServiceGetConfigInput": {
+      "description": "Input for ConfigService/GetConfig procedure",
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      },
+      "required": ["key"],
+      "type": "object"
+    },
+    "ConfigServiceGetConfigOutput": {
+      "description": "Output for ConfigService/GetConfig procedure",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/Config"
+        }
+      },
+      "required": ["config"],
+      "type": "object"
+    },
+    "ConfigServiceSetConfigInput": {
+      "description": "Input for ConfigService/SetConfig procedure",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["key", "value"],
+      "type": "object"
+    },
+    "ConfigServiceSetConfigOutput": {
+      "description": "Output for ConfigService/SetConfig procedure",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": ["success"],
+      "type": "object"
+    }
+  },
+  "$id": "https://api.example.com/schemas/config/v2.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

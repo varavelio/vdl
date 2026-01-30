@@ -1,0 +1,13 @@
+rpc MyService {
+  proc MyProc {
+    input {}
+
+    output {}
+  }
+
+  stream MyStream {
+    input {}
+
+    output {}
+  }
+}

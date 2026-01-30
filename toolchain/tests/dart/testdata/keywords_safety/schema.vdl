@@ -1,0 +1,23 @@
+// Test schema for Dart reserved keywords
+// NOTE: VDL field names use camelCase which maps to Dart field names
+// This tests that the JSON keys preserve original names
+
+type SafeFields {
+  // These are safe field names that test JSON key preservation
+  finalValue: string
+  varName: string
+  constData: string
+  className: string
+  isActive: bool
+  inRange: bool
+  withPrefix: string
+  asType: string
+  newItem: string
+  defaultVal: string
+}
+
+type OptionalSafe {
+  finalValue?: string
+  varName?: int
+  className?: bool
+}

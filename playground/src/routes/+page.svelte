@@ -52,7 +52,7 @@
 
       <div class="mb-8 flex flex-wrap items-center justify-center gap-2">
         <a
-          href="https://github.com/uforg/uforpc"
+          href="https://github.com/varavelio/vdl"
           target="_blank"
           class={{
             "btn btn-primary": true,
@@ -63,7 +63,7 @@
           View on GitHub
         </a>
         <a
-          href="https://uforpc.uforg.dev"
+          href="https://vdl.varavel.com"
           target="_blank"
           class={{
             "btn btn-outline": true,

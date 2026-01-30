@@ -79,7 +79,7 @@
       {#if !storeUi.store.isMobile}
         <a
           class="sticky top-0 z-10 flex h-[72px] w-full items-end p-4"
-          href="https://uforpc.uforg.dev"
+          href="https://vdl.varavel.com"
           target="_blank"
         >
           <Tooltip content={versionWithPrefix} placement="right">

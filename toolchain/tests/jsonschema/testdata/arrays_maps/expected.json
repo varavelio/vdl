@@ -1,0 +1,337 @@
+{
+  "$defs": {
+    "DataContainer": {
+      "properties": {
+        "complexData": {
+          "additionalProperties": {
+            "properties": {
+              "count": {
+                "type": "integer"
+              },
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": ["count", "items"],
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "type": "object"
+        },
+        "cube": {
+          "items": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "deepArray": {
+          "items": {
+            "items": {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "flags": {
+          "items": {
+            "type": "boolean"
+          },
+          "type": "array"
+        },
+        "matrix": {
+          "items": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "matrixByName": {
+          "additionalProperties": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "pointMatrix": {
+          "items": {
+            "items": {
+              "$ref": "#/$defs/Point"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/Point"
+          },
+          "type": "array"
+        },
+        "pointsByName": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Point"
+          },
+          "type": "object"
+        },
+        "ratings": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "type": "object"
+        },
+        "scores": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "scoresByCategory": {
+          "additionalProperties": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        },
+        "tagGroups": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "timestamps": {
+          "items": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "complexData",
+        "counts",
+        "cube",
+        "deepArray",
+        "flags",
+        "matrix",
+        "matrixByName",
+        "metadata",
+        "pointMatrix",
+        "points",
+        "pointsByName",
+        "ratings",
+        "scores",
+        "scoresByCategory",
+        "tagGroups",
+        "tags",
+        "timestamps",
+        "values"
+      ],
+      "type": "object"
+    },
+    "DataServiceGetContainerInput": {
+      "description": "Input for DataService/GetContainer procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "DataServiceGetContainerOutput": {
+      "description": "Output for DataService/GetContainer procedure",
+      "properties": {
+        "container": {
+          "$ref": "#/$defs/DataContainer"
+        }
+      },
+      "required": ["container"],
+      "type": "object"
+    },
+    "DataServiceProcessArraysInput": {
+      "description": "Input for DataService/ProcessArrays procedure",
+      "properties": {
+        "items": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "matrix": {
+          "items": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/Point"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["items", "matrix", "points"],
+      "type": "object"
+    },
+    "DataServiceProcessArraysOutput": {
+      "description": "Output for DataService/ProcessArrays procedure",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "processed": {
+          "type": "boolean"
+        }
+      },
+      "required": ["count", "processed"],
+      "type": "object"
+    },
+    "DataServiceProcessMapsInput": {
+      "description": "Input for DataService/ProcessMaps procedure",
+      "properties": {
+        "data": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "nested": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "type": "object"
+        }
+      },
+      "required": ["data", "nested"],
+      "type": "object"
+    },
+    "DataServiceProcessMapsOutput": {
+      "description": "Output for DataService/ProcessMaps procedure",
+      "properties": {
+        "result": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": ["result"],
+      "type": "object"
+    },
+    "NestedMaps": {
+      "properties": {
+        "level1": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "level2": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "mixed": {
+          "additionalProperties": {
+            "properties": {
+              "inner": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "type": "object"
+              }
+            },
+            "required": ["inner"],
+            "type": "object"
+          },
+          "type": "object"
+        }
+      },
+      "required": ["level1", "level2", "mixed"],
+      "type": "object"
+    },
+    "Point": {
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": ["x", "y"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

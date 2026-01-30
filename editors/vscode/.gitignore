@@ -1,0 +1,13 @@
+node_modules/
+dist/
+bin/
+
+# Temp
+tmp/
+temp/
+
+# Test files
+schema.vdl
+
+# VS Code
+*.vsix

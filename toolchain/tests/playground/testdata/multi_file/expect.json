@@ -1,0 +1,19 @@
+{
+  "requiredFiles": ["index.html", "schema.vdl"],
+  "forbiddenFiles": ["config.json", ".gitkeep"],
+  "contentContains": {
+    "schema.vdl": [
+      "rpc OrderService",
+      "proc GetOrder",
+      "proc ListOrders",
+      "type Order",
+      "enum OrderStatus",
+      "/* Comment */",
+      "\"\"\" OrderService Docs \"\"\"",
+      "\"\"\" OrderStatus docs \"\"\"",
+      "// EOL Comment",
+      "# Test external",
+      "External documentation"
+    ]
+  }
+}

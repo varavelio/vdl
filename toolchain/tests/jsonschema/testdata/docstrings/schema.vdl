@@ -1,0 +1,62 @@
+// Tests docstrings on types, fields, and enums
+
+""" Represents a user in the system """
+type User {
+  """ The unique identifier for the user """
+  id: string
+
+  """ The user's display name """
+  name: string
+
+  """ The user's email address (must be unique) """
+  email: string
+
+  """ Whether the user account is active """
+  isActive: bool
+
+  """ When the user was created """
+  createdAt: datetime
+}
+
+"""
+Represents the status of an operation.
+Can be used to track the progress of async tasks.
+"""
+enum OperationStatus {
+  Pending = "pending"
+  Running = "running"
+  Completed = "completed"
+  Failed = "failed"
+}
+
+""" Contains configuration for API requests """
+type RequestConfig {
+  """ The timeout in milliseconds """
+  timeout?: int
+
+  """ Maximum number of retry attempts """
+  retries?: int
+
+  """ Custom headers to include """
+  headers?: map<string>
+}
+
+rpc UserService {
+  proc GetUser {
+    input {
+      """ The ID of the user to retrieve """
+      userId: string
+
+      """ Optional configuration for the request """
+      config?: RequestConfig
+    }
+
+    output {
+      """ The retrieved user """
+      user: User
+
+      """ The status of the retrieval operation """
+      status: OperationStatus
+    }
+  }
+}

@@ -1,0 +1,649 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: AuthProcedures
+    description: Authentication service
+  - name: AuthStreams
+    description: Authentication service
+  - name: NotificationsProcedures
+    description: Notifications service
+  - name: NotificationsStreams
+    description: Notifications service
+  - name: UsersProcedures
+    description: User management service
+  - name: UsersStreams
+    description: User management service
+paths:
+  /Auth/Login:
+    post:
+      description: Login procedure
+      requestBody:
+        $ref: "#/components/requestBodies/AuthLoginInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthLoginOutput"
+      tags:
+        - AuthProcedures
+  /Auth/Logout:
+    post:
+      description: Logout procedure
+      requestBody:
+        $ref: "#/components/requestBodies/AuthLogoutInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthLogoutOutput"
+      tags:
+        - AuthProcedures
+  /Auth/SessionStatus:
+    post:
+      description: Session status stream
+      requestBody:
+        $ref: "#/components/requestBodies/AuthSessionStatusInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthSessionStatusOutput"
+      tags:
+        - AuthStreams
+  /Notifications/Send:
+    post:
+      description: Send notification
+      requestBody:
+        $ref: "#/components/requestBodies/NotificationsSendInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/NotificationsSendOutput"
+      tags:
+        - NotificationsProcedures
+  /Notifications/Subscribe:
+    post:
+      description: Subscribe to notifications
+      requestBody:
+        $ref: "#/components/requestBodies/NotificationsSubscribeInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/NotificationsSubscribeOutput"
+      tags:
+        - NotificationsStreams
+  /Users/Changes:
+    post:
+      description: Stream user changes
+      requestBody:
+        $ref: "#/components/requestBodies/UsersChangesInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersChangesOutput"
+      tags:
+        - UsersStreams
+  /Users/Create:
+    post:
+      description: Create a new user
+      requestBody:
+        $ref: "#/components/requestBodies/UsersCreateInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersCreateOutput"
+      tags:
+        - UsersProcedures
+  /Users/List:
+    post:
+      description: List users with filters
+      requestBody:
+        $ref: "#/components/requestBodies/UsersListInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersListOutput"
+      tags:
+        - UsersProcedures
+  /Users/Update:
+    post:
+      description: Update user
+      requestBody:
+        $ref: "#/components/requestBodies/UsersUpdateInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersUpdateOutput"
+      tags:
+        - UsersProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Permission:
+      properties:
+        actions:
+          items:
+            type: string
+          type: array
+        resource:
+          type: string
+      required:
+        - resource
+        - actions
+      type: object
+    Role:
+      enum:
+        - Admin
+        - User
+        - Guest
+      type: string
+    Status:
+      enum:
+        - 1
+        - 2
+        - 3
+      type: integer
+    User:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          $ref: "#/components/schemas/Role"
+        status:
+          $ref: "#/components/schemas/Status"
+      required:
+        - id
+        - name
+        - role
+        - status
+      type: object
+  requestBodies:
+    AuthLoginInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+            required:
+              - email
+              - password
+            type: object
+      description: Request body for Auth/Login procedure
+    AuthLogoutInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              token:
+                type: string
+            required:
+              - token
+            type: object
+      description: Request body for Auth/Logout procedure
+    AuthSessionStatusInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              token:
+                type: string
+            required:
+              - token
+            type: object
+      description: Request body for Auth/SessionStatus stream subscription
+    NotificationsSendInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              body:
+                type: string
+              data:
+                additionalProperties:
+                  type: string
+                type: object
+              title:
+                type: string
+              userId:
+                type: string
+            required:
+              - userId
+              - title
+              - body
+            type: object
+      description: Request body for Notifications/Send procedure
+    NotificationsSubscribeInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              channels:
+                items:
+                  type: string
+                type: array
+              userId:
+                type: string
+            required:
+              - userId
+            type: object
+      description: Request body for Notifications/Subscribe stream subscription
+    UsersChangesInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              userIds:
+                items:
+                  type: string
+                type: array
+            type: object
+      description: Request body for Users/Changes stream subscription
+    UsersCreateInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              email:
+                type: string
+              metadata:
+                additionalProperties:
+                  type: string
+                type: object
+              name:
+                type: string
+              role:
+                $ref: "#/components/schemas/Role"
+            required:
+              - name
+              - email
+              - role
+            type: object
+      description: Request body for Users/Create procedure
+    UsersListInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              limit:
+                type: integer
+              offset:
+                type: integer
+              roles:
+                items:
+                  $ref: "#/components/schemas/Role"
+                type: array
+              search:
+                type: string
+              statuses:
+                items:
+                  $ref: "#/components/schemas/Status"
+                type: array
+            required:
+              - limit
+              - offset
+            type: object
+      description: Request body for Users/List procedure
+    UsersUpdateInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              role:
+                $ref: "#/components/schemas/Role"
+              status:
+                $ref: "#/components/schemas/Status"
+            required:
+              - id
+            type: object
+      description: Request body for Users/Update procedure
+  responses:
+    AuthLoginOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  permissions:
+                    items:
+                      $ref: "#/components/schemas/Permission"
+                    type: array
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - token
+                  - user
+                  - permissions
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Auth/Login procedure
+    AuthLogoutOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Auth/Logout procedure
+    AuthSessionStatusOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  expiresAt:
+                    format: date-time
+                    type: string
+                  isValid:
+                    type: boolean
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - isValid
+                  - expiresAt
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for Auth/SessionStatus stream
+    NotificationsSendOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  notificationId:
+                    type: string
+                  sentAt:
+                    format: date-time
+                    type: string
+                required:
+                  - notificationId
+                  - sentAt
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Notifications/Send procedure
+    NotificationsSubscribeOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  body:
+                    type: string
+                  data:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  id:
+                    type: string
+                  receivedAt:
+                    format: date-time
+                    type: string
+                  title:
+                    type: string
+                required:
+                  - id
+                  - title
+                  - body
+                  - receivedAt
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for Notifications/Subscribe stream
+    UsersChangesOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  changeType:
+                    type: string
+                  timestamp:
+                    format: date-time
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+                  userId:
+                    type: string
+                required:
+                  - userId
+                  - changeType
+                  - user
+                  - timestamp
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for Users/Changes stream
+    UsersCreateOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - user
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Users/Create procedure
+    UsersListOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  total:
+                    type: integer
+                  users:
+                    items:
+                      $ref: "#/components/schemas/User"
+                    type: array
+                required:
+                  - users
+                  - total
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Users/List procedure
+    UsersUpdateOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - user
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Users/Update procedure

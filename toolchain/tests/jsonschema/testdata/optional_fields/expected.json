@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "ApiResponse": {
+      "properties": {
+        "data": {
+          "properties": {
+            "items": {
+              "items": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "page": {
+              "type": "integer"
+            },
+            "total": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "error": {
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": ["code", "message"],
+          "type": "object"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "required": ["success"],
+      "type": "object"
+    },
+    "SearchFilters": {
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "maxPrice": {
+          "type": "number"
+        },
+        "minPrice": {
+          "type": "number"
+        },
+        "query": {
+          "type": "string"
+        },
+        "sortBy": {
+          "type": "string"
+        },
+        "sortOrder": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["query"],
+      "type": "object"
+    },
+    "UserProfile": {
+      "properties": {
+        "avatar": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "settings": {
+          "properties": {
+            "language": {
+              "type": "string"
+            },
+            "notifications": {
+              "type": "boolean"
+            },
+            "theme": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "username"],
+      "type": "object"
+    },
+    "UserServiceGetProfileInput": {
+      "description": "Input for UserService/GetProfile procedure",
+      "properties": {
+        "includeSettings": {
+          "type": "boolean"
+        },
+        "userId": {
+          "type": "string"
+        }
+      },
+      "required": ["userId"],
+      "type": "object"
+    },
+    "UserServiceGetProfileOutput": {
+      "description": "Output for UserService/GetProfile procedure",
+      "properties": {
+        "profile": {
+          "$ref": "#/$defs/UserProfile"
+        }
+      },
+      "required": ["profile"],
+      "type": "object"
+    },
+    "UserServiceSearchInput": {
+      "description": "Input for UserService/Search procedure",
+      "properties": {
+        "filters": {
+          "$ref": "#/$defs/SearchFilters"
+        }
+      },
+      "required": ["filters"],
+      "type": "object"
+    },
+    "UserServiceSearchOutput": {
+      "description": "Output for UserService/Search procedure",
+      "properties": {
+        "response": {
+          "$ref": "#/$defs/ApiResponse"
+        }
+      },
+      "required": ["response"],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,157 @@
+type Address {
+  street: string
+  city: string
+}
+
+type Person {
+  name: string
+  address: Address
+}
+
+type Team {
+  leader: Person
+  members: Person[]
+}
+
+type Organization {
+  name: string
+  teams: Team[]
+  contacts: map<Person>
+}
+
+// Types for testing optional nested with required inner fields
+type RequiredInner {
+  required1: string
+  required2: int
+}
+
+type OptionalNested {
+  id: string
+  // Optional object where if present, all inner fields are required
+  details?: RequiredInner
+}
+
+type DeepOptionalNested {
+  id: string
+  // Optional nested structure with multiple levels
+  level1?: {
+    required1: string
+    level2?: {
+      required2: string
+      level3: {
+        required3: string
+      }
+    }
+  }
+}
+
+type OptionalArrayNested {
+  id: string
+  // Optional array where each element must have all required fields
+  items?: RequiredInner[]
+}
+
+type OptionalMapNested {
+  id: string
+  // Optional map where each value must have all required fields
+  entries?: map<RequiredInner>
+}
+
+type ComplexOptionalValidation {
+  id: string
+  // Multiple optional fields with different structures
+  simpleOptional?: string
+  nestedOptional?: RequiredInner
+  arrayOptional?: RequiredInner[]
+  mapOptional?: map<RequiredInner>
+  // Deeply nested optional with mixed required/optional
+  deepOptional?: {
+    outerRequired: string
+    innerOptional?: {
+      innerRequired: string
+    }
+  }
+}
+
+rpc Service {
+  proc ValidatePerson {
+    input {
+      person: Person
+    }
+
+    output {}
+  }
+
+  proc ValidateTeam {
+    input {
+      team: Team
+    }
+
+    output {}
+  }
+
+  proc ValidateOrganization {
+    input {
+      org: Organization
+    }
+
+    output {}
+  }
+
+  proc ValidateArray {
+    input {
+      people: Person[]
+    }
+
+    output {}
+  }
+
+  proc ValidateMap {
+    input {
+      contacts: map<Address>
+    }
+
+    output {}
+  }
+
+  // New procs for optional nested validation
+  proc ValidateOptionalNested {
+    input {
+      data: OptionalNested
+    }
+
+    output {}
+  }
+
+  proc ValidateDeepOptionalNested {
+    input {
+      data: DeepOptionalNested
+    }
+
+    output {}
+  }
+
+  proc ValidateOptionalArrayNested {
+    input {
+      data: OptionalArrayNested
+    }
+
+    output {}
+  }
+
+  proc ValidateOptionalMapNested {
+    input {
+      data: OptionalMapNested
+    }
+
+    output {}
+  }
+
+  proc ValidateComplexOptional {
+    input {
+      data: ComplexOptionalValidation
+    }
+
+    output {}
+  }
+}

@@ -1,0 +1,29 @@
+"""
+Topic pattern for user events.
+"""
+pattern UserTopic = "events.users.{userId}.{action}"
+
+"""
+Cache key pattern.
+"""
+pattern CacheKey = "cache:{prefix}:{key}"
+
+"""
+Simple pattern with single placeholder.
+"""
+pattern SimpleRoute = "/api/v1/{resource}"
+
+"""
+Pattern with placeholder at the start.
+"""
+pattern PrefixedPath = "{prefix}/suffix"
+
+"""
+Pattern with no placeholders (edge case).
+"""
+pattern StaticPath = "static/path/to/resource"
+
+"""
+Duplicated placeholders
+"""
+pattern DuplicatedPlaceholder = "users.{userId}.{action}.{userId}"

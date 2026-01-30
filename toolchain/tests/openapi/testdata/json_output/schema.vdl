@@ -1,0 +1,18 @@
+// Tests JSON output format
+
+type Entity {
+  id: string
+  value: int
+}
+
+rpc EntityService {
+  proc GetEntity {
+    input {
+      id: string
+    }
+
+    output {
+      entity: Entity
+    }
+  }
+}

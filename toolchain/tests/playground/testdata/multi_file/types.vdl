@@ -1,0 +1,15 @@
+""" ./doc.md """
+
+type Order {
+  id: string
+  userId: string
+  total: float
+  status: OrderStatus
+}
+
+""" OrderStatus docs """
+enum OrderStatus {
+  Pending // EOL Comment
+  Shipped
+  Delivered
+}

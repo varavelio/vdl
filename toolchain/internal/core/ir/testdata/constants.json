@@ -1,0 +1,41 @@
+{
+  "types": [],
+  "enums": [],
+  "constants": [
+    {
+      "name": "API_VERSION",
+      "doc": "API version string.",
+      "valueType": "string",
+      "value": "1.0.0"
+    },
+    {
+      "name": "DEFAULT_TAX_RATE",
+      "doc": "Default tax rate.",
+      "valueType": "float",
+      "value": "0.21"
+    },
+    {
+      "name": "FEATURE_NEW_UI",
+      "doc": "Feature flag for new UI.",
+      "valueType": "bool",
+      "value": "true"
+    },
+    {
+      "name": "LEGACY_MODE",
+      "doc": "Legacy mode disabled.",
+      "valueType": "bool",
+      "value": "false"
+    },
+    {
+      "name": "MAX_PAGE_SIZE",
+      "doc": "Maximum items per page.",
+      "valueType": "int",
+      "value": "100"
+    }
+  ],
+  "patterns": [],
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
+}

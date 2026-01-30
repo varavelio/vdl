@@ -1,0 +1,37 @@
+deprecated	type legacyUser { 
+id   :	string 
+}   
+
+deprecated ( "Use NewService instead") 
+rpc  	  oldService  	  { 
+deprecated proc fetchData {  	  }  	  
+} 
+
+deprecated   enum oldStatus { 
+Active 
+Inactive   
+} 
+
+deprecated const old_limit =   100	
+
+deprecated	pattern oldPattern = "old.{id}"
+
+// >>>>
+
+deprecated type LegacyUser {
+  id: string
+}
+
+deprecated("Use NewService instead")
+rpc OldService {
+  deprecated proc FetchData {}
+}
+
+deprecated enum OldStatus {
+  Active
+  Inactive
+}
+
+deprecated const OLD_LIMIT = 100
+
+deprecated pattern OldPattern = "old.{id}"

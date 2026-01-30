@@ -1,0 +1,7 @@
+version: 1
+schema: schema.vdl
+targets:
+  - jsonschema:
+      output: gen
+      id: https://api.example.com/schemas/config/v2.0.0
+      filename: config-schema.json

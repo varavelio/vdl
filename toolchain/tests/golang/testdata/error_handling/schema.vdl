@@ -1,0 +1,15 @@
+rpc Auth {
+  proc Login {
+    input {}
+
+    output {}
+  }
+}
+
+rpc Users {
+  proc Get {
+    input {}
+
+    output {}
+  }
+}

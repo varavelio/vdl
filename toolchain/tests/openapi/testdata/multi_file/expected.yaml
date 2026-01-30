@@ -1,0 +1,166 @@
+openapi: 3.0.0
+info:
+  title: Multi-File API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: UserServiceProcedures
+    description: Procedures for UserService
+paths:
+  /UserService/GetUser:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/UserServiceGetUserInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserServiceGetUserOutput"
+      tags:
+        - UserServiceProcedures
+  /UserService/ListUsers:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/UserServiceListUsersInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserServiceListUsersOutput"
+      tags:
+        - UserServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Pagination:
+      properties:
+        limit:
+          type: integer
+        page:
+          type: integer
+      required:
+        - page
+        - limit
+      type: object
+    Status:
+      enum:
+        - Active
+        - Inactive
+      type: string
+    User:
+      description: User type documentation loaded from external file.
+      properties:
+        email:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          $ref: "#/components/schemas/Status"
+      required:
+        - id
+        - name
+        - email
+        - status
+      type: object
+  requestBodies:
+    UserServiceGetUserInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+            required:
+              - id
+            type: object
+      description: Request body for UserService/GetUser procedure
+    UserServiceListUsersInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              limit:
+                type: integer
+              page:
+                type: integer
+            required:
+              - page
+              - limit
+            type: object
+      description: Request body for UserService/ListUsers procedure
+  responses:
+    UserServiceGetUserOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - user
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for UserService/GetUser procedure
+    UserServiceListUsersOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  total:
+                    type: integer
+                  users:
+                    items:
+                      $ref: "#/components/schemas/User"
+                    type: array
+                required:
+                  - users
+                  - total
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for UserService/ListUsers procedure

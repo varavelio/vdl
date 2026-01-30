@@ -1,0 +1,41 @@
+// Valid spread usage
+
+type BaseEntity {
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type Timestamps {
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type Identifiable {
+  id: string
+}
+
+type User {
+  ...BaseEntity
+  name: string
+  email: string
+}
+
+type Article {
+  ...Identifiable
+  title: string
+  content: string
+}
+
+rpc Users {
+  proc CreateUser {
+    input {
+      ...BaseEntity
+      name: string
+    }
+
+    output {
+      success: bool
+    }
+  }
+}

@@ -1,0 +1,12 @@
+rpc Service {
+  proc Echo {
+    input {
+      data: string
+    }
+
+    output {
+      data: string
+      receivedTraceId: string
+    }
+  }
+}

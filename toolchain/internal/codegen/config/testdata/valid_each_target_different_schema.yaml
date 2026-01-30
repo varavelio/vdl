@@ -1,0 +1,13 @@
+version: 1
+schema: ./default.vdl
+targets:
+  - go:
+      output: ./gen/go
+      schema: ./go-schema.vdl
+      package: main
+  - typescript:
+      output: ./gen/ts
+      schema: ./ts-schema.vdl
+  - dart:
+      output: ./gen/dart
+      schema: ./dart-schema.vdl

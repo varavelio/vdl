@@ -3,7 +3,7 @@
 </script>
 
 <a
-  href="https://uforpc.uforg.dev"
+  href="https://vdl.varavel.com"
   target="_blank"
   class="btn btn-ghost justify-start space-x-1"
 >

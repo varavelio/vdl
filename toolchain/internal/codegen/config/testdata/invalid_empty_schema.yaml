@@ -1,0 +1,6 @@
+version: 1
+schema: ""
+targets:
+  - go:
+      output: ./gen/go
+      package: main

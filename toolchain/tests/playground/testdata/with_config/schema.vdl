@@ -1,0 +1,17 @@
+type Product {
+  id: string
+  name: string
+  price: float
+}
+
+rpc ProductService {
+  proc GetProduct {
+    input {
+      id: string
+    }
+
+    output {
+      product: Product
+    }
+  }
+}

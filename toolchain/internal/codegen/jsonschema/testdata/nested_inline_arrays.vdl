@@ -1,0 +1,48 @@
+type ComplexRoot {
+  // 1. Array of objects with nested maps and arrays
+  layer1: {
+    id: string
+    // Map where values are string arrays: {"key": ["a", "b"]}
+    tags: map<string[]>
+    // Array of maps where values are ints: [{"key": 1}, {"key": 2}]
+    scores: map<int>[]
+  }[]
+
+  // 2. Map where values are objects containing arrays of maps and maps of objects
+  layer2: map<{
+    // 2D Array of maps: [[{"k": 1.0}], [{"k": 2.0}]]
+    grid: map<float>[][]
+    // Map where values are inline objects: {"conf1": {active: true}}
+    config: map<{
+      active: bool
+      retries: int
+    }>
+  }>
+
+  // 3. Deeply nested edge case
+  // Map<Array<Map<Array<Object>>>>
+  // A map (keys=string) pointing to...
+  // An array of...
+  // Maps (keys=string) pointing to...
+  // An array of...
+  // Inline Objects
+  edgeCase: map<map<{
+    raw: string
+    // Map inside the deepest object
+    parsed: map<string>
+  }[]>[]>
+
+  // 4. Pure nested arrays of inline objects
+  pureNested: {
+    level1: string
+    children: {
+      level2: int
+      grandchildren: {
+        level3: bool
+        matrix: {
+          val: float
+        }[][]
+      }[]
+    }[]
+  }[]
+}

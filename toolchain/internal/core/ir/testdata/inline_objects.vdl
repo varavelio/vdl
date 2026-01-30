@@ -1,0 +1,25 @@
+type Location {
+  latitude: float
+  longitude: float
+}
+
+type Address {
+  street: string
+  city: string
+  location: {
+    lat: float
+    lng: float
+  }
+}
+
+type Company {
+  name: string
+  headquarters: {
+    address: string
+    floors: int
+    amenities: {
+      hasGym: bool
+      hasCafeteria: bool
+    }
+  }
+}

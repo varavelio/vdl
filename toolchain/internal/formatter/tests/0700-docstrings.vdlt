@@ -1,0 +1,103 @@
+""" Standalone """
+
+""" Standalone """ // Comment
+  """ 
+    Standalone
+    
+          Multi-line
+    """
+
+
+""" Standalone """/* Comment */""" Standalone """""" Associated """ type Test {} """ Standalone """
+
+rpc Service { """ Associated """ proc Test {} }
+
+""" Standalone """
+// Comment
+""" Standalone """
+
+// Comment
+
+""" Standalone """
+
+// Nested Docstring
+rpc MyRpc {
+  proc MyProc {
+    input {
+      foo: {
+        bar: {
+          baz: {
+            qux: {
+"""
+        This Docstring
+    Should
+      be
+        Formatted Correctly
+          """
+              field1: string
+                  """This one too""" field2: int
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// >>>>
+
+""" Standalone """
+
+""" Standalone """ // Comment
+"""
+Standalone
+
+      Multi-line
+"""
+
+""" Standalone """ /* Comment */
+""" Standalone """
+
+""" Associated """
+type Test {}
+
+""" Standalone """
+
+rpc Service {
+  """ Associated """
+  proc Test {}
+}
+
+""" Standalone """
+// Comment
+""" Standalone """
+
+// Comment
+
+""" Standalone """
+
+// Nested Docstring
+rpc MyRpc {
+  proc MyProc {
+    input {
+      foo: {
+        bar: {
+          baz: {
+            qux: {
+              """
+                  This Docstring
+              Should
+                be
+                  Formatted Correctly
+              """
+              field1: string
+
+              """ This one too """
+              field2: int
+            }
+          }
+        }
+      }
+    }
+  }
+}

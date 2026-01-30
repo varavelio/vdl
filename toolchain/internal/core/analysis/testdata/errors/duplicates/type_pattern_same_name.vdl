@@ -1,0 +1,8 @@
+// @expect: E805
+// Type and pattern share the same name
+
+type Config {
+  value: string
+}
+
+pattern Config = "config.{key}"

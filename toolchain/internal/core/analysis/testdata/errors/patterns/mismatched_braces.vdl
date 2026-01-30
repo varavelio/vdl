@@ -1,0 +1,3 @@
+// @expect: E401
+
+pattern Invalid = "events.{id}.{name"

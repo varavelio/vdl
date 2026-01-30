@@ -1,0 +1,86 @@
+// orders.vdl - Order domain types and service
+include "./shared.vdl"
+
+type OrderItem {
+  productId: string
+  name: string
+  quantity: int
+  unitPrice: float
+  totalPrice: float
+}
+
+type Order {
+  ...Identifiable
+  ...Timestamps
+  userId: string
+  items: OrderItem[]
+  status: Status
+  priority: Priority
+  shippingAddress: Address
+  billingAddress?: Address
+  total: float
+  notes?: string
+}
+
+type OrderSummary {
+  ...Identifiable
+  userId: string
+  itemCount: int
+  total: float
+  status: Status
+}
+
+rpc OrderService {
+  proc GetOrder {
+    input {
+      id: string
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  proc ListOrders {
+    input {
+      userId?: string
+      status?: Status
+      priority?: Priority
+      limit?: int
+    }
+
+    output {
+      orders: OrderSummary[]
+      total: int
+    }
+  }
+
+  proc CreateOrder {
+    input {
+      userId: string
+      items: {
+        productId: string
+        quantity: int
+      }[]
+      shippingAddress: Address
+      billingAddress?: Address
+      priority?: Priority
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  stream OrderUpdates {
+    input {
+      orderId: string
+    }
+
+    output {
+      status: Status
+      message: string
+      timestamp: datetime
+    }
+  }
+}

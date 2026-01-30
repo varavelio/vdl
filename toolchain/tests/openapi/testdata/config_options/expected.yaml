@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: My Custom API
+  version: 2.5.0
+  description: This is a custom API with full configuration.
+  contact:
+    name: API Team
+    email: api@example.com
+  license:
+    name: MIT
+servers:
+  - url: https://api.example.com/v2
+security:
+  - AuthToken: []
+tags:
+  - name: ItemServiceProcedures
+    description: Procedures for ItemService
+paths:
+  /ItemService/GetItem:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/ItemServiceGetItemInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ItemServiceGetItemOutput"
+      tags:
+        - ItemServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Item:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+      type: object
+  requestBodies:
+    ItemServiceGetItemInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+            required:
+              - id
+            type: object
+      description: Request body for ItemService/GetItem procedure
+  responses:
+    ItemServiceGetItemOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  item:
+                    $ref: "#/components/schemas/Item"
+                required:
+                  - item
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for ItemService/GetItem procedure

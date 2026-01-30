@@ -1,0 +1,30 @@
+type User {
+  id: string
+  name: string
+  email?: string
+}
+
+rpc Users {
+  """ Creates a new user. """
+  proc CreateUser {
+    input {
+      name: string
+      email: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """ Gets a user by ID. """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+}

@@ -1,0 +1,17 @@
+type User {
+  id: string
+  name: string
+  email: string
+}
+
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+}

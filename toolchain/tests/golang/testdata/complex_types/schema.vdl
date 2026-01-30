@@ -1,0 +1,134 @@
+type Address {
+  street: string
+  city: string
+  zip: int
+}
+
+type User {
+  id: int
+  username: string
+  isActive: bool
+  tags: string[]
+  metadata: map<string>
+  address?: Address
+}
+
+type Level3 {
+  value: string
+}
+
+type Level2 {
+  name: string
+  level3: Level3
+}
+
+type Level1 {
+  id: int
+  level2: Level2
+}
+
+type Point {
+  x: int
+  y: int
+}
+
+type Score {
+  name: string
+  value: float
+}
+
+type Container {
+  user: User
+  matrix: int[][]
+  nestedArrays: string[][][]
+  mapOfArrays: map<int[]>
+  arrayOfMaps: map<string>[]
+  mapOfObjects: map<User>
+  deepNest: Level1
+  points: Point[]
+  scores: map<Score>
+  arrayOfMapOfArrays: map<int[]>[]
+}
+
+// InlineContainer tests deeply nested inline object definitions
+// These structures exercise the code generator's ability to handle
+// anonymous types at arbitrary nesting levels
+type InlineContainer {
+  // Simple inline object
+  simpleInline: {
+    name: string
+    value: int
+  }
+
+  // Array of inline objects
+  arrayOfInline: {
+    id: int
+    label: string
+  }[]
+
+  // Map of inline objects
+  mapOfInline: map<{
+    code: string
+    active: bool
+  }>
+
+  // Nested inline objects (inline within inline)
+  nestedInline: {
+    outer: string
+    inner: {
+      deep: string
+      deeper: {
+        deepest: string
+      }
+    }
+  }
+
+  // Array of arrays of inline objects
+  matrixOfInline: {
+    x: int
+    y: int
+  }[][]
+
+  // Map of arrays of inline objects
+  mapOfArrayOfInline: map<{
+    item: string
+    count: int
+  }[]>
+
+  // Array of maps of inline objects
+  arrayOfMapOfInline: map<{
+    key: string
+    data: {
+      nested: string
+    }
+  }>[]
+
+  // Complex: map of arrays of arrays of inline objects with nested inline
+  ultraComplex: map<{
+    level1: {
+      level2: string
+    }
+  }[][]>[]
+}
+
+rpc Service {
+  proc Echo {
+    input {
+      data: Container
+    }
+
+    output {
+      data: Container
+    }
+  }
+
+  proc EchoInline {
+    input {
+      data: InlineContainer
+    }
+
+    output {
+      data: InlineContainer
+    }
+  }
+}

@@ -1,0 +1,121 @@
+// Tests deeply nested inline objects
+
+type DeepStructure {
+  level1: {
+    name: string
+    level2: {
+      value: int
+      level3: {
+        flag: bool
+        level4: {
+          timestamp: datetime
+          level5: {
+            data: string
+            level6: {
+              count: int
+              finalValue: float
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+type ComplexNesting {
+  config: {
+    database: {
+      host: string
+      port: int
+      credentials: {
+        username: string
+        password: string
+        options?: {
+          ssl: bool
+          timeout?: int
+        }
+      }
+    }
+    cache: {
+      enabled: bool
+      ttl: int
+      servers: {
+        primary: {
+          host: string
+          port: int
+        }
+        secondary?: {
+          host: string
+          port: int
+        }
+      }
+    }
+  }
+}
+
+type ArraysInNesting {
+  groups: {
+    name: string
+    members: {
+      id: string
+      roles: {
+        name: string
+        permissions: string[]
+      }[]
+    }[]
+  }[]
+}
+
+type MapsInNesting {
+  regions: map<{
+    name: string
+    zones: map<{
+      id: string
+      servers: map<{
+        host: string
+        port: int
+        status: string
+      }>
+    }>
+  }>
+}
+
+rpc NestedService {
+  proc GetDeepStructure {
+    input {
+      id: string
+    }
+
+    output {
+      structure: DeepStructure
+    }
+  }
+
+  proc GetComplexConfig {
+    input {
+      environment: string
+    }
+
+    output {
+      config: ComplexNesting
+    }
+  }
+
+  proc ProcessNested {
+    input {
+      data: {
+        outer: {
+          middle: {
+            inner: {
+              value: string
+            }
+          }
+        }
+      }
+    }
+
+    output {
+      success: bool
+    }
+  }
+}

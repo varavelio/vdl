@@ -1,0 +1,29 @@
+{
+  "types": [],
+  "enums": [],
+  "constants": [],
+  "patterns": [
+    {
+      "name": "SessionCacheKey",
+      "doc": "Redis cache key for sessions.",
+      "template": "cache:session:{sessionId}",
+      "placeholders": ["sessionId"]
+    },
+    {
+      "name": "SimpleKey",
+      "doc": "Simple pattern with one placeholder.",
+      "template": "key:{id}",
+      "placeholders": ["id"]
+    },
+    {
+      "name": "UserEventSubject",
+      "doc": "NATS subject for user events.",
+      "template": "events.users.{userId}.{eventType}",
+      "placeholders": ["userId", "eventType"]
+    }
+  ],
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": []
+}

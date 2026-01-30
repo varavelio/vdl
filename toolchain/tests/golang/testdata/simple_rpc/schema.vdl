@@ -1,0 +1,12 @@
+rpc Calculator {
+  proc Add {
+    input {
+      a: int
+      b: int
+    }
+
+    output {
+      sum: int
+    }
+  }
+}

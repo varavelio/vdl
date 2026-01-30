@@ -1,0 +1,5 @@
+// @expect: E601
+
+type Node {
+  child: Node
+}

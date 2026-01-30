@@ -1,0 +1,14 @@
+// @expect: E805
+// Type and RPC share the same name
+
+type Users {
+  id: string
+}
+
+rpc Users {
+  proc GetAll {
+    input {}
+
+    output {}
+  }
+}

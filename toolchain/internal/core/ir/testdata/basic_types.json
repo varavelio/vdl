@@ -1,0 +1,83 @@
+{
+  "types": [
+    {
+      "name": "OptionalFields",
+      "fields": [
+        {
+          "name": "required",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "optional",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "optionalInt",
+          "optional": true,
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SimpleType",
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "primitive",
+            "primitive": "string"
+          }
+        },
+        {
+          "name": "age",
+          "type": {
+            "kind": "primitive",
+            "primitive": "int"
+          }
+        },
+        {
+          "name": "score",
+          "type": {
+            "kind": "primitive",
+            "primitive": "float"
+          }
+        },
+        {
+          "name": "active",
+          "type": {
+            "kind": "primitive",
+            "primitive": "bool"
+          }
+        },
+        {
+          "name": "createdAt",
+          "type": {
+            "kind": "primitive",
+            "primitive": "datetime"
+          }
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "constants": [],
+  "patterns": [],
+  "rpcs": [],
+  "procedures": null,
+  "streams": null,
+  "docs": [
+    {
+      "content": "Basic types test schema."
+    }
+  ]
+}

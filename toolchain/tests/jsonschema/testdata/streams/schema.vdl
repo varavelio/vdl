@@ -1,0 +1,64 @@
+// Tests streams in RPC
+
+type Event {
+  id: string
+  eventType: string
+  payload: string
+  timestamp: datetime
+}
+
+type LogEntry {
+  level: string
+  message: string
+  timestamp: datetime
+  metadata?: map<string>
+}
+
+rpc EventService {
+  proc GetEvent {
+    input {
+      eventId: string
+    }
+
+    output {
+      event: Event
+    }
+  }
+
+  stream SubscribeEvents {
+    input {
+      eventTypes: string[]
+      startFrom?: datetime
+    }
+
+    output {
+      event: Event
+    }
+  }
+
+  stream StreamLogs {
+    input {
+      level?: string
+      service?: string
+    }
+
+    output {
+      entry: LogEntry
+    }
+  }
+
+  stream WatchChanges {
+    input {
+      resourceId: string
+      includeMetadata?: bool
+    }
+
+    output {
+      changeType: string
+      resourceId: string
+      newValue?: string
+      oldValue?: string
+      changedAt: datetime
+    }
+  }
+}

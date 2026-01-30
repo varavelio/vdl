@@ -1,0 +1,18 @@
+// fmt:off
+// @expect: E101
+// @expect: E102
+// @expect: E201
+// @expect: E101
+// @expect: E104
+// @expect: E103
+// Tests that all symbols are collected despite multiple errors
+
+type invalid {
+	BadField: UnknownType
+}
+
+enum lowercase {
+	member_one
+}
+
+const badName = 100

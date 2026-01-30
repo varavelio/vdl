@@ -1,0 +1,19 @@
+// Test schema for numeric stability
+// Verifies that int/double coercion works correctly in fromJson
+
+type NumericData {
+  intField: int
+  floatField: float
+  optionalInt?: int
+  optionalFloat?: float
+}
+
+type NumericArrays {
+  intArray: int[]
+  floatArray: float[]
+}
+
+type NumericMaps {
+  intMap: map<int>
+  floatMap: map<float>
+}

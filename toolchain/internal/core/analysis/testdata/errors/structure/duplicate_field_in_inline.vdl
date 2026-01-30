@@ -1,0 +1,8 @@
+// @expect: E703
+
+type User {
+  data: {
+    id: string
+    id: int
+  }
+}

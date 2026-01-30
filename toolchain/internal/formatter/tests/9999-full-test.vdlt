@@ -1,0 +1,471 @@
+include "./foo.ufo"
+
+// ============================================================================
+// External Documentation
+// ============================================================================
+    """ ./docs/welcome.md """""" ./docs/authentication.md """
+
+// ============================================================================
+// Constants
+// ============================================================================
+""" Maximum number of items returned in a single page. """
+ const   MAX_PAGE_SIZE        = 100
+
+""" Current API version. """
+const    API_VERSION =     
+     "1.0.0"
+
+const PI = 3.14159
+ const
+  IS_ENABLED = true
+  const   debugMode = false
+
+// ============================================================================
+// Enumerations
+// ============================================================================
+""" Represents the status of an order in the system. """
+enum OrderStatus {	
+Pending 
+Processing   
+Shipped	
+Delivered Cancelled}
+
+""" Priority levels for support tickets. """
+enum Priority { 
+  Low = 1   Medium = 2
+  High = 3
+  Critical = 10}
+
+enum SimpleEnum { 
+A 
+B	
+C   
+}   
+
+// ============================================================================
+// Patterns
+// ============================================================================
+""" Generates a NATS subject for product-related events. """
+pattern   ProductEventSubject =   "events.products.{productId}.{eventType}"
+
+""" Generates a Redis cache key for a user session. """
+pattern   SessionCacheKey =   "cache:session:{sessionId}"
+
+     pattern SimplePattern = "simple.{id}" pattern OtherPattern = "other.{id}"
+
+// ============================================================================
+// Shared Types
+// ============================================================================
+"""
+Common fields for all auditable entities.
+"""
+type AuditMetadata  	  { 
+id :   string	
+createdAt : datetime 
+updatedAt	: datetime   
+} 
+
+"""
+Standard pagination parameters for list requests.
+"""
+type	PaginationParams {   
+page	:   int 
+limit :	int 
+}  	  
+
+"""
+Standard pagination response metadata.
+"""
+type   PaginatedResponse  	  { 
+totalItems   : int  	  
+totalPages  	  : int	
+currentPage :   int 
+}	
+
+// ============================================================================
+// Domain Types
+// ============================================================================
+"""
+Represents a product in the catalog.
+"""
+type   Product   { 
+...AuditMetadata	
+
+""" The name of the product. """
+name : string 
+
+""" The price of the product in USD. """
+price	:   float 
+
+""" The current order status for this product listing. """
+status   :  	  OrderStatus  	  
+
+""" The date when the product will be available. """
+availabilityDate :   datetime 
+
+""" A list of tags for categorization. """
+tags? :   string[] 
+
+meta :	map<string> 
+
+attributes :	{ 
+color :	string  	  
+weight	: float 
+} 
+}   
+
+"""
+Represents a customer review for a product.
+"""
+deprecated ( "Use NewReview instead") 
+type Review   {  	  
+""" The rating, from 1 to 5. """
+rating : int   
+
+""" The customer's written feedback. """
+comment	: string   
+
+""" The ID of the user who wrote the review. """
+userId :   string 
+}	
+
+// ============================================================================
+// RPC Services
+// ============================================================================
+"""
+Catalog Service
+
+Provides operations for managing products and browsing the catalog.
+"""
+rpc Catalog { 
+"""
+  # Product Lifecycle
+  Endpoints for creating and managing products.
+  """
+
+"""
+  Creates a new product in the system.
+  """
+proc	CreateProduct { 
+input {   
+product :   Product 
+} 
+
+output { 
+success   :	bool   
+productId :   string 
+}   
+} 
+
+"""
+  Retrieves a product by its ID, including its reviews.
+  """
+proc   GetProduct {   
+input { 
+productId : string	
+} 
+
+output {   
+product : Product 
+reviews : Review[] 
+} 
+}   
+
+"""
+  Lists all products with pagination support.
+  """
+deprecated proc ListProducts {   
+input { 
+...PaginationParams	
+filterByStatus? :	OrderStatus   
+} 
+
+output { 
+...PaginatedResponse	
+items : Product[] 
+} 
+}	
+} 
+
+"""
+Chat Service
+
+Provides real-time messaging capabilities.
+"""
+rpc Chat { 
+"""
+  Sends a message to a chat room.
+  """
+proc	SendMessage  	  {   
+input   { 
+""" The ID of the chat room. """
+chatId : string 
+
+""" The content of the message. """
+message  	  : string 
+}   
+
+output   {   
+""" The ID of the created message. """
+messageId : string 
+
+""" The server timestamp of when the message was recorded. """
+timestamp	: datetime   
+}   
+}   
+
+"""
+  Subscribes to new messages in a specific chat room.
+  """
+stream NewMessage  	  { 
+input	{	
+chatId : string 
+}   
+
+output  	  { 
+id	: string 
+message : string	
+userId   :  	  string 
+timestamp :   datetime 
+}	
+} 
+} 
+
+// >>>>
+
+include "./foo.ufo"
+
+// ============================================================================
+// External Documentation
+// ============================================================================
+""" ./docs/welcome.md """
+""" ./docs/authentication.md """
+
+// ============================================================================
+// Constants
+// ============================================================================
+""" Maximum number of items returned in a single page. """
+const MAX_PAGE_SIZE = 100
+
+""" Current API version. """
+const API_VERSION = "1.0.0"
+
+const PI = 3.14159
+const IS_ENABLED = true
+const DEBUG_MODE = false
+
+// ============================================================================
+// Enumerations
+// ============================================================================
+""" Represents the status of an order in the system. """
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+""" Priority levels for support tickets. """
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+  Critical = 10
+}
+
+enum SimpleEnum {
+  A
+  B
+  C
+}
+
+// ============================================================================
+// Patterns
+// ============================================================================
+""" Generates a NATS subject for product-related events. """
+pattern ProductEventSubject = "events.products.{productId}.{eventType}"
+
+""" Generates a Redis cache key for a user session. """
+pattern SessionCacheKey = "cache:session:{sessionId}"
+
+pattern SimplePattern = "simple.{id}"
+pattern OtherPattern = "other.{id}"
+
+// ============================================================================
+// Shared Types
+// ============================================================================
+"""
+Common fields for all auditable entities.
+"""
+type AuditMetadata {
+  id: string
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+"""
+Standard pagination parameters for list requests.
+"""
+type PaginationParams {
+  page: int
+  limit: int
+}
+
+"""
+Standard pagination response metadata.
+"""
+type PaginatedResponse {
+  totalItems: int
+  totalPages: int
+  currentPage: int
+}
+
+// ============================================================================
+// Domain Types
+// ============================================================================
+"""
+Represents a product in the catalog.
+"""
+type Product {
+  ...AuditMetadata
+
+  """ The name of the product. """
+  name: string
+
+  """ The price of the product in USD. """
+  price: float
+
+  """ The current order status for this product listing. """
+  status: OrderStatus
+
+  """ The date when the product will be available. """
+  availabilityDate: datetime
+
+  """ A list of tags for categorization. """
+  tags?: string[]
+
+  meta: map<string>
+
+  attributes: {
+    color: string
+    weight: float
+  }
+}
+
+"""
+Represents a customer review for a product.
+"""
+deprecated("Use NewReview instead")
+type Review {
+  """ The rating, from 1 to 5. """
+  rating: int
+
+  """ The customer's written feedback. """
+  comment: string
+
+  """ The ID of the user who wrote the review. """
+  userId: string
+}
+
+// ============================================================================
+// RPC Services
+// ============================================================================
+"""
+Catalog Service
+
+Provides operations for managing products and browsing the catalog.
+"""
+rpc Catalog {
+  """
+  # Product Lifecycle
+  Endpoints for creating and managing products.
+  """
+
+  """
+  Creates a new product in the system.
+  """
+  proc CreateProduct {
+    input {
+      product: Product
+    }
+
+    output {
+      success: bool
+      productId: string
+    }
+  }
+
+  """
+  Retrieves a product by its ID, including its reviews.
+  """
+  proc GetProduct {
+    input {
+      productId: string
+    }
+
+    output {
+      product: Product
+      reviews: Review[]
+    }
+  }
+
+  """
+  Lists all products with pagination support.
+  """
+  deprecated proc ListProducts {
+    input {
+      ...PaginationParams
+      filterByStatus?: OrderStatus
+    }
+
+    output {
+      ...PaginatedResponse
+      items: Product[]
+    }
+  }
+}
+
+"""
+Chat Service
+
+Provides real-time messaging capabilities.
+"""
+rpc Chat {
+  """
+  Sends a message to a chat room.
+  """
+  proc SendMessage {
+    input {
+      """ The ID of the chat room. """
+      chatId: string
+
+      """ The content of the message. """
+      message: string
+    }
+
+    output {
+      """ The ID of the created message. """
+      messageId: string
+
+      """ The server timestamp of when the message was recorded. """
+      timestamp: datetime
+    }
+  }
+
+  """
+  Subscribes to new messages in a specific chat room.
+  """
+  stream NewMessage {
+    input {
+      chatId: string
+    }
+
+    output {
+      id: string
+      message: string
+      userId: string
+      timestamp: datetime
+    }
+  }
+}

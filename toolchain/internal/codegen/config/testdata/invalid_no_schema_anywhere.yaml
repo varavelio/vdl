@@ -1,0 +1,5 @@
+version: 1
+targets:
+  - go:
+      output: gen/go
+      package: mypkg

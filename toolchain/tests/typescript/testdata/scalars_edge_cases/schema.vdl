@@ -1,0 +1,19 @@
+rpc Service {
+  proc Echo {
+    input {
+      intVal: int
+      floatVal: float
+      boolVal: bool
+      stringVal: string
+      datetimeVal: datetime
+    }
+
+    output {
+      intVal: int
+      floatVal: float
+      boolVal: bool
+      stringVal: string
+      datetimeVal: datetime
+    }
+  }
+}

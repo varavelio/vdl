@@ -1,0 +1,165 @@
+openapi: 3.0.0
+info:
+  title: Enums API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: TaskServiceProcedures
+    description: Procedures for TaskService
+paths:
+  /TaskService/CreateTask:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/TaskServiceCreateTaskInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/TaskServiceCreateTaskOutput"
+      tags:
+        - TaskServiceProcedures
+  /TaskService/GetTasksByPriority:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/TaskServiceGetTasksByPriorityInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/TaskServiceGetTasksByPriorityOutput"
+      tags:
+        - TaskServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Priority:
+      description: Priority levels for tasks.
+      enum:
+        - 1
+        - 5
+        - 10
+        - 100
+      type: integer
+    Role:
+      description: User role in the system.
+      enum:
+        - Admin
+        - User
+        - Guest
+      type: string
+    Task:
+      properties:
+        assigneeRole:
+          $ref: "#/components/schemas/Role"
+        id:
+          type: string
+        priority:
+          $ref: "#/components/schemas/Priority"
+        title:
+          type: string
+      required:
+        - id
+        - title
+        - priority
+        - assigneeRole
+      type: object
+  requestBodies:
+    TaskServiceCreateTaskInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              assigneeRole:
+                $ref: "#/components/schemas/Role"
+              priority:
+                $ref: "#/components/schemas/Priority"
+              title:
+                type: string
+            required:
+              - title
+              - priority
+              - assigneeRole
+            type: object
+      description: Request body for TaskService/CreateTask procedure
+    TaskServiceGetTasksByPriorityInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              priority:
+                $ref: "#/components/schemas/Priority"
+            required:
+              - priority
+            type: object
+      description: Request body for TaskService/GetTasksByPriority procedure
+  responses:
+    TaskServiceCreateTaskOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  task:
+                    $ref: "#/components/schemas/Task"
+                required:
+                  - task
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for TaskService/CreateTask procedure
+    TaskServiceGetTasksByPriorityOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  tasks:
+                    items:
+                      $ref: "#/components/schemas/Task"
+                    type: array
+                required:
+                  - tasks
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for TaskService/GetTasksByPriority procedure

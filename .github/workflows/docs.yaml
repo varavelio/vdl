@@ -1,0 +1,38 @@
+name: Deploy UFO RPC Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create mount directories
+        run: |
+          mkdir -p ~/.claude ~/.config/opencode ~/.local/share/opencode
+
+      - name: Run CI Task
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: /bin/bash -c "cd ./docs && npm install && npm run build"
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: pages deploy ./docs/dist --project-name=uforpc
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,38 @@
+// Test schema for null safety boundaries
+
+type WithOptionalList {
+  items?: string[]
+}
+
+type WithOptionalMap {
+  metadata?: map<string>
+}
+
+type WithOptionalNested {
+  child?: NestedChild
+}
+
+type NestedChild {
+  name: string
+  value?: int
+}
+
+type AllOptional {
+  stringField?: string
+  intField?: int
+  listField?: int[]
+  mapField?: map<string>
+  nestedField?: NestedChild
+}
+
+type DeepOptional {
+  level1?: Level1
+}
+
+type Level1 {
+  level2?: Level2
+}
+
+type Level2 {
+  value: string
+}

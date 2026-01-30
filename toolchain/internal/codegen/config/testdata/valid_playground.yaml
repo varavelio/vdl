@@ -1,0 +1,9 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - playground:
+      output: ./gen/playground
+      default_base_url: https://api.example.com
+      default_headers:
+        - key: Authorization
+          value: Bearer token

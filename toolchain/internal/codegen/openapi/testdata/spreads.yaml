@@ -1,0 +1,378 @@
+openapi: 3.0.0
+info:
+  title: Test API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: ArticlesProcedures
+    description: Procedures for Articles
+paths:
+  /Articles/Create:
+    post:
+      description: Create with spread in input
+      requestBody:
+        $ref: "#/components/requestBodies/ArticlesCreateInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ArticlesCreateOutput"
+      tags:
+        - ArticlesProcedures
+  /Articles/Get:
+    post:
+      description: Get with minimal spread
+      requestBody:
+        $ref: "#/components/requestBodies/ArticlesGetInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ArticlesGetOutput"
+      tags:
+        - ArticlesProcedures
+  /Articles/List:
+    post:
+      description: List with spread in both input and output
+      requestBody:
+        $ref: "#/components/requestBodies/ArticlesListInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ArticlesListOutput"
+      tags:
+        - ArticlesProcedures
+  /Articles/Update:
+    post:
+      description: Update with multiple optional spread fields
+      requestBody:
+        $ref: "#/components/requestBodies/ArticlesUpdateInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/ArticlesUpdateOutput"
+      tags:
+        - ArticlesProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Article:
+      description: Article with multiple spreads
+      properties:
+        author:
+          $ref: "#/components/schemas/Author"
+        content:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        id:
+          type: string
+        title:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - title
+        - content
+        - author
+      type: object
+    Author:
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+      required:
+        - name
+        - email
+      type: object
+    Identifiable:
+      properties:
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    Pagination:
+      properties:
+        limit:
+          type: integer
+        page:
+          type: integer
+      required:
+        - page
+        - limit
+      type: object
+    PaginationResult:
+      properties:
+        currentPage:
+          type: integer
+        hasNextPage:
+          type: boolean
+        hasPrevPage:
+          type: boolean
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - totalItems
+        - totalPages
+        - currentPage
+        - hasNextPage
+        - hasPrevPage
+      type: object
+    Timestamps:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - createdAt
+        - updatedAt
+      type: object
+  requestBodies:
+    ArticlesCreateInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              content:
+                type: string
+              email:
+                type: string
+              name:
+                type: string
+              tags:
+                items:
+                  type: string
+                type: array
+              title:
+                type: string
+            required:
+              - name
+              - email
+              - title
+              - content
+            type: object
+      description: Request body for Articles/Create procedure
+    ArticlesGetInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
+            required:
+              - id
+            type: object
+      description: Request body for Articles/Get procedure
+    ArticlesListInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              authorEmail:
+                type: string
+              limit:
+                type: integer
+              page:
+                type: integer
+              searchQuery:
+                type: string
+            required:
+              - page
+              - limit
+            type: object
+      description: Request body for Articles/List procedure
+    ArticlesUpdateInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              author:
+                properties:
+                  email:
+                    type: string
+                  name:
+                    type: string
+                required:
+                  - name
+                  - email
+                type: object
+              content:
+                type: string
+              id:
+                type: string
+              title:
+                type: string
+            required:
+              - id
+            type: object
+      description: Request body for Articles/Update procedure
+  responses:
+    ArticlesCreateOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  article:
+                    $ref: "#/components/schemas/Article"
+                required:
+                  - article
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Articles/Create procedure
+    ArticlesGetOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  article:
+                    $ref: "#/components/schemas/Article"
+                required:
+                  - article
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Articles/Get procedure
+    ArticlesListOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  articles:
+                    items:
+                      $ref: "#/components/schemas/Article"
+                    type: array
+                  currentPage:
+                    type: integer
+                  hasNextPage:
+                    type: boolean
+                  hasPrevPage:
+                    type: boolean
+                  totalItems:
+                    type: integer
+                  totalPages:
+                    type: integer
+                required:
+                  - totalItems
+                  - totalPages
+                  - currentPage
+                  - hasNextPage
+                  - hasPrevPage
+                  - articles
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Articles/List procedure
+    ArticlesUpdateOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  article:
+                    $ref: "#/components/schemas/Article"
+                  createdAt:
+                    format: date-time
+                    type: string
+                  updatedAt:
+                    format: date-time
+                    type: string
+                required:
+                  - createdAt
+                  - updatedAt
+                  - article
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for Articles/Update procedure

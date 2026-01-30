@@ -1,0 +1,302 @@
+// Base types for spread composition
+type Timestamps {
+  createdAt: datetime
+  updatedAt: datetime
+}
+
+type Identifiable {
+  id: string
+}
+
+// Auditable extends Timestamps (chain of spreads)
+type Auditable {
+  ...Timestamps
+  createdBy: string
+  updatedBy: string
+}
+
+// Simple spread - one level
+type User {
+  ...Identifiable
+  name: string
+  email: string
+}
+
+// Multiple spreads in one type
+type UserWithTimestamps {
+  ...Identifiable
+  ...Timestamps
+  name: string
+  email: string
+  deletedAt?: datetime
+}
+
+// Chain of spreads - AuditedEntity extends Auditable which extends Timestamps
+type AuditedEntity {
+  ...Auditable
+  entityType: string
+  entityId: string
+}
+
+// Spread with nested objects
+type Address {
+  street: string
+  city: string
+  country: string
+}
+
+type ContactInfo {
+  email: string
+  phone?: string
+  address: Address
+}
+
+type Person {
+  ...Identifiable
+  ...Timestamps
+  name: string
+  contact: ContactInfo
+}
+
+// Spread with arrays and maps
+type Taggable {
+  tags: string[]
+  metadata: map<string>
+}
+
+type Document {
+  ...Identifiable
+  ...Timestamps
+  ...Taggable
+  title: string
+  content: string
+}
+
+// Multiple levels of nesting with spreads
+type BaseConfig {
+  enabled: bool
+  priority: int
+}
+
+type AdvancedConfig {
+  ...BaseConfig
+  retryCount: int
+  timeout: int
+}
+
+type ServiceConfig {
+  ...AdvancedConfig
+  serviceName: string
+  endpoints: string[]
+}
+
+// Spread with complex nested arrays
+type OrderItem {
+  productId: string
+  quantity: int
+  price: float
+}
+
+type Order {
+  ...Identifiable
+  ...Timestamps
+  items: OrderItem[]
+  total: float
+  status: string
+}
+
+rpc Service {
+  proc EchoUser {
+    input {
+      user: User
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  proc EchoUserWithTimestamps {
+    input {
+      user: UserWithTimestamps
+    }
+
+    output {
+      user: UserWithTimestamps
+    }
+  }
+
+  proc EchoAuditedEntity {
+    input {
+      entity: AuditedEntity
+    }
+
+    output {
+      entity: AuditedEntity
+    }
+  }
+
+  proc EchoPerson {
+    input {
+      person: Person
+    }
+
+    output {
+      person: Person
+    }
+  }
+
+  proc EchoDocument {
+    input {
+      doc: Document
+    }
+
+    output {
+      doc: Document
+    }
+  }
+
+  proc EchoServiceConfig {
+    input {
+      config: ServiceConfig
+    }
+
+    output {
+      config: ServiceConfig
+    }
+  }
+
+  proc EchoOrder {
+    input {
+      order: Order
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  // Spread directly in input block
+  proc SpreadInInput {
+    input {
+      ...Identifiable
+      ...Timestamps
+      customField: string
+    }
+
+    output {
+      id: string
+      createdAt: datetime
+      updatedAt: datetime
+      customField: string
+    }
+  }
+
+  // Spread directly in output block
+  proc SpreadInOutput {
+    input {
+      id: string
+      name: string
+    }
+
+    output {
+      ...Identifiable
+      ...Timestamps
+      ...Taggable
+      name: string
+      processed: bool
+    }
+  }
+
+  // Spread in nested anonymous object within input
+  proc SpreadInNestedAnonymous {
+    input {
+      wrapper: {
+        ...Identifiable
+        data: {
+          ...Timestamps
+          ...Taggable
+          value: string
+        }
+      }
+    }
+
+    output {
+      wrapper: {
+        ...Identifiable
+        data: {
+          ...Timestamps
+          ...Taggable
+          value: string
+        }
+      }
+    }
+  }
+
+  // Multiple spreads in deeply nested anonymous objects
+  proc DeepNestedSpreads {
+    input {
+      level1: {
+        ...Identifiable
+        level2: {
+          ...Timestamps
+          level3: {
+            ...Taggable
+            deepValue: string
+          }
+        }
+      }
+    }
+
+    output {
+      level1: {
+        ...Identifiable
+        level2: {
+          ...Timestamps
+          level3: {
+            ...Taggable
+            deepValue: string
+          }
+        }
+      }
+    }
+  }
+
+  // Spread in anonymous object inside array
+  proc SpreadInArrayAnonymous {
+    input {
+      items: {
+        ...Identifiable
+        ...Timestamps
+        name: string
+      }[]
+    }
+
+    output {
+      items: {
+        ...Identifiable
+        ...Timestamps
+        name: string
+      }[]
+      count: int
+    }
+  }
+
+  // Spread in anonymous object inside map
+  proc SpreadInMapAnonymous {
+    input {
+      entries: map<{
+        ...Auditable
+        value: string
+      }>
+    }
+
+    output {
+      entries: map<{
+        ...Auditable
+        value: string
+      }>
+      keys: string[]
+    }
+  }
+}

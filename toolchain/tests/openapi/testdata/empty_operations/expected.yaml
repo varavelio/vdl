@@ -1,0 +1,271 @@
+openapi: 3.0.0
+info:
+  title: Empty Operations API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: HealthServiceStreams
+    description: Streams for HealthService
+  - name: PingServiceProcedures
+    description: Procedures for PingService
+paths:
+  /HealthService/Heartbeat:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/HealthServiceHeartbeatInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/HealthServiceHeartbeatOutput"
+      tags:
+        - HealthServiceStreams
+  /HealthService/SystemMetrics:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/HealthServiceSystemMetricsInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/HealthServiceSystemMetricsOutput"
+      tags:
+        - HealthServiceStreams
+  /PingService/GetStatus:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/PingServiceGetStatusInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PingServiceGetStatusOutput"
+      tags:
+        - PingServiceProcedures
+  /PingService/LogEvent:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/PingServiceLogEventInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PingServiceLogEventOutput"
+      tags:
+        - PingServiceProcedures
+  /PingService/Ping:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/PingServicePingInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/PingServicePingOutput"
+      tags:
+        - PingServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: "Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.\n\n---\n**Examples:**\n- **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)\n- **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)\n- **API Key:** `sk_live_123abc456def` (a raw token)"
+      in: header
+      name: Authorization
+      type: apiKey
+  requestBodies:
+    HealthServiceHeartbeatInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for HealthService/Heartbeat stream subscription
+    HealthServiceSystemMetricsInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for HealthService/SystemMetrics stream subscription
+    PingServiceGetStatusInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for PingService/GetStatus procedure
+    PingServiceLogEventInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              event:
+                type: string
+              level:
+                type: integer
+            required:
+              - event
+              - level
+            type: object
+      description: Request body for PingService/LogEvent procedure
+    PingServicePingInput:
+      content:
+        application/json:
+          schema:
+            properties: {}
+            type: object
+      description: Request body for PingService/Ping procedure
+  responses:
+    HealthServiceHeartbeatOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties: {}
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for HealthService/Heartbeat stream
+    HealthServiceSystemMetricsOutput:
+      content:
+        text/event-stream:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  metric:
+                    type: string
+                  timestamp:
+                    format: date-time
+                    type: string
+                  value:
+                    type: number
+                required:
+                  - metric
+                  - value
+                  - timestamp
+                type: object
+            required:
+              - ok
+            type: object
+      description: Server-Sent Events for HealthService/SystemMetrics stream
+    PingServiceGetStatusOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  status:
+                    type: string
+                  uptime:
+                    type: integer
+                required:
+                  - status
+                  - uptime
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for PingService/GetStatus procedure
+    PingServiceLogEventOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties: {}
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for PingService/LogEvent procedure
+    PingServicePingOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties: {}
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for PingService/Ping procedure

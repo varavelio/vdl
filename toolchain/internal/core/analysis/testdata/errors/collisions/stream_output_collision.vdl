@@ -1,0 +1,18 @@
+// @expect: E901
+// Type collides with auto-generated SubscribeOutput from stream Subscribe
+
+rpc Subscriptions {
+  stream Subscribe {
+    input {
+      topic: string
+    }
+
+    output {
+      message: string
+    }
+  }
+}
+
+type SubscribeOutput {
+  data: string
+}

@@ -1,0 +1,26 @@
+type Address {
+  street: string
+  city: string
+}
+
+rpc Service {
+  proc Echo {
+    input {
+      required: string
+      optional?: string
+      optionalInt?: int
+      optionalBool?: bool
+      optionalArray?: string[]
+      optionalObject?: Address
+    }
+
+    output {
+      required: string
+      optional?: string
+      optionalInt?: int
+      optionalBool?: bool
+      optionalArray?: string[]
+      optionalObject?: Address
+    }
+  }
+}

@@ -10,7 +10,7 @@ import path from "path";
 // =================== CONFIGURATION ===================
 const filesToUpdate: FileConfig[] = [
   {
-    path: "./urpc/internal/version/version.go",
+    path: "./toolchain/internal/version/version.go",
     searchText: 'const Version = "0.0.0-dev"',
     replacement: 'const Version = "%"',
   },

@@ -1,0 +1,7 @@
+version: 1
+schema: schema.vdl
+targets:
+  - openapi:
+      output: gen
+      title: Streams API
+      version: 1.0.0

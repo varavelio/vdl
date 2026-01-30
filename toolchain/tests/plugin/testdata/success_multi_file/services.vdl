@@ -1,0 +1,94 @@
+// RPC service definitions
+
+"""
+User management service.
+"""
+rpc UserService {
+  """
+  Get a user by ID.
+  """
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """
+  Create a new user.
+  """
+  proc CreateUser {
+    input {
+      username: string
+      email: string
+      role: UserRole
+    }
+
+    output {
+      user: User
+    }
+  }
+
+  """
+  Stream user activity events.
+  """
+  stream UserActivity {
+    input {
+      userId: string
+    }
+
+    output {
+      action: string
+      timestamp: datetime
+    }
+  }
+}
+
+"""
+Order management service.
+"""
+rpc OrderService {
+  """
+  Get an order by ID.
+  """
+  proc GetOrder {
+    input {
+      id: string
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  """
+  Create a new order.
+  """
+  proc CreateOrder {
+    input {
+      userId: string
+      items: OrderItem[]
+    }
+
+    output {
+      order: Order
+    }
+  }
+
+  """
+  Stream order status updates.
+  """
+  stream OrderUpdates {
+    input {
+      orderId: string
+    }
+
+    output {
+      status: OrderStatus
+      timestamp: datetime
+    }
+  }
+}

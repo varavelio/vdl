@@ -1,0 +1,9 @@
+// @expect: E805
+// Enum and pattern share the same name
+
+enum Status {
+  Active
+  Inactive
+}
+
+pattern Status = "status.{code}"

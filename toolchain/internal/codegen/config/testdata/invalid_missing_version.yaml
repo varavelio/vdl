@@ -1,0 +1,5 @@
+schema: ./schema.vdl
+targets:
+  - go:
+      output: ./gen/go
+      package: main

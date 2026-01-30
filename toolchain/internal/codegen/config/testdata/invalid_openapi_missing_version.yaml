@@ -1,0 +1,6 @@
+version: 1
+schema: ./schema.vdl
+targets:
+  - openapi:
+      output: ./gen/docs
+      title: Missing Version
