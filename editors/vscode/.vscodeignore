@@ -1,21 +1,11 @@
-.vscode/**
-.vscode-test/**
-test/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/jsconfig.json
-**/*.map
-**/eslint.config.mjs
-**/.vscode-test.*
+# Exclude everything
+**/*
 
-# Test files
-schema.vdl
-
-# Temp
-temp/
-tmp/
-
-# Unbundled files
-node_modules/
-src/
+# Include only these files
+!LICENSE
+!CHANGELOG.md
+!README.md
+!package.json
+!assets/
+!language/
+!dist/
