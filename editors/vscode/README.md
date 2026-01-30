@@ -42,6 +42,7 @@ If the binary is not in your operating system PATH, you can set a custom path in
 
 - `vdl.init`: Initialize a new `vdl.yaml` and `schema.vdl` files
 - `vdl.restart`: Restart Language Server
+- `vdl.openLogs`: Open Language Server Logs
 
 ## Snippets
 
@@ -64,6 +65,10 @@ The following snippets are available for `.vdl` files:
 ## Release Notes
 
 Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/editors/vscode/CHANGELOG.md).
+
+### v0.1.1 - 2026-01-30
+
+- Added `vdl.openLogs` command to easily open the language server log file.
 
 ### v0.1.0 - 2026-01-29
 

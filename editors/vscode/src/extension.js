@@ -1,6 +1,7 @@
 const vscode = require("vscode");
 const getBinaryPath = require("./getBinaryPath.js");
 const { initCommand } = require("./initCommand.js");
+const { openLogsCommand } = require("./openLogsCommand.js");
 const {
   startLanguageServer,
   stopLanguageServer,
@@ -48,6 +49,17 @@ async function activate(context) {
       try {
         const path = getBinaryPath();
         await restartLanguageServer(path);
+      } catch (e) {
+        vscode.window.showErrorMessage(e.message);
+      }
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("vdl.openLogs", () => {
+      try {
+        const path = getBinaryPath();
+        openLogsCommand(path);
       } catch (e) {
         vscode.window.showErrorMessage(e.message);
       }
