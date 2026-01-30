@@ -3,7 +3,6 @@ package lsp
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/core/parser"
@@ -40,7 +39,7 @@ func (l *LSP) handleTextDocumentDocumentLink(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode documentLink request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 
 	// Fetch document content
 	content, err := l.fs.ReadFile(filePath)
@@ -79,16 +78,13 @@ func collectDocumentLinks(content string, docPath string) []DocumentLink {
 			if path, isExternal := child.Docstring.GetExternal(); isExternal {
 				normPath := filepath.Join(baseDir, path)
 				normPath = filepath.Clean(normPath)
-				if !strings.HasPrefix(normPath, "file://") {
-					normPath = "file://" + normPath
-				}
 
 				links = append(links, DocumentLink{
 					Range: TextDocumentRange{
 						Start: convertASTPositionToLSPPosition(child.Docstring.Pos),
 						End:   convertASTPositionToLSPPosition(child.Docstring.EndPos),
 					},
-					Target:  normPath,
+					Target:  PathToUri(normPath),
 					Tooltip: "Open markdown file",
 				})
 			}
@@ -129,16 +125,13 @@ func collectDocumentLinks(content string, docPath string) []DocumentLink {
 		if child.Include != nil {
 			normPath := filepath.Join(baseDir, string(child.Include.Path))
 			normPath = filepath.Clean(normPath)
-			if !strings.HasPrefix(normPath, "file://") {
-				normPath = "file://" + normPath
-			}
 
 			links = append(links, DocumentLink{
 				Range: TextDocumentRange{
 					Start: convertASTPositionToLSPPosition(child.Include.Pos),
 					End:   convertASTPositionToLSPPosition(child.Include.EndPos),
 				},
-				Target:  normPath,
+				Target:  PathToUri(normPath),
 				Tooltip: "Open included file",
 			})
 		}
@@ -156,16 +149,13 @@ func addExternalDocstringLink(links *[]DocumentLink, docstring *ast.Docstring, b
 
 	normPath := filepath.Join(baseDir, path)
 	normPath = filepath.Clean(normPath)
-	if !strings.HasPrefix(normPath, "file://") {
-		normPath = "file://" + normPath
-	}
 
 	*links = append(*links, DocumentLink{
 		Range: TextDocumentRange{
 			Start: convertASTPositionToLSPPosition(docstring.Pos),
 			End:   convertASTPositionToLSPPosition(docstring.EndPos),
 		},
-		Target:  normPath,
+		Target:  PathToUri(normPath),
 		Tooltip: "Open markdown file",
 	})
 }

@@ -16,7 +16,7 @@ func (l *LSP) handleTextDocumentDidClose(rawMessage []byte) (any, error) {
 		return nil, err
 	}
 
-	filePath := uriToPath(notification.Params.TextDocument.URI)
+	filePath := UriToPath(notification.Params.TextDocument.URI)
 
 	// Remove the file from the virtual file system cache
 	l.fs.RemoveFileCache(filePath)

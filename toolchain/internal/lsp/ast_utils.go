@@ -353,7 +353,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 	// Check types
 	if t, ok := program.Types[symbolName]; ok {
 		return &Location{
-			URI: pathToURI(t.File),
+			URI: PathToUri(t.File),
 			Range: TextDocumentRange{
 				Start: convertASTPositionToLSPPosition(t.Pos),
 				End:   convertASTPositionToLSPPosition(t.EndPos),
@@ -364,7 +364,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 	// Check enums
 	if e, ok := program.Enums[symbolName]; ok {
 		return &Location{
-			URI: pathToURI(e.File),
+			URI: PathToUri(e.File),
 			Range: TextDocumentRange{
 				Start: convertASTPositionToLSPPosition(e.Pos),
 				End:   convertASTPositionToLSPPosition(e.EndPos),
@@ -375,7 +375,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 	// Check constants
 	if c, ok := program.Consts[symbolName]; ok {
 		return &Location{
-			URI: pathToURI(c.File),
+			URI: PathToUri(c.File),
 			Range: TextDocumentRange{
 				Start: convertASTPositionToLSPPosition(c.Pos),
 				End:   convertASTPositionToLSPPosition(c.EndPos),
@@ -386,7 +386,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 	// Check patterns
 	if p, ok := program.Patterns[symbolName]; ok {
 		return &Location{
-			URI: pathToURI(p.File),
+			URI: PathToUri(p.File),
 			Range: TextDocumentRange{
 				Start: convertASTPositionToLSPPosition(p.Pos),
 				End:   convertASTPositionToLSPPosition(p.EndPos),
@@ -397,7 +397,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 	// Check RPCs
 	if r, ok := program.RPCs[symbolName]; ok {
 		return &Location{
-			URI: pathToURI(r.File),
+			URI: PathToUri(r.File),
 			Range: TextDocumentRange{
 				Start: convertASTPositionToLSPPosition(r.Pos),
 				End:   convertASTPositionToLSPPosition(r.EndPos),
@@ -409,7 +409,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 	for _, rpc := range program.RPCs {
 		if proc, ok := rpc.Procs[symbolName]; ok {
 			return &Location{
-				URI: pathToURI(proc.File),
+				URI: PathToUri(proc.File),
 				Range: TextDocumentRange{
 					Start: convertASTPositionToLSPPosition(proc.Pos),
 					End:   convertASTPositionToLSPPosition(proc.EndPos),
@@ -418,7 +418,7 @@ func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Loca
 		}
 		if stream, ok := rpc.Streams[symbolName]; ok {
 			return &Location{
-				URI: pathToURI(stream.File),
+				URI: PathToUri(stream.File),
 				Range: TextDocumentRange{
 					Start: convertASTPositionToLSPPosition(stream.Pos),
 					End:   convertASTPositionToLSPPosition(stream.EndPos),

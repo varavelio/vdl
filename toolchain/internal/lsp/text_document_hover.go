@@ -51,7 +51,7 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode hover request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 	position := request.Params.Position
 
 	// Get the document content

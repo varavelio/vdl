@@ -3,7 +3,6 @@ package lsp
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 )
 
 // RequestMessageTextDocumentDefinition represents a request for the definition of a symbol.
@@ -42,7 +41,7 @@ func (l *LSP) handleTextDocumentDefinition(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode definition request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 	position := request.Params.Position
 
 	// Get the document content
@@ -112,13 +111,8 @@ func (l *LSP) findExternalDocstringDefinition(currentFile, mdPath string) *Locat
 		return nil
 	}
 
-	uri := resolvedPath
-	if !strings.HasPrefix(uri, "file://") {
-		uri = "file://" + uri
-	}
-
 	return &Location{
-		URI: uri,
+		URI: PathToUri(resolvedPath),
 		Range: TextDocumentRange{
 			Start: TextDocumentPosition{Line: 0, Character: 0},
 			End:   TextDocumentPosition{Line: 0, Character: 0},

@@ -66,7 +66,7 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode completion request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 	pos := request.Params.Position
 
 	content, err := l.fs.ReadFile(filePath)

@@ -13,7 +13,7 @@ func newTestLSP(t require.TestingT, schema, uri string) *LSP {
 	l := New(reader, writer)
 
 	// Convert URI to path and store in vfs
-	filePath := uriToPath(uri)
+	filePath := UriToPath(uri)
 	l.fs.WriteFileCache(filePath, []byte(schema))
 
 	return l

@@ -32,7 +32,7 @@ func (l *LSP) handleTextDocumentReferences(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode references request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 	pos := request.Params.Position
 
 	// Get content
@@ -75,7 +75,7 @@ func collectReferences(content, filePath, symbol string) []Location {
 	var locs []Location
 	for _, ref := range references {
 		locs = append(locs, Location{
-			URI: pathToURI(filePath),
+			URI: PathToUri(filePath),
 			Range: TextDocumentRange{
 				Start: convertASTPositionToLSPPosition(ref.Pos),
 				End:   convertASTPositionToLSPPosition(ref.EndPos),

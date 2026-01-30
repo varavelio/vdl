@@ -16,7 +16,7 @@ func (l *LSP) handleTextDocumentDidOpen(rawMessage []byte) (any, error) {
 		return nil, err
 	}
 
-	filePath := uriToPath(notification.Params.TextDocument.URI)
+	filePath := UriToPath(notification.Params.TextDocument.URI)
 	content := notification.Params.TextDocument.Text
 
 	// Store the content in the virtual file system
@@ -25,7 +25,7 @@ func (l *LSP) handleTextDocumentDidOpen(rawMessage []byte) (any, error) {
 	l.logger.Info("text document did open", "uri", notification.Params.TextDocument.URI)
 
 	// Trigger immediate analysis for newly opened documents
-	l.analyzeAndPublishDiagnostics(notification.Params.TextDocument.URI)
+	l.analyzeAndPublishDiagnostics(filePath, notification.Params.TextDocument.URI)
 
 	return nil, nil
 }

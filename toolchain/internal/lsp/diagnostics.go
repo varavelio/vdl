@@ -100,10 +100,11 @@ func (l *LSP) clearDiagnostics(uri string) {
 	l.publishDiagnostics(uri, []Diagnostic{})
 }
 
-// analyzeAndPublishDiagnostics analyzes the document at the given URI and publishes diagnostics.
-func (l *LSP) analyzeAndPublishDiagnostics(uri string) {
+// analyzeAndPublishDiagnostics analyzes the document at the given file path and publishes diagnostics.
+// filePath is the native OS path used for analysis, uri is the LSP URI to send to the client.
+func (l *LSP) analyzeAndPublishDiagnostics(filePath, uri string) {
 	// Run the analysis
-	_, diagnostics := l.analyze(uri)
+	_, diagnostics := l.analyze(filePath)
 
 	// Convert analysis diagnostics to LSP diagnostics
 	lspDiagnostics := make([]Diagnostic, 0, len(diagnostics))
@@ -115,9 +116,10 @@ func (l *LSP) analyzeAndPublishDiagnostics(uri string) {
 	l.publishDiagnostics(uri, lspDiagnostics)
 }
 
-// analyzeAndPublishDiagnosticsDebounced schedules an analysis for the given URI with debouncing.
+// analyzeAndPublishDiagnosticsDebounced schedules an analysis for the given file with debouncing.
 // If another analysis is scheduled within the debounce time, the previous one is cancelled.
-func (l *LSP) analyzeAndPublishDiagnosticsDebounced(uri string) {
+// filePath is the native OS path used for analysis, uri is the LSP URI to send to the client.
+func (l *LSP) analyzeAndPublishDiagnosticsDebounced(filePath, uri string) {
 	// debounceTime is the time to wait before running the analyzer after a document change.
 	const debounceTime = 500 * time.Millisecond
 
@@ -143,14 +145,14 @@ func (l *LSP) analyzeAndPublishDiagnosticsDebounced(uri string) {
 		if l.analysisInProgress {
 			l.analysisInProgressMu.Unlock()
 			// If an analysis is already in progress, schedule another one
-			l.analyzeAndPublishDiagnosticsDebounced(uri)
+			l.analyzeAndPublishDiagnosticsDebounced(filePath, uri)
 			return
 		}
 		l.analysisInProgress = true
 		l.analysisInProgressMu.Unlock()
 
 		// Run the analysis
-		l.analyzeAndPublishDiagnostics(uri)
+		l.analyzeAndPublishDiagnostics(filePath, uri)
 
 		// Mark analysis as complete
 		l.analysisInProgressMu.Lock()

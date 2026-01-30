@@ -40,9 +40,9 @@ func New(reader io.Reader, writer io.Writer) *LSP {
 	}
 }
 
-// analyze runs the analysis pipeline on the given file URI and returns the program and diagnostics.
-func (l *LSP) analyze(uri string) (*analysis.Program, []analysis.Diagnostic) {
-	return analysis.Analyze(l.fs, uri)
+// analyze runs the analysis pipeline on the given file path and returns the program and diagnostics.
+func (l *LSP) analyze(filePath string) (*analysis.Program, []analysis.Diagnostic) {
+	return analysis.Analyze(l.fs, filePath)
 }
 
 // Run starts the LSP server. It will read messages from the reader and write responses
@@ -176,23 +176,4 @@ func (l *LSP) sendMessage(message any) error {
 	}
 
 	return nil
-}
-
-// uriToPath converts a file:// URI to an absolute file path.
-// If the URI doesn't have file:// prefix, it returns the URI as-is.
-func uriToPath(uri string) string {
-	const prefix = "file://"
-	if len(uri) > len(prefix) && uri[:len(prefix)] == prefix {
-		return uri[len(prefix):]
-	}
-	return uri
-}
-
-// pathToURI converts an absolute file path to a file:// URI.
-func pathToURI(path string) string {
-	const prefix = "file://"
-	if len(path) > len(prefix) && path[:len(prefix)] == prefix {
-		return path
-	}
-	return prefix + path
 }

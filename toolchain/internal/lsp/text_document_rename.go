@@ -42,7 +42,7 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode rename request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 	position := request.Params.Position
 	newName := request.Params.NewName
 

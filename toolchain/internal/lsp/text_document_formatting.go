@@ -28,7 +28,7 @@ func (l *LSP) handleTextDocumentFormatting(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode text document formatting request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 	content, err := l.fs.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file from vfs: %w", err)

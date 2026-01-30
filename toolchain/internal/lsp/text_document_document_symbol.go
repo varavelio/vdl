@@ -71,7 +71,7 @@ func (l *LSP) handleTextDocumentDocumentSymbol(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to decode documentSymbol request: %w", err)
 	}
 
-	filePath := uriToPath(request.Params.TextDocument.URI)
+	filePath := UriToPath(request.Params.TextDocument.URI)
 
 	// Run analysis to get the program
 	program, _ := l.analyze(filePath)
