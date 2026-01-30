@@ -84,7 +84,13 @@
         "language": "vdl",
         "path": "./language/vdl.code-snippets"
       }
-    ]
+    ],
+    "configurationDefaults": {
+      "[vdl]": {
+        "editor.defaultFormatter": "varavel.vdl",
+        "editor.formatOnSave": true
+      }
+    }
   },
   "scripts": {
     "dev": "node esbuild.js --watch",
