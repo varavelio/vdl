@@ -5,12 +5,12 @@
 # See all available options at https://vdl.varavel.com/config
 
 version: 1
-schema: "{{schema_path}}"
+schema: "{{schema_path}}" # Schema for all targets
 
 # You can add as many targets as you want, including multiple for the same language.
 targets:
   # - go:
-  #     output: ./vdlgen/go
+  #     output: ./gen/go
   #     package: vdl
   #     gen_server: false
   #     gen_client: false
@@ -18,38 +18,47 @@ targets:
   #     gen_consts: true
 
   # - typescript:
-  #     output: ./vdlgen/ts
+  #     output: ./gen/ts
   #     gen_server: false
   #     gen_client: false
   #     gen_patterns: true
   #     gen_consts: true
 
   # - dart:
-  #     output: ./vdlgen/dart
-  #     package: vdl
-  #     gen_client: false
+  #     output: ./gen/dart
+  #     gen_patterns: true
+  #     gen_consts: true
+
+  # - python:
+  #     output: ./gen/python
   #     gen_patterns: true
   #     gen_consts: true
 
   # - jsonschema:
-  #     output: ./vdlgen/jsonschema
+  #     output: ./gen/jsonschema
   #     filename: schema.json
-  #     id: "https://example.com/schema.json"
+  #     id: https://example.com/schema.json
 
   # - openapi:
-  #     output: ./vdlgen/openapi
+  #     output: ./gen/openapi
   #     filename: openapi.yaml
-  #     title: "VDL API"
-  #     version: "1.0.0"
-  #     description: "VDL API"
-  #     base_url: "http://example.com/api/v1/vdl"
-  #     contact_name: "Example"
-  #     contact_email: "api-support@example.com"
-  #     license_name: "Proprietary"
+  #     title: VDL API
+  #     version: 1.0.0
+  #     description: VDL API
+  #     base_url: http://api.example.com/rpc
+  #     contact_name: Example
+  #     contact_email: contact@example.com
+  #     license_name: Proprietary
 
   # - playground:
-  #     output: ./vdlgen/playground
-  #     default_base_url: "http://example.com/api/v1/vdl"
+  #     output: ./gen/playground
+  #     default_base_url: http://localhost:8080/rpc
   #     default_headers:
-  #       - key: "Authorization"
-  #         value: "Bearer token"
+  #       - key: Authorization
+  #         value: Bearer token
+
+  # - plugin:
+  #     output: ./gen/plugin
+  #     command: ["echo", "foo"]
+  #     options:
+  #       key: value
