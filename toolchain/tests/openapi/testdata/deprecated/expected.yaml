@@ -47,7 +47,7 @@ components:
   schemas:
     User:
       deprecated: true
-      description: "\n\nDeprecated: Use UserV2 instead"
+      description: "\nDeprecated: Use UserV2 instead"
       properties:
         id:
           type: string

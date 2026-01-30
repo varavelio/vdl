@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/goccy/go-yaml"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"gopkg.in/yaml.v3"
 )
 
 // File represents a generated file. This mirrors codegen.File to avoid import cycles.
