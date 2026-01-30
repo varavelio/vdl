@@ -1,38 +1,34 @@
 const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const { execSync } = require("child_process");
 
-/**
- * This function is used to get the binary path of the VDL binary.
- * It checks the following locations in order:
- *
- * 1. The configuration `vdl.binaryPath`
- * 2. The GOBIN environment variable
- * 3. The system PATH
- *
- * The binary to find is `vdl` or `vdl.exe`.
- *
- * If the binary path is not found in any of these locations, it throws an error.
- *
- * @returns {string} The binary path of the VDL binary.
- * @throws {Error} If the binary path is not found in any of the locations.
- */
 function getBinaryPath() {
-  // 1. Try to get the binary path from the configuration "vdl.binaryPath"
-  //    and if found, early return it
   const config = vscode.workspace.getConfiguration("vdl");
   const configBinaryPath = config.get("binaryPath");
 
-  if (configBinaryPath && fs.existsSync(configBinaryPath)) {
-    return configBinaryPath;
+  // 1. Manual Configuration
+  if (configBinaryPath && configBinaryPath.trim() !== "") {
+    let finalPath = configBinaryPath;
+    // Expand '~' for Linux/Mac
+    if (finalPath.startsWith("~")) {
+      finalPath = path.join(os.homedir(), finalPath.slice(1));
+    }
+
+    if (fs.existsSync(finalPath)) {
+      return finalPath;
+    }
+    // Warn instead of throw to allow fallback to PATH
+    vscode.window.showWarningMessage(
+      `VDL: Configured path not found: ${finalPath}. Searching in PATH...`,
+    );
   }
 
   const isWindows = process.platform === "win32";
   const binaryName = isWindows ? "vdl.exe" : "vdl";
 
-  // 2. Try to get the binary path from the GOBIN environment variable
-  //    and if found, early return it
+  // 2. GOBIN Environment Variable
   const gobinPath = process.env.GOBIN;
   if (gobinPath) {
     const binaryPath = path.join(gobinPath, binaryName);
@@ -41,21 +37,30 @@ function getBinaryPath() {
     }
   }
 
-  // 3. Try to get the binary path from the system PATH
-  //    and if found, early return it
+  // 3. System PATH
   try {
     const command = isWindows ? "where vdl" : "which vdl";
-    const binaryPath = execSync(command, { encoding: "utf8" }).trim();
+    // stdio: 'pipe' prevents noise in console if it fails
+    const stdout = execSync(command, { encoding: "utf8", stdio: "pipe" });
 
-    if (binaryPath && fs.existsSync(binaryPath)) {
-      return binaryPath;
+    // Strict cleanup of newlines (Critical for Windows)
+    const lines = stdout
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    for (const line of lines) {
+      if (fs.existsSync(line)) {
+        return line;
+      }
     }
-  } catch {}
+  } catch (e) {
+    // Ignore error if not found in PATH
+  }
 
-  let errMsg = "Could not find the vdl/vdl.exe binary. ";
-  errMsg += "Please download it and make sure it's in your PATH. ";
-  errMsg +=
-    "You can also set a custom binary path in the vdl.binaryPath setting.";
+  let errMsg = "Could not find the vdl binary. ";
+  errMsg += "Please ensure it is installed and in your PATH, ";
+  errMsg += "or set 'vdl.binaryPath' in VS Code settings.";
   throw new Error(errMsg);
 }
 

@@ -1,18 +1,23 @@
 const vscode = require("vscode");
 const execProcess = require("child_process").exec;
 
-/**
- * Runs the init command for the VDL binary.
- *
- * @param {string} binaryPath The path to the VDL binary.
- * @returns {Promise<void>} A promise that resolves when the command is complete.
- */
 async function initCommand(binaryPath) {
+  let defaultUri = undefined;
+
+  // Open dialog in current project folder
+  if (
+    vscode.workspace.workspaceFolders &&
+    vscode.workspace.workspaceFolders.length > 0
+  ) {
+    defaultUri = vscode.workspace.workspaceFolders[0].uri;
+  }
+
   const folderUri = await vscode.window.showOpenDialog({
     canSelectFiles: false,
     canSelectFolders: true,
     canSelectMany: false,
-    openLabel: "Select folder to initialize VDL",
+    defaultUri: defaultUri,
+    openLabel: "Initialize VDL Here",
   });
 
   if (!folderUri || folderUri.length === 0) {
@@ -20,27 +25,23 @@ async function initCommand(binaryPath) {
   }
 
   const folderPath = folderUri[0].fsPath;
-  const initCommand = `${binaryPath} init ${folderPath}`;
+
+  // Quote paths to support spaces (e.g. "Program Files")
+  const cmd = `"${binaryPath}" init "${folderPath}"`;
 
   console.log(`VDL: Initializing at ${folderPath}`);
-  execProcess(initCommand, (error, stdout, stderr) => {
+
+  execProcess(cmd, (error, stdout, _) => {
     if (error) {
-      vscode.window.showErrorMessage(
-        `VDL: Failed to initialize: ${error.message}`,
-      );
-      console.error(`VDL: Error initializing schema: ${error.message}`);
+      vscode.window.showErrorMessage(`VDL Init Failed: ${error.message}`);
       return;
     }
 
-    if (stderr) {
-      console.log(`VDL: Init stderr: ${stderr}`);
-    }
+    if (stdout) console.log(stdout);
 
-    if (stdout) {
-      console.log(`VDL: Init stdout: ${stdout}`);
-    }
-
-    vscode.window.showInformationMessage(`VDL: Initialized at ${folderPath}`);
+    vscode.window.showInformationMessage(
+      `VDL initialized successfully in: ${folderPath}`,
+    );
   });
 }
 
