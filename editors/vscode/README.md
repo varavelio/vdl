@@ -47,9 +47,22 @@ If the binary is not in your operating system PATH, you can set a custom path in
 
 The following snippets are available for `.vdl` files:
 
-- `rule`: Creates a new rule template (`rule @$name { }`)
-- `type`: Creates a new type template (`type $name { }`)
-- `proc`: Creates a new procedure template (`proc $name { }`)
+- `type`: Define a new custom data type
+- `field`: Add a field to a type
+- `field?`: Add an optional field to a type
+- `enum`: Define an enumeration (String or Integer)
+- `const`: Define a global constant
+- `pattern`: Define a string interpolation pattern
+- `map`: Define a map type (keys are always strings)
+- `field:map`: Define a field with a map type
+- `rpc`: Define a new RPC service block
+- `proc`: Define a request-response procedure inside an RPC
+- `stream`: Define a unidirectional stream inside an RPC
+- `include`: Include another VDL file
+- `deprecated`: Mark the next element as deprecated
+- `doc`: Insert a standalone documentation block
+- `docfile`: Reference an external markdown documentation file
+- `...`: Spread fields from another type
 
 ## Release Notes
 
