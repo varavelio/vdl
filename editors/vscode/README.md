@@ -63,7 +63,7 @@ The following snippets are available for `.vdl` files:
 
 ## Release Notes
 
-Below are release notes for the last 10 versions, you can also see the entire [changelog](./CHANGELOG.md).
+Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/editors/vscode/CHANGELOG.md).
 
 ### v0.1.0 - 2026-01-29
 
