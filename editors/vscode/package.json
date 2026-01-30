@@ -1,0 +1,104 @@
+{
+  "name": "vdl",
+  "displayName": "VDL",
+  "description": "Official language support for VDL (Varavel Definition Language): Syntax highlighting, LSP, snippets, and more.",
+  "icon": "./assets/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varavelio/vdl.git",
+    "directory": "editors/vscode"
+  },
+  "license": "MIT",
+  "publisher": "varavel",
+  "contributors": [
+    {
+      "name": "Luis Eduardo Jerez",
+      "url": "https://eduardo.lat"
+    }
+  ],
+  "version": "0.1.8",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "vdl",
+        "aliases": [
+          "Varavel Definition Language",
+          "VDL",
+          "vdl",
+          "vdl-rpc"
+        ],
+        "extensions": [
+          ".vdl"
+        ],
+        "configuration": "./language/vdl.lang-config.json",
+        "icon": {
+          "dark": "./assets/icon.png",
+          "light": "./assets/icon.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "vdl",
+        "scopeName": "source.vdl",
+        "path": "./language/vdl.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "VDL (Varavel Definition Language)",
+      "properties": {
+        "vdl.enable": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Enable VDL language support. If disabled, the only feature that will be available is Syntax Highlighting."
+        },
+        "vdl.binaryPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path to the VDL binary. If not set, the extension will try to find `vdl` or `vdl.exe` in your PATH."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "vdl.init",
+        "title": "VDL: Initialize a new vdl.yaml and schema.vdl files"
+      },
+      {
+        "command": "vdl.restart",
+        "title": "VDL: Restart Language Server"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "vdl",
+        "path": "./language/vdl.code-snippets"
+      }
+    ]
+  },
+  "scripts": {
+    "dev": "node esbuild.js --watch",
+    "build": "node esbuild.js --production",
+    "package": "rm -rf *.vsix && rm -rf ./dist/ && npm run build && vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@types/vscode": "1.90.0",
+    "@vscode/test-cli": "0.0.10",
+    "@vscode/test-electron": "2.4.1",
+    "esbuild": "0.25.2"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  }
+}
