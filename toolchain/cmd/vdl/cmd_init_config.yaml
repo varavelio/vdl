@@ -42,23 +42,11 @@ targets:
   # - openapi:
   #     output: ./gen/openapi
   #     filename: openapi.yaml
-  #     title: VDL API
-  #     version: 1.0.0
-  #     description: VDL API
-  #     base_url: http://api.example.com/rpc
-  #     contact_name: Example
-  #     contact_email: contact@example.com
-  #     license_name: Proprietary
 
   # - playground:
   #     output: ./gen/playground
   #     default_base_url: http://localhost:8080/rpc
-  #     default_headers:
-  #       - key: Authorization
-  #         value: Bearer token
 
   # - plugin:
   #     output: ./gen/plugin
   #     command: ["echo", "foo"]
-  #     options:
-  #       key: value
