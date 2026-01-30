@@ -55,12 +55,11 @@ var (
 
 // asciiArtRaw is used to generate AsciiArt
 var asciiArtRaw = strings.TrimSpace(`
-██╗   ██╗██████╗ ██╗
-██║   ██║██╔══██╗██║
-██║   ██║██║  ██║██║
-╚██╗ ██╔╝██║  ██║██║
- ╚████╔╝ ██████╔╝███████╗
-  ╚═══╝  ╚═════╝ ╚══════╝
+██╗  ██╗█████╗ ██╗
+██║  ██║██╔═██╗██║
+╚██╗██╔╝██║ ██║██║
+ ╚███╔╝ █████╔╝█████╗
+  ╚══╝  ╚════╝ ╚════╝
 `)
 
 // basicInfoRaw is used to generate AsciiArt
