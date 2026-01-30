@@ -36,7 +36,7 @@
       ]
     },
     "docstrings": {
-      "name": "comment.block.documentation.vdl",
+      "name": "string.quoted.docstring.multi.vdl",
       "begin": "\"\"\"",
       "end": "\"\"\"",
       "patterns": [
