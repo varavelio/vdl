@@ -238,6 +238,16 @@ func verifyGeneratedFiles(t *testing.T, caseDir string) {
 		return
 	}
 
+	// If expected_empty exists, ensure no files were generated
+	if _, err := os.Stat(filepath.Join(caseDir, "expected_empty")); err == nil {
+		if info, err := os.Stat(genDir); err == nil && info.IsDir() {
+			entries, err := os.ReadDir(genDir)
+			require.NoError(t, err, "failed to read gen directory")
+			require.Empty(t, entries, "expected no generated files")
+		}
+		return
+	}
+
 	// If expected.json exists, compare the single output file
 	expectedFile := filepath.Join(caseDir, "expected.json")
 	if _, err := os.Stat(expectedFile); err == nil {

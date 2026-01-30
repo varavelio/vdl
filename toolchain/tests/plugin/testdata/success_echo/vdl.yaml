@@ -3,4 +3,4 @@ schema: schema.vdl
 targets:
   - plugin:
       output: gen
-      command: ["python3", "plugin.py"]
+      command: ["echo", "hello"]
