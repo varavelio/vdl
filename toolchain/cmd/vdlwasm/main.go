@@ -8,8 +8,6 @@ import (
 )
 
 var wrappers map[string]js.Func = map[string]js.Func{
-	// "cmdTranspile":     cmdTranspileWrapper(),
-	"cmdFmt":           cmdFmtWrapper(),
 	"cmdCodegen":       cmdCodegenWrapper(),
 	"cmdExpandTypes":   cmdExpandTypesWrapper(),
 	"cmdExtractType":   cmdExtractTypeWrapper(),
