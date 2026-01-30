@@ -10,7 +10,7 @@ Official VDL extension for Visual Studio Code or any VSCode based editor.
 
 - [Install from the VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=varavel.vdl)
 - [Install from Open VSX Registry](https://open-vsx.org/extension/varavel/vdl)
-- [Download the `.vsix` file from the releases page](https://github.com/varavelio/vdl/releases)
+- [Download the `.vsix` file from the releases page](https://github.com/varavelio/vdl/releases?q=vscode)
 
 ## Features
 
