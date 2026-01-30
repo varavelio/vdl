@@ -45,6 +45,16 @@
     ],
     "description": "Define a string interpolation pattern",
   },
+  "VDL Map": {
+    "prefix": "map",
+    "body": ["map<${1:string}>"],
+    "description": "Define a map type (keys are always strings)",
+  },
+  "VDL Map Field": {
+    "prefix": "field:map",
+    "body": ["${1:fieldName}: map<${2:string}>"],
+    "description": "Define a field with a map type",
+  },
   "VDL RPC Service": {
     "prefix": "rpc",
     "body": [
