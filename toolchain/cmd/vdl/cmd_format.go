@@ -10,12 +10,12 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/formatter"
 )
 
-type cmdFmtArgs struct {
+type cmdFormatArgs struct {
 	Pattern string `arg:"positional" help:"The file pattern to format (supports recursive globs e.g. './**/*.vdl')"`
 	Verbose bool   `arg:"-v,--verbose" help:"Verbose output prints all formatted files"`
 }
 
-func cmdFmt(args *cmdFmtArgs) {
+func cmdFmt(args *cmdFormatArgs) {
 	var matches []string
 	var err error
 	startTime := time.Now()

@@ -11,7 +11,7 @@ import (
 
 type allArgs struct {
 	Init     *cmdInitArgs     `arg:"subcommand:init" help:"Initialize a new VDL schema in the specified path"`
-	Fmt      *cmdFmtArgs      `arg:"subcommand:fmt" help:"Format the VDL schema in the specified path"`
+	Format   *cmdFormatArgs   `arg:"subcommand:format" help:"Format the VDL schema in the specified path"`
 	Generate *cmdGenerateArgs `arg:"subcommand:generate" help:"Generate code from the VDL schema"`
 	LSP      *cmdLSPArgs      `arg:"subcommand:lsp" help:"Start the VDL Language Server"`
 	Version  *struct{}        `arg:"subcommand:version" help:"Show vdl version information"`
@@ -63,8 +63,8 @@ func main() {
 		return
 	}
 
-	if args.Fmt != nil {
-		cmdFmt(args.Fmt)
+	if args.Format != nil {
+		cmdFmt(args.Format)
 		return
 	}
 
