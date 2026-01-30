@@ -1,123 +1,139 @@
 package lsp
 
 import (
-	"bytes"
-	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
 )
 
-// LSPLogger is a LSPLogger for the LSP.
+const (
+	maxLogSizeBytes = 3 * 1024 * 1024 // 3MB
+	logDirName      = "vdl"
+	logFileName     = "lsp.log"
+	oldLogFileName  = "lsp.old.log"
+)
+
 type LSPLogger struct {
-	slogger  *slog.Logger
-	filePath string
-	writeMu  sync.Mutex
+	logger *slog.Logger
+	file   *os.File
+	mu     sync.Mutex
+	path   string
+	size   int64
 }
 
-// NewLSPLogger creates a new logger. It will log to a file named .vdl-lsp.log in the
-// user's home directory and if that fails, it will store the log in the system's temp
-// directory.
-//
-// The logs are written in JSON format and the latest logs are always at the top of the file.
+// GetLogFilePath returns the absolute path to the log file.
+// Used by the CLI (vdl lsp --log-path) and the Logger.
+func GetLogFilePath() string {
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		cacheDir = os.TempDir()
+	}
+
+	// Ensure directory exists
+	dir := filepath.Join(cacheDir, logDirName)
+	_ = os.MkdirAll(dir, 0755)
+
+	return filepath.Join(dir, logFileName)
+}
+
 func NewLSPLogger() *LSPLogger {
-	dir, err := os.UserHomeDir()
-	if err != nil {
-		dir = os.TempDir()
+	l := &LSPLogger{
+		path: GetLogFilePath(),
 	}
 
-	filePath := filepath.Join(dir, ".vdl-lsp.log")
+	// Ensure file is open and initial rotation check
+	l.ensureFileOpen()
+	l.rotate()
 
-	lgr := &LSPLogger{
-		filePath: filePath,
-		writeMu:  sync.Mutex{},
-	}
-	lgr.slogger = slog.New(slog.NewJSONHandler(lgr, nil))
-
-	return lgr
+	l.logger = slog.New(slog.NewJSONHandler(l, nil))
+	return l
 }
 
-func (l *LSPLogger) ensureLogFile() error {
-	_, err := os.Stat(l.filePath)
-
-	if os.IsNotExist(err) {
-		file, err := os.Create(l.filePath)
-		if err != nil {
-			return err
-		}
-		return file.Close()
+// ensureFileOpen opens the file if not already open and updates the size counter.
+// Caller must verify error.
+func (l *LSPLogger) ensureFileOpen() {
+	if l.file != nil {
+		return
 	}
 
+	// Open in append mode for performance
+	file, err := os.OpenFile(l.path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
+		return
+	}
+	l.file = file
+
+	// Initialize size from disk
+	info, err := file.Stat()
+	if err == nil {
+		l.size = info.Size()
+	} else {
+		l.size = 0
+	}
+}
+
+func (l *LSPLogger) rotate() {
+	if l.file == nil || l.size <= maxLogSizeBytes {
+		return
+	}
+
+	if l.file != nil {
+		_ = l.file.Close()
+		l.file = nil
+	}
+
+	oldPath := filepath.Join(filepath.Dir(l.path), oldLogFileName)
+	_ = os.Rename(l.path, oldPath)
+
+	l.ensureFileOpen()
+}
+
+// Write implements io.Writer with optimized in-memory size tracking.
+func (l *LSPLogger) Write(p []byte) (n int, err error) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	// Ensure the file is open and rotate file if necessary
+	l.ensureFileOpen()
+	l.rotate()
+
+	// Protect writes to a nil file
+	if l.file == nil {
+		return 0, os.ErrPermission
+	}
+
+	// Write file and update counter
+	n, err = l.file.Write(p)
+	if err == nil {
+		l.size += int64(n)
+	}
+
+	return n, err
+}
+
+func (l *LSPLogger) Close() error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.file != nil {
+		err := l.file.Close()
+		l.file = nil
 		return err
 	}
-
 	return nil
 }
 
-func (l *LSPLogger) cleanOldLogs() error {
-	const maxLogLines = 10_000
-
-	content, err := os.ReadFile(l.filePath)
-	if err != nil {
-		return err
-	}
-
-	lines := bytes.Split(content, []byte("\n"))
-	if len(lines) <= maxLogLines {
-		return nil
-	}
-
-	lines = lines[len(lines)-maxLogLines:]
-	err = os.WriteFile(l.filePath, bytes.Join(lines, []byte("\n")), 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (l *LSPLogger) Write(content []byte) (int, error) {
-	l.writeMu.Lock()
-	defer l.writeMu.Unlock()
-
-	if err := l.ensureLogFile(); err != nil {
-		return 0, fmt.Errorf("failed to ensure log file: %w", err)
-	}
-
-	if err := l.cleanOldLogs(); err != nil {
-		return 0, fmt.Errorf("failed to clean old logs: %w", err)
-	}
-
-	existingContent, err := os.ReadFile(l.filePath)
-	if err != nil {
-		return 0, fmt.Errorf("failed to read log file: %w", err)
-	}
-
-	if err := os.WriteFile(l.filePath, append(content, existingContent...), 0644); err != nil {
-		return 0, fmt.Errorf("failed to write log file: %w", err)
-	}
-
-	return len(content), nil
-}
-
-// Info logs a message with severity INFO.
+// Info logs at [slog.LevelInfo].
 func (l *LSPLogger) Info(msg string, args ...any) {
-	l.slogger.Info(msg, args...)
+	l.logger.Info(msg, args...)
 }
 
-// Error logs a message with severity ERROR.
+// Error logs at [slog.LevelError].
 func (l *LSPLogger) Error(msg string, args ...any) {
-	l.slogger.Error(msg, args...)
+	l.logger.Error(msg, args...)
 }
 
-// Debug logs a message with severity DEBUG.
-func (l *LSPLogger) Debug(msg string, args ...any) {
-	l.slogger.Debug(msg, args...)
-}
-
-// Warn logs a message with severity WARNING.
+// Warn logs at [slog.LevelWarn].
 func (l *LSPLogger) Warn(msg string, args ...any) {
-	l.slogger.Warn(msg, args...)
+	l.logger.Warn(msg, args...)
 }
