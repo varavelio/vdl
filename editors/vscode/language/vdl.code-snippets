@@ -1,0 +1,115 @@
+{
+  "VDL Type Definition": {
+    "prefix": "type",
+    "body": [
+      "\"\"\" ${1:Description...} \"\"\"",
+      "type ${2:TypeName} {",
+      "\t${3:field}: ${4:string}",
+      "}",
+    ],
+    "description": "Define a new custom data type",
+  },
+  "VDL Field": {
+    "prefix": "field",
+    "body": ["${1:fieldName}: ${2:string}"],
+    "description": "Add a field to a type",
+  },
+  "VDL Optional Field": {
+    "prefix": "field?",
+    "body": ["${1:fieldName}?: ${2:string}"],
+    "description": "Add an optional field to a type",
+  },
+  "VDL Enum": {
+    "prefix": "enum",
+    "body": [
+      "\"\"\" ${1:Description...} \"\"\"",
+      "enum ${2:EnumName} {",
+      "\t${3:Member}",
+      "}",
+    ],
+    "description": "Define an enumeration (String or Integer)",
+  },
+  "VDL Constant": {
+    "prefix": "const",
+    "body": [
+      "\"\"\" ${1:Description...} \"\"\"",
+      "const ${2:CONSTANT_NAME} = ${3:Value}",
+    ],
+    "description": "Define a global constant",
+  },
+  "VDL Pattern": {
+    "prefix": "pattern",
+    "body": [
+      "\"\"\" ${1:Description...} \"\"\"",
+      "pattern ${2:PatternName} = \"${3:prefix.{placeholder}}\"",
+    ],
+    "description": "Define a string interpolation pattern",
+  },
+  "VDL RPC Service": {
+    "prefix": "rpc",
+    "body": [
+      "\"\"\" ${1:Service Description...} \"\"\"",
+      "rpc ${2:ServiceName} {",
+      "\t$0",
+      "}",
+    ],
+    "description": "Define a new RPC service block",
+  },
+  "VDL Procedure": {
+    "prefix": "proc",
+    "body": [
+      "\"\"\" ${1:Procedure Description...} \"\"\"",
+      "proc ${2:ProcedureName} {",
+      "\tinput {",
+      "\t\t${3:field}: ${4:string}",
+      "\t}",
+      "",
+      "\toutput {",
+      "\t\t${5:field}: ${6:string}",
+      "\t}",
+      "}",
+    ],
+    "description": "Define a request-response procedure inside an RPC",
+  },
+  "VDL Stream": {
+    "prefix": "stream",
+    "body": [
+      "\"\"\" ${1:Stream Description...} \"\"\"",
+      "stream ${2:StreamName} {",
+      "\tinput {",
+      "\t\t${3:field}: ${4:string}",
+      "\t}",
+      "",
+      "\toutput {",
+      "\t\t${5:field}: ${6:string}",
+      "\t}",
+      "}",
+    ],
+    "description": "Define a unidirectional stream inside an RPC",
+  },
+  "VDL Include": {
+    "prefix": "include",
+    "body": ["include \"./${1:file}.vdl\""],
+    "description": "Include another VDL file",
+  },
+  "VDL Deprecated": {
+    "prefix": "deprecated",
+    "body": ["deprecated(\"Use ${1:NewElement} instead\")"],
+    "description": "Mark the next element as deprecated",
+  },
+  "VDL Docstring (Standalone)": {
+    "prefix": "doc",
+    "body": ["\"\"\"", "# ${1:Title}", "${2:Description...}", "\"\"\""],
+    "description": "Insert a standalone documentation block",
+  },
+  "VDL Docstring (External)": {
+    "prefix": "docfile",
+    "body": ["\"\"\" ./${1:docs/file.md} \"\"\""],
+    "description": "Reference an external markdown documentation file",
+  },
+  "VDL Spread (Destructuring)": {
+    "prefix": "...",
+    "body": ["...${1:TypeToSpread}"],
+    "description": "Spread fields from another type",
+  },
+}
