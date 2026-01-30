@@ -8,7 +8,6 @@ require (
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/alexflint/go-arg v1.6.1
 	github.com/bmatcuk/doublestar/v4 v4.10.0
-	github.com/goccy/go-yaml v1.19.2
 	github.com/invopop/jsonschema v0.13.0
 	github.com/kaptinlin/jsonschema v0.6.6
 	github.com/stretchr/testify v1.11.1
@@ -24,6 +23,7 @@ require (
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
+	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/kaptinlin/go-i18n v0.2.2 // indirect
 	github.com/kaptinlin/jsonpointer v0.4.8 // indirect
 	github.com/kaptinlin/messageformat-go v0.4.7 // indirect
