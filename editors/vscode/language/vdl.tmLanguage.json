@@ -1,0 +1,199 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "VDL (Varavel Definition Language)",
+  "scopeName": "source.vdl",
+  "config": {
+    "name": "VDL (Varavel Definition Language)"
+  },
+  "fileTypes": ["vdl"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#docstrings" },
+    { "include": "#strings" },
+    { "include": "#keywords" },
+    { "include": "#constants-language" },
+    { "include": "#constants-numeric" },
+    { "include": "#constants-user" },
+    { "include": "#types-primitive" },
+    { "include": "#types-container" },
+    { "include": "#types-custom" },
+    { "include": "#functions-macros" },
+    { "include": "#operators" },
+    { "include": "#properties" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.vdl",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.vdl",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "docstrings": {
+      "name": "comment.block.documentation.vdl",
+      "begin": "\"\"\"",
+      "end": "\"\"\"",
+      "patterns": [
+        {
+          "match": "(\\./[a-zA-Z0-9_\\-\\./]+\\.md)",
+          "captures": {
+            "1": { "name": "markup.underline.link.vdl" }
+          }
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.vdl",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.vdl",
+          "match": "\\\\."
+        },
+        {
+          "name": "variable.other.pattern.placeholder.vdl",
+          "match": "\\{[a-zA-Z0-9_]+\\}"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.vdl",
+          "match": "\\b(type|rpc|proc|stream|enum|const|pattern|input|output|include)\\b"
+        }
+      ]
+    },
+    "functions-macros": {
+      "patterns": [
+        {
+          "name": "keyword.other.deprecated.vdl",
+          "match": "\\b(deprecated)\\b"
+        }
+      ]
+    },
+    "constants-language": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.vdl",
+          "match": "\\b(true|false)\\b"
+        }
+      ]
+    },
+    "constants-numeric": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.vdl",
+          "match": "\\b\\d+\\.\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.integer.vdl",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    "constants-user": {
+      "patterns": [
+        {
+          "name": "constant.other.caps.vdl",
+          "match": "\\b[A-Z][A-Z0-9_]+\\b"
+        }
+      ]
+    },
+    "types-primitive": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.vdl",
+          "match": "\\b(string|int|float|bool|datetime)\\b"
+        }
+      ]
+    },
+    "types-container": {
+      "patterns": [
+        {
+          "name": "storage.type.container.vdl",
+          "match": "\\b(map)\\b"
+        }
+      ]
+    },
+    "types-custom": {
+      "patterns": [
+        {
+          "name": "entity.name.type.class.vdl",
+          "match": "\\b([A-Z][a-zA-Z0-9]*)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.spread.vdl",
+          "match": "\\.\\.\\."
+        },
+        {
+          "name": "keyword.operator.optional.vdl",
+          "match": "\\?"
+        },
+        {
+          "name": "keyword.operator.assignment.vdl",
+          "match": "="
+        },
+        {
+          "name": "punctuation.separator.key-value.vdl",
+          "match": ":"
+        },
+        {
+          "name": "punctuation.terminator.vdl",
+          "match": ","
+        },
+        {
+          "name": "punctuation.definition.type.begin.vdl",
+          "match": "<"
+        },
+        {
+          "name": "punctuation.definition.type.end.vdl",
+          "match": ">"
+        },
+        {
+          "name": "punctuation.section.braces.begin.vdl",
+          "match": "\\{"
+        },
+        {
+          "name": "punctuation.section.braces.end.vdl",
+          "match": "\\}"
+        },
+        {
+          "name": "punctuation.section.brackets.begin.vdl",
+          "match": "\\["
+        },
+        {
+          "name": "punctuation.section.brackets.end.vdl",
+          "match": "\\]"
+        },
+        {
+          "name": "punctuation.definition.parameters.begin.vdl",
+          "match": "\\("
+        },
+        {
+          "name": "punctuation.definition.parameters.end.vdl",
+          "match": "\\)"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "variable.object.property.vdl",
+          "match": "\\b[a-z][a-zA-Z0-9]*\\b(?=\\s*(\\?|:))"
+        }
+      ]
+    }
+  }
+}
