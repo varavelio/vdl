@@ -12,7 +12,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "uforg.urpc",
+        "varavel.vdl",
         "golang.go",
         "svelte.svelte-vscode",
         "bradlc.vscode-tailwindcss",
@@ -23,7 +23,6 @@
         "Dart-Code.dart-code"
       ],
       "settings": {
-        "urpc.enable": false,
         "files.eol": "\n",
         "editor.formatOnSave": true,
         "editor.foldingStrategy": "indentation",
