@@ -55,10 +55,10 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		Content:      []byte(indexContent),
 	})
 
-	// core_types.py - Core VDL types (Response, VdlError)
+	// core.py - Core VDL types (Response, VdlError)
 	coreContent := g.generateCoreFile(schema)
 	files = append(files, File{
-		RelativePath: "core_types.py",
+		RelativePath: "core.py",
 		Content:      []byte(coreContent),
 	})
 
@@ -90,11 +90,11 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		})
 	}
 
-	// rpc_catalog.py - RPC catalog for introspection (if any RPCs)
+	// catalog.py - RPC catalog for introspection (if any RPCs)
 	if len(schema.RPCs) > 0 {
 		catalogContent := g.generateRPCCatalogFile(schema)
 		files = append(files, File{
-			RelativePath: "rpc_catalog.py",
+			RelativePath: "catalog.py",
 			Content:      []byte(catalogContent),
 		})
 	}
@@ -156,7 +156,7 @@ func (g *Generator) generateTypesFile(schema *ir.Schema) string {
 	builder.Line("from typing import Any, Dict, List, Optional, Union")
 	builder.Line("import datetime")
 	builder.Break()
-	builder.Line("from .core_types import Response, VdlError")
+	builder.Line("from .core import Response, VdlError")
 	builder.Break()
 
 	// Generate enums
@@ -209,7 +209,7 @@ func (g *Generator) generateIndexFile(schema *ir.Schema) string {
 	builder.Raw(generateHeader())
 
 	// Core types
-	builder.Line("from .core_types import *")
+	builder.Line("from .core import *")
 
 	// Constants
 	if g.config.ShouldGenConsts() && len(schema.Constants) > 0 {
@@ -229,7 +229,7 @@ func (g *Generator) generateIndexFile(schema *ir.Schema) string {
 
 	// RPC Catalog
 	if len(schema.RPCs) > 0 {
-		builder.Line("from .rpc_catalog import *")
+		builder.Line("from .catalog import *")
 	}
 
 	return builder.String()

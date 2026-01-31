@@ -7,7 +7,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-//go:embed pieces/core_types.py
+//go:embed pieces/core.py
 var coreTypesContent string
 
 func generateCore(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
