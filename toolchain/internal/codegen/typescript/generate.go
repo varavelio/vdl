@@ -68,14 +68,14 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		})
 	}
 
-	// 1. core.ts
+	// core.ts
 	coreContent, err := generateCoreTypes(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	addFile("core.ts", []byte(coreContent))
 
-	// 2. types.ts
+	// types.ts
 	typesBuilder := gen.New().WithSpaces(2)
 	if len(schema.Procedures) > 0 || len(schema.Streams) > 0 {
 		generateImport(typesBuilder, []string{"Response"}, "./core", true, g.config)
@@ -115,7 +115,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	addFile("types.ts", []byte(typesBuilder.String()))
 
-	// 3. constants.ts
+	// constants.ts
 	constantsBuilder := gen.New().WithSpaces(2)
 	if err := appendContent(constantsBuilder, generateConstants); err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		hasConstants = true
 	}
 
-	// 4. patterns.ts
+	// patterns.ts
 	patternsBuilder := gen.New().WithSpaces(2)
 	if err := appendContent(patternsBuilder, generatePatterns); err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		hasPatterns = true
 	}
 
-	// 5. catalog.ts
+	// catalog.ts
 	catalogContent, err := generateRPCCatalog(schema, g.config)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		addFile("catalog.ts", []byte(catalogContent))
 	}
 
-	// 6. client.ts
+	// client.ts
 	if g.config.GenClient && len(schema.RPCs) > 0 {
 		clientContent, err := generateClient(schema, g.config)
 		if err != nil {
@@ -167,7 +167,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		addFile("client.ts", []byte(clientBuilder.String()))
 	}
 
-	// 7. server.ts
+	// server.ts
 	if g.config.GenServer && len(schema.RPCs) > 0 {
 		serverContent, err := generateServer(schema, g.config)
 		if err != nil {
@@ -204,7 +204,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		addFile("adapters/node.ts", []byte(nodeAdapterContent))
 	}
 
-	// 8. index.ts (Exports everything)
+	// index.ts (Exports everything)
 	indexBuilder := gen.New().WithSpaces(2)
 	indexBuilder.Line(formatExport("./core", g.config))
 	indexBuilder.Line(formatExport("./types", g.config))
