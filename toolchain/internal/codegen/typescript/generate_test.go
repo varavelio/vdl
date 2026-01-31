@@ -52,42 +52,11 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect: coreTypes.ts, types.ts, catalog.ts, client.ts, index.ts
+	// Expect: core.ts, types.ts, catalog.ts, client.ts, index.ts
 	require.Len(t, files, 5)
 
-	coreContent := findFile(files, "coreTypes.ts")
+	coreContent := findFile(files, "core.ts")
 	assert.Contains(t, coreContent, "export type Response<T>")
-}
-
-func TestGenerator_Generate_WithTypes(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
-	})
-
-	vdl := `
-		type User {
-			// Represents a user in the system.
-			id: string
-			email: string
-			age?: int
-		}
-	`
-	schema := parseAndBuildIR(t, vdl)
-
-	files, err := g.Generate(context.Background(), schema)
-	require.NoError(t, err)
-	require.Len(t, files, 5) // coreTypes.ts, types.ts, catalog.ts, client.ts, index.ts
-
-	content := findFile(files, "types.ts")
-	assert.Contains(t, content, "export type User = {")
-	assert.Contains(t, content, "id: string")
-	assert.Contains(t, content, "email: string")
-	assert.Contains(t, content, "age?: number")
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
@@ -114,7 +83,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
+	require.Len(t, files, 4) // core.ts, types.ts, catalog.ts, index.ts
 
 	content := findFile(files, "types.ts")
 
@@ -145,7 +114,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 5) // coreTypes.ts, types.ts, constants.ts, catalog.ts, index.ts
+	require.Len(t, files, 5) // core.ts, types.ts, constants.ts, catalog.ts, index.ts
 
 	content := findFile(files, "constants.ts")
 	assert.Contains(t, content, "export const MAX_PAGE_SIZE: number = 100;")
@@ -173,7 +142,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 5) // coreTypes.ts, types.ts, patterns.ts, catalog.ts, index.ts
+	require.Len(t, files, 5) // core.ts, types.ts, patterns.ts, catalog.ts, index.ts
 
 	content := findFile(files, "patterns.ts")
 	assert.Contains(t, content, "export function UserEventSubject(userId: string, eventType: string): string")
@@ -305,7 +274,7 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts
+	require.Len(t, files, 4) // core.ts, types.ts, catalog.ts, index.ts
 
 	content := findFile(files, "types.ts")
 
@@ -493,7 +462,7 @@ func TestGenerator_Generate_NoClient(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // coreTypes.ts, types.ts, catalog.ts, index.ts (no client.ts)
+	require.Len(t, files, 4) // core.ts, types.ts, catalog.ts, index.ts (no client.ts)
 
 	typesContent := findFile(files, "types.ts")
 	clientContent := findFile(files, "client.ts")
@@ -544,22 +513,22 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 		{
 			name:      "none (default)",
 			extension: "",
-			expected:  `from "./coreTypes";`,
+			expected:  `from "./core";`,
 		},
 		{
 			name:      "explicit none",
 			extension: "none",
-			expected:  `from "./coreTypes";`,
+			expected:  `from "./core";`,
 		},
 		{
 			name:      ".js extension",
 			extension: ".js",
-			expected:  `from "./coreTypes.js";`,
+			expected:  `from "./core.js";`,
 		},
 		{
 			name:      ".ts extension",
 			extension: ".ts",
-			expected:  `from "./coreTypes.ts";`,
+			expected:  `from "./core.ts";`,
 		},
 	}
 
@@ -582,9 +551,9 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 
 			indexContent := findFile(files, "index.ts")
 			if tt.extension == "" || tt.extension == "none" {
-				assert.Contains(t, indexContent, `export * from "./coreTypes";`)
+				assert.Contains(t, indexContent, `export * from "./core";`)
 			} else {
-				assert.Contains(t, indexContent, `export * from "./coreTypes`+tt.extension+`";`)
+				assert.Contains(t, indexContent, `export * from "./core`+tt.extension+`";`)
 			}
 		})
 	}

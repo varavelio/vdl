@@ -52,16 +52,16 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		})
 	}
 
-	// 1. coreTypes.ts
+	// 1. core.ts
 	coreContent, err := generateCoreTypes(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
-	addFile("coreTypes.ts", []byte(coreContent))
+	addFile("core.ts", []byte(coreContent))
 
 	// 2. types.ts
 	typesBuilder := gen.New().WithSpaces(2)
-	typesBuilder.Line(formatImport("{ Response }", "./coreTypes", g.config))
+	typesBuilder.Line(formatImport("{ Response }", "./core", g.config))
 	typesBuilder.Break()
 
 	// Helper to append content if not empty
@@ -119,7 +119,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 	// Add imports to catalog
 	catalogBuilder := gen.New().WithSpaces(2)
-	catalogBuilder.Line(formatImport("{ OperationDefinition }", "./coreTypes", g.config))
+	catalogBuilder.Line(formatImport("{ OperationDefinition }", "./core", g.config))
 	catalogBuilder.Break()
 	catalogBuilder.Raw(catalogContent)
 
@@ -132,7 +132,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		clientBuilder := gen.New().WithSpaces(2)
-		clientBuilder.Line(formatImport("{ Response, VdlError, asError, OperationType, OperationDefinition, sleep }", "./coreTypes", g.config))
+		clientBuilder.Line(formatImport("{ Response, VdlError, asError, OperationType, OperationDefinition, sleep }", "./core", g.config))
 
 		typeNames := collectAllTypeNames(schema)
 		sort.Strings(typeNames)
@@ -154,7 +154,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		serverBuilder := gen.New().WithSpaces(2)
-		serverBuilder.Line(formatImport("{ Response, VdlError, asError, OperationDefinition, OperationType }", "./coreTypes", g.config))
+		serverBuilder.Line(formatImport("{ Response, VdlError, asError, OperationDefinition, OperationType }", "./core", g.config))
 		serverBuilder.Line(formatImport("{ VDLProcedures, VDLStreams }", "./catalog", g.config))
 
 		typeNames := collectAllTypeNames(schema)
@@ -184,7 +184,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// 8. index.ts (Exports everything)
 	indexBuilder := gen.New().WithSpaces(2)
-	indexBuilder.Line(formatExport("./coreTypes", g.config))
+	indexBuilder.Line(formatExport("./core", g.config))
 	indexBuilder.Line(formatExport("./types", g.config))
 	if hasConstants {
 		indexBuilder.Line(formatExport("./constants", g.config))
