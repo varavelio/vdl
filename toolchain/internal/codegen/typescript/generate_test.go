@@ -57,6 +57,10 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	coreContent := findFile(files, "core.ts")
 	assert.Contains(t, coreContent, "export type Response<T>")
+
+	typesContent := findFile(files, "types.ts")
+	assert.NotContains(t, typesContent, "import { Response }")
+	assert.NotContains(t, typesContent, "import type { Response }")
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
@@ -192,6 +196,18 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	assert.Contains(t, typesContent, "export type UsersGetUserInput = {")
 	assert.Contains(t, typesContent, "export type UsersGetUserOutput = {")
 	assert.Contains(t, typesContent, "export type UsersGetUserResponse = Response<UsersGetUserOutput>")
+
+	// Check imports in client.ts
+	assert.Contains(t, clientContent, `import type {`)
+	assert.Contains(t, clientContent, `  Response,`)
+	assert.Contains(t, clientContent, `  OperationType,`)
+	assert.Contains(t, clientContent, `  OperationDefinition,`)
+	assert.Contains(t, clientContent, `} from "./core";`)
+	assert.Contains(t, clientContent, `import {`)
+	assert.Contains(t, clientContent, `  VdlError,`)
+	assert.Contains(t, clientContent, `  asError,`)
+	assert.Contains(t, clientContent, `  sleep,`)
+	assert.Contains(t, clientContent, `} from "./core";`)
 
 	// Check procedure names list
 	assert.Contains(t, catalogContent, `"/Users/GetUser"`)
@@ -541,13 +557,17 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 				ImportExtension: tt.extension,
 			})
 
-			schema := parseAndBuildIR(t, "type User { id: string }")
+			schema := parseAndBuildIR(t, `
+				type User { id: string }
+				rpc S { proc P { input { u: User } output { u: User } } }
+			`)
 
 			files, err := g.Generate(context.Background(), schema)
 			require.NoError(t, err)
 
 			typesContent := findFile(files, "types.ts")
 			assert.Contains(t, typesContent, tt.expected)
+			assert.Contains(t, typesContent, "import type { Response }")
 
 			indexContent := findFile(files, "index.ts")
 			if tt.extension == "" || tt.extension == "none" {

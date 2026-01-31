@@ -25,7 +25,7 @@ func generateFetchAdapter(cfg *config.TypeScriptConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	// Imports
-	g.Line(formatImport("{ HTTPAdapter, Server }", "../server", cfg))
+	generateImport(g, []string{"HTTPAdapter", "Server"}, "../server", false, cfg)
 	g.Break()
 
 	// Core adapter piece
@@ -44,7 +44,7 @@ func generateNodeAdapter(cfg *config.TypeScriptConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	// Core adapter piece (it already contains the node:http import after the delimiter)
-	g.Line(formatImport("{ HTTPAdapter, Server }", "../server", cfg))
+	generateImport(g, []string{"HTTPAdapter", "Server"}, "../server", false, cfg)
 	g.Break()
 	g.Raw(piece)
 
