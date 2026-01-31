@@ -8,7 +8,7 @@ import {
   sleep,
   OperationType,
   OperationDefinition,
-} from "./coreTypes";
+} from "./core";
 
 /** START FROM HERE **/
 

@@ -7,7 +7,7 @@ import {
   asError,
   OperationDefinition,
   OperationType,
-} from "./coreTypes";
+} from "./core";
 
 /** START FROM HERE **/
 
