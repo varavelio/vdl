@@ -15,63 +15,124 @@ import (
 // Enumerations
 // -----------------------------------------------------------------------------
 
-// Represents a target for codegen WASM function
-type WasmCodegenTarget string
+// Represents a target for codegen function
+type CodegenTarget string
 
-// WasmCodegenTarget enum values
+// CodegenTarget enum values
 const (
-	WasmCodegenTargetGo         WasmCodegenTarget = "Go"
-	WasmCodegenTargetTypescript WasmCodegenTarget = "Typescript"
-	WasmCodegenTargetDart       WasmCodegenTarget = "Dart"
-	WasmCodegenTargetPython     WasmCodegenTarget = "Python"
-	WasmCodegenTargetOpenApi    WasmCodegenTarget = "OpenApi"
-	WasmCodegenTargetJsonSchema WasmCodegenTarget = "JsonSchema"
+	CodegenTargetGo         CodegenTarget = "Go"
+	CodegenTargetTypescript CodegenTarget = "Typescript"
+	CodegenTargetDart       CodegenTarget = "Dart"
+	CodegenTargetPython     CodegenTarget = "Python"
+	CodegenTargetOpenApi    CodegenTarget = "OpenApi"
+	CodegenTargetJsonSchema CodegenTarget = "JsonSchema"
 )
 
-// WasmCodegenTargetList contains all valid WasmCodegenTarget values.
-var WasmCodegenTargetList = []WasmCodegenTarget{
-	WasmCodegenTargetGo,
-	WasmCodegenTargetTypescript,
-	WasmCodegenTargetDart,
-	WasmCodegenTargetPython,
-	WasmCodegenTargetOpenApi,
-	WasmCodegenTargetJsonSchema,
+// CodegenTargetList contains all valid CodegenTarget values.
+var CodegenTargetList = []CodegenTarget{
+	CodegenTargetGo,
+	CodegenTargetTypescript,
+	CodegenTargetDart,
+	CodegenTargetPython,
+	CodegenTargetOpenApi,
+	CodegenTargetJsonSchema,
 }
 
-// String returns the string representation of WasmCodegenTarget.
-func (e WasmCodegenTarget) String() string {
+// String returns the string representation of CodegenTarget.
+func (e CodegenTarget) String() string {
 	return string(e)
 }
 
-// IsValid returns true if the value is a valid WasmCodegenTarget.
-func (e WasmCodegenTarget) IsValid() bool {
+// IsValid returns true if the value is a valid CodegenTarget.
+func (e CodegenTarget) IsValid() bool {
 	switch e {
-	case WasmCodegenTargetGo, WasmCodegenTargetTypescript, WasmCodegenTargetDart, WasmCodegenTargetPython, WasmCodegenTargetOpenApi, WasmCodegenTargetJsonSchema:
+	case CodegenTargetGo, CodegenTargetTypescript, CodegenTargetDart, CodegenTargetPython, CodegenTargetOpenApi, CodegenTargetJsonSchema:
 		return true
 	}
 	return false
 }
 
 // MarshalJSON implements json.Marshaler.
-// Returns an error if the value is not a valid WasmCodegenTarget member.
-func (e WasmCodegenTarget) MarshalJSON() ([]byte, error) {
+// Returns an error if the value is not a valid CodegenTarget member.
+func (e CodegenTarget) MarshalJSON() ([]byte, error) {
 	if !e.IsValid() {
-		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum WasmCodegenTarget", string(e))
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum CodegenTarget", string(e))
 	}
 	return json.Marshal(string(e))
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-// Returns an error if the value is not a valid WasmCodegenTarget member.
-func (e *WasmCodegenTarget) UnmarshalJSON(data []byte) error {
+// Returns an error if the value is not a valid CodegenTarget member.
+func (e *CodegenTarget) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
 
-	v := WasmCodegenTarget(s)
+	v := CodegenTarget(s)
 	if !v.IsValid() {
-		return fmt.Errorf("invalid value '%s' for enum WasmCodegenTarget", s)
+		return fmt.Errorf("invalid value '%s' for enum CodegenTarget", s)
+	}
+
+	*e = v
+	return nil
+}
+
+// Represents a function to be called via WASM
+type WasmFunctionName string
+
+// WasmFunctionName enum values
+const (
+	WasmFunctionNameExpandTypes   WasmFunctionName = "ExpandTypes"
+	WasmFunctionNameExtractType   WasmFunctionName = "ExtractType"
+	WasmFunctionNameExtractProc   WasmFunctionName = "ExtractProc"
+	WasmFunctionNameExtractStream WasmFunctionName = "ExtractStream"
+	WasmFunctionNameCodegen       WasmFunctionName = "Codegen"
+)
+
+// WasmFunctionNameList contains all valid WasmFunctionName values.
+var WasmFunctionNameList = []WasmFunctionName{
+	WasmFunctionNameExpandTypes,
+	WasmFunctionNameExtractType,
+	WasmFunctionNameExtractProc,
+	WasmFunctionNameExtractStream,
+	WasmFunctionNameCodegen,
+}
+
+// String returns the string representation of WasmFunctionName.
+func (e WasmFunctionName) String() string {
+	return string(e)
+}
+
+// IsValid returns true if the value is a valid WasmFunctionName.
+func (e WasmFunctionName) IsValid() bool {
+	switch e {
+	case WasmFunctionNameExpandTypes, WasmFunctionNameExtractType, WasmFunctionNameExtractProc, WasmFunctionNameExtractStream, WasmFunctionNameCodegen:
+		return true
+	}
+	return false
+}
+
+// MarshalJSON implements json.Marshaler.
+// Returns an error if the value is not a valid WasmFunctionName member.
+func (e WasmFunctionName) MarshalJSON() ([]byte, error) {
+	if !e.IsValid() {
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum WasmFunctionName", string(e))
+	}
+	return json.Marshal(string(e))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+// Returns an error if the value is not a valid WasmFunctionName member.
+func (e *WasmFunctionName) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	v := WasmFunctionName(s)
+	if !v.IsValid() {
+		return fmt.Errorf("invalid value '%s' for enum WasmFunctionName", s)
 	}
 
 	*e = v
@@ -82,22 +143,22 @@ func (e *WasmCodegenTarget) UnmarshalJSON(data []byte) error {
 // Domain Types
 // -----------------------------------------------------------------------------
 
-// Rrepresents a file generated by codegen WASM function
-type WasmCodegenFile struct {
+// Rrepresents a file generated by codegen function
+type CodegenFile struct {
 	Path    string `json:"path"`
 	Content string `json:"content"`
 }
 
-// preWasmCodegenFile is the version of WasmCodegenFile previous to the required field validation
-type preWasmCodegenFile struct {
+// preCodegenFile is the version of CodegenFile previous to the required field validation
+type preCodegenFile struct {
 	Path    Optional[string] `json:"path,omitzero"`
 	Content Optional[string] `json:"content,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenFile
-func (p *preWasmCodegenFile) validate() error {
+// validate validates the required fields of CodegenFile
+func (p *preCodegenFile) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenFile is nil")
+		return errorMissingRequiredField("preCodegenFile is nil")
 	}
 
 	// Validation for field "path"
@@ -113,40 +174,40 @@ func (p *preWasmCodegenFile) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenFile type to the final WasmCodegenFile type
-func (p *preWasmCodegenFile) transform() WasmCodegenFile {
+// transform transforms the preCodegenFile type to the final CodegenFile type
+func (p *preCodegenFile) transform() CodegenFile {
 	// Transformations
 	transPath := p.Path.Value
 	transContent := p.Content.Value
 
 	// Assignments
-	return WasmCodegenFile{
+	return CodegenFile{
 		Path:    transPath,
 		Content: transContent,
 	}
 }
 
-// Input for codegen WASM function
-type WasmCodegenInput struct {
+// Input for codegen function
+type CodegenInput struct {
 	// Schema to generate code from
 	VdlSchema string `json:"vdlSchema"`
 	// Target to generate code for
-	Target WasmCodegenTarget `json:"target"`
+	Target CodegenTarget `json:"target"`
 	// Configuration if the target is Go
-	GoConfig Optional[WasmCodegenInputGoConfig] `json:"goConfig,omitzero"`
+	GoConfig Optional[CodegenInputGoConfig] `json:"goConfig,omitzero"`
 	// Configuration if the target is Typescript
-	TypescriptConfig Optional[WasmCodegenInputTypescriptConfig] `json:"typescriptConfig,omitzero"`
+	TypescriptConfig Optional[CodegenInputTypescriptConfig] `json:"typescriptConfig,omitzero"`
 	// Configuration if the target is Dart
-	DartConfig Optional[WasmCodegenInputDartConfig] `json:"dartConfig,omitzero"`
+	DartConfig Optional[CodegenInputDartConfig] `json:"dartConfig,omitzero"`
 	// Configuration if the target is Python
-	PythonConfig Optional[WasmCodegenInputPythonConfig] `json:"pythonConfig,omitzero"`
+	PythonConfig Optional[CodegenInputPythonConfig] `json:"pythonConfig,omitzero"`
 	// Configuration if the target is JsonSchema
-	JsonSchemaConfig Optional[WasmCodegenInputJsonSchemaConfig] `json:"jsonSchemaConfig,omitzero"`
+	JsonSchemaConfig Optional[CodegenInputJsonSchemaConfig] `json:"jsonSchemaConfig,omitzero"`
 	// Configuration if the target is OpenApi
-	OpenApiConfig Optional[WasmCodegenInputOpenApiConfig] `json:"openApiConfig,omitzero"`
+	OpenApiConfig Optional[CodegenInputOpenApiConfig] `json:"openApiConfig,omitzero"`
 }
 
-type WasmCodegenInputGoConfig struct {
+type CodegenInputGoConfig struct {
 	Package     string `json:"package"`
 	GenPatterns bool   `json:"genPatterns"`
 	GenConsts   bool   `json:"genConsts"`
@@ -154,7 +215,7 @@ type WasmCodegenInputGoConfig struct {
 	GenServer   bool   `json:"genServer"`
 }
 
-type WasmCodegenInputTypescriptConfig struct {
+type CodegenInputTypescriptConfig struct {
 	ImportExtension string `json:"importExtension"`
 	GenPatterns     bool   `json:"genPatterns"`
 	GenConsts       bool   `json:"genConsts"`
@@ -162,21 +223,21 @@ type WasmCodegenInputTypescriptConfig struct {
 	GenServer       bool   `json:"genServer"`
 }
 
-type WasmCodegenInputDartConfig struct {
+type CodegenInputDartConfig struct {
 	GenPatterns bool `json:"genPatterns"`
 	GenConsts   bool `json:"genConsts"`
 }
 
-type WasmCodegenInputPythonConfig struct {
+type CodegenInputPythonConfig struct {
 	GenPatterns bool `json:"genPatterns"`
 	GenConsts   bool `json:"genConsts"`
 }
 
-type WasmCodegenInputJsonSchemaConfig struct {
+type CodegenInputJsonSchemaConfig struct {
 	SchemaId string `json:"schemaId"`
 }
 
-type WasmCodegenInputOpenApiConfig struct {
+type CodegenInputOpenApiConfig struct {
 	Title        string           `json:"title"`
 	Version      string           `json:"version"`
 	Description  Optional[string] `json:"description,omitzero"`
@@ -186,20 +247,20 @@ type WasmCodegenInputOpenApiConfig struct {
 	LicenseName  Optional[string] `json:"licenseName,omitzero"`
 }
 
-// preWasmCodegenInput is the version of WasmCodegenInput previous to the required field validation
-type preWasmCodegenInput struct {
-	VdlSchema        Optional[string]                              `json:"vdlSchema,omitzero"`
-	Target           Optional[WasmCodegenTarget]                   `json:"target,omitzero"`
-	GoConfig         Optional[preWasmCodegenInputGoConfig]         `json:"goConfig,omitzero"`
-	TypescriptConfig Optional[preWasmCodegenInputTypescriptConfig] `json:"typescriptConfig,omitzero"`
-	DartConfig       Optional[preWasmCodegenInputDartConfig]       `json:"dartConfig,omitzero"`
-	PythonConfig     Optional[preWasmCodegenInputPythonConfig]     `json:"pythonConfig,omitzero"`
-	JsonSchemaConfig Optional[preWasmCodegenInputJsonSchemaConfig] `json:"jsonSchemaConfig,omitzero"`
-	OpenApiConfig    Optional[preWasmCodegenInputOpenApiConfig]    `json:"openApiConfig,omitzero"`
+// preCodegenInput is the version of CodegenInput previous to the required field validation
+type preCodegenInput struct {
+	VdlSchema        Optional[string]                          `json:"vdlSchema,omitzero"`
+	Target           Optional[CodegenTarget]                   `json:"target,omitzero"`
+	GoConfig         Optional[preCodegenInputGoConfig]         `json:"goConfig,omitzero"`
+	TypescriptConfig Optional[preCodegenInputTypescriptConfig] `json:"typescriptConfig,omitzero"`
+	DartConfig       Optional[preCodegenInputDartConfig]       `json:"dartConfig,omitzero"`
+	PythonConfig     Optional[preCodegenInputPythonConfig]     `json:"pythonConfig,omitzero"`
+	JsonSchemaConfig Optional[preCodegenInputJsonSchemaConfig] `json:"jsonSchemaConfig,omitzero"`
+	OpenApiConfig    Optional[preCodegenInputOpenApiConfig]    `json:"openApiConfig,omitzero"`
 }
 
-// preWasmCodegenInputGoConfig is the version of WasmCodegenInputGoConfig previous to the required field validation
-type preWasmCodegenInputGoConfig struct {
+// preCodegenInputGoConfig is the version of CodegenInputGoConfig previous to the required field validation
+type preCodegenInputGoConfig struct {
 	Package     Optional[string] `json:"package,omitzero"`
 	GenPatterns Optional[bool]   `json:"genPatterns,omitzero"`
 	GenConsts   Optional[bool]   `json:"genConsts,omitzero"`
@@ -207,10 +268,10 @@ type preWasmCodegenInputGoConfig struct {
 	GenServer   Optional[bool]   `json:"genServer,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenInputGoConfig
-func (p *preWasmCodegenInputGoConfig) validate() error {
+// validate validates the required fields of CodegenInputGoConfig
+func (p *preCodegenInputGoConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInputGoConfig is nil")
+		return errorMissingRequiredField("preCodegenInputGoConfig is nil")
 	}
 
 	// Validation for field "package"
@@ -241,8 +302,8 @@ func (p *preWasmCodegenInputGoConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInputGoConfig type to the final WasmCodegenInputGoConfig type
-func (p *preWasmCodegenInputGoConfig) transform() WasmCodegenInputGoConfig {
+// transform transforms the preCodegenInputGoConfig type to the final CodegenInputGoConfig type
+func (p *preCodegenInputGoConfig) transform() CodegenInputGoConfig {
 	// Transformations
 	transPackage := p.Package.Value
 	transGenPatterns := p.GenPatterns.Value
@@ -251,7 +312,7 @@ func (p *preWasmCodegenInputGoConfig) transform() WasmCodegenInputGoConfig {
 	transGenServer := p.GenServer.Value
 
 	// Assignments
-	return WasmCodegenInputGoConfig{
+	return CodegenInputGoConfig{
 		Package:     transPackage,
 		GenPatterns: transGenPatterns,
 		GenConsts:   transGenConsts,
@@ -260,8 +321,8 @@ func (p *preWasmCodegenInputGoConfig) transform() WasmCodegenInputGoConfig {
 	}
 }
 
-// preWasmCodegenInputTypescriptConfig is the version of WasmCodegenInputTypescriptConfig previous to the required field validation
-type preWasmCodegenInputTypescriptConfig struct {
+// preCodegenInputTypescriptConfig is the version of CodegenInputTypescriptConfig previous to the required field validation
+type preCodegenInputTypescriptConfig struct {
 	ImportExtension Optional[string] `json:"importExtension,omitzero"`
 	GenPatterns     Optional[bool]   `json:"genPatterns,omitzero"`
 	GenConsts       Optional[bool]   `json:"genConsts,omitzero"`
@@ -269,10 +330,10 @@ type preWasmCodegenInputTypescriptConfig struct {
 	GenServer       Optional[bool]   `json:"genServer,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenInputTypescriptConfig
-func (p *preWasmCodegenInputTypescriptConfig) validate() error {
+// validate validates the required fields of CodegenInputTypescriptConfig
+func (p *preCodegenInputTypescriptConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInputTypescriptConfig is nil")
+		return errorMissingRequiredField("preCodegenInputTypescriptConfig is nil")
 	}
 
 	// Validation for field "importExtension"
@@ -303,8 +364,8 @@ func (p *preWasmCodegenInputTypescriptConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInputTypescriptConfig type to the final WasmCodegenInputTypescriptConfig type
-func (p *preWasmCodegenInputTypescriptConfig) transform() WasmCodegenInputTypescriptConfig {
+// transform transforms the preCodegenInputTypescriptConfig type to the final CodegenInputTypescriptConfig type
+func (p *preCodegenInputTypescriptConfig) transform() CodegenInputTypescriptConfig {
 	// Transformations
 	transImportExtension := p.ImportExtension.Value
 	transGenPatterns := p.GenPatterns.Value
@@ -313,7 +374,7 @@ func (p *preWasmCodegenInputTypescriptConfig) transform() WasmCodegenInputTypesc
 	transGenServer := p.GenServer.Value
 
 	// Assignments
-	return WasmCodegenInputTypescriptConfig{
+	return CodegenInputTypescriptConfig{
 		ImportExtension: transImportExtension,
 		GenPatterns:     transGenPatterns,
 		GenConsts:       transGenConsts,
@@ -322,16 +383,16 @@ func (p *preWasmCodegenInputTypescriptConfig) transform() WasmCodegenInputTypesc
 	}
 }
 
-// preWasmCodegenInputDartConfig is the version of WasmCodegenInputDartConfig previous to the required field validation
-type preWasmCodegenInputDartConfig struct {
+// preCodegenInputDartConfig is the version of CodegenInputDartConfig previous to the required field validation
+type preCodegenInputDartConfig struct {
 	GenPatterns Optional[bool] `json:"genPatterns,omitzero"`
 	GenConsts   Optional[bool] `json:"genConsts,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenInputDartConfig
-func (p *preWasmCodegenInputDartConfig) validate() error {
+// validate validates the required fields of CodegenInputDartConfig
+func (p *preCodegenInputDartConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInputDartConfig is nil")
+		return errorMissingRequiredField("preCodegenInputDartConfig is nil")
 	}
 
 	// Validation for field "genPatterns"
@@ -347,29 +408,29 @@ func (p *preWasmCodegenInputDartConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInputDartConfig type to the final WasmCodegenInputDartConfig type
-func (p *preWasmCodegenInputDartConfig) transform() WasmCodegenInputDartConfig {
+// transform transforms the preCodegenInputDartConfig type to the final CodegenInputDartConfig type
+func (p *preCodegenInputDartConfig) transform() CodegenInputDartConfig {
 	// Transformations
 	transGenPatterns := p.GenPatterns.Value
 	transGenConsts := p.GenConsts.Value
 
 	// Assignments
-	return WasmCodegenInputDartConfig{
+	return CodegenInputDartConfig{
 		GenPatterns: transGenPatterns,
 		GenConsts:   transGenConsts,
 	}
 }
 
-// preWasmCodegenInputPythonConfig is the version of WasmCodegenInputPythonConfig previous to the required field validation
-type preWasmCodegenInputPythonConfig struct {
+// preCodegenInputPythonConfig is the version of CodegenInputPythonConfig previous to the required field validation
+type preCodegenInputPythonConfig struct {
 	GenPatterns Optional[bool] `json:"genPatterns,omitzero"`
 	GenConsts   Optional[bool] `json:"genConsts,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenInputPythonConfig
-func (p *preWasmCodegenInputPythonConfig) validate() error {
+// validate validates the required fields of CodegenInputPythonConfig
+func (p *preCodegenInputPythonConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInputPythonConfig is nil")
+		return errorMissingRequiredField("preCodegenInputPythonConfig is nil")
 	}
 
 	// Validation for field "genPatterns"
@@ -385,28 +446,28 @@ func (p *preWasmCodegenInputPythonConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInputPythonConfig type to the final WasmCodegenInputPythonConfig type
-func (p *preWasmCodegenInputPythonConfig) transform() WasmCodegenInputPythonConfig {
+// transform transforms the preCodegenInputPythonConfig type to the final CodegenInputPythonConfig type
+func (p *preCodegenInputPythonConfig) transform() CodegenInputPythonConfig {
 	// Transformations
 	transGenPatterns := p.GenPatterns.Value
 	transGenConsts := p.GenConsts.Value
 
 	// Assignments
-	return WasmCodegenInputPythonConfig{
+	return CodegenInputPythonConfig{
 		GenPatterns: transGenPatterns,
 		GenConsts:   transGenConsts,
 	}
 }
 
-// preWasmCodegenInputJsonSchemaConfig is the version of WasmCodegenInputJsonSchemaConfig previous to the required field validation
-type preWasmCodegenInputJsonSchemaConfig struct {
+// preCodegenInputJsonSchemaConfig is the version of CodegenInputJsonSchemaConfig previous to the required field validation
+type preCodegenInputJsonSchemaConfig struct {
 	SchemaId Optional[string] `json:"schemaId,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenInputJsonSchemaConfig
-func (p *preWasmCodegenInputJsonSchemaConfig) validate() error {
+// validate validates the required fields of CodegenInputJsonSchemaConfig
+func (p *preCodegenInputJsonSchemaConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInputJsonSchemaConfig is nil")
+		return errorMissingRequiredField("preCodegenInputJsonSchemaConfig is nil")
 	}
 
 	// Validation for field "schemaId"
@@ -417,19 +478,19 @@ func (p *preWasmCodegenInputJsonSchemaConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInputJsonSchemaConfig type to the final WasmCodegenInputJsonSchemaConfig type
-func (p *preWasmCodegenInputJsonSchemaConfig) transform() WasmCodegenInputJsonSchemaConfig {
+// transform transforms the preCodegenInputJsonSchemaConfig type to the final CodegenInputJsonSchemaConfig type
+func (p *preCodegenInputJsonSchemaConfig) transform() CodegenInputJsonSchemaConfig {
 	// Transformations
 	transSchemaId := p.SchemaId.Value
 
 	// Assignments
-	return WasmCodegenInputJsonSchemaConfig{
+	return CodegenInputJsonSchemaConfig{
 		SchemaId: transSchemaId,
 	}
 }
 
-// preWasmCodegenInputOpenApiConfig is the version of WasmCodegenInputOpenApiConfig previous to the required field validation
-type preWasmCodegenInputOpenApiConfig struct {
+// preCodegenInputOpenApiConfig is the version of CodegenInputOpenApiConfig previous to the required field validation
+type preCodegenInputOpenApiConfig struct {
 	Title        Optional[string] `json:"title,omitzero"`
 	Version      Optional[string] `json:"version,omitzero"`
 	Description  Optional[string] `json:"description,omitzero"`
@@ -439,10 +500,10 @@ type preWasmCodegenInputOpenApiConfig struct {
 	LicenseName  Optional[string] `json:"licenseName,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenInputOpenApiConfig
-func (p *preWasmCodegenInputOpenApiConfig) validate() error {
+// validate validates the required fields of CodegenInputOpenApiConfig
+func (p *preCodegenInputOpenApiConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInputOpenApiConfig is nil")
+		return errorMissingRequiredField("preCodegenInputOpenApiConfig is nil")
 	}
 
 	// Validation for field "title"
@@ -468,8 +529,8 @@ func (p *preWasmCodegenInputOpenApiConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInputOpenApiConfig type to the final WasmCodegenInputOpenApiConfig type
-func (p *preWasmCodegenInputOpenApiConfig) transform() WasmCodegenInputOpenApiConfig {
+// transform transforms the preCodegenInputOpenApiConfig type to the final CodegenInputOpenApiConfig type
+func (p *preCodegenInputOpenApiConfig) transform() CodegenInputOpenApiConfig {
 	// Transformations
 	transTitle := p.Title.Value
 	transVersion := p.Version.Value
@@ -480,7 +541,7 @@ func (p *preWasmCodegenInputOpenApiConfig) transform() WasmCodegenInputOpenApiCo
 	transLicenseName := p.LicenseName
 
 	// Assignments
-	return WasmCodegenInputOpenApiConfig{
+	return CodegenInputOpenApiConfig{
 		Title:        transTitle,
 		Version:      transVersion,
 		Description:  transDescription,
@@ -491,10 +552,10 @@ func (p *preWasmCodegenInputOpenApiConfig) transform() WasmCodegenInputOpenApiCo
 	}
 }
 
-// validate validates the required fields of WasmCodegenInput
-func (p *preWasmCodegenInput) validate() error {
+// validate validates the required fields of CodegenInput
+func (p *preCodegenInput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenInput is nil")
+		return errorMissingRequiredField("preCodegenInput is nil")
 	}
 
 	// Validation for field "vdlSchema"
@@ -552,50 +613,50 @@ func (p *preWasmCodegenInput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenInput type to the final WasmCodegenInput type
-func (p *preWasmCodegenInput) transform() WasmCodegenInput {
+// transform transforms the preCodegenInput type to the final CodegenInput type
+func (p *preCodegenInput) transform() CodegenInput {
 	// Transformations
 	transVdlSchema := p.VdlSchema.Value
 	transTarget := p.Target.Value
-	transGoConfig := Optional[WasmCodegenInputGoConfig]{Present: p.GoConfig.Present}
+	transGoConfig := Optional[CodegenInputGoConfig]{Present: p.GoConfig.Present}
 	if p.GoConfig.Present {
-		var valGoConfig WasmCodegenInputGoConfig
+		var valGoConfig CodegenInputGoConfig
 		valGoConfig = p.GoConfig.Value.transform()
 		transGoConfig.Value = valGoConfig
 	}
-	transTypescriptConfig := Optional[WasmCodegenInputTypescriptConfig]{Present: p.TypescriptConfig.Present}
+	transTypescriptConfig := Optional[CodegenInputTypescriptConfig]{Present: p.TypescriptConfig.Present}
 	if p.TypescriptConfig.Present {
-		var valTypescriptConfig WasmCodegenInputTypescriptConfig
+		var valTypescriptConfig CodegenInputTypescriptConfig
 		valTypescriptConfig = p.TypescriptConfig.Value.transform()
 		transTypescriptConfig.Value = valTypescriptConfig
 	}
-	transDartConfig := Optional[WasmCodegenInputDartConfig]{Present: p.DartConfig.Present}
+	transDartConfig := Optional[CodegenInputDartConfig]{Present: p.DartConfig.Present}
 	if p.DartConfig.Present {
-		var valDartConfig WasmCodegenInputDartConfig
+		var valDartConfig CodegenInputDartConfig
 		valDartConfig = p.DartConfig.Value.transform()
 		transDartConfig.Value = valDartConfig
 	}
-	transPythonConfig := Optional[WasmCodegenInputPythonConfig]{Present: p.PythonConfig.Present}
+	transPythonConfig := Optional[CodegenInputPythonConfig]{Present: p.PythonConfig.Present}
 	if p.PythonConfig.Present {
-		var valPythonConfig WasmCodegenInputPythonConfig
+		var valPythonConfig CodegenInputPythonConfig
 		valPythonConfig = p.PythonConfig.Value.transform()
 		transPythonConfig.Value = valPythonConfig
 	}
-	transJsonSchemaConfig := Optional[WasmCodegenInputJsonSchemaConfig]{Present: p.JsonSchemaConfig.Present}
+	transJsonSchemaConfig := Optional[CodegenInputJsonSchemaConfig]{Present: p.JsonSchemaConfig.Present}
 	if p.JsonSchemaConfig.Present {
-		var valJsonSchemaConfig WasmCodegenInputJsonSchemaConfig
+		var valJsonSchemaConfig CodegenInputJsonSchemaConfig
 		valJsonSchemaConfig = p.JsonSchemaConfig.Value.transform()
 		transJsonSchemaConfig.Value = valJsonSchemaConfig
 	}
-	transOpenApiConfig := Optional[WasmCodegenInputOpenApiConfig]{Present: p.OpenApiConfig.Present}
+	transOpenApiConfig := Optional[CodegenInputOpenApiConfig]{Present: p.OpenApiConfig.Present}
 	if p.OpenApiConfig.Present {
-		var valOpenApiConfig WasmCodegenInputOpenApiConfig
+		var valOpenApiConfig CodegenInputOpenApiConfig
 		valOpenApiConfig = p.OpenApiConfig.Value.transform()
 		transOpenApiConfig.Value = valOpenApiConfig
 	}
 
 	// Assignments
-	return WasmCodegenInput{
+	return CodegenInput{
 		VdlSchema:        transVdlSchema,
 		Target:           transTarget,
 		GoConfig:         transGoConfig,
@@ -607,21 +668,21 @@ func (p *preWasmCodegenInput) transform() WasmCodegenInput {
 	}
 }
 
-// Output for codegen WASM function
-type WasmCodegenOutput struct {
+// Output for codegen function
+type CodegenOutput struct {
 	// The files generated for the picked code generator target
-	Files []WasmCodegenFile `json:"files"`
+	Files []CodegenFile `json:"files"`
 }
 
-// preWasmCodegenOutput is the version of WasmCodegenOutput previous to the required field validation
-type preWasmCodegenOutput struct {
-	Files Optional[[]preWasmCodegenFile] `json:"files,omitzero"`
+// preCodegenOutput is the version of CodegenOutput previous to the required field validation
+type preCodegenOutput struct {
+	Files Optional[[]preCodegenFile] `json:"files,omitzero"`
 }
 
-// validate validates the required fields of WasmCodegenOutput
-func (p *preWasmCodegenOutput) validate() error {
+// validate validates the required fields of CodegenOutput
+func (p *preCodegenOutput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmCodegenOutput is nil")
+		return errorMissingRequiredField("preCodegenOutput is nil")
 	}
 
 	// Validation for field "files"
@@ -639,37 +700,37 @@ func (p *preWasmCodegenOutput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmCodegenOutput type to the final WasmCodegenOutput type
-func (p *preWasmCodegenOutput) transform() WasmCodegenOutput {
+// transform transforms the preCodegenOutput type to the final CodegenOutput type
+func (p *preCodegenOutput) transform() CodegenOutput {
 	// Transformations
-	var transFiles []WasmCodegenFile
-	transFiles = make([]WasmCodegenFile, len(p.Files.Value))
+	var transFiles []CodegenFile
+	transFiles = make([]CodegenFile, len(p.Files.Value))
 	for i, v := range p.Files.Value {
-		var tmp_ WasmCodegenFile
+		var tmp_ CodegenFile
 		tmp_ = v.transform()
 		transFiles[i] = tmp_
 	}
 
 	// Assignments
-	return WasmCodegenOutput{
+	return CodegenOutput{
 		Files: transFiles,
 	}
 }
 
-// Input for expandTypes WASM function
-type WasmExpandTypesInput struct {
+// Input for expandTypes function
+type ExpandTypesInput struct {
 	VdlSchema string `json:"vdlSchema"`
 }
 
-// preWasmExpandTypesInput is the version of WasmExpandTypesInput previous to the required field validation
-type preWasmExpandTypesInput struct {
+// preExpandTypesInput is the version of ExpandTypesInput previous to the required field validation
+type preExpandTypesInput struct {
 	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
 }
 
-// validate validates the required fields of WasmExpandTypesInput
-func (p *preWasmExpandTypesInput) validate() error {
+// validate validates the required fields of ExpandTypesInput
+func (p *preExpandTypesInput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExpandTypesInput is nil")
+		return errorMissingRequiredField("preExpandTypesInput is nil")
 	}
 
 	// Validation for field "vdlSchema"
@@ -680,31 +741,31 @@ func (p *preWasmExpandTypesInput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExpandTypesInput type to the final WasmExpandTypesInput type
-func (p *preWasmExpandTypesInput) transform() WasmExpandTypesInput {
+// transform transforms the preExpandTypesInput type to the final ExpandTypesInput type
+func (p *preExpandTypesInput) transform() ExpandTypesInput {
 	// Transformations
 	transVdlSchema := p.VdlSchema.Value
 
 	// Assignments
-	return WasmExpandTypesInput{
+	return ExpandTypesInput{
 		VdlSchema: transVdlSchema,
 	}
 }
 
-// Output for expandTypes WASM function
-type WasmExpandTypesOutput struct {
+// Output for expandTypes function
+type ExpandTypesOutput struct {
 	ExpandedSchema string `json:"expandedSchema"`
 }
 
-// preWasmExpandTypesOutput is the version of WasmExpandTypesOutput previous to the required field validation
-type preWasmExpandTypesOutput struct {
+// preExpandTypesOutput is the version of ExpandTypesOutput previous to the required field validation
+type preExpandTypesOutput struct {
 	ExpandedSchema Optional[string] `json:"expandedSchema,omitzero"`
 }
 
-// validate validates the required fields of WasmExpandTypesOutput
-func (p *preWasmExpandTypesOutput) validate() error {
+// validate validates the required fields of ExpandTypesOutput
+func (p *preExpandTypesOutput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExpandTypesOutput is nil")
+		return errorMissingRequiredField("preExpandTypesOutput is nil")
 	}
 
 	// Validation for field "expandedSchema"
@@ -715,35 +776,35 @@ func (p *preWasmExpandTypesOutput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExpandTypesOutput type to the final WasmExpandTypesOutput type
-func (p *preWasmExpandTypesOutput) transform() WasmExpandTypesOutput {
+// transform transforms the preExpandTypesOutput type to the final ExpandTypesOutput type
+func (p *preExpandTypesOutput) transform() ExpandTypesOutput {
 	// Transformations
 	transExpandedSchema := p.ExpandedSchema.Value
 
 	// Assignments
-	return WasmExpandTypesOutput{
+	return ExpandTypesOutput{
 		ExpandedSchema: transExpandedSchema,
 	}
 }
 
-// Input for extractProc WASM function
-type WasmExtractProcInput struct {
+// Input for extractProc function
+type ExtractProcInput struct {
 	VdlSchema string `json:"vdlSchema"`
 	RpcName   string `json:"rpcName"`
 	ProcName  string `json:"procName"`
 }
 
-// preWasmExtractProcInput is the version of WasmExtractProcInput previous to the required field validation
-type preWasmExtractProcInput struct {
+// preExtractProcInput is the version of ExtractProcInput previous to the required field validation
+type preExtractProcInput struct {
 	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
 	RpcName   Optional[string] `json:"rpcName,omitzero"`
 	ProcName  Optional[string] `json:"procName,omitzero"`
 }
 
-// validate validates the required fields of WasmExtractProcInput
-func (p *preWasmExtractProcInput) validate() error {
+// validate validates the required fields of ExtractProcInput
+func (p *preExtractProcInput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExtractProcInput is nil")
+		return errorMissingRequiredField("preExtractProcInput is nil")
 	}
 
 	// Validation for field "vdlSchema"
@@ -764,35 +825,35 @@ func (p *preWasmExtractProcInput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExtractProcInput type to the final WasmExtractProcInput type
-func (p *preWasmExtractProcInput) transform() WasmExtractProcInput {
+// transform transforms the preExtractProcInput type to the final ExtractProcInput type
+func (p *preExtractProcInput) transform() ExtractProcInput {
 	// Transformations
 	transVdlSchema := p.VdlSchema.Value
 	transRpcName := p.RpcName.Value
 	transProcName := p.ProcName.Value
 
 	// Assignments
-	return WasmExtractProcInput{
+	return ExtractProcInput{
 		VdlSchema: transVdlSchema,
 		RpcName:   transRpcName,
 		ProcName:  transProcName,
 	}
 }
 
-// Output for extractProc WASM function
-type WasmExtractProcOutput struct {
+// Output for extractProc function
+type ExtractProcOutput struct {
 	ProcSchema string `json:"procSchema"`
 }
 
-// preWasmExtractProcOutput is the version of WasmExtractProcOutput previous to the required field validation
-type preWasmExtractProcOutput struct {
+// preExtractProcOutput is the version of ExtractProcOutput previous to the required field validation
+type preExtractProcOutput struct {
 	ProcSchema Optional[string] `json:"procSchema,omitzero"`
 }
 
-// validate validates the required fields of WasmExtractProcOutput
-func (p *preWasmExtractProcOutput) validate() error {
+// validate validates the required fields of ExtractProcOutput
+func (p *preExtractProcOutput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExtractProcOutput is nil")
+		return errorMissingRequiredField("preExtractProcOutput is nil")
 	}
 
 	// Validation for field "procSchema"
@@ -803,35 +864,35 @@ func (p *preWasmExtractProcOutput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExtractProcOutput type to the final WasmExtractProcOutput type
-func (p *preWasmExtractProcOutput) transform() WasmExtractProcOutput {
+// transform transforms the preExtractProcOutput type to the final ExtractProcOutput type
+func (p *preExtractProcOutput) transform() ExtractProcOutput {
 	// Transformations
 	transProcSchema := p.ProcSchema.Value
 
 	// Assignments
-	return WasmExtractProcOutput{
+	return ExtractProcOutput{
 		ProcSchema: transProcSchema,
 	}
 }
 
-// Input for extractStream WASM function
-type WasmExtractStreamInput struct {
+// Input for extractStream function
+type ExtractStreamInput struct {
 	VdlSchema  string `json:"vdlSchema"`
 	RpcName    string `json:"rpcName"`
 	StreamName string `json:"streamName"`
 }
 
-// preWasmExtractStreamInput is the version of WasmExtractStreamInput previous to the required field validation
-type preWasmExtractStreamInput struct {
+// preExtractStreamInput is the version of ExtractStreamInput previous to the required field validation
+type preExtractStreamInput struct {
 	VdlSchema  Optional[string] `json:"vdlSchema,omitzero"`
 	RpcName    Optional[string] `json:"rpcName,omitzero"`
 	StreamName Optional[string] `json:"streamName,omitzero"`
 }
 
-// validate validates the required fields of WasmExtractStreamInput
-func (p *preWasmExtractStreamInput) validate() error {
+// validate validates the required fields of ExtractStreamInput
+func (p *preExtractStreamInput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExtractStreamInput is nil")
+		return errorMissingRequiredField("preExtractStreamInput is nil")
 	}
 
 	// Validation for field "vdlSchema"
@@ -852,35 +913,35 @@ func (p *preWasmExtractStreamInput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExtractStreamInput type to the final WasmExtractStreamInput type
-func (p *preWasmExtractStreamInput) transform() WasmExtractStreamInput {
+// transform transforms the preExtractStreamInput type to the final ExtractStreamInput type
+func (p *preExtractStreamInput) transform() ExtractStreamInput {
 	// Transformations
 	transVdlSchema := p.VdlSchema.Value
 	transRpcName := p.RpcName.Value
 	transStreamName := p.StreamName.Value
 
 	// Assignments
-	return WasmExtractStreamInput{
+	return ExtractStreamInput{
 		VdlSchema:  transVdlSchema,
 		RpcName:    transRpcName,
 		StreamName: transStreamName,
 	}
 }
 
-// Output for extractStream WASM function
-type WasmExtractStreamOutput struct {
+// Output for extractStream function
+type ExtractStreamOutput struct {
 	StreamSchema string `json:"streamSchema"`
 }
 
-// preWasmExtractStreamOutput is the version of WasmExtractStreamOutput previous to the required field validation
-type preWasmExtractStreamOutput struct {
+// preExtractStreamOutput is the version of ExtractStreamOutput previous to the required field validation
+type preExtractStreamOutput struct {
 	StreamSchema Optional[string] `json:"streamSchema,omitzero"`
 }
 
-// validate validates the required fields of WasmExtractStreamOutput
-func (p *preWasmExtractStreamOutput) validate() error {
+// validate validates the required fields of ExtractStreamOutput
+func (p *preExtractStreamOutput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExtractStreamOutput is nil")
+		return errorMissingRequiredField("preExtractStreamOutput is nil")
 	}
 
 	// Validation for field "streamSchema"
@@ -891,33 +952,33 @@ func (p *preWasmExtractStreamOutput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExtractStreamOutput type to the final WasmExtractStreamOutput type
-func (p *preWasmExtractStreamOutput) transform() WasmExtractStreamOutput {
+// transform transforms the preExtractStreamOutput type to the final ExtractStreamOutput type
+func (p *preExtractStreamOutput) transform() ExtractStreamOutput {
 	// Transformations
 	transStreamSchema := p.StreamSchema.Value
 
 	// Assignments
-	return WasmExtractStreamOutput{
+	return ExtractStreamOutput{
 		StreamSchema: transStreamSchema,
 	}
 }
 
-// Input for extractType WASM function
-type WasmExtractTypeInput struct {
+// Input for extractType function
+type ExtractTypeInput struct {
 	VdlSchema string `json:"vdlSchema"`
 	TypeName  string `json:"typeName"`
 }
 
-// preWasmExtractTypeInput is the version of WasmExtractTypeInput previous to the required field validation
-type preWasmExtractTypeInput struct {
+// preExtractTypeInput is the version of ExtractTypeInput previous to the required field validation
+type preExtractTypeInput struct {
 	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
 	TypeName  Optional[string] `json:"typeName,omitzero"`
 }
 
-// validate validates the required fields of WasmExtractTypeInput
-func (p *preWasmExtractTypeInput) validate() error {
+// validate validates the required fields of ExtractTypeInput
+func (p *preExtractTypeInput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExtractTypeInput is nil")
+		return errorMissingRequiredField("preExtractTypeInput is nil")
 	}
 
 	// Validation for field "vdlSchema"
@@ -933,33 +994,33 @@ func (p *preWasmExtractTypeInput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExtractTypeInput type to the final WasmExtractTypeInput type
-func (p *preWasmExtractTypeInput) transform() WasmExtractTypeInput {
+// transform transforms the preExtractTypeInput type to the final ExtractTypeInput type
+func (p *preExtractTypeInput) transform() ExtractTypeInput {
 	// Transformations
 	transVdlSchema := p.VdlSchema.Value
 	transTypeName := p.TypeName.Value
 
 	// Assignments
-	return WasmExtractTypeInput{
+	return ExtractTypeInput{
 		VdlSchema: transVdlSchema,
 		TypeName:  transTypeName,
 	}
 }
 
-// Output for extractType WASM function
-type WasmExtractTypeOutput struct {
+// Output for extractType function
+type ExtractTypeOutput struct {
 	TypeSchema string `json:"typeSchema"`
 }
 
-// preWasmExtractTypeOutput is the version of WasmExtractTypeOutput previous to the required field validation
-type preWasmExtractTypeOutput struct {
+// preExtractTypeOutput is the version of ExtractTypeOutput previous to the required field validation
+type preExtractTypeOutput struct {
 	TypeSchema Optional[string] `json:"typeSchema,omitzero"`
 }
 
-// validate validates the required fields of WasmExtractTypeOutput
-func (p *preWasmExtractTypeOutput) validate() error {
+// validate validates the required fields of ExtractTypeOutput
+func (p *preExtractTypeOutput) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preWasmExtractTypeOutput is nil")
+		return errorMissingRequiredField("preExtractTypeOutput is nil")
 	}
 
 	// Validation for field "typeSchema"
@@ -970,13 +1031,234 @@ func (p *preWasmExtractTypeOutput) validate() error {
 	return nil
 }
 
-// transform transforms the preWasmExtractTypeOutput type to the final WasmExtractTypeOutput type
-func (p *preWasmExtractTypeOutput) transform() WasmExtractTypeOutput {
+// transform transforms the preExtractTypeOutput type to the final ExtractTypeOutput type
+func (p *preExtractTypeOutput) transform() ExtractTypeOutput {
 	// Transformations
 	transTypeSchema := p.TypeSchema.Value
 
 	// Assignments
-	return WasmExtractTypeOutput{
+	return ExtractTypeOutput{
 		TypeSchema: transTypeSchema,
+	}
+}
+
+// The input for the WASM function call
+type WasmInput struct {
+	FunctionName  WasmFunctionName             `json:"functionName"`
+	ExpandTypes   Optional[ExpandTypesInput]   `json:"expandTypes,omitzero"`
+	ExtractType   Optional[ExtractTypeInput]   `json:"extractType,omitzero"`
+	ExtractProc   Optional[ExtractProcInput]   `json:"extractProc,omitzero"`
+	ExtractStream Optional[ExtractStreamInput] `json:"extractStream,omitzero"`
+	Codegen       Optional[CodegenInput]       `json:"codegen,omitzero"`
+}
+
+// preWasmInput is the version of WasmInput previous to the required field validation
+type preWasmInput struct {
+	FunctionName  Optional[WasmFunctionName]      `json:"functionName,omitzero"`
+	ExpandTypes   Optional[preExpandTypesInput]   `json:"expandTypes,omitzero"`
+	ExtractType   Optional[preExtractTypeInput]   `json:"extractType,omitzero"`
+	ExtractProc   Optional[preExtractProcInput]   `json:"extractProc,omitzero"`
+	ExtractStream Optional[preExtractStreamInput] `json:"extractStream,omitzero"`
+	Codegen       Optional[preCodegenInput]       `json:"codegen,omitzero"`
+}
+
+// validate validates the required fields of WasmInput
+func (p *preWasmInput) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preWasmInput is nil")
+	}
+
+	// Validation for field "functionName"
+	if !p.FunctionName.Present {
+		return errorMissingRequiredField("field functionName is required")
+	}
+
+	// Validation for field "expandTypes"
+	if p.ExpandTypes.Present {
+		if err := p.ExpandTypes.Value.validate(); err != nil {
+			return errorMissingRequiredField("field expandTypes: " + err.Error())
+		}
+	}
+
+	// Validation for field "extractType"
+	if p.ExtractType.Present {
+		if err := p.ExtractType.Value.validate(); err != nil {
+			return errorMissingRequiredField("field extractType: " + err.Error())
+		}
+	}
+
+	// Validation for field "extractProc"
+	if p.ExtractProc.Present {
+		if err := p.ExtractProc.Value.validate(); err != nil {
+			return errorMissingRequiredField("field extractProc: " + err.Error())
+		}
+	}
+
+	// Validation for field "extractStream"
+	if p.ExtractStream.Present {
+		if err := p.ExtractStream.Value.validate(); err != nil {
+			return errorMissingRequiredField("field extractStream: " + err.Error())
+		}
+	}
+
+	// Validation for field "codegen"
+	if p.Codegen.Present {
+		if err := p.Codegen.Value.validate(); err != nil {
+			return errorMissingRequiredField("field codegen: " + err.Error())
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preWasmInput type to the final WasmInput type
+func (p *preWasmInput) transform() WasmInput {
+	// Transformations
+	transFunctionName := p.FunctionName.Value
+	transExpandTypes := Optional[ExpandTypesInput]{Present: p.ExpandTypes.Present}
+	if p.ExpandTypes.Present {
+		var valExpandTypes ExpandTypesInput
+		valExpandTypes = p.ExpandTypes.Value.transform()
+		transExpandTypes.Value = valExpandTypes
+	}
+	transExtractType := Optional[ExtractTypeInput]{Present: p.ExtractType.Present}
+	if p.ExtractType.Present {
+		var valExtractType ExtractTypeInput
+		valExtractType = p.ExtractType.Value.transform()
+		transExtractType.Value = valExtractType
+	}
+	transExtractProc := Optional[ExtractProcInput]{Present: p.ExtractProc.Present}
+	if p.ExtractProc.Present {
+		var valExtractProc ExtractProcInput
+		valExtractProc = p.ExtractProc.Value.transform()
+		transExtractProc.Value = valExtractProc
+	}
+	transExtractStream := Optional[ExtractStreamInput]{Present: p.ExtractStream.Present}
+	if p.ExtractStream.Present {
+		var valExtractStream ExtractStreamInput
+		valExtractStream = p.ExtractStream.Value.transform()
+		transExtractStream.Value = valExtractStream
+	}
+	transCodegen := Optional[CodegenInput]{Present: p.Codegen.Present}
+	if p.Codegen.Present {
+		var valCodegen CodegenInput
+		valCodegen = p.Codegen.Value.transform()
+		transCodegen.Value = valCodegen
+	}
+
+	// Assignments
+	return WasmInput{
+		FunctionName:  transFunctionName,
+		ExpandTypes:   transExpandTypes,
+		ExtractType:   transExtractType,
+		ExtractProc:   transExtractProc,
+		ExtractStream: transExtractStream,
+		Codegen:       transCodegen,
+	}
+}
+
+// The output for the WASM function call
+type WasmOutput struct {
+	ExpandTypes   Optional[ExpandTypesOutput]   `json:"expandTypes,omitzero"`
+	ExtractType   Optional[ExtractTypeOutput]   `json:"extractType,omitzero"`
+	ExtractProc   Optional[ExtractProcOutput]   `json:"extractProc,omitzero"`
+	ExtractStream Optional[ExtractStreamOutput] `json:"extractStream,omitzero"`
+	Codegen       Optional[CodegenOutput]       `json:"codegen,omitzero"`
+}
+
+// preWasmOutput is the version of WasmOutput previous to the required field validation
+type preWasmOutput struct {
+	ExpandTypes   Optional[preExpandTypesOutput]   `json:"expandTypes,omitzero"`
+	ExtractType   Optional[preExtractTypeOutput]   `json:"extractType,omitzero"`
+	ExtractProc   Optional[preExtractProcOutput]   `json:"extractProc,omitzero"`
+	ExtractStream Optional[preExtractStreamOutput] `json:"extractStream,omitzero"`
+	Codegen       Optional[preCodegenOutput]       `json:"codegen,omitzero"`
+}
+
+// validate validates the required fields of WasmOutput
+func (p *preWasmOutput) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preWasmOutput is nil")
+	}
+
+	// Validation for field "expandTypes"
+	if p.ExpandTypes.Present {
+		if err := p.ExpandTypes.Value.validate(); err != nil {
+			return errorMissingRequiredField("field expandTypes: " + err.Error())
+		}
+	}
+
+	// Validation for field "extractType"
+	if p.ExtractType.Present {
+		if err := p.ExtractType.Value.validate(); err != nil {
+			return errorMissingRequiredField("field extractType: " + err.Error())
+		}
+	}
+
+	// Validation for field "extractProc"
+	if p.ExtractProc.Present {
+		if err := p.ExtractProc.Value.validate(); err != nil {
+			return errorMissingRequiredField("field extractProc: " + err.Error())
+		}
+	}
+
+	// Validation for field "extractStream"
+	if p.ExtractStream.Present {
+		if err := p.ExtractStream.Value.validate(); err != nil {
+			return errorMissingRequiredField("field extractStream: " + err.Error())
+		}
+	}
+
+	// Validation for field "codegen"
+	if p.Codegen.Present {
+		if err := p.Codegen.Value.validate(); err != nil {
+			return errorMissingRequiredField("field codegen: " + err.Error())
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preWasmOutput type to the final WasmOutput type
+func (p *preWasmOutput) transform() WasmOutput {
+	// Transformations
+	transExpandTypes := Optional[ExpandTypesOutput]{Present: p.ExpandTypes.Present}
+	if p.ExpandTypes.Present {
+		var valExpandTypes ExpandTypesOutput
+		valExpandTypes = p.ExpandTypes.Value.transform()
+		transExpandTypes.Value = valExpandTypes
+	}
+	transExtractType := Optional[ExtractTypeOutput]{Present: p.ExtractType.Present}
+	if p.ExtractType.Present {
+		var valExtractType ExtractTypeOutput
+		valExtractType = p.ExtractType.Value.transform()
+		transExtractType.Value = valExtractType
+	}
+	transExtractProc := Optional[ExtractProcOutput]{Present: p.ExtractProc.Present}
+	if p.ExtractProc.Present {
+		var valExtractProc ExtractProcOutput
+		valExtractProc = p.ExtractProc.Value.transform()
+		transExtractProc.Value = valExtractProc
+	}
+	transExtractStream := Optional[ExtractStreamOutput]{Present: p.ExtractStream.Present}
+	if p.ExtractStream.Present {
+		var valExtractStream ExtractStreamOutput
+		valExtractStream = p.ExtractStream.Value.transform()
+		transExtractStream.Value = valExtractStream
+	}
+	transCodegen := Optional[CodegenOutput]{Present: p.Codegen.Present}
+	if p.Codegen.Present {
+		var valCodegen CodegenOutput
+		valCodegen = p.Codegen.Value.transform()
+		transCodegen.Value = valCodegen
+	}
+
+	// Assignments
+	return WasmOutput{
+		ExpandTypes:   transExpandTypes,
+		ExtractType:   transExtractType,
+		ExtractProc:   transExtractProc,
+		ExtractStream: transExtractStream,
+		Codegen:       transCodegen,
 	}
 }
