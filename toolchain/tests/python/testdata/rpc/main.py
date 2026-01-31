@@ -3,9 +3,9 @@ import os
 
 sys.path.append(os.getcwd())
 
-from gen.rpc_catalog import VDL_PROCEDURES, VDLPaths, OperationDefinition
+from gen.catalog import VDL_PROCEDURES, VDLPaths, OperationDefinition
 from gen.types import GreeterGreetInput, GreeterGreetOutput, GreeterGreetResponse
-from gen.core_types import Response
+from gen.core import Response
 
 def test_rpc():
     assert len(VDL_PROCEDURES) == 1
