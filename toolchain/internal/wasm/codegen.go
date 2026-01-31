@@ -83,7 +83,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		})
 
 		gen := typescript.New(&config.TypeScriptConfig{
-			ImportExtension: cfg.ImportExtension,
+			ImportExtension: cfg.ImportExtension.String(),
 			ServerConfig:    config.ServerConfig{GenServer: cfg.GenServer},
 			ClientConfig:    config.ClientConfig{GenClient: cfg.GenClient},
 			PatternsConfig:  config.PatternsConfig{GenPatterns: &cfg.GenPatterns},
