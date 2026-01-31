@@ -198,23 +198,15 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 	assert.Contains(t, typesContent, "export type UsersGetUserResponse = Response<UsersGetUserOutput>")
 
 	// Check imports in client.ts
-	assert.Contains(t, clientContent, `import type {`)
-	assert.Contains(t, clientContent, `  Response,`)
-	assert.Contains(t, clientContent, `  OperationType,`)
-	assert.Contains(t, clientContent, `  OperationDefinition,`)
-	assert.Contains(t, clientContent, `} from "./core";`)
-	assert.Contains(t, clientContent, `import {`)
-	assert.Contains(t, clientContent, `  VdlError,`)
-	assert.Contains(t, clientContent, `  asError,`)
-	assert.Contains(t, clientContent, `  sleep,`)
-	assert.Contains(t, clientContent, `} from "./core";`)
+	assert.Contains(t, clientContent, `import type { Response, OperationType, OperationDefinition } from "./core";`)
+	assert.Contains(t, clientContent, `import { VdlError, asError, sleep } from "./core";`)
 
 	// Check procedure names list
 	assert.Contains(t, catalogContent, `"/Users/GetUser"`)
 
 	// Check client implementation
 	assert.Contains(t, clientContent, "class builderUsersGetUser")
-	assert.Contains(t, clientContent, "async execute(input: UsersGetUserInput): Promise<UsersGetUserOutput>")
+	assert.Contains(t, clientContent, "async execute(input: vdlTypes.UsersGetUserInput): Promise<vdlTypes.UsersGetUserOutput>")
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
@@ -260,7 +252,7 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 
 	// Check client implementation
 	assert.Contains(t, clientContent, "class builderChatMessagesStream")
-	assert.Contains(t, clientContent, "execute(input: ChatMessagesInput)")
+	assert.Contains(t, clientContent, "execute(input: vdlTypes.ChatMessagesInput)")
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {

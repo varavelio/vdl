@@ -3,7 +3,6 @@ package typescript
 import (
 	_ "embed"
 	"fmt"
-	"sort"
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
@@ -25,12 +24,7 @@ func generateServer(schema *ir.Schema, config *config.TypeScriptConfig) (string,
 	generateImport(g, []string{"Response", "OperationDefinition", "OperationType"}, "./core", true, config)
 	generateImport(g, []string{"VdlError", "asError"}, "./core", false, config)
 	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, config)
-
-	typeNames, valueNames := collectImports(schema)
-	sort.Strings(typeNames)
-	sort.Strings(valueNames)
-	generateImport(g, typeNames, "./types", true, config)
-	generateImport(g, valueNames, "./types", false, config)
+	generateImportAll(g, "vdlTypes", "./types", config)
 	g.Break()
 
 	core, err := generateServerCore(schema, config)
@@ -318,25 +312,25 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 			g.Line(" * The middleware wraps the business handler, allowing you")
 			g.Line(" * to implement cross-cutting concerns in a type-safe way.")
 			g.Line(" */")
-			g.Linef("use(mw: ProcMiddlewareFunc<T, %s, %s>): void {", inputName, outputName)
+			g.Linef("use(mw: ProcMiddlewareFunc<T, vdlTypes.%s, vdlTypes.%s>): void {", inputName, outputName)
 			g.Block(func() {
 				g.Line("const adapted: ProcMiddlewareFunc<T, any, any> = (next) => {")
 				g.Block(func() {
 					g.Line("return async (cGeneric) => {")
 					g.Block(func() {
-						g.Linef("const typedNext: ProcHandlerFunc<T, %s, %s> = async (c) => {", inputName, outputName)
+						g.Linef("const typedNext: ProcHandlerFunc<T, vdlTypes.%s, vdlTypes.%s> = async (c) => {", inputName, outputName)
 						g.Block(func() {
 							g.Line("cGeneric.props = c.props;")
 							g.Line("cGeneric.input = c.input;")
 							g.Line("const genericOutput = await next(cGeneric);")
-							g.Linef("return genericOutput as %s;", outputName)
+							g.Linef("return genericOutput as vdlTypes.%s;", outputName)
 						})
 						g.Line("};")
 						g.Break()
 						g.Line("const typedChain = mw(typedNext);")
 						g.Break()
-						g.Linef("const input = cGeneric.input as %s;", inputName)
-						g.Linef("const cSpecific = new HandlerContext<T, %s>(", inputName)
+						g.Linef("const input = cGeneric.input as vdlTypes.%s;", inputName)
+						g.Linef("const cSpecific = new HandlerContext<T, vdlTypes.%s>(", inputName)
 						g.Line("cGeneric.props, input, cGeneric.signal, cGeneric.operation")
 						g.Line(");")
 						g.Break()
@@ -353,12 +347,12 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 			g.Line("/**")
 			g.Linef(" * Registers the business handler for the %s procedure.", uniqueName)
 			g.Line(" */")
-			g.Linef("handle(handler: ProcHandlerFunc<T, %s, %s>): void {", inputName, outputName)
+			g.Linef("handle(handler: ProcHandlerFunc<T, vdlTypes.%s, vdlTypes.%s>): void {", inputName, outputName)
 			g.Block(func() {
 				g.Line("const adaptedHandler: ProcHandlerFunc<T, any, any> = async (cGeneric) => {")
 				g.Block(func() {
-					g.Linef("const input = cGeneric.input as %s;", inputName)
-					g.Linef("const cSpecific = new HandlerContext<T, %s>(", inputName)
+					g.Linef("const input = cGeneric.input as vdlTypes.%s;", inputName)
+					g.Linef("const cSpecific = new HandlerContext<T, vdlTypes.%s>(", inputName)
 					g.Line("cGeneric.props, input, cGeneric.signal, cGeneric.operation")
 					g.Line(");")
 					g.Line("return handler(cSpecific);")
@@ -368,7 +362,7 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 				g.Line("const deserializer: DeserializerFunc = async (raw) => {")
 				g.Block(func() {
 					validateFnName := fmt.Sprintf("validate%sInput", proc.FullName())
-					g.Linef("const err = %s(raw);", validateFnName)
+					g.Linef("const err = vdlTypes.%s(raw);", validateFnName)
 					g.Line("if (err !== null) {")
 					g.Block(func() {
 						g.Line("throw new VdlError({ message: err, code: \"INVALID_INPUT\", category: \"ValidationError\" });")
@@ -408,13 +402,13 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 			g.Break()
 
 			g.Linef("/** Registers a typed middleware for the %s stream. */", uniqueName)
-			g.Linef("use(mw: StreamMiddlewareFunc<T, %s, %s>): void {", inputName, outputName)
+			g.Linef("use(mw: StreamMiddlewareFunc<T, vdlTypes.%s, vdlTypes.%s>): void {", inputName, outputName)
 			g.Block(func() {
 				g.Line("const adapted: StreamMiddlewareFunc<T, any, any> = (next) => {")
 				g.Block(func() {
 					g.Line("return async (cGeneric, emitGeneric) => {")
 					g.Block(func() {
-						g.Linef("const typedNext: StreamHandlerFunc<T, %s, %s> = async (c, emit) => {", inputName, outputName)
+						g.Linef("const typedNext: StreamHandlerFunc<T, vdlTypes.%s, vdlTypes.%s> = async (c, emit) => {", inputName, outputName)
 						g.Block(func() {
 							g.Line("cGeneric.props = c.props;")
 							g.Line("cGeneric.input = c.input;")
@@ -424,14 +418,14 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 						g.Break()
 						g.Line("const typedChain = mw(typedNext);")
 						g.Break()
-						g.Linef("const emitSpecific: EmitFunc<T, %s, %s> = async (c, output) => {", inputName, outputName)
+						g.Linef("const emitSpecific: EmitFunc<T, vdlTypes.%s, vdlTypes.%s> = async (c, output) => {", inputName, outputName)
 						g.Block(func() {
 							g.Line("return emitGeneric(cGeneric, output);")
 						})
 						g.Line("};")
 						g.Break()
-						g.Linef("const input = cGeneric.input as %s;", inputName)
-						g.Linef("const cSpecific = new HandlerContext<T, %s>(", inputName)
+						g.Linef("const input = cGeneric.input as vdlTypes.%s;", inputName)
+						g.Linef("const cSpecific = new HandlerContext<T, vdlTypes.%s>(", inputName)
 						g.Line("cGeneric.props, input, cGeneric.signal, cGeneric.operation")
 						g.Line(");")
 						g.Break()
@@ -446,13 +440,13 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 			g.Break()
 
 			g.Linef("/** Registers a typed emit middleware for the %s stream. */", uniqueName)
-			g.Linef("useEmit(mw: EmitMiddlewareFunc<T, %s, %s>): void {", inputName, outputName)
+			g.Linef("useEmit(mw: EmitMiddlewareFunc<T, vdlTypes.%s, vdlTypes.%s>): void {", inputName, outputName)
 			g.Block(func() {
 				g.Line("const adapted: EmitMiddlewareFunc<T, any, any> = (next) => {")
 				g.Block(func() {
 					g.Line("return async (cGeneric, outputGeneric) => {")
 					g.Block(func() {
-						g.Linef("const typedNext: EmitFunc<T, %s, %s> = async (c, output) => {", inputName, outputName)
+						g.Linef("const typedNext: EmitFunc<T, vdlTypes.%s, vdlTypes.%s> = async (c, output) => {", inputName, outputName)
 						g.Block(func() {
 							g.Line("cGeneric.props = c.props;")
 							g.Line("cGeneric.input = c.input;")
@@ -462,11 +456,11 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 						g.Break()
 						g.Line("const emitChain = mw(typedNext);")
 						g.Break()
-						g.Linef("const input = cGeneric.input as %s;", inputName)
-						g.Linef("const cSpecific = new HandlerContext<T, %s>(", inputName)
+						g.Linef("const input = cGeneric.input as vdlTypes.%s;", inputName)
+						g.Linef("const cSpecific = new HandlerContext<T, vdlTypes.%s>(", inputName)
 						g.Line("cGeneric.props, input, cGeneric.signal, cGeneric.operation")
 						g.Line(");")
-						g.Linef("const outputSpecific = outputGeneric as %s;", outputName)
+						g.Linef("const outputSpecific = outputGeneric as vdlTypes.%s;", outputName)
 						g.Break()
 						g.Line("return emitChain(cSpecific, outputSpecific);")
 					})
@@ -479,18 +473,18 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 			g.Break()
 
 			g.Linef("/** Registers the business handler for the %s stream. */", uniqueName)
-			g.Linef("handle(handler: StreamHandlerFunc<T, %s, %s>): void {", inputName, outputName)
+			g.Linef("handle(handler: StreamHandlerFunc<T, vdlTypes.%s, vdlTypes.%s>): void {", inputName, outputName)
 			g.Block(func() {
 				g.Line("const adaptedHandler: StreamHandlerFunc<T, any, any> = async (cGeneric, emitGeneric) => {")
 				g.Block(func() {
-					g.Linef("const emitSpecific: EmitFunc<T, %s, %s> = async (c, output) => {", inputName, outputName)
+					g.Linef("const emitSpecific: EmitFunc<T, vdlTypes.%s, vdlTypes.%s> = async (c, output) => {", inputName, outputName)
 					g.Block(func() {
 						g.Line("return emitGeneric(cGeneric, output);")
 					})
 					g.Line("};")
 					g.Break()
-					g.Linef("const input = cGeneric.input as %s;", inputName)
-					g.Linef("const cSpecific = new HandlerContext<T, %s>(", inputName)
+					g.Linef("const input = cGeneric.input as vdlTypes.%s;", inputName)
+					g.Linef("const cSpecific = new HandlerContext<T, vdlTypes.%s>(", inputName)
 					g.Line("cGeneric.props, input, cGeneric.signal, cGeneric.operation")
 					g.Line(");")
 					g.Break()
@@ -501,7 +495,7 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 				g.Line("const deserializer: DeserializerFunc = async (raw) => {")
 				g.Block(func() {
 					validateFnName := fmt.Sprintf("validate%sInput", stream.FullName())
-					g.Linef("const err = %s(raw);", validateFnName)
+					g.Linef("const err = vdlTypes.%s(raw);", validateFnName)
 					g.Line("if (err !== null) {")
 					g.Block(func() {
 						g.Line("throw new VdlError({ message: err, code: \"INVALID_INPUT\", category: \"ValidationError\" });")

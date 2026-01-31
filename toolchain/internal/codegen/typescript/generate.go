@@ -144,22 +144,22 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// index.ts (Exports everything)
 	indexBuilder := gen.New().WithSpaces(2)
-	indexBuilder.Line(formatExportAll("./core", g.config))
-	indexBuilder.Line(formatExportAll("./types", g.config))
+	indexBuilder.Line(generateExportAll("./core", g.config))
+	indexBuilder.Line(generateExportAll("./types", g.config))
 	if hasConstants {
-		indexBuilder.Line(formatExportAll("./constants", g.config))
+		indexBuilder.Line(generateExportAll("./constants", g.config))
 	}
 	if hasPatterns {
-		indexBuilder.Line(formatExportAll("./patterns", g.config))
+		indexBuilder.Line(generateExportAll("./patterns", g.config))
 	}
 	if strings.TrimSpace(catalogContent) != "" {
-		indexBuilder.Line(formatExportAll("./catalog", g.config))
+		indexBuilder.Line(generateExportAll("./catalog", g.config))
 	}
 	if g.config.GenClient && len(schema.RPCs) > 0 {
-		indexBuilder.Line(formatExportAll("./client", g.config))
+		indexBuilder.Line(generateExportAll("./client", g.config))
 	}
 	if g.config.GenServer && len(schema.RPCs) > 0 {
-		indexBuilder.Line(formatExportAll("./server", g.config))
+		indexBuilder.Line(generateExportAll("./server", g.config))
 	}
 	addFile("index.ts", []byte(indexBuilder.String()))
 

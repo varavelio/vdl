@@ -3,7 +3,6 @@ package typescript
 import (
 	_ "embed"
 	"fmt"
-	"sort"
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
@@ -29,12 +28,7 @@ func generateClient(schema *ir.Schema, config *config.TypeScriptConfig) (string,
 	generateImport(g, []string{"Response", "OperationType", "OperationDefinition"}, "./core", true, config)
 	generateImport(g, []string{"VdlError", "asError", "sleep"}, "./core", false, config)
 	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, config)
-
-	typeNames, valueNames := collectImports(schema)
-	sort.Strings(typeNames)
-	sort.Strings(valueNames)
-	generateImport(g, typeNames, "./types", true, config)
-	generateImport(g, valueNames, "./types", false, config)
+	generateImportAll(g, "vdlTypes", "./types", config)
 	g.Break()
 
 	g.Raw(piece)
@@ -378,10 +372,10 @@ func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 			g.Linef(" * @param input - The %s input parameters", fullName)
 			g.Linef(" * @returns Promise resolving to %s or throws UfoError if something went wrong", outputType)
 			g.Line(" */")
-			g.Linef("async execute(input: %s): Promise<%s> {", inputType, outputType)
+			g.Linef("async execute(input: vdlTypes.%s): Promise<vdlTypes.%s> {", inputType, outputType)
 			g.Block(func() {
 				// Add client-side input validation
-				validateFuncName := fmt.Sprintf("validate%s", inputType)
+				validateFuncName := fmt.Sprintf("vdlTypes.validate%s", inputType)
 				g.Linef("const validationError = %s(input);", validateFuncName)
 				g.Line("if (validationError !== null) {")
 				g.Block(func() {
@@ -409,7 +403,7 @@ func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 				g.Line(");")
 
 				g.Line("if (!rawResponse.ok) throw rawResponse.error;")
-				g.Linef("return %s(rawResponse.output);", hydrateFuncName)
+				g.Linef("return vdlTypes.%s(rawResponse.output);", hydrateFuncName)
 			})
 			g.Line("}")
 		})
@@ -471,6 +465,7 @@ func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
 		inputType := fmt.Sprintf("%sInput", fullName)
 		outputType := fmt.Sprintf("%sOutput", fullName)
+		responseType := fmt.Sprintf("%sResponse", fullName)
 		methodName := strutil.ToCamelCase(stream.RPCName) + strutil.ToPascalCase(stream.Name)
 
 		g.Linef("/**")
@@ -718,16 +713,16 @@ func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 			g.Line(" * cancel();")
 			g.Line(" * ```")
 			g.Line(" */")
-			g.Linef("execute(input: %s): {", inputType)
+			g.Linef("execute(input: vdlTypes.%s): {", inputType)
 			g.Block(func() {
-				g.Linef("stream: AsyncGenerator<Response<%s>, void, unknown>;", outputType)
+				g.Linef("stream: AsyncGenerator<vdlTypes.%s, void, unknown>;", responseType)
 				g.Line("cancel: () => void;")
 			})
 			g.Line("} {")
 			g.Block(func() {
 				// Add client-side input validation
 				validateFuncName := fmt.Sprintf("validate%s", inputType)
-				g.Linef("const validationError = %s(input);", validateFuncName)
+				g.Linef("const validationError = vdlTypes.%s(input);", validateFuncName)
 				g.Line("if (validationError !== null) {")
 				g.Block(func() {
 					g.Line("throw new VdlError({")
@@ -756,12 +751,12 @@ func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 				})
 				g.Line(");")
 
-				g.Linef("const typedStream = async function* (): AsyncGenerator<Response<%s>, void, unknown> {", outputType)
+				g.Linef("const typedStream = async function* (): AsyncGenerator<vdlTypes.%s, void, unknown> {", responseType)
 				g.Block(func() {
 					g.Line("for await (const event of stream) {")
 					g.Block(func() {
-						g.Linef("const evt = event as Response<%s>;", outputType)
-						g.Linef("if (evt.ok) evt.output = %s(evt.output);", hydrateFuncName)
+						g.Linef("const evt = event as vdlTypes.%s;", responseType)
+						g.Linef("if (evt.ok) evt.output = vdlTypes.%s(evt.output);", hydrateFuncName)
 						g.Line("yield evt;")
 					})
 					g.Line("}")
