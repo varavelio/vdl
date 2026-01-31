@@ -64,7 +64,7 @@ func cmdExtractProcWrapper() js.Func {
 
 			go func() {
 				if len(args) != 2 {
-					reject.Invoke("missing input and/or proc name")
+					reject.Invoke("missing input and/or rpc/proc name")
 					return
 				}
 				if extracted, err := cmdExtractProc(args[0].String(), args[1].String(), args[2].String()); err != nil {
@@ -91,7 +91,7 @@ func cmdExtractStreamWrapper() js.Func {
 
 			go func() {
 				if len(args) != 2 {
-					reject.Invoke("missing input and/or stream name")
+					reject.Invoke("missing input and/or rpc/stream name")
 					return
 				}
 				if extracted, err := cmdExtractStream(args[0].String(), args[1].String(), args[2].String()); err != nil {
