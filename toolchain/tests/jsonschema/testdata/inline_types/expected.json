@@ -1,0 +1,154 @@
+{
+  "$defs": {
+    "ComplexInlineTypes": {
+      "properties": {
+        "configs": {
+          "items": {
+            "additionalProperties": {
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": ["key", "value"],
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "deepNest": {
+          "properties": {
+            "child": {
+              "properties": {
+                "grandChild": {
+                  "properties": {
+                    "greatGrandChild": {
+                      "properties": {
+                        "data": {
+                          "type": "string"
+                        },
+                        "level4": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["data", "level4"],
+                      "type": "object"
+                    },
+                    "level3": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["greatGrandChild", "level3"],
+                  "type": "object"
+                },
+                "level2": {
+                  "type": "integer"
+                }
+              },
+              "required": ["grandChild", "level2"],
+              "type": "object"
+            },
+            "level1": {
+              "type": "string"
+            }
+          },
+          "required": ["child", "level1"],
+          "type": "object"
+        },
+        "files": {
+          "items": {
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": ["content", "path"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "grid": {
+          "items": {
+            "items": {
+              "properties": {
+                "x": {
+                  "type": "integer"
+                },
+                "y": {
+                  "type": "integer"
+                }
+              },
+              "required": ["x", "y"],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "groupedFiles": {
+          "additionalProperties": {
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "integer"
+                }
+              },
+              "required": ["name", "size"],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "type": "object"
+        },
+        "meta": {
+          "additionalProperties": {
+            "properties": {
+              "author": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": ["author", "createdAt"],
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "simple": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["enabled", "name"],
+          "type": "object"
+        }
+      },
+      "required": [
+        "configs",
+        "deepNest",
+        "files",
+        "grid",
+        "groupedFiles",
+        "meta",
+        "simple"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
