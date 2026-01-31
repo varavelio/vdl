@@ -52,13 +52,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		return b
 	}
 
-	// Core Types (core_types.go)
+	// Core Types (core.go)
 	code, err := generateCoreTypes(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("core_types.go")
+		b := getBuilder("core.go")
 		b.Raw(code)
 		b.Break()
 	}
@@ -105,13 +105,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b.Break()
 	}
 
-	// RPC Catalog (rpc_catalog.go)
+	// RPC Catalog (catalog.go)
 	code, err = generateRPCCatalog(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("rpc_catalog.go")
+		b := getBuilder("catalog.go")
 		b.Raw(code)
 		b.Break()
 	}
@@ -127,13 +127,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b.Break()
 	}
 
-	// RPC Server (rpc_server.go) - Core + All RPCs
+	// RPC Server (server.go) - Core + All RPCs
 	code, err = generateServerCore(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("rpc_server.go")
+		b := getBuilder("server.go")
 		b.Raw(code)
 		b.Break()
 	}
@@ -143,19 +143,19 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		if code = strings.TrimSpace(code); code != "" {
-			b := getBuilder("rpc_server.go")
+			b := getBuilder("server.go")
 			b.Raw(code)
 			b.Break()
 		}
 	}
 
-	// RPC Client (rpc_client.go) - Core + All RPCs
+	// RPC Client (client.go) - Core + All RPCs
 	code, err = generateClientCore(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("rpc_client.go")
+		b := getBuilder("client.go")
 		b.Raw(code)
 		b.Break()
 	}
@@ -165,7 +165,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 			return nil, err
 		}
 		if code = strings.TrimSpace(code); code != "" {
-			b := getBuilder("rpc_client.go")
+			b := getBuilder("client.go")
 			b.Raw(code)
 			b.Break()
 		}
