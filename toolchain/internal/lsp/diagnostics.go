@@ -204,8 +204,8 @@ func (l *LSP) analyzeAndPublishDiagnosticsDebounced(filePath, uri string) {
 // This ensures that when an imported file is modified, the diagnostics in
 // importing files are updated without requiring manual edits to those files.
 func (l *LSP) reanalyzeDependents(ctx context.Context, filePath string) {
-	// Get all files that depend on this file
-	dependents := l.depGraph.GetDependents(filePath)
+	// Get all files that depend on this file (direct and indirect)
+	dependents := l.depGraph.GetAllDependents(filePath)
 	if len(dependents) == 0 {
 		return
 	}
@@ -227,9 +227,6 @@ func (l *LSP) reanalyzeDependents(ctx context.Context, filePath string) {
 
 		l.logger.Info("re-analyzing dependent", "file", depPath)
 		l.analyzeAndPublishDiagnostics(ctx, depPath, uri)
-
-		// Recursively propagate to transitive dependents
-		l.reanalyzeDependents(ctx, depPath)
 	}
 }
 

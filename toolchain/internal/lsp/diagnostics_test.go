@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"strings"
 	"testing"
@@ -118,5 +119,49 @@ func TestDiagnostics(t *testing.T) {
 		diagArray, ok := params["diagnostics"].([]interface{})
 		require.True(t, ok, "Diagnostics not found or not an array")
 		assert.Empty(t, diagArray, "Expected empty diagnostics array")
+	})
+
+	t.Run("ReanalyzeDependents", func(t *testing.T) {
+		// This test verifies that reanalyzeDependents calls publishDiagnostics for open dependent files
+		// We can't easily check the side effects on the writer because reanalyzeDependents runs async-ish (or at least complicated to mock fully).
+		// However, we can mock the openDocs and depGraph and see if it tries to analyze.
+		// Since analyzeAndPublishDiagnostics actually calls analyze -> which reads from FS -> which parses.
+
+		// Setup VFS with valid content to avoid parse errors
+		schemaA := `type A {}`
+		schemaB := `include "a.vdl"
+type B { f: A }`
+
+		uriA := "file:///a.vdl"
+		uriB := "file:///b.vdl"
+		pathA := UriToPath(uriA)
+		pathB := UriToPath(uriB)
+
+		lsp.fs.WriteFileCache(pathA, []byte(schemaA))
+		lsp.fs.WriteFileCache(pathB, []byte(schemaB))
+
+		// Register B depends on A
+		lsp.depGraph.UpdateDependencies(pathB, []string{pathA})
+
+		// Open both documents
+		lsp.registerOpenDoc(pathA, uriA)
+		lsp.registerOpenDoc(pathB, uriB)
+
+		// Clear writer
+		mockWriter.Reset()
+
+		// Call reanalyzeDependents for A
+		// This should trigger analysis for B (since B depends on A)
+		// We use a context that is not cancelled
+		ctx := context.Background()
+		lsp.reanalyzeDependents(ctx, pathA)
+
+		// Check output
+		response := mockWriter.String()
+
+		// We expect publishDiagnostics for B (uriB)
+		// Since A has no changes, we only care about B being re-analyzed
+		assert.Contains(t, response, uriB)
+		assert.Contains(t, response, "publishDiagnostics")
 	})
 }

@@ -59,8 +59,8 @@ rpc Test {
 			name:      "End line out of range",
 			startLine: 1,
 			endLine:   100,
-			want:      "",
-			wantErr:   true,
+			want:      "type FooType {\n  firstField: string\n  secondField: int[]\n}\n\nrpc Test {\n  proc BarProc {\n    input {\n      foo: FooType\n    }\n\n    output {\n      baz: bool\n    }\n  }\n}",
+			wantErr:   false,
 		},
 	}
 

@@ -94,29 +94,29 @@ func findDocstringPathAtPosition(content string, lspPosition TextDocumentPositio
 // collectAllIdentifiersFromSchema collects all identifier occurrences from the parsed schema.
 // This walks the AST and collects all identifiers with their positions.
 func collectAllIdentifiersFromSchema(schema *ast.Schema, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
+	// Pre-allocate a reasonable capacity to avoid frequent re-allocations
+	// Most files have < 1000 identifiers
+	identifiers := make([]IdentifierInfo, 0, 100)
 
 	for _, child := range schema.Children {
 		switch child.Kind() {
 		case ast.SchemaChildKindType:
-			identifiers = append(identifiers, collectIdentifiersFromType(child.Type, content)...)
+			collectIdentifiersFromType(child.Type, content, &identifiers)
 		case ast.SchemaChildKindEnum:
-			identifiers = append(identifiers, collectIdentifiersFromEnum(child.Enum, content)...)
+			collectIdentifiersFromEnum(child.Enum, content, &identifiers)
 		case ast.SchemaChildKindConst:
-			identifiers = append(identifiers, collectIdentifiersFromConst(child.Const, content)...)
+			collectIdentifiersFromConst(child.Const, content, &identifiers)
 		case ast.SchemaChildKindPattern:
-			identifiers = append(identifiers, collectIdentifiersFromPattern(child.Pattern, content)...)
+			collectIdentifiersFromPattern(child.Pattern, content, &identifiers)
 		case ast.SchemaChildKindRPC:
-			identifiers = append(identifiers, collectIdentifiersFromRPC(child.RPC, content)...)
+			collectIdentifiersFromRPC(child.RPC, content, &identifiers)
 		}
 	}
 
 	return identifiers
 }
 
-func collectIdentifiersFromType(t *ast.TypeDecl, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromType(t *ast.TypeDecl, content string, identifiers *[]IdentifierInfo) {
 	// Type name
 	// Find the position of the name
 	startPos := t.Pos
@@ -129,7 +129,7 @@ func collectIdentifiersFromType(t *ast.TypeDecl, content string) []IdentifierInf
 
 	namePos, nameEndPos := findIdentifierRange(content, startPos, t.Name)
 
-	identifiers = append(identifiers, IdentifierInfo{
+	*identifiers = append(*identifiers, IdentifierInfo{
 		Name:   t.Name,
 		Pos:    namePos,
 		EndPos: nameEndPos,
@@ -138,24 +138,20 @@ func collectIdentifiersFromType(t *ast.TypeDecl, content string) []IdentifierInf
 	// Fields and spreads
 	for _, child := range t.Children {
 		if child.Field != nil {
-			identifiers = append(identifiers, collectIdentifiersFromField(child.Field, content)...)
+			collectIdentifiersFromField(child.Field, content, identifiers)
 		}
 		if child.Spread != nil {
 			namePos, nameEndPos := findIdentifierRange(content, child.Spread.Pos, child.Spread.TypeName)
-			identifiers = append(identifiers, IdentifierInfo{
+			*identifiers = append(*identifiers, IdentifierInfo{
 				Name:   child.Spread.TypeName,
 				Pos:    namePos,
 				EndPos: nameEndPos,
 			})
 		}
 	}
-
-	return identifiers
 }
 
-func collectIdentifiersFromField(f *ast.Field, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromField(f *ast.Field, content string, identifiers *[]IdentifierInfo) {
 	// Field name
 	startPos := f.Pos
 	if f.Docstring != nil {
@@ -164,23 +160,19 @@ func collectIdentifiersFromField(f *ast.Field, content string) []IdentifierInfo 
 
 	namePos, nameEndPos := findIdentifierRange(content, startPos, f.Name)
 
-	identifiers = append(identifiers, IdentifierInfo{
+	*identifiers = append(*identifiers, IdentifierInfo{
 		Name:   f.Name,
 		Pos:    namePos,
 		EndPos: nameEndPos,
 	})
 
 	// Field type references
-	identifiers = append(identifiers, collectIdentifiersFromFieldType(&f.Type, content)...)
-
-	return identifiers
+	collectIdentifiersFromFieldType(&f.Type, content, identifiers)
 }
 
-func collectIdentifiersFromFieldType(ft *ast.FieldType, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromFieldType(ft *ast.FieldType, content string, identifiers *[]IdentifierInfo) {
 	if ft.Base == nil {
-		return identifiers
+		return
 	}
 
 	// Named type reference
@@ -190,7 +182,7 @@ func collectIdentifiersFromFieldType(ft *ast.FieldType, content string) []Identi
 		if !ast.IsPrimitiveType(name) {
 			// ft.Base.Pos covers the name
 			namePos, nameEndPos := findIdentifierRange(content, ft.Base.Pos, name)
-			identifiers = append(identifiers, IdentifierInfo{
+			*identifiers = append(*identifiers, IdentifierInfo{
 				Name:   name,
 				Pos:    namePos,
 				EndPos: nameEndPos,
@@ -200,18 +192,18 @@ func collectIdentifiersFromFieldType(ft *ast.FieldType, content string) []Identi
 
 	// Map value type
 	if ft.Base.Map != nil && ft.Base.Map.ValueType != nil {
-		identifiers = append(identifiers, collectIdentifiersFromFieldType(ft.Base.Map.ValueType, content)...)
+		collectIdentifiersFromFieldType(ft.Base.Map.ValueType, content, identifiers)
 	}
 
 	// Inline object
 	if ft.Base.Object != nil {
 		for _, child := range ft.Base.Object.Children {
 			if child.Field != nil {
-				identifiers = append(identifiers, collectIdentifiersFromField(child.Field, content)...)
+				collectIdentifiersFromField(child.Field, content, identifiers)
 			}
 			if child.Spread != nil {
 				namePos, nameEndPos := findIdentifierRange(content, child.Spread.Pos, child.Spread.TypeName)
-				identifiers = append(identifiers, IdentifierInfo{
+				*identifiers = append(*identifiers, IdentifierInfo{
 					Name:   child.Spread.TypeName,
 					Pos:    namePos,
 					EndPos: nameEndPos,
@@ -219,13 +211,9 @@ func collectIdentifiersFromFieldType(ft *ast.FieldType, content string) []Identi
 			}
 		}
 	}
-
-	return identifiers
 }
 
-func collectIdentifiersFromEnum(e *ast.EnumDecl, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromEnum(e *ast.EnumDecl, content string, identifiers *[]IdentifierInfo) {
 	// Enum name
 	startPos := e.Pos
 	if e.Docstring != nil {
@@ -236,7 +224,7 @@ func collectIdentifiersFromEnum(e *ast.EnumDecl, content string) []IdentifierInf
 	}
 	namePos, nameEndPos := findIdentifierRange(content, startPos, e.Name)
 
-	identifiers = append(identifiers, IdentifierInfo{
+	*identifiers = append(*identifiers, IdentifierInfo{
 		Name:   e.Name,
 		Pos:    namePos,
 		EndPos: nameEndPos,
@@ -245,46 +233,17 @@ func collectIdentifiersFromEnum(e *ast.EnumDecl, content string) []IdentifierInf
 	// Enum members
 	for _, member := range e.Members {
 		if member.Name != "" {
-			// Member Pos should check for comment?
-			// EnumMember: Comment | Name (Value?)
-			// If Comment is present, Pos is comment.
-			// But member.Name is not empty here.
-			// member.Pos points to start of member.
-
-			// We need to be careful if there's a comment before the name in the same node?
-			// EnumMember struct:
-			// Comment *Comment `parser:"  @@"`
-			// Name    string     `parser:"| @Ident"`
-			// If Comment is matched, Name is empty (due to |).
-			// Wait, let's check EnumMember struct again.
-			/*
-				type EnumMember struct {
-					Positions
-					Comment *Comment   `parser:"  @@"`
-					Name    string     `parser:"| @Ident"`
-					Value   *EnumValue `parser:"  (Equals @@)?"`
-				}
-			*/
-			// It's an alternation? `parser:" @@ | @Ident"`?
-			// No, `parser:"  @@"` for Comment.
-			// `parser:"| @Ident"` for Name.
-			// This means an EnumMember is EITHER a Comment OR a Name.
-			// So if Name is not empty, it's a Name node.
-			// So member.Pos should be the start of Name.
-
 			namePos, nameEndPos := findIdentifierRange(content, member.Pos, member.Name)
-			identifiers = append(identifiers, IdentifierInfo{
+			*identifiers = append(*identifiers, IdentifierInfo{
 				Name:   member.Name,
 				Pos:    namePos,
 				EndPos: nameEndPos,
 			})
 		}
 	}
-
-	return identifiers
 }
 
-func collectIdentifiersFromConst(c *ast.ConstDecl, content string) []IdentifierInfo {
+func collectIdentifiersFromConst(c *ast.ConstDecl, content string, identifiers *[]IdentifierInfo) {
 	startPos := c.Pos
 	if c.Docstring != nil {
 		startPos = c.Docstring.EndPos
@@ -294,16 +253,14 @@ func collectIdentifiersFromConst(c *ast.ConstDecl, content string) []IdentifierI
 	}
 	namePos, nameEndPos := findIdentifierRange(content, startPos, c.Name)
 
-	return []IdentifierInfo{
-		{
-			Name:   c.Name,
-			Pos:    namePos,
-			EndPos: nameEndPos,
-		},
-	}
+	*identifiers = append(*identifiers, IdentifierInfo{
+		Name:   c.Name,
+		Pos:    namePos,
+		EndPos: nameEndPos,
+	})
 }
 
-func collectIdentifiersFromPattern(p *ast.PatternDecl, content string) []IdentifierInfo {
+func collectIdentifiersFromPattern(p *ast.PatternDecl, content string, identifiers *[]IdentifierInfo) {
 	startPos := p.Pos
 	if p.Docstring != nil {
 		startPos = p.Docstring.EndPos
@@ -312,18 +269,14 @@ func collectIdentifiersFromPattern(p *ast.PatternDecl, content string) []Identif
 		startPos = p.Deprecated.EndPos
 	}
 	namePos, nameEndPos := findIdentifierRange(content, startPos, p.Name)
-	return []IdentifierInfo{
-		{
-			Name:   p.Name,
-			Pos:    namePos,
-			EndPos: nameEndPos,
-		},
-	}
+	*identifiers = append(*identifiers, IdentifierInfo{
+		Name:   p.Name,
+		Pos:    namePos,
+		EndPos: nameEndPos,
+	})
 }
 
-func collectIdentifiersFromRPC(r *ast.RPCDecl, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromRPC(r *ast.RPCDecl, content string, identifiers *[]IdentifierInfo) {
 	// RPC name
 	startPos := r.Pos
 	if r.Docstring != nil {
@@ -334,7 +287,7 @@ func collectIdentifiersFromRPC(r *ast.RPCDecl, content string) []IdentifierInfo 
 	}
 	namePos, nameEndPos := findIdentifierRange(content, startPos, r.Name)
 
-	identifiers = append(identifiers, IdentifierInfo{
+	*identifiers = append(*identifiers, IdentifierInfo{
 		Name:   r.Name,
 		Pos:    namePos,
 		EndPos: nameEndPos,
@@ -343,19 +296,15 @@ func collectIdentifiersFromRPC(r *ast.RPCDecl, content string) []IdentifierInfo 
 	// Procs and Streams
 	for _, child := range r.Children {
 		if child.Proc != nil {
-			identifiers = append(identifiers, collectIdentifiersFromProc(child.Proc, content)...)
+			collectIdentifiersFromProc(child.Proc, content, identifiers)
 		}
 		if child.Stream != nil {
-			identifiers = append(identifiers, collectIdentifiersFromStream(child.Stream, content)...)
+			collectIdentifiersFromStream(child.Stream, content, identifiers)
 		}
 	}
-
-	return identifiers
 }
 
-func collectIdentifiersFromProc(p *ast.ProcDecl, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromProc(p *ast.ProcDecl, content string, identifiers *[]IdentifierInfo) {
 	// Proc name
 	startPos := p.Pos
 	if p.Docstring != nil {
@@ -366,7 +315,7 @@ func collectIdentifiersFromProc(p *ast.ProcDecl, content string) []IdentifierInf
 	}
 	namePos, nameEndPos := findIdentifierRange(content, startPos, p.Name)
 
-	identifiers = append(identifiers, IdentifierInfo{
+	*identifiers = append(*identifiers, IdentifierInfo{
 		Name:   p.Name,
 		Pos:    namePos,
 		EndPos: nameEndPos,
@@ -375,19 +324,15 @@ func collectIdentifiersFromProc(p *ast.ProcDecl, content string) []IdentifierInf
 	// Input/Output
 	for _, child := range p.Children {
 		if child.Input != nil {
-			identifiers = append(identifiers, collectIdentifiersFromInputOutput(child.Input.Children, content)...)
+			collectIdentifiersFromInputOutput(child.Input.Children, content, identifiers)
 		}
 		if child.Output != nil {
-			identifiers = append(identifiers, collectIdentifiersFromInputOutput(child.Output.Children, content)...)
+			collectIdentifiersFromInputOutput(child.Output.Children, content, identifiers)
 		}
 	}
-
-	return identifiers
 }
 
-func collectIdentifiersFromStream(s *ast.StreamDecl, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromStream(s *ast.StreamDecl, content string, identifiers *[]IdentifierInfo) {
 	// Stream name
 	startPos := s.Pos
 	if s.Docstring != nil {
@@ -398,7 +343,7 @@ func collectIdentifiersFromStream(s *ast.StreamDecl, content string) []Identifie
 	}
 	namePos, nameEndPos := findIdentifierRange(content, startPos, s.Name)
 
-	identifiers = append(identifiers, IdentifierInfo{
+	*identifiers = append(*identifiers, IdentifierInfo{
 		Name:   s.Name,
 		Pos:    namePos,
 		EndPos: nameEndPos,
@@ -407,34 +352,28 @@ func collectIdentifiersFromStream(s *ast.StreamDecl, content string) []Identifie
 	// Input/Output
 	for _, child := range s.Children {
 		if child.Input != nil {
-			identifiers = append(identifiers, collectIdentifiersFromInputOutput(child.Input.Children, content)...)
+			collectIdentifiersFromInputOutput(child.Input.Children, content, identifiers)
 		}
 		if child.Output != nil {
-			identifiers = append(identifiers, collectIdentifiersFromInputOutput(child.Output.Children, content)...)
+			collectIdentifiersFromInputOutput(child.Output.Children, content, identifiers)
 		}
 	}
-
-	return identifiers
 }
 
-func collectIdentifiersFromInputOutput(children []*ast.InputOutputChild, content string) []IdentifierInfo {
-	var identifiers []IdentifierInfo
-
+func collectIdentifiersFromInputOutput(children []*ast.InputOutputChild, content string, identifiers *[]IdentifierInfo) {
 	for _, child := range children {
 		if child.Field != nil {
-			identifiers = append(identifiers, collectIdentifiersFromField(child.Field, content)...)
+			collectIdentifiersFromField(child.Field, content, identifiers)
 		}
 		if child.Spread != nil {
 			namePos, nameEndPos := findIdentifierRange(content, child.Spread.Pos, child.Spread.TypeName)
-			identifiers = append(identifiers, IdentifierInfo{
+			*identifiers = append(*identifiers, IdentifierInfo{
 				Name:   child.Spread.TypeName,
 				Pos:    namePos,
 				EndPos: nameEndPos,
 			})
 		}
 	}
-
-	return identifiers
 }
 
 // findReferencesInSchema finds all occurrences of a symbol name in the schema.

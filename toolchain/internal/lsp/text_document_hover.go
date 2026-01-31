@@ -205,18 +205,62 @@ func extractSourceCode(fs interface{ ReadFile(string) ([]byte, error) }, filePat
 
 // extractCodeFromContent extracts a range of lines from the content.
 func extractCodeFromContent(content string, startLine, endLine int) (string, error) {
-	lines := strings.Split(content, "\n")
-
-	if startLine <= 0 || startLine > len(lines) {
+	if startLine <= 0 {
 		return "", fmt.Errorf("start line out of range: %d", startLine)
 	}
 
-	if endLine <= 0 || endLine > len(lines) {
-		return "", fmt.Errorf("end line out of range: %d", endLine)
+	if endLine < startLine {
+		return "", fmt.Errorf("end line before start line: %d < %d", endLine, startLine)
 	}
 
-	// Extract the lines
-	extractedLines := lines[startLine-1 : endLine]
+	// Find the start offset
+	currentLine := 1
+	startOffset := 0
+	for currentLine < startLine && startOffset < len(content) {
+		idx := strings.IndexByte(content[startOffset:], '\n')
+		if idx == -1 {
+			break
+		}
+		startOffset += idx + 1
+		currentLine++
+	}
+
+	if currentLine < startLine {
+		return "", fmt.Errorf("start line out of range: %d", startLine)
+	}
+
+	// Find the end offset
+	endOffset := startOffset
+	for currentLine <= endLine && endOffset < len(content) {
+		idx := strings.IndexByte(content[endOffset:], '\n')
+		if idx == -1 {
+			endOffset = len(content)
+			break
+		}
+		endOffset += idx + 1
+		currentLine++
+	}
+
+	// If startOffset >= len(content), it's empty or out of bounds.
+	if startOffset >= len(content) {
+		// If startLine was exactly len(lines)+1 ? No.
+		return "", fmt.Errorf("start line out of range")
+	}
+
+	// If endOffset > len(content), clamp it.
+	if endOffset > len(content) {
+		endOffset = len(content)
+	}
+
+	chunk := content[startOffset:endOffset]
+	// Remove trailing newline of the chunk to avoid an empty last line in split
+	if strings.HasSuffix(chunk, "\n") {
+		chunk = chunk[:len(chunk)-1]
+	} else if strings.HasSuffix(chunk, "\r\n") {
+		chunk = chunk[:len(chunk)-2]
+	}
+
+	extractedLines := strings.Split(chunk, "\n")
 
 	// Find the minimum indentation
 	minIndent := -1
@@ -226,7 +270,15 @@ func extractCodeFromContent(content string, startLine, endLine int) (string, err
 			continue
 		}
 
-		indent := len(line) - len(strings.TrimLeft(line, " \t"))
+		indent := 0
+		for i := 0; i < len(line); i++ {
+			if line[i] == ' ' || line[i] == '\t' {
+				indent++
+			} else {
+				break
+			}
+		}
+
 		if minIndent == -1 || indent < minIndent {
 			minIndent = indent
 		}
