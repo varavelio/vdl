@@ -3,6 +3,7 @@ package lsp
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/core/parser"
@@ -80,10 +81,7 @@ func collectDocumentLinks(content string, docPath string) []DocumentLink {
 				normPath = filepath.Clean(normPath)
 
 				links = append(links, DocumentLink{
-					Range: TextDocumentRange{
-						Start: convertASTPositionToLSPPosition(child.Docstring.Pos),
-						End:   convertASTPositionToLSPPosition(child.Docstring.EndPos),
-					},
+					Range:   calculateDocstringPathRange(child.Docstring, path),
 					Target:  PathToUri(normPath),
 					Tooltip: "Open markdown file",
 				})
@@ -127,10 +125,7 @@ func collectDocumentLinks(content string, docPath string) []DocumentLink {
 			normPath = filepath.Clean(normPath)
 
 			links = append(links, DocumentLink{
-				Range: TextDocumentRange{
-					Start: convertASTPositionToLSPPosition(child.Include.Pos),
-					End:   convertASTPositionToLSPPosition(child.Include.EndPos),
-				},
+				Range:   calculateIncludePathRange(child.Include),
 				Target:  PathToUri(normPath),
 				Tooltip: "Open included file",
 			})
@@ -151,11 +146,75 @@ func addExternalDocstringLink(links *[]DocumentLink, docstring *ast.Docstring, b
 	normPath = filepath.Clean(normPath)
 
 	*links = append(*links, DocumentLink{
-		Range: TextDocumentRange{
-			Start: convertASTPositionToLSPPosition(docstring.Pos),
-			End:   convertASTPositionToLSPPosition(docstring.EndPos),
-		},
+		Range:   calculateDocstringPathRange(docstring, path),
 		Target:  PathToUri(normPath),
 		Tooltip: "Open markdown file",
 	})
+}
+
+// calculateDocstringPathRange calculates the exact range for the path inside a docstring.
+// For example, in `""" ./doc.md """`, this returns the range for just `./doc.md`.
+func calculateDocstringPathRange(docstring *ast.Docstring, path string) TextDocumentRange {
+	// The docstring starts at Pos, which includes the opening """
+	startPos := docstring.Pos
+
+	// The path is inside the """ ... """ markers
+	// We need to find where the path starts within the docstring
+	// The docstring.Value already has the """ stripped, so we need to calculate from the raw position
+
+	// Starting from the opening """, we add 3 characters for the opening quotes
+	pathStartLine := startPos.Line
+	pathStartColumn := startPos.Column + 3
+
+	// Find leading whitespace by trimming the docstring value
+	trimmedValue := docstring.Value.String()
+	originalLength := len(trimmedValue)
+	trimmedValue = strings.TrimLeft(trimmedValue, " \t")
+	leadingWhitespace := originalLength - len(trimmedValue)
+
+	pathStartColumn += leadingWhitespace
+
+	// The path length determines the end position
+	pathEndColumn := pathStartColumn + len(path)
+
+	return TextDocumentRange{
+		Start: TextDocumentPosition{
+			Line:      pathStartLine - 1,   // Convert to 0-based
+			Character: pathStartColumn - 1, // Convert to 0-based
+		},
+		End: TextDocumentPosition{
+			Line:      pathStartLine - 1, // Convert to 0-based
+			Character: pathEndColumn - 1, // Convert to 0-based
+		},
+	}
+}
+
+// calculateIncludePathRange calculates the exact range for the path inside an include statement.
+// For example, in `include "foo.vdl"`, this returns the range for just `foo.vdl`.
+func calculateIncludePathRange(include *ast.Include) TextDocumentRange {
+	// The include starts at Pos, which includes the "include" keyword
+	startPos := include.Pos
+
+	// Since we don't know exactly how many spaces it has, we'll calculate from the end
+	// The path is already stripped of quotes in include.Path
+	path := include.Path.String()
+
+	// The EndPos is at the end of the closing quote
+	// So the closing quote is at EndPos.Column - 1
+	// The path ends at EndPos.Column - 2 (before the closing quote)
+	// The path starts at (path end - path length)
+
+	pathEndColumn := include.EndPos.Column - 1 // Before the closing quote
+	pathStartColumn := pathEndColumn - len(path)
+
+	return TextDocumentRange{
+		Start: TextDocumentPosition{
+			Line:      startPos.Line - 1,   // Convert to 0-based
+			Character: pathStartColumn - 1, // Convert to 0-based
+		},
+		End: TextDocumentPosition{
+			Line:      include.EndPos.Line - 1, // Convert to 0-based
+			Character: pathEndColumn - 1,       // Convert to 0-based
+		},
+	}
 }
