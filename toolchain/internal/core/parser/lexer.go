@@ -15,7 +15,7 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{Name: "Docstring", Pattern: `"""(?:[^"]+|"[^"]|""[^"])*"""`},
 
 	// Comments
-	{Name: "CommentBlock", Pattern: `/\*([^*]|\*[^/])*\*/`},
+	{Name: "CommentBlock", Pattern: `(?s)/\*.*?\*/`},
 	{Name: "Comment", Pattern: `//[^\n]*`},
 
 	// Keywords (must come before Ident to have higher priority)

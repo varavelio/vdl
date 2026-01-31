@@ -241,18 +241,39 @@ func TestLexer(t *testing.T) {
 		require.Equal(t, expected, filtered)
 	})
 
-	t.Run("TestLexerCommentBlocks", func(t *testing.T) {
-		input := "/* This is a multiline comment\nwith multiple lines */"
+	t.Run("TestLexerCommentBlockWithManyStars", func(t *testing.T) {
+		input := "/**** Hello ****/"
 
 		tokens, err := lexString(input)
 		require.NoError(t, err)
 
 		expected := []tokenInfo{
-			{Type: "CommentBlock", Value: "/* This is a multiline comment\nwith multiple lines */"},
+			{Type: "CommentBlock", Value: "/**** Hello ****/"},
 			{Type: "EOF", Value: ""},
 		}
 
 		require.Equal(t, expected, tokens)
+	})
+
+	t.Run("TestLexerCommentBlockMixedWithDocstring", func(t *testing.T) {
+		input := `
+			/** Hello **/
+
+			""" Docstring """
+			type Foo {}
+		`
+		tokens, err := lexString(input)
+		require.NoError(t, err)
+
+		filtered := filterTokens(tokens)
+
+		var types []string
+		for _, tok := range filtered {
+			types = append(types, tok.Type)
+		}
+
+		expectedTypes := []string{"CommentBlock", "Docstring", "Type", "Ident", "LBrace", "RBrace", "EOF"}
+		require.Equal(t, expectedTypes, types)
 	})
 
 	t.Run("TestLexerDocstrings", func(t *testing.T) {
