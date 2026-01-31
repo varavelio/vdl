@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -240,19 +241,37 @@ func getCompletionContext(content string, pos TextDocumentPosition) (string, Com
 	return "", 0, false
 }
 
+// Regex for fallback extraction
+var typeDefRegex = regexp.MustCompile(`\btype\s+([a-zA-Z_]\w*)`)
+var enumDefRegex = regexp.MustCompile(`\benum\s+([a-zA-Z_]\w*)`)
+
 // collectCustomTypesFromContent parses the content and returns type names.
 // Note: We ignore parse errors because the parser returns partial results
 // which are useful for completion even in incomplete/invalid schemas.
 func collectCustomTypesFromContent(content, uri string) []string {
+	var types []string
+	seen := make(map[string]bool)
+
+	// Try parsing
 	schema, _ := parser.ParserInstance.ParseString(uri, content)
-	if schema == nil {
-		return nil
+	if schema != nil {
+		for _, t := range schema.GetTypes() {
+			if t.Name != "" {
+				types = append(types, t.Name)
+				seen[t.Name] = true
+			}
+		}
 	}
 
-	var types []string
-	for _, t := range schema.GetTypes() {
-		if t.Name != "" {
-			types = append(types, t.Name)
+	// Fallback: Regex scan to find types defined below the cursor or in broken code
+	matches := typeDefRegex.FindAllStringSubmatch(content, -1)
+	for _, match := range matches {
+		if len(match) > 1 {
+			name := match[1]
+			if !seen[name] {
+				types = append(types, name)
+				seen[name] = true
+			}
 		}
 	}
 
@@ -263,15 +282,29 @@ func collectCustomTypesFromContent(content, uri string) []string {
 // Note: We ignore parse errors because the parser returns partial results
 // which are useful for completion even in incomplete/invalid schemas.
 func collectEnumsFromContent(content, uri string) []string {
+	var enums []string
+	seen := make(map[string]bool)
+
+	// Try parsing
 	schema, _ := parser.ParserInstance.ParseString(uri, content)
-	if schema == nil {
-		return nil
+	if schema != nil {
+		for _, e := range schema.GetEnums() {
+			if e.Name != "" {
+				enums = append(enums, e.Name)
+				seen[e.Name] = true
+			}
+		}
 	}
 
-	var enums []string
-	for _, e := range schema.GetEnums() {
-		if e.Name != "" {
-			enums = append(enums, e.Name)
+	// Fallback: Regex scan
+	matches := enumDefRegex.FindAllStringSubmatch(content, -1)
+	for _, match := range matches {
+		if len(match) > 1 {
+			name := match[1]
+			if !seen[name] {
+				enums = append(enums, name)
+				seen[name] = true
+			}
 		}
 	}
 

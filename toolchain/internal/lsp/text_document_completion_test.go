@@ -186,3 +186,44 @@ type Bar {
 	require.True(t, hasFoo, "Should suggest Foo inside map with prefix 'F'")
 	require.False(t, hasInt, "Should NOT suggest int inside map with prefix 'F'")
 }
+
+func TestHandleTextDocumentCompletion_ForwardReference(t *testing.T) {
+	// The cursor is inside TypeA, but TypeB is defined *after* it.
+	// Because TypeA is incomplete/invalid syntax at the moment of typing,
+	// the parser might stop before reaching TypeB.
+	// We want to ensure TypeB is still suggested.
+	schema := `type TypeA {
+  f: 
+}
+
+type TypeB {}
+enum EnumC { X }
+`
+	uri := "file:///forward.vdl"
+	l := newTestLSP(t, schema, uri)
+
+	req := RequestMessageTextDocumentCompletion{
+		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
+		Params: RequestMessageTextDocumentCompletionParams{
+			TextDocument: TextDocumentIdentifier{URI: uri},
+			Position:     TextDocumentPosition{Line: 1, Character: 5}, // after "f: "
+		},
+	}
+	b, _ := json.Marshal(req)
+	anyResp, err := l.handleTextDocumentCompletion(b)
+	require.NoError(t, err)
+	resp := anyResp.(ResponseMessageTextDocumentCompletion)
+
+	hasTypeB := false
+	hasEnumC := false
+	for _, item := range resp.Result {
+		if item.Label == "TypeB" {
+			hasTypeB = true
+		}
+		if item.Label == "EnumC" {
+			hasEnumC = true
+		}
+	}
+	require.True(t, hasTypeB, "Should suggest TypeB defined below")
+	require.True(t, hasEnumC, "Should suggest EnumC defined below")
+}
