@@ -81,13 +81,30 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 		return resp, nil
 	}
 
-	// Collect all occurrences of the identifier in the document
-	edits := collectRenameEdits(string(content), filePath, oldName, newName)
-
+	// Collect all occurrences of the identifier in the document and its dependents
 	workspaceEdit := WorkspaceEdit{
-		Changes: map[string][]TextDocumentTextEdit{
-			request.Params.TextDocument.URI: edits,
-		},
+		Changes: make(map[string][]TextDocumentTextEdit),
+	}
+
+	// Files to check: current file + dependents
+	filesToCheck := []string{filePath}
+	dependents := l.depGraph.GetDependents(filePath)
+	filesToCheck = append(filesToCheck, dependents...)
+
+	for _, fPath := range filesToCheck {
+		// Read file content
+		fContentBytes, err := l.fs.ReadFile(fPath)
+		if err != nil {
+			// If we can't read a dependent file, we just skip it
+			continue
+		}
+		fContent := string(fContentBytes)
+
+		// Collect edits for this file
+		edits := collectRenameEdits(fContent, fPath, oldName, newName)
+		if len(edits) > 0 {
+			workspaceEdit.Changes[PathToUri(fPath)] = edits
+		}
 	}
 
 	response := ResponseMessageTextDocumentRename{
