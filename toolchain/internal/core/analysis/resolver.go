@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -14,15 +15,17 @@ import (
 // resolver handles the resolution of includes and external docstrings.
 // It traverses the include graph, parses files, and resolves external markdown docstrings.
 type resolver struct {
+	ctx         context.Context
 	fs          *vfs.FileSystem
 	files       map[string]*File // Resolved files by absolute path
 	visited     map[string]bool  // Tracks files currently in the resolution stack (cycle detection)
 	diagnostics []Diagnostic
 }
 
-// newResolver creates a new resolver instance.
-func newResolver(fs *vfs.FileSystem) *resolver {
+// newResolverWithContext creates a new resolver instance with context support for cancellation.
+func newResolverWithContext(ctx context.Context, fs *vfs.FileSystem) *resolver {
 	return &resolver{
+		ctx:         ctx,
 		fs:          fs,
 		files:       make(map[string]*File),
 		visited:     make(map[string]bool),
@@ -33,7 +36,13 @@ func newResolver(fs *vfs.FileSystem) *resolver {
 // resolve performs complete resolution starting from an entry point.
 // It parses all files, resolves includes recursively, and resolves external docstrings.
 // Returns the map of resolved files and any diagnostics encountered.
+// If the context is cancelled, returns partial results.
 func (r *resolver) resolve(entryPoint string) (map[string]*File, []Diagnostic) {
+	// Check for cancellation before starting
+	if r.ctx.Err() != nil {
+		return r.files, r.diagnostics
+	}
+
 	absPath := r.fs.Resolve("", entryPoint)
 	r.resolveFile(absPath, nil)
 	return r.files, r.diagnostics
@@ -42,6 +51,10 @@ func (r *resolver) resolve(entryPoint string) (map[string]*File, []Diagnostic) {
 // resolveFile recursively resolves a single file and its includes.
 // includeStack tracks the include chain for cycle detection error messages.
 func (r *resolver) resolveFile(absPath string, includeStack []string) {
+	// Check for cancellation at each file resolution
+	if r.ctx.Err() != nil {
+		return
+	}
 	// Already fully resolved?
 	if _, ok := r.files[absPath]; ok {
 		return

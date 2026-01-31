@@ -39,6 +39,8 @@
 package analysis
 
 import (
+	"context"
+
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
@@ -74,13 +76,36 @@ import (
 //	}
 //	// Use program...
 func Analyze(fs *vfs.FileSystem, entryPoint string) (*Program, []Diagnostic) {
+	return AnalyzeWithContext(context.Background(), fs, entryPoint)
+}
+
+// AnalyzeWithContext performs complete semantic analysis with context support for cancellation.
+//
+// This variant allows the caller to cancel the analysis early if needed (e.g., when the
+// user types again before analysis completes). The context is checked at key points
+// during the analysis pipeline: before resolution, after resolution, and before validation.
+//
+// If the context is cancelled, this function returns nil, nil immediately.
+//
+// See Analyze for full documentation.
+func AnalyzeWithContext(ctx context.Context, fs *vfs.FileSystem, entryPoint string) (*Program, []Diagnostic) {
+	// Check for cancellation before starting
+	if ctx.Err() != nil {
+		return nil, nil
+	}
+
 	absPath := fs.Resolve("", entryPoint)
 	var allDiags []Diagnostic
 
 	// Phase 1: Resolution
-	resolver := newResolver(fs)
+	resolver := newResolverWithContext(ctx, fs)
 	files, resolverDiags := resolver.resolve(entryPoint)
 	allDiags = append(allDiags, resolverDiags...)
+
+	// Check for cancellation after resolution
+	if ctx.Err() != nil {
+		return nil, nil
+	}
 
 	// Even if resolution had errors, we may have partial files to work with
 	// If no files at all, return an empty program
@@ -89,13 +114,23 @@ func Analyze(fs *vfs.FileSystem, entryPoint string) (*Program, []Diagnostic) {
 	}
 
 	// Phase 2: Symbol Collection
-	validator := newValidator(files)
+	validator := newValidatorWithContext(ctx, files)
 	collectionDiags := validator.collect()
 	allDiags = append(allDiags, collectionDiags...)
+
+	// Check for cancellation after collection
+	if ctx.Err() != nil {
+		return nil, nil
+	}
 
 	// Phase 3: Validation
 	validationDiags := validator.validate()
 	allDiags = append(allDiags, validationDiags...)
+
+	// Check for cancellation after validation
+	if ctx.Err() != nil {
+		return nil, nil
+	}
 
 	// Phase 4: Result - Always return the program (best-effort)
 	return validator.buildProgram(absPath), allDiags
