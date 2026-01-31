@@ -7,7 +7,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-//go:embed pieces/core_types.dart
+//go:embed pieces/core.dart
 var coreTypesRawPiece string
 
 // generateCore returns the core types content (Response, VdlError).

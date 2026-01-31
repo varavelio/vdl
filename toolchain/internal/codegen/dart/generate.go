@@ -48,10 +48,10 @@ func generateHeader() string {
 func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
 	var files []File
 
-	// core_types.dart - Core VDL types (Response, VdlError)
+	// core.dart - Core VDL types (Response, VdlError)
 	coreContent := g.generateCoreFile(schema)
 	files = append(files, File{
-		RelativePath: "core_types.dart",
+		RelativePath: "core.dart",
 		Content:      []byte(coreContent),
 	})
 
@@ -83,11 +83,11 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		})
 	}
 
-	// rpc_catalog.dart - RPC catalog for introspection (if any RPCs)
+	// catalog.dart - RPC catalog for introspection (if any RPCs)
 	if len(schema.RPCs) > 0 {
 		catalogContent := g.generateRPCCatalogFile(schema)
 		files = append(files, File{
-			RelativePath: "rpc_catalog.dart",
+			RelativePath: "catalog.dart",
 			Content:      []byte(catalogContent),
 		})
 	}
@@ -111,7 +111,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	return files, nil
 }
 
-// generateCoreFile generates the core_types.dart file.
+// generateCoreFile generates the core.dart file.
 func (g *Generator) generateCoreFile(schema *ir.Schema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
@@ -152,9 +152,9 @@ func (g *Generator) generateTypesFile(schema *ir.Schema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
-	// Add import for core_types if we have procedures or streams
+	// Add import for core if we have procedures or streams
 	if len(schema.Procedures) > 0 || len(schema.Streams) > 0 {
-		builder.Line("import 'core_types.dart';")
+		builder.Line("import 'core.dart';")
 		builder.Break()
 	}
 
@@ -192,7 +192,7 @@ func (g *Generator) generateTypesFile(schema *ir.Schema) string {
 	return strutil.LimitConsecutiveNewlines(content, 2)
 }
 
-// generateRPCCatalogFile generates the rpc_catalog.dart file.
+// generateRPCCatalogFile generates the catalog.dart file.
 func (g *Generator) generateRPCCatalogFile(schema *ir.Schema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
@@ -213,8 +213,8 @@ func (g *Generator) generateIndexFile(schema *ir.Schema) string {
 	builder.Line("// Import this file to access all generated code.")
 	builder.Break()
 
-	// Always export core_types
-	builder.Line("export 'core_types.dart';")
+	// Always export core
+	builder.Line("export 'core.dart';")
 
 	// Conditionally export other files
 	if g.config.ShouldGenConsts() && len(schema.Constants) > 0 {
@@ -232,7 +232,7 @@ func (g *Generator) generateIndexFile(schema *ir.Schema) string {
 	}
 
 	if len(schema.RPCs) > 0 {
-		builder.Line("export 'rpc_catalog.dart';")
+		builder.Line("export 'catalog.dart';")
 	}
 
 	content := builder.String()

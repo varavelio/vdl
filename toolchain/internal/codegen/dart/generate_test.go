@@ -49,10 +49,10 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 2) // core_types.dart and index.dart
+	require.Len(t, files, 2) // core.dart and index.dart
 
-	// Check core_types.dart exists
-	coreContent := findFileContent(files, "core_types.dart")
+	// Check core.dart exists
+	coreContent := findFileContent(files, "core.dart")
 	require.NotEmpty(t, coreContent)
 	assert.Contains(t, coreContent, "class Response<T>")
 	assert.Contains(t, coreContent, "class VdlError")
@@ -60,7 +60,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 	// Check index.dart exists
 	indexContent := findFileContent(files, "index.dart")
 	require.NotEmpty(t, indexContent)
-	assert.Contains(t, indexContent, "export 'core_types.dart';")
+	assert.Contains(t, indexContent, "export 'core.dart';")
 }
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
@@ -378,8 +378,8 @@ func TestGenerator_Generate_WithRPCCatalog(t *testing.T) {
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
 
-	catalogContent := findFileContent(files, "rpc_catalog.dart")
-	require.NotEmpty(t, catalogContent, "rpc_catalog.dart should be generated")
+	catalogContent := findFileContent(files, "catalog.dart")
+	require.NotEmpty(t, catalogContent, "catalog.dart should be generated")
 
 	// Check OperationType enum
 	assert.Contains(t, catalogContent, "enum OperationType {")
@@ -405,9 +405,9 @@ func TestGenerator_Generate_WithRPCCatalog(t *testing.T) {
 	assert.Contains(t, catalogContent, "String get getUser => '/Users/GetUser';")
 	assert.Contains(t, catalogContent, "String get userUpdates => '/Users/UserUpdates';")
 
-	// Check index exports rpc_catalog.dart
+	// Check index exports catalog.dart
 	indexContent := findFileContent(files, "index.dart")
-	assert.Contains(t, indexContent, "export 'rpc_catalog.dart';")
+	assert.Contains(t, indexContent, "export 'catalog.dart';")
 }
 
 func TestGenerator_Generate_WithEnumInType(t *testing.T) {
@@ -468,16 +468,15 @@ func TestGenerator_Generate_MultipleFiles(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should generate 6 files:
-	// core_types.dart, constants.dart, patterns.dart, types.dart, rpc_catalog.dart, index.dart
-	// (enums and procedures are now in types.dart)
+	// core.dart, constants.dart, patterns.dart, types.dart, catalog.dart, index.dart
 	require.Len(t, files, 6)
 
-	// Verify each file exists
-	assert.NotEmpty(t, findFileContent(files, "core_types.dart"))
+	// Check each file exists
+	assert.NotEmpty(t, findFileContent(files, "core.dart"))
 	assert.NotEmpty(t, findFileContent(files, "constants.dart"))
 	assert.NotEmpty(t, findFileContent(files, "patterns.dart"))
 	assert.NotEmpty(t, findFileContent(files, "types.dart"))
-	assert.NotEmpty(t, findFileContent(files, "rpc_catalog.dart"))
+	assert.NotEmpty(t, findFileContent(files, "catalog.dart"))
 	assert.NotEmpty(t, findFileContent(files, "index.dart"))
 
 	// Verify enums.dart and procedures.dart do NOT exist
@@ -486,11 +485,11 @@ func TestGenerator_Generate_MultipleFiles(t *testing.T) {
 
 	// Verify index exports all files (except enums.dart and procedures.dart)
 	indexContent := findFileContent(files, "index.dart")
-	assert.Contains(t, indexContent, "export 'core_types.dart';")
+	assert.Contains(t, indexContent, "export 'core.dart';")
 	assert.Contains(t, indexContent, "export 'constants.dart';")
 	assert.Contains(t, indexContent, "export 'patterns.dart';")
 	assert.Contains(t, indexContent, "export 'types.dart';")
-	assert.Contains(t, indexContent, "export 'rpc_catalog.dart';")
+	assert.Contains(t, indexContent, "export 'catalog.dart';")
 	assert.NotContains(t, indexContent, "export 'enums.dart';")
 	assert.NotContains(t, indexContent, "export 'procedures.dart';")
 }
