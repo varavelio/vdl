@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Inline Types API
+  version: 1.0.0
+security:
+  - AuthToken: []
+components:
+  securitySchemes:
+    AuthToken:
+      description: |-
+        Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.
+
+        ---
+        **Examples:**
+        - **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)
+        - **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)
+        - **API Key:** `sk_live_123abc456def` (a raw token)
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    ComplexInlineTypes:
+      properties:
+        configs:
+          items:
+            additionalProperties:
+              properties:
+                key:
+                  type: string
+                value:
+                  type: string
+              required:
+                - key
+                - value
+              type: object
+            type: object
+          type: array
+        deepNest:
+          properties:
+            child:
+              properties:
+                grandChild:
+                  properties:
+                    greatGrandChild:
+                      properties:
+                        data:
+                          type: string
+                        level4:
+                          type: number
+                      required:
+                        - level4
+                        - data
+                      type: object
+                    level3:
+                      type: boolean
+                  required:
+                    - level3
+                    - greatGrandChild
+                  type: object
+                level2:
+                  type: integer
+              required:
+                - level2
+                - grandChild
+              type: object
+            level1:
+              type: string
+          required:
+            - level1
+            - child
+          type: object
+        files:
+          items:
+            properties:
+              content:
+                type: string
+              path:
+                type: string
+            required:
+              - path
+              - content
+            type: object
+          type: array
+        grid:
+          items:
+            items:
+              properties:
+                x:
+                  type: integer
+                "y":
+                  type: integer
+              required:
+                - x
+                - "y"
+              type: object
+            type: array
+          type: array
+        groupedFiles:
+          additionalProperties:
+            items:
+              properties:
+                name:
+                  type: string
+                size:
+                  type: integer
+              required:
+                - name
+                - size
+              type: object
+            type: array
+          type: object
+        meta:
+          additionalProperties:
+            properties:
+              author:
+                type: string
+              createdAt:
+                type: string
+            required:
+              - createdAt
+              - author
+            type: object
+          type: object
+        simple:
+          properties:
+            enabled:
+              type: boolean
+            name:
+              type: string
+          required:
+            - name
+            - enabled
+          type: object
+      required:
+        - files
+        - meta
+        - groupedFiles
+        - configs
+        - grid
+        - simple
+        - deepNest
+      type: object
