@@ -111,7 +111,7 @@ func collectRenameEdits(content, filePath, oldName, newName string) []TextDocume
 	}
 
 	// Find all references in the schema
-	references := findReferencesInSchema(schema, oldName)
+	references := findReferencesInSchema(schema, oldName, content)
 
 	// Convert to text edits
 	var edits []TextDocumentTextEdit

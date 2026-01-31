@@ -69,7 +69,7 @@ func collectReferences(content, filePath, symbol string) []Location {
 	}
 
 	// Find all references in the schema
-	references := findReferencesInSchema(schema, symbol)
+	references := findReferencesInSchema(schema, symbol, content)
 
 	// Convert to LSP locations
 	var locs []Location
