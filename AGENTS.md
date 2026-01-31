@@ -12,7 +12,7 @@ When updating this document, do so with the context of the entire document in mi
 
 ## 2. General Instructions (The Constitution)
 
-- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`) and Node/Svelte (`playground/`).
+- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`), Node/Svelte (`playground/`), and Editor Extensions (`editors/`).
 - **Command Authority**: The root `Taskfile.yml` is the single source of truth for orchestration. Do not run `npm` or `go` commands manually if a `task` command exists for it.
 - **Verification**:
   - Always run `task fmt` to handle multi-language formatting (Prettier + Go Fmt).
@@ -23,7 +23,7 @@ When updating this document, do so with the context of the entire document in mi
   - Node: Manage in `playground/package.json` or root `package.json` for dev tools.
 - **Code Style**:
   - Go: Idiomatic, `golangci-lint` strictness.
-  - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4.
+  - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4, DaisyUI v5.
 - **Terminology**: The core tool is referred to as `toolchain`. The binary is named `vdl`.
 
 ## 3. Architecture & Organization
@@ -32,7 +32,8 @@ When updating this document, do so with the context of the entire document in mi
 
 - `Taskfile.yml`: Orchestrates the entire build pipeline across languages.
 - `toolchain/`: The Go backend/core (Compiler, CLI, WASM).
-- `playground/`: The Svelte 5 frontend.
+- `playground/`: The Svelte 5 frontend (See `playground/AGENTS.md`).
+- `editors/`: Editor plugins (VS Code, Neovim).
 - `docs/`: Documentation and specifications (contains the VDL spec).
 - `scripts/`: Build and maintenance scripts.
 - `assets/`: Static assets.
@@ -75,11 +76,25 @@ When updating this document, do so with the context of the entire document in mi
 ### `playground/` (Frontend)
 
 - **Role**: A visual editor/playground for VDL.
-- **Tech**: Svelte 5 (Runes), Vite, TailwindCSS 4, Biome.
+- **Tech**: Svelte 5 (Runes), Vite, TailwindCSS 4, DaisyUI 5, Biome.
 - **Integration**:
   - Consumes `vdl.wasm` (via `wasm_exec.js`).
   - Generates Typescript definitions from Go schemas.
   - Builds to static files that are eventually embedded into the Go binary.
+
+### `editors/` (IDE Integrations)
+
+- **Role**: Provides syntax highlighting and LSP support for VDL.
+- **Key Directories**:
+  - `vscode/`: Visual Studio Code extension (Node.js/TS).
+  - `neovim/`: Neovim plugin (Markdown instructions).
+
+### `docs/` (Documentation)
+
+- **Role**: Official documentation and specifications.
+- **Key Directories**:
+  - `spec/`: The formal VDL specification (`spec.md`, `rpc-request-lifecycle.md`).
+  - `public/`: Assets for the documentation site.
 
 ### Build Pipeline
 
@@ -100,7 +115,7 @@ When updating this document, do so with the context of the entire document in mi
         - For **Go/TS/Dart/Python**: Executes the consumer program (`main.go`, `main.ts`, `main.dart`, `main.py`). The consumer code must **panic** or exit with non-zero status on failure.
         - For **Schemas/Docs** (JSONSchema, OpenAPI): Compares the generated output against a "golden" expected file.
         - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
-- **Frontend Tests**: Component/Logic tests using `vitest`.
+- **Frontend Tests**: Component/Logic tests using `vitest` in `playground/`.
 
 ### Adding a New E2E Test Case
 
@@ -133,7 +148,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Framework**: Svelte 5 (Runes preferred).
 - **Bundler**: Vite.
-- **Styles**: Tailwind CSS 4.
+- **Styles**: Tailwind CSS 4, DaisyUI 5.
 - **Linter/Formatter**: Biome.
 
 ## 6. Operational Commands
