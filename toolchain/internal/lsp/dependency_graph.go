@@ -122,6 +122,40 @@ func (g *DependencyGraph) GetAllDependents(filePath string) []string {
 	return result
 }
 
+// GetAllDependencies returns all files that the given file depends on, directly or indirectly.
+// It returns a flattened list of all dependencies (includes).
+func (g *DependencyGraph) GetAllDependencies(filePath string) []string {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
+	visited := make(map[string]struct{})
+	var result []string
+
+	// Queue of files to inspect for their dependencies
+	queue := []string{filePath}
+
+	// We mark filePath as visited so we don't process it if we encounter a cycle
+	visited[filePath] = struct{}{}
+
+	head := 0
+	for head < len(queue) {
+		current := queue[head]
+		head++
+
+		if imports, ok := g.forwardDeps[current]; ok {
+			for imp := range imports {
+				if _, seen := visited[imp]; !seen {
+					visited[imp] = struct{}{}
+					queue = append(queue, imp)
+					result = append(result, imp)
+				}
+			}
+		}
+	}
+
+	return result
+}
+
 // RemoveFile removes a file and all its dependencies from the graph.
 // This should be called when a file is closed.
 func (g *DependencyGraph) RemoveFile(filePath string) {

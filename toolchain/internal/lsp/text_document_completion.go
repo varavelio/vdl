@@ -74,7 +74,8 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 		return nil, fmt.Errorf("failed to read file from vfs: %w", err)
 	}
 
-	prefix, ok := getFieldTypePrefix(string(content), pos)
+	// Determine completion context
+	prefix, ctxKind, ok := getCompletionContext(string(content), pos)
 	if !ok {
 		// Not appropriate context; return empty result
 		resp := ResponseMessageTextDocumentCompletion{
@@ -84,22 +85,58 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 		return resp, nil
 	}
 
-	// Collect primitive types
+	// Determine which types to include
+	includePrimitives := false
+	includeEnums := false
+	includeTypes := false
+
+	switch ctxKind {
+	case CompletionContextFieldType:
+		includePrimitives = true
+		includeEnums = true
+		includeTypes = true
+	case CompletionContextSpread:
+		includePrimitives = false
+		includeEnums = false
+		includeTypes = true
+	}
+
 	itemsMap := map[string]int{}
-	for _, prim := range ast.PrimitiveTypes {
-		itemsMap[prim] = CompletionItemKindValue
+
+	// Collect primitive types
+	if includePrimitives {
+		for _, prim := range ast.PrimitiveTypes {
+			itemsMap[prim] = CompletionItemKindValue
+		}
 	}
 
-	// Collect custom types from the parsed schema
-	customTypes := collectCustomTypesFromContent(string(content), filePath)
-	for _, tName := range customTypes {
-		itemsMap[tName] = CompletionItemKindStruct
-	}
+	// Identify files to scan: current file + all dependencies
+	filesToScan := []string{filePath}
+	dependencies := l.depGraph.GetAllDependencies(filePath)
+	filesToScan = append(filesToScan, dependencies...)
 
-	// Collect enums from the parsed schema
-	customEnums := collectEnumsFromContent(string(content), filePath)
-	for _, eName := range customEnums {
-		itemsMap[eName] = CompletionItemKindEnum
+	for _, fPath := range filesToScan {
+		fContentBytes, err := l.fs.ReadFile(fPath)
+		if err != nil {
+			continue
+		}
+		fContent := string(fContentBytes)
+
+		// Collect custom types
+		if includeTypes {
+			customTypes := collectCustomTypesFromContent(fContent, fPath)
+			for _, tName := range customTypes {
+				itemsMap[tName] = CompletionItemKindStruct
+			}
+		}
+
+		// Collect enums
+		if includeEnums {
+			customEnums := collectEnumsFromContent(fContent, fPath)
+			for _, eName := range customEnums {
+				itemsMap[eName] = CompletionItemKindEnum
+			}
+		}
 	}
 
 	// Convert to slice and sort alphabetically, applying prefix filter
@@ -123,28 +160,84 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 	return response, nil
 }
 
-// getFieldTypePrefix returns the current prefix typed after a field's ": " and whether the context matches.
-func getFieldTypePrefix(content string, pos TextDocumentPosition) (string, bool) {
+type CompletionContextKind int
+
+const (
+	CompletionContextFieldType CompletionContextKind = iota
+	CompletionContextSpread
+)
+
+// getCompletionContext returns the completion prefix and kind.
+func getCompletionContext(content string, pos TextDocumentPosition) (string, CompletionContextKind, bool) {
 	lines := strings.Split(content, "\n")
 	if pos.Line >= len(lines) {
-		return "", false
+		return "", 0, false
 	}
 	line := lines[pos.Line]
 	if pos.Character > len(line) {
-		return "", false
+		return "", 0, false
 	}
 	beforeCursor := line[:pos.Character]
-	idx := strings.LastIndex(beforeCursor, ":")
-	if idx == -1 {
-		return "", false
+
+	idx := len(beforeCursor) - 1
+
+	// Consume Prefix (Identifier chars)
+	for idx >= 0 && isIdentifierChar(beforeCursor[idx]) {
+		idx--
 	}
-	// Ensure only whitespace between ':' and cursor
-	segment := beforeCursor[idx+1:]
-	trimmed := strings.TrimLeft(segment, " \t")
-	if strings.Contains(trimmed, " ") || strings.Contains(trimmed, "\t") {
-		return "", false
+	prefix := beforeCursor[idx+1:]
+
+	// Consume Whitespace
+	for idx >= 0 && (beforeCursor[idx] == ' ' || beforeCursor[idx] == '\t') {
+		idx--
 	}
-	return trimmed, true
+
+	if idx < 0 {
+		return "", 0, false
+	}
+
+	// Check Delimiter
+	lastChar := beforeCursor[idx]
+
+	// Case A: Field Definition "Name: Type"
+	if lastChar == ':' {
+		return prefix, CompletionContextFieldType, true
+	}
+
+	// Case B: Map "map<Type"
+	if lastChar == '<' {
+		// Check for "map" keyword before '<'
+		// We need to check text BEFORE '<'.
+
+		mapEndIdx := idx - 1
+		// Consume whitespace between 'map' and '<'
+		for mapEndIdx >= 0 && (beforeCursor[mapEndIdx] == ' ' || beforeCursor[mapEndIdx] == '\t') {
+			mapEndIdx--
+		}
+
+		// Check for "map"
+		if mapEndIdx >= 2 &&
+			beforeCursor[mapEndIdx] == 'p' &&
+			beforeCursor[mapEndIdx-1] == 'a' &&
+			beforeCursor[mapEndIdx-2] == 'm' {
+
+			// Verify word boundary
+			if mapEndIdx-3 < 0 || !isIdentifierChar(beforeCursor[mapEndIdx-3]) {
+				return prefix, CompletionContextFieldType, true
+			}
+		}
+		return "", 0, false
+	}
+
+	// Case C: Spread "...Type"
+	if lastChar == '.' {
+		// Check for "..."
+		if idx >= 2 && beforeCursor[idx-1] == '.' && beforeCursor[idx-2] == '.' {
+			return prefix, CompletionContextSpread, true
+		}
+	}
+
+	return "", 0, false
 }
 
 // collectCustomTypesFromContent parses the content and returns type names.
