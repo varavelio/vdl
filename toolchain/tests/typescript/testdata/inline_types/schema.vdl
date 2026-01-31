@@ -1,0 +1,45 @@
+type ComplexInlineTypes {
+  files: {
+    path: string
+    content: string
+  }[]
+
+  meta: map<{
+    createdAt: string
+    author: string
+  }>
+
+  groupedFiles: map<{
+    name: string
+    size: int
+  }[]>
+
+  configs: map<{
+    key: string
+    value: string
+  }>[]
+
+  grid: {
+    x: int
+    y: int
+  }[][]
+
+  simple: {
+    name: string
+    enabled: bool
+  }
+
+  deepNest: {
+    level1: string
+    child: {
+      level2: int
+      grandChild: {
+        level3: bool
+        greatGrandChild: {
+          level4: float
+          data: string
+        }
+      }
+    }
+  }
+}

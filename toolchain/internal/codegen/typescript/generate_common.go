@@ -106,14 +106,38 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 	g.Break()
 
 	// Render children inline types
-	for _, field := range fields {
-		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
-			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderType("", childName, "", field.Type.Object.Fields))
-		}
-	}
+	renderChildrenTypes(g, fullName, fields, func(p, n string, f []ir.Field) string {
+		return renderType(p, n, "", f)
+	})
 
 	return g.String()
+}
+
+// renderChildrenTypes iterates over fields and recursively renders nested object types
+// found within Object, Array, or Map types.
+func renderChildrenTypes(g *gen.Generator, parentName string, fields []ir.Field, renderFunc func(string, string, []ir.Field) string) {
+	for _, field := range fields {
+		renderChildType(g, parentName, field.Name, field.Type, renderFunc)
+	}
+}
+
+// renderChildType recursively checks for Object types within TypeRefs and renders them.
+func renderChildType(g *gen.Generator, parentName, fieldName string, tr ir.TypeRef, renderFunc func(string, string, []ir.Field) string) {
+	switch tr.Kind {
+	case ir.TypeKindObject:
+		if tr.Object != nil {
+			childName := parentName + strutil.ToPascalCase(fieldName)
+			g.Line(renderFunc("", childName, tr.Object.Fields))
+		}
+	case ir.TypeKindArray:
+		if tr.ArrayItem != nil {
+			renderChildType(g, parentName, fieldName, *tr.ArrayItem, renderFunc)
+		}
+	case ir.TypeKindMap:
+		if tr.MapValue != nil {
+			renderChildType(g, parentName, fieldName, *tr.MapValue, renderFunc)
+		}
+	}
 }
 
 // =============================================================================
@@ -287,12 +311,7 @@ func renderHydrateType(parentName string, name string, fields []ir.Field) string
 	g.Break()
 
 	// Render children inline types hydration functions
-	for _, field := range fields {
-		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
-			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderHydrateType("", childName, field.Type.Object.Fields))
-		}
-	}
+	renderChildrenTypes(g, fullName, fields, renderHydrateType)
 
 	return g.String()
 }
@@ -436,12 +455,7 @@ func renderValidateType(parentName string, name string, fields []ir.Field) strin
 	g.Break()
 
 	// Render children inline types validation functions
-	for _, field := range fields {
-		if field.Type.Kind == ir.TypeKindObject && field.Type.Object != nil {
-			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderValidateType("", childName, field.Type.Object.Fields))
-		}
-	}
+	renderChildrenTypes(g, fullName, fields, renderValidateType)
 
 	return g.String()
 }
