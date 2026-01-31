@@ -1,0 +1,130 @@
+/********************
+* WASM EXPAND TYPES *
+********************/
+
+""" Input for expandTypes WASM function """
+type WasmExpandTypesInput {
+  vdlSchema: string
+}
+
+""" Output for expandTypes WASM function """
+type WasmExpandTypesOutput {
+  expandedSchema: string
+}
+
+/*********************
+* WASM EXTRACT TYPES *
+*********************/
+
+""" Input for extractType WASM function """
+type WasmExtractTypeInput {
+  vdlSchema: string
+  typeName: string
+}
+
+""" Output for extractType WASM function """
+type WasmExtractTypeOutput {
+  typeSchema: string
+}
+
+""" Input for extractProc WASM function """
+type WasmExtractProcInput {
+  vdlSchema: string
+  rpcName: string
+  procName: string
+}
+
+""" Output for extractProc WASM function """
+type WasmExtractProcOutput {
+  procSchema: string
+}
+
+""" Input for extractStream WASM function """
+type WasmExtractStreamInput {
+  vdlSchema: string
+  rpcName: string
+  streamName: string
+}
+
+""" Output for extractStream WASM function """
+type WasmExtractStreamOutput {
+  streamSchema: string
+}
+
+/*********************
+* WASM CODEGEN TYPES *
+*********************/
+
+""" Represents a target for codegen WASM function """
+enum WasmCodegenTarget {
+  Go
+  Typescript
+  Dart
+  Python
+  OpenApi
+  JsonSchema
+}
+
+""" Input for codegen WASM function """
+type WasmCodegenInput {
+  """ Schema to generate code from """
+  vdlSchema: string
+
+  """ Target to generate code for """
+  target: WasmCodegenTarget
+
+  """ Configuration if the target is Go """
+  goConfig?: {
+    package: string
+    genPatterns: bool
+    genConsts: bool
+    genClient: bool
+    genServer: bool
+  }
+
+  """ Configuration if the target is Typescript """
+  typescriptConfig?: {
+    importExtension: string
+    genPatterns: bool
+    genConsts: bool
+    genClient: bool
+    genServer: bool
+  }
+
+  """ Configuration if the target is Dart """
+  dartConfig?: {
+    genPatterns: bool
+    genConsts: bool
+  }
+
+  """ Configuration if the target is Python """
+  pythonConfig?: {
+    genPatterns: bool
+    genConsts: bool
+  }
+
+  """ Configuration if the target is JsonSchema """
+  jsonSchemaConfig?: {
+    schemaId: string
+  }
+
+  """ Configuration if the target is OpenApi """
+  openApiConfig?: {
+    title: string
+    version: string
+    description?: string
+    baseUrl?: string
+    contactName?: string
+    contactEmail?: string
+    licenseName?: string
+  }
+}
+
+""" Output for codegen WASM function """
+type WasmCodegenOutput {
+  """ The files generated for the picked code generator target """
+  files: {
+    path: string
+    content: string
+  }[]
+}

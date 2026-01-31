@@ -27,6 +27,12 @@ tasks:
       - cd ./playground && npm run build # <- Required by the final VDL binary
       - cd ./toolchain && task build:vdl
 
+  gen:schemas:
+    desc: Generate the code for the VDL schemas used in the project
+    cmds:
+      - cd ./toolchain && task install
+      - vdl generate
+
   setversion:
     desc: Set the version from latest git tag in the relevant files
     cmd: node ./scripts/set-version.ts
