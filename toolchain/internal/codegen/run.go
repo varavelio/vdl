@@ -90,7 +90,7 @@ func Run(configPath string) error {
 			for _, d := range diagnostics {
 				errMsgs = append(errMsgs, d.String())
 			}
-			return nil, nil, fmt.Errorf("schema validation failed for %s:\n%s", absSchemaPath, joinErrors(errMsgs))
+			return nil, nil, fmt.Errorf("schema validation failed for %s:\n%s", absSchemaPath, strings.Join(errMsgs, "\n"))
 		}
 
 		schema := ir.FromProgram(program)
@@ -195,11 +195,6 @@ func runPlugin(ctx context.Context, absConfigDir string, cfg *config.PluginConfi
 		generatedFiles[i] = GeneratedFile{Path: f.Path, Content: f.Content}
 	}
 	return writeGeneratedFiles(outputDir, generatedFiles)
-}
-
-// joinErrors joins multiple error messages with newlines.
-func joinErrors(errs []string) string {
-	return strings.Join(errs, "\n")
 }
 
 func runOpenAPI(ctx context.Context, absConfigDir string, cfg *config.OpenAPIConfig, schema *ir.Schema) error {
