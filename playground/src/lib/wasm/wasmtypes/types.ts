@@ -30,6 +30,21 @@ export function isCodegenTarget(value: unknown): value is CodegenTarget {
 }
 
 /**
+ * Import extension for typescript code generator
+ */
+export type CodegenTypescriptImportExtension = "none" | ".js" | ".ts";
+
+export const CodegenTypescriptImportExtensionList: CodegenTypescriptImportExtension[] = [
+  "none",
+  ".js",
+  ".ts",
+];
+
+export function isCodegenTypescriptImportExtension(value: unknown): value is CodegenTypescriptImportExtension {
+  return CodegenTypescriptImportExtensionList.includes(value as CodegenTypescriptImportExtension);
+}
+
+/**
  * Represents a function to be called via WASM
  */
 export type WasmFunctionName = "ExpandTypes" | "ExtractType" | "ExtractProc" | "ExtractStream" | "Codegen";
@@ -94,7 +109,7 @@ export type CodegenInputGoConfig = {
 }
 
 export type CodegenInputTypescriptConfig = {
-  importExtension: string
+  importExtension: CodegenTypescriptImportExtension
   genPatterns: boolean
   genConsts: boolean
   genClient: boolean
@@ -234,6 +249,12 @@ export function validateCodegenInput(input: unknown, path = "CodegenInput"): str
       return `${path}.target: invalid enum value '${obj.target}' for CodegenTarget`;
     }
   }
+  if (obj.typescriptConfig !== undefined && obj.typescriptConfig !== null) {
+    {
+      const err = validateCodegenInputTypescriptConfig(obj.typescriptConfig, `${path}.typescriptConfig`);
+      if (err !== null) return err;
+    }
+  }
   return null;
 }
 
@@ -241,7 +262,20 @@ export function validateCodegenInputGoConfig(_input: unknown, _path = "CodegenIn
   return null;
 }
 
-export function validateCodegenInputTypescriptConfig(_input: unknown, _path = "CodegenInputTypescriptConfig"): string | null {
+export function validateCodegenInputTypescriptConfig(input: unknown, path = "CodegenInputTypescriptConfig"): string | null {
+  if (input === null || input === undefined || typeof input !== "object") {
+    return `${path}: expected object, got ${typeof input}`;
+  }
+  const obj = input as Record<string, unknown>;
+
+  if (obj.importExtension === undefined || obj.importExtension === null) {
+    return `${path}.importExtension: required field is missing`;
+  }
+  {
+    if (!isCodegenTypescriptImportExtension(obj.importExtension)) {
+      return `${path}.importExtension: invalid enum value '${obj.importExtension}' for CodegenTypescriptImportExtension`;
+    }
+  }
   return null;
 }
 

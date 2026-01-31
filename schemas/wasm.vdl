@@ -97,6 +97,13 @@ enum CodegenTarget {
   JsonSchema
 }
 
+""" Import extension for typescript code generator """
+enum CodegenTypescriptImportExtension {
+  None = "none"
+  Js = ".js"
+  Ts = ".ts"
+}
+
 """ Input for codegen function """
 type CodegenInput {
   """ Schema to generate code from """
@@ -116,7 +123,7 @@ type CodegenInput {
 
   """ Configuration if the target is Typescript """
   typescriptConfig?: {
-    importExtension: string
+    importExtension: CodegenTypescriptImportExtension
     genPatterns: bool
     genConsts: bool
     genClient: bool

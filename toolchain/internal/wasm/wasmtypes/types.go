@@ -78,6 +78,63 @@ func (e *CodegenTarget) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Import extension for typescript code generator
+type CodegenTypescriptImportExtension string
+
+// CodegenTypescriptImportExtension enum values
+const (
+	CodegenTypescriptImportExtensionNone CodegenTypescriptImportExtension = "none"
+	CodegenTypescriptImportExtensionJs   CodegenTypescriptImportExtension = ".js"
+	CodegenTypescriptImportExtensionTs   CodegenTypescriptImportExtension = ".ts"
+)
+
+// CodegenTypescriptImportExtensionList contains all valid CodegenTypescriptImportExtension values.
+var CodegenTypescriptImportExtensionList = []CodegenTypescriptImportExtension{
+	CodegenTypescriptImportExtensionNone,
+	CodegenTypescriptImportExtensionJs,
+	CodegenTypescriptImportExtensionTs,
+}
+
+// String returns the string representation of CodegenTypescriptImportExtension.
+func (e CodegenTypescriptImportExtension) String() string {
+	return string(e)
+}
+
+// IsValid returns true if the value is a valid CodegenTypescriptImportExtension.
+func (e CodegenTypescriptImportExtension) IsValid() bool {
+	switch e {
+	case CodegenTypescriptImportExtensionNone, CodegenTypescriptImportExtensionJs, CodegenTypescriptImportExtensionTs:
+		return true
+	}
+	return false
+}
+
+// MarshalJSON implements json.Marshaler.
+// Returns an error if the value is not a valid CodegenTypescriptImportExtension member.
+func (e CodegenTypescriptImportExtension) MarshalJSON() ([]byte, error) {
+	if !e.IsValid() {
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum CodegenTypescriptImportExtension", string(e))
+	}
+	return json.Marshal(string(e))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+// Returns an error if the value is not a valid CodegenTypescriptImportExtension member.
+func (e *CodegenTypescriptImportExtension) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	v := CodegenTypescriptImportExtension(s)
+	if !v.IsValid() {
+		return fmt.Errorf("invalid value '%s' for enum CodegenTypescriptImportExtension", s)
+	}
+
+	*e = v
+	return nil
+}
+
 // Represents a function to be called via WASM
 type WasmFunctionName string
 
@@ -216,11 +273,11 @@ type CodegenInputGoConfig struct {
 }
 
 type CodegenInputTypescriptConfig struct {
-	ImportExtension string `json:"importExtension"`
-	GenPatterns     bool   `json:"genPatterns"`
-	GenConsts       bool   `json:"genConsts"`
-	GenClient       bool   `json:"genClient"`
-	GenServer       bool   `json:"genServer"`
+	ImportExtension CodegenTypescriptImportExtension `json:"importExtension"`
+	GenPatterns     bool                             `json:"genPatterns"`
+	GenConsts       bool                             `json:"genConsts"`
+	GenClient       bool                             `json:"genClient"`
+	GenServer       bool                             `json:"genServer"`
 }
 
 type CodegenInputDartConfig struct {
@@ -323,11 +380,11 @@ func (p *preCodegenInputGoConfig) transform() CodegenInputGoConfig {
 
 // preCodegenInputTypescriptConfig is the version of CodegenInputTypescriptConfig previous to the required field validation
 type preCodegenInputTypescriptConfig struct {
-	ImportExtension Optional[string] `json:"importExtension,omitzero"`
-	GenPatterns     Optional[bool]   `json:"genPatterns,omitzero"`
-	GenConsts       Optional[bool]   `json:"genConsts,omitzero"`
-	GenClient       Optional[bool]   `json:"genClient,omitzero"`
-	GenServer       Optional[bool]   `json:"genServer,omitzero"`
+	ImportExtension Optional[CodegenTypescriptImportExtension] `json:"importExtension,omitzero"`
+	GenPatterns     Optional[bool]                             `json:"genPatterns,omitzero"`
+	GenConsts       Optional[bool]                             `json:"genConsts,omitzero"`
+	GenClient       Optional[bool]                             `json:"genClient,omitzero"`
+	GenServer       Optional[bool]                             `json:"genServer,omitzero"`
 }
 
 // validate validates the required fields of CodegenInputTypescriptConfig
