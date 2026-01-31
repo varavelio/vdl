@@ -88,7 +88,7 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 
 	// Files to check: current file + dependents
 	filesToCheck := []string{filePath}
-	dependents := l.depGraph.GetDependents(filePath)
+	dependents := l.depGraph.GetAllDependents(filePath)
 	filesToCheck = append(filesToCheck, dependents...)
 
 	for _, fPath := range filesToCheck {

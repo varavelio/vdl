@@ -121,4 +121,18 @@ func TestDependencyGraph_TransitiveDependencies(t *testing.T) {
 		require.Len(t, dependents, 1)
 		require.Equal(t, "/main.vdl", dependents[0])
 	})
+
+	t.Run("GetAllDependents returns transitive dependents", func(t *testing.T) {
+		g := NewDependencyGraph()
+
+		// Chain: main.vdl -> api.vdl -> models.vdl
+		g.UpdateDependencies("/main.vdl", []string{"/api.vdl"})
+		g.UpdateDependencies("/api.vdl", []string{"/models.vdl"})
+
+		// GetAllDependents of models.vdl should return both api.vdl and main.vdl
+		dependents := g.GetAllDependents("/models.vdl")
+		require.Len(t, dependents, 2)
+		require.Contains(t, dependents, "/api.vdl")
+		require.Contains(t, dependents, "/main.vdl")
+	})
 }
