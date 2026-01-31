@@ -17,7 +17,7 @@ func RunString(input string) (string, error) {
 
 	typedOutput, err := Run(typedInput)
 	if err != nil {
-		return "", fmt.Errorf("error running the function: %w", err)
+		return "", fmt.Errorf("error executing the function: %w", err)
 	}
 
 	output, err := json.Marshal(typedOutput)
@@ -29,6 +29,38 @@ func RunString(input string) (string, error) {
 }
 
 // Run runs the WASM logic
-func Run(input wasmtypes.WasmInput) (wasmtypes.WasmOutput, error) {
-	return wasmtypes.WasmOutput{}, nil
+func Run(input wasmtypes.WasmInput) (*wasmtypes.WasmOutput, error) {
+	switch input.FunctionName {
+	case wasmtypes.WasmFunctionNameExpandTypes:
+		out, err := runExpandTypes(input.ExpandTypes.Value)
+		if err != nil {
+			return nil, fmt.Errorf("error while executing expand types function: %w", err)
+		}
+		return &wasmtypes.WasmOutput{ExpandTypes: wasmtypes.Some(*out)}, nil
+
+	case wasmtypes.WasmFunctionNameExtractType:
+		out, err := runExtractType(input.ExtractType.Value)
+		if err != nil {
+			return nil, fmt.Errorf("error while executing extract type function: %w", err)
+		}
+		return &wasmtypes.WasmOutput{ExtractType: wasmtypes.Some(*out)}, nil
+
+	case wasmtypes.WasmFunctionNameExtractProc:
+		out, err := runExtractProc(input.ExtractProc.Value)
+		if err != nil {
+			return nil, fmt.Errorf("error while executing extract procedure function: %w", err)
+		}
+		return &wasmtypes.WasmOutput{ExtractProc: wasmtypes.Some(*out)}, nil
+
+	case wasmtypes.WasmFunctionNameExtractStream:
+		out, err := runExtractStream(input.ExtractStream.Value)
+		if err != nil {
+			return nil, fmt.Errorf("error while executing extract stream function: %w", err)
+		}
+		return &wasmtypes.WasmOutput{ExtractStream: wasmtypes.Some(*out)}, nil
+
+	case wasmtypes.WasmFunctionNameCodegen:
+	}
+
+	return nil, fmt.Errorf("function name %s not supported", input.FunctionName)
 }
