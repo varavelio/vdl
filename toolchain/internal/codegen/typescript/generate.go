@@ -133,16 +133,18 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	if err != nil {
 		return nil, err
 	}
-	// Add imports to catalog
-	catalogBuilder := gen.New().WithSpaces(2)
-	catalogBuilder.Line(formatImport("{ OperationDefinition }", "./core", g.config))
-	catalogBuilder.Break()
-	catalogBuilder.Raw(catalogContent)
+	if strings.TrimSpace(catalogContent) != "" {
+		// Add imports to catalog
+		catalogBuilder := gen.New().WithSpaces(2)
+		catalogBuilder.Line(formatImport("{ OperationDefinition }", "./core", g.config))
+		catalogBuilder.Break()
+		catalogBuilder.Raw(catalogContent)
 
-	addFile("catalog.ts", []byte(catalogBuilder.String()))
+		addFile("catalog.ts", []byte(catalogBuilder.String()))
+	}
 
 	// 6. client.ts
-	if g.config.GenClient {
+	if g.config.GenClient && len(schema.RPCs) > 0 {
 		clientContent, err := generateClient(schema, g.config)
 		if err != nil {
 			return nil, err
@@ -164,7 +166,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// 7. server.ts
-	if g.config.GenServer {
+	if g.config.GenServer && len(schema.RPCs) > 0 {
 		serverContent, err := generateServer(schema, g.config)
 		if err != nil {
 			return nil, err
@@ -208,11 +210,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	if hasPatterns {
 		indexBuilder.Line(formatExport("./patterns", g.config))
 	}
-	indexBuilder.Line(formatExport("./catalog", g.config))
-	if g.config.GenClient {
+	if strings.TrimSpace(catalogContent) != "" {
+		indexBuilder.Line(formatExport("./catalog", g.config))
+	}
+	if g.config.GenClient && len(schema.RPCs) > 0 {
 		indexBuilder.Line(formatExport("./client", g.config))
 	}
-	if g.config.GenServer {
+	if g.config.GenServer && len(schema.RPCs) > 0 {
 		indexBuilder.Line(formatExport("./server", g.config))
 	}
 

@@ -52,8 +52,8 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect: core.ts, types.ts, catalog.ts, client.ts, index.ts
-	require.Len(t, files, 5)
+	// Expect: core.ts, types.ts, index.ts (no catalog.ts, no client.ts as no RPCs)
+	require.Len(t, files, 3)
 
 	coreContent := findFile(files, "core.ts")
 	assert.Contains(t, coreContent, "export type Response<T>")
@@ -83,7 +83,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // core.ts, types.ts, catalog.ts, index.ts
+	require.Len(t, files, 3) // core.ts, types.ts, index.ts (no catalog)
 
 	content := findFile(files, "types.ts")
 
@@ -114,7 +114,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 5) // core.ts, types.ts, constants.ts, catalog.ts, index.ts
+	require.Len(t, files, 4) // core.ts, types.ts, constants.ts, index.ts (no catalog)
 
 	content := findFile(files, "constants.ts")
 	assert.Contains(t, content, "export const MAX_PAGE_SIZE: number = 100;")
@@ -142,7 +142,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 5) // core.ts, types.ts, patterns.ts, catalog.ts, index.ts
+	require.Len(t, files, 4) // core.ts, types.ts, patterns.ts, index.ts (no catalog)
 
 	content := findFile(files, "patterns.ts")
 	assert.Contains(t, content, "export function UserEventSubject(userId: string, eventType: string): string")
@@ -274,7 +274,7 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	require.Len(t, files, 4) // core.ts, types.ts, catalog.ts, index.ts
+	require.Len(t, files, 3) // core.ts, types.ts, index.ts (no catalog)
 
 	content := findFile(files, "types.ts")
 
