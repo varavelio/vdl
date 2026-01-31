@@ -282,6 +282,42 @@ export function validateWasmCodegenOutput(input: unknown, path = "WasmCodegenOut
 }
 
 /**
+ * WasmExpandTypesInput Input for expandTypes WASM function
+ */
+export type WasmExpandTypesInput = {
+  vdlSchema: string
+}
+
+export function hydrateWasmExpandTypesInput(input: WasmExpandTypesInput): WasmExpandTypesInput {
+  const hydratedVdlSchema = input.vdlSchema
+  return {
+    vdlSchema: hydratedVdlSchema,
+  }
+}
+
+export function validateWasmExpandTypesInput(_input: unknown, _path = "WasmExpandTypesInput"): string | null {
+  return null;
+}
+
+/**
+ * WasmExpandTypesOutput Output for expandTypes WASM function
+ */
+export type WasmExpandTypesOutput = {
+  expandedSchema: string
+}
+
+export function hydrateWasmExpandTypesOutput(input: WasmExpandTypesOutput): WasmExpandTypesOutput {
+  const hydratedExpandedSchema = input.expandedSchema
+  return {
+    expandedSchema: hydratedExpandedSchema,
+  }
+}
+
+export function validateWasmExpandTypesOutput(_input: unknown, _path = "WasmExpandTypesOutput"): string | null {
+  return null;
+}
+
+/**
  * WasmExtractProcInput Input for extractProc WASM function
  */
 export type WasmExtractProcInput = {

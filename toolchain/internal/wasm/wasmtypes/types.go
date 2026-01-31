@@ -656,6 +656,76 @@ func (p *preWasmCodegenOutput) transform() WasmCodegenOutput {
 	}
 }
 
+// Input for expandTypes WASM function
+type WasmExpandTypesInput struct {
+	VdlSchema string `json:"vdlSchema"`
+}
+
+// preWasmExpandTypesInput is the version of WasmExpandTypesInput previous to the required field validation
+type preWasmExpandTypesInput struct {
+	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
+}
+
+// validate validates the required fields of WasmExpandTypesInput
+func (p *preWasmExpandTypesInput) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preWasmExpandTypesInput is nil")
+	}
+
+	// Validation for field "vdlSchema"
+	if !p.VdlSchema.Present {
+		return errorMissingRequiredField("field vdlSchema is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preWasmExpandTypesInput type to the final WasmExpandTypesInput type
+func (p *preWasmExpandTypesInput) transform() WasmExpandTypesInput {
+	// Transformations
+	transVdlSchema := p.VdlSchema.Value
+
+	// Assignments
+	return WasmExpandTypesInput{
+		VdlSchema: transVdlSchema,
+	}
+}
+
+// Output for expandTypes WASM function
+type WasmExpandTypesOutput struct {
+	ExpandedSchema string `json:"expandedSchema"`
+}
+
+// preWasmExpandTypesOutput is the version of WasmExpandTypesOutput previous to the required field validation
+type preWasmExpandTypesOutput struct {
+	ExpandedSchema Optional[string] `json:"expandedSchema,omitzero"`
+}
+
+// validate validates the required fields of WasmExpandTypesOutput
+func (p *preWasmExpandTypesOutput) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preWasmExpandTypesOutput is nil")
+	}
+
+	// Validation for field "expandedSchema"
+	if !p.ExpandedSchema.Present {
+		return errorMissingRequiredField("field expandedSchema is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preWasmExpandTypesOutput type to the final WasmExpandTypesOutput type
+func (p *preWasmExpandTypesOutput) transform() WasmExpandTypesOutput {
+	// Transformations
+	transExpandedSchema := p.ExpandedSchema.Value
+
+	// Assignments
+	return WasmExpandTypesOutput{
+		ExpandedSchema: transExpandedSchema,
+	}
+}
+
 // Input for extractProc WASM function
 type WasmExtractProcInput struct {
 	VdlSchema string `json:"vdlSchema"`
