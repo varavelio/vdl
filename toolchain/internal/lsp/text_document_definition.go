@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 )
@@ -51,7 +52,7 @@ func (l *LSP) handleTextDocumentDefinition(rawMessage []byte) (any, error) {
 	}
 
 	// Run the analysis to get the program
-	program, _ := l.analyze(filePath)
+	program, _ := l.analyze(context.Background(), filePath)
 
 	// First check if we're on an external docstring (.md file reference)
 	if mdPath, ok := findDocstringPathAtPosition(string(content), position); ok {

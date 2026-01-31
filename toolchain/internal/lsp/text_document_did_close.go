@@ -21,6 +21,9 @@ func (l *LSP) handleTextDocumentDidClose(rawMessage []byte) (any, error) {
 	// Remove the file from the virtual file system cache
 	l.fs.RemoveFileCache(filePath)
 
+	// Unregister this document and clean up its dependencies
+	l.unregisterOpenDoc(filePath)
+
 	l.logger.Info("text document did close", "uri", notification.Params.TextDocument.URI)
 
 	// Clear diagnostics when a document is closed

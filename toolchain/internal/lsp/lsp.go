@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"runtime/debug"
@@ -22,6 +23,18 @@ type LSP struct {
 	analysisTimerMu      sync.Mutex
 	analysisInProgress   bool
 	analysisInProgressMu sync.Mutex
+
+	// Dependency tracking for reactive updates
+	depGraph *DependencyGraph
+
+	// Open documents tracking: maps absolute file path to its LSP URI
+	openDocs   map[string]string
+	openDocsMu sync.RWMutex
+
+	// Context cancellation for analysis pipeline
+	analysisCtx    context.Context
+	analysisCancel context.CancelFunc
+	analysisCtxMu  sync.Mutex
 }
 
 // New creates a new LSP instance. It uses the given reader and writer to read and write
@@ -37,12 +50,38 @@ func New(reader io.Reader, writer io.Writer) *LSP {
 		analysisTimerMu:      sync.Mutex{},
 		analysisInProgress:   false,
 		analysisInProgressMu: sync.Mutex{},
+		depGraph:             NewDependencyGraph(),
+		openDocs:             make(map[string]string),
+		openDocsMu:           sync.RWMutex{},
+		analysisCtx:          nil,
+		analysisCancel:       nil,
+		analysisCtxMu:        sync.Mutex{},
 	}
 }
 
 // analyze runs the analysis pipeline on the given file path and returns the program and diagnostics.
-func (l *LSP) analyze(filePath string) (*analysis.Program, []analysis.Diagnostic) {
-	return analysis.Analyze(l.fs, filePath)
+// It also updates the dependency graph based on the resolved imports.
+func (l *LSP) analyze(ctx context.Context, filePath string) (*analysis.Program, []analysis.Diagnostic) {
+	// Check for cancellation before starting
+	if ctx.Err() != nil {
+		return nil, nil
+	}
+
+	program, diagnostics := analysis.AnalyzeWithContext(ctx, l.fs, filePath)
+
+	// Check for cancellation after analysis
+	if ctx.Err() != nil {
+		return nil, nil
+	}
+
+	// Update dependency graph based on the program's file imports
+	if program != nil {
+		for path, file := range program.Files {
+			l.depGraph.UpdateDependencies(path, file.Includes)
+		}
+	}
+
+	return program, diagnostics
 }
 
 // Run starts the LSP server. It will read messages from the reader and write responses

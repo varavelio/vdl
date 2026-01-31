@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"context"
 	"runtime/debug"
 	"time"
 
@@ -101,10 +102,21 @@ func (l *LSP) clearDiagnostics(uri string) {
 }
 
 // analyzeAndPublishDiagnostics analyzes the document at the given file path and publishes diagnostics.
+// It uses the provided context for cancellation support.
 // filePath is the native OS path used for analysis, uri is the LSP URI to send to the client.
-func (l *LSP) analyzeAndPublishDiagnostics(filePath, uri string) {
+func (l *LSP) analyzeAndPublishDiagnostics(ctx context.Context, filePath, uri string) {
+	// Check for cancellation before starting
+	if ctx.Err() != nil {
+		return
+	}
+
 	// Run the analysis
-	_, diagnostics := l.analyze(filePath)
+	_, diagnostics := l.analyze(ctx, filePath)
+
+	// Check for cancellation - don't publish if cancelled
+	if ctx.Err() != nil {
+		return
+	}
 
 	// Convert analysis diagnostics to LSP diagnostics
 	lspDiagnostics := make([]Diagnostic, 0, len(diagnostics))
@@ -116,8 +128,16 @@ func (l *LSP) analyzeAndPublishDiagnostics(filePath, uri string) {
 	l.publishDiagnostics(uri, lspDiagnostics)
 }
 
+// analyzeAndPublishDiagnosticsImmediate runs immediate analysis without debouncing.
+// This is used for didOpen events where we want instant feedback.
+func (l *LSP) analyzeAndPublishDiagnosticsImmediate(filePath, uri string) {
+	ctx := context.Background()
+	l.analyzeAndPublishDiagnostics(ctx, filePath, uri)
+}
+
 // analyzeAndPublishDiagnosticsDebounced schedules an analysis for the given file with debouncing.
 // If another analysis is scheduled within the debounce time, the previous one is cancelled.
+// This also triggers re-analysis of dependent files (files that import the changed file).
 // filePath is the native OS path used for analysis, uri is the LSP URI to send to the client.
 func (l *LSP) analyzeAndPublishDiagnosticsDebounced(filePath, uri string) {
 	// debounceTime is the time to wait before running the analyzer after a document change.
@@ -130,6 +150,13 @@ func (l *LSP) analyzeAndPublishDiagnosticsDebounced(filePath, uri string) {
 	if l.analysisTimer != nil {
 		l.analysisTimer.Stop()
 	}
+
+	// Cancel any in-progress analysis
+	l.analysisCtxMu.Lock()
+	if l.analysisCancel != nil {
+		l.analysisCancel()
+	}
+	l.analysisCtxMu.Unlock()
 
 	// Schedule a new analysis
 	l.analysisTimer = time.AfterFunc(debounceTime, func() {
@@ -151,12 +178,81 @@ func (l *LSP) analyzeAndPublishDiagnosticsDebounced(filePath, uri string) {
 		l.analysisInProgress = true
 		l.analysisInProgressMu.Unlock()
 
-		// Run the analysis
-		l.analyzeAndPublishDiagnostics(filePath, uri)
+		// Create a new cancellable context for this analysis run
+		l.analysisCtxMu.Lock()
+		ctx, cancel := context.WithCancel(context.Background())
+		l.analysisCtx = ctx
+		l.analysisCancel = cancel
+		l.analysisCtxMu.Unlock()
+
+		// Run the analysis for the changed file
+		l.analyzeAndPublishDiagnostics(ctx, filePath, uri)
+
+		// Propagate changes to dependent files
+		if ctx.Err() == nil {
+			l.reanalyzeDependents(ctx, filePath)
+		}
 
 		// Mark analysis as complete
 		l.analysisInProgressMu.Lock()
 		l.analysisInProgress = false
 		l.analysisInProgressMu.Unlock()
 	})
+}
+
+// reanalyzeDependents re-analyzes all open files that depend on the given file.
+// This ensures that when an imported file is modified, the diagnostics in
+// importing files are updated without requiring manual edits to those files.
+func (l *LSP) reanalyzeDependents(ctx context.Context, filePath string) {
+	// Get all files that depend on this file
+	dependents := l.depGraph.GetDependents(filePath)
+	if len(dependents) == 0 {
+		return
+	}
+
+	l.logger.Info("propagating changes to dependents", "file", filePath, "dependents", dependents)
+
+	// Re-analyze each dependent that is currently open
+	for _, depPath := range dependents {
+		// Check for cancellation
+		if ctx.Err() != nil {
+			return
+		}
+
+		// Only re-analyze if the file is open in the editor
+		uri := l.getOpenDocURI(depPath)
+		if uri == "" {
+			continue
+		}
+
+		l.logger.Info("re-analyzing dependent", "file", depPath)
+		l.analyzeAndPublishDiagnostics(ctx, depPath, uri)
+
+		// Recursively propagate to transitive dependents
+		l.reanalyzeDependents(ctx, depPath)
+	}
+}
+
+// registerOpenDoc registers a document as open with its file path and URI.
+func (l *LSP) registerOpenDoc(filePath, uri string) {
+	l.openDocsMu.Lock()
+	defer l.openDocsMu.Unlock()
+	l.openDocs[filePath] = uri
+}
+
+// unregisterOpenDoc removes a document from the open documents registry.
+func (l *LSP) unregisterOpenDoc(filePath string) {
+	l.openDocsMu.Lock()
+	defer l.openDocsMu.Unlock()
+	delete(l.openDocs, filePath)
+
+	// Also clean up the dependency graph for this file
+	l.depGraph.RemoveFile(filePath)
+}
+
+// getOpenDocURI returns the URI for an open document, or empty string if not open.
+func (l *LSP) getOpenDocURI(filePath string) string {
+	l.openDocsMu.RLock()
+	defer l.openDocsMu.RUnlock()
+	return l.openDocs[filePath]
 }

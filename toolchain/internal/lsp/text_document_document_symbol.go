@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -74,7 +75,7 @@ func (l *LSP) handleTextDocumentDocumentSymbol(rawMessage []byte) (any, error) {
 	filePath := UriToPath(request.Params.TextDocument.URI)
 
 	// Run analysis to get the program
-	program, _ := l.analyze(filePath)
+	program, _ := l.analyze(context.Background(), filePath)
 
 	symbols := buildDocumentSymbols(program, filePath)
 	response := ResponseMessageTextDocumentDocumentSymbol{

@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -61,7 +62,7 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 	}
 
 	// Run the analysis to get the program
-	program, _ := l.analyze(filePath)
+	program, _ := l.analyze(context.Background(), filePath)
 
 	// Find the identifier at the cursor position
 	identifier := findIdentifierAtPosition(string(content), position)
