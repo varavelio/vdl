@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateDomainTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
+func generateDomainTypes(schema *ir.Schema, _ *config.PythonConfig) (string, error) {
 	g := gen.New()
 
 	g.Line("def _require_field(name: str, value: Any) -> Any:")
@@ -18,13 +18,13 @@ func generateDomainTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, e
 	g.Line("    return value")
 	g.Break()
 
-	g.Line("def _require_list(value: Any) -> Any:")
+	g.Line("def _require_list(value: Any) -> List[Any]:")
 	g.Line("    if not isinstance(value, list):")
 	g.Line("        raise TypeError('Expected list')")
 	g.Line("    return value")
 	g.Break()
 
-	g.Line("def _require_dict(value: Any) -> Any:")
+	g.Line("def _require_dict(value: Any) -> Dict[str, Any]:")
 	g.Line("    if not isinstance(value, dict):")
 	g.Line("        raise TypeError('Expected dict')")
 	g.Line("    return value")

@@ -1,8 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Protocol
 
 T = TypeVar("T")
+
+class Decodable(Protocol):
+    def from_dict(self, d: Dict[str, Any]) -> Any: ...
 
 @dataclass
 class VdlError:
@@ -44,7 +47,7 @@ class Response(Generic[T]):
         return result
 
     @staticmethod
-    def from_dict(d: Dict[str, Any], type_hook: Any = None) -> Response[T]:
+    def from_dict(d: Dict[str, Any], type_hook: Optional[Decodable] = None) -> Response[T]:
         result_val = d.get("result")
         if result_val is not None and type_hook is not None:
             if hasattr(type_hook, "from_dict"):
