@@ -11,7 +11,7 @@ import (
 )
 
 type cmdFormatArgs struct {
-	Patterns []string `arg:"positional" help:"The file patterns to format (supports recursive globs e.g. './**/*.vdl')"`
+	Patterns []string `arg:"positional" help:"The file patterns to format (supports recursive globs) - Default ./**/*.vdl"`
 	Verbose  bool     `arg:"-v,--verbose" help:"Verbose output prints all formatted files"`
 }
 
