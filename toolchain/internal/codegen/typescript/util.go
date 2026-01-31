@@ -44,9 +44,9 @@ func generateImport(g *gen.Generator, items []string, from string, isType bool, 
 	g.Linef("} from %q;", path)
 }
 
-// formatExport returns a formatted export statement.
-// Example: formatExport("./core", cfg) -> `export * from "./core.js";`
-func formatExport(path string, cfg *config.TypeScriptConfig) string {
+// formatExportAll returns a formatted export statement.
+// Example: formatExportAll("./core", cfg) -> `export * from "./core.js";`
+func formatExportAll(path string, cfg *config.TypeScriptConfig) string {
 	return fmt.Sprintf("export * from \"%s\";", formatImportPath(path, cfg))
 }
 

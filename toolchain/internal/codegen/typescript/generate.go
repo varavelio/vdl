@@ -3,7 +3,6 @@ package typescript
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/varavelio/gen"
@@ -76,67 +75,34 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	addFile("core.ts", []byte(coreContent))
 
 	// types.ts
-	typesBuilder := gen.New().WithSpaces(2)
-	if len(schema.Procedures) > 0 || len(schema.Streams) > 0 {
-		generateImport(typesBuilder, []string{"Response"}, "./core", true, g.config)
-	}
-	typesBuilder.Break()
-
-	// Helper to append content if not empty
-	appendContent := func(builder *gen.Generator, genFunc func(*ir.Schema, *config.TypeScriptConfig) (string, error)) error {
-		content, err := genFunc(schema, g.config)
-		if err != nil {
-			return err
-		}
-		if strings.TrimSpace(content) != "" {
-			builder.Raw(content)
-			builder.Break()
-		}
-		return nil
-	}
-
-	if err := appendContent(typesBuilder, generateEnums); err != nil {
+	typesContent, err := generateTypes(schema, g.config)
+	if err != nil {
 		return nil, err
 	}
-	if err := appendContent(typesBuilder, generateDomainTypes); err != nil {
-		return nil, err
-	}
-	if err := appendContent(typesBuilder, generateProcedureTypes); err != nil {
-		return nil, err
-	}
-	if err := appendContent(typesBuilder, generateStreamTypes); err != nil {
-		return nil, err
-	}
-
-	typesContent := typesBuilder.String()
-	if strings.TrimSpace(typesContent) == "" {
-		typesBuilder.Line("export {};")
-	}
-
-	addFile("types.ts", []byte(typesBuilder.String()))
+	addFile("types.ts", []byte(typesContent))
 
 	// constants.ts
-	constantsBuilder := gen.New().WithSpaces(2)
-	if err := appendContent(constantsBuilder, generateConstants); err != nil {
+	constantsContent, err := generateConstants(schema, g.config)
+	if err != nil {
 		return nil, err
 	}
-	if constantsContent := constantsBuilder.String(); strings.TrimSpace(constantsContent) != "" {
+	if strings.TrimSpace(constantsContent) != "" {
 		addFile("constants.ts", []byte(constantsContent))
 		hasConstants = true
 	}
 
 	// patterns.ts
-	patternsBuilder := gen.New().WithSpaces(2)
-	if err := appendContent(patternsBuilder, generatePatterns); err != nil {
+	patternsContent, err := generatePatterns(schema, g.config)
+	if err != nil {
 		return nil, err
 	}
-	if patternsContent := patternsBuilder.String(); strings.TrimSpace(patternsContent) != "" {
+	if strings.TrimSpace(patternsContent) != "" {
 		addFile("patterns.ts", []byte(patternsContent))
 		hasPatterns = true
 	}
 
 	// catalog.ts
-	catalogContent, err := generateRPCCatalog(schema, g.config)
+	catalogContent, err := generateCatalog(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
@@ -150,21 +116,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		if err != nil {
 			return nil, err
 		}
-		clientBuilder := gen.New().WithSpaces(2)
-		generateImport(clientBuilder, []string{"Response", "OperationType", "OperationDefinition"}, "./core", true, g.config)
-		generateImport(clientBuilder, []string{"VdlError", "asError", "sleep"}, "./core", false, g.config)
-
-		typeNames, valueNames := collectImports(schema)
-		sort.Strings(typeNames)
-		sort.Strings(valueNames)
-		generateImport(clientBuilder, typeNames, "./types", true, g.config)
-		generateImport(clientBuilder, valueNames, "./types", false, g.config)
-
-		generateImport(clientBuilder, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, g.config)
-		clientBuilder.Break()
-		clientBuilder.Raw(clientContent)
-
-		addFile("client.ts", []byte(clientBuilder.String()))
+		addFile("client.ts", []byte(clientContent))
 	}
 
 	// server.ts
@@ -173,30 +125,16 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		if err != nil {
 			return nil, err
 		}
-		serverBuilder := gen.New().WithSpaces(2)
-		generateImport(serverBuilder, []string{"Response", "OperationDefinition", "OperationType"}, "./core", true, g.config)
-		generateImport(serverBuilder, []string{"VdlError", "asError"}, "./core", false, g.config)
-		generateImport(serverBuilder, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, g.config)
+		addFile("server.ts", []byte(serverContent))
 
-		typeNames, valueNames := collectImports(schema)
-		sort.Strings(typeNames)
-		sort.Strings(valueNames)
-		generateImport(serverBuilder, typeNames, "./types", true, g.config)
-		generateImport(serverBuilder, valueNames, "./types", false, g.config)
-
-		serverBuilder.Break()
-		serverBuilder.Raw(serverContent)
-
-		addFile("server.ts", []byte(serverBuilder.String()))
-
-		// 7.1 adapters/fetch.ts - Universal Web Standards adapter
+		// adapters/fetch.ts - Universal Web Standards adapter
 		fetchAdapterContent, err := generateFetchAdapter(g.config)
 		if err != nil {
 			return nil, err
 		}
 		addFile("adapters/fetch.ts", []byte(fetchAdapterContent))
 
-		// 7.2 adapters/node.ts - Node.js adapter
+		// adapters/node.ts - Node.js adapter
 		nodeAdapterContent, err := generateNodeAdapter(g.config)
 		if err != nil {
 			return nil, err
@@ -206,24 +144,23 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// index.ts (Exports everything)
 	indexBuilder := gen.New().WithSpaces(2)
-	indexBuilder.Line(formatExport("./core", g.config))
-	indexBuilder.Line(formatExport("./types", g.config))
+	indexBuilder.Line(formatExportAll("./core", g.config))
+	indexBuilder.Line(formatExportAll("./types", g.config))
 	if hasConstants {
-		indexBuilder.Line(formatExport("./constants", g.config))
+		indexBuilder.Line(formatExportAll("./constants", g.config))
 	}
 	if hasPatterns {
-		indexBuilder.Line(formatExport("./patterns", g.config))
+		indexBuilder.Line(formatExportAll("./patterns", g.config))
 	}
 	if strings.TrimSpace(catalogContent) != "" {
-		indexBuilder.Line(formatExport("./catalog", g.config))
+		indexBuilder.Line(formatExportAll("./catalog", g.config))
 	}
 	if g.config.GenClient && len(schema.RPCs) > 0 {
-		indexBuilder.Line(formatExport("./client", g.config))
+		indexBuilder.Line(formatExportAll("./client", g.config))
 	}
 	if g.config.GenServer && len(schema.RPCs) > 0 {
-		indexBuilder.Line(formatExport("./server", g.config))
+		indexBuilder.Line(formatExportAll("./server", g.config))
 	}
-
 	addFile("index.ts", []byte(indexBuilder.String()))
 
 	// Pseudo format generated files

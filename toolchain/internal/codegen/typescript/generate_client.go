@@ -3,6 +3,7 @@ package typescript
 import (
 	_ "embed"
 	"fmt"
+	"sort"
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
@@ -24,6 +25,17 @@ func generateClient(schema *ir.Schema, config *config.TypeScriptConfig) (string,
 	}
 
 	g := gen.New().WithSpaces(2)
+
+	generateImport(g, []string{"Response", "OperationType", "OperationDefinition"}, "./core", true, config)
+	generateImport(g, []string{"VdlError", "asError", "sleep"}, "./core", false, config)
+
+	typeNames, valueNames := collectImports(schema)
+	sort.Strings(typeNames)
+	sort.Strings(valueNames)
+	generateImport(g, typeNames, "./types", true, config)
+	generateImport(g, valueNames, "./types", false, config)
+	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, config)
+	g.Break()
 
 	g.Raw(piece)
 	g.Break()

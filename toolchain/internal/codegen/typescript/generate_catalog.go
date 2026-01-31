@@ -6,8 +6,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 )
 
-// generateRPCCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateRPCCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
+// generateCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
+func generateCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
 	if len(schema.RPCs) == 0 {
 		return "", nil
 	}
