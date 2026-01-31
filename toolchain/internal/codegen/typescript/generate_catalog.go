@@ -7,12 +7,15 @@ import (
 )
 
 // generateRPCCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateRPCCatalog(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
+func generateRPCCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
 	if len(schema.RPCs) == 0 {
 		return "", nil
 	}
 
 	g := gen.New().WithSpaces(2)
+
+	generateImport(g, []string{"OperationDefinition"}, "./core", true, config)
+	g.Break()
 
 	g.Line("// -----------------------------------------------------------------------------")
 	g.Line("// VDL RPC Catalog")

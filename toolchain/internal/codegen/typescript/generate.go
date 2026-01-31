@@ -141,13 +141,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		return nil, err
 	}
 	if strings.TrimSpace(catalogContent) != "" {
-		// Add imports to catalog
-		catalogBuilder := gen.New().WithSpaces(2)
-		generateImport(catalogBuilder, []string{"OperationDefinition"}, "./core", true, g.config)
-		catalogBuilder.Break()
-		catalogBuilder.Raw(catalogContent)
-
-		addFile("catalog.ts", []byte(catalogBuilder.String()))
+		addFile("catalog.ts", []byte(catalogContent))
 	}
 
 	// 6. client.ts
