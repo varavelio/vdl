@@ -8,6 +8,10 @@ import (
 )
 
 func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
+	if len(schema.RPCs) == 0 {
+		return "", nil
+	}
+
 	g := gen.New()
 	g.Line("from dataclasses import dataclass")
 	g.Line("from enum import Enum")
