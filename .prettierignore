@@ -4,9 +4,16 @@ node_modules/
 dist/
 build/
 out/
+gen/
+
+# Temporary directories
+tmp/
+temp/
 
 # Sveltekit
 .svelte-kit/
+immutable/
+_app/
 
 # Generated JSON schemas
 *.schema.json
