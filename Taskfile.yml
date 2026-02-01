@@ -23,7 +23,7 @@ tasks:
   ##############
 
   ci:
-    desc: Run all CI tasks
+    desc: "Run full CI pipeline (deps, test, lint, build)"
     cmds:
       - task deps
       - task test
@@ -31,7 +31,7 @@ tasks:
       - task build
 
   deps:
-    desc: Install all dependencies for the project
+    desc: "Install dependencies for all subprojects (Go, Node, etc)"
     cmds:
       - npm install
       - cd ./toolchain && go mod download
@@ -39,31 +39,31 @@ tasks:
       # - cd ./docs && npm install
 
   build:
-    desc: Builds the WASM binary, the Playground and the VDL binary
+    desc: "Build everything (WASM, Playground, and VDL CLI)"
     cmds:
       - cd ./toolchain && task build:wasm # <- Required by the playground
       - cd ./playground && npm run build # <- Required by the final VDL binary
       - cd ./toolchain && task build:vdl
 
   codegen:
-    desc: Run all project code generators
+    desc: "Run all code generators (Schemas, Toolchain, Playground)"
     cmds:
       - task: codegen:schemas
       - task: tc:codegen
       - task: pg:codegen
 
   codegen:schemas:
-    desc: Generate the code for the VDL schemas used in the project
+    desc: "Generate Go code from VDL schemas"
     cmds:
       - cd ./toolchain && task install
       - vdl generate
 
   setversion:
-    desc: Set the version from latest git tag in the relevant files
+    desc: "Sync project version from git tag to all files"
     cmd: node ./scripts/set-version.ts
 
   format:
-    desc: Run all repository code formatters
+    desc: "Format all code (Go, TS, Svelte, etc.)"
     cmds:
       - task: tc:format
       - task: pg:format
@@ -71,13 +71,13 @@ tasks:
       - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   test:
-    desc: Run all repository tests
+    desc: "Run all tests (Toolchain, Toolchain E2E and Playground)"
     cmds:
       - task: tc:test
       - task: pg:test
 
   lint:
-    desc: Run all repository linters
+    desc: "Lint all code (Go, TS, Svelte)"
     cmds:
       - task: tc:lint
       - task: pg:lint
@@ -89,13 +89,13 @@ tasks:
   ###################
 
   tc:install:
-    desc: TOOLCHAIN - Build and install the vdl binary in the local PATH for testing
+    desc: "Toolchain: Install 'vdl' binary to local GOPATH"
     deps:
       - codegen
     cmd: go install ./cmd/vdl/.
 
   tc:build:wasm:
-    desc: TOOLCHAIN - Build the WebAssembly binary for the Playground
+    desc: "Toolchain: Build WASM binary for Playground"
     deps:
       - codegen
     cmds:
@@ -103,7 +103,7 @@ tasks:
       - cp "/usr/local/go/lib/wasm/wasm_exec.js" ./dist/wasm_exec.js
 
   tc:build:vdl:
-    desc: TOOLCHAIN - Build the vdl binary for all platforms
+    desc: "Toolchain: Cross-compile VDL CLI for all platforms"
     dir: ./toolchain
     deps:
       - codegen
@@ -121,18 +121,18 @@ tasks:
       - GOOS=darwin GOARCH=arm64 go build -o ./dist/vdl-darwin-arm64 ./cmd/vdl/.
 
   tc:codegen:
-    desc: TOOLCHAIN - Run all toolchain code generators
+    desc: "Toolchain: Run internal code generators"
     dir: ./toolchain
     cmds:
       - task: tc:codegen:schemas
 
   tc:codegen:schemas:
-    desc: TOOLCHAIN - Generate the JSON Schemas for the project
+    desc: "Toolchain: Generate JSON Schemas from Go structs"
     dir: ./toolchain
     cmd: go run ./internal/cmd/schemagen/.
 
   tc:format:
-    desc: TOOLCHAIN - Run code formatter
+    desc: "Toolchain: Format Go code and run internal formatters"
     dir: ./toolchain
     cmds:
       - npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
@@ -140,24 +140,24 @@ tasks:
       - go run ./cmd/vdl/. format
 
   tc:test:
-    desc: TOOLCHAIN - Run all toolchain tests
+    desc: "Toolchain: Run unit and E2E tests"
     dir: ./toolchain
     cmds:
       - go test ./...
       - go test -race ./...
 
   tc:lint:
-    desc: TOOLCHAIN - Run all toolchain linters
+    desc: "Toolchain: Run GolangCI-Lint and format checks"
     deps: [tc:lint:golang, tc:lint:format]
     failfast: true
 
   tc:lint:golang:
-    desc: TOOLCHAIN - Run golang linters
+    desc: "Toolchain: Run GolangCI-Lint"
     dir: ./toolchain
     cmd: golangci-lint run ./...
 
   tc:lint:format:
-    desc: TOOLCHAIN - Ensure code is formatted
+    desc: "Toolchain: Verify code formatting"
     dir: ./toolchain
     cmds:
       - |
@@ -174,14 +174,14 @@ tasks:
   ####################
 
   pg:dev:
-    desc: PLAYGROUND - Start development server
+    desc: "Playground: Start Vite dev server"
     dir: ./playground
     cmds:
       - task: pg:codegen
       - npx --no vite dev
 
   pg:build:
-    desc: PLAYGROUND - Build for production
+    desc: "Playground: Build static assets for embedding"
     dir: ./playground
     cmds:
       - task: pg:codegen
@@ -189,12 +189,12 @@ tasks:
       - node ./postbuild.ts
 
   pg:format:
-    desc: PLAYGROUND - Run code formatter
+    desc: "Playground: Format Svelte/TS code (Prettier)"
     dir: ./playground
     cmd: npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
 
   pg:lint:
-    desc: PLAYGROUND - Run linter
+    desc: "Playground: Lint Svelte/TS (Biome + Svelte Check)"
     dir: ./playground
     cmds:
       - npx --no svelte-kit sync
@@ -203,18 +203,18 @@ tasks:
       - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
 
   pg:test:
-    desc: PLAYGROUND - Run tests
+    desc: "Playground: Run Vitest unit tests"
     dir: ./playground
     cmd: npx --no vitest run
 
   pg:codegen:
-    desc: PLAYGROUND - Run all playground code generators
+    desc: "Playground: Run internal code generators"
     dir: ./playground
     cmds:
       - task: pg:codegen:irschema
 
   pg:codegen:irschema:
-    desc: PLAYGROUND - Generate TS types from VDL IR schema
+    desc: "Playground: Generate TS types from IR JSON Schema"
     dir: ./playground
     cmd: npx --no json2ts ../toolchain/internal/core/ir/ir.schema.json > ./src/lib/irTypes.ts
 
@@ -223,19 +223,21 @@ tasks:
   ##########################
 
   ve:dev:
-    desc: VSCODE EXT - Build extension code (Development Watch Mode)
+    desc: "VSCode: Build extension in watch mode"
     dir: ./editors/vscode
-    cmd: node esbuild.js --watch
+    cmds:
+      - rm -rf ./dist
+      - node esbuild.js --watch
 
   ve:build:
-    desc: VSCODE EXT - Build extension code (Production mode)
+    desc: "VSCode: Build extension for production"
     dir: ./editors/vscode
     cmds:
       - rm -rf ./dist
       - node esbuild.js --production
 
   ve:package:
-    desc: VSCODE EXT - Build and package extension to .vsix file
+    desc: "VSCode: Package extension into .vsix"
     dir: ./editors/vscode
     cmds:
       - task: ve:build
@@ -243,17 +245,17 @@ tasks:
       - npx --no vsce package
 
   ve:package:ls:
-    desc: VSCODE EXT - List .vsix file content
+    desc: "VSCode: List contents of packaged .vsix"
     dir: ./editors/vscode
     cmd: npx --no vsce ls
 
   ve:format:
-    desc: PLAYGROUND - Run code formatter
+    desc: "VSCode: Format extension code"
     dir: ./editors/vscode
     cmd: npx --no prettier . --write --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
 
   ve:lint:
-    desc: PLAYGROUND - Run linter
+    desc: "VSCode: Lint extension code"
     dir: ./editors/vscode
     cmd: npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
 
