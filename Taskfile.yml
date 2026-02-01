@@ -23,8 +23,8 @@ tasks:
     desc: Run all CI tasks
     cmds:
       - task deps
-      - task lint
       - task test
+      - task lint
       - task build
 
   deps:
