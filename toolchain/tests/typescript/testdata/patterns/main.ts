@@ -1,5 +1,7 @@
 // Verifies patterns are generated correctly in a separate patterns.ts file.
 // Import directly from patterns.ts to verify the file exists
+// Also verify patterns are exported via index.ts
+import * as gen from "./gen/index.ts";
 import {
   UserTopic,
   CacheKey,
@@ -8,9 +10,6 @@ import {
   StaticPath,
   DuplicatedPlaceholder,
 } from "./gen/patterns.ts";
-
-// Also verify patterns are exported via index.ts
-import * as gen from "./gen/index.ts";
 
 function fail(name: string, expected: unknown, actual: unknown): never {
   console.error(

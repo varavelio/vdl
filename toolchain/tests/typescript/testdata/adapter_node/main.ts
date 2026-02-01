@@ -4,11 +4,10 @@
  * This test verifies that the generated Node.js adapter (gen/adapters/node.ts)
  * works correctly with both native Node.js http and with pre-parsed body.
  */
-
-import { createServer } from "http";
-import { Server } from "./gen/server.ts";
-import { NewClient } from "./gen/client.ts";
 import { createNodeHandler, NodeAdapter } from "./gen/adapters/node.ts";
+import { NewClient } from "./gen/client.ts";
+import { Server } from "./gen/server.ts";
+import { createServer } from "http";
 
 async function main() {
   // =========================================================================

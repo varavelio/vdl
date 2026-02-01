@@ -1,7 +1,7 @@
 // Verifies scalar edge cases: zero values (0, 0.0, false, "", zero datetime)
 // should be correctly transmitted and distinguishable from absent values.
-import { Server, NewClient, Client } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, Client } from "./gen/index.ts";
 import { createServer } from "http";
 
 async function main() {

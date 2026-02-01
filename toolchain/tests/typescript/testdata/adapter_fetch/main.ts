@@ -7,13 +7,12 @@
  * Since we're running in Node.js and not a real edge runtime,
  * we simulate the Fetch API flow by directly invoking the handler.
  */
-
-import { Server } from "./gen/server.ts";
 import {
   createFetchHandler,
   FetchAdapter,
   parseRpcPath,
 } from "./gen/adapters/fetch.ts";
+import { Server } from "./gen/server.ts";
 
 async function main() {
   // =========================================================================

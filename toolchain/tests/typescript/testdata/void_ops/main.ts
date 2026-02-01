@@ -1,6 +1,6 @@
 // Verifies procs with empty input/output (void operations) work correctly.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 async function main() {

@@ -1,7 +1,7 @@
 // Verifies client timeout configuration: the server handler sleeps for 500ms,
 // but the client is configured with a 100ms timeout, so it should fail with REQUEST_TIMEOUT.
-import { Server, NewClient, VdlError } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, VdlError } from "./gen/index.ts";
 import { createServer } from "http";
 
 function sleep(ms: number) {

@@ -8,7 +8,6 @@ import {
   IS_ENABLED,
   GREETING,
 } from "./gen/constants.ts";
-
 // Also verify constants are exported via index.ts
 import * as gen from "./gen/index.ts";
 

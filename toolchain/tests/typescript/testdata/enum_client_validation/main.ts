@@ -1,8 +1,8 @@
 // Verifies that the client properly validates enum values BEFORE sending requests.
 // This tests client-side validation, which catches invalid enums without making network calls.
+import { createNodeHandler } from "./gen/adapters/node.ts";
 import { NewClient, VdlError } from "./gen/index.ts";
 import { Server } from "./gen/index.ts";
-import { createNodeHandler } from "./gen/adapters/node.ts";
 import { createServer } from "http";
 
 async function main() {

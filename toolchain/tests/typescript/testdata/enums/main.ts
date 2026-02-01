@@ -1,6 +1,6 @@
 // Verifies enum serialization: both string enums and int enums are echoed correctly.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import type { Color, Priority } from "./gen/index.ts";
 import { createServer } from "http";
 

@@ -1,6 +1,6 @@
 // Verifies stream lifecycle hooks (onConnect, onDisconnect, onReconnect) work correctly.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 function sleep(ms: number) {

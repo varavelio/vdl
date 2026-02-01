@@ -1,7 +1,7 @@
 // Verifies SSE ping handling: the server sends pings during a long-running stream.
 // Uses a raw HTTP client to verify pings are actually on the wire (the generated client filters them out).
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 function sleep(ms: number) {

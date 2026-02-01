@@ -1,6 +1,6 @@
 // Verifies optional field behavior: fields can be omitted or provided with values.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 async function main() {

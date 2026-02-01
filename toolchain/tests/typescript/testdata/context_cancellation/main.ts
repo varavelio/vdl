@@ -1,7 +1,7 @@
 // Verifies context cancellation behavior: when the client cancels the AbortSignal
 // mid-stream, the server should stop sending events and clean up resources.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 function sleep(ms: number) {

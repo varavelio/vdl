@@ -1,8 +1,8 @@
 // Verifies spread (type composition with ...) works correctly.
 // Tests simple spreads, chained spreads, multiple spreads, spreads with complex nested types,
 // and spreads directly in input/output blocks and nested anonymous objects.
-import { Server, NewClient, Client } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, Client } from "./gen/index.ts";
 import type {
   User,
   UserWithTimestamps,

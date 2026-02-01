@@ -1,6 +1,6 @@
 // Verifies that the server properly validates enum values and rejects invalid ones.
-import { Server, NewClient, VdlError } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, VdlError } from "./gen/index.ts";
 import { createServer } from "http";
 
 async function main() {

@@ -1,8 +1,8 @@
 // Verifies enum serialization: enums should be transmitted as strings on the wire,
 // and round-trip correctly through client->server->client.
 // Tests both implicit-value enums (name=value) and explicit-value enums (name!=value).
-import { Server, NewClient, Client } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, Client } from "./gen/index.ts";
 import type { Color, Status, HttpStatus } from "./gen/index.ts";
 import { createServer } from "http";
 

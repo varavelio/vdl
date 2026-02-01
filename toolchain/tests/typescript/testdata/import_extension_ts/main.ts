@@ -1,8 +1,8 @@
 // Verifies that import_extension: ".ts" generates correct import paths
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
-import { createServer } from "http";
+import { Server, NewClient } from "./gen/index.ts";
 import { readFileSync } from "fs";
+import { createServer } from "http";
 
 async function main() {
   // =========================================================================

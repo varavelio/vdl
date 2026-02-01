@@ -1,7 +1,7 @@
 // Verifies complex type serialization: deeply nested structures, maps of arrays,
 // arrays of maps, nested objects, and multi-dimensional arrays.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import type {
   Container,
   User,

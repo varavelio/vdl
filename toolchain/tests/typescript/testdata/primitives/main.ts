@@ -1,6 +1,6 @@
 // Verifies primitive type serialization: int, float, bool, string, and datetime.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 async function main() {

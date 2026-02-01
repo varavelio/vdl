@@ -1,7 +1,7 @@
 // Verifies error handler precedence: RPC-level error handlers override global handlers.
 // Users.Get uses global handler ("Global: fail"), Auth.Login uses RPC-specific handler ("Auth: fail").
-import { Server, NewClient, VdlError } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, VdlError } from "./gen/index.ts";
 import { createServer } from "http";
 
 async function main() {

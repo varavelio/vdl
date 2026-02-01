@@ -1,7 +1,7 @@
 // Verifies stream error events: when a handler returns an error, the client
 // receives it as an error event with the expected message.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 function sleep(ms: number) {

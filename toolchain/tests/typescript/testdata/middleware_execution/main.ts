@@ -1,8 +1,8 @@
 // Verifies middleware execution order and coverage across all levels:
 // Global middleware applies to all RPCs, RPC middleware applies to all procs in that RPC,
 // and Proc middleware applies only to specific procs.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer, IncomingMessage, ServerResponse } from "http";
 
 interface AppProps {

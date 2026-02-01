@@ -1,7 +1,7 @@
 // Verifies custom header propagation: X-Trace-ID and other headers
 // should be correctly passed from client to server and accessible in handlers.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer, IncomingMessage, ServerResponse } from "http";
 
 interface AppProps {

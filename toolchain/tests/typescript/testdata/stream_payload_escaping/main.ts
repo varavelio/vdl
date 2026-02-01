@@ -1,7 +1,7 @@
 // Verifies SSE payload escaping: messages with newlines, unicode,
 // and special characters should be correctly transmitted through SSE.
-import { Server, NewClient } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
 
 const testMessages = [

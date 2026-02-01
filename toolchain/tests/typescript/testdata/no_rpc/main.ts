@@ -1,6 +1,6 @@
+import { Something } from "./gen/index.ts";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { Something } from "./gen/index.ts";
 
 function main() {
   const s: Something = { field: "value" };

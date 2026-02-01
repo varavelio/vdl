@@ -1,7 +1,7 @@
 // Verifies enum serialization and round-trip: both string enums and int enums
 // are echoed correctly through client/server communication.
-import { Server, NewClient, Client } from "./gen/index.ts";
 import { createNodeHandler } from "./gen/adapters/node.ts";
+import { Server, NewClient, Client } from "./gen/index.ts";
 import type { Color, Priority, LogLevel } from "./gen/index.ts";
 import { createServer } from "http";
 
