@@ -1,9 +1,12 @@
 {
-  "name": "uforpc",
+  "name": "vdl",
   "version": "1.0.0",
   "type": "module",
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/node": "24.3.1",
-    "prettier": "3.7.4"
+    "prettier": "3.7.4",
+    "prettier-plugin-svelte": "3.4.1",
+    "prettier-plugin-tailwindcss": "0.7.2"
   }
 }

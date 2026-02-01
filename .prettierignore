@@ -1,7 +1,12 @@
-# The following directories should have their own formatting mechanisms
-# so they are not formatted by the root formatter and instead the
-# task fmt command should call the formatter for each directory.
-playground/
+# Common ignored files
+package-lock.json
 
+# Generated JSON schemas
 *.schema.json
+
+# End to end tests generated code
 toolchain/tests/**/gen/
+
+# Golang WASM script and generated schemas
+wasm_exec.js
+wasmtypes/

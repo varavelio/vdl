@@ -8,8 +8,7 @@
     "preview": "npm run genschema && npm run lint && vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "lint": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && biome lint --write .",
-    "fmt": "prettier . --write",
-    "fmt-check": "prettier . --check",
+    "format": "prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --log-level warn",
     "test": "vitest run",
     "genschema": "json2ts ../urpc/internal/schema/schema.json > ./src/lib/urpcTypes.ts"
   },
@@ -24,7 +23,6 @@
     "@sveltejs/vite-plugin-svelte": "5.0.3",
     "@tailwindcss/typography": "0.5.16",
     "@tailwindcss/vite": "4.1.4",
-    "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/lodash-es": "4.17.12",
     "@types/swagger-ui": "5.21.1",
     "client-zip": "2.5.0",
@@ -38,9 +36,6 @@
     "marked": "15.0.11",
     "minisearch": "7.1.2",
     "monaco-editor": "0.52.2",
-    "prettier": "3.6.2",
-    "prettier-plugin-svelte": "3.3.3",
-    "prettier-plugin-tailwindcss": "0.6.11",
     "shiki": "3.3.0",
     "svelte": "5.28.2",
     "svelte-check": "4.1.6",
@@ -54,8 +49,5 @@
     "vite": "6.2.5",
     "vite-plugin-static-copy": "3.1.0",
     "vitest": "3.1.3"
-  },
-  "dependencies": {
-    "D": "1.0.0"
   }
 }

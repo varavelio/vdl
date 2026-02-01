@@ -1,8 +1,27 @@
 {
+  "plugins": [
+    "prettier-plugin-svelte",
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
   "overrides": [
     {
-      "files": "*.code-workspace",
-      "options": { "parser": "json" }
+      "files": "*.svelte",
+      "options": { "parser": "svelte" }
+    },
+    {
+      "files": "playground/**/*.{svelte,ts,js}",
+      "options": {
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true,
+        "importOrderCaseInsensitive": true,
+        "importOrder": [
+          "^\\$lib/(?!components)(.*)$",
+          "^\\$lib/components/(.*)$",
+          "^[.][.]/",
+          "^[.]/"
+        ]
+      }
     }
   ]
 }
