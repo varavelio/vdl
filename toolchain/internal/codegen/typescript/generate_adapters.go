@@ -45,9 +45,9 @@ func generateNodeAdapter(cfg *config.TypeScriptConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	// Imports
+	g.Line("import type { IncomingMessage, ServerResponse } from \"node:http\";")
 	generateImport(g, []string{"HTTPAdapter"}, "../server", true, cfg)
 	generateImport(g, []string{"Server"}, "../server", false, cfg)
-	g.Line("import type { IncomingMessage, ServerResponse } from \"node:http\";")
 	g.Break()
 
 	// Core adapter piece
