@@ -16,7 +16,10 @@ RUN set -e && \
     # Update and install system dependencies
     apt-get update -qq && \
     apt-get install -y -qq --no-install-recommends \
-        wget curl zip unzip p7zip-full tzdata git npm tree gnupg2 apt-transport-https ca-certificates && \
+        wget curl zip unzip p7zip-full tzdata git npm tree ripgrep \
+        gnupg2 apt-transport-https ca-certificates \
+        python3 python3-pip
+    && \
     # Install Node.js using n
     npm install -g n@latest && \
     n 22.18.0 && \
