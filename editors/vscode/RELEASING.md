@@ -4,7 +4,7 @@ This document outlines the manual process for releasing a new version of the VDL
 
 ## Prerequisites
 
-- Ensure you are in the `editors/vscode` directory.
+- Ensure you are in the **root** directory of the project (not this folder).
 - Ensure you have the necessary permissions for the GitHub repository and Marketplace accounts.
 
 ---
@@ -34,17 +34,18 @@ This document outlines the manual process for releasing a new version of the VDL
 ## Phase 2: Build & Package
 
 1.  **Generate the VSIX Package**
-    Run the following command from the `editors/vscode` directory. This script cleans previous builds, compiles the code, and packages the extension.
+    Run the following command from the **root** directory. This task cleans previous builds, compiles the code, and packages the extension.
 
     ```bash
-    npm run package
+    task ve:package
     ```
 
 2.  **Verify the Artifact**
-    - Confirm that a file named `vdl-X.X.X.vsix` has been created in the directory.
+    - Confirm that a file named `vdl-X.X.X.vsix` has been created in the `editors/vscode` directory.
     - (Optional) Verify the package contents to ensure only necessary files are included:
+
       ```bash
-      npx vsce ls
+      task ve:package:ls
       ```
 
 ---
@@ -73,18 +74,16 @@ This document outlines the manual process for releasing a new version of the VDL
 
 ### 1. Visual Studio Marketplace (Official)
 
-1.  Log in to the [VS Code Marketplace Management Portal](https://marketplace.visualstudio.com/manage).
-2.  Select the **vdl** extension.
-3.  Click **Update** (or the ellipsis `...` -> **Update**).
-4.  Upload the `.vsix` file.
-5.  Wait for the verification process to complete.
+1.  Log in to the [VS Code Marketplace Management Portal](https://marketplace.visualstudio.com/manage/publishers/varavel).
+2.  Find the **vdl** extension and click ellipsis `...` -> **Update**.
+3.  Upload the `.vsix` file.
+4.  Wait for the verification process to complete.
 
 ### 2. Open VSX Registry (Open Source / VSCodium)
 
 1.  Log in to the [Open VSX Registry User Settings](https://open-vsx.org/user-settings/extensions).
-2.  Locate the namespace/extension.
-3.  Drag and drop the `.vsix` file into the upload area (or click to browse).
-4.  Confirm the upload.
+2.  Click "PUBLISH EXTENSION".
+3.  Upload the `.vsix` file.
 
 ---
 
