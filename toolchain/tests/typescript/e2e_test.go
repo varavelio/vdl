@@ -17,8 +17,6 @@ var (
 	vdlBinaryPath string
 	toolchainRoot string
 	tsTestsRoot   string
-	tscPath       string
-	tsxPath       string
 )
 
 func TestMain(m *testing.M) {
@@ -27,14 +25,6 @@ func TestMain(m *testing.M) {
 	tsTestsRoot = filepath.Dir(filename)
 	toolchainRoot = filepath.Join(tsTestsRoot, "..", "..")
 	toolchainRoot, _ = filepath.Abs(toolchainRoot)
-
-	tscPath = filepath.Join(tsTestsRoot, "node_modules", ".bin", "tsc")
-	tsxPath = filepath.Join(tsTestsRoot, "node_modules", ".bin", "tsx")
-
-	if runtime.GOOS == "windows" {
-		tscPath += ".cmd"
-		tsxPath += ".cmd"
-	}
 
 	// Build VDL Binary
 	if err := buildVDLBinary(); err != nil {
@@ -120,8 +110,7 @@ func runTestCase(t *testing.T, caseDir string) {
 	defer cancelTsc()
 
 	// Use the absolute path to tsc to avoid npx overhead
-	// We quote tscPath in case it contains spaces
-	tscCmd := fmt.Sprintf("'%s' ./*.ts ./gen/*.ts --noEmit --moduleResolution node --target es2022 --skipLibCheck --allowImportingTsExtensions", tscPath)
+	tscCmd := "npx --no tsc ./*.ts ./gen/*.ts --noEmit --moduleResolution node --target es2022 --skipLibCheck --allowImportingTsExtensions"
 	cmdTsc := exec.CommandContext(ctxTsc, "sh", "-c", tscCmd)
 	cmdTsc.Dir = caseDir
 	outTsc, err := cmdTsc.CombinedOutput()
@@ -133,7 +122,8 @@ func runTestCase(t *testing.T, caseDir string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	cmdRun := exec.CommandContext(ctx, tsxPath, "main.ts")
+	tsxCmd := "npx --no tsx main.ts"
+	cmdRun := exec.CommandContext(ctx, "sh", "-c", tsxCmd)
 	cmdRun.Dir = caseDir
 	outRun, err := cmdRun.CombinedOutput()
 	if err != nil {
