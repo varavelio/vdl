@@ -1,5 +1,11 @@
-# Common ignored files
+# Common ignored files and directories
 package-lock.json
+node_modules/
+dist/
+build/
+
+# Sveltekit
+.svelte-kit/
 
 # Generated JSON schemas
 *.schema.json
