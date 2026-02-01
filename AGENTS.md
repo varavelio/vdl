@@ -13,11 +13,13 @@ When updating this document, do so with the context of the entire document in mi
 ## 2. General Instructions (The Constitution)
 
 - **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`), Node/Svelte (`playground/`), and Editor Extensions (`editors/`).
-- **Command Authority**: The root `Taskfile.yml` is the single source of truth for orchestration. Do not run `npm` or `go` commands manually if a `task` command exists for it.
+- **Command Authority**: The root `Taskfile.yml` is the **single source of truth** for orchestration.
+  - **Do NOT** run `npm`, `go`, `vite`, or `vsce` commands manually.
+  - **ALWAYS** run `task --list-all` from the project root to discover the available commands before starting any task.
+  - **Execution**: All commands are run via `task <command>`.
 - **Verification**:
-  - Always run `task fmt` to handle multi-language formatting (Prettier + Go Fmt).
-  - Always run `task lint` to check both Go (golangci-lint) and Svelte/TS (Biome).
-  - Always run `task test` to verify integrity.
+  - Always check available verification tasks (lint, test, format) via `task --list-all`.
+  - Ensure standard checks pass before finishing work.
 - **Dependency Management**:
   - Go: Manage in `toolchain/go.mod`.
   - Node: Manage in `playground/package.json` or root `package.json` for dev tools.
@@ -98,24 +100,24 @@ When updating this document, do so with the context of the entire document in mi
 
 ### Build Pipeline
 
-1. **WASM Build**: Go code compiles to WASM (`task build:wasm`) -> `toolchain/dist/vdl.wasm`.
-2. **Frontend Build**: Playground consumes WASM and builds static assets (`npm run build`).
-3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary (`task build:vdl`).
+1. **WASM Build**: Go code compiles to WASM.
+2. **Frontend Build**: Playground consumes WASM and builds static assets.
+3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary.
 
 ## 4. Testing & Quality
 
 ### Strategy
 
-- **Unit Tests**: Standard Go tests (`go test ./...`) for internal logic.
+- **Unit Tests**: Standard Go tests for internal logic.
 - **E2E Tests (`toolchain/tests/*`)**:
   - These are **integration tests** wrapped in Go test runners (`e2e_test.go`) located in each subdirectory.
   - **Mechanism**: The runner builds a temporary `vdl` binary from the current source, then for each case in `testdata/`:
-    1.  Runs `vdl generate` in the test case folder.
+    1.  Runs the generation command via the test harness.
     2.  **Verification**:
-        - For **Go/TS/Dart/Python**: Executes the consumer program (`main.go`, `main.ts`, `main.dart`, `main.py`). The consumer code must **panic** or exit with non-zero status on failure.
-        - For **Schemas/Docs** (JSONSchema, OpenAPI): Compares the generated output against a "golden" expected file.
+        - For **Code Gen**: Executes the consumer program. The consumer code must **panic** or exit with non-zero status on failure.
+        - For **Schemas/Docs**: Compares the generated output against a "golden" expected file.
         - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
-- **Frontend Tests**: Component/Logic tests using `vitest` in `playground/`.
+- **Frontend Tests**: Component/Logic tests in `playground/`.
 
 ### Adding a New E2E Test Case
 
@@ -129,9 +131,7 @@ When updating this document, do so with the context of the entire document in mi
 
 ### Commands
 
-- **Run All Tests**: `task test` (Root).
-- **Run Go/E2E Only**: `cd toolchain && task test`.
-- **Lint**: `task lint` (Triggers `golangci-lint` for Go and `biome` for JS/TS).
+Do NOT rely on memory. Run `task --list-all` to find the appropriate testing command (e.g., for running all tests, specific toolchain tests, frontend tests, etc).
 
 ## 5. Tech Stack & Conventions
 
@@ -153,11 +153,15 @@ When updating this document, do so with the context of the entire document in mi
 
 ## 6. Operational Commands
 
-**Run these from the project root:**
+**IMPORTANT**: All operational commands are centralized in `Taskfile.yml` and must be executed from the project root. There is no "npm scripts", "per subfolder Taskfile.yml" or other things, literally the source of truth is the `Taskfile.yml` in the repository root.
 
-- **Run all checks**: `task ci`
-- **Setup/Install**: `task deps` (Installs Node modules and Go mods).
-- **Build All**: `task build` (Handles the WASM -> Frontend -> CLI pipeline).
-- **Test All**: `task test`.
-- **Lint All**: `task lint`.
-- **Format All**: `task fmt`.
+1.  **Discover**: Run the following command to see all available tasks and their descriptions:
+    ```bash
+    task --list-all
+    ```
+2.  **Execute**: Run a specific task using:
+    ```bash
+    task <command_name>
+    ```
+
+**Do not guess commands.** The `Taskfile.yml` is the only source of truth for building, testing, linting, formatting, and releasing this project. You can list all the commands or read the file but don't guess random commands.
