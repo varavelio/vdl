@@ -32,9 +32,9 @@ export class WasmClient {
     const go = new window.Go();
     const { instance } = await WebAssembly.instantiateStreaming(
       await fetch(WASM_BINARY_URL),
-      go.importObject
+      go.importObject,
     );
-    
+
     // Run asynchronously
     go.run(instance);
     window.__vdlWasmReady = true;
@@ -95,7 +95,11 @@ export class WasmClient {
   /**
    * Extract a specific procedure declaration from the schema.
    */
-  async extractProc(vdlSchema: string, rpcName: string, procName: string): Promise<string> {
+  async extractProc(
+    vdlSchema: string,
+    rpcName: string,
+    procName: string,
+  ): Promise<string> {
     const res = await this.call({
       functionName: "ExtractProc",
       extractProc: { vdlSchema, rpcName, procName },
@@ -110,7 +114,11 @@ export class WasmClient {
   /**
    * Extract a specific stream declaration from the schema.
    */
-  async extractStream(vdlSchema: string, rpcName: string, streamName: string): Promise<string> {
+  async extractStream(
+    vdlSchema: string,
+    rpcName: string,
+    streamName: string,
+  ): Promise<string> {
     const res = await this.call({
       functionName: "ExtractStream",
       extractStream: { vdlSchema, rpcName, streamName },
@@ -166,4 +174,3 @@ export class WasmClient {
 
 // Export a singleton instance for ease of use
 export const vdlWasm = new WasmClient();
-
