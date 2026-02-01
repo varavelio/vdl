@@ -1,13 +1,28 @@
-# https://taskfile.dev
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+#####################################################################
+# Docs: https://taskfile.dev                                        #
+#                                                                   #
+# Use npx with the "--no" argument to ensure that dependencies with #
+# versions different from those in package.json are not downloaded. #
+#####################################################################
+
+###############################################################################
+# BUILD PIPELINE:                                                             #
+### Install deps -> Build WASM binary -> Build Playground -> Build VDL binary #
+###############################################################################
 
 version: "3"
 
 tasks:
+  ##############
+  # ROOT TASKS #
+  ##############
+
   ci:
     desc: Run all CI tasks
     cmds:
       - task deps
-      - task fmt-check
       - task lint
       - task test
       - task build
@@ -18,7 +33,7 @@ tasks:
       - npm install
       - cd ./toolchain && go mod download
       - cd ./playground && npm install
-      - cd ./docs && npm install
+      # - cd ./docs && npm install
 
   build:
     desc: Builds the WASM binary, the Playground and the VDL binary
@@ -27,7 +42,14 @@ tasks:
       - cd ./playground && npm run build # <- Required by the final VDL binary
       - cd ./toolchain && task build:vdl
 
-  gen:schemas:
+  codegen:
+    desc: Run all project code generators
+    cmds:
+      - task: codegen:schemas
+      - task: tc:codegen
+      - task: pg:codegen
+
+  codegen:schemas:
     desc: Generate the code for the VDL schemas used in the project
     cmds:
       - cd ./toolchain && task install
@@ -37,30 +59,160 @@ tasks:
     desc: Set the version from latest git tag in the relevant files
     cmd: node ./scripts/set-version.ts
 
+  format:
+    desc: Run all repository code formatters
+    cmds:
+      - task: tc:format
+      - task: pg:format
+      - npx prettier '**/*' '!toolchain/**' '!playground/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+
   test:
     desc: Run all repository tests
     cmds:
-      - cd ./toolchain && task test
-      - cd ./playground && npm run test
+      - task: tc:test
+      - task: pg:test
 
   lint:
     desc: Run all repository linters
     cmds:
-      - cd ./toolchain && task lint
-      - cd ./playground && npm run lint
+      - task: tc:lint
+      - task: pg:lint
+      - npx prettier '**/*' '!toolchain/**' '!playground/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
-  fmt:
-    desc: Run all repository code formatters
-    cmds:
-      - prettier . --write --config ./.prettierrc --ignore-path ./.prettierignore --log-level warn # <- Default formatter for the root directory
-      # The following commands are specific to each directory that has its
-      # own formatter
-      - cd ./toolchain && task fmt
-      - cd ./playground && npm run fmt
-      - cd ./docs && npm run fmt
+  ###################
+  # TOOLCHAIN TASKS #
+  ###################
 
-  fmt-check:
-    desc: Run all repository code formatter checks
+  tc:install:
+    desc: TOOLCHAIN - Build and install the vdl binary in the local PATH for testing
+    deps:
+      - codegen
+    cmd: go install ./cmd/vdl/.
+
+  tc:build:wasm:
+    desc: TOOLCHAIN - Build the WebAssembly binary for the Playground
+    deps:
+      - codegen
     cmds:
-      - cd ./toolchain && task fmt-check
-      - cd ./playground && npm run fmt-check
+      - GOOS=js GOARCH=wasm go build -o ./dist/vdl.wasm ./cmd/vdlwasm/.
+      - cp "/usr/local/go/lib/wasm/wasm_exec.js" ./dist/wasm_exec.js
+
+  tc:build:vdl:
+    desc: TOOLCHAIN - Build the vdl binary for all platforms
+    dir: ./toolchain
+    deps:
+      - codegen
+    cmds:
+      # LINUX builds
+      - GOOS=linux GOARCH=amd64 go build -o ./dist/vdl-linux-amd64 ./cmd/vdl/.
+      - GOOS=linux GOARCH=arm64 go build -o ./dist/vdl-linux-arm64 ./cmd/vdl/.
+
+      # WINDOWS builds
+      - GOOS=windows GOARCH=amd64 go build -o ./dist/vdl-windows-amd64.exe ./cmd/vdl/.
+      - GOOS=windows GOARCH=arm64 go build -o ./dist/vdl-windows-arm64.exe ./cmd/vdl/.
+
+      # DARWIN (macOS) builds
+      - GOOS=darwin GOARCH=amd64 go build -o ./dist/vdl-darwin-amd64 ./cmd/vdl/.
+      - GOOS=darwin GOARCH=arm64 go build -o ./dist/vdl-darwin-arm64 ./cmd/vdl/.
+
+  tc:codegen:
+    desc: TOOLCHAIN - Run all toolchain code generators
+    dir: ./toolchain
+    cmds:
+      - task: tc:codegen:schemas
+
+  tc:codegen:schemas:
+    desc: TOOLCHAIN - Generate the JSON Schemas for the project
+    dir: ./toolchain
+    cmd: go run ./internal/cmd/schemagen/.
+
+  tc:format:
+    desc: TOOLCHAIN - Run code formatter
+    dir: ./toolchain
+    cmds:
+      - npx prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - go fmt ./...
+      - go run ./cmd/vdl/. format
+
+  tc:test:
+    desc: TOOLCHAIN - Run all toolchain tests
+    dir: ./toolchain
+    cmds:
+      - go test ./...
+      - go test -race ./...
+
+  tc:lint:
+    desc: TOOLCHAIN - Run all toolchain linters
+    deps: [tc:lint:golang, tc:lint:format]
+    failfast: true
+
+  tc:lint:golang:
+    desc: TOOLCHAIN - Run golang linters
+    dir: ./toolchain
+    cmd: golangci-lint run ./...
+
+  tc:lint:format:
+    desc: TOOLCHAIN - Ensure code is formatted
+    dir: ./toolchain
+    cmds:
+      - |
+        UNFORMATTED=$(gofmt -l .)
+        if [ -n "$UNFORMATTED" ]; then
+          echo "The following files are not formatted correctly:"
+          echo "$UNFORMATTED"
+          exit 1
+        fi
+      - npx prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+
+  ####################
+  # PLAYGROUND TASKS #
+  ####################
+
+  pg:dev:
+    desc: PLAYGROUND - Start development server
+    dir: ./playground
+    cmds:
+      - task: pg:codegen
+      - npx --no vite dev
+
+  pg:build:
+    desc: PLAYGROUND - Build for production
+    dir: ./playground
+    cmds:
+      - task: pg:codegen
+      - npx --no vite build
+      - node ./postbuild.ts
+
+  pg:format:
+    desc: PLAYGROUND - Run code formatter
+    dir: ./playground
+    cmd: npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+
+  pg:lint:
+    desc: PLAYGROUND - Run linter
+    dir: ./playground
+    cmds:
+      - npx --no svelte-kit sync
+      - npx --no svelte-check --tsconfig ./tsconfig.json
+      - npx --no biome lint .
+      - npx prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+
+  pg:test:
+    desc: PLAYGROUND - Run tests
+    dir: ./playground
+    cmd: npx --no vitest run
+
+  pg:codegen:
+    desc: PLAYGROUND - Run all playground code generators
+    dir: ./playground
+    cmds:
+      - task: pg:codegen:irschema
+
+  pg:codegen:irschema:
+    desc: PLAYGROUND - Generate TS types from VDL IR schema
+    dir: ./playground
+    cmd: npx --no json2ts ../toolchain/internal/core/ir/ir.schema.json > ./src/lib/irTypes.ts
+
+  ##############
+  # DOCS TASKS #
+  ##############

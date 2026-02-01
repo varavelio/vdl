@@ -3,14 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "npm run genschema && vite dev",
-    "build": "npm run genschema && npm run lint && vite build && node ./postbuild.ts",
-    "preview": "npm run genschema && npm run lint && vite preview",
-    "prepare": "svelte-kit sync || echo ''",
-    "lint": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && biome lint --write .",
-    "format": "prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --log-level warn",
-    "test": "vitest run",
-    "genschema": "json2ts ../urpc/internal/schema/schema.json > ./src/lib/urpcTypes.ts"
+    "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
