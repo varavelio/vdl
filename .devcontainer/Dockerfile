@@ -8,24 +8,23 @@ ARG TARGETPLATFORM
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN set -e && \
-    # 1. Architecture check
+    # Architecture check
     echo "Building for ${TARGETPLATFORM}" && \
     if [ "${TARGETPLATFORM}" != "linux/amd64" ] && [ "${TARGETPLATFORM}" != "linux/arm64" ]; then \
       echo "Unsupported architecture: ${TARGETPLATFORM}" && exit 1; \
     fi && \
-    # 2. Update and install system dependencies
+    # Update and install system dependencies
     apt-get update -qq && \
     apt-get install -y -qq --no-install-recommends \
         wget curl zip unzip p7zip-full tzdata git npm tree gnupg2 apt-transport-https ca-certificates && \
-    # 3. Install Node.js using n and prettier
+    # Install Node.js using n
     npm install -g n@latest && \
     n 22.18.0 && \
-    npm install -g prettier@3.5.3 && \
-    # 4. Install Dart SDK
+    # Install Dart SDK
     wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/dart.gpg && \
     echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | tee /etc/apt/sources.list.d/dart_stable.list && \
     apt-get update -qq && apt-get install -y -qq dart && \
-    # 5. Install downloadable binaries in a temporary directory
+    # Install downloadable binaries in a temporary directory
     mkdir -p /tmp/bin-downloads && cd /tmp/bin-downloads && \
     if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
         ARCH="arm64"; \
@@ -40,7 +39,7 @@ RUN set -e && \
     wget --no-verbose https://github.com/golangci/golangci-lint/releases/download/v2.8.0/golangci-lint-2.8.0-linux-${ARCH}.tar.gz && \
     tar -xzf golangci-lint-2.8.0-linux-${ARCH}.tar.gz && \
     mv ./golangci-lint-2.8.0-linux-${ARCH}/golangci-lint /usr/local/bin/golangci-lint && \
-    # 6. Final setup: chmod, git config, and cleanup
+    # Final setup: chmod, git config, and cleanup
     chmod +x /usr/local/bin/* && \
     git config --global --add safe.directory '*' && \
     cd / && rm -rf /tmp/bin-downloads /var/lib/apt/lists/*
