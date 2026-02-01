@@ -1,7 +1,7 @@
 {
   "name": "vdl",
-  "version": "1.0.0",
   "type": "module",
+  "private": true,
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/node": "24.3.1",
