@@ -14,20 +14,27 @@
  *
  * Docs: https://svelte.dev/docs/kit/service-workers
  *
- * Caching criteria:
- * - Caches are scoped to the service worker's path.
- * - Caches same-origin assets ONLY if they are inside an `/_app/` subdirectory
- *   relative to the service worker's scope.
- * - Caches cross-origin assets (CDNs, etc.).
- * - Caches only GET requests.
- *
  * Caching strategy:
  * A "Cache First, falling back to Network" strategy is used for all
- * assets that meet the caching criteria.
+ * network requests with the exception of all requests that terminate
+ * with any of the files listed in NETWORK_FIRST_FILES, those use
+ * a "Network First, falling back to Cache" strategy.
+ *
+ * The "version" import changes in every build, use it to invalidate cache on updates.
  */
-import { version } from "$service-worker";
+import { build, files, prerendered, version } from "$service-worker";
 
 const swSelf = globalThis.self as unknown as ServiceWorkerGlobalScope;
+const KNOWN_ASSETS = [...build, ...files, ...prerendered];
+const NETWORK_FIRST_FILES = [
+  "/",
+  "index.html",
+  "version.json",
+  "config.json",
+  "schema.vdl",
+  "openapi.yaml",
+  "openapi.yml",
+];
 
 /**
  * Generates the cache key prefix for the given scope.
@@ -47,12 +54,30 @@ const getCacheKey = (scope: string): string => {
   return `${getCacheKeyPrefix(scope)}-${version}`;
 };
 
-swSelf.addEventListener("install", (event: ExtendableEvent) => {
-  event.waitUntil(swSelf.skipWaiting());
+swSelf.addEventListener("install", (event) => {
+  const scope = swSelf.registration.scope;
+  const currentCacheKey = getCacheKey(scope);
+  const cleanKnownAssets = KNOWN_ASSETS.map((asset) => {
+    // If is URL return as is
+    if (asset.startsWith("http")) return asset;
+    // Make the path relative by removing the first /
+    const relativePath = asset.startsWith("/") ? asset.slice(1) : asset;
+    // Create an absolute path using the current scope
+    return new URL(relativePath, scope).href;
+  });
+
+  async function addFilesToCache() {
+    const cache = await caches.open(currentCacheKey);
+    await cache.addAll(cleanKnownAssets);
+  }
+
+  event.waitUntil(addFilesToCache());
+  swSelf.skipWaiting();
 });
 
 swSelf.addEventListener("activate", (event: ExtendableEvent) => {
   const scope = swSelf.registration.scope;
+  const cachePrefix = getCacheKeyPrefix(scope);
   const currentCacheKey = getCacheKey(scope);
 
   async function cleanOldCaches() {
@@ -60,7 +85,7 @@ swSelf.addEventListener("activate", (event: ExtendableEvent) => {
 
     for (const cacheName of cacheNames) {
       if (cacheName === currentCacheKey) continue;
-      if (cacheName.startsWith(getCacheKeyPrefix(scope))) {
+      if (cacheName.startsWith(cachePrefix)) {
         await caches.delete(cacheName);
       }
     }
@@ -72,33 +97,43 @@ swSelf.addEventListener("activate", (event: ExtendableEvent) => {
 });
 
 swSelf.addEventListener("fetch", (event: FetchEvent) => {
-  const scope = swSelf.registration.scope;
   const request = event.request;
-
-  const scopeURL = new URL(scope);
-  const requestURL = new URL(request.url);
-
-  const scopePath = scopeURL.pathname;
-  const requestPath = requestURL.pathname;
-
-  const isSameOrigin = requestURL.origin === scopeURL.origin;
-  const isInAppPath = requestPath.startsWith(`${scopePath}_app/`);
-
   if (request.method !== "GET") return;
-  if (isSameOrigin && !isInAppPath) return;
+
+  async function respondNetworkFirst(): Promise<Response> {
+    const currentCacheKey = getCacheKey(swSelf.registration.scope);
+    const cache = await caches.open(currentCacheKey);
+
+    try {
+      // Try network first
+      const networkResponse = await fetch(request);
+      if (networkResponse.status === 200) {
+        await cache.put(request, networkResponse.clone());
+      }
+      return networkResponse;
+    } catch (error) {
+      // Fallback to cache (Offline)
+      const cachedResponse = await cache.match(request);
+      if (cachedResponse) return cachedResponse;
+      throw error;
+    }
+  }
 
   async function respondCacheFirst(): Promise<Response> {
-    const currentCacheKey = getCacheKey(scope);
+    const currentCacheKey = getCacheKey(swSelf.registration.scope);
     const cache = await caches.open(currentCacheKey);
     const cachedResponse = await cache.match(request);
 
-    // Cache first
+    // Try cache first
     if (cachedResponse) return cachedResponse;
 
-    // Network fallback (caches if successful)
+    // Fallback to network (caches if successful)
     try {
       const networkResponse = await fetch(request);
-      if (networkResponse && networkResponse.status === 200) {
+      if (
+        networkResponse &&
+        (networkResponse.status === 200 || networkResponse.status === 0)
+      ) {
         await cache.put(request, networkResponse.clone());
       }
       return networkResponse;
@@ -109,6 +144,17 @@ swSelf.addEventListener("fetch", (event: FetchEvent) => {
         headers: { "Content-Type": "text/plain" },
       });
     }
+  }
+
+  const url = new URL(request.url);
+  const isNavigation = request.mode === "navigate";
+  const isCriticalFile = NETWORK_FIRST_FILES.some((file) =>
+    url.pathname.endsWith(file),
+  );
+
+  if (isNavigation || isCriticalFile) {
+    event.respondWith(respondNetworkFirst());
+    return;
   }
 
   event.respondWith(respondCacheFirst());
