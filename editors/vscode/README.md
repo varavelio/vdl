@@ -66,6 +66,10 @@ The following snippets are available for `.vdl` files:
 
 Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/editors/vscode/CHANGELOG.md).
 
+### v0.1.2 - 2026-02-01
+
+- Refactored VDL syntax highlighting with granular declarations and improved pattern matching.
+
 ### v0.1.1 - 2026-01-30
 
 - Added `vdl.openLogs` command to easily open the language server log file.
