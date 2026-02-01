@@ -9,6 +9,7 @@
     "source=${localEnv:HOME}/.config/opencode,target=/root/.config/opencode,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.local/share/opencode,target=/root/.local/share/opencode,type=bind,consistency=cached"
   ],
+  "postCreateCommand": "task deps",
   "customizations": {
     "vscode": {
       "extensions": [
