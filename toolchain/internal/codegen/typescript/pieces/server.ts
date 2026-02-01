@@ -1,6 +1,5 @@
 // This imports are just to prevent errors in the IDE when developing, this imports
 // are handled in the generator for the generated code
-
 import {
   Response,
   VdlError,

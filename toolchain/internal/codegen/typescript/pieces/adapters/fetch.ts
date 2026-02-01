@@ -1,7 +1,7 @@
 // This imports are just to prevent errors in the IDE when developing, this imports
 // are handled in the generator for the generated code
-
 import type { HTTPAdapter } from "../server";
+
 type Server<_> = any;
 
 /** START FROM HERE **/

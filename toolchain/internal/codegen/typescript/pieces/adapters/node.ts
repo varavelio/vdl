@@ -1,12 +1,11 @@
 // This imports are just to prevent errors in the IDE when developing, this imports
 // are handled in the generator for the generated code
-
 import type { HTTPAdapter } from "../server";
+import type { IncomingMessage, ServerResponse } from "node:http";
+
 type Server<_> = any;
 
 /** START FROM HERE **/
-
-import type { IncomingMessage, ServerResponse } from "node:http";
 
 // -----------------------------------------------------------------------------
 // Node.js Adapter - For Express, Fastify, native http, etc.
