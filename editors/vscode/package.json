@@ -97,9 +97,7 @@
     }
   },
   "scripts": {
-    "dev": "node esbuild.js --watch",
-    "build": "node esbuild.js --production",
-    "package": "rm -rf *.vsix && rm -rf ./dist/ && npm run build && vsce package"
+    "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
     "@types/node": "20.x",

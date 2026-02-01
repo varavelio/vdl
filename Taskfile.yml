@@ -64,7 +64,8 @@ tasks:
     cmds:
       - task: tc:format
       - task: pg:format
-      - npx prettier '**/*' '!toolchain/**' '!playground/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+      - task: ve:format
+      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   test:
     desc: Run all repository tests
@@ -77,7 +78,8 @@ tasks:
     cmds:
       - task: tc:lint
       - task: pg:lint
-      - npx prettier '**/*' '!toolchain/**' '!playground/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+      - task: ve:lint
+      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   ###################
   # TOOLCHAIN TASKS #
@@ -130,7 +132,7 @@ tasks:
     desc: TOOLCHAIN - Run code formatter
     dir: ./toolchain
     cmds:
-      - npx prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
       - go fmt ./...
       - go run ./cmd/vdl/. format
 
@@ -162,7 +164,7 @@ tasks:
           echo "$UNFORMATTED"
           exit 1
         fi
-      - npx prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
 
   ####################
   # PLAYGROUND TASKS #
@@ -195,7 +197,7 @@ tasks:
       - npx --no svelte-kit sync
       - npx --no svelte-check --tsconfig ./tsconfig.json
       - npx --no biome lint .
-      - npx prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
 
   pg:test:
     desc: PLAYGROUND - Run tests
@@ -212,6 +214,45 @@ tasks:
     desc: PLAYGROUND - Generate TS types from VDL IR schema
     dir: ./playground
     cmd: npx --no json2ts ../toolchain/internal/core/ir/ir.schema.json > ./src/lib/irTypes.ts
+
+  ##########################
+  # VSCODE EXTENSION TASKS #
+  ##########################
+
+  ve:dev:
+    desc: VSCODE EXT - Build extension code (Development Watch Mode)
+    dir: ./editors/vscode
+    cmd: node esbuild.js --watch
+
+  ve:build:
+    desc: VSCODE EXT - Build extension code (Production mode)
+    dir: ./editors/vscode
+    cmds:
+      - rm -rf ./dist
+      - node esbuild.js --production
+
+  ve:package:
+    desc: VSCODE EXT - Build and package extension to .vsix file
+    dir: ./editors/vscode
+    cmds:
+      - task: ve:build
+      - rm -rf *.vsix
+      - npx --no vsce package
+
+  ve:package:ls:
+    desc: VSCODE EXT - List .vsix file content
+    dir: ./editors/vscode
+    cmd: npx --no vsce ls
+
+  ve:format:
+    desc: PLAYGROUND - Run code formatter
+    dir: ./editors/vscode
+    cmd: npx --no prettier . --write --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+
+  ve:lint:
+    desc: PLAYGROUND - Run linter
+    dir: ./editors/vscode
+    cmd: npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
 
   ##############
   # DOCS TASKS #
