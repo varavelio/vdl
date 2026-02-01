@@ -10,14 +10,15 @@
     { "include": "#comments" },
     { "include": "#docstrings" },
     { "include": "#strings" },
+    { "include": "#declarations" },
     { "include": "#keywords" },
+    { "include": "#functions-macros" },
     { "include": "#constants-language" },
     { "include": "#constants-numeric" },
-    { "include": "#constants-user" },
+    { "include": "#constants-usage" },
     { "include": "#types-primitive" },
     { "include": "#types-container" },
-    { "include": "#types-custom" },
-    { "include": "#functions-macros" },
+    { "include": "#types-usage" },
     { "include": "#operators" },
     { "include": "#properties" }
   ],
@@ -63,11 +64,47 @@
         }
       ]
     },
+    "declarations": {
+      "patterns": [
+        {
+          "name": "meta.declaration.type.vdl",
+          "match": "\\b(type|enum)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.vdl" },
+            "2": { "name": "entity.name.type.class.vdl" }
+          }
+        },
+        {
+          "name": "meta.declaration.rpc.vdl",
+          "match": "\\b(rpc)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.vdl" },
+            "2": { "name": "entity.name.type.class.vdl" }
+          }
+        },
+        {
+          "name": "meta.declaration.function.vdl",
+          "match": "\\b(proc|stream|pattern)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.vdl" },
+            "2": { "name": "entity.name.function.vdl" }
+          }
+        },
+        {
+          "name": "meta.declaration.constant.vdl",
+          "match": "\\b(const)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.vdl" },
+            "2": { "name": "variable.other.constant.vdl" }
+          }
+        }
+      ]
+    },
     "keywords": {
       "patterns": [
         {
           "name": "keyword.control.vdl",
-          "match": "\\b(type|rpc|proc|stream|enum|const|pattern|input|output|include)\\b"
+          "match": "\\b(include|input|output)\\b"
         }
       ]
     },
@@ -75,7 +112,19 @@
       "patterns": [
         {
           "name": "keyword.other.deprecated.vdl",
-          "match": "\\b(deprecated)\\b"
+          "match": "\\bdeprecated\\b"
+        },
+        {
+          "begin": "\\b(deprecated)\\s*(\\()",
+          "beginCaptures": {
+            "1": { "name": "keyword.other.deprecated.vdl" },
+            "2": { "name": "punctuation.definition.parameters.begin.vdl" }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.parameters.end.vdl" }
+          },
+          "patterns": [{ "include": "#strings" }]
         }
       ]
     },
@@ -99,11 +148,12 @@
         }
       ]
     },
-    "constants-user": {
+    "constants-usage": {
       "patterns": [
         {
-          "name": "constant.other.caps.vdl",
-          "match": "\\b[A-Z][A-Z0-9_]+\\b"
+          "comment": "Matches UPPER_CASE identifiers as constants references",
+          "name": "variable.other.constant.vdl",
+          "match": "\\b[A-Z][A-Z0-9_]*_\\w+\\b|\\b[A-Z]{2,}\\b"
         }
       ]
     },
@@ -123,11 +173,12 @@
         }
       ]
     },
-    "types-custom": {
+    "types-usage": {
       "patterns": [
         {
+          "comment": "Matches PascalCase identifiers as Types/Enums references",
           "name": "entity.name.type.class.vdl",
-          "match": "\\b([A-Z][a-zA-Z0-9]*)\\b"
+          "match": "\\b[A-Z][a-zA-Z0-9]*\\b"
         }
       ]
     },
@@ -190,8 +241,9 @@
     "properties": {
       "patterns": [
         {
+          "comment": "Matches properties like field: Type",
           "name": "variable.object.property.vdl",
-          "match": "\\b[a-z][a-zA-Z0-9]*\\b(?=\\s*(\\?|:))"
+          "match": "\\b[a-z][a-zA-Z0-9_]*\\b(?=\\s*(\\?|:))"
         }
       ]
     }
