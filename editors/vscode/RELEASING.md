@@ -37,7 +37,7 @@ This document outlines the manual process for releasing a new version of the VDL
     Run the following command from the **root** directory. This task cleans previous builds, compiles the code, and packages the extension.
 
     ```bash
-    task ve:package
+    task vs:package
     ```
 
 2.  **Verify the Artifact**
@@ -45,7 +45,7 @@ This document outlines the manual process for releasing a new version of the VDL
     - (Optional) Verify the package contents to ensure only necessary files are included:
 
       ```bash
-      task ve:package:ls
+      task vs:package:ls
       ```
 
 ---

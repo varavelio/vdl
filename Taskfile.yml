@@ -67,7 +67,7 @@ tasks:
     cmds:
       - task: tc:format
       - task: pg:format
-      - task: ve:format
+      - task: vs:format
       - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   test:
@@ -81,7 +81,7 @@ tasks:
     cmds:
       - task: tc:lint
       - task: pg:lint
-      - task: ve:lint
+      - task: vs:lint
       - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   ###################
@@ -222,39 +222,39 @@ tasks:
   # VSCODE EXTENSION TASKS #
   ##########################
 
-  ve:dev:
+  vs:dev:
     desc: "VSCode: Build extension in watch mode"
     dir: ./editors/vscode
     cmds:
       - rm -rf ./dist
       - node esbuild.js --watch
 
-  ve:build:
+  vs:build:
     desc: "VSCode: Build extension for production"
     dir: ./editors/vscode
     cmds:
       - rm -rf ./dist
       - node esbuild.js --production
 
-  ve:package:
+  vs:package:
     desc: "VSCode: Package extension into .vsix"
     dir: ./editors/vscode
     cmds:
-      - task: ve:build
+      - task: vs:build
       - rm -rf *.vsix
       - npx --no vsce package
 
-  ve:package:ls:
+  vs:package:ls:
     desc: "VSCode: List contents of packaged .vsix"
     dir: ./editors/vscode
     cmd: npx --no vsce ls
 
-  ve:format:
+  vs:format:
     desc: "VSCode: Format extension code"
     dir: ./editors/vscode
     cmd: npx --no prettier . --write --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
 
-  ve:lint:
+  vs:lint:
     desc: "VSCode: Lint extension code"
     dir: ./editors/vscode
     cmd: npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
