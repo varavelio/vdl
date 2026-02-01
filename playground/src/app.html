@@ -10,8 +10,8 @@
     <script>
       const __mpOriginalFetch = globalThis.fetch;
       const __mpRedirects = {
-        "/tree-sitter.wasm": "./app/cconv/tree-sitter.wasm",
-        "/tree-sitter-bash.wasm": "./app/cconv/tree-sitter-bash.wasm",
+        "/tree-sitter.wasm": "./_app/curlconverter/tree-sitter.wasm",
+        "/tree-sitter-bash.wasm": "./_app/curlconverter/tree-sitter-bash.wasm",
       };
       globalThis.fetch = async function (resource, options) {
         if (__mpRedirects[resource]) resource = __mpRedirects[resource];

@@ -10,20 +10,20 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: "../urpc/dist/urpc.wasm",
-          dest: "app/urpc",
+          src: "../toolchain/dist/vdl.wasm",
+          dest: "_app/vdl",
         },
         {
-          src: "../urpc/dist/wasm_exec.js",
-          dest: "app/urpc",
+          src: "../toolchain/dist/wasm_exec.js",
+          dest: "_app/vdl",
         },
         {
           src: "node_modules/web-tree-sitter/tree-sitter.wasm",
-          dest: "app/cconv",
+          dest: "_app/curlconverter",
         },
         {
           src: "node_modules/curlconverter/dist/tree-sitter-bash.wasm",
-          dest: "app/cconv",
+          dest: "_app/curlconverter",
         },
       ],
     }),

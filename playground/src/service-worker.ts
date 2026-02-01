@@ -16,7 +16,7 @@
  *
  * Caching criteria:
  * - Caches are scoped to the service worker's path.
- * - Caches same-origin assets ONLY if they are inside an `/app/` subdirectory
+ * - Caches same-origin assets ONLY if they are inside an `/_app/` subdirectory
  *   relative to the service worker's scope.
  * - Caches cross-origin assets (CDNs, etc.).
  * - Caches only GET requests.
@@ -82,7 +82,7 @@ swSelf.addEventListener("fetch", (event: FetchEvent) => {
   const requestPath = requestURL.pathname;
 
   const isSameOrigin = requestURL.origin === scopeURL.origin;
-  const isInAppPath = requestPath.startsWith(`${scopePath}app/`);
+  const isInAppPath = requestPath.startsWith(`${scopePath}_app/`);
 
   if (request.method !== "GET") return;
   if (isSameOrigin && !isInAppPath) return;

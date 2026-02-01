@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 /**
- * Script to replace all absolute resource paths (e.g., "/icon.png", "/app/...")
- * with relative paths ("./icon.png", "./app/...") throughout the build output.
+ * Script to replace all absolute resource paths (e.g., "/icon.png", "/_app/...")
+ * with relative paths ("./icon.png", "./_app/...") throughout the build output.
  *
  * It solves the following SvelteKit issue:
  * https://github.com/sveltejs/kit/issues/9569
