@@ -29,8 +29,7 @@ func cmdGenerate(args *cmdGenerateArgs) {
 	}
 
 	if args.ConfigPath == "" {
-		fmt.Fprintf(os.Stderr, "VDL could not find the configuration file (searched: %s)\n", strings.Join(candidates, ", "))
-		os.Exit(1)
+		printFatal("VDL could not find the configuration file (searched: %s)", strings.Join(candidates, ", "))
 	}
 
 	fileCount, err := codegen.Run(args.ConfigPath)
@@ -64,5 +63,5 @@ func cmdGenerate(args *cmdGenerateArgs) {
 		filesText = "file"
 	}
 
-	fmt.Printf("VDL generated %d %s in %s\n", fileCount, filesText, time.Since(startTime))
+	printSuccess("VDL generated %d %s in %s", fileCount, filesText, time.Since(startTime))
 }

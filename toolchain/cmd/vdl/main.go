@@ -42,8 +42,7 @@ func main() {
 	var args allArgs
 	p, err := arg.NewParser(arg.Config{}, &args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "VDL failed to create arg parser: %v\n", err)
-		os.Exit(1)
+		printFatal("VDL failed to create arg parser: %v", err)
 	}
 
 	err = p.Parse(os.Args[1:])
@@ -53,7 +52,7 @@ func main() {
 		p.WriteHelp(os.Stdout)
 		os.Exit(0)
 	case err != nil:
-		fmt.Fprintf(os.Stderr, "VDL error: %v\n", err)
+		printError("VDL error: %v", err)
 		p.WriteUsage(os.Stderr)
 		os.Exit(1)
 	}

@@ -21,7 +21,6 @@ func cmdLSP(_ *cmdLSPArgs) {
 
 	lspInstance := lsp.New(os.Stdin, os.Stdout)
 	if err := lspInstance.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "VDL lsp error: %v\n", err)
-		os.Exit(1)
+		printFatal("VDL lsp error: %v", err)
 	}
 }
