@@ -61,8 +61,18 @@ This document outlines the manual process for releasing a new version of the VDL
     - _Note:_ This suffix is mandatory to distinguish extension releases from the core VDL binary releases in the monorepo.
 
 3.  **Release Details**
-    - **Title:** `VDL VS Code Extension vX.X.X`
-    - **Description:** Copy the relevant section from your `CHANGELOG.md`.
+    - **Title:** `VDL VSCode Extension vX.X.X`
+    - **Description:** Use the following exact format (copy from `CHANGELOG.md` and add the comparison link):
+
+      ```markdown
+      ## vX.X.X - YYYY-MM-DD
+
+      - Changes from changelog here...
+      - One list item per change...
+
+      **Full Changelog**: https://github.com/varavelio/vdl/compare/v{PREVIOUS}-vscode...v{CURRENT}-vscode
+      ```
+
     - **Assets:** Upload the generated `.vsix` file to the release assets.
 
 4.  **Publish**
