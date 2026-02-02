@@ -4,16 +4,17 @@ import "fmt"
 
 // ANSI color codes
 const (
-	reset   = "\033[0m"
-	bold    = "\033[1m"
-	black   = "\033[30m"
-	red     = "\033[31m"
-	green   = "\033[32m"
-	yellow  = "\033[33m"
-	blue    = "\033[34m"
-	magenta = "\033[35m"
-	cyan    = "\033[36m"
-	white   = "\033[37m"
+	reset     = "\033[0m"
+	bold      = "\033[1m"
+	underline = "\033[4m"
+	black     = "\033[30m"
+	red       = "\033[31m"
+	green     = "\033[32m"
+	yellow    = "\033[33m"
+	blue      = "\033[34m"
+	magenta   = "\033[35m"
+	cyan      = "\033[36m"
+	white     = "\033[37m"
 )
 
 // ColorizeBlack returns the string wrapped in black color.
@@ -99,4 +100,29 @@ func ColorizeCyanBold(s string) string {
 // ColorizeWhiteBold returns the string wrapped in bold white color.
 func ColorizeWhiteBold(s string) string {
 	return fmt.Sprintf("%s%s%s%s", bold, white, s, reset)
+}
+
+// ColorizeUnderline returns the string wrapped in underline.
+func ColorizeUnderline(s string) string {
+	return fmt.Sprintf("%s%s%s", underline, s, reset)
+}
+
+// ColorizeBlueUnderline returns the string wrapped in blue color with underline.
+func ColorizeBlueUnderline(s string) string {
+	return fmt.Sprintf("%s%s%s%s", underline, blue, s, reset)
+}
+
+// ColorizeBlueBoldUnderline returns the string wrapped in bold blue color with underline.
+func ColorizeBlueBoldUnderline(s string) string {
+	return fmt.Sprintf("%s%s%s%s%s", bold, underline, blue, s, reset)
+}
+
+// ColorizeCyanUnderline returns the string wrapped in cyan color with underline.
+func ColorizeCyanUnderline(s string) string {
+	return fmt.Sprintf("%s%s%s%s", underline, cyan, s, reset)
+}
+
+// ColorizeCyanBoldUnderline returns the string wrapped in bold cyan color with underline.
+func ColorizeCyanBoldUnderline(s string) string {
+	return fmt.Sprintf("%s%s%s%s%s", bold, underline, cyan, s, reset)
 }
