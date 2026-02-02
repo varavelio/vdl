@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // validateSpreads checks that all spread references are valid:
@@ -63,12 +64,20 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 		// Check if the referenced type exists
 		refType := symbols.lookupType(spread.TypeName)
 		if refType == nil {
+			msg := fmt.Sprintf("spread references undefined type %q", spread.TypeName)
+
+			// Find similar types to suggest (only types, not enums for spreads)
+			suggestions, _ := strutil.FuzzySearch(symbols.allTypeNames(), spread.TypeName)
+			if len(suggestions) > 0 {
+				msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
+			}
+
 			diagnostics = append(diagnostics, newDiagnostic(
 				typ.File,
 				spread.Pos,
 				spread.EndPos,
 				CodeSpreadTypeNotFound,
-				fmt.Sprintf("spread references undefined type %q", spread.TypeName),
+				msg,
 			))
 			continue
 		}
@@ -118,13 +127,21 @@ func validateBlockSpreads(symbols *symbolTable, block *BlockSymbol, parentFile, 
 		// Check if the referenced type exists
 		refType := symbols.lookupType(spread.TypeName)
 		if refType == nil {
+			msg := fmt.Sprintf("spread in %s %q references undefined type %q",
+				context, parentName, spread.TypeName)
+
+			// Find similar types to suggest (only types, not enums for spreads)
+			suggestions, _ := strutil.FuzzySearch(symbols.allTypeNames(), spread.TypeName)
+			if len(suggestions) > 0 {
+				msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
+			}
+
 			diagnostics = append(diagnostics, newDiagnostic(
 				parentFile,
 				spread.Pos,
 				spread.EndPos,
 				CodeSpreadTypeNotFound,
-				fmt.Sprintf("spread in %s %q references undefined type %q",
-					context, parentName, spread.TypeName),
+				msg,
 			))
 			continue
 		}

@@ -5,6 +5,7 @@ package analysis
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
@@ -125,5 +126,28 @@ func newDiagnosticFromPositions(positions ast.Positions, code, message string) D
 		EndPos:  positions.EndPos,
 		Code:    code,
 		Message: message,
+	}
+}
+
+// formatSuggestions formats a slice of suggestions for display in error messages.
+// Returns strings like: "Foo", "Foo or Bar", "Foo, Bar, or Baz"
+func formatSuggestions(suggestions []string) string {
+	switch len(suggestions) {
+	case 0:
+		return ""
+	case 1:
+		return fmt.Sprintf("%q", suggestions[0])
+	case 2:
+		return fmt.Sprintf("%q or %q", suggestions[0], suggestions[1])
+	default:
+		var b strings.Builder
+		for i, s := range suggestions {
+			if i == len(suggestions)-1 {
+				fmt.Fprintf(&b, "or %q", s)
+			} else {
+				fmt.Fprintf(&b, "%q, ", s)
+			}
+		}
+		return b.String()
 	}
 }

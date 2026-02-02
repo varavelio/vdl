@@ -402,3 +402,122 @@ func TestEdgeCases(t *testing.T) {
 		assert.Equal(t, analysis.CodeFileNotFound, diagnostics[0].Code)
 	})
 }
+
+// ============================================================================
+// Fuzzy Search Suggestion Tests - verify "did you mean" suggestions
+// ============================================================================
+
+func TestFuzzySuggestions(t *testing.T) {
+	t.Run("type_not_found_suggests_similar_type", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type User {
+					name: string
+			}
+
+			type Profile {
+					user: Usr
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeTypeNotDeclared, diagnostics[0].Code)
+		assert.Contains(t, diagnostics[0].Message, "did you mean")
+		assert.Contains(t, diagnostics[0].Message, "User")
+	})
+
+	t.Run("type_not_found_suggests_primitive", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type User {
+					name: strnig
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeTypeNotDeclared, diagnostics[0].Code)
+		assert.Contains(t, diagnostics[0].Message, "did you mean")
+		assert.Contains(t, diagnostics[0].Message, "string")
+	})
+
+	t.Run("type_not_found_suggests_enum", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			enum Status {
+					Active
+					Inactive
+			}
+
+			type User {
+					status: Staus
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeTypeNotDeclared, diagnostics[0].Code)
+		assert.Contains(t, diagnostics[0].Message, "did you mean")
+		assert.Contains(t, diagnostics[0].Message, "Status")
+	})
+
+	t.Run("spread_not_found_suggests_similar_type", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type BaseEntity {
+					id: string
+			}
+
+			type User {
+					...BasEntity
+					name: string
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeSpreadTypeNotFound, diagnostics[0].Code)
+		assert.Contains(t, diagnostics[0].Message, "did you mean")
+		assert.Contains(t, diagnostics[0].Message, "BaseEntity")
+	})
+
+	t.Run("transposition_typo_suggests_correct_type", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Unit {
+					value: int
+			}
+
+			type Measurement {
+					unit: Uint
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeTypeNotDeclared, diagnostics[0].Code)
+		assert.Contains(t, diagnostics[0].Message, "did you mean")
+		assert.Contains(t, diagnostics[0].Message, "Unit")
+	})
+
+	t.Run("no_suggestion_when_completely_different", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type User {
+					name: Xyzzy
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeTypeNotDeclared, diagnostics[0].Code)
+		assert.NotContains(t, diagnostics[0].Message, "did you mean")
+	})
+}

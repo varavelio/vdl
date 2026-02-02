@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // validateTypes checks that all type references point to existing types.
@@ -79,14 +80,24 @@ func validateFieldType(symbols *symbolTable, typeInfo *FieldTypeInfo, field *Fie
 			// Link the resolved enum for O(1) LSP navigation
 			typeInfo.ResolvedEnum = enumSym
 		} else {
-			// Type not found - emit diagnostic
+			// Type not found - emit diagnostic with suggestions
+			msg := fmt.Sprintf(
+				"undefined type %q in field %q of %s %q",
+				typeInfo.Name, field.Name, context, parentName,
+			)
+
+			// Find similar types to suggest
+			suggestions, _ := strutil.FuzzySearch(symbols.allFieldTypeNames(), typeInfo.Name)
+			if len(suggestions) > 0 {
+				msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
+			}
+
 			diagnostics = append(diagnostics, newDiagnostic(
 				field.File,
 				field.Pos,
 				field.EndPos,
 				CodeTypeNotDeclared,
-				fmt.Sprintf("type %q referenced in field %q of %s %q is not declared",
-					typeInfo.Name, field.Name, context, parentName),
+				msg,
 			))
 		}
 

@@ -150,6 +150,36 @@ func (st *symbolTable) lookupEnum(name string) *EnumSymbol {
 	return st.enums[name]
 }
 
+// allTypeNames returns a slice of all registered type names.
+func (st *symbolTable) allTypeNames() []string {
+	names := make([]string, 0, len(st.types))
+	for name := range st.types {
+		names = append(names, name)
+	}
+	return names
+}
+
+// allFieldTypeNames returns all valid type names for field types.
+// This includes primitive types, custom types, and enums.
+func (st *symbolTable) allFieldTypeNames() []string {
+	names := make([]string, 0, len(st.types)+len(st.enums)+5)
+
+	// Add primitive types
+	names = append(names, "string", "int", "float", "bool", "datetime")
+
+	// Add custom types
+	for name := range st.types {
+		names = append(names, name)
+	}
+
+	// Add enums
+	for name := range st.enums {
+		names = append(names, name)
+	}
+
+	return names
+}
+
 // buildProgram creates a Program from the collected symbols.
 func (st *symbolTable) buildProgram(entryPoint string, files map[string]*File) *Program {
 	return &Program{
