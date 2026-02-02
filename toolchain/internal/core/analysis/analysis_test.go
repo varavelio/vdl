@@ -521,3 +521,168 @@ func TestFuzzySuggestions(t *testing.T) {
 		assert.NotContains(t, diagnostics[0].Message, "did you mean")
 	})
 }
+
+// ============================================================================
+// Cycle Detection Tests - verify circular type dependency handling
+// ============================================================================
+
+func TestCycleDetection(t *testing.T) {
+	t.Run("direct_cycle_without_optional_is_error", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Node {
+				child: Node
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeCircularTypeDependency, diagnostics[0].Code)
+		assert.Contains(t, diagnostics[0].Message, "Node -> Node")
+	})
+
+	t.Run("direct_cycle_with_optional_is_valid", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Node {
+				child?: Node
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		assert.Empty(t, diagnostics, "Optional self-reference should be allowed")
+	})
+
+	t.Run("indirect_cycle_without_optional_is_error", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type A {
+				b: B
+			}
+			type B {
+				c: C
+			}
+			type C {
+				a: A
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		// Should have 3 errors (one per type in cycle)
+		require.True(t, len(diagnostics) >= 1, "Expected at least 1 cycle error")
+		for _, d := range diagnostics {
+			assert.Equal(t, analysis.CodeCircularTypeDependency, d.Code)
+		}
+	})
+
+	t.Run("indirect_cycle_with_one_optional_is_valid", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type A {
+				b: B
+			}
+			type B {
+				c: C
+			}
+			type C {
+				a?: A
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		assert.Empty(t, diagnostics, "Cycle with one optional field should be allowed")
+	})
+
+	t.Run("array_cycle_without_optional_is_error", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type TreeNode {
+				value: string
+				children: TreeNode[]
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeCircularTypeDependency, diagnostics[0].Code)
+	})
+
+	t.Run("array_cycle_with_optional_is_valid", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type TreeNode {
+				value: string
+				children?: TreeNode[]
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		assert.Empty(t, diagnostics, "Optional array self-reference should be allowed")
+	})
+
+	t.Run("map_cycle_without_optional_is_error", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Graph {
+				name: string
+				edges: map<Graph>
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		require.Len(t, diagnostics, 1)
+		assert.Equal(t, analysis.CodeCircularTypeDependency, diagnostics[0].Code)
+	})
+
+	t.Run("map_cycle_with_optional_is_valid", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Graph {
+				name: string
+				edges?: map<Graph>
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		assert.Empty(t, diagnostics, "Optional map self-reference should be allowed")
+	})
+
+	t.Run("inline_object_cycle_with_optional_is_valid", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Container {
+				item?: {
+					nested?: Container
+				}
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		assert.Empty(t, diagnostics, "Optional inline object cycle should be allowed")
+	})
+
+	t.Run("mutual_optional_references_are_valid", func(t *testing.T) {
+		fs := vfs.New()
+		fs.WriteFileCache("/test.vdl", []byte(`
+			type Parent {
+				children?: Child[]
+			}
+			type Child {
+				parent?: Parent
+			}
+		`))
+
+		_, diagnostics := analysis.Analyze(fs, "/test.vdl")
+
+		assert.Empty(t, diagnostics, "Mutual optional references should be allowed")
+	})
+}
