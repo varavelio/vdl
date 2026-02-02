@@ -13,10 +13,15 @@ import (
 
 // FuzzySearch performs a search using the Levenshtein distance algorithm.
 //
+// The maximum distance is automatically determined based on query length:
+//   - query <= 4 chars: distance 1
+//   - query <= 8 chars: distance 2
+//   - query > 8 chars: distance 3
+//
 // It returns:
-//   - fuzzyMatches: A slice of strings from data that fall within the maxDist threshold after normalization.
+//   - fuzzyMatches: A slice of strings from data that fall within the distance threshold after normalization.
 //   - exactMatchFound: A boolean indicating whether the exactMatch was identified before normalization (LITERALLY EXACT MATCH).
-func FuzzySearch(data []string, query string, maxDist int) (fuzzyMatches []string, exactMatchFound bool) {
+func FuzzySearch(data []string, query string) (fuzzyMatches []string, exactMatchFound bool) {
 	if len(data) == 0 {
 		return nil, false
 	}
@@ -26,6 +31,7 @@ func FuzzySearch(data []string, query string, maxDist int) (fuzzyMatches []strin
 
 	normalizedQuery := normalize(query)
 	queryRunes := []rune(normalizedQuery)
+	maxDist := getAdaptiveDistance(normalizedQuery)
 
 	resultsChan := make(chan string, len(data))
 	var wg sync.WaitGroup
@@ -98,4 +104,15 @@ func abs(x int) int {
 		return -x
 	}
 	return x
+}
+
+func getAdaptiveDistance(query string) int {
+	length := len([]rune(query))
+	if length <= 4 {
+		return 1
+	}
+	if length <= 8 {
+		return 2
+	}
+	return 3
 }
