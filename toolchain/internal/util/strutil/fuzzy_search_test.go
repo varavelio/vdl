@@ -37,31 +37,45 @@ func TestFuzzySearch(t *testing.T) {
 		require.Len(t, matches, maxFuzzyResults)
 	})
 
-	t.Run("results sorted by distance then length similarity", func(t *testing.T) {
-		// Query "hello" (5 chars) -> distance 2
-		data := []string{"help", "hallo", "hello", "helloo", "helo"}
+	t.Run("exact normalized match ranks first", func(t *testing.T) {
+		data := []string{"helloo", "hallo", "hello", "help", "helo"}
 
 		matches, _ := FuzzySearch(data, "hello")
-		// hello(dist=0, lenDiff=0), hallo(dist=1, lenDiff=0), helo(dist=1, lenDiff=1), helloo(dist=1, lenDiff=1)
-		// Both helo and helloo have dist=1, lenDiff=1, so order between them is not guaranteed
 		require.Len(t, matches, 3)
-		require.Equal(t, "hello", matches[0])
-		require.Equal(t, "hallo", matches[1])
-		// Third is either helo or helloo (both have same distance and lenDiff)
-		require.True(t, matches[2] == "helo" || matches[2] == "helloo")
+		require.Equal(t, "hello", matches[0]) // exact match
+		// helloo is prefix match (hello is prefix of helloo), ranks second
+		require.Equal(t, "helloo", matches[1])
 	})
 
-	t.Run("length similarity breaks distance ties", func(t *testing.T) {
-		// Query "test" (4 chars) -> distance 1
-		data := []string{"tests", "tes", "test", "text"}
+	t.Run("prefix matches rank higher than edit distance", func(t *testing.T) {
+		// Query "test" - "tests" and "testing" are prefix matches
+		data := []string{"text", "tests", "testing", "test"}
 
 		matches, _ := FuzzySearch(data, "test")
-		// test(dist=0, lenDiff=0) should be first
-		// text(dist=1, lenDiff=0), tes(dist=1, lenDiff=1), tests(dist=1, lenDiff=1)
-		require.Equal(t, "test", matches[0])
-		require.Equal(t, "text", matches[1])
-		// Third could be "tes" or "tests" (both lenDiff=1), order may vary
-		require.Len(t, matches, 3)
+		require.Equal(t, "test", matches[0])    // exact
+		require.Equal(t, "tests", matches[1])   // prefix
+		require.Equal(t, "testing", matches[2]) // prefix (longer)
+	})
+
+	t.Run("suffix matches included even beyond edit distance", func(t *testing.T) {
+		// Query "User" (4 chars, maxDist=1)
+		// "BaseUser" is 8 chars, diff=4 > maxDist, but it's a suffix match
+		data := []string{"BaseUser", "Users", "User", "Usr"}
+
+		matches, _ := FuzzySearch(data, "User")
+		require.Contains(t, matches, "User")
+		require.Contains(t, matches, "Users")    // prefix match
+		require.Contains(t, matches, "BaseUser") // suffix match
+	})
+
+	t.Run("contains matches included", func(t *testing.T) {
+		// Query "User" contained in "SuperUserAdmin"
+		data := []string{"SuperUserAdmin", "UserProfile", "User", "Admin"}
+
+		matches, _ := FuzzySearch(data, "User")
+		require.Equal(t, "User", matches[0]) // exact
+		require.Contains(t, matches, "UserProfile")
+		require.Contains(t, matches, "SuperUserAdmin")
 	})
 
 	t.Run("transpositions rank higher than substitutions", func(t *testing.T) {
@@ -71,7 +85,6 @@ func TestFuzzySearch(t *testing.T) {
 
 		matches, exact := FuzzySearch(data, "uint")
 		require.True(t, exact)
-		// uint(dist=0), unit(dist=1, transposition), hint(dist=1), init(dist=2-excluded)
 		require.Contains(t, matches, "uint")
 		require.Contains(t, matches, "unit")
 	})
@@ -81,7 +94,6 @@ func TestFuzzySearch(t *testing.T) {
 		data := []string{"cat", "car", "bat", "dog"}
 
 		matches, _ := FuzzySearch(data, "cat")
-		// cat(0), car(1), bat(1), dog(3-excluded)
 		require.Len(t, matches, 3)
 		require.Equal(t, "cat", matches[0])
 	})
@@ -108,7 +120,7 @@ func TestFuzzySearch(t *testing.T) {
 		data := []string{"cafe", "café", "CAFÉ", "Cafe"}
 
 		matches, _ := FuzzySearch(data, "cafe")
-		// All normalize to "cafe", so all match with distance 0
+		// All normalize to "cafe", so all match
 		require.Len(t, matches, 3)
 
 		_, exact := FuzzySearch(data, "café")
@@ -122,13 +134,12 @@ func TestFuzzySearch(t *testing.T) {
 		require.Len(t, matches, 3)
 	})
 
-	t.Run("empty query string", func(t *testing.T) {
+	t.Run("empty query string matches only empty strings", func(t *testing.T) {
 		data := []string{"", "a", "ab", "abc"}
 
 		matches, exact := FuzzySearch(data, "")
-		// empty query (0 chars) -> distance 1
-		// ""(dist=0), "a"(dist=1)
-		require.Len(t, matches, 2)
+		require.Len(t, matches, 1)
+		require.Equal(t, "", matches[0])
 		require.True(t, exact)
 	})
 
@@ -157,9 +168,10 @@ func TestFuzzySearch(t *testing.T) {
 
 		// Query "ab" (2 chars) -> distance 1
 		matches, _ := FuzzySearch(data, "ab")
-		// ab(0), ba(1-transposition), abc(1-insertion), acb excluded by limit
 		require.Len(t, matches, 3)
 		require.Equal(t, "ab", matches[0])
+		// abc is a prefix match
+		require.Equal(t, "abc", matches[1])
 	})
 
 	t.Run("transpositions in longer strings", func(t *testing.T) {
@@ -167,9 +179,10 @@ func TestFuzzySearch(t *testing.T) {
 
 		// Query "receive" (7 chars) -> distance 2
 		matches, _ := FuzzySearch(data, "receive")
-		// receive(0), recieve(1-transposition), receiver(1-insertion)
 		require.Len(t, matches, 3)
 		require.Equal(t, "receive", matches[0])
+		// receiver is prefix match
+		require.Equal(t, "receiver", matches[1])
 		require.Contains(t, matches, "recieve")
 	})
 
@@ -213,11 +226,100 @@ func TestFuzzySearch(t *testing.T) {
 			data[i] = "word"
 		}
 		data[50] = "test"
-		data[51] = "text"
-		data[52] = "tест" // different but same length
+		data[51] = "testing" // prefix match
 
 		matches, _ := FuzzySearch(data, "test")
 		require.LessOrEqual(t, len(matches), 3)
 		require.Equal(t, "test", matches[0])
+	})
+
+	// New tests for prefix/suffix/contains functionality
+
+	t.Run("prefix match skips edit distance calculation", func(t *testing.T) {
+		// "UserRepository" starts with "User" - should match even though
+		// length diff (14-4=10) exceeds maxDist (1 for 4 chars)
+		data := []string{"UserRepository", "AdminService", "User"}
+
+		matches, _ := FuzzySearch(data, "User")
+		require.Contains(t, matches, "User")
+		require.Contains(t, matches, "UserRepository")
+	})
+
+	t.Run("suffix match skips edit distance calculation", func(t *testing.T) {
+		// "IUserService" ends with "Service" - should match
+		data := []string{"IUserService", "AdminController", "Service"}
+
+		matches, _ := FuzzySearch(data, "Service")
+		require.Contains(t, matches, "Service")
+		require.Contains(t, matches, "IUserService")
+	})
+
+	t.Run("contains match skips edit distance calculation", func(t *testing.T) {
+		// "getUserById" contains "User" - should match
+		data := []string{"getUserById", "AdminService", "User"}
+
+		matches, _ := FuzzySearch(data, "User")
+		require.Contains(t, matches, "User")
+		require.Contains(t, matches, "getUserById")
+	})
+
+	t.Run("priority order exact > prefix > suffix > contains > edit", func(t *testing.T) {
+		data := []string{
+			"MyUserHelper", // contains "User"
+			"SuperUser",    // suffix "User"
+			"UserService",  // prefix "User"
+			"User",         // exact
+			"Usr",          // edit distance
+		}
+
+		matches, _ := FuzzySearch(data, "User")
+		require.Len(t, matches, 3)
+		require.Equal(t, "User", matches[0])        // exact
+		require.Equal(t, "UserService", matches[1]) // prefix
+		require.Equal(t, "SuperUser", matches[2])   // suffix
+	})
+
+	t.Run("abbreviation as prefix finds full names", func(t *testing.T) {
+		// User types "Cfg" looking for "Config" or "Configuration"
+		data := []string{"Configuration", "Config", "Settings", "CfgManager"}
+
+		matches, _ := FuzzySearch(data, "Cfg")
+		// CfgManager starts with Cfg
+		require.Contains(t, matches, "CfgManager")
+	})
+
+	t.Run("case insensitive structural matching", func(t *testing.T) {
+		data := []string{"UserService", "USERSERVICE", "userservice"}
+
+		matches, _ := FuzzySearch(data, "user")
+		// All should match as prefix (normalized)
+		require.Len(t, matches, 3)
+	})
+
+	t.Run("structural matches with diacritics", func(t *testing.T) {
+		data := []string{"CaféService", "CafeManager", "Café"}
+
+		matches, _ := FuzzySearch(data, "cafe")
+		require.Len(t, matches, 3)
+		// All normalize and match
+	})
+
+	t.Run("edit distance still works when no structural match", func(t *testing.T) {
+		// "Sttring" has typo, no structural match with "String"
+		data := []string{"String", "Integer", "Boolean"}
+
+		matches, _ := FuzzySearch(data, "Sttring")
+		require.Contains(t, matches, "String") // edit distance match
+	})
+
+	t.Run("short abbreviation finds longer matches", func(t *testing.T) {
+		// Common pattern: user types short form
+		data := []string{"StringBuilder", "StringBuffer", "String", "Integer"}
+
+		matches, _ := FuzzySearch(data, "Str")
+		// All String* should match as prefix
+		require.Contains(t, matches, "String")
+		require.Contains(t, matches, "StringBuilder")
+		require.Contains(t, matches, "StringBuffer")
 	})
 }

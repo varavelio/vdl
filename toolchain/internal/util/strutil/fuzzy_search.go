@@ -19,22 +19,42 @@ const (
 	concurrencyThreshold = 50
 )
 
-// fuzzyMatch holds a match candidate with its computed distance.
+// matchKind represents the type of match found, ordered by relevance (lower = better).
+type matchKind int
+
+const (
+	matchExact    matchKind = iota // Normalized strings are identical
+	matchPrefix                    // Query is a prefix of the word
+	matchSuffix                    // Query is a suffix of the word
+	matchContains                  // Query is contained within the word
+	matchEdit                      // Match by edit distance only
+)
+
+// fuzzyMatch holds a match candidate with its computed score.
 type fuzzyMatch struct {
 	word     string
-	distance int
+	kind     matchKind
+	distance int // edit distance (0 for exact/prefix/suffix/contains)
 	lenDiff  int // absolute difference in length from query
 }
 
-// FuzzySearch performs a search using the Damerau-Levenshtein distance algorithm.
+// FuzzySearch performs an intelligent fuzzy search combining structural matching
+// (prefix, suffix, contains) with Damerau-Levenshtein edit distance.
 //
-// The maximum distance is automatically determined based on query length:
+// Match priority (highest to lowest):
+//  1. Exact match (after normalization)
+//  2. Prefix match (query is prefix of word)
+//  3. Suffix match (query is suffix of word)
+//  4. Contains match (query appears within word)
+//  5. Edit distance match (within adaptive threshold)
+//
+// The maximum edit distance is automatically determined based on query length:
 //   - query <= 4 chars: distance 1
 //   - query <= 8 chars: distance 2
 //   - query > 8 chars: distance 3
 //
 // It returns:
-//   - fuzzyMatches: Up to 3 strings from data, sorted by the distance (then by length similarity).
+//   - fuzzyMatches: Up to 3 strings from data, sorted by relevance.
 //   - exactMatchFound: A boolean indicating whether an exact match was found before normalization.
 func FuzzySearch(data []string, query string) (fuzzyMatches []string, exactMatchFound bool) {
 	if len(data) == 0 {
@@ -45,6 +65,11 @@ func FuzzySearch(data []string, query string) (fuzzyMatches []string, exactMatch
 	exactMatchFound = slices.Contains(data, query)
 
 	normalizedQuery := normalize(query)
+	if normalizedQuery == "" {
+		// Empty query: only return exact empty matches
+		return collectEmptyMatches(data), exactMatchFound
+	}
+
 	queryRunes := []rune(normalizedQuery)
 	queryLen := len(queryRunes)
 	maxDist := getAdaptiveDistance(normalizedQuery)
@@ -52,20 +77,13 @@ func FuzzySearch(data []string, query string) (fuzzyMatches []string, exactMatch
 	var matches []fuzzyMatch
 
 	if len(data) < concurrencyThreshold {
-		// Sequential processing for small datasets
-		matches = searchSequential(data, queryRunes, queryLen, maxDist)
+		matches = searchSequential(data, normalizedQuery, queryRunes, queryLen, maxDist)
 	} else {
-		// Parallel processing for larger datasets
-		matches = searchParallel(data, queryRunes, queryLen, maxDist)
+		matches = searchParallel(data, normalizedQuery, queryRunes, queryLen, maxDist)
 	}
 
-	// Sort by distance first, then by length difference (tiebreaker)
-	slices.SortFunc(matches, func(a, b fuzzyMatch) int {
-		if a.distance != b.distance {
-			return a.distance - b.distance
-		}
-		return a.lenDiff - b.lenDiff
-	})
+	// Sort by: kind (lower=better), then distance, then length similarity
+	slices.SortFunc(matches, compareMatches)
 
 	// Return top N results
 	limit := min(maxFuzzyResults, len(matches))
@@ -77,33 +95,99 @@ func FuzzySearch(data []string, query string) (fuzzyMatches []string, exactMatch
 	return fuzzyMatches, exactMatchFound
 }
 
-func searchSequential(data []string, queryRunes []rune, queryLen, maxDist int) []fuzzyMatch {
-	var matches []fuzzyMatch
+// compareMatches defines the sorting order for matches.
+func compareMatches(a, b fuzzyMatch) int {
+	// Primary: match kind (exact > prefix > suffix > contains > edit)
+	if a.kind != b.kind {
+		return int(a.kind) - int(b.kind)
+	}
+	// Secondary: edit distance (for edit matches)
+	if a.distance != b.distance {
+		return a.distance - b.distance
+	}
+	// Tertiary: length similarity
+	return a.lenDiff - b.lenDiff
+}
+
+// evaluateMatch determines if and how a word matches the query.
+// Returns the match and whether it qualifies.
+// Uses short-circuit evaluation: structural matches skip edit distance calculation.
+func evaluateMatch(word, normalizedQuery string, queryRunes []rune, queryLen, maxDist int) (fuzzyMatch, bool) {
+	normalizedWord := normalize(word)
+	wordLen := len([]rune(normalizedWord))
+	lenDiff := abs(queryLen - wordLen)
+
+	// Fast path: exact normalized match
+	if normalizedWord == normalizedQuery {
+		return fuzzyMatch{
+			word:     word,
+			kind:     matchExact,
+			distance: 0,
+			lenDiff:  0,
+		}, true
+	}
+
+	// Structural matches: prefix, suffix, contains
+	// These skip expensive edit distance calculation
+	if strings.HasPrefix(normalizedWord, normalizedQuery) {
+		return fuzzyMatch{
+			word:     word,
+			kind:     matchPrefix,
+			distance: 0,
+			lenDiff:  lenDiff,
+		}, true
+	}
+
+	if strings.HasSuffix(normalizedWord, normalizedQuery) {
+		return fuzzyMatch{
+			word:     word,
+			kind:     matchSuffix,
+			distance: 0,
+			lenDiff:  lenDiff,
+		}, true
+	}
+
+	if strings.Contains(normalizedWord, normalizedQuery) {
+		return fuzzyMatch{
+			word:     word,
+			kind:     matchContains,
+			distance: 0,
+			lenDiff:  lenDiff,
+		}, true
+	}
+
+	// Edit distance match: only if length difference is within bounds
+	if lenDiff > maxDist {
+		return fuzzyMatch{}, false
+	}
+
+	wordRunes := []rune(normalizedWord)
+	dist := damerauLevenshtein(queryRunes, wordRunes)
+	if dist <= maxDist {
+		return fuzzyMatch{
+			word:     word,
+			kind:     matchEdit,
+			distance: dist,
+			lenDiff:  lenDiff,
+		}, true
+	}
+
+	return fuzzyMatch{}, false
+}
+
+func searchSequential(data []string, normalizedQuery string, queryRunes []rune, queryLen, maxDist int) []fuzzyMatch {
+	matches := make([]fuzzyMatch, 0, min(len(data), maxFuzzyResults*2))
 
 	for _, word := range data {
-		normalizedWord := normalize(word)
-		wordRunes := []rune(normalizedWord)
-		wordLen := len(wordRunes)
-
-		lenDiff := abs(queryLen - wordLen)
-		if lenDiff > maxDist {
-			continue
-		}
-
-		dist := damerauLevenshtein(queryRunes, wordRunes)
-		if dist <= maxDist {
-			matches = append(matches, fuzzyMatch{
-				word:     word,
-				distance: dist,
-				lenDiff:  lenDiff,
-			})
+		if m, ok := evaluateMatch(word, normalizedQuery, queryRunes, queryLen, maxDist); ok {
+			matches = append(matches, m)
 		}
 	}
 
 	return matches
 }
 
-func searchParallel(data []string, queryRunes []rune, queryLen, maxDist int) []fuzzyMatch {
+func searchParallel(data []string, normalizedQuery string, queryRunes []rune, queryLen, maxDist int) []fuzzyMatch {
 	type result struct {
 		match fuzzyMatch
 		ok    bool
@@ -114,29 +198,8 @@ func searchParallel(data []string, queryRunes []rune, queryLen, maxDist int) []f
 
 	for _, word := range data {
 		wg.Go(func() {
-			normalizedWord := normalize(word)
-			wordRunes := []rune(normalizedWord)
-			wordLen := len(wordRunes)
-
-			lenDiff := abs(queryLen - wordLen)
-			if lenDiff > maxDist {
-				resultsChan <- result{ok: false}
-				return
-			}
-
-			dist := damerauLevenshtein(queryRunes, wordRunes)
-			if dist <= maxDist {
-				resultsChan <- result{
-					match: fuzzyMatch{
-						word:     word,
-						distance: dist,
-						lenDiff:  lenDiff,
-					},
-					ok: true,
-				}
-			} else {
-				resultsChan <- result{ok: false}
-			}
+			m, ok := evaluateMatch(word, normalizedQuery, queryRunes, queryLen, maxDist)
+			resultsChan <- result{match: m, ok: ok}
 		})
 	}
 
@@ -145,13 +208,27 @@ func searchParallel(data []string, queryRunes []rune, queryLen, maxDist int) []f
 		close(resultsChan)
 	}()
 
-	var matches []fuzzyMatch
+	matches := make([]fuzzyMatch, 0, min(len(data), maxFuzzyResults*2))
 	for r := range resultsChan {
 		if r.ok {
 			matches = append(matches, r.match)
 		}
 	}
 
+	return matches
+}
+
+// collectEmptyMatches handles the edge case of empty query.
+func collectEmptyMatches(data []string) []string {
+	var matches []string
+	for _, word := range data {
+		if normalize(word) == "" {
+			matches = append(matches, word)
+			if len(matches) >= maxFuzzyResults {
+				break
+			}
+		}
+	}
 	return matches
 }
 
@@ -163,7 +240,6 @@ func normalize(s string) string {
 }
 
 // damerauLevenshtein calculates the Damerau-Levenshtein distance using O(m) space.
-// This includes insertions, deletions, substitutions, and transpositions of adjacent characters.
 func damerauLevenshtein(a, b []rune) int {
 	n, m := len(a), len(b)
 	if n == 0 {
@@ -180,12 +256,10 @@ func damerauLevenshtein(a, b []rune) int {
 	}
 
 	// Use 3 rows instead of full matrix: previous-previous, previous, current
-	// This reduces space from O(n*m) to O(m)
-	row0 := make([]int, m+1) // two rows back (for transposition)
-	row1 := make([]int, m+1) // previous row
-	row2 := make([]int, m+1) // current row
+	row0 := make([]int, m+1)
+	row1 := make([]int, m+1)
+	row2 := make([]int, m+1)
 
-	// Initialize first row
 	for j := range m + 1 {
 		row1[j] = j
 	}
@@ -199,24 +273,20 @@ func damerauLevenshtein(a, b []rune) int {
 				cost = 0
 			}
 
-			// deletion, insertion, substitution
 			row2[j] = min(
-				row1[j]+1,      // deletion
-				row2[j-1]+1,    // insertion
-				row1[j-1]+cost, // substitution
+				row1[j]+1,
+				row2[j-1]+1,
+				row1[j-1]+cost,
 			)
 
-			// transposition of adjacent characters
 			if i > 1 && j > 1 && a[i-1] == b[j-2] && a[i-2] == b[j-1] {
 				row2[j] = min(row2[j], row0[j-2]+cost)
 			}
 		}
 
-		// Rotate rows: row0 <- row1 <- row2
 		row0, row1, row2 = row1, row2, row0
 	}
 
-	// Result is in row1 after the last rotation
 	return row1[m]
 }
 
