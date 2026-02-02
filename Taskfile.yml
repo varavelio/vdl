@@ -56,7 +56,7 @@ tasks:
   codegen:schemas:
     desc: "Generate Go code from VDL schemas"
     cmds:
-      - cd ./toolchain && task install
+      - task tc:install
       - vdl generate
 
   setversion:
@@ -91,12 +91,12 @@ tasks:
 
   tc:install:
     desc: "Toolchain: Install 'vdl' binary to local GOPATH"
-    deps:
-      - codegen
+    dir: ./toolchain
     cmd: go install ./cmd/vdl/.
 
   tc:build:wasm:
     desc: "Toolchain: Build WASM binary for Playground"
+    dir: ./toolchain
     deps:
       - codegen
     cmds:
@@ -217,7 +217,7 @@ tasks:
   pg:codegen:irschema:
     desc: "Playground: Generate TS types from IR JSON Schema"
     dir: ./playground
-    cmd: npx --no json2ts ../toolchain/internal/core/ir/ir.schema.json > ./src/lib/irTypes.ts
+    cmd: npx --no json2ts ../toolchain/internal/core/ir/ir.schema.json > ./src/lib/wasm/irTypes.ts
 
   ##########################
   # VSCODE EXTENSION TASKS #
