@@ -104,6 +104,23 @@ When updating this document, do so with the context of the entire document in mi
 2. **Frontend Build**: Playground consumes WASM and builds static assets.
 3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary.
 
+### WASM Communication Protocol
+
+The communication between the Playground (Svelte) and the Core (Go) relies on a strict **JSON-RPC style protocol** defined in VDL itself.
+
+1.  **The Contract (`schemas/wasm.vdl`)**:
+    - This is the source of truth. It defines the `WasmInput` and `WasmOutput` data structures and the `WasmFunctionName` enum.
+
+2.  **The Bridge**:
+    - **Frontend (`playground/src/lib/wasm/index.ts`)**: The `WasmClient` serializes requests to JSON and calls the global `window.wasmExecuteFunction`.
+    - **WASM Entry (`toolchain/cmd/vdlwasm/main.go`)**: This Go program runs in the browser. It attaches the `wasmExecuteFunction` to the Javascript `window` object. It wraps the execution in a Javascript Promise to handle async operations.
+
+3.  **The Execution (`toolchain/internal/wasm/run.go`)**:
+    - Receives the JSON string.
+    - Unmarshals it into Go structs (generated from `wasm.vdl`).
+    - Routes the request based on `FunctionName` (e.g., `Codegen`, `ExpandTypes`, etc) to the internal logic.
+    - Returns the response as a JSON string.
+
 ## 4. Testing & Quality
 
 ### Strategy
