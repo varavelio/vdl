@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -38,7 +38,7 @@ func cmdFmt(args *cmdFormatArgs) {
 
 			matches, err := doublestar.FilepathGlob(dirPattern)
 			if err != nil {
-				log.Printf("VDL: warning: failed to glob directory '%s': %s", pattern, err)
+				fmt.Fprintf(os.Stderr, "[WARN] VDL failed to glob directory '%s': %v\n", pattern, err)
 				continue
 			}
 
@@ -49,7 +49,8 @@ func cmdFmt(args *cmdFormatArgs) {
 		// Normal glob processing (files or glob patterns)
 		matches, err := doublestar.FilepathGlob(pattern)
 		if err != nil {
-			log.Fatalf("VDL: failed to glob pattern '%s': %s", pattern, err)
+			fmt.Fprintf(os.Stderr, "VDL failed to glob pattern '%s': %v\n", pattern, err)
+			os.Exit(1)
 		}
 		allMatches = append(allMatches, matches...)
 	}
@@ -72,24 +73,27 @@ func cmdFmt(args *cmdFormatArgs) {
 
 		fileBytes, err := os.ReadFile(match)
 		if err != nil {
-			log.Fatalf("VDL: failed to read file: %s", err)
+			fmt.Fprintf(os.Stderr, "VDL failed to read file '%s': %v\n", match, err)
+			os.Exit(1)
 		}
 
 		formatted, err := formatter.Format(match, string(fileBytes))
 		if err != nil {
-			log.Fatalf("VDL: failed to format file: %s", err)
+			fmt.Fprintf(os.Stderr, "VDL failed to format '%s': %v\n", match, err)
+			os.Exit(1)
 		}
 
 		if err := os.WriteFile(match, []byte(formatted), 0644); err != nil {
-			log.Fatalf("VDL: failed to write file: %s", err)
+			fmt.Fprintf(os.Stderr, "VDL failed to write file '%s': %v\n", match, err)
+			os.Exit(1)
 		}
 
 		if args.Verbose {
-			log.Println("VDL: formatted", match)
+			fmt.Printf("VDL formatted %s\n", match)
 		}
 
 		formattedCount++
 	}
 
-	log.Printf("VDL: formatted %d files in %s", formattedCount, time.Since(startTime))
+	fmt.Printf("VDL formatted %d files in %s\n", formattedCount, time.Since(startTime))
 }

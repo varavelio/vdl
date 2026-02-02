@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/alexflint/go-arg"
@@ -43,7 +42,8 @@ func main() {
 	var args allArgs
 	p, err := arg.NewParser(arg.Config{}, &args)
 	if err != nil {
-		log.Fatalf("failed to create arg parser: %s", err)
+		fmt.Fprintf(os.Stderr, "VDL failed to create arg parser: %v\n", err)
+		os.Exit(1)
 	}
 
 	err = p.Parse(os.Args[1:])
@@ -53,8 +53,8 @@ func main() {
 		p.WriteHelp(os.Stdout)
 		os.Exit(0)
 	case err != nil:
-		fmt.Printf("error: %v\n", err)
-		p.WriteUsage(os.Stdout)
+		fmt.Fprintf(os.Stderr, "VDL error: %v\n", err)
+		p.WriteUsage(os.Stderr)
 		os.Exit(1)
 	}
 

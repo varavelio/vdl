@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"slices"
 
@@ -22,6 +21,7 @@ func cmdLSP(_ *cmdLSPArgs) {
 
 	lspInstance := lsp.New(os.Stdin, os.Stdout)
 	if err := lspInstance.Run(); err != nil {
-		log.Fatalf("failed to run lsp: %s", err)
+		fmt.Fprintf(os.Stderr, "VDL lsp error: %v\n", err)
+		os.Exit(1)
 	}
 }

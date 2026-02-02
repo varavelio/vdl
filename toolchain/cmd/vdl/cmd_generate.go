@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -27,12 +27,14 @@ func cmdGenerate(args *cmdGenerateArgs) {
 	}
 
 	if args.ConfigPath == "" {
-		log.Fatal("VDL: no configuration file found. Searched for: " + strings.Join(candidates, ", "))
+		fmt.Fprintf(os.Stderr, "VDL could not find the configuration file (searched: %s)\n", strings.Join(candidates, ", "))
+		os.Exit(1)
 	}
 
 	if err := codegen.Run(args.ConfigPath); err != nil {
-		log.Fatalf("VDL: failed to run code generator: %s", err)
+		fmt.Fprintf(os.Stderr, "VDL error: %v\n", err)
+		os.Exit(1)
 	}
 
-	log.Printf("VDL: code generation finished in %s", time.Since(startTime))
+	fmt.Printf("VDL code generation finished in %s\n", time.Since(startTime))
 }

@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,12 +28,14 @@ func cmdInit(args *cmdInitArgs) {
 
 	// Validate that path is a directory
 	if info, err := os.Stat(args.Path); err == nil && !info.IsDir() {
-		log.Fatalf("VDL: path must be a directory, not a file: %s", args.Path)
+		fmt.Fprintf(os.Stderr, "VDL error: path must be a directory, not a file: %s\n", args.Path)
+		os.Exit(1)
 	}
 
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(args.Path, 0755); err != nil {
-		log.Fatalf("VDL: failed to create directory: %s", err)
+		fmt.Fprintf(os.Stderr, "VDL failed to create directory: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Generate unique filenames
@@ -42,13 +43,15 @@ func cmdInit(args *cmdInitArgs) {
 
 	// Write both files
 	if err := os.WriteFile(schemaPath, initSchema, 0644); err != nil {
-		log.Fatalf("VDL: failed to write schema file: %s", err)
+		fmt.Fprintf(os.Stderr, "VDL failed to write schema file: %v\n", err)
+		os.Exit(1)
 	}
 
 	initConfigStr := strings.ReplaceAll(string(initConfig), "{{schema_path}}", "./"+schemaName)
 	initConfigStr = strings.ReplaceAll(initConfigStr, "{{config_schema_id}}", version.SchemaConfigID)
 	if err := os.WriteFile(configPath, []byte(initConfigStr), 0644); err != nil {
-		log.Fatalf("VDL: failed to write config file: %s", err)
+		fmt.Fprintf(os.Stderr, "VDL failed to write config file: %v\n", err)
+		os.Exit(1)
 	}
 
 	fmt.Printf("VDL: files initialized:\n- %s\n- %s\n", schemaPath, configPath)
