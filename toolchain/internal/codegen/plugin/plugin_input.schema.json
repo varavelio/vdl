@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://vdl.varavel.com/schemas/v0/plugin_input.schema.json",
-  "$ref": "#/$defs/Input",
   "$defs": {
     "Constant": {
       "properties": {
@@ -166,22 +165,6 @@
       "type": "object",
       "required": [
         "fields"
-      ]
-    },
-    "Input": {
-      "properties": {
-        "ir": {
-          "$ref": "#/$defs/Schema"
-        },
-        "options": {
-          "type": "object"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "ir",
-        "options"
       ]
     },
     "Pattern": {
@@ -493,6 +476,20 @@
       ]
     }
   },
+  "properties": {
+    "ir": {
+      "$ref": "#/$defs/Schema"
+    },
+    "options": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "ir",
+    "options"
+  ],
   "title": "VDL Plugin Input Schema",
   "description": "JSON Schema for the VDL Plugin Input Protocol"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://vdl.varavel.com/schemas/v0/config.schema.json",
-  "$ref": "#/$defs/VDLConfig",
   "$defs": {
     "DartConfig": {
       "properties": {
@@ -363,32 +362,30 @@
       "required": [
         "output"
       ]
-    },
-    "VDLConfig": {
-      "properties": {
-        "version": {
-          "type": "integer"
-        },
-        "schema": {
-          "type": "string",
-          "description": "Path to the default global VDL schema file."
-        },
-        "targets": {
-          "items": {
-            "$ref": "#/$defs/TargetConfig"
-          },
-          "type": "array",
-          "minItems": 1
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "version",
-        "targets"
-      ]
     }
   },
+  "properties": {
+    "version": {
+      "type": "integer"
+    },
+    "schema": {
+      "type": "string",
+      "description": "Path to the default global VDL schema file."
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/TargetConfig"
+      },
+      "type": "array",
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "version",
+    "targets"
+  ],
   "title": "VDL Config Schema",
   "description": "JSON Schema for the VDL Config"
 }

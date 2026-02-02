@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://vdl.varavel.com/schemas/v0/ir.schema.json",
-  "$ref": "#/$defs/Schema",
   "$defs": {
     "Constant": {
       "properties": {
@@ -288,78 +287,6 @@
         "streams"
       ]
     },
-    "Schema": {
-      "properties": {
-        "types": {
-          "items": {
-            "$ref": "#/$defs/Type"
-          },
-          "type": "array",
-          "description": "List of all type definitions in the schema"
-        },
-        "enums": {
-          "items": {
-            "$ref": "#/$defs/Enum"
-          },
-          "type": "array",
-          "description": "List of all enum definitions in the schema"
-        },
-        "constants": {
-          "items": {
-            "$ref": "#/$defs/Constant"
-          },
-          "type": "array",
-          "description": "List of all constant definitions in the schema"
-        },
-        "patterns": {
-          "items": {
-            "$ref": "#/$defs/Pattern"
-          },
-          "type": "array",
-          "description": "List of all pattern definitions in the schema"
-        },
-        "rpcs": {
-          "items": {
-            "$ref": "#/$defs/RPC"
-          },
-          "type": "array",
-          "description": "List of all RPC service definitions in the schema"
-        },
-        "procedures": {
-          "items": {
-            "$ref": "#/$defs/Procedure"
-          },
-          "type": "array",
-          "description": "Flattened list of all procedures from all RPCs"
-        },
-        "streams": {
-          "items": {
-            "$ref": "#/$defs/Stream"
-          },
-          "type": "array",
-          "description": "Flattened list of all streams from all RPCs"
-        },
-        "docs": {
-          "items": {
-            "$ref": "#/$defs/Doc"
-          },
-          "type": "array",
-          "description": "List of all standalone documentation blocks (even from all RPCs)"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "types",
-        "enums",
-        "constants",
-        "patterns",
-        "rpcs",
-        "procedures",
-        "streams",
-        "docs"
-      ]
-    },
     "Stream": {
       "properties": {
         "rpcName": {
@@ -477,6 +404,76 @@
       ]
     }
   },
+  "properties": {
+    "types": {
+      "items": {
+        "$ref": "#/$defs/Type"
+      },
+      "type": "array",
+      "description": "List of all type definitions in the schema"
+    },
+    "enums": {
+      "items": {
+        "$ref": "#/$defs/Enum"
+      },
+      "type": "array",
+      "description": "List of all enum definitions in the schema"
+    },
+    "constants": {
+      "items": {
+        "$ref": "#/$defs/Constant"
+      },
+      "type": "array",
+      "description": "List of all constant definitions in the schema"
+    },
+    "patterns": {
+      "items": {
+        "$ref": "#/$defs/Pattern"
+      },
+      "type": "array",
+      "description": "List of all pattern definitions in the schema"
+    },
+    "rpcs": {
+      "items": {
+        "$ref": "#/$defs/RPC"
+      },
+      "type": "array",
+      "description": "List of all RPC service definitions in the schema"
+    },
+    "procedures": {
+      "items": {
+        "$ref": "#/$defs/Procedure"
+      },
+      "type": "array",
+      "description": "Flattened list of all procedures from all RPCs"
+    },
+    "streams": {
+      "items": {
+        "$ref": "#/$defs/Stream"
+      },
+      "type": "array",
+      "description": "Flattened list of all streams from all RPCs"
+    },
+    "docs": {
+      "items": {
+        "$ref": "#/$defs/Doc"
+      },
+      "type": "array",
+      "description": "List of all standalone documentation blocks (even from all RPCs)"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "types",
+    "enums",
+    "constants",
+    "patterns",
+    "rpcs",
+    "procedures",
+    "streams",
+    "docs"
+  ],
   "title": "VDL IR Schema",
   "description": "JSON Schema for the VDL Intermediate Representation"
 }

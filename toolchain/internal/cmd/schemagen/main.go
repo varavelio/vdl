@@ -61,7 +61,8 @@ func main() {
 }
 
 func generate(cfg schemaGenConfig) error {
-	schema := (&jsonschema.Reflector{}).Reflect(cfg.Struct)
+	// We use ExpandedStruct because of this (needed for the playground): https://github.com/bcherny/json-schema-to-typescript/issues/132
+	schema := (&jsonschema.Reflector{ExpandedStruct: true}).Reflect(cfg.Struct)
 	schema.ID = jsonschema.ID(cfg.ID)
 	schema.Title = cfg.Title
 	schema.Description = cfg.Description
