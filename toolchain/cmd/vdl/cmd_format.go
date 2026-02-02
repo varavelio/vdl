@@ -95,5 +95,10 @@ func cmdFmt(args *cmdFormatArgs) {
 		formattedCount++
 	}
 
-	fmt.Printf("VDL formatted %d files in %s\n", formattedCount, time.Since(startTime))
+	filesText := "files"
+	if formattedCount == 1 {
+		filesText = "file"
+	}
+
+	fmt.Printf("VDL formatted %d %s in %s\n", formattedCount, filesText, time.Since(startTime))
 }

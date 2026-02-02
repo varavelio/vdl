@@ -31,10 +31,16 @@ func cmdGenerate(args *cmdGenerateArgs) {
 		os.Exit(1)
 	}
 
-	if err := codegen.Run(args.ConfigPath); err != nil {
+	fileCount, err := codegen.Run(args.ConfigPath)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "VDL error: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("VDL code generation finished in %s\n", time.Since(startTime))
+	filesText := "files"
+	if fileCount == 1 {
+		filesText = "file"
+	}
+
+	fmt.Printf("VDL generated %d %s in %s\n", fileCount, filesText, time.Since(startTime))
 }
