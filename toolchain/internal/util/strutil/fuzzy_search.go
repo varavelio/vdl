@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// FuzzySearch performs a search using the Levenshtein distance algorithm.
+// FuzzySearch performs a search using the Damerau-Levenshtein distance algorithm.
 //
 // The maximum distance is automatically determined based on query length:
 //   - query <= 4 chars: distance 1
@@ -45,7 +45,7 @@ func FuzzySearch(data []string, query string) (fuzzyMatches []string, exactMatch
 				return
 			}
 
-			if levenshtein(queryRunes, wordRunes) <= maxDist {
+			if damerauLevenshtein(queryRunes, wordRunes) <= maxDist {
 				resultsChan <- word
 			}
 		})
@@ -70,33 +70,53 @@ func normalize(s string) string {
 	return result
 }
 
-func levenshtein(a, b []rune) int {
+// damerauLevenshtein calculates the Damerau-Levenshtein distance between two rune slices.
+// This includes insertions, deletions, substitutions, and transpositions of adjacent characters.
+func damerauLevenshtein(a, b []rune) int {
 	n, m := len(a), len(b)
-	if n < m {
-		a, b = b, a
-		n, m = m, n
+	if n == 0 {
+		return m
+	}
+	if m == 0 {
+		return n
 	}
 
-	row := make([]int, m+1)
-	for i := 0; i <= m; i++ {
-		row[i] = i
+	// Create matrix with dimensions (n+1) x (m+1)
+	d := make([][]int, n+1)
+	for i := range d {
+		d[i] = make([]int, m+1)
 	}
 
+	// Initialize first column and row
+	for i := 0; i <= n; i++ {
+		d[i][0] = i
+	}
+	for j := 0; j <= m; j++ {
+		d[0][j] = j
+	}
+
+	// Fill the matrix
 	for i := 1; i <= n; i++ {
-		prev := i
 		for j := 1; j <= m; j++ {
-			var current int
+			cost := 1
 			if a[i-1] == b[j-1] {
-				current = row[j-1]
-			} else {
-				current = min(row[j-1]+1, min(row[j]+1, prev+1))
+				cost = 0
 			}
-			row[j-1] = prev
-			prev = current
+
+			d[i][j] = min(
+				d[i-1][j]+1,      // deletion
+				d[i][j-1]+1,      // insertion
+				d[i-1][j-1]+cost, // substitution
+			)
+
+			// Transposition
+			if i > 1 && j > 1 && a[i-1] == b[j-2] && a[i-2] == b[j-1] {
+				d[i][j] = min(d[i][j], d[i-2][j-2]+cost)
+			}
 		}
-		row[m] = prev
 	}
-	return row[m]
+
+	return d[n][m]
 }
 
 func abs(x int) int {

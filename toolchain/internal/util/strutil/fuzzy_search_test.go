@@ -208,4 +208,43 @@ func TestFuzzySearch(t *testing.T) {
 		matches, _ := FuzzySearch(data, "xyz")
 		require.Empty(t, matches)
 	})
+
+	t.Run("transpositions count as distance 1", func(t *testing.T) {
+		// This is the key difference between Damerau-Levenshtein and Levenshtein
+		// In Levenshtein, "ab" -> "ba" would be distance 2 (delete + insert or 2 substitutions)
+		// In Damerau-Levenshtein, "ab" -> "ba" is distance 1 (single transposition)
+		data := []string{"ab", "ba", "abc", "acb", "bac", "cab", "cba"}
+
+		// Query "ab" (2 chars) -> distance 1
+		matches, _ := FuzzySearch(data, "ab")
+		slices.Sort(matches)
+		// ab(0), ba(1-transposition), abc(1-insertion), acb(1-transposition of bc), cab(1-transposition)
+		require.Equal(t, []string{"ab", "abc", "acb", "ba", "cab"}, matches)
+
+		// Query "abc" (3 chars) -> distance 1
+		matches, _ = FuzzySearch(data, "abc")
+		slices.Sort(matches)
+		// abc(0), ab(1-deletion), acb(1-transposition), bac(1-transposition), cab(2-excluded)
+		require.Equal(t, []string{"ab", "abc", "acb", "bac"}, matches)
+	})
+
+	t.Run("transpositions in longer strings", func(t *testing.T) {
+		data := []string{"receive", "recieve", "receiv", "receiver"}
+
+		// Query "receive" (7 chars) -> distance 2
+		matches, _ := FuzzySearch(data, "receive")
+		slices.Sort(matches)
+		// receive(0), recieve(1-transposition of ie), receiv(1-deletion), receiver(1-insertion)
+		require.Equal(t, []string{"receiv", "receive", "receiver", "recieve"}, matches)
+	})
+
+	t.Run("multiple transpositions", func(t *testing.T) {
+		data := []string{"abcd", "bacd", "abdc", "badc", "dcba"}
+
+		// Query "abcd" (4 chars) -> distance 1
+		matches, _ := FuzzySearch(data, "abcd")
+		slices.Sort(matches)
+		// abcd(0), bacd(1-transposition ab->ba), abdc(1-transposition cd->dc), badc(2-excluded), dcba(4-excluded)
+		require.Equal(t, []string{"abcd", "abdc", "bacd"}, matches)
+	})
 }
