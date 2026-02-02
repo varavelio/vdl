@@ -76,7 +76,7 @@ func buildComplexInput() gen.Container {
 			IsActive: true,
 			Tags:     []string{"admin", "editor", "viewer"},
 			Metadata: map[string]string{"role": "superuser", "level": "9000"},
-			Address:  gen.Some(gen.Address{Street: "123 Main St", City: "Wonderland", Zip: 90210}),
+			Address:  gen.Ptr(gen.Address{Street: "123 Main St", City: "Wonderland", Zip: 90210}),
 		},
 		Matrix: [][]int64{
 			{1, 2, 3},

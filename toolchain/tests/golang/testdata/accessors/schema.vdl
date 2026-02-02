@@ -1,0 +1,14 @@
+// Test schema for Safe Accessors (Getters)
+type UserConfig {
+  // Required field
+  host: string
+  // Optional field
+  timeout?: int
+  // Optional nested type
+  advanced?: AdvancedConfig
+}
+
+type AdvancedConfig {
+  maxRetries: int
+  debug?: bool
+}

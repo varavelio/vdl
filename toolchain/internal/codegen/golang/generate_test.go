@@ -47,7 +47,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect core.go, optional.go, server.go, client.go
+	// Expect core.go, pointers.go, server.go, client.go
 	// types.go is NOT generated because there are no types/procs/streams.
 	require.Len(t, files, 4)
 
@@ -58,7 +58,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 	require.Contains(t, fileMap, "core.go")
 	assert.Contains(t, fileMap["core.go"], "package api")
-	require.Contains(t, fileMap, "optional.go")
+	require.Contains(t, fileMap, "pointers.go")
 	require.Contains(t, fileMap, "server.go")
 	require.Contains(t, fileMap, "client.go")
 	require.NotContains(t, fileMap, "types.go")
@@ -106,7 +106,11 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 
 	assert.Contains(t, content, "Id")
 	assert.Contains(t, content, "Email")
-	assert.Contains(t, content, "Optional[int64]")
+	// Optional fields now use pointers instead of Optional[T]
+	assert.Contains(t, content, "*int64")
+	// Verify getters are generated
+	assert.Contains(t, content, "func (x *User) GetAge() int64")
+	assert.Contains(t, content, "func (x *User) GetAgeOr(defaultValue int64) int64")
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
@@ -134,7 +138,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect core_types.go, types.go and optional.go
+	// Expect core_types.go, types.go and pointers.go
 	require.Len(t, files, 3)
 
 	fileMap := make(map[string]string)
@@ -177,7 +181,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect core.go, optional.go, constants.go
+	// Expect core.go, pointers.go, constants.go
 	// types.go is NOT generated because there are no types/procs/streams.
 	require.Len(t, files, 3)
 
@@ -214,7 +218,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect core.go, optional.go, patterns.go
+	// Expect core.go, pointers.go, patterns.go
 	// types.go is NOT generated because there are no types/procs/streams.
 	require.Len(t, files, 3)
 
@@ -404,7 +408,7 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 
 	files, err := g.Generate(context.Background(), schema)
 	require.NoError(t, err)
-	// Expect core_types.go, types.go and optional.go
+	// Expect core_types.go, types.go and pointers.go
 	require.Len(t, files, 3)
 
 	fileMap := make(map[string]string)

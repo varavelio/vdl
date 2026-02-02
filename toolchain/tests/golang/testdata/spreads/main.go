@@ -218,7 +218,7 @@ func testMultipleSpreads(ctx context.Context, client *gen.Client, now time.Time)
 		UpdatedAt: now.Add(time.Hour),
 		Name:      "Bob",
 		Email:     "bob@example.com",
-		DeletedAt: gen.Some(now.Add(24 * time.Hour)),
+		DeletedAt: gen.Ptr(now.Add(24 * time.Hour)),
 	}
 
 	res, err := client.RPCs.Service().Procs.EchoUserWithTimestamps().Execute(ctx, gen.ServiceEchoUserWithTimestampsInput{User: user})
@@ -261,7 +261,7 @@ func testSpreadWithNestedObjects(ctx context.Context, client *gen.Client, now ti
 		Name:      "Charlie",
 		Contact: gen.ContactInfo{
 			Email: "charlie@example.com",
-			Phone: gen.Some("+1-555-1234"),
+			Phone: gen.Ptr("+1-555-1234"),
 			Address: gen.Address{
 				Street:  "123 Main St",
 				City:    "Springfield",

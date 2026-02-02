@@ -63,13 +63,13 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b.Break()
 	}
 
-	// Optional utility type (optional.go)
-	code, err = generateOptional(schema, g.config)
+	// Pointer utility functions (pointers.go)
+	code, err = generatePointers(schema, g.config)
 	if err != nil {
 		return nil, err
 	}
 	if code = strings.TrimSpace(code); code != "" {
-		b := getBuilder("optional.go")
+		b := getBuilder("pointers.go")
 		b.Raw(code)
 		b.Break()
 	}

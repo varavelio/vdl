@@ -302,50 +302,50 @@ func testOptionalEnums(client *gen.Client) {
 	if err != nil {
 		panic(fmt.Sprintf("EchoOptional failed: %v", err))
 	}
-	if res.Container.Color.Present {
+	if res.Container.Color != nil {
 		panic("color should be absent")
 	}
-	if res.Container.Priority.Present {
+	if res.Container.Priority != nil {
 		panic("priority should be absent")
 	}
 
 	// Test with present valid optional enums
 	res2, err := client.RPCs.Service().Procs.EchoOptional().Execute(ctx, gen.ServiceEchoOptionalInput{
 		Container: gen.Container{
-			Color:    gen.Some(gen.ColorBlue),
-			Priority: gen.Some(gen.PriorityHigh),
+			Color:    gen.Ptr(gen.ColorBlue),
+			Priority: gen.Ptr(gen.PriorityHigh),
 		},
 	})
 	if err != nil {
 		panic(fmt.Sprintf("EchoOptional failed: %v", err))
 	}
-	if !res2.Container.Color.Present {
+	if res2.Container.Color == nil {
 		panic("color should be present")
 	}
-	if res2.Container.Color.Value != gen.ColorBlue {
-		panic(fmt.Sprintf("expected ColorBlue, got %s", res2.Container.Color.Value))
+	if *res2.Container.Color != gen.ColorBlue {
+		panic(fmt.Sprintf("expected ColorBlue, got %s", *res2.Container.Color))
 	}
-	if !res2.Container.Priority.Present {
+	if res2.Container.Priority == nil {
 		panic("priority should be present")
 	}
-	if res2.Container.Priority.Value != gen.PriorityHigh {
-		panic(fmt.Sprintf("expected PriorityHigh, got %d", res2.Container.Priority.Value))
+	if *res2.Container.Priority != gen.PriorityHigh {
+		panic(fmt.Sprintf("expected PriorityHigh, got %d", *res2.Container.Priority))
 	}
 
 	// Test optional explicit-value enum
 	res3, err := client.RPCs.Service().Procs.EchoOptional().Execute(ctx, gen.ServiceEchoOptionalInput{
 		Container: gen.Container{
-			LogLevel: gen.Some(gen.LogLevelWarning),
+			LogLevel: gen.Ptr(gen.LogLevelWarning),
 		},
 	})
 	if err != nil {
 		panic(fmt.Sprintf("EchoOptional with LogLevel failed: %v", err))
 	}
-	if !res3.Container.LogLevel.Present {
+	if res3.Container.LogLevel == nil {
 		panic("logLevel should be present")
 	}
-	if res3.Container.LogLevel.Value != gen.LogLevelWarning {
-		panic(fmt.Sprintf("expected LogLevelWarning (WARN), got %s", res3.Container.LogLevel.Value))
+	if *res3.Container.LogLevel != gen.LogLevelWarning {
+		panic(fmt.Sprintf("expected LogLevelWarning (WARN), got %s", *res3.Container.LogLevel))
 	}
 }
 

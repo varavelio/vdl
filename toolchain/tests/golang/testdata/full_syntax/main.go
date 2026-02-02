@@ -66,8 +66,8 @@ func verifyTypes() {
 
 	// Verify optional fields
 	u := gen.User{}
-	if !u.Bio.IsZero() {
-		fail("User.Bio optional default", "IsZero=true", "IsZero=false")
+	if u.Bio != nil {
+		fail("User.Bio optional default", "nil", "not nil")
 	}
 }
 

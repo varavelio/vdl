@@ -122,14 +122,15 @@ func renderField(parentTypeName string, field ir.Field) string {
 	inlineTypeName := parentTypeName + namePascal
 	typeLiteral := typeRefToGo(inlineTypeName, field.Type)
 
+	// Optional fields use pointers
 	if field.Optional {
-		typeLiteral = fmt.Sprintf("Optional[%s]", typeLiteral)
+		typeLiteral = "*" + typeLiteral
 	}
 
-	// JSON tag
+	// JSON tag: optional fields get omitempty
 	jsonTag := fmt.Sprintf(" `json:\"%s\"`", nameCamel)
 	if field.Optional {
-		jsonTag = fmt.Sprintf(" `json:\"%s,omitzero\"`", nameCamel)
+		jsonTag = fmt.Sprintf(" `json:\"%s,omitempty\"`", nameCamel)
 	}
 
 	doc := renderDocString(field.Doc, false)
@@ -138,7 +139,7 @@ func renderField(parentTypeName string, field ir.Field) string {
 }
 
 // renderPreField generates the Go struct field code for a pre-type field.
-// All fields in pre-types are wrapped in Optional for validation.
+// All fields in pre-types are pointers for validation.
 func renderPreField(parentTypeName string, field ir.Field) string {
 	namePascal := strutil.ToPascalCase(field.Name)
 	nameCamel := strutil.ToCamelCase(field.Name)
@@ -147,10 +148,10 @@ func renderPreField(parentTypeName string, field ir.Field) string {
 	inlineTypeName := parentTypeName + namePascal
 	typeLiteral := typeRefToPreGo(inlineTypeName, field.Type)
 
-	// All pre-type fields are optional for validation
-	typeLiteral = fmt.Sprintf("Optional[%s]", typeLiteral)
+	// All pre-type fields are pointers for validation
+	typeLiteral = "*" + typeLiteral
 
-	jsonTag := fmt.Sprintf(" `json:\"%s,omitzero\"`", nameCamel)
+	jsonTag := fmt.Sprintf(" `json:\"%s,omitempty\"`", nameCamel)
 	result := fmt.Sprintf("%s %s", namePascal, typeLiteral)
 	return result + jsonTag
 }
@@ -187,6 +188,9 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 	})
 	g.Line("}")
 	g.Break()
+
+	// Render accessor methods for this type
+	g.Line(renderAccessors(fullName, fields))
 
 	// Render children inline types
 	for _, field := range fields {
@@ -252,7 +256,7 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 			g.Linef(`// Validation for field "%s"`, field.Name)
 
 			if isRequired {
-				g.Linef("if !p.%s.Present {", fieldName)
+				g.Linef("if p.%s == nil {", fieldName)
 				g.Block(func() {
 					g.Linef("return errorMissingRequiredField(\"field %s is required\")", field.Name)
 				})
@@ -260,10 +264,11 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 			}
 
 			if needsPre {
-				g.Linef("if p.%s.Present {", fieldName)
+				g.Linef("if p.%s != nil {", fieldName)
 				g.Block(func() {
-					source := fmt.Sprintf("p.%s.Value", fieldName)
-					renderNestedValidation(g, source, field.Type, field.Name)
+					source := fmt.Sprintf("p.%s", fieldName)
+					// Pre-type fields are pointers, so isPointer is true
+					renderNestedValidation(g, source, field.Type, field.Name, true)
 				})
 				g.Line("}")
 			}
@@ -279,7 +284,9 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 }
 
 // renderNestedValidation renders validation code for nested types.
-func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fieldName string) {
+// The source should be the field access expression (e.g., "p.Field" for pointer fields)
+// isPointer indicates whether the source is a pointer that needs dereferencing for range operations
+func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fieldName string, isPointer bool) {
 	switch tr.Kind {
 	case ir.TypeKindType, ir.TypeKindObject:
 		g.Linef("if err := %s.validate(); err != nil {", source)
@@ -290,14 +297,24 @@ func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fiel
 
 	case ir.TypeKindArray:
 		if needsPreType(*tr.ArrayItem) {
-			renderArrayValidation(g, source, tr.ArrayDimensions, *tr.ArrayItem, fieldName)
+			// For pointer to slice, dereference first
+			rangeSource := source
+			if isPointer {
+				rangeSource = "*" + source
+			}
+			renderArrayValidation(g, rangeSource, tr.ArrayDimensions, *tr.ArrayItem, fieldName)
 		}
 
 	case ir.TypeKindMap:
 		if needsPreType(*tr.MapValue) {
+			// For pointer to map, dereference first
+			rangeSource := source
+			if isPointer {
+				rangeSource = "*" + source
+			}
 			// Use key in error message only for direct object types
 			if tr.MapValue.Kind == ir.TypeKindType || tr.MapValue.Kind == ir.TypeKindObject {
-				g.Linef("for key, value := range %s {", source)
+				g.Linef("for key, value := range %s {", rangeSource)
 				g.Block(func() {
 					g.Line("if err := value.validate(); err != nil {")
 					g.Block(func() {
@@ -308,9 +325,10 @@ func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fiel
 				g.Line("}")
 			} else {
 				// For nested types (arrays, maps), we don't include the key in error messages
-				g.Linef("for _, value := range %s {", source)
+				// The value from range is not a pointer, so isPointer is false
+				g.Linef("for _, value := range %s {", rangeSource)
 				g.Block(func() {
-					renderNestedValidation(g, "value", *tr.MapValue, fieldName)
+					renderNestedValidation(g, "value", *tr.MapValue, fieldName, false)
 				})
 				g.Line("}")
 			}
@@ -321,7 +339,8 @@ func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fiel
 // renderArrayValidation recursively validates array elements based on dimensions.
 func renderArrayValidation(g *gen.Generator, source string, dims int, itemType ir.TypeRef, fieldName string) {
 	if dims == 0 {
-		renderNestedValidation(g, source, itemType, fieldName)
+		// When we get here from a range, the source is not a pointer
+		renderNestedValidation(g, source, itemType, fieldName, false)
 		return
 	}
 
@@ -348,7 +367,7 @@ func renderTransformFunc(typeName string, fields []ir.Field) string {
 			if !needsPre {
 				// Simple extraction for primitives and enums
 				if isRequired {
-					g.Linef("%s := p.%s.Value", fieldNameTemp, fieldName)
+					g.Linef("%s := *p.%s", fieldNameTemp, fieldName)
 				} else {
 					g.Linef("%s := p.%s", fieldNameTemp, fieldName)
 				}
@@ -381,15 +400,23 @@ func renderFieldTransform(g *gen.Generator, field ir.Field, fieldName, tempName,
 	isRequired := !field.Optional
 	goType := typeRefToGo(parentType+fieldName, field.Type)
 
-	source := fmt.Sprintf("p.%s.Value", fieldName)
+	// For Type and Object, use pointer source since preField is a pointer
+	// For Arrays and Maps, use dereferenced source since they are slices/maps directly
+	source := fmt.Sprintf("p.%s", fieldName)
+	needsDeref := field.Type.Kind == ir.TypeKindArray || field.Type.Kind == ir.TypeKindMap
+	if needsDeref {
+		source = fmt.Sprintf("*p.%s", fieldName)
+	}
+
 	if !isRequired {
-		g.Linef("%s := Optional[%s]{Present: p.%s.Present}", tempName, goType, fieldName)
-		g.Linef("if p.%s.Present {", fieldName)
+		// Optional field: use pointer type in output
+		g.Linef("var %s *%s", tempName, goType)
+		g.Linef("if p.%s != nil {", fieldName)
 		g.Block(func() {
 			valTemp := "val" + strutil.ToPascalCase(fieldName)
 			g.Linef("var %s %s", valTemp, goType)
 			renderValueTransform(g, source, valTemp, field.Type, parentType+fieldName, "tmp")
-			g.Linef("%s.Value = %s", tempName, valTemp)
+			g.Linef("%s = &%s", tempName, valTemp)
 		})
 		g.Line("}")
 	} else {
@@ -467,6 +494,76 @@ func renderArrayTransform(g *gen.Generator, source, dest string, dims int, itemT
 		g.Linef("%s[i] = %s", dest, tempVar)
 	})
 	g.Line("}")
+}
+
+// =============================================================================
+// Safe Accessors (Getters)
+// =============================================================================
+
+// renderAccessors generates getter methods for all fields in a struct.
+// Getters provide nil-safe access to fields, especially for optional pointers.
+func renderAccessors(typeName string, fields []ir.Field) string {
+	g := gen.New().WithTabs()
+
+	for _, field := range fields {
+		fieldName := strutil.ToPascalCase(field.Name)
+		inlineTypeName := typeName + fieldName
+		goType := typeRefToGo(inlineTypeName, field.Type)
+
+		// Generate Get{FieldName}()
+		g.Linef("// Get%s returns the value of %s or the zero value if the receiver or field is nil.", fieldName, fieldName)
+		g.Linef("func (x *%s) Get%s() %s {", typeName, fieldName, goType)
+		g.Block(func() {
+			if field.Optional {
+				// Optional field: check both receiver and field
+				g.Linef("if x != nil && x.%s != nil {", fieldName)
+				g.Block(func() {
+					g.Linef("return *x.%s", fieldName)
+				})
+				g.Line("}")
+				g.Linef("var zero %s", goType)
+				g.Line("return zero")
+			} else {
+				// Required field: only check receiver
+				g.Line("if x != nil {")
+				g.Block(func() {
+					g.Linef("return x.%s", fieldName)
+				})
+				g.Line("}")
+				g.Linef("var zero %s", goType)
+				g.Line("return zero")
+			}
+		})
+		g.Line("}")
+		g.Break()
+
+		// Generate Get{FieldName}Or(defaultVal)
+		g.Linef("// Get%sOr returns the value of %s or the provided default if the receiver or field is nil.", fieldName, fieldName)
+		g.Linef("func (x *%s) Get%sOr(defaultValue %s) %s {", typeName, fieldName, goType, goType)
+		g.Block(func() {
+			if field.Optional {
+				// Optional field: check both receiver and field
+				g.Linef("if x != nil && x.%s != nil {", fieldName)
+				g.Block(func() {
+					g.Linef("return *x.%s", fieldName)
+				})
+				g.Line("}")
+				g.Line("return defaultValue")
+			} else {
+				// Required field: only check receiver
+				g.Line("if x != nil {")
+				g.Block(func() {
+					g.Linef("return x.%s", fieldName)
+				})
+				g.Line("}")
+				g.Line("return defaultValue")
+			}
+		})
+		g.Line("}")
+		g.Break()
+	}
+
+	return g.String()
 }
 
 // =============================================================================
