@@ -5,5 +5,4 @@ targets:
       output: ./gen/playground
       defaultBaseUrl: https://api.example.com
       defaultHeaders:
-        - key: Authorization
-          value: Bearer token
+        Authorization: Bearer token

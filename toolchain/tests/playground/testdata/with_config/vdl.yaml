@@ -5,7 +5,5 @@ targets:
       output: gen
       defaultBaseUrl: https://api.example.com
       defaultHeaders:
-        - key: Authorization
-          value: Bearer token123
-        - key: X-API-Version
-          value: v2
+        Authorization: Bearer token123
+        X-API-Version: v2
