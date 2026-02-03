@@ -50,7 +50,6 @@ tasks:
     desc: "Run all code generators (Schemas, Toolchain, Playground)"
     cmds:
       - task: codegen:schemas
-      - task: tc:codegen
       - task: pg:codegen
 
   codegen:schemas:
@@ -120,17 +119,6 @@ tasks:
       # DARWIN (macOS) builds
       - GOOS=darwin GOARCH=amd64 go build -o ./dist/vdl-darwin-amd64 ./cmd/vdl/.
       - GOOS=darwin GOARCH=arm64 go build -o ./dist/vdl-darwin-arm64 ./cmd/vdl/.
-
-  tc:codegen:
-    desc: "Toolchain: Run internal code generators"
-    dir: ./toolchain
-    cmds:
-      - task: tc:codegen:schemas
-
-  tc:codegen:schemas:
-    desc: "Toolchain: Generate JSON Schemas from Go structs"
-    dir: ./toolchain
-    cmd: go run ./internal/cmd/schemagen/.
 
   tc:format:
     desc: "Toolchain: Format Go code and run internal formatters"
