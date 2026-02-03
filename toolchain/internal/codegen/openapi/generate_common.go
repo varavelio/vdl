@@ -1,29 +1,30 @@
 package openapi
 
 import (
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateTypeRefSchema converts an IR TypeRef to a JSON Schema representation.
-func generateTypeRefSchema(t ir.TypeRef) map[string]any {
+func generateTypeRefSchema(t irtypes.TypeRef) map[string]any {
 	switch t.Kind {
-	case ir.TypeKindPrimitive:
-		return primitiveToJSONSchema(t.Primitive)
+	case irtypes.TypeKindPrimitive:
+		return primitiveToJSONSchema(t.GetPrimitiveName())
 
-	case ir.TypeKindType:
+	case irtypes.TypeKindType:
 		return map[string]any{
-			"$ref": "#/components/schemas/" + t.Type,
+			"$ref": "#/components/schemas/" + t.GetTypeName(),
 		}
 
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		return map[string]any{
-			"$ref": "#/components/schemas/" + t.Enum,
+			"$ref": "#/components/schemas/" + t.GetEnumName(),
 		}
 
-	case ir.TypeKindArray:
-		itemSchema := generateTypeRefSchema(*t.ArrayItem)
+	case irtypes.TypeKindArray:
+		itemSchema := generateTypeRefSchema(t.GetArrayType())
 		// For multi-dimensional arrays, we need to nest the array schema
-		for i := 1; i < t.ArrayDimensions; i++ {
+		dims := t.GetArrayDims()
+		for i := int64(1); i < dims; i++ {
 			itemSchema = map[string]any{
 				"type":  "array",
 				"items": itemSchema,
@@ -34,14 +35,14 @@ func generateTypeRefSchema(t ir.TypeRef) map[string]any {
 			"items": itemSchema,
 		}
 
-	case ir.TypeKindMap:
+	case irtypes.TypeKindMap:
 		return map[string]any{
 			"type":                 "object",
-			"additionalProperties": generateTypeRefSchema(*t.MapValue),
+			"additionalProperties": generateTypeRefSchema(t.GetMapType()),
 		}
 
-	case ir.TypeKindObject:
-		props, required := generatePropertiesFromFields(t.Object.Fields)
+	case irtypes.TypeKindObject:
+		props, required := generatePropertiesFromFields(t.GetObjectFields())
 		schema := map[string]any{
 			"type":       "object",
 			"properties": props,
@@ -56,17 +57,17 @@ func generateTypeRefSchema(t ir.TypeRef) map[string]any {
 }
 
 // primitiveToJSONSchema converts an IR primitive type to JSON Schema.
-func primitiveToJSONSchema(p ir.PrimitiveType) map[string]any {
+func primitiveToJSONSchema(p irtypes.PrimitiveType) map[string]any {
 	switch p {
-	case ir.PrimitiveString:
+	case irtypes.PrimitiveTypeString:
 		return map[string]any{"type": "string"}
-	case ir.PrimitiveInt:
+	case irtypes.PrimitiveTypeInt:
 		return map[string]any{"type": "integer"}
-	case ir.PrimitiveFloat:
+	case irtypes.PrimitiveTypeFloat:
 		return map[string]any{"type": "number"}
-	case ir.PrimitiveBool:
+	case irtypes.PrimitiveTypeBool:
 		return map[string]any{"type": "boolean"}
-	case ir.PrimitiveDatetime:
+	case irtypes.PrimitiveTypeDatetime:
 		return map[string]any{"type": "string", "format": "date-time"}
 	}
 	return map[string]any{"type": "string"}
@@ -74,25 +75,26 @@ func primitiveToJSONSchema(p ir.PrimitiveType) map[string]any {
 
 // generatePropertiesFromFields generates JSON schema properties from IR fields.
 // Returns the properties map and a list of required field names.
-func generatePropertiesFromFields(fields []ir.Field) (map[string]any, []string) {
+func generatePropertiesFromFields(fields []irtypes.Field) (map[string]any, []string) {
 	properties := map[string]any{}
 	required := []string{}
 
 	for _, field := range fields {
-		prop := generateTypeRefSchema(field.Type)
+		prop := generateTypeRefSchema(field.TypeRef)
 
 		// Add description if present
-		if field.Doc != "" {
+		doc := field.GetDoc()
+		if doc != "" {
 			// If prop is a $ref, we need to wrap it in allOf to add description
 			if _, hasRef := prop["$ref"]; hasRef {
 				prop = map[string]any{
 					"allOf": []map[string]any{
 						prop,
-						{"description": field.Doc},
+						{"description": doc},
 					},
 				}
 			} else {
-				prop["description"] = field.Doc
+				prop["description"] = doc
 			}
 		}
 
@@ -108,7 +110,7 @@ func generatePropertiesFromFields(fields []ir.Field) (map[string]any, []string) 
 
 // generateOutputProperties generates the output wrapper with ok/error structure.
 // This follows the VDL response lifecycle spec.
-func generateOutputProperties(fields []ir.Field) (map[string]any, []string) {
+func generateOutputProperties(fields []irtypes.Field) (map[string]any, []string) {
 	outputProperties, outputRequiredFields := generatePropertiesFromFields(fields)
 	output := map[string]any{
 		"type":       "object",

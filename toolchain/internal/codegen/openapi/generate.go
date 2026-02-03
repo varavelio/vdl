@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"gopkg.in/yaml.v3"
 )
 
@@ -35,7 +35,7 @@ func (g *Generator) Name() string {
 }
 
 // Generate produces OpenAPI spec files from the IR schema.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	cfg := g.config
 
 	if cfg.Title == "" {
@@ -104,15 +104,32 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 // generateTags creates OpenAPI tags from the schema RPCs.
 // Tags are generated in PascalCase format: {RPC}Procedures, {RPC}Streams
-func generateTags(schema *ir.Schema) []Tag {
+func generateTags(schema *irtypes.IrSchema) []Tag {
 	tags := []Tag{}
 
-	for _, rpc := range schema.RPCs {
+	// Build a map of RPC names to check which have procedures or streams
+	rpcHasProcs := make(map[string]bool)
+	rpcHasStreams := make(map[string]bool)
+	rpcDocs := make(map[string]string)
+
+	for _, rpc := range schema.Rpcs {
+		rpcDocs[rpc.Name] = rpc.GetDoc()
+	}
+
+	for _, proc := range schema.Procedures {
+		rpcHasProcs[proc.RpcName] = true
+	}
+
+	for _, stream := range schema.Streams {
+		rpcHasStreams[stream.RpcName] = true
+	}
+
+	for _, rpc := range schema.Rpcs {
 		// Tag for procedures of this RPC
-		if len(rpc.Procs) > 0 {
+		if rpcHasProcs[rpc.Name] {
 			desc := fmt.Sprintf("Procedures for %s", rpc.Name)
-			if rpc.Doc != "" {
-				desc = rpc.Doc
+			if rpcDocs[rpc.Name] != "" {
+				desc = rpcDocs[rpc.Name]
 			}
 			tags = append(tags, Tag{
 				Name:        rpc.Name + "Procedures",
@@ -121,10 +138,10 @@ func generateTags(schema *ir.Schema) []Tag {
 		}
 
 		// Tag for streams of this RPC
-		if len(rpc.Streams) > 0 {
+		if rpcHasStreams[rpc.Name] {
 			desc := fmt.Sprintf("Streams for %s", rpc.Name)
-			if rpc.Doc != "" {
-				desc = rpc.Doc
+			if rpcDocs[rpc.Name] != "" {
+				desc = rpcDocs[rpc.Name]
 			}
 			tags = append(tags, Tag{
 				Name:        rpc.Name + "Streams",

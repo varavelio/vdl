@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 const authTokenDescription = `
@@ -19,7 +19,7 @@ Enter the full value for the Authorization header. The specific format (Bearer, 
 `
 
 // generateComponents generates OpenAPI components from the IR schema.
-func generateComponents(schema *ir.Schema) Components {
+func generateComponents(schema *irtypes.IrSchema) Components {
 	components := Components{
 		SecuritySchemes: map[string]any{
 			"AuthToken": map[string]any{
@@ -44,46 +44,43 @@ func generateComponents(schema *ir.Schema) Components {
 		components.Schemas[e.Name] = generateEnumSchema(e)
 	}
 
-	// Generate request/response bodies for each RPC endpoint
-	for _, rpc := range schema.RPCs {
-		// Procedures
-		for _, proc := range rpc.Procs {
-			inputName := rpc.Name + proc.Name + "Input"
-			outputName := rpc.Name + proc.Name + "Output"
+	// Generate request/response bodies for each procedure
+	for _, proc := range schema.Procedures {
+		inputName := proc.RpcName + proc.Name + "Input"
+		outputName := proc.RpcName + proc.Name + "Output"
 
-			components.RequestBodies[inputName] = generateRequestBody(
-				proc.Input,
-				fmt.Sprintf("Request body for %s/%s procedure", rpc.Name, proc.Name),
-			)
+		components.RequestBodies[inputName] = generateRequestBody(
+			proc.InputFields,
+			fmt.Sprintf("Request body for %s/%s procedure", proc.RpcName, proc.Name),
+		)
 
-			components.Responses[outputName] = generateProcedureResponse(
-				proc.Output,
-				fmt.Sprintf("Response for %s/%s procedure", rpc.Name, proc.Name),
-			)
-		}
+		components.Responses[outputName] = generateProcedureResponse(
+			proc.OutputFields,
+			fmt.Sprintf("Response for %s/%s procedure", proc.RpcName, proc.Name),
+		)
+	}
 
-		// Streams
-		for _, stream := range rpc.Streams {
-			inputName := rpc.Name + stream.Name + "Input"
-			outputName := rpc.Name + stream.Name + "Output"
+	// Generate request/response bodies for each stream
+	for _, stream := range schema.Streams {
+		inputName := stream.RpcName + stream.Name + "Input"
+		outputName := stream.RpcName + stream.Name + "Output"
 
-			components.RequestBodies[inputName] = generateRequestBody(
-				stream.Input,
-				fmt.Sprintf("Request body for %s/%s stream subscription", rpc.Name, stream.Name),
-			)
+		components.RequestBodies[inputName] = generateRequestBody(
+			stream.InputFields,
+			fmt.Sprintf("Request body for %s/%s stream subscription", stream.RpcName, stream.Name),
+		)
 
-			components.Responses[outputName] = generateStreamResponse(
-				stream.Output,
-				fmt.Sprintf("Server-Sent Events for %s/%s stream", rpc.Name, stream.Name),
-			)
-		}
+		components.Responses[outputName] = generateStreamResponse(
+			stream.OutputFields,
+			fmt.Sprintf("Server-Sent Events for %s/%s stream", stream.RpcName, stream.Name),
+		)
 	}
 
 	return components
 }
 
 // generateTypeSchema generates an OpenAPI schema for an IR type.
-func generateTypeSchema(t ir.Type) map[string]any {
+func generateTypeSchema(t irtypes.TypeDef) map[string]any {
 	properties, required := generatePropertiesFromFields(t.Fields)
 
 	schema := map[string]any{
@@ -91,18 +88,20 @@ func generateTypeSchema(t ir.Type) map[string]any {
 		"properties": properties,
 	}
 
-	if t.Doc != "" {
-		schema["description"] = t.Doc
+	doc := t.GetDoc()
+	if doc != "" {
+		schema["description"] = doc
 	}
 
-	if t.Deprecated != nil {
+	if t.Deprecation != nil {
 		schema["deprecated"] = true
-		if t.Deprecated.Message != "" {
+		deprecation := t.GetDeprecation()
+		if deprecation != "" {
 			desc := schema["description"]
 			if desc == nil {
 				desc = ""
 			}
-			schema["description"] = fmt.Sprintf("%s\n\nDeprecated: %s", desc, t.Deprecated.Message)
+			schema["description"] = fmt.Sprintf("%s\n\nDeprecated: %s", desc, deprecation)
 		}
 	}
 
@@ -114,10 +113,10 @@ func generateTypeSchema(t ir.Type) map[string]any {
 }
 
 // generateEnumSchema generates an OpenAPI schema for an IR enum.
-func generateEnumSchema(e ir.Enum) map[string]any {
+func generateEnumSchema(e irtypes.EnumDef) map[string]any {
 	schema := map[string]any{}
 
-	if e.ValueType == ir.EnumValueTypeString {
+	if e.EnumType == irtypes.EnumTypeString {
 		values := []string{}
 		for _, m := range e.Members {
 			values = append(values, m.Value)
@@ -134,11 +133,12 @@ func generateEnumSchema(e ir.Enum) map[string]any {
 		schema["enum"] = values
 	}
 
-	if e.Doc != "" {
-		schema["description"] = e.Doc
+	doc := e.GetDoc()
+	if doc != "" {
+		schema["description"] = doc
 	}
 
-	if e.Deprecated != nil {
+	if e.Deprecation != nil {
 		schema["deprecated"] = true
 	}
 
@@ -146,7 +146,7 @@ func generateEnumSchema(e ir.Enum) map[string]any {
 }
 
 // generateRequestBody generates an OpenAPI request body from IR fields.
-func generateRequestBody(fields []ir.Field, description string) map[string]any {
+func generateRequestBody(fields []irtypes.Field, description string) map[string]any {
 	properties, required := generatePropertiesFromFields(fields)
 
 	schema := map[string]any{
@@ -168,7 +168,7 @@ func generateRequestBody(fields []ir.Field, description string) map[string]any {
 }
 
 // generateProcedureResponse generates an OpenAPI response for a procedure.
-func generateProcedureResponse(fields []ir.Field, description string) map[string]any {
+func generateProcedureResponse(fields []irtypes.Field, description string) map[string]any {
 	properties, required := generateOutputProperties(fields)
 
 	schema := map[string]any{
@@ -190,7 +190,7 @@ func generateProcedureResponse(fields []ir.Field, description string) map[string
 }
 
 // generateStreamResponse generates an OpenAPI response for a stream (SSE).
-func generateStreamResponse(fields []ir.Field, description string) map[string]any {
+func generateStreamResponse(fields []irtypes.Field, description string) map[string]any {
 	properties, required := generateOutputProperties(fields)
 
 	schema := map[string]any{

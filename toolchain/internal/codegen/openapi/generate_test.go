@@ -13,6 +13,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 	"gopkg.in/yaml.v3"
 )
@@ -102,10 +103,15 @@ func TestGenerator_Name(t *testing.T) {
 func TestGenerator_DefaultConfig(t *testing.T) {
 	gen := New(&config.OpenAPIConfig{})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{},
-		Enums: []ir.Enum{},
-		RPCs:  []ir.RPC{},
+	schema := &irtypes.IrSchema{
+		Types:      []irtypes.TypeDef{},
+		Enums:      []irtypes.EnumDef{},
+		Rpcs:       []irtypes.RpcDef{},
+		Procedures: []irtypes.ProcedureDef{},
+		Streams:    []irtypes.StreamDef{},
+		Constants:  []irtypes.ConstantDef{},
+		Patterns:   []irtypes.PatternDef{},
+		Docs:       []irtypes.DocDef{},
 	}
 
 	files, err := gen.Generate(context.Background(), schema)
@@ -126,10 +132,15 @@ func TestGenerator_JSONOutput(t *testing.T) {
 		Title:    "JSON Test API",
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{},
-		Enums: []ir.Enum{},
-		RPCs:  []ir.RPC{},
+	schema := &irtypes.IrSchema{
+		Types:      []irtypes.TypeDef{},
+		Enums:      []irtypes.EnumDef{},
+		Rpcs:       []irtypes.RpcDef{},
+		Procedures: []irtypes.ProcedureDef{},
+		Streams:    []irtypes.StreamDef{},
+		Constants:  []irtypes.ConstantDef{},
+		Patterns:   []irtypes.PatternDef{},
+		Docs:       []irtypes.DocDef{},
 	}
 
 	files, err := gen.Generate(context.Background(), schema)
@@ -143,25 +154,29 @@ func TestGenerator_JSONOutput(t *testing.T) {
 
 // TestGenerateTags tests tag generation from RPCs.
 func TestGenerateTags(t *testing.T) {
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
+	usersDoc := "User management"
+	schema := &irtypes.IrSchema{
+		Rpcs: []irtypes.RpcDef{
 			{
 				Name: "Users",
-				Doc:  "User management",
-				Procs: []ir.Procedure{
-					{Name: "GetUser"},
-				},
-				Streams: []ir.Stream{
-					{Name: "UserUpdates"},
-				},
+				Doc:  &usersDoc,
 			},
 			{
 				Name: "Chat",
-				Procs: []ir.Procedure{
-					{Name: "Send"},
-				},
 			},
 		},
+		Procedures: []irtypes.ProcedureDef{
+			{RpcName: "Users", Name: "GetUser"},
+			{RpcName: "Chat", Name: "Send"},
+		},
+		Streams: []irtypes.StreamDef{
+			{RpcName: "Users", Name: "UserUpdates"},
+		},
+		Types:     []irtypes.TypeDef{},
+		Enums:     []irtypes.EnumDef{},
+		Constants: []irtypes.ConstantDef{},
+		Patterns:  []irtypes.PatternDef{},
+		Docs:      []irtypes.DocDef{},
 	}
 
 	tags := generateTags(schema)
@@ -178,27 +193,35 @@ func TestGenerateTags(t *testing.T) {
 
 // TestGeneratePaths tests path generation with correct RPC structure.
 func TestGeneratePaths(t *testing.T) {
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{
+	createUserDoc := "Creates a user"
+	deleteUserDeprecation := "Use RemoveUser"
+	schema := &irtypes.IrSchema{
+		Rpcs: []irtypes.RpcDef{
+			{Name: "Users"},
+		},
+		Procedures: []irtypes.ProcedureDef{
 			{
-				Name: "Users",
-				Procs: []ir.Procedure{
-					{
-						Name: "CreateUser",
-						Doc:  "Creates a user",
-					},
-					{
-						Name:       "DeleteUser",
-						Deprecated: &ir.Deprecation{Message: "Use RemoveUser"},
-					},
-				},
-				Streams: []ir.Stream{
-					{
-						Name: "UserEvents",
-					},
-				},
+				RpcName: "Users",
+				Name:    "CreateUser",
+				Doc:     &createUserDoc,
+			},
+			{
+				RpcName:     "Users",
+				Name:        "DeleteUser",
+				Deprecation: &deleteUserDeprecation,
 			},
 		},
+		Streams: []irtypes.StreamDef{
+			{
+				RpcName: "Users",
+				Name:    "UserEvents",
+			},
+		},
+		Types:     []irtypes.TypeDef{},
+		Enums:     []irtypes.EnumDef{},
+		Constants: []irtypes.ConstantDef{},
+		Patterns:  []irtypes.PatternDef{},
+		Docs:      []irtypes.DocDef{},
 	}
 
 	paths := generatePaths(schema)
@@ -228,11 +251,12 @@ func TestGeneratePaths(t *testing.T) {
 // TestGenerateEnumSchema tests enum schema generation.
 func TestGenerateEnumSchema(t *testing.T) {
 	t.Run("string enum", func(t *testing.T) {
-		e := ir.Enum{
-			Name:      "Status",
-			Doc:       "Order status",
-			ValueType: ir.EnumValueTypeString,
-			Members: []ir.EnumMember{
+		doc := "Order status"
+		e := irtypes.EnumDef{
+			Name:     "Status",
+			Doc:      &doc,
+			EnumType: irtypes.EnumTypeString,
+			Members: []irtypes.EnumDefMember{
 				{Name: "Pending", Value: "Pending"},
 				{Name: "Active", Value: "Active"},
 			},
@@ -246,10 +270,10 @@ func TestGenerateEnumSchema(t *testing.T) {
 	})
 
 	t.Run("int enum", func(t *testing.T) {
-		e := ir.Enum{
-			Name:      "Priority",
-			ValueType: ir.EnumValueTypeInt,
-			Members: []ir.EnumMember{
+		e := irtypes.EnumDef{
+			Name:     "Priority",
+			EnumType: irtypes.EnumTypeInt,
+			Members: []irtypes.EnumDefMember{
 				{Name: "Low", Value: "1"},
 				{Name: "High", Value: "10"},
 			},
@@ -266,57 +290,57 @@ func TestGenerateEnumSchema(t *testing.T) {
 func TestGenerateTypeRefSchema(t *testing.T) {
 	tests := []struct {
 		name     string
-		typeRef  ir.TypeRef
+		typeRef  irtypes.TypeRef
 		expected map[string]any
 	}{
 		{
 			name: "primitive string",
-			typeRef: ir.TypeRef{
-				Kind:      ir.TypeKindPrimitive,
-				Primitive: ir.PrimitiveString,
+			typeRef: irtypes.TypeRef{
+				Kind:          irtypes.TypeKindPrimitive,
+				PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString),
 			},
 			expected: map[string]any{"type": "string"},
 		},
 		{
 			name: "primitive int",
-			typeRef: ir.TypeRef{
-				Kind:      ir.TypeKindPrimitive,
-				Primitive: ir.PrimitiveInt,
+			typeRef: irtypes.TypeRef{
+				Kind:          irtypes.TypeKindPrimitive,
+				PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeInt),
 			},
 			expected: map[string]any{"type": "integer"},
 		},
 		{
 			name: "primitive datetime",
-			typeRef: ir.TypeRef{
-				Kind:      ir.TypeKindPrimitive,
-				Primitive: ir.PrimitiveDatetime,
+			typeRef: irtypes.TypeRef{
+				Kind:          irtypes.TypeKindPrimitive,
+				PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeDatetime),
 			},
 			expected: map[string]any{"type": "string", "format": "date-time"},
 		},
 		{
 			name: "custom type reference",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindType,
-				Type: "User",
+			typeRef: irtypes.TypeRef{
+				Kind:     irtypes.TypeKindType,
+				TypeName: ptrString("User"),
 			},
 			expected: map[string]any{"$ref": "#/components/schemas/User"},
 		},
 		{
 			name: "enum reference",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindEnum,
-				Enum: "Status",
+			typeRef: irtypes.TypeRef{
+				Kind:     irtypes.TypeKindEnum,
+				EnumName: ptrString("Status"),
 			},
 			expected: map[string]any{"$ref": "#/components/schemas/Status"},
 		},
 		{
 			name: "simple array",
-			typeRef: ir.TypeRef{
-				Kind:            ir.TypeKindArray,
-				ArrayDimensions: 1,
-				ArrayItem: &ir.TypeRef{
-					Kind:      ir.TypeKindPrimitive,
-					Primitive: ir.PrimitiveString,
+			typeRef: irtypes.TypeRef{
+				Kind:      irtypes.TypeKindArray,
+				ArrayDims: ptrInt64(1),
+				ArrayType: &irtypes.TypeRef{
+					Kind:          irtypes.TypeKindPrimitive,
+					PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString),
 				},
 			},
 			expected: map[string]any{
@@ -326,11 +350,11 @@ func TestGenerateTypeRefSchema(t *testing.T) {
 		},
 		{
 			name: "map type",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindMap,
-				MapValue: &ir.TypeRef{
-					Kind:      ir.TypeKindPrimitive,
-					Primitive: ir.PrimitiveInt,
+			typeRef: irtypes.TypeRef{
+				Kind: irtypes.TypeKindMap,
+				MapType: &irtypes.TypeRef{
+					Kind:          irtypes.TypeKindPrimitive,
+					PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeInt),
 				},
 			},
 			expected: map[string]any{
@@ -348,23 +372,33 @@ func TestGenerateTypeRefSchema(t *testing.T) {
 	}
 }
 
+func ptrString(s string) *string {
+	return &s
+}
+
+func ptrInt64(i int64) *int64 {
+	return &i
+}
+
 // TestGeneratePropertiesFromFields tests field to property conversion.
 func TestGeneratePropertiesFromFields(t *testing.T) {
-	fields := []ir.Field{
+	emailDoc := "User email"
+	userDoc := "The user object"
+	fields := []irtypes.Field{
 		{
-			Name: "id",
-			Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+			Name:    "id",
+			TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString)},
 		},
 		{
 			Name:     "email",
 			Optional: true,
-			Doc:      "User email",
-			Type:     ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+			Doc:      &emailDoc,
+			TypeRef:  irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString)},
 		},
 		{
-			Name: "user",
-			Doc:  "The user object",
-			Type: ir.TypeRef{Kind: ir.TypeKindType, Type: "User"},
+			Name:    "user",
+			Doc:     &userDoc,
+			TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: ptrString("User")},
 		},
 	}
 
