@@ -36,7 +36,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - `Taskfile.yml`: Orchestrates the entire build pipeline across languages.
 - `toolchain/`: The Go backend/core (Compiler, CLI, WASM).
-- `playground/`: The Svelte 5 frontend (See `playground/AGENTS.md`).
+- `playground/`: The Svelte 5 frontend.
 - `editors/`: Editor plugins (VS Code, Neovim).
 - `docs/`: Documentation site (Astro/Starlight).
 - `schemas/`: VDL self-definitions (Internal structures defined in VDL).
@@ -175,11 +175,18 @@ Do NOT rely on memory. Run `task --list-all` to find the appropriate testing com
   - When working with the AST, remember that `Proc` and `Stream` are children of `RPC`.
   - Use `transform` package for AST manipulations intended for display or refactoring.
 
-### Frontend
+### Playground
 
-- **Framework**: Svelte 5 (Runes preferred).
-- **Bundler**: Vite.
-- **Styles**: Tailwind CSS 4, DaisyUI 5.
+- **Framework**: Svelte 5 (SvelteKit static).
+  - **Syntax**: MUST use **Runes** (`$state`, `$derived`, etc) and TypeScript.
+  - **Styles**: Do NOT use `<style>` blocks. Use Tailwind/DaisyUI classes exclusively.
+- **UI System**:
+  - **DaisyUI v5**: Prefer component classes (e.g., `btn`, `card`) over raw utility classes. Always prefer DaisyUI classes, you can read the documentation here: https://daisyui.com/llms.txt
+  - **Tailwind CSS v4**:
+    - **Breakpoints**: Custom setup. Use **mobile-first** (no prefix) by default. Use `desk:` prefix for desktop. **Ignore standard breakpoints** (`sm`, `md`, `lg`, etc).
+- **Icons**: Use `@lucide/svelte`.
+  - Import: `import { Zap } from "@lucide/svelte";`
+  - Usage: `<Zap class="size-4" />`
 - **Linter/Formatter**: Biome.
 
 ### Documentation
