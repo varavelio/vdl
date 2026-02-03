@@ -3,8 +3,10 @@
 Plugin that validates all IR elements are correctly serialized.
 Tests: types, enums, constants, patterns, rpcs, procedures, streams, docs,
        spreads, optionals, arrays, maps, inline objects, deprecation.
+Also validates the protocol fields: version and schema.
 """
 import json
+import re
 import sys
 
 def main():
@@ -12,6 +14,42 @@ def main():
     ir = input_data.get("ir", {})
     
     errors = []
+    
+    # =========================================================================
+    # VALIDATE PROTOCOL FIELDS (version and schema)
+    # =========================================================================
+    version = input_data.get("version")
+    if version is None:
+        errors.append("Missing required field: version")
+    elif not isinstance(version, str) or len(version) == 0:
+        errors.append(f"version must be non-empty string, got: {version}")
+    else:
+        # Validate semver format
+        semver_pattern = r'^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$'
+        if not re.match(semver_pattern, version):
+            errors.append(f"version must be valid semver, got: {version}")
+    
+    schema = input_data.get("schema")
+    if schema is None:
+        errors.append("Missing required field: schema")
+    elif not isinstance(schema, str) or len(schema) == 0:
+        errors.append(f"schema must be non-empty string")
+    else:
+        # Verify schema contains expected definitions
+        expected_in_schema = [
+            "type BaseEntity",
+            "type User",
+            "enum Role",
+            "enum Priority",
+            "const API_VERSION",
+            "rpc UserService",
+            "rpc OrderService",
+            "proc GetUser",
+            "stream UserUpdates"
+        ]
+        for expected in expected_in_schema:
+            if expected not in schema:
+                errors.append(f"schema should contain '{expected}'")
     
     # =========================================================================
     # VALIDATE CONSTANTS
@@ -237,6 +275,10 @@ def main():
             "path": "validation_result.json",
             "content": json.dumps({
                 "success": True,
+                "protocol": {
+                    "version": version,
+                    "schema_length": len(schema) if schema else 0
+                },
                 "summary": {
                     "types_count": len(types),
                     "enums_count": len(enums),
