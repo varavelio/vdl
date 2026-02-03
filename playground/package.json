@@ -1,7 +1,6 @@
 {
   "name": "vdl-playground",
   "type": "module",
-  "private": true,
   "scripts": {
     "-": "Run commands using the root's Taskfile.yml file"
   },
