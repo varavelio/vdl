@@ -223,11 +223,6 @@ func Run(configPath string) (int, error) {
 }
 
 func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.PluginTargetConfig, schema *irtypes.IrSchema) (int, error) {
-	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
-		return 0, err
-	}
-
 	gen := plugin.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
@@ -235,11 +230,20 @@ func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.Plugin
 	}
 
 	generatedFiles := make([]GeneratedFile, len(files))
-	for i, f := range files {
-		generatedFiles[i] = GeneratedFile{Path: f.Path, Content: f.Content}
-	}
-	if err := writeGeneratedFiles(outputDir, generatedFiles); err != nil {
-		return 0, err
+
+	if len(files) > 0 {
+		outputDir := filepath.Join(absConfigDir, cfg.Output)
+		if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
+			return 0, err
+		}
+
+		for i, f := range files {
+			generatedFiles[i] = GeneratedFile{Path: f.Path, Content: f.Content}
+		}
+
+		if err := writeGeneratedFiles(outputDir, generatedFiles); err != nil {
+			return 0, err
+		}
 	}
 
 	return len(generatedFiles), nil
