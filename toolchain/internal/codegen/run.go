@@ -11,12 +11,14 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/irjson"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/python"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/vdlschema"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
@@ -189,6 +191,29 @@ func Run(configPath string) (int, error) {
 			count, err := runPlugin(ctx, absConfigDir, target.Plugin, schema)
 			if err != nil {
 				return 0, fmt.Errorf("target #%d (plugin): %w", i, err)
+			}
+			totalFiles += count
+		} else if target.Ir != nil {
+			schema, _, err := getSchema(*target.Ir.Schema)
+			if err != nil {
+				return 0, err
+			}
+			count, err := runIR(ctx, absConfigDir, target.Ir, schema)
+			if err != nil {
+				return 0, fmt.Errorf("target #%d (ir): %w", i, err)
+			}
+			totalFiles += count
+		} else if target.Vdlschema != nil {
+			schema, program, err := getSchema(*target.Vdlschema.Schema)
+			if err != nil {
+				return 0, err
+			}
+			// VDL Schema needs merged and formatted schema (all includes resolved into one file)
+			formatted := transform.MergeAndFormat(program)
+
+			count, err := runVdlSchema(ctx, absConfigDir, target.Vdlschema, schema, formatted)
+			if err != nil {
+				return 0, fmt.Errorf("target #%d (vdlschema): %w", i, err)
 			}
 			totalFiles += count
 		}
@@ -385,6 +410,52 @@ func runJSONSchema(ctx context.Context, absConfigDir string, cfg *configtypes.Js
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return 0, fmt.Errorf("failed to generate code: %w", err)
+	}
+
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
+	}
+	if err := writeGeneratedFiles(outputDir, generatedFiles); err != nil {
+		return 0, err
+	}
+
+	return len(generatedFiles), nil
+}
+
+func runIR(ctx context.Context, absConfigDir string, cfg *configtypes.IrConfig, schema *irtypes.IrSchema) (int, error) {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
+		return 0, err
+	}
+
+	gen := irjson.New(cfg)
+	files, err := gen.Generate(ctx, schema)
+	if err != nil {
+		return 0, fmt.Errorf("failed to generate IR JSON: %w", err)
+	}
+
+	generatedFiles := make([]GeneratedFile, len(files))
+	for i, f := range files {
+		generatedFiles[i] = GeneratedFile{Path: f.RelativePath, Content: f.Content}
+	}
+	if err := writeGeneratedFiles(outputDir, generatedFiles); err != nil {
+		return 0, err
+	}
+
+	return len(generatedFiles), nil
+}
+
+func runVdlSchema(ctx context.Context, absConfigDir string, cfg *configtypes.VdlSchemaConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
+	outputDir := filepath.Join(absConfigDir, cfg.Output)
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
+		return 0, err
+	}
+
+	gen := vdlschema.New(cfg, formattedSchema)
+	files, err := gen.Generate(ctx, schema)
+	if err != nil {
+		return 0, fmt.Errorf("failed to generate unified VDL schema: %w", err)
 	}
 
 	generatedFiles := make([]GeneratedFile, len(files))
