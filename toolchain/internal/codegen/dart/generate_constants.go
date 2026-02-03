@@ -6,11 +6,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateConstants generates Dart constant definitions.
-func generateConstants(schema *ir.Schema, config *config.DartConfig) (string, error) {
+func generateConstants(schema *irtypes.IrSchema, config *config.DartConfig) (string, error) {
 	if !config.ShouldGenConsts() {
 		return "", nil
 	}
@@ -34,29 +34,29 @@ func generateConstants(schema *ir.Schema, config *config.DartConfig) (string, er
 }
 
 // renderDartConstant renders a single Dart constant definition.
-func renderDartConstant(g *gen.Generator, constant ir.Constant) {
+func renderDartConstant(g *gen.Generator, constant irtypes.ConstantDef) {
 	// Generate doc comment
-	if constant.Doc != "" {
-		doc := strings.TrimSpace(constant.Doc)
+	if constant.GetDoc() != "" {
+		doc := strings.TrimSpace(constant.GetDoc())
 		renderMultilineCommentDart(g, doc)
 	}
-	if constant.Deprecated != nil {
-		renderDeprecatedDart(g, constant.Deprecated)
+	if constant.Deprecation != nil {
+		renderDeprecatedDart(g, constant.Deprecation)
 	}
 
 	// Determine the Dart type and value format
 	var dartType, dartValue string
-	switch constant.ValueType {
-	case ir.ConstValueTypeString:
+	switch constant.ConstType {
+	case irtypes.ConstTypeString:
 		dartType = "String"
 		dartValue = fmt.Sprintf("'%s'", constant.Value)
-	case ir.ConstValueTypeInt:
+	case irtypes.ConstTypeInt:
 		dartType = "int"
 		dartValue = constant.Value
-	case ir.ConstValueTypeFloat:
+	case irtypes.ConstTypeFloat:
 		dartType = "double"
 		dartValue = constant.Value
-	case ir.ConstValueTypeBool:
+	case irtypes.ConstTypeBool:
 		dartType = "bool"
 		dartValue = constant.Value
 	default:

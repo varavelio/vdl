@@ -7,7 +7,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
 )
@@ -45,7 +45,7 @@ func generateHeader() string {
 }
 
 // Generate produces Dart source files from the IR schema.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	var files []File
 
 	// core.dart - Core VDL types (Response, VdlError)
@@ -84,7 +84,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// catalog.dart - RPC catalog for introspection (if any RPCs)
-	if len(schema.RPCs) > 0 {
+	if len(schema.Rpcs) > 0 {
 		catalogContent := g.generateRPCCatalogFile(schema)
 		files = append(files, File{
 			RelativePath: "catalog.dart",
@@ -112,7 +112,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 }
 
 // generateCoreFile generates the core.dart file.
-func (g *Generator) generateCoreFile(schema *ir.Schema) string {
+func (g *Generator) generateCoreFile(schema *irtypes.IrSchema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
@@ -124,7 +124,7 @@ func (g *Generator) generateCoreFile(schema *ir.Schema) string {
 }
 
 // generateConstantsFile generates the constants.dart file.
-func (g *Generator) generateConstantsFile(schema *ir.Schema) string {
+func (g *Generator) generateConstantsFile(schema *irtypes.IrSchema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
@@ -136,7 +136,7 @@ func (g *Generator) generateConstantsFile(schema *ir.Schema) string {
 }
 
 // generatePatternsFile generates the patterns.dart file.
-func (g *Generator) generatePatternsFile(schema *ir.Schema) string {
+func (g *Generator) generatePatternsFile(schema *irtypes.IrSchema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
@@ -148,7 +148,7 @@ func (g *Generator) generatePatternsFile(schema *ir.Schema) string {
 }
 
 // generateTypesFile generates the types.dart file (includes enums, domain types, procedures and streams).
-func (g *Generator) generateTypesFile(schema *ir.Schema) string {
+func (g *Generator) generateTypesFile(schema *irtypes.IrSchema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
@@ -193,7 +193,7 @@ func (g *Generator) generateTypesFile(schema *ir.Schema) string {
 }
 
 // generateRPCCatalogFile generates the catalog.dart file.
-func (g *Generator) generateRPCCatalogFile(schema *ir.Schema) string {
+func (g *Generator) generateRPCCatalogFile(schema *irtypes.IrSchema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
@@ -205,7 +205,7 @@ func (g *Generator) generateRPCCatalogFile(schema *ir.Schema) string {
 }
 
 // generateIndexFile generates the index.dart file with re-exports.
-func (g *Generator) generateIndexFile(schema *ir.Schema) string {
+func (g *Generator) generateIndexFile(schema *irtypes.IrSchema) string {
 	builder := gen.New().WithSpaces(2)
 	builder.Raw(generateHeader())
 
@@ -231,7 +231,7 @@ func (g *Generator) generateIndexFile(schema *ir.Schema) string {
 		builder.Line("export 'types.dart';")
 	}
 
-	if len(schema.RPCs) > 0 {
+	if len(schema.Rpcs) > 0 {
 		builder.Line("export 'catalog.dart';")
 	}
 

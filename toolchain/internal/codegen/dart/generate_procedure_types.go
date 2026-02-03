@@ -5,10 +5,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateProcedureTypes(schema *ir.Schema, _ *config.DartConfig) (string, error) {
+func generateProcedureTypes(schema *irtypes.IrSchema, _ *config.DartConfig) (string, error) {
 	if len(schema.Procedures) == 0 {
 		return "", nil
 	}
@@ -21,7 +21,7 @@ func generateProcedureTypes(schema *ir.Schema, _ *config.DartConfig) (string, er
 	g.Break()
 
 	for _, proc := range schema.Procedures {
-		fullName := proc.FullName()
+		fullName := proc.RpcName + proc.Name
 
 		inputName := fmt.Sprintf("%sInput", fullName)
 		outputName := fmt.Sprintf("%sOutput", fullName)
@@ -31,10 +31,10 @@ func generateProcedureTypes(schema *ir.Schema, _ *config.DartConfig) (string, er
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s procedure.", outputName, fullName)
 		responseDesc := fmt.Sprintf("%s is the typed result wrapper returned by %s calls.", responseName, fullName)
 
-		g.Line(renderDartType("", inputName, inputDesc, proc.Input))
+		g.Line(renderDartType("", inputName, inputDesc, proc.InputFields))
 		g.Break()
 
-		g.Line(renderDartType("", outputName, outputDesc, proc.Output))
+		g.Line(renderDartType("", outputName, outputDesc, proc.OutputFields))
 		g.Break()
 
 		g.Linef("/// %s", responseDesc)

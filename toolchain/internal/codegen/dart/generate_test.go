@@ -9,6 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
@@ -17,7 +18,7 @@ func TestGenerator_Name(t *testing.T) {
 	assert.Equal(t, "dart", g.Name())
 }
 
-func parseAndBuildIR(t *testing.T, content string) *ir.Schema {
+func parseAndBuildIR(t *testing.T, content string) *irtypes.IrSchema {
 	fs := vfs.New()
 	path := "/test.vdl"
 	fs.WriteFileCache(path, []byte(content))
@@ -519,84 +520,95 @@ func TestGenerator_Generate_FileHeader(t *testing.T) {
 }
 
 func TestTypeRefToDart(t *testing.T) {
+	// Helper to create pointer values
+	primString := irtypes.PrimitiveTypeString
+	primInt := irtypes.PrimitiveTypeInt
+	primFloat := irtypes.PrimitiveTypeFloat
+	primBool := irtypes.PrimitiveTypeBool
+	primDatetime := irtypes.PrimitiveTypeDatetime
+	typeName := "User"
+	enumName := "OrderStatus"
+	arrayDims1 := int64(1)
+	arrayDims2 := int64(2)
+
 	tests := []struct {
 		name   string
-		tr     ir.TypeRef
+		tr     irtypes.TypeRef
 		parent string
 		want   string
 	}{
 		{
 			name: "string primitive",
-			tr:   ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
 			want: "String",
 		},
 		{
 			name: "int primitive",
-			tr:   ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveInt},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primInt},
 			want: "int",
 		},
 		{
 			name: "float primitive",
-			tr:   ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveFloat},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primFloat},
 			want: "double",
 		},
 		{
 			name: "bool primitive",
-			tr:   ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveBool},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primBool},
 			want: "bool",
 		},
 		{
 			name: "datetime primitive",
-			tr:   ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveDatetime},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primDatetime},
 			want: "DateTime",
 		},
 		{
 			name: "custom type",
-			tr:   ir.TypeRef{Kind: ir.TypeKindType, Type: "User"},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &typeName},
 			want: "User",
 		},
 		{
 			name: "enum",
-			tr:   ir.TypeRef{Kind: ir.TypeKindEnum, Enum: "OrderStatus"},
+			tr:   irtypes.TypeRef{Kind: irtypes.TypeKindEnum, EnumName: &enumName},
 			want: "OrderStatus",
 		},
 		{
 			name: "1D array of strings",
-			tr: ir.TypeRef{
-				Kind:            ir.TypeKindArray,
-				ArrayDimensions: 1,
-				ArrayItem:       &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+			tr: irtypes.TypeRef{
+				Kind:      irtypes.TypeKindArray,
+				ArrayDims: &arrayDims1,
+				ArrayType: &irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
 			},
 			want: "List<String>",
 		},
 		{
 			name: "2D array of ints",
-			tr: ir.TypeRef{
-				Kind:            ir.TypeKindArray,
-				ArrayDimensions: 2,
-				ArrayItem:       &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveInt},
+			tr: irtypes.TypeRef{
+				Kind:      irtypes.TypeKindArray,
+				ArrayDims: &arrayDims2,
+				ArrayType: &irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primInt},
 			},
 			want: "List<List<int>>",
 		},
 		{
 			name: "map of strings",
-			tr: ir.TypeRef{
-				Kind:     ir.TypeKindMap,
-				MapValue: &ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+			tr: irtypes.TypeRef{
+				Kind:    irtypes.TypeKindMap,
+				MapType: &irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
 			},
 			want: "Map<String, String>",
 		},
 		{
 			name: "map of custom types",
-			tr: ir.TypeRef{
-				Kind:     ir.TypeKindMap,
-				MapValue: &ir.TypeRef{Kind: ir.TypeKindType, Type: "User"},
+			tr: irtypes.TypeRef{
+				Kind:    irtypes.TypeKindMap,
+				MapType: &irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &typeName},
 			},
 			want: "Map<String, User>",
 		},
 		{
 			name:   "inline object",
-			tr:     ir.TypeRef{Kind: ir.TypeKindObject},
+			tr:     irtypes.TypeRef{Kind: irtypes.TypeKindObject},
 			parent: "UserAddress",
 			want:   "UserAddress",
 		},

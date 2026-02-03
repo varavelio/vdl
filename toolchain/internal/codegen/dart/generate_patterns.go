@@ -6,11 +6,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generatePatterns generates Dart pattern template functions.
-func generatePatterns(schema *ir.Schema, config *config.DartConfig) (string, error) {
+func generatePatterns(schema *irtypes.IrSchema, config *config.DartConfig) (string, error) {
 	if !config.ShouldGenPatterns() {
 		return "", nil
 	}
@@ -34,9 +34,9 @@ func generatePatterns(schema *ir.Schema, config *config.DartConfig) (string, err
 }
 
 // renderDartPattern renders a single Dart pattern template function.
-func renderDartPattern(g *gen.Generator, pattern ir.Pattern) {
+func renderDartPattern(g *gen.Generator, pattern irtypes.PatternDef) {
 	// Generate doc comment
-	doc := pattern.Doc
+	doc := pattern.GetDoc()
 	if doc == "" {
 		doc = fmt.Sprintf("%s generates a string from the pattern template.", pattern.Name)
 	}
@@ -45,9 +45,9 @@ func renderDartPattern(g *gen.Generator, pattern ir.Pattern) {
 		renderMultilineCommentDart(g, "")
 		renderMultilineCommentDart(g, fmt.Sprintf("Template: `%s`", pattern.Template))
 	}
-	if pattern.Deprecated != nil {
+	if pattern.Deprecation != nil {
 		renderMultilineCommentDart(g, "")
-		renderDeprecatedDart(g, pattern.Deprecated)
+		renderDeprecatedDart(g, pattern.Deprecation)
 	}
 
 	// Generate function signature with parameters

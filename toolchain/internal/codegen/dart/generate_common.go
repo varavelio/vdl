@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -15,31 +15,31 @@ import (
 
 // typeRefToDart converts an IR TypeRef to its Dart type string representation.
 // parentTypeName is used to generate names for inline object types.
-func typeRefToDart(parentTypeName string, tr ir.TypeRef) string {
+func typeRefToDart(parentTypeName string, tr irtypes.TypeRef) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		return primitiveToDart(tr.Primitive)
+	case irtypes.TypeKindPrimitive:
+		return primitiveToDart(tr.GetPrimitiveName())
 
-	case ir.TypeKindType:
-		return tr.Type
+	case irtypes.TypeKindType:
+		return tr.GetTypeName()
 
-	case ir.TypeKindEnum:
-		return tr.Enum
+	case irtypes.TypeKindEnum:
+		return tr.GetEnumName()
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		// Build nested List types for multi-dimensional arrays
-		elementType := typeRefToDart(parentTypeName, *tr.ArrayItem)
+		elementType := typeRefToDart(parentTypeName, *tr.ArrayType)
 		result := elementType
-		for i := 0; i < tr.ArrayDimensions; i++ {
+		for i := int64(0); i < tr.GetArrayDims(); i++ {
 			result = fmt.Sprintf("List<%s>", result)
 		}
 		return result
 
-	case ir.TypeKindMap:
-		valueType := typeRefToDart(parentTypeName, *tr.MapValue)
+	case irtypes.TypeKindMap:
+		valueType := typeRefToDart(parentTypeName, *tr.MapType)
 		return fmt.Sprintf("Map<String, %s>", valueType)
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		// Inline objects get a generated name based on parent
 		return parentTypeName
 	}
@@ -48,17 +48,17 @@ func typeRefToDart(parentTypeName string, tr ir.TypeRef) string {
 }
 
 // primitiveToDart converts an IR primitive type to its Dart equivalent.
-func primitiveToDart(p ir.PrimitiveType) string {
+func primitiveToDart(p irtypes.PrimitiveType) string {
 	switch p {
-	case ir.PrimitiveString:
+	case irtypes.PrimitiveTypeString:
 		return "String"
-	case ir.PrimitiveInt:
+	case irtypes.PrimitiveTypeInt:
 		return "int"
-	case ir.PrimitiveFloat:
+	case irtypes.PrimitiveTypeFloat:
 		return "double"
-	case ir.PrimitiveBool:
+	case irtypes.PrimitiveTypeBool:
 		return "bool"
-	case ir.PrimitiveDatetime:
+	case irtypes.PrimitiveTypeDatetime:
 		return "DateTime"
 	}
 	return "dynamic"
@@ -69,30 +69,30 @@ func primitiveToDart(p ir.PrimitiveType) string {
 // =============================================================================
 
 // dartFromJsonExpr returns the Dart expression to parse a single field from JSON value.
-func dartFromJsonExpr(parentTypeName string, field ir.Field, jsonAccessor string) string {
-	return buildFromJsonExpr(parentTypeName, field.Name, field.Type, jsonAccessor)
+func dartFromJsonExpr(parentTypeName string, field irtypes.Field, jsonAccessor string) string {
+	return buildFromJsonExpr(parentTypeName, field.Name, field.TypeRef, jsonAccessor)
 }
 
 // buildFromJsonExpr builds the fromJson expression for a TypeRef.
-func buildFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, jsonAccessor string) string {
+func buildFromJsonExpr(parentTypeName, fieldName string, tr irtypes.TypeRef, jsonAccessor string) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		return buildPrimitiveFromJson(tr.Primitive, jsonAccessor)
+	case irtypes.TypeKindPrimitive:
+		return buildPrimitiveFromJson(tr.GetPrimitiveName(), jsonAccessor)
 
-	case ir.TypeKindType:
-		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.Type, jsonAccessor)
+	case irtypes.TypeKindType:
+		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.GetTypeName(), jsonAccessor)
 
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		// Enums need to be converted from JSON value using the extension's fromJson method
-		return fmt.Sprintf("%sJson.fromJson(%s)", tr.Enum, jsonAccessor)
+		return fmt.Sprintf("%sJson.fromJson(%s)", tr.GetEnumName(), jsonAccessor)
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		return buildArrayFromJson(parentTypeName, fieldName, tr, jsonAccessor)
 
-	case ir.TypeKindMap:
+	case irtypes.TypeKindMap:
 		return buildMapFromJson(parentTypeName, fieldName, tr, jsonAccessor)
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		inlineName := parentTypeName + strutil.ToPascalCase(fieldName)
 		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", inlineName, jsonAccessor)
 	}
@@ -101,30 +101,30 @@ func buildFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, jsonAcce
 }
 
 // buildPrimitiveFromJson builds the fromJson expression for primitive types.
-func buildPrimitiveFromJson(p ir.PrimitiveType, jsonAccessor string) string {
+func buildPrimitiveFromJson(p irtypes.PrimitiveType, jsonAccessor string) string {
 	switch p {
-	case ir.PrimitiveString:
+	case irtypes.PrimitiveTypeString:
 		return fmt.Sprintf("%s as String", jsonAccessor)
-	case ir.PrimitiveInt:
+	case irtypes.PrimitiveTypeInt:
 		return fmt.Sprintf("(%s as num).toInt()", jsonAccessor)
-	case ir.PrimitiveFloat:
+	case irtypes.PrimitiveTypeFloat:
 		return fmt.Sprintf("(%s as num).toDouble()", jsonAccessor)
-	case ir.PrimitiveBool:
+	case irtypes.PrimitiveTypeBool:
 		return fmt.Sprintf("%s as bool", jsonAccessor)
-	case ir.PrimitiveDatetime:
+	case irtypes.PrimitiveTypeDatetime:
 		return fmt.Sprintf("DateTime.parse(%s as String)", jsonAccessor)
 	}
 	return jsonAccessor
 }
 
 // buildArrayFromJson builds the fromJson expression for array types.
-func buildArrayFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAccessor string) string {
-	itemExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.ArrayItem, "e")
+func buildArrayFromJson(parentTypeName, fieldName string, tr irtypes.TypeRef, jsonAccessor string) string {
+	itemExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.ArrayType, "e")
 
 	// For multi-dimensional arrays, we need nested maps
-	if tr.ArrayDimensions > 1 {
+	if tr.GetArrayDims() > 1 {
 		// Build nested map expression
-		result := fmt.Sprintf("((%s as List).map((e) => %s).toList())", jsonAccessor, buildNestedArrayFromJson(parentTypeName, fieldName, *tr.ArrayItem, tr.ArrayDimensions-1, "e"))
+		result := fmt.Sprintf("((%s as List).map((e) => %s).toList())", jsonAccessor, buildNestedArrayFromJson(parentTypeName, fieldName, *tr.ArrayType, tr.GetArrayDims()-1, "e"))
 		return result
 	}
 
@@ -132,7 +132,7 @@ func buildArrayFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAcc
 }
 
 // buildNestedArrayFromJson builds nested array parsing for multi-dimensional arrays.
-func buildNestedArrayFromJson(parentTypeName, fieldName string, itemType ir.TypeRef, remainingDims int, varName string) string {
+func buildNestedArrayFromJson(parentTypeName, fieldName string, itemType irtypes.TypeRef, remainingDims int64, varName string) string {
 	if remainingDims == 0 {
 		return buildItemFromJsonExpr(parentTypeName, fieldName, itemType, varName)
 	}
@@ -142,39 +142,39 @@ func buildNestedArrayFromJson(parentTypeName, fieldName string, itemType ir.Type
 }
 
 // buildItemFromJsonExpr builds the expression for parsing a single array/map item.
-func buildItemFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, varName string) string {
+func buildItemFromJsonExpr(parentTypeName, fieldName string, tr irtypes.TypeRef, varName string) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		switch tr.Primitive {
-		case ir.PrimitiveString:
+	case irtypes.TypeKindPrimitive:
+		switch tr.GetPrimitiveName() {
+		case irtypes.PrimitiveTypeString:
 			return fmt.Sprintf("%s as String", varName)
-		case ir.PrimitiveInt:
+		case irtypes.PrimitiveTypeInt:
 			return fmt.Sprintf("(%s as num).toInt()", varName)
-		case ir.PrimitiveFloat:
+		case irtypes.PrimitiveTypeFloat:
 			return fmt.Sprintf("(%s as num).toDouble()", varName)
-		case ir.PrimitiveBool:
+		case irtypes.PrimitiveTypeBool:
 			return fmt.Sprintf("%s as bool", varName)
-		case ir.PrimitiveDatetime:
+		case irtypes.PrimitiveTypeDatetime:
 			return fmt.Sprintf("DateTime.parse(%s as String)", varName)
 		}
 
-	case ir.TypeKindType:
-		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.Type, varName)
+	case irtypes.TypeKindType:
+		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", tr.GetTypeName(), varName)
 
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		// Enums need to be converted using the extension's fromJson method
-		return fmt.Sprintf("%sJson.fromJson(%s)", tr.Enum, varName)
+		return fmt.Sprintf("%sJson.fromJson(%s)", tr.GetEnumName(), varName)
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		inlineName := parentTypeName + strutil.ToPascalCase(fieldName)
 		return fmt.Sprintf("%s.fromJson((%s as Map).cast<String, dynamic>())", inlineName, varName)
 
-	case ir.TypeKindArray:
-		innerExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.ArrayItem, "inner")
+	case irtypes.TypeKindArray:
+		innerExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.ArrayType, "inner")
 		return fmt.Sprintf("((%s as List).map((inner) => %s).toList())", varName, innerExpr)
 
-	case ir.TypeKindMap:
-		innerExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.MapValue, "v")
+	case irtypes.TypeKindMap:
+		innerExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.MapType, "v")
 		return fmt.Sprintf("((%s as Map).cast<String, dynamic>().map((k, v) => MapEntry(k, %s)))", varName, innerExpr)
 	}
 
@@ -182,8 +182,8 @@ func buildItemFromJsonExpr(parentTypeName, fieldName string, tr ir.TypeRef, varN
 }
 
 // buildMapFromJson builds the fromJson expression for map types.
-func buildMapFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAccessor string) string {
-	valueExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.MapValue, "v")
+func buildMapFromJson(parentTypeName, fieldName string, tr irtypes.TypeRef, jsonAccessor string) string {
+	valueExpr := buildItemFromJsonExpr(parentTypeName, fieldName, *tr.MapType, "v")
 	return fmt.Sprintf("((%s as Map).cast<String, dynamic>().map((k, v) => MapEntry(k, %s)))", jsonAccessor, valueExpr)
 }
 
@@ -192,7 +192,7 @@ func buildMapFromJson(parentTypeName, fieldName string, tr ir.TypeRef, jsonAcces
 // =============================================================================
 
 // buildNestedArrayToJson builds nested array serialization for multi-dimensional arrays.
-func buildNestedArrayToJson(itemType ir.TypeRef, remainingDims int, varName string) string {
+func buildNestedArrayToJson(itemType irtypes.TypeRef, remainingDims int64, varName string) string {
 	if remainingDims == 1 {
 		// Base case: innermost dimension
 		itemExpr := buildItemToJsonExpr(itemType, "e")
@@ -211,39 +211,39 @@ func buildNestedArrayToJson(itemType ir.TypeRef, remainingDims int, varName stri
 }
 
 // dartToJsonExpr returns the Dart expression to serialise a field to JSON.
-func dartToJsonExpr(field ir.Field, varName string) string {
-	return buildToJsonExpr(field.Type, varName)
+func dartToJsonExpr(field irtypes.Field, varName string) string {
+	return buildToJsonExpr(field.TypeRef, varName)
 }
 
 // buildToJsonExpr builds the toJson expression for a TypeRef.
-func buildToJsonExpr(tr ir.TypeRef, varName string) string {
+func buildToJsonExpr(tr irtypes.TypeRef, varName string) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		if tr.Primitive == ir.PrimitiveDatetime {
+	case irtypes.TypeKindPrimitive:
+		if tr.GetPrimitiveName() == irtypes.PrimitiveTypeDatetime {
 			return fmt.Sprintf("%s.toUtc().toIso8601String()", varName)
 		}
 		return varName
 
-	case ir.TypeKindType, ir.TypeKindObject:
+	case irtypes.TypeKindType, irtypes.TypeKindObject:
 		return fmt.Sprintf("%s.toJson()", varName)
 
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		// Enums use the toJson method from the extension
 		return fmt.Sprintf("%s.toJson()", varName)
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		// For multi-dimensional arrays, we need nested maps
-		if tr.ArrayDimensions > 1 {
-			return buildNestedArrayToJson(*tr.ArrayItem, tr.ArrayDimensions, varName)
+		if tr.GetArrayDims() > 1 {
+			return buildNestedArrayToJson(*tr.ArrayType, tr.GetArrayDims(), varName)
 		}
-		itemExpr := buildItemToJsonExpr(*tr.ArrayItem, "e")
+		itemExpr := buildItemToJsonExpr(*tr.ArrayType, "e")
 		if itemExpr == "e" {
 			return varName
 		}
 		return fmt.Sprintf("%s.map((e) => %s).toList()", varName, itemExpr)
 
-	case ir.TypeKindMap:
-		valueExpr := buildItemToJsonExpr(*tr.MapValue, "v")
+	case irtypes.TypeKindMap:
+		valueExpr := buildItemToJsonExpr(*tr.MapType, "v")
 		if valueExpr == "v" {
 			return varName
 		}
@@ -254,30 +254,30 @@ func buildToJsonExpr(tr ir.TypeRef, varName string) string {
 }
 
 // buildItemToJsonExpr builds the toJson expression for a single array/map item.
-func buildItemToJsonExpr(tr ir.TypeRef, varName string) string {
+func buildItemToJsonExpr(tr irtypes.TypeRef, varName string) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		if tr.Primitive == ir.PrimitiveDatetime {
+	case irtypes.TypeKindPrimitive:
+		if tr.GetPrimitiveName() == irtypes.PrimitiveTypeDatetime {
 			return fmt.Sprintf("%s.toUtc().toIso8601String()", varName)
 		}
 		return varName
 
-	case ir.TypeKindType, ir.TypeKindObject:
+	case irtypes.TypeKindType, irtypes.TypeKindObject:
 		return fmt.Sprintf("%s.toJson()", varName)
 
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		// Enums use the toJson method from the extension
 		return fmt.Sprintf("%s.toJson()", varName)
 
-	case ir.TypeKindArray:
-		innerExpr := buildItemToJsonExpr(*tr.ArrayItem, "inner")
+	case irtypes.TypeKindArray:
+		innerExpr := buildItemToJsonExpr(*tr.ArrayType, "inner")
 		if innerExpr == "inner" {
 			return varName
 		}
 		return fmt.Sprintf("%s.map((inner) => %s).toList()", varName, innerExpr)
 
-	case ir.TypeKindMap:
-		innerExpr := buildItemToJsonExpr(*tr.MapValue, "v2")
+	case irtypes.TypeKindMap:
+		innerExpr := buildItemToJsonExpr(*tr.MapType, "v2")
 		if innerExpr == "v2" {
 			return varName
 		}
@@ -293,7 +293,7 @@ func buildItemToJsonExpr(tr ir.TypeRef, varName string) string {
 
 // renderDartType renders a Dart class for given fields, including a short description,
 // a factory constructor to hydrate from JSON and a toJson method for serialisation.
-func renderDartType(parentName, name, desc string, fields []ir.Field) string {
+func renderDartType(parentName, name, desc string, fields []irtypes.Field) string {
 	fullName := parentName + name
 
 	g := gen.New().WithSpaces(2)
@@ -306,13 +306,13 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 		for _, field := range fields {
 			fieldName := strutil.ToCamelCase(field.Name)
 			inlineTypeName := fullName + strutil.ToPascalCase(field.Name)
-			typeLit := typeRefToDart(inlineTypeName, field.Type)
+			typeLit := typeRefToDart(inlineTypeName, field.TypeRef)
 			if field.Optional {
 				typeLit = typeLit + "?"
 			}
 			// Field description if present
-			if field.Doc != "" {
-				g.Line("/// " + strings.ReplaceAll(strings.TrimSpace(field.Doc), "\n", "\n/// "))
+			if field.GetDoc() != "" {
+				g.Line("/// " + strings.ReplaceAll(strings.TrimSpace(field.GetDoc()), "\n", "\n/// "))
 			}
 			g.Linef("final %s %s;", typeLit, fieldName)
 		}
@@ -399,7 +399,7 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 				for _, field := range fields {
 					fieldName := strutil.ToCamelCase(field.Name)
 					inlineTypeName := fullName + strutil.ToPascalCase(field.Name)
-					typeLit := typeRefToDart(inlineTypeName, field.Type)
+					typeLit := typeRefToDart(inlineTypeName, field.TypeRef)
 					// All fields are optional in copyWith
 					g.Linef("%s? %s,", typeLit, fieldName)
 				}
@@ -505,39 +505,39 @@ func renderDartType(parentName, name, desc string, fields []ir.Field) string {
 type inlineTypeInfo struct {
 	name   string
 	doc    string
-	fields []ir.Field
+	fields []irtypes.Field
 }
 
 // extractInlineTypes recursively extracts all inline object types from a TypeRef.
 // parentName is the full name prefix for the inline type.
-func extractInlineTypes(parentName string, tr ir.TypeRef) []inlineTypeInfo {
+func extractInlineTypes(parentName string, tr irtypes.TypeRef) []inlineTypeInfo {
 	var result []inlineTypeInfo
 
 	switch tr.Kind {
-	case ir.TypeKindObject:
-		if tr.Object != nil {
+	case irtypes.TypeKindObject:
+		if tr.ObjectFields != nil {
 			result = append(result, inlineTypeInfo{
 				name:   parentName,
 				doc:    "",
-				fields: tr.Object.Fields,
+				fields: *tr.ObjectFields,
 			})
 			// Recursively extract from child fields
-			for _, f := range tr.Object.Fields {
+			for _, f := range *tr.ObjectFields {
 				childName := parentName + strutil.ToPascalCase(f.Name)
-				result = append(result, extractInlineTypes(childName, f.Type)...)
+				result = append(result, extractInlineTypes(childName, f.TypeRef)...)
 			}
 		}
 
-	case ir.TypeKindArray:
-		if tr.ArrayItem != nil {
+	case irtypes.TypeKindArray:
+		if tr.ArrayType != nil {
 			// For arrays, the inline type name is the same as parentName
-			result = append(result, extractInlineTypes(parentName, *tr.ArrayItem)...)
+			result = append(result, extractInlineTypes(parentName, *tr.ArrayType)...)
 		}
 
-	case ir.TypeKindMap:
-		if tr.MapValue != nil {
+	case irtypes.TypeKindMap:
+		if tr.MapType != nil {
 			// For maps, the inline type name is the same as parentName
-			result = append(result, extractInlineTypes(parentName, *tr.MapValue)...)
+			result = append(result, extractInlineTypes(parentName, *tr.MapType)...)
 		}
 	}
 
@@ -545,11 +545,11 @@ func extractInlineTypes(parentName string, tr ir.TypeRef) []inlineTypeInfo {
 }
 
 // extractAllInlineTypes extracts all inline types from a list of fields.
-func extractAllInlineTypes(parentName string, fields []ir.Field) []inlineTypeInfo {
+func extractAllInlineTypes(parentName string, fields []irtypes.Field) []inlineTypeInfo {
 	var result []inlineTypeInfo
 	for _, field := range fields {
 		childName := parentName + strutil.ToPascalCase(field.Name)
-		inlines := extractInlineTypes(childName, field.Type)
+		inlines := extractInlineTypes(childName, field.TypeRef)
 		result = append(result, inlines...)
 	}
 	return result
@@ -557,7 +557,7 @@ func extractAllInlineTypes(parentName string, fields []ir.Field) []inlineTypeInf
 
 // renderInlineType renders a single inline type class without recursively rendering children
 // (since extractAllInlineTypes already flattens the hierarchy).
-func renderInlineType(name, desc string, fields []ir.Field) string {
+func renderInlineType(name, desc string, fields []irtypes.Field) string {
 	g := gen.New().WithSpaces(2)
 	if desc != "" {
 		g.Line("/// " + strings.ReplaceAll(desc, "\n", "\n/// "))
@@ -568,12 +568,12 @@ func renderInlineType(name, desc string, fields []ir.Field) string {
 		for _, field := range fields {
 			fieldName := strutil.ToCamelCase(field.Name)
 			inlineTypeName := name + strutil.ToPascalCase(field.Name)
-			typeLit := typeRefToDart(inlineTypeName, field.Type)
+			typeLit := typeRefToDart(inlineTypeName, field.TypeRef)
 			if field.Optional {
 				typeLit = typeLit + "?"
 			}
-			if field.Doc != "" {
-				g.Line("/// " + strings.ReplaceAll(strings.TrimSpace(field.Doc), "\n", "\n/// "))
+			if field.GetDoc() != "" {
+				g.Line("/// " + strings.ReplaceAll(strings.TrimSpace(field.GetDoc()), "\n", "\n/// "))
 			}
 			g.Linef("final %s %s;", typeLit, fieldName)
 		}
@@ -659,7 +659,7 @@ func renderInlineType(name, desc string, fields []ir.Field) string {
 				for _, field := range fields {
 					fieldName := strutil.ToCamelCase(field.Name)
 					inlineTypeName := name + strutil.ToPascalCase(field.Name)
-					typeLit := typeRefToDart(inlineTypeName, field.Type)
+					typeLit := typeRefToDart(inlineTypeName, field.TypeRef)
 					g.Linef("%s? %s,", typeLit, fieldName)
 				}
 			})
@@ -751,15 +751,16 @@ func renderInlineType(name, desc string, fields []ir.Field) string {
 // =============================================================================
 
 // renderDeprecatedDart writes a deprecated doc line if provided.
-func renderDeprecatedDart(g *gen.Generator, deprecated *ir.Deprecation) {
+// deprecated is a *string (nil if not deprecated, message if deprecated)
+func renderDeprecatedDart(g *gen.Generator, deprecated *string) {
 	if deprecated == nil {
 		return
 	}
 	desc := "@deprecated "
-	if deprecated.Message == "" {
+	if *deprecated == "" {
 		desc += "This is deprecated and should not be used in new code."
 	} else {
-		desc += deprecated.Message
+		desc += *deprecated
 	}
 	g.Line("///")
 	for _, line := range strings.Split(desc, "\n") {

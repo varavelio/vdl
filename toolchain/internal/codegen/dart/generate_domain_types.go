@@ -5,10 +5,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateDomainTypes(schema *ir.Schema, _ *config.DartConfig) (string, error) {
+func generateDomainTypes(schema *irtypes.IrSchema, _ *config.DartConfig) (string, error) {
 	if len(schema.Types) == 0 {
 		return "", nil
 	}
@@ -22,15 +22,15 @@ func generateDomainTypes(schema *ir.Schema, _ *config.DartConfig) (string, error
 
 	for _, typeNode := range schema.Types {
 		desc := "is a domain type defined in VDL with no documentation."
-		if typeNode.Doc != "" {
-			desc = strings.TrimSpace(typeNode.Doc)
+		if typeNode.GetDoc() != "" {
+			desc = strings.TrimSpace(typeNode.GetDoc())
 		}
-		if typeNode.Deprecated != nil {
+		if typeNode.Deprecation != nil {
 			desc += "\n\n@deprecated "
-			if typeNode.Deprecated.Message == "" {
+			if *typeNode.Deprecation == "" {
 				desc += "This type is deprecated and should not be used in new code."
 			} else {
-				desc += typeNode.Deprecated.Message
+				desc += *typeNode.Deprecation
 			}
 		}
 

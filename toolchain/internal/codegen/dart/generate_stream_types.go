@@ -5,10 +5,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateStreamTypes(schema *ir.Schema, _ *config.DartConfig) (string, error) {
+func generateStreamTypes(schema *irtypes.IrSchema, _ *config.DartConfig) (string, error) {
 	if len(schema.Streams) == 0 {
 		return "", nil
 	}
@@ -21,7 +21,7 @@ func generateStreamTypes(schema *ir.Schema, _ *config.DartConfig) (string, error
 	g.Break()
 
 	for _, stream := range schema.Streams {
-		fullName := stream.FullName()
+		fullName := stream.RpcName + stream.Name
 
 		inputName := fmt.Sprintf("%sInput", fullName)
 		outputName := fmt.Sprintf("%sOutput", fullName)
@@ -31,10 +31,10 @@ func generateStreamTypes(schema *ir.Schema, _ *config.DartConfig) (string, error
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, fullName)
 		responseDesc := fmt.Sprintf("%s is the typed event wrapper yielded by the %s stream.", responseName, fullName)
 
-		g.Line(renderDartType("", inputName, inputDesc, stream.Input))
+		g.Line(renderDartType("", inputName, inputDesc, stream.InputFields))
 		g.Break()
 
-		g.Line(renderDartType("", outputName, outputDesc, stream.Output))
+		g.Line(renderDartType("", outputName, outputDesc, stream.OutputFields))
 		g.Break()
 
 		g.Linef("/// %s", responseDesc)

@@ -6,10 +6,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateEnums(schema *ir.Schema, _ *config.DartConfig) (string, error) {
+func generateEnums(schema *irtypes.IrSchema, _ *config.DartConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}
@@ -29,21 +29,21 @@ func generateEnums(schema *ir.Schema, _ *config.DartConfig) (string, error) {
 }
 
 // renderDartEnum renders a single Dart enum definition.
-func renderDartEnum(g *gen.Generator, enum ir.Enum) {
+func renderDartEnum(g *gen.Generator, enum irtypes.EnumDef) {
 	// Generate doc comment
-	if enum.Doc != "" {
-		doc := strings.TrimSpace(enum.Doc)
+	if enum.GetDoc() != "" {
+		doc := strings.TrimSpace(enum.GetDoc())
 		renderMultilineCommentDart(g, doc)
 	} else {
 		g.Linef("/// %s is an enumeration type.", enum.Name)
 	}
 
 	// Deprecation
-	if enum.Deprecated != nil {
-		renderDeprecatedDart(g, enum.Deprecated)
+	if enum.Deprecation != nil {
+		renderDeprecatedDart(g, enum.Deprecation)
 	}
 
-	if enum.ValueType == ir.EnumValueTypeString {
+	if enum.EnumType == irtypes.EnumTypeString {
 		// String enums - use Dart enum with string values
 		g.Linef("enum %s {", enum.Name)
 		g.Block(func() {
@@ -94,7 +94,7 @@ func renderDartEnum(g *gen.Generator, enum ir.Enum) {
 	// Generate extension for JSON serialization
 	g.Linef("extension %sJson on %s {", enum.Name, enum.Name)
 	g.Block(func() {
-		if enum.ValueType == ir.EnumValueTypeString {
+		if enum.EnumType == irtypes.EnumTypeString {
 			g.Line("String toJson() => value;")
 			g.Break()
 			g.Linef("static %s fromJson(String json) {", enum.Name)

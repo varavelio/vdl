@@ -3,12 +3,12 @@ package dart
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateRPCCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateRPCCatalog(schema *ir.Schema, _ *config.DartConfig) (string, error) {
-	if len(schema.RPCs) == 0 {
+func generateRPCCatalog(schema *irtypes.IrSchema, _ *config.DartConfig) (string, error) {
+	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}
 
@@ -54,31 +54,27 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.DartConfig) (string, error)
 	g.Line("}")
 	g.Break()
 
-	// VDLProcedures
+	// VDLProcedures - now using flattened schema.Procedures
 	g.Line("/// VDLProcedures is a list of all procedure definitions.")
 	g.Line("///")
 	g.Line("/// It allows introspection of RPC procedures at runtime.")
 	g.Line("const List<OperationDefinition> vdlProcedures = [")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, proc := range rpc.Procs {
-				g.Linef("OperationDefinition(rpcName: '%s', name: '%s', type: OperationType.proc),", rpc.Name, proc.Name)
-			}
+		for _, proc := range schema.Procedures {
+			g.Linef("OperationDefinition(rpcName: '%s', name: '%s', type: OperationType.proc),", proc.RpcName, proc.Name)
 		}
 	})
 	g.Line("];")
 	g.Break()
 
-	// VDLStreams
+	// VDLStreams - now using flattened schema.Streams
 	g.Line("/// VDLStreams is a list of all stream definitions.")
 	g.Line("///")
 	g.Line("/// It allows introspection of RPC streams at runtime.")
 	g.Line("const List<OperationDefinition> vdlStreams = [")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, stream := range rpc.Streams {
-				g.Linef("OperationDefinition(rpcName: '%s', name: '%s', type: OperationType.stream),", rpc.Name, stream.Name)
-			}
+		for _, stream := range schema.Streams {
+			g.Linef("OperationDefinition(rpcName: '%s', name: '%s', type: OperationType.stream),", stream.RpcName, stream.Name)
 		}
 	})
 	g.Line("];")
@@ -88,7 +84,7 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.DartConfig) (string, error)
 	g.Line("/// VDLPaths provides type-safe access to all RPC operation paths.")
 	g.Line("abstract class VDLPaths {")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
+		for _, rpc := range schema.Rpcs {
 			g.Linef("/// Paths for the %s RPC.", rpc.Name)
 			g.Linef("static const %s = _%sPaths._();", lowercaseFirst(rpc.Name), rpc.Name)
 		}
@@ -97,18 +93,24 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.DartConfig) (string, error)
 	g.Break()
 
 	// Generate path classes for each RPC
-	for _, rpc := range schema.RPCs {
+	for _, rpc := range schema.Rpcs {
 		g.Linef("class _%sPaths {", rpc.Name)
 		g.Block(func() {
 			g.Linef("const _%sPaths._();", rpc.Name)
 			g.Break()
-			for _, proc := range rpc.Procs {
-				g.Linef("/// Path for the %s procedure.", proc.Name)
-				g.Linef("String get %s => '/%s/%s';", lowercaseFirst(proc.Name), rpc.Name, proc.Name)
+			// Find procedures for this RPC
+			for _, proc := range schema.Procedures {
+				if proc.RpcName == rpc.Name {
+					g.Linef("/// Path for the %s procedure.", proc.Name)
+					g.Linef("String get %s => '/%s/%s';", lowercaseFirst(proc.Name), rpc.Name, proc.Name)
+				}
 			}
-			for _, stream := range rpc.Streams {
-				g.Linef("/// Path for the %s stream.", stream.Name)
-				g.Linef("String get %s => '/%s/%s';", lowercaseFirst(stream.Name), rpc.Name, stream.Name)
+			// Find streams for this RPC
+			for _, stream := range schema.Streams {
+				if stream.RpcName == rpc.Name {
+					g.Linef("/// Path for the %s stream.", stream.Name)
+					g.Linef("String get %s => '/%s/%s';", lowercaseFirst(stream.Name), rpc.Name, stream.Name)
+				}
 			}
 		})
 		g.Line("}")
