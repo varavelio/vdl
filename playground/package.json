@@ -5,7 +5,6 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
     "@lucide/svelte": "0.544.0",
     "@monaco-editor/loader": "1.5.0",
     "@shikijs/colorized-brackets": "3.3.0",

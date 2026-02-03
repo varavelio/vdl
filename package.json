@@ -5,6 +5,7 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.14",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/node": "24.3.1",
     "prettier": "3.7.4",

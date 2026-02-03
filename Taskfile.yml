@@ -181,7 +181,7 @@ tasks:
     cmds:
       - npx --no svelte-kit sync
       - npx --no svelte-check --tsconfig ./tsconfig.json
-      - npx --no biome lint .
+      - npx --no biome lint . --config-path ../biome.json
       - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
 
   pg:test:
@@ -256,4 +256,6 @@ tasks:
   dc:lint:
     desc: "Docs: Lint code"
     dir: ./docs
-    cmd: npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+    cmds:
+      - npx --no biome lint . --config-path ../biome.json
+      - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
