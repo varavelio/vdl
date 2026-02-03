@@ -1,11 +1,11 @@
 package plugin
 
-import "github.com/varavelio/vdl/toolchain/internal/core/ir"
+import "github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 
 // Input represents the data sent to the plugin via Stdin.
 type Input struct {
 	// IR is the complete VDL Intermediate Representation.
-	IR *ir.Schema `json:"ir"`
+	IR *irtypes.IrSchema `json:"ir"`
 	// Options is the map of arbitrary options defined in vdl.yaml.
 	Options map[string]any `json:"options"`
 }

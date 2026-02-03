@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 func TestGenerator(t *testing.T) {
@@ -45,8 +45,8 @@ json.dump(output, sys.stdout)
 	require.NoError(t, err)
 
 	// Create a dummy schema
-	schema := &ir.Schema{
-		RPCs: []ir.RPC{},
+	schema := &irtypes.IrSchema{
+		Rpcs: []irtypes.RpcDef{},
 	}
 
 	// Create configuration

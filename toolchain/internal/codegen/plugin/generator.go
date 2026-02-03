@@ -10,7 +10,7 @@ import (
 	"os/exec"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // GeneratedFile represents a generated file.
@@ -37,7 +37,7 @@ func (g *Generator) Name() string {
 }
 
 // Generate executes the plugin and returns the generated files.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]GeneratedFile, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]GeneratedFile, error) {
 	if len(g.config.Command) == 0 {
 		return nil, fmt.Errorf("plugin command is empty")
 	}
