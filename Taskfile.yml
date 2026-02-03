@@ -239,7 +239,7 @@ tasks:
     dir: ./docs
     deps:
       - tc:build:wasm
-    cmd: npx --no astro dev
+    cmd: npx --no astro dev --host 0.0.0.0
 
   dc:build:
     desc: "Docs: Build the production docs site"
