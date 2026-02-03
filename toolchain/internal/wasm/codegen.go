@@ -43,22 +43,14 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 	// Convert to IR Schema
 	schema := ir.FromProgram(program)
 
-	switch input.Target {
-	case wasmtypes.CodegenTargetGo:
-		cfg := input.GetGoConfigOr(wasmtypes.CodegenInputGoConfig{
-			Package:     "vdl",
-			GenPatterns: true,
-			GenConsts:   true,
-			GenClient:   true,
-			GenServer:   true,
-		})
-
+	switch {
+	case input.Target.Go != nil:
 		gen := golang.New(&configtypes.GoTargetConfig{
-			Package:     cfg.Package,
-			GenServer:   configtypes.Ptr(cfg.GenServer),
-			GenClient:   configtypes.Ptr(cfg.GenClient),
-			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
-			GenConsts:   configtypes.Ptr(cfg.GenConsts),
+			Package:     input.Target.Go.Package,
+			GenServer:   input.Target.Go.GenServer,
+			GenClient:   input.Target.Go.GenClient,
+			GenPatterns: input.Target.Go.GenPatterns,
+			GenConsts:   input.Target.Go.GenConsts,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -66,29 +58,21 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			return nil, fmt.Errorf("failed to generate go code: %w", err)
 		}
 
-		outFiles := make([]wasmtypes.CodegenFile, len(genFiles))
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
 		for i, genFile := range genFiles {
-			outFiles[i] = wasmtypes.CodegenFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
-	case wasmtypes.CodegenTargetTypescript:
-		cfg := input.GetTypescriptConfigOr(wasmtypes.CodegenInputTypescriptConfig{
-			ImportExtension: "none",
-			GenPatterns:     true,
-			GenConsts:       true,
-			GenClient:       true,
-			GenServer:       true,
-		})
-
-		importExt := configtypes.TypescriptTargetImportExtension(cfg.ImportExtension.String())
+	case input.Target.Typescript != nil:
+		importExt := configtypes.TypescriptTargetImportExtension(input.Target.Typescript.ImportExtension.String())
 		gen := typescript.New(&configtypes.TypeScriptTargetConfig{
 			ImportExtension: &importExt,
-			GenServer:       configtypes.Ptr(cfg.GenServer),
-			GenClient:       configtypes.Ptr(cfg.GenClient),
-			GenPatterns:     configtypes.Ptr(cfg.GenPatterns),
-			GenConsts:       configtypes.Ptr(cfg.GenConsts),
+			GenServer:       input.Target.Typescript.GenServer,
+			GenClient:       input.Target.Typescript.GenClient,
+			GenPatterns:     input.Target.Typescript.GenPatterns,
+			GenConsts:       input.Target.Typescript.GenConsts,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -96,22 +80,17 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			return nil, fmt.Errorf("failed to generate typescript code: %w", err)
 		}
 
-		outFiles := make([]wasmtypes.CodegenFile, len(genFiles))
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
 		for i, genFile := range genFiles {
-			outFiles[i] = wasmtypes.CodegenFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
-	case wasmtypes.CodegenTargetDart:
-		cfg := input.GetDartConfigOr(wasmtypes.CodegenInputDartConfig{
-			GenPatterns: true,
-			GenConsts:   true,
-		})
-
+	case input.Target.Dart != nil:
 		gen := dart.New(&configtypes.DartTargetConfig{
-			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
-			GenConsts:   configtypes.Ptr(cfg.GenConsts),
+			GenPatterns: input.Target.Dart.GenPatterns,
+			GenConsts:   input.Target.Dart.GenConsts,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -119,22 +98,17 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			return nil, fmt.Errorf("failed to generate dart code: %w", err)
 		}
 
-		outFiles := make([]wasmtypes.CodegenFile, len(genFiles))
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
 		for i, genFile := range genFiles {
-			outFiles[i] = wasmtypes.CodegenFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
-	case wasmtypes.CodegenTargetPython:
-		cfg := input.GetPythonConfigOr(wasmtypes.CodegenInputPythonConfig{
-			GenPatterns: true,
-			GenConsts:   true,
-		})
-
+	case input.Target.Python != nil:
 		gen := python.New(&configtypes.PythonTargetConfig{
-			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
-			GenConsts:   configtypes.Ptr(cfg.GenConsts),
+			GenPatterns: input.Target.Python.GenPatterns,
+			GenConsts:   input.Target.Python.GenConsts,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -142,28 +116,23 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			return nil, fmt.Errorf("failed to generate python code: %w", err)
 		}
 
-		outFiles := make([]wasmtypes.CodegenFile, len(genFiles))
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
 		for i, genFile := range genFiles {
-			outFiles[i] = wasmtypes.CodegenFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
-	case wasmtypes.CodegenTargetOpenApi:
-		cfg := input.GetOpenApiConfigOr(wasmtypes.CodegenInputOpenApiConfig{
-			Title:   "VDL RPC API",
-			Version: "1.0.0",
-		})
-
+	case input.Target.Openapi != nil:
 		gen := openapi.New(&configtypes.OpenApiTargetConfig{
-			Title:        cfg.Title,
-			Version:      cfg.Version,
-			Description:  configtypes.Ptr(cfg.GetDescription()),
-			BaseUrl:      configtypes.Ptr(cfg.GetBaseUrl()),
-			ContactName:  configtypes.Ptr(cfg.GetContactName()),
-			ContactEmail: configtypes.Ptr(cfg.GetContactEmail()),
-			LicenseName:  configtypes.Ptr(cfg.GetLicenseName()),
-			Filename:     configtypes.Ptr("openapi.yaml"),
+			Title:        input.Target.Openapi.Title,
+			Version:      input.Target.Openapi.Version,
+			Description:  input.Target.Openapi.Description,
+			BaseUrl:      input.Target.Openapi.BaseUrl,
+			ContactName:  input.Target.Openapi.ContactName,
+			ContactEmail: input.Target.Openapi.ContactEmail,
+			LicenseName:  input.Target.Openapi.LicenseName,
+			Filename:     input.Target.Openapi.Filename,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -171,19 +140,18 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			return nil, fmt.Errorf("failed to generate openapi code: %w", err)
 		}
 
-		outFiles := make([]wasmtypes.CodegenFile, len(genFiles))
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
 		for i, genFile := range genFiles {
-			outFiles[i] = wasmtypes.CodegenFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
-	case wasmtypes.CodegenTargetJsonSchema:
-		cfg := input.GetJsonSchemaConfigOr(wasmtypes.CodegenInputJsonSchemaConfig{})
-
+	case input.Target.Jsonschema != nil:
 		gen := jsonschema.New(&configtypes.JsonSchemaTargetConfig{
-			Id:       configtypes.Ptr(cfg.SchemaId),
-			Filename: configtypes.Ptr("schema.json"),
+			Filename: input.Target.Jsonschema.Filename,
+			Id:       input.Target.Jsonschema.Id,
+			Root:     input.Target.Jsonschema.Root,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -191,13 +159,13 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			return nil, fmt.Errorf("failed to generate jsonschema code: %w", err)
 		}
 
-		outFiles := make([]wasmtypes.CodegenFile, len(genFiles))
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
 		for i, genFile := range genFiles {
-			outFiles[i] = wasmtypes.CodegenFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 	}
 
-	return nil, fmt.Errorf("target %s is not supported in WASM", input.Target)
+	return nil, fmt.Errorf("target is not supported in WASM")
 }
