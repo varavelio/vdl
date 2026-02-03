@@ -1,9 +1,8 @@
 name: Deploy Documentation
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
     paths:
       - "docs/**"
 
@@ -32,7 +31,8 @@ jobs:
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
-          command: pages deploy ./docs/dist --project-name=varavel-vdl
+          workingDirectory: ./docs
+          command: pages deploy ./dist --project-name=varavel-vdl --branch=${{ github.head_ref || github.ref_name }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
