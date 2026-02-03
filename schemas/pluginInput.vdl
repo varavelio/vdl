@@ -1,0 +1,34 @@
+include "./ir.vdl"
+
+"""
+PluginInput represents the data payload sent to a plugin via stdin.
+
+The plugin receives this as a single JSON object containing the complete
+Intermediate Representation of the VDL schema along with any user-defined
+configuration options from vdl.yaml.
+"""
+type PluginInput {
+  """ The VDL binary version (without v prefix, e.g. 1.0.0) """
+  version: string
+
+  """
+  The complete VDL Intermediate Representation.
+
+  Contains all types, enums, constants, patterns, RPCs, procedures, streams,
+  and documentation blocks from the compiled schema, fully resolved and ready
+  for code generation.
+  """
+  ir: IrSchema
+
+  """ The complete VDL schema in plain text (with includes and external docstrings already resolved) """
+  schema: string
+
+  """
+  Arbitrary key-value options passed from the vdl.yaml configuration.
+
+  These allow users to customize plugin behavior without modifying the plugin
+  itself. Common use cases include specifying target frameworks, API versions,
+  naming conventions, or feature flags.
+  """
+  options: map<string>
+}
