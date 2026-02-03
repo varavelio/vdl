@@ -43,27 +43,45 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: "My Docs",
+      favicon: "/_vdl/assets/png/icon.png",
+      title: "UFO RPC",
+      description:
+        "Open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.",
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/withastro/starlight",
+          href: "https://github.com/varavelio/vdl",
+        },
+        {
+          icon: "discord",
+          label: "Discord",
+          href: "https://vdl.varavel.com/discord",
+        },
+        {
+          icon: "reddit",
+          label: "Reddit",
+          href: "https://vdl.varavel.com/reddit",
+        },
+        {
+          icon: "x.com",
+          label: "X (Twitter)",
+          href: "https://vdl.varavel.com/x",
         },
       ],
       sidebar: [
         {
           label: "Guides",
-          items: [
-            // Each item here is one entry in the navigation menu.
-            { label: "Example Guide", slug: "guides/example" },
-          ],
+          autogenerate: { directory: "guides" },
         },
         {
           label: "Reference",
           autogenerate: { directory: "reference" },
         },
       ],
+      editLink: {
+        baseUrl: "https://github.com/varavelio/vdl/tree/main/docs/",
+      },
     }),
   ],
 
