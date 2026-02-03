@@ -206,10 +206,44 @@ type CodegenFile struct {
 	Content string `json:"content"`
 }
 
+// GetPath returns the value of Path or the zero value if the receiver or field is nil.
+func (x *CodegenFile) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	var zero string
+	return zero
+}
+
+// GetPathOr returns the value of Path or the provided default if the receiver or field is nil.
+func (x *CodegenFile) GetPathOr(defaultValue string) string {
+	if x != nil {
+		return x.Path
+	}
+	return defaultValue
+}
+
+// GetContent returns the value of Content or the zero value if the receiver or field is nil.
+func (x *CodegenFile) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	var zero string
+	return zero
+}
+
+// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
+func (x *CodegenFile) GetContentOr(defaultValue string) string {
+	if x != nil {
+		return x.Content
+	}
+	return defaultValue
+}
+
 // preCodegenFile is the version of CodegenFile previous to the required field validation
 type preCodegenFile struct {
-	Path    Optional[string] `json:"path,omitzero"`
-	Content Optional[string] `json:"content,omitzero"`
+	Path    *string `json:"path,omitempty"`
+	Content *string `json:"content,omitempty"`
 }
 
 // validate validates the required fields of CodegenFile
@@ -219,12 +253,12 @@ func (p *preCodegenFile) validate() error {
 	}
 
 	// Validation for field "path"
-	if !p.Path.Present {
+	if p.Path == nil {
 		return errorMissingRequiredField("field path is required")
 	}
 
 	// Validation for field "content"
-	if !p.Content.Present {
+	if p.Content == nil {
 		return errorMissingRequiredField("field content is required")
 	}
 
@@ -234,8 +268,8 @@ func (p *preCodegenFile) validate() error {
 // transform transforms the preCodegenFile type to the final CodegenFile type
 func (p *preCodegenFile) transform() CodegenFile {
 	// Transformations
-	transPath := p.Path.Value
-	transContent := p.Content.Value
+	transPath := *p.Path
+	transContent := *p.Content
 
 	// Assignments
 	return CodegenFile{
@@ -251,17 +285,153 @@ type CodegenInput struct {
 	// Target to generate code for
 	Target CodegenTarget `json:"target"`
 	// Configuration if the target is Go
-	GoConfig Optional[CodegenInputGoConfig] `json:"goConfig,omitzero"`
+	GoConfig *CodegenInputGoConfig `json:"goConfig,omitempty"`
 	// Configuration if the target is Typescript
-	TypescriptConfig Optional[CodegenInputTypescriptConfig] `json:"typescriptConfig,omitzero"`
+	TypescriptConfig *CodegenInputTypescriptConfig `json:"typescriptConfig,omitempty"`
 	// Configuration if the target is Dart
-	DartConfig Optional[CodegenInputDartConfig] `json:"dartConfig,omitzero"`
+	DartConfig *CodegenInputDartConfig `json:"dartConfig,omitempty"`
 	// Configuration if the target is Python
-	PythonConfig Optional[CodegenInputPythonConfig] `json:"pythonConfig,omitzero"`
+	PythonConfig *CodegenInputPythonConfig `json:"pythonConfig,omitempty"`
 	// Configuration if the target is JsonSchema
-	JsonSchemaConfig Optional[CodegenInputJsonSchemaConfig] `json:"jsonSchemaConfig,omitzero"`
+	JsonSchemaConfig *CodegenInputJsonSchemaConfig `json:"jsonSchemaConfig,omitempty"`
 	// Configuration if the target is OpenApi
-	OpenApiConfig Optional[CodegenInputOpenApiConfig] `json:"openApiConfig,omitzero"`
+	OpenApiConfig *CodegenInputOpenApiConfig `json:"openApiConfig,omitempty"`
+}
+
+// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetVdlSchema() string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetVdlSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	return defaultValue
+}
+
+// GetTarget returns the value of Target or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetTarget() CodegenTarget {
+	if x != nil {
+		return x.Target
+	}
+	var zero CodegenTarget
+	return zero
+}
+
+// GetTargetOr returns the value of Target or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetTargetOr(defaultValue CodegenTarget) CodegenTarget {
+	if x != nil {
+		return x.Target
+	}
+	return defaultValue
+}
+
+// GetGoConfig returns the value of GoConfig or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetGoConfig() CodegenInputGoConfig {
+	if x != nil && x.GoConfig != nil {
+		return *x.GoConfig
+	}
+	var zero CodegenInputGoConfig
+	return zero
+}
+
+// GetGoConfigOr returns the value of GoConfig or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetGoConfigOr(defaultValue CodegenInputGoConfig) CodegenInputGoConfig {
+	if x != nil && x.GoConfig != nil {
+		return *x.GoConfig
+	}
+	return defaultValue
+}
+
+// GetTypescriptConfig returns the value of TypescriptConfig or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetTypescriptConfig() CodegenInputTypescriptConfig {
+	if x != nil && x.TypescriptConfig != nil {
+		return *x.TypescriptConfig
+	}
+	var zero CodegenInputTypescriptConfig
+	return zero
+}
+
+// GetTypescriptConfigOr returns the value of TypescriptConfig or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetTypescriptConfigOr(defaultValue CodegenInputTypescriptConfig) CodegenInputTypescriptConfig {
+	if x != nil && x.TypescriptConfig != nil {
+		return *x.TypescriptConfig
+	}
+	return defaultValue
+}
+
+// GetDartConfig returns the value of DartConfig or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetDartConfig() CodegenInputDartConfig {
+	if x != nil && x.DartConfig != nil {
+		return *x.DartConfig
+	}
+	var zero CodegenInputDartConfig
+	return zero
+}
+
+// GetDartConfigOr returns the value of DartConfig or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetDartConfigOr(defaultValue CodegenInputDartConfig) CodegenInputDartConfig {
+	if x != nil && x.DartConfig != nil {
+		return *x.DartConfig
+	}
+	return defaultValue
+}
+
+// GetPythonConfig returns the value of PythonConfig or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetPythonConfig() CodegenInputPythonConfig {
+	if x != nil && x.PythonConfig != nil {
+		return *x.PythonConfig
+	}
+	var zero CodegenInputPythonConfig
+	return zero
+}
+
+// GetPythonConfigOr returns the value of PythonConfig or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetPythonConfigOr(defaultValue CodegenInputPythonConfig) CodegenInputPythonConfig {
+	if x != nil && x.PythonConfig != nil {
+		return *x.PythonConfig
+	}
+	return defaultValue
+}
+
+// GetJsonSchemaConfig returns the value of JsonSchemaConfig or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetJsonSchemaConfig() CodegenInputJsonSchemaConfig {
+	if x != nil && x.JsonSchemaConfig != nil {
+		return *x.JsonSchemaConfig
+	}
+	var zero CodegenInputJsonSchemaConfig
+	return zero
+}
+
+// GetJsonSchemaConfigOr returns the value of JsonSchemaConfig or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetJsonSchemaConfigOr(defaultValue CodegenInputJsonSchemaConfig) CodegenInputJsonSchemaConfig {
+	if x != nil && x.JsonSchemaConfig != nil {
+		return *x.JsonSchemaConfig
+	}
+	return defaultValue
+}
+
+// GetOpenApiConfig returns the value of OpenApiConfig or the zero value if the receiver or field is nil.
+func (x *CodegenInput) GetOpenApiConfig() CodegenInputOpenApiConfig {
+	if x != nil && x.OpenApiConfig != nil {
+		return *x.OpenApiConfig
+	}
+	var zero CodegenInputOpenApiConfig
+	return zero
+}
+
+// GetOpenApiConfigOr returns the value of OpenApiConfig or the provided default if the receiver or field is nil.
+func (x *CodegenInput) GetOpenApiConfigOr(defaultValue CodegenInputOpenApiConfig) CodegenInputOpenApiConfig {
+	if x != nil && x.OpenApiConfig != nil {
+		return *x.OpenApiConfig
+	}
+	return defaultValue
 }
 
 type CodegenInputGoConfig struct {
@@ -272,6 +442,91 @@ type CodegenInputGoConfig struct {
 	GenServer   bool   `json:"genServer"`
 }
 
+// GetPackage returns the value of Package or the zero value if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetPackage() string {
+	if x != nil {
+		return x.Package
+	}
+	var zero string
+	return zero
+}
+
+// GetPackageOr returns the value of Package or the provided default if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetPackageOr(defaultValue string) string {
+	if x != nil {
+		return x.Package
+	}
+	return defaultValue
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenPatterns() bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenConsts() bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	return defaultValue
+}
+
+// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenClient() bool {
+	if x != nil {
+		return x.GenClient
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenClientOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenClient
+	}
+	return defaultValue
+}
+
+// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenServer() bool {
+	if x != nil {
+		return x.GenServer
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
+func (x *CodegenInputGoConfig) GetGenServerOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenServer
+	}
+	return defaultValue
+}
+
 type CodegenInputTypescriptConfig struct {
 	ImportExtension CodegenTypescriptImportExtension `json:"importExtension"`
 	GenPatterns     bool                             `json:"genPatterns"`
@@ -280,9 +535,128 @@ type CodegenInputTypescriptConfig struct {
 	GenServer       bool                             `json:"genServer"`
 }
 
+// GetImportExtension returns the value of ImportExtension or the zero value if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetImportExtension() CodegenTypescriptImportExtension {
+	if x != nil {
+		return x.ImportExtension
+	}
+	var zero CodegenTypescriptImportExtension
+	return zero
+}
+
+// GetImportExtensionOr returns the value of ImportExtension or the provided default if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetImportExtensionOr(defaultValue CodegenTypescriptImportExtension) CodegenTypescriptImportExtension {
+	if x != nil {
+		return x.ImportExtension
+	}
+	return defaultValue
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenPatterns() bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenConsts() bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	return defaultValue
+}
+
+// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenClient() bool {
+	if x != nil {
+		return x.GenClient
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenClientOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenClient
+	}
+	return defaultValue
+}
+
+// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenServer() bool {
+	if x != nil {
+		return x.GenServer
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
+func (x *CodegenInputTypescriptConfig) GetGenServerOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenServer
+	}
+	return defaultValue
+}
+
 type CodegenInputDartConfig struct {
 	GenPatterns bool `json:"genPatterns"`
 	GenConsts   bool `json:"genConsts"`
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *CodegenInputDartConfig) GetGenPatterns() bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *CodegenInputDartConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *CodegenInputDartConfig) GetGenConsts() bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *CodegenInputDartConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	return defaultValue
 }
 
 type CodegenInputPythonConfig struct {
@@ -290,39 +664,209 @@ type CodegenInputPythonConfig struct {
 	GenConsts   bool `json:"genConsts"`
 }
 
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *CodegenInputPythonConfig) GetGenPatterns() bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *CodegenInputPythonConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *CodegenInputPythonConfig) GetGenConsts() bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *CodegenInputPythonConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil {
+		return x.GenConsts
+	}
+	return defaultValue
+}
+
 type CodegenInputJsonSchemaConfig struct {
 	SchemaId string `json:"schemaId"`
 }
 
+// GetSchemaId returns the value of SchemaId or the zero value if the receiver or field is nil.
+func (x *CodegenInputJsonSchemaConfig) GetSchemaId() string {
+	if x != nil {
+		return x.SchemaId
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaIdOr returns the value of SchemaId or the provided default if the receiver or field is nil.
+func (x *CodegenInputJsonSchemaConfig) GetSchemaIdOr(defaultValue string) string {
+	if x != nil {
+		return x.SchemaId
+	}
+	return defaultValue
+}
+
 type CodegenInputOpenApiConfig struct {
-	Title        string           `json:"title"`
-	Version      string           `json:"version"`
-	Description  Optional[string] `json:"description,omitzero"`
-	BaseUrl      Optional[string] `json:"baseUrl,omitzero"`
-	ContactName  Optional[string] `json:"contactName,omitzero"`
-	ContactEmail Optional[string] `json:"contactEmail,omitzero"`
-	LicenseName  Optional[string] `json:"licenseName,omitzero"`
+	Title        string  `json:"title"`
+	Version      string  `json:"version"`
+	Description  *string `json:"description,omitempty"`
+	BaseUrl      *string `json:"baseUrl,omitempty"`
+	ContactName  *string `json:"contactName,omitempty"`
+	ContactEmail *string `json:"contactEmail,omitempty"`
+	LicenseName  *string `json:"licenseName,omitempty"`
+}
+
+// GetTitle returns the value of Title or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	var zero string
+	return zero
+}
+
+// GetTitleOr returns the value of Title or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetTitleOr(defaultValue string) string {
+	if x != nil {
+		return x.Title
+	}
+	return defaultValue
+}
+
+// GetVersion returns the value of Version or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	var zero string
+	return zero
+}
+
+// GetVersionOr returns the value of Version or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetVersionOr(defaultValue string) string {
+	if x != nil {
+		return x.Version
+	}
+	return defaultValue
+}
+
+// GetDescription returns the value of Description or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	var zero string
+	return zero
+}
+
+// GetDescriptionOr returns the value of Description or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetDescriptionOr(defaultValue string) string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return defaultValue
+}
+
+// GetBaseUrl returns the value of BaseUrl or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetBaseUrl() string {
+	if x != nil && x.BaseUrl != nil {
+		return *x.BaseUrl
+	}
+	var zero string
+	return zero
+}
+
+// GetBaseUrlOr returns the value of BaseUrl or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetBaseUrlOr(defaultValue string) string {
+	if x != nil && x.BaseUrl != nil {
+		return *x.BaseUrl
+	}
+	return defaultValue
+}
+
+// GetContactName returns the value of ContactName or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetContactName() string {
+	if x != nil && x.ContactName != nil {
+		return *x.ContactName
+	}
+	var zero string
+	return zero
+}
+
+// GetContactNameOr returns the value of ContactName or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetContactNameOr(defaultValue string) string {
+	if x != nil && x.ContactName != nil {
+		return *x.ContactName
+	}
+	return defaultValue
+}
+
+// GetContactEmail returns the value of ContactEmail or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetContactEmail() string {
+	if x != nil && x.ContactEmail != nil {
+		return *x.ContactEmail
+	}
+	var zero string
+	return zero
+}
+
+// GetContactEmailOr returns the value of ContactEmail or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetContactEmailOr(defaultValue string) string {
+	if x != nil && x.ContactEmail != nil {
+		return *x.ContactEmail
+	}
+	return defaultValue
+}
+
+// GetLicenseName returns the value of LicenseName or the zero value if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetLicenseName() string {
+	if x != nil && x.LicenseName != nil {
+		return *x.LicenseName
+	}
+	var zero string
+	return zero
+}
+
+// GetLicenseNameOr returns the value of LicenseName or the provided default if the receiver or field is nil.
+func (x *CodegenInputOpenApiConfig) GetLicenseNameOr(defaultValue string) string {
+	if x != nil && x.LicenseName != nil {
+		return *x.LicenseName
+	}
+	return defaultValue
 }
 
 // preCodegenInput is the version of CodegenInput previous to the required field validation
 type preCodegenInput struct {
-	VdlSchema        Optional[string]                          `json:"vdlSchema,omitzero"`
-	Target           Optional[CodegenTarget]                   `json:"target,omitzero"`
-	GoConfig         Optional[preCodegenInputGoConfig]         `json:"goConfig,omitzero"`
-	TypescriptConfig Optional[preCodegenInputTypescriptConfig] `json:"typescriptConfig,omitzero"`
-	DartConfig       Optional[preCodegenInputDartConfig]       `json:"dartConfig,omitzero"`
-	PythonConfig     Optional[preCodegenInputPythonConfig]     `json:"pythonConfig,omitzero"`
-	JsonSchemaConfig Optional[preCodegenInputJsonSchemaConfig] `json:"jsonSchemaConfig,omitzero"`
-	OpenApiConfig    Optional[preCodegenInputOpenApiConfig]    `json:"openApiConfig,omitzero"`
+	VdlSchema        *string                          `json:"vdlSchema,omitempty"`
+	Target           *CodegenTarget                   `json:"target,omitempty"`
+	GoConfig         *preCodegenInputGoConfig         `json:"goConfig,omitempty"`
+	TypescriptConfig *preCodegenInputTypescriptConfig `json:"typescriptConfig,omitempty"`
+	DartConfig       *preCodegenInputDartConfig       `json:"dartConfig,omitempty"`
+	PythonConfig     *preCodegenInputPythonConfig     `json:"pythonConfig,omitempty"`
+	JsonSchemaConfig *preCodegenInputJsonSchemaConfig `json:"jsonSchemaConfig,omitempty"`
+	OpenApiConfig    *preCodegenInputOpenApiConfig    `json:"openApiConfig,omitempty"`
 }
 
 // preCodegenInputGoConfig is the version of CodegenInputGoConfig previous to the required field validation
 type preCodegenInputGoConfig struct {
-	Package     Optional[string] `json:"package,omitzero"`
-	GenPatterns Optional[bool]   `json:"genPatterns,omitzero"`
-	GenConsts   Optional[bool]   `json:"genConsts,omitzero"`
-	GenClient   Optional[bool]   `json:"genClient,omitzero"`
-	GenServer   Optional[bool]   `json:"genServer,omitzero"`
+	Package     *string `json:"package,omitempty"`
+	GenPatterns *bool   `json:"genPatterns,omitempty"`
+	GenConsts   *bool   `json:"genConsts,omitempty"`
+	GenClient   *bool   `json:"genClient,omitempty"`
+	GenServer   *bool   `json:"genServer,omitempty"`
 }
 
 // validate validates the required fields of CodegenInputGoConfig
@@ -332,27 +876,27 @@ func (p *preCodegenInputGoConfig) validate() error {
 	}
 
 	// Validation for field "package"
-	if !p.Package.Present {
+	if p.Package == nil {
 		return errorMissingRequiredField("field package is required")
 	}
 
 	// Validation for field "genPatterns"
-	if !p.GenPatterns.Present {
+	if p.GenPatterns == nil {
 		return errorMissingRequiredField("field genPatterns is required")
 	}
 
 	// Validation for field "genConsts"
-	if !p.GenConsts.Present {
+	if p.GenConsts == nil {
 		return errorMissingRequiredField("field genConsts is required")
 	}
 
 	// Validation for field "genClient"
-	if !p.GenClient.Present {
+	if p.GenClient == nil {
 		return errorMissingRequiredField("field genClient is required")
 	}
 
 	// Validation for field "genServer"
-	if !p.GenServer.Present {
+	if p.GenServer == nil {
 		return errorMissingRequiredField("field genServer is required")
 	}
 
@@ -362,11 +906,11 @@ func (p *preCodegenInputGoConfig) validate() error {
 // transform transforms the preCodegenInputGoConfig type to the final CodegenInputGoConfig type
 func (p *preCodegenInputGoConfig) transform() CodegenInputGoConfig {
 	// Transformations
-	transPackage := p.Package.Value
-	transGenPatterns := p.GenPatterns.Value
-	transGenConsts := p.GenConsts.Value
-	transGenClient := p.GenClient.Value
-	transGenServer := p.GenServer.Value
+	transPackage := *p.Package
+	transGenPatterns := *p.GenPatterns
+	transGenConsts := *p.GenConsts
+	transGenClient := *p.GenClient
+	transGenServer := *p.GenServer
 
 	// Assignments
 	return CodegenInputGoConfig{
@@ -380,11 +924,11 @@ func (p *preCodegenInputGoConfig) transform() CodegenInputGoConfig {
 
 // preCodegenInputTypescriptConfig is the version of CodegenInputTypescriptConfig previous to the required field validation
 type preCodegenInputTypescriptConfig struct {
-	ImportExtension Optional[CodegenTypescriptImportExtension] `json:"importExtension,omitzero"`
-	GenPatterns     Optional[bool]                             `json:"genPatterns,omitzero"`
-	GenConsts       Optional[bool]                             `json:"genConsts,omitzero"`
-	GenClient       Optional[bool]                             `json:"genClient,omitzero"`
-	GenServer       Optional[bool]                             `json:"genServer,omitzero"`
+	ImportExtension *CodegenTypescriptImportExtension `json:"importExtension,omitempty"`
+	GenPatterns     *bool                             `json:"genPatterns,omitempty"`
+	GenConsts       *bool                             `json:"genConsts,omitempty"`
+	GenClient       *bool                             `json:"genClient,omitempty"`
+	GenServer       *bool                             `json:"genServer,omitempty"`
 }
 
 // validate validates the required fields of CodegenInputTypescriptConfig
@@ -394,27 +938,27 @@ func (p *preCodegenInputTypescriptConfig) validate() error {
 	}
 
 	// Validation for field "importExtension"
-	if !p.ImportExtension.Present {
+	if p.ImportExtension == nil {
 		return errorMissingRequiredField("field importExtension is required")
 	}
 
 	// Validation for field "genPatterns"
-	if !p.GenPatterns.Present {
+	if p.GenPatterns == nil {
 		return errorMissingRequiredField("field genPatterns is required")
 	}
 
 	// Validation for field "genConsts"
-	if !p.GenConsts.Present {
+	if p.GenConsts == nil {
 		return errorMissingRequiredField("field genConsts is required")
 	}
 
 	// Validation for field "genClient"
-	if !p.GenClient.Present {
+	if p.GenClient == nil {
 		return errorMissingRequiredField("field genClient is required")
 	}
 
 	// Validation for field "genServer"
-	if !p.GenServer.Present {
+	if p.GenServer == nil {
 		return errorMissingRequiredField("field genServer is required")
 	}
 
@@ -424,11 +968,11 @@ func (p *preCodegenInputTypescriptConfig) validate() error {
 // transform transforms the preCodegenInputTypescriptConfig type to the final CodegenInputTypescriptConfig type
 func (p *preCodegenInputTypescriptConfig) transform() CodegenInputTypescriptConfig {
 	// Transformations
-	transImportExtension := p.ImportExtension.Value
-	transGenPatterns := p.GenPatterns.Value
-	transGenConsts := p.GenConsts.Value
-	transGenClient := p.GenClient.Value
-	transGenServer := p.GenServer.Value
+	transImportExtension := *p.ImportExtension
+	transGenPatterns := *p.GenPatterns
+	transGenConsts := *p.GenConsts
+	transGenClient := *p.GenClient
+	transGenServer := *p.GenServer
 
 	// Assignments
 	return CodegenInputTypescriptConfig{
@@ -442,8 +986,8 @@ func (p *preCodegenInputTypescriptConfig) transform() CodegenInputTypescriptConf
 
 // preCodegenInputDartConfig is the version of CodegenInputDartConfig previous to the required field validation
 type preCodegenInputDartConfig struct {
-	GenPatterns Optional[bool] `json:"genPatterns,omitzero"`
-	GenConsts   Optional[bool] `json:"genConsts,omitzero"`
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+	GenConsts   *bool `json:"genConsts,omitempty"`
 }
 
 // validate validates the required fields of CodegenInputDartConfig
@@ -453,12 +997,12 @@ func (p *preCodegenInputDartConfig) validate() error {
 	}
 
 	// Validation for field "genPatterns"
-	if !p.GenPatterns.Present {
+	if p.GenPatterns == nil {
 		return errorMissingRequiredField("field genPatterns is required")
 	}
 
 	// Validation for field "genConsts"
-	if !p.GenConsts.Present {
+	if p.GenConsts == nil {
 		return errorMissingRequiredField("field genConsts is required")
 	}
 
@@ -468,8 +1012,8 @@ func (p *preCodegenInputDartConfig) validate() error {
 // transform transforms the preCodegenInputDartConfig type to the final CodegenInputDartConfig type
 func (p *preCodegenInputDartConfig) transform() CodegenInputDartConfig {
 	// Transformations
-	transGenPatterns := p.GenPatterns.Value
-	transGenConsts := p.GenConsts.Value
+	transGenPatterns := *p.GenPatterns
+	transGenConsts := *p.GenConsts
 
 	// Assignments
 	return CodegenInputDartConfig{
@@ -480,8 +1024,8 @@ func (p *preCodegenInputDartConfig) transform() CodegenInputDartConfig {
 
 // preCodegenInputPythonConfig is the version of CodegenInputPythonConfig previous to the required field validation
 type preCodegenInputPythonConfig struct {
-	GenPatterns Optional[bool] `json:"genPatterns,omitzero"`
-	GenConsts   Optional[bool] `json:"genConsts,omitzero"`
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+	GenConsts   *bool `json:"genConsts,omitempty"`
 }
 
 // validate validates the required fields of CodegenInputPythonConfig
@@ -491,12 +1035,12 @@ func (p *preCodegenInputPythonConfig) validate() error {
 	}
 
 	// Validation for field "genPatterns"
-	if !p.GenPatterns.Present {
+	if p.GenPatterns == nil {
 		return errorMissingRequiredField("field genPatterns is required")
 	}
 
 	// Validation for field "genConsts"
-	if !p.GenConsts.Present {
+	if p.GenConsts == nil {
 		return errorMissingRequiredField("field genConsts is required")
 	}
 
@@ -506,8 +1050,8 @@ func (p *preCodegenInputPythonConfig) validate() error {
 // transform transforms the preCodegenInputPythonConfig type to the final CodegenInputPythonConfig type
 func (p *preCodegenInputPythonConfig) transform() CodegenInputPythonConfig {
 	// Transformations
-	transGenPatterns := p.GenPatterns.Value
-	transGenConsts := p.GenConsts.Value
+	transGenPatterns := *p.GenPatterns
+	transGenConsts := *p.GenConsts
 
 	// Assignments
 	return CodegenInputPythonConfig{
@@ -518,7 +1062,7 @@ func (p *preCodegenInputPythonConfig) transform() CodegenInputPythonConfig {
 
 // preCodegenInputJsonSchemaConfig is the version of CodegenInputJsonSchemaConfig previous to the required field validation
 type preCodegenInputJsonSchemaConfig struct {
-	SchemaId Optional[string] `json:"schemaId,omitzero"`
+	SchemaId *string `json:"schemaId,omitempty"`
 }
 
 // validate validates the required fields of CodegenInputJsonSchemaConfig
@@ -528,7 +1072,7 @@ func (p *preCodegenInputJsonSchemaConfig) validate() error {
 	}
 
 	// Validation for field "schemaId"
-	if !p.SchemaId.Present {
+	if p.SchemaId == nil {
 		return errorMissingRequiredField("field schemaId is required")
 	}
 
@@ -538,7 +1082,7 @@ func (p *preCodegenInputJsonSchemaConfig) validate() error {
 // transform transforms the preCodegenInputJsonSchemaConfig type to the final CodegenInputJsonSchemaConfig type
 func (p *preCodegenInputJsonSchemaConfig) transform() CodegenInputJsonSchemaConfig {
 	// Transformations
-	transSchemaId := p.SchemaId.Value
+	transSchemaId := *p.SchemaId
 
 	// Assignments
 	return CodegenInputJsonSchemaConfig{
@@ -548,13 +1092,13 @@ func (p *preCodegenInputJsonSchemaConfig) transform() CodegenInputJsonSchemaConf
 
 // preCodegenInputOpenApiConfig is the version of CodegenInputOpenApiConfig previous to the required field validation
 type preCodegenInputOpenApiConfig struct {
-	Title        Optional[string] `json:"title,omitzero"`
-	Version      Optional[string] `json:"version,omitzero"`
-	Description  Optional[string] `json:"description,omitzero"`
-	BaseUrl      Optional[string] `json:"baseUrl,omitzero"`
-	ContactName  Optional[string] `json:"contactName,omitzero"`
-	ContactEmail Optional[string] `json:"contactEmail,omitzero"`
-	LicenseName  Optional[string] `json:"licenseName,omitzero"`
+	Title        *string `json:"title,omitempty"`
+	Version      *string `json:"version,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	BaseUrl      *string `json:"baseUrl,omitempty"`
+	ContactName  *string `json:"contactName,omitempty"`
+	ContactEmail *string `json:"contactEmail,omitempty"`
+	LicenseName  *string `json:"licenseName,omitempty"`
 }
 
 // validate validates the required fields of CodegenInputOpenApiConfig
@@ -564,12 +1108,12 @@ func (p *preCodegenInputOpenApiConfig) validate() error {
 	}
 
 	// Validation for field "title"
-	if !p.Title.Present {
+	if p.Title == nil {
 		return errorMissingRequiredField("field title is required")
 	}
 
 	// Validation for field "version"
-	if !p.Version.Present {
+	if p.Version == nil {
 		return errorMissingRequiredField("field version is required")
 	}
 
@@ -589,8 +1133,8 @@ func (p *preCodegenInputOpenApiConfig) validate() error {
 // transform transforms the preCodegenInputOpenApiConfig type to the final CodegenInputOpenApiConfig type
 func (p *preCodegenInputOpenApiConfig) transform() CodegenInputOpenApiConfig {
 	// Transformations
-	transTitle := p.Title.Value
-	transVersion := p.Version.Value
+	transTitle := *p.Title
+	transVersion := *p.Version
 	transDescription := p.Description
 	transBaseUrl := p.BaseUrl
 	transContactName := p.ContactName
@@ -616,53 +1160,53 @@ func (p *preCodegenInput) validate() error {
 	}
 
 	// Validation for field "vdlSchema"
-	if !p.VdlSchema.Present {
+	if p.VdlSchema == nil {
 		return errorMissingRequiredField("field vdlSchema is required")
 	}
 
 	// Validation for field "target"
-	if !p.Target.Present {
+	if p.Target == nil {
 		return errorMissingRequiredField("field target is required")
 	}
 
 	// Validation for field "goConfig"
-	if p.GoConfig.Present {
-		if err := p.GoConfig.Value.validate(); err != nil {
+	if p.GoConfig != nil {
+		if err := p.GoConfig.validate(); err != nil {
 			return errorMissingRequiredField("field goConfig: " + err.Error())
 		}
 	}
 
 	// Validation for field "typescriptConfig"
-	if p.TypescriptConfig.Present {
-		if err := p.TypescriptConfig.Value.validate(); err != nil {
+	if p.TypescriptConfig != nil {
+		if err := p.TypescriptConfig.validate(); err != nil {
 			return errorMissingRequiredField("field typescriptConfig: " + err.Error())
 		}
 	}
 
 	// Validation for field "dartConfig"
-	if p.DartConfig.Present {
-		if err := p.DartConfig.Value.validate(); err != nil {
+	if p.DartConfig != nil {
+		if err := p.DartConfig.validate(); err != nil {
 			return errorMissingRequiredField("field dartConfig: " + err.Error())
 		}
 	}
 
 	// Validation for field "pythonConfig"
-	if p.PythonConfig.Present {
-		if err := p.PythonConfig.Value.validate(); err != nil {
+	if p.PythonConfig != nil {
+		if err := p.PythonConfig.validate(); err != nil {
 			return errorMissingRequiredField("field pythonConfig: " + err.Error())
 		}
 	}
 
 	// Validation for field "jsonSchemaConfig"
-	if p.JsonSchemaConfig.Present {
-		if err := p.JsonSchemaConfig.Value.validate(); err != nil {
+	if p.JsonSchemaConfig != nil {
+		if err := p.JsonSchemaConfig.validate(); err != nil {
 			return errorMissingRequiredField("field jsonSchemaConfig: " + err.Error())
 		}
 	}
 
 	// Validation for field "openApiConfig"
-	if p.OpenApiConfig.Present {
-		if err := p.OpenApiConfig.Value.validate(); err != nil {
+	if p.OpenApiConfig != nil {
+		if err := p.OpenApiConfig.validate(); err != nil {
 			return errorMissingRequiredField("field openApiConfig: " + err.Error())
 		}
 	}
@@ -673,43 +1217,43 @@ func (p *preCodegenInput) validate() error {
 // transform transforms the preCodegenInput type to the final CodegenInput type
 func (p *preCodegenInput) transform() CodegenInput {
 	// Transformations
-	transVdlSchema := p.VdlSchema.Value
-	transTarget := p.Target.Value
-	transGoConfig := Optional[CodegenInputGoConfig]{Present: p.GoConfig.Present}
-	if p.GoConfig.Present {
+	transVdlSchema := *p.VdlSchema
+	transTarget := *p.Target
+	var transGoConfig *CodegenInputGoConfig
+	if p.GoConfig != nil {
 		var valGoConfig CodegenInputGoConfig
-		valGoConfig = p.GoConfig.Value.transform()
-		transGoConfig.Value = valGoConfig
+		valGoConfig = p.GoConfig.transform()
+		transGoConfig = &valGoConfig
 	}
-	transTypescriptConfig := Optional[CodegenInputTypescriptConfig]{Present: p.TypescriptConfig.Present}
-	if p.TypescriptConfig.Present {
+	var transTypescriptConfig *CodegenInputTypescriptConfig
+	if p.TypescriptConfig != nil {
 		var valTypescriptConfig CodegenInputTypescriptConfig
-		valTypescriptConfig = p.TypescriptConfig.Value.transform()
-		transTypescriptConfig.Value = valTypescriptConfig
+		valTypescriptConfig = p.TypescriptConfig.transform()
+		transTypescriptConfig = &valTypescriptConfig
 	}
-	transDartConfig := Optional[CodegenInputDartConfig]{Present: p.DartConfig.Present}
-	if p.DartConfig.Present {
+	var transDartConfig *CodegenInputDartConfig
+	if p.DartConfig != nil {
 		var valDartConfig CodegenInputDartConfig
-		valDartConfig = p.DartConfig.Value.transform()
-		transDartConfig.Value = valDartConfig
+		valDartConfig = p.DartConfig.transform()
+		transDartConfig = &valDartConfig
 	}
-	transPythonConfig := Optional[CodegenInputPythonConfig]{Present: p.PythonConfig.Present}
-	if p.PythonConfig.Present {
+	var transPythonConfig *CodegenInputPythonConfig
+	if p.PythonConfig != nil {
 		var valPythonConfig CodegenInputPythonConfig
-		valPythonConfig = p.PythonConfig.Value.transform()
-		transPythonConfig.Value = valPythonConfig
+		valPythonConfig = p.PythonConfig.transform()
+		transPythonConfig = &valPythonConfig
 	}
-	transJsonSchemaConfig := Optional[CodegenInputJsonSchemaConfig]{Present: p.JsonSchemaConfig.Present}
-	if p.JsonSchemaConfig.Present {
+	var transJsonSchemaConfig *CodegenInputJsonSchemaConfig
+	if p.JsonSchemaConfig != nil {
 		var valJsonSchemaConfig CodegenInputJsonSchemaConfig
-		valJsonSchemaConfig = p.JsonSchemaConfig.Value.transform()
-		transJsonSchemaConfig.Value = valJsonSchemaConfig
+		valJsonSchemaConfig = p.JsonSchemaConfig.transform()
+		transJsonSchemaConfig = &valJsonSchemaConfig
 	}
-	transOpenApiConfig := Optional[CodegenInputOpenApiConfig]{Present: p.OpenApiConfig.Present}
-	if p.OpenApiConfig.Present {
+	var transOpenApiConfig *CodegenInputOpenApiConfig
+	if p.OpenApiConfig != nil {
 		var valOpenApiConfig CodegenInputOpenApiConfig
-		valOpenApiConfig = p.OpenApiConfig.Value.transform()
-		transOpenApiConfig.Value = valOpenApiConfig
+		valOpenApiConfig = p.OpenApiConfig.transform()
+		transOpenApiConfig = &valOpenApiConfig
 	}
 
 	// Assignments
@@ -731,9 +1275,26 @@ type CodegenOutput struct {
 	Files []CodegenFile `json:"files"`
 }
 
+// GetFiles returns the value of Files or the zero value if the receiver or field is nil.
+func (x *CodegenOutput) GetFiles() []CodegenFile {
+	if x != nil {
+		return x.Files
+	}
+	var zero []CodegenFile
+	return zero
+}
+
+// GetFilesOr returns the value of Files or the provided default if the receiver or field is nil.
+func (x *CodegenOutput) GetFilesOr(defaultValue []CodegenFile) []CodegenFile {
+	if x != nil {
+		return x.Files
+	}
+	return defaultValue
+}
+
 // preCodegenOutput is the version of CodegenOutput previous to the required field validation
 type preCodegenOutput struct {
-	Files Optional[[]preCodegenFile] `json:"files,omitzero"`
+	Files *[]preCodegenFile `json:"files,omitempty"`
 }
 
 // validate validates the required fields of CodegenOutput
@@ -743,11 +1304,11 @@ func (p *preCodegenOutput) validate() error {
 	}
 
 	// Validation for field "files"
-	if !p.Files.Present {
+	if p.Files == nil {
 		return errorMissingRequiredField("field files is required")
 	}
-	if p.Files.Present {
-		for _, item := range p.Files.Value {
+	if p.Files != nil {
+		for _, item := range *p.Files {
 			if err := item.validate(); err != nil {
 				return errorMissingRequiredField("field files: " + err.Error())
 			}
@@ -761,8 +1322,8 @@ func (p *preCodegenOutput) validate() error {
 func (p *preCodegenOutput) transform() CodegenOutput {
 	// Transformations
 	var transFiles []CodegenFile
-	transFiles = make([]CodegenFile, len(p.Files.Value))
-	for i, v := range p.Files.Value {
+	transFiles = make([]CodegenFile, len(*p.Files))
+	for i, v := range *p.Files {
 		var tmp_ CodegenFile
 		tmp_ = v.transform()
 		transFiles[i] = tmp_
@@ -779,9 +1340,26 @@ type ExpandTypesInput struct {
 	VdlSchema string `json:"vdlSchema"`
 }
 
+// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
+func (x *ExpandTypesInput) GetVdlSchema() string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
+func (x *ExpandTypesInput) GetVdlSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	return defaultValue
+}
+
 // preExpandTypesInput is the version of ExpandTypesInput previous to the required field validation
 type preExpandTypesInput struct {
-	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
+	VdlSchema *string `json:"vdlSchema,omitempty"`
 }
 
 // validate validates the required fields of ExpandTypesInput
@@ -791,7 +1369,7 @@ func (p *preExpandTypesInput) validate() error {
 	}
 
 	// Validation for field "vdlSchema"
-	if !p.VdlSchema.Present {
+	if p.VdlSchema == nil {
 		return errorMissingRequiredField("field vdlSchema is required")
 	}
 
@@ -801,7 +1379,7 @@ func (p *preExpandTypesInput) validate() error {
 // transform transforms the preExpandTypesInput type to the final ExpandTypesInput type
 func (p *preExpandTypesInput) transform() ExpandTypesInput {
 	// Transformations
-	transVdlSchema := p.VdlSchema.Value
+	transVdlSchema := *p.VdlSchema
 
 	// Assignments
 	return ExpandTypesInput{
@@ -814,9 +1392,26 @@ type ExpandTypesOutput struct {
 	ExpandedSchema string `json:"expandedSchema"`
 }
 
+// GetExpandedSchema returns the value of ExpandedSchema or the zero value if the receiver or field is nil.
+func (x *ExpandTypesOutput) GetExpandedSchema() string {
+	if x != nil {
+		return x.ExpandedSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetExpandedSchemaOr returns the value of ExpandedSchema or the provided default if the receiver or field is nil.
+func (x *ExpandTypesOutput) GetExpandedSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.ExpandedSchema
+	}
+	return defaultValue
+}
+
 // preExpandTypesOutput is the version of ExpandTypesOutput previous to the required field validation
 type preExpandTypesOutput struct {
-	ExpandedSchema Optional[string] `json:"expandedSchema,omitzero"`
+	ExpandedSchema *string `json:"expandedSchema,omitempty"`
 }
 
 // validate validates the required fields of ExpandTypesOutput
@@ -826,7 +1421,7 @@ func (p *preExpandTypesOutput) validate() error {
 	}
 
 	// Validation for field "expandedSchema"
-	if !p.ExpandedSchema.Present {
+	if p.ExpandedSchema == nil {
 		return errorMissingRequiredField("field expandedSchema is required")
 	}
 
@@ -836,7 +1431,7 @@ func (p *preExpandTypesOutput) validate() error {
 // transform transforms the preExpandTypesOutput type to the final ExpandTypesOutput type
 func (p *preExpandTypesOutput) transform() ExpandTypesOutput {
 	// Transformations
-	transExpandedSchema := p.ExpandedSchema.Value
+	transExpandedSchema := *p.ExpandedSchema
 
 	// Assignments
 	return ExpandTypesOutput{
@@ -851,11 +1446,62 @@ type ExtractProcInput struct {
 	ProcName  string `json:"procName"`
 }
 
+// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
+func (x *ExtractProcInput) GetVdlSchema() string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
+func (x *ExtractProcInput) GetVdlSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	return defaultValue
+}
+
+// GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
+func (x *ExtractProcInput) GetRpcName() string {
+	if x != nil {
+		return x.RpcName
+	}
+	var zero string
+	return zero
+}
+
+// GetRpcNameOr returns the value of RpcName or the provided default if the receiver or field is nil.
+func (x *ExtractProcInput) GetRpcNameOr(defaultValue string) string {
+	if x != nil {
+		return x.RpcName
+	}
+	return defaultValue
+}
+
+// GetProcName returns the value of ProcName or the zero value if the receiver or field is nil.
+func (x *ExtractProcInput) GetProcName() string {
+	if x != nil {
+		return x.ProcName
+	}
+	var zero string
+	return zero
+}
+
+// GetProcNameOr returns the value of ProcName or the provided default if the receiver or field is nil.
+func (x *ExtractProcInput) GetProcNameOr(defaultValue string) string {
+	if x != nil {
+		return x.ProcName
+	}
+	return defaultValue
+}
+
 // preExtractProcInput is the version of ExtractProcInput previous to the required field validation
 type preExtractProcInput struct {
-	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
-	RpcName   Optional[string] `json:"rpcName,omitzero"`
-	ProcName  Optional[string] `json:"procName,omitzero"`
+	VdlSchema *string `json:"vdlSchema,omitempty"`
+	RpcName   *string `json:"rpcName,omitempty"`
+	ProcName  *string `json:"procName,omitempty"`
 }
 
 // validate validates the required fields of ExtractProcInput
@@ -865,17 +1511,17 @@ func (p *preExtractProcInput) validate() error {
 	}
 
 	// Validation for field "vdlSchema"
-	if !p.VdlSchema.Present {
+	if p.VdlSchema == nil {
 		return errorMissingRequiredField("field vdlSchema is required")
 	}
 
 	// Validation for field "rpcName"
-	if !p.RpcName.Present {
+	if p.RpcName == nil {
 		return errorMissingRequiredField("field rpcName is required")
 	}
 
 	// Validation for field "procName"
-	if !p.ProcName.Present {
+	if p.ProcName == nil {
 		return errorMissingRequiredField("field procName is required")
 	}
 
@@ -885,9 +1531,9 @@ func (p *preExtractProcInput) validate() error {
 // transform transforms the preExtractProcInput type to the final ExtractProcInput type
 func (p *preExtractProcInput) transform() ExtractProcInput {
 	// Transformations
-	transVdlSchema := p.VdlSchema.Value
-	transRpcName := p.RpcName.Value
-	transProcName := p.ProcName.Value
+	transVdlSchema := *p.VdlSchema
+	transRpcName := *p.RpcName
+	transProcName := *p.ProcName
 
 	// Assignments
 	return ExtractProcInput{
@@ -902,9 +1548,26 @@ type ExtractProcOutput struct {
 	ProcSchema string `json:"procSchema"`
 }
 
+// GetProcSchema returns the value of ProcSchema or the zero value if the receiver or field is nil.
+func (x *ExtractProcOutput) GetProcSchema() string {
+	if x != nil {
+		return x.ProcSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetProcSchemaOr returns the value of ProcSchema or the provided default if the receiver or field is nil.
+func (x *ExtractProcOutput) GetProcSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.ProcSchema
+	}
+	return defaultValue
+}
+
 // preExtractProcOutput is the version of ExtractProcOutput previous to the required field validation
 type preExtractProcOutput struct {
-	ProcSchema Optional[string] `json:"procSchema,omitzero"`
+	ProcSchema *string `json:"procSchema,omitempty"`
 }
 
 // validate validates the required fields of ExtractProcOutput
@@ -914,7 +1577,7 @@ func (p *preExtractProcOutput) validate() error {
 	}
 
 	// Validation for field "procSchema"
-	if !p.ProcSchema.Present {
+	if p.ProcSchema == nil {
 		return errorMissingRequiredField("field procSchema is required")
 	}
 
@@ -924,7 +1587,7 @@ func (p *preExtractProcOutput) validate() error {
 // transform transforms the preExtractProcOutput type to the final ExtractProcOutput type
 func (p *preExtractProcOutput) transform() ExtractProcOutput {
 	// Transformations
-	transProcSchema := p.ProcSchema.Value
+	transProcSchema := *p.ProcSchema
 
 	// Assignments
 	return ExtractProcOutput{
@@ -939,11 +1602,62 @@ type ExtractStreamInput struct {
 	StreamName string `json:"streamName"`
 }
 
+// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
+func (x *ExtractStreamInput) GetVdlSchema() string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
+func (x *ExtractStreamInput) GetVdlSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	return defaultValue
+}
+
+// GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
+func (x *ExtractStreamInput) GetRpcName() string {
+	if x != nil {
+		return x.RpcName
+	}
+	var zero string
+	return zero
+}
+
+// GetRpcNameOr returns the value of RpcName or the provided default if the receiver or field is nil.
+func (x *ExtractStreamInput) GetRpcNameOr(defaultValue string) string {
+	if x != nil {
+		return x.RpcName
+	}
+	return defaultValue
+}
+
+// GetStreamName returns the value of StreamName or the zero value if the receiver or field is nil.
+func (x *ExtractStreamInput) GetStreamName() string {
+	if x != nil {
+		return x.StreamName
+	}
+	var zero string
+	return zero
+}
+
+// GetStreamNameOr returns the value of StreamName or the provided default if the receiver or field is nil.
+func (x *ExtractStreamInput) GetStreamNameOr(defaultValue string) string {
+	if x != nil {
+		return x.StreamName
+	}
+	return defaultValue
+}
+
 // preExtractStreamInput is the version of ExtractStreamInput previous to the required field validation
 type preExtractStreamInput struct {
-	VdlSchema  Optional[string] `json:"vdlSchema,omitzero"`
-	RpcName    Optional[string] `json:"rpcName,omitzero"`
-	StreamName Optional[string] `json:"streamName,omitzero"`
+	VdlSchema  *string `json:"vdlSchema,omitempty"`
+	RpcName    *string `json:"rpcName,omitempty"`
+	StreamName *string `json:"streamName,omitempty"`
 }
 
 // validate validates the required fields of ExtractStreamInput
@@ -953,17 +1667,17 @@ func (p *preExtractStreamInput) validate() error {
 	}
 
 	// Validation for field "vdlSchema"
-	if !p.VdlSchema.Present {
+	if p.VdlSchema == nil {
 		return errorMissingRequiredField("field vdlSchema is required")
 	}
 
 	// Validation for field "rpcName"
-	if !p.RpcName.Present {
+	if p.RpcName == nil {
 		return errorMissingRequiredField("field rpcName is required")
 	}
 
 	// Validation for field "streamName"
-	if !p.StreamName.Present {
+	if p.StreamName == nil {
 		return errorMissingRequiredField("field streamName is required")
 	}
 
@@ -973,9 +1687,9 @@ func (p *preExtractStreamInput) validate() error {
 // transform transforms the preExtractStreamInput type to the final ExtractStreamInput type
 func (p *preExtractStreamInput) transform() ExtractStreamInput {
 	// Transformations
-	transVdlSchema := p.VdlSchema.Value
-	transRpcName := p.RpcName.Value
-	transStreamName := p.StreamName.Value
+	transVdlSchema := *p.VdlSchema
+	transRpcName := *p.RpcName
+	transStreamName := *p.StreamName
 
 	// Assignments
 	return ExtractStreamInput{
@@ -990,9 +1704,26 @@ type ExtractStreamOutput struct {
 	StreamSchema string `json:"streamSchema"`
 }
 
+// GetStreamSchema returns the value of StreamSchema or the zero value if the receiver or field is nil.
+func (x *ExtractStreamOutput) GetStreamSchema() string {
+	if x != nil {
+		return x.StreamSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetStreamSchemaOr returns the value of StreamSchema or the provided default if the receiver or field is nil.
+func (x *ExtractStreamOutput) GetStreamSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.StreamSchema
+	}
+	return defaultValue
+}
+
 // preExtractStreamOutput is the version of ExtractStreamOutput previous to the required field validation
 type preExtractStreamOutput struct {
-	StreamSchema Optional[string] `json:"streamSchema,omitzero"`
+	StreamSchema *string `json:"streamSchema,omitempty"`
 }
 
 // validate validates the required fields of ExtractStreamOutput
@@ -1002,7 +1733,7 @@ func (p *preExtractStreamOutput) validate() error {
 	}
 
 	// Validation for field "streamSchema"
-	if !p.StreamSchema.Present {
+	if p.StreamSchema == nil {
 		return errorMissingRequiredField("field streamSchema is required")
 	}
 
@@ -1012,7 +1743,7 @@ func (p *preExtractStreamOutput) validate() error {
 // transform transforms the preExtractStreamOutput type to the final ExtractStreamOutput type
 func (p *preExtractStreamOutput) transform() ExtractStreamOutput {
 	// Transformations
-	transStreamSchema := p.StreamSchema.Value
+	transStreamSchema := *p.StreamSchema
 
 	// Assignments
 	return ExtractStreamOutput{
@@ -1026,10 +1757,44 @@ type ExtractTypeInput struct {
 	TypeName  string `json:"typeName"`
 }
 
+// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
+func (x *ExtractTypeInput) GetVdlSchema() string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
+func (x *ExtractTypeInput) GetVdlSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	return defaultValue
+}
+
+// GetTypeName returns the value of TypeName or the zero value if the receiver or field is nil.
+func (x *ExtractTypeInput) GetTypeName() string {
+	if x != nil {
+		return x.TypeName
+	}
+	var zero string
+	return zero
+}
+
+// GetTypeNameOr returns the value of TypeName or the provided default if the receiver or field is nil.
+func (x *ExtractTypeInput) GetTypeNameOr(defaultValue string) string {
+	if x != nil {
+		return x.TypeName
+	}
+	return defaultValue
+}
+
 // preExtractTypeInput is the version of ExtractTypeInput previous to the required field validation
 type preExtractTypeInput struct {
-	VdlSchema Optional[string] `json:"vdlSchema,omitzero"`
-	TypeName  Optional[string] `json:"typeName,omitzero"`
+	VdlSchema *string `json:"vdlSchema,omitempty"`
+	TypeName  *string `json:"typeName,omitempty"`
 }
 
 // validate validates the required fields of ExtractTypeInput
@@ -1039,12 +1804,12 @@ func (p *preExtractTypeInput) validate() error {
 	}
 
 	// Validation for field "vdlSchema"
-	if !p.VdlSchema.Present {
+	if p.VdlSchema == nil {
 		return errorMissingRequiredField("field vdlSchema is required")
 	}
 
 	// Validation for field "typeName"
-	if !p.TypeName.Present {
+	if p.TypeName == nil {
 		return errorMissingRequiredField("field typeName is required")
 	}
 
@@ -1054,8 +1819,8 @@ func (p *preExtractTypeInput) validate() error {
 // transform transforms the preExtractTypeInput type to the final ExtractTypeInput type
 func (p *preExtractTypeInput) transform() ExtractTypeInput {
 	// Transformations
-	transVdlSchema := p.VdlSchema.Value
-	transTypeName := p.TypeName.Value
+	transVdlSchema := *p.VdlSchema
+	transTypeName := *p.TypeName
 
 	// Assignments
 	return ExtractTypeInput{
@@ -1069,9 +1834,26 @@ type ExtractTypeOutput struct {
 	TypeSchema string `json:"typeSchema"`
 }
 
+// GetTypeSchema returns the value of TypeSchema or the zero value if the receiver or field is nil.
+func (x *ExtractTypeOutput) GetTypeSchema() string {
+	if x != nil {
+		return x.TypeSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetTypeSchemaOr returns the value of TypeSchema or the provided default if the receiver or field is nil.
+func (x *ExtractTypeOutput) GetTypeSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.TypeSchema
+	}
+	return defaultValue
+}
+
 // preExtractTypeOutput is the version of ExtractTypeOutput previous to the required field validation
 type preExtractTypeOutput struct {
-	TypeSchema Optional[string] `json:"typeSchema,omitzero"`
+	TypeSchema *string `json:"typeSchema,omitempty"`
 }
 
 // validate validates the required fields of ExtractTypeOutput
@@ -1081,7 +1863,7 @@ func (p *preExtractTypeOutput) validate() error {
 	}
 
 	// Validation for field "typeSchema"
-	if !p.TypeSchema.Present {
+	if p.TypeSchema == nil {
 		return errorMissingRequiredField("field typeSchema is required")
 	}
 
@@ -1091,7 +1873,7 @@ func (p *preExtractTypeOutput) validate() error {
 // transform transforms the preExtractTypeOutput type to the final ExtractTypeOutput type
 func (p *preExtractTypeOutput) transform() ExtractTypeOutput {
 	// Transformations
-	transTypeSchema := p.TypeSchema.Value
+	transTypeSchema := *p.TypeSchema
 
 	// Assignments
 	return ExtractTypeOutput{
@@ -1101,22 +1883,124 @@ func (p *preExtractTypeOutput) transform() ExtractTypeOutput {
 
 // The input for the WASM function call
 type WasmInput struct {
-	FunctionName  WasmFunctionName             `json:"functionName"`
-	ExpandTypes   Optional[ExpandTypesInput]   `json:"expandTypes,omitzero"`
-	ExtractType   Optional[ExtractTypeInput]   `json:"extractType,omitzero"`
-	ExtractProc   Optional[ExtractProcInput]   `json:"extractProc,omitzero"`
-	ExtractStream Optional[ExtractStreamInput] `json:"extractStream,omitzero"`
-	Codegen       Optional[CodegenInput]       `json:"codegen,omitzero"`
+	FunctionName  WasmFunctionName    `json:"functionName"`
+	ExpandTypes   *ExpandTypesInput   `json:"expandTypes,omitempty"`
+	ExtractType   *ExtractTypeInput   `json:"extractType,omitempty"`
+	ExtractProc   *ExtractProcInput   `json:"extractProc,omitempty"`
+	ExtractStream *ExtractStreamInput `json:"extractStream,omitempty"`
+	Codegen       *CodegenInput       `json:"codegen,omitempty"`
+}
+
+// GetFunctionName returns the value of FunctionName or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetFunctionName() WasmFunctionName {
+	if x != nil {
+		return x.FunctionName
+	}
+	var zero WasmFunctionName
+	return zero
+}
+
+// GetFunctionNameOr returns the value of FunctionName or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetFunctionNameOr(defaultValue WasmFunctionName) WasmFunctionName {
+	if x != nil {
+		return x.FunctionName
+	}
+	return defaultValue
+}
+
+// GetExpandTypes returns the value of ExpandTypes or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetExpandTypes() ExpandTypesInput {
+	if x != nil && x.ExpandTypes != nil {
+		return *x.ExpandTypes
+	}
+	var zero ExpandTypesInput
+	return zero
+}
+
+// GetExpandTypesOr returns the value of ExpandTypes or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetExpandTypesOr(defaultValue ExpandTypesInput) ExpandTypesInput {
+	if x != nil && x.ExpandTypes != nil {
+		return *x.ExpandTypes
+	}
+	return defaultValue
+}
+
+// GetExtractType returns the value of ExtractType or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetExtractType() ExtractTypeInput {
+	if x != nil && x.ExtractType != nil {
+		return *x.ExtractType
+	}
+	var zero ExtractTypeInput
+	return zero
+}
+
+// GetExtractTypeOr returns the value of ExtractType or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetExtractTypeOr(defaultValue ExtractTypeInput) ExtractTypeInput {
+	if x != nil && x.ExtractType != nil {
+		return *x.ExtractType
+	}
+	return defaultValue
+}
+
+// GetExtractProc returns the value of ExtractProc or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetExtractProc() ExtractProcInput {
+	if x != nil && x.ExtractProc != nil {
+		return *x.ExtractProc
+	}
+	var zero ExtractProcInput
+	return zero
+}
+
+// GetExtractProcOr returns the value of ExtractProc or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetExtractProcOr(defaultValue ExtractProcInput) ExtractProcInput {
+	if x != nil && x.ExtractProc != nil {
+		return *x.ExtractProc
+	}
+	return defaultValue
+}
+
+// GetExtractStream returns the value of ExtractStream or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetExtractStream() ExtractStreamInput {
+	if x != nil && x.ExtractStream != nil {
+		return *x.ExtractStream
+	}
+	var zero ExtractStreamInput
+	return zero
+}
+
+// GetExtractStreamOr returns the value of ExtractStream or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetExtractStreamOr(defaultValue ExtractStreamInput) ExtractStreamInput {
+	if x != nil && x.ExtractStream != nil {
+		return *x.ExtractStream
+	}
+	return defaultValue
+}
+
+// GetCodegen returns the value of Codegen or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetCodegen() CodegenInput {
+	if x != nil && x.Codegen != nil {
+		return *x.Codegen
+	}
+	var zero CodegenInput
+	return zero
+}
+
+// GetCodegenOr returns the value of Codegen or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetCodegenOr(defaultValue CodegenInput) CodegenInput {
+	if x != nil && x.Codegen != nil {
+		return *x.Codegen
+	}
+	return defaultValue
 }
 
 // preWasmInput is the version of WasmInput previous to the required field validation
 type preWasmInput struct {
-	FunctionName  Optional[WasmFunctionName]      `json:"functionName,omitzero"`
-	ExpandTypes   Optional[preExpandTypesInput]   `json:"expandTypes,omitzero"`
-	ExtractType   Optional[preExtractTypeInput]   `json:"extractType,omitzero"`
-	ExtractProc   Optional[preExtractProcInput]   `json:"extractProc,omitzero"`
-	ExtractStream Optional[preExtractStreamInput] `json:"extractStream,omitzero"`
-	Codegen       Optional[preCodegenInput]       `json:"codegen,omitzero"`
+	FunctionName  *WasmFunctionName      `json:"functionName,omitempty"`
+	ExpandTypes   *preExpandTypesInput   `json:"expandTypes,omitempty"`
+	ExtractType   *preExtractTypeInput   `json:"extractType,omitempty"`
+	ExtractProc   *preExtractProcInput   `json:"extractProc,omitempty"`
+	ExtractStream *preExtractStreamInput `json:"extractStream,omitempty"`
+	Codegen       *preCodegenInput       `json:"codegen,omitempty"`
 }
 
 // validate validates the required fields of WasmInput
@@ -1126,41 +2010,41 @@ func (p *preWasmInput) validate() error {
 	}
 
 	// Validation for field "functionName"
-	if !p.FunctionName.Present {
+	if p.FunctionName == nil {
 		return errorMissingRequiredField("field functionName is required")
 	}
 
 	// Validation for field "expandTypes"
-	if p.ExpandTypes.Present {
-		if err := p.ExpandTypes.Value.validate(); err != nil {
+	if p.ExpandTypes != nil {
+		if err := p.ExpandTypes.validate(); err != nil {
 			return errorMissingRequiredField("field expandTypes: " + err.Error())
 		}
 	}
 
 	// Validation for field "extractType"
-	if p.ExtractType.Present {
-		if err := p.ExtractType.Value.validate(); err != nil {
+	if p.ExtractType != nil {
+		if err := p.ExtractType.validate(); err != nil {
 			return errorMissingRequiredField("field extractType: " + err.Error())
 		}
 	}
 
 	// Validation for field "extractProc"
-	if p.ExtractProc.Present {
-		if err := p.ExtractProc.Value.validate(); err != nil {
+	if p.ExtractProc != nil {
+		if err := p.ExtractProc.validate(); err != nil {
 			return errorMissingRequiredField("field extractProc: " + err.Error())
 		}
 	}
 
 	// Validation for field "extractStream"
-	if p.ExtractStream.Present {
-		if err := p.ExtractStream.Value.validate(); err != nil {
+	if p.ExtractStream != nil {
+		if err := p.ExtractStream.validate(); err != nil {
 			return errorMissingRequiredField("field extractStream: " + err.Error())
 		}
 	}
 
 	// Validation for field "codegen"
-	if p.Codegen.Present {
-		if err := p.Codegen.Value.validate(); err != nil {
+	if p.Codegen != nil {
+		if err := p.Codegen.validate(); err != nil {
 			return errorMissingRequiredField("field codegen: " + err.Error())
 		}
 	}
@@ -1171,36 +2055,36 @@ func (p *preWasmInput) validate() error {
 // transform transforms the preWasmInput type to the final WasmInput type
 func (p *preWasmInput) transform() WasmInput {
 	// Transformations
-	transFunctionName := p.FunctionName.Value
-	transExpandTypes := Optional[ExpandTypesInput]{Present: p.ExpandTypes.Present}
-	if p.ExpandTypes.Present {
+	transFunctionName := *p.FunctionName
+	var transExpandTypes *ExpandTypesInput
+	if p.ExpandTypes != nil {
 		var valExpandTypes ExpandTypesInput
-		valExpandTypes = p.ExpandTypes.Value.transform()
-		transExpandTypes.Value = valExpandTypes
+		valExpandTypes = p.ExpandTypes.transform()
+		transExpandTypes = &valExpandTypes
 	}
-	transExtractType := Optional[ExtractTypeInput]{Present: p.ExtractType.Present}
-	if p.ExtractType.Present {
+	var transExtractType *ExtractTypeInput
+	if p.ExtractType != nil {
 		var valExtractType ExtractTypeInput
-		valExtractType = p.ExtractType.Value.transform()
-		transExtractType.Value = valExtractType
+		valExtractType = p.ExtractType.transform()
+		transExtractType = &valExtractType
 	}
-	transExtractProc := Optional[ExtractProcInput]{Present: p.ExtractProc.Present}
-	if p.ExtractProc.Present {
+	var transExtractProc *ExtractProcInput
+	if p.ExtractProc != nil {
 		var valExtractProc ExtractProcInput
-		valExtractProc = p.ExtractProc.Value.transform()
-		transExtractProc.Value = valExtractProc
+		valExtractProc = p.ExtractProc.transform()
+		transExtractProc = &valExtractProc
 	}
-	transExtractStream := Optional[ExtractStreamInput]{Present: p.ExtractStream.Present}
-	if p.ExtractStream.Present {
+	var transExtractStream *ExtractStreamInput
+	if p.ExtractStream != nil {
 		var valExtractStream ExtractStreamInput
-		valExtractStream = p.ExtractStream.Value.transform()
-		transExtractStream.Value = valExtractStream
+		valExtractStream = p.ExtractStream.transform()
+		transExtractStream = &valExtractStream
 	}
-	transCodegen := Optional[CodegenInput]{Present: p.Codegen.Present}
-	if p.Codegen.Present {
+	var transCodegen *CodegenInput
+	if p.Codegen != nil {
 		var valCodegen CodegenInput
-		valCodegen = p.Codegen.Value.transform()
-		transCodegen.Value = valCodegen
+		valCodegen = p.Codegen.transform()
+		transCodegen = &valCodegen
 	}
 
 	// Assignments
@@ -1216,20 +2100,105 @@ func (p *preWasmInput) transform() WasmInput {
 
 // The output for the WASM function call
 type WasmOutput struct {
-	ExpandTypes   Optional[ExpandTypesOutput]   `json:"expandTypes,omitzero"`
-	ExtractType   Optional[ExtractTypeOutput]   `json:"extractType,omitzero"`
-	ExtractProc   Optional[ExtractProcOutput]   `json:"extractProc,omitzero"`
-	ExtractStream Optional[ExtractStreamOutput] `json:"extractStream,omitzero"`
-	Codegen       Optional[CodegenOutput]       `json:"codegen,omitzero"`
+	ExpandTypes   *ExpandTypesOutput   `json:"expandTypes,omitempty"`
+	ExtractType   *ExtractTypeOutput   `json:"extractType,omitempty"`
+	ExtractProc   *ExtractProcOutput   `json:"extractProc,omitempty"`
+	ExtractStream *ExtractStreamOutput `json:"extractStream,omitempty"`
+	Codegen       *CodegenOutput       `json:"codegen,omitempty"`
+}
+
+// GetExpandTypes returns the value of ExpandTypes or the zero value if the receiver or field is nil.
+func (x *WasmOutput) GetExpandTypes() ExpandTypesOutput {
+	if x != nil && x.ExpandTypes != nil {
+		return *x.ExpandTypes
+	}
+	var zero ExpandTypesOutput
+	return zero
+}
+
+// GetExpandTypesOr returns the value of ExpandTypes or the provided default if the receiver or field is nil.
+func (x *WasmOutput) GetExpandTypesOr(defaultValue ExpandTypesOutput) ExpandTypesOutput {
+	if x != nil && x.ExpandTypes != nil {
+		return *x.ExpandTypes
+	}
+	return defaultValue
+}
+
+// GetExtractType returns the value of ExtractType or the zero value if the receiver or field is nil.
+func (x *WasmOutput) GetExtractType() ExtractTypeOutput {
+	if x != nil && x.ExtractType != nil {
+		return *x.ExtractType
+	}
+	var zero ExtractTypeOutput
+	return zero
+}
+
+// GetExtractTypeOr returns the value of ExtractType or the provided default if the receiver or field is nil.
+func (x *WasmOutput) GetExtractTypeOr(defaultValue ExtractTypeOutput) ExtractTypeOutput {
+	if x != nil && x.ExtractType != nil {
+		return *x.ExtractType
+	}
+	return defaultValue
+}
+
+// GetExtractProc returns the value of ExtractProc or the zero value if the receiver or field is nil.
+func (x *WasmOutput) GetExtractProc() ExtractProcOutput {
+	if x != nil && x.ExtractProc != nil {
+		return *x.ExtractProc
+	}
+	var zero ExtractProcOutput
+	return zero
+}
+
+// GetExtractProcOr returns the value of ExtractProc or the provided default if the receiver or field is nil.
+func (x *WasmOutput) GetExtractProcOr(defaultValue ExtractProcOutput) ExtractProcOutput {
+	if x != nil && x.ExtractProc != nil {
+		return *x.ExtractProc
+	}
+	return defaultValue
+}
+
+// GetExtractStream returns the value of ExtractStream or the zero value if the receiver or field is nil.
+func (x *WasmOutput) GetExtractStream() ExtractStreamOutput {
+	if x != nil && x.ExtractStream != nil {
+		return *x.ExtractStream
+	}
+	var zero ExtractStreamOutput
+	return zero
+}
+
+// GetExtractStreamOr returns the value of ExtractStream or the provided default if the receiver or field is nil.
+func (x *WasmOutput) GetExtractStreamOr(defaultValue ExtractStreamOutput) ExtractStreamOutput {
+	if x != nil && x.ExtractStream != nil {
+		return *x.ExtractStream
+	}
+	return defaultValue
+}
+
+// GetCodegen returns the value of Codegen or the zero value if the receiver or field is nil.
+func (x *WasmOutput) GetCodegen() CodegenOutput {
+	if x != nil && x.Codegen != nil {
+		return *x.Codegen
+	}
+	var zero CodegenOutput
+	return zero
+}
+
+// GetCodegenOr returns the value of Codegen or the provided default if the receiver or field is nil.
+func (x *WasmOutput) GetCodegenOr(defaultValue CodegenOutput) CodegenOutput {
+	if x != nil && x.Codegen != nil {
+		return *x.Codegen
+	}
+	return defaultValue
 }
 
 // preWasmOutput is the version of WasmOutput previous to the required field validation
 type preWasmOutput struct {
-	ExpandTypes   Optional[preExpandTypesOutput]   `json:"expandTypes,omitzero"`
-	ExtractType   Optional[preExtractTypeOutput]   `json:"extractType,omitzero"`
-	ExtractProc   Optional[preExtractProcOutput]   `json:"extractProc,omitzero"`
-	ExtractStream Optional[preExtractStreamOutput] `json:"extractStream,omitzero"`
-	Codegen       Optional[preCodegenOutput]       `json:"codegen,omitzero"`
+	ExpandTypes   *preExpandTypesOutput   `json:"expandTypes,omitempty"`
+	ExtractType   *preExtractTypeOutput   `json:"extractType,omitempty"`
+	ExtractProc   *preExtractProcOutput   `json:"extractProc,omitempty"`
+	ExtractStream *preExtractStreamOutput `json:"extractStream,omitempty"`
+	Codegen       *preCodegenOutput       `json:"codegen,omitempty"`
 }
 
 // validate validates the required fields of WasmOutput
@@ -1239,36 +2208,36 @@ func (p *preWasmOutput) validate() error {
 	}
 
 	// Validation for field "expandTypes"
-	if p.ExpandTypes.Present {
-		if err := p.ExpandTypes.Value.validate(); err != nil {
+	if p.ExpandTypes != nil {
+		if err := p.ExpandTypes.validate(); err != nil {
 			return errorMissingRequiredField("field expandTypes: " + err.Error())
 		}
 	}
 
 	// Validation for field "extractType"
-	if p.ExtractType.Present {
-		if err := p.ExtractType.Value.validate(); err != nil {
+	if p.ExtractType != nil {
+		if err := p.ExtractType.validate(); err != nil {
 			return errorMissingRequiredField("field extractType: " + err.Error())
 		}
 	}
 
 	// Validation for field "extractProc"
-	if p.ExtractProc.Present {
-		if err := p.ExtractProc.Value.validate(); err != nil {
+	if p.ExtractProc != nil {
+		if err := p.ExtractProc.validate(); err != nil {
 			return errorMissingRequiredField("field extractProc: " + err.Error())
 		}
 	}
 
 	// Validation for field "extractStream"
-	if p.ExtractStream.Present {
-		if err := p.ExtractStream.Value.validate(); err != nil {
+	if p.ExtractStream != nil {
+		if err := p.ExtractStream.validate(); err != nil {
 			return errorMissingRequiredField("field extractStream: " + err.Error())
 		}
 	}
 
 	// Validation for field "codegen"
-	if p.Codegen.Present {
-		if err := p.Codegen.Value.validate(); err != nil {
+	if p.Codegen != nil {
+		if err := p.Codegen.validate(); err != nil {
 			return errorMissingRequiredField("field codegen: " + err.Error())
 		}
 	}
@@ -1279,35 +2248,35 @@ func (p *preWasmOutput) validate() error {
 // transform transforms the preWasmOutput type to the final WasmOutput type
 func (p *preWasmOutput) transform() WasmOutput {
 	// Transformations
-	transExpandTypes := Optional[ExpandTypesOutput]{Present: p.ExpandTypes.Present}
-	if p.ExpandTypes.Present {
+	var transExpandTypes *ExpandTypesOutput
+	if p.ExpandTypes != nil {
 		var valExpandTypes ExpandTypesOutput
-		valExpandTypes = p.ExpandTypes.Value.transform()
-		transExpandTypes.Value = valExpandTypes
+		valExpandTypes = p.ExpandTypes.transform()
+		transExpandTypes = &valExpandTypes
 	}
-	transExtractType := Optional[ExtractTypeOutput]{Present: p.ExtractType.Present}
-	if p.ExtractType.Present {
+	var transExtractType *ExtractTypeOutput
+	if p.ExtractType != nil {
 		var valExtractType ExtractTypeOutput
-		valExtractType = p.ExtractType.Value.transform()
-		transExtractType.Value = valExtractType
+		valExtractType = p.ExtractType.transform()
+		transExtractType = &valExtractType
 	}
-	transExtractProc := Optional[ExtractProcOutput]{Present: p.ExtractProc.Present}
-	if p.ExtractProc.Present {
+	var transExtractProc *ExtractProcOutput
+	if p.ExtractProc != nil {
 		var valExtractProc ExtractProcOutput
-		valExtractProc = p.ExtractProc.Value.transform()
-		transExtractProc.Value = valExtractProc
+		valExtractProc = p.ExtractProc.transform()
+		transExtractProc = &valExtractProc
 	}
-	transExtractStream := Optional[ExtractStreamOutput]{Present: p.ExtractStream.Present}
-	if p.ExtractStream.Present {
+	var transExtractStream *ExtractStreamOutput
+	if p.ExtractStream != nil {
 		var valExtractStream ExtractStreamOutput
-		valExtractStream = p.ExtractStream.Value.transform()
-		transExtractStream.Value = valExtractStream
+		valExtractStream = p.ExtractStream.transform()
+		transExtractStream = &valExtractStream
 	}
-	transCodegen := Optional[CodegenOutput]{Present: p.Codegen.Present}
-	if p.Codegen.Present {
+	var transCodegen *CodegenOutput
+	if p.Codegen != nil {
 		var valCodegen CodegenOutput
-		valCodegen = p.Codegen.Value.transform()
-		transCodegen.Value = valCodegen
+		valCodegen = p.Codegen.transform()
+		transCodegen = &valCodegen
 	}
 
 	// Assignments
