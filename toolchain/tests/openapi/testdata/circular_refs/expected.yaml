@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Circular References API
+  version: 1.0.0
+security:
+  - AuthToken: []
+tags:
+  - name: TestServiceProcedures
+    description: Procedures for TestService
+paths:
+  /TestService/TestCircular:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/TestServiceTestCircularInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/TestServiceTestCircularOutput"
+      tags:
+        - TestServiceProcedures
+components:
+  securitySchemes:
+    AuthToken:
+      description: |-
+        Enter the full value for the Authorization header. The specific format (Bearer, Basic, API Key, etc.) is determined by the server's implementation.
+
+        ---
+        **Examples:**
+        - **Bearer Token:** `Bearer eyJhbGciOiJIUzI1Ni...` (a JWT token)
+        - **Basic Auth:** `Basic dXNlcm5hbWU6cGFzc3dvcmQ=` (a base64 encoding of `username:password`)
+        - **API Key:** `sk_live_123abc456def` (a raw token)
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    FullyOptionalA:
+      properties:
+        b:
+          $ref: "#/components/schemas/FullyOptionalB"
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    FullyOptionalB:
+      properties:
+        c:
+          $ref: "#/components/schemas/FullyOptionalC"
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    FullyOptionalC:
+      properties:
+        d:
+          $ref: "#/components/schemas/FullyOptionalD"
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    FullyOptionalD:
+      properties:
+        a:
+          $ref: "#/components/schemas/FullyOptionalA"
+        id:
+          type: string
+      required:
+        - id
+      type: object
+    NodeA:
+      properties:
+        nodeB:
+          $ref: "#/components/schemas/NodeB"
+        value:
+          type: string
+      required:
+        - value
+        - nodeB
+      type: object
+    NodeB:
+      properties:
+        nodeC:
+          $ref: "#/components/schemas/NodeC"
+        value:
+          type: string
+      required:
+        - value
+        - nodeC
+      type: object
+    NodeC:
+      properties:
+        nodeD:
+          $ref: "#/components/schemas/NodeD"
+        value:
+          type: string
+      required:
+        - value
+        - nodeD
+      type: object
+    NodeD:
+      properties:
+        nodeE:
+          $ref: "#/components/schemas/NodeE"
+        value:
+          type: string
+      required:
+        - value
+        - nodeE
+      type: object
+    NodeE:
+      properties:
+        backToA:
+          $ref: "#/components/schemas/NodeA"
+        value:
+          type: string
+      required:
+        - value
+      type: object
+    SelfReferencing:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        parent:
+          $ref: "#/components/schemas/SelfReferencing"
+      required:
+        - id
+        - name
+      type: object
+  requestBodies:
+    TestServiceTestCircularInput:
+      content:
+        application/json:
+          schema:
+            properties:
+              chain:
+                $ref: "#/components/schemas/NodeA"
+              optional:
+                $ref: "#/components/schemas/FullyOptionalA"
+              self:
+                $ref: "#/components/schemas/SelfReferencing"
+            required:
+              - self
+              - chain
+              - optional
+            type: object
+      description: Request body for TestService/TestCircular procedure
+  responses:
+    TestServiceTestCircularOutput:
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                properties:
+                  category:
+                    type: string
+                  code:
+                    type: string
+                  details:
+                    additionalProperties: true
+                    properties: {}
+                    type: object
+                  message:
+                    type: string
+                required:
+                  - message
+                type: object
+              ok:
+                type: boolean
+              output:
+                properties:
+                  chain:
+                    $ref: "#/components/schemas/NodeA"
+                  optional:
+                    $ref: "#/components/schemas/FullyOptionalA"
+                  self:
+                    $ref: "#/components/schemas/SelfReferencing"
+                required:
+                  - self
+                  - chain
+                  - optional
+                type: object
+            required:
+              - ok
+            type: object
+      description: Response for TestService/TestCircular procedure
