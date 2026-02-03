@@ -59,6 +59,13 @@ func Run(input wasmtypes.WasmInput) (*wasmtypes.WasmOutput, error) {
 		}
 		return &wasmtypes.WasmOutput{ExtractStream: out}, nil
 
+	case wasmtypes.WasmFunctionNameIrgen:
+		out, err := runIrgen(input.GetIrgen())
+		if err != nil {
+			return nil, fmt.Errorf("error while running irgen function: %w", err)
+		}
+		return &wasmtypes.WasmOutput{Irgen: out}, nil
+
 	case wasmtypes.WasmFunctionNameCodegen:
 		out, err := runCodegen(input.GetCodegen())
 		if err != nil {
