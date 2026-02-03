@@ -1,0 +1,66 @@
+type SelfReferencing {
+  id: string
+  name: string
+  parent?: SelfReferencing
+}
+
+type NodeA {
+  value: string
+  nodeB: NodeB
+}
+
+type NodeB {
+  value: string
+  nodeC: NodeC
+}
+
+type NodeC {
+  value: string
+  nodeD: NodeD
+}
+
+type NodeD {
+  value: string
+  nodeE: NodeE
+}
+
+type NodeE {
+  value: string
+  backToA?: NodeA
+}
+
+type FullyOptionalA {
+  id: string
+  b?: FullyOptionalB
+}
+
+type FullyOptionalB {
+  id: string
+  c?: FullyOptionalC
+}
+
+type FullyOptionalC {
+  id: string
+  d?: FullyOptionalD
+}
+
+type FullyOptionalD {
+  id: string
+  a?: FullyOptionalA
+}
+
+rpc TestService {
+  proc TestCircular {
+    input {
+      self: SelfReferencing
+      chain: NodeA
+      optional: FullyOptionalA
+    }
+
+    output {
+      self: SelfReferencing
+      chain: NodeA
+      optional: FullyOptionalA
+    }
+  }
+}
