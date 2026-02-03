@@ -16,9 +16,11 @@
         "varavel.vdl",
         "golang.go",
         "svelte.svelte-vscode",
-        "bradlc.vscode-tailwindcss",
         "Chanzhaoyu.svelte-5-snippets",
+        "astro-build.astro-vscode",
+        "bradlc.vscode-tailwindcss",
         "esbenp.prettier-vscode",
+        "unifiedjs.vscode-mdx",
         "vitest.explorer",
         "biomejs.biome",
         "Dart-Code.dart-code"
