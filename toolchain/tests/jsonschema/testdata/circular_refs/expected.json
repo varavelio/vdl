@@ -1,0 +1,161 @@
+{
+  "$defs": {
+    "FullyOptionalA": {
+      "properties": {
+        "b": {
+          "$ref": "#/$defs/FullyOptionalB"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "FullyOptionalB": {
+      "properties": {
+        "c": {
+          "$ref": "#/$defs/FullyOptionalC"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "FullyOptionalC": {
+      "properties": {
+        "d": {
+          "$ref": "#/$defs/FullyOptionalD"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "FullyOptionalD": {
+      "properties": {
+        "a": {
+          "$ref": "#/$defs/FullyOptionalA"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "type": "object"
+    },
+    "NodeA": {
+      "properties": {
+        "nodeB": {
+          "$ref": "#/$defs/NodeB"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["nodeB", "value"],
+      "type": "object"
+    },
+    "NodeB": {
+      "properties": {
+        "nodeC": {
+          "$ref": "#/$defs/NodeC"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["nodeC", "value"],
+      "type": "object"
+    },
+    "NodeC": {
+      "properties": {
+        "nodeD": {
+          "$ref": "#/$defs/NodeD"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["nodeD", "value"],
+      "type": "object"
+    },
+    "NodeD": {
+      "properties": {
+        "nodeE": {
+          "$ref": "#/$defs/NodeE"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["nodeE", "value"],
+      "type": "object"
+    },
+    "NodeE": {
+      "properties": {
+        "backToA": {
+          "$ref": "#/$defs/NodeA"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["value"],
+      "type": "object"
+    },
+    "SelfReferencing": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parent": {
+          "$ref": "#/$defs/SelfReferencing"
+        }
+      },
+      "required": ["id", "name"],
+      "type": "object"
+    },
+    "TestServiceTestCircularInput": {
+      "description": "Input for TestService/TestCircular procedure",
+      "properties": {
+        "chain": {
+          "$ref": "#/$defs/NodeA"
+        },
+        "optional": {
+          "$ref": "#/$defs/FullyOptionalA"
+        },
+        "self": {
+          "$ref": "#/$defs/SelfReferencing"
+        }
+      },
+      "required": ["chain", "optional", "self"],
+      "type": "object"
+    },
+    "TestServiceTestCircularOutput": {
+      "description": "Output for TestService/TestCircular procedure",
+      "properties": {
+        "chain": {
+          "$ref": "#/$defs/NodeA"
+        },
+        "optional": {
+          "$ref": "#/$defs/FullyOptionalA"
+        },
+        "self": {
+          "$ref": "#/$defs/SelfReferencing"
+        }
+      },
+      "required": ["chain", "optional", "self"],
+      "type": "object"
+    }
+  },
+  "$id": "https://example.com/circular-refs.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

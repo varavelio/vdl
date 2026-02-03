@@ -1,0 +1,6 @@
+version: 1
+schema: schema.vdl
+targets:
+  - jsonschema:
+      output: gen
+      id: https://example.com/circular-refs.json
