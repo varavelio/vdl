@@ -1,4 +1,4 @@
-name: Deploy UFO RPC Documentation
+name: Deploy Documentation
 
 on:
   push:
@@ -27,12 +27,12 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: /bin/bash -c "cd ./docs && npm install && npm run build"
+          runCmd: /bin/bash -c "task deps && task dc:build"
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
+          command: pages deploy ./docs/dist --project-name=varavel-vdl
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy ./docs/dist --project-name=uforpc
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
