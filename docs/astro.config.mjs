@@ -1,5 +1,6 @@
 // @ts-check
 import starlight from "@astrojs/starlight";
+import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import fse from "fs-extra";
@@ -44,6 +45,7 @@ export default defineConfig({
   },
 
   integrations: [
+    svelte(),
     starlight({
       favicon: "/_vdl/assets/png/icon.png",
       title: "UFO RPC",
