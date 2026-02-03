@@ -6,11 +6,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generatePatterns(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
+func generatePatterns(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
 	g := gen.New()
 	g.Break()
 
@@ -33,7 +33,7 @@ func generatePatterns(schema *ir.Schema, cfg *config.PythonConfig) (string, erro
 		g.Linef("def %s(%s) -> str:", funcName, strings.Join(args, ", "))
 
 		// Generate docstring
-		doc := p.Doc
+		doc := p.GetDoc()
 		if doc == "" {
 			doc = fmt.Sprintf("%s generates a string from the pattern template.", p.Name)
 		}
@@ -41,7 +41,7 @@ func generatePatterns(schema *ir.Schema, cfg *config.PythonConfig) (string, erro
 			doc = fmt.Sprintf("%s\n\nTemplate: `%s`", doc, p.Template)
 		}
 		renderDocstringPython(g, doc)
-		renderDeprecatedPython(g, p.Deprecated)
+		renderDeprecatedPython(g, p.Deprecation)
 
 		// Convert template to python f-string
 		// VDL template uses {placeholder}. Python f-string also uses {placeholder}.

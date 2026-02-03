@@ -5,10 +5,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateProcedureTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
+func generateProcedureTypes(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
 	if len(schema.Procedures) == 0 {
 		return "", nil
 	}
@@ -16,7 +17,7 @@ func generateProcedureTypes(schema *ir.Schema, cfg *config.PythonConfig) (string
 	g := gen.New()
 
 	for _, proc := range schema.Procedures {
-		fullName := proc.FullName()
+		fullName := strutil.ToPascalCase(proc.RpcName) + strutil.ToPascalCase(proc.Name)
 
 		inputName := fmt.Sprintf("%sInput", fullName)
 		outputName := fmt.Sprintf("%sOutput", fullName)
@@ -24,14 +25,14 @@ func generateProcedureTypes(schema *ir.Schema, cfg *config.PythonConfig) (string
 		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s procedure.", inputName, fullName)
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s procedure.", outputName, fullName)
 
-		g.Raw(GenerateDataclass(inputName, inputDesc, proc.Input))
+		g.Raw(GenerateDataclass(inputName, inputDesc, proc.InputFields))
 		g.Break()
-		g.Raw(renderInlineTypes(inputName, proc.Input))
+		g.Raw(renderInlineTypes(inputName, proc.InputFields))
 		g.Break()
 
-		g.Raw(GenerateDataclass(outputName, outputDesc, proc.Output))
+		g.Raw(GenerateDataclass(outputName, outputDesc, proc.OutputFields))
 		g.Break()
-		g.Raw(renderInlineTypes(outputName, proc.Output))
+		g.Raw(renderInlineTypes(outputName, proc.OutputFields))
 		g.Break()
 
 		// Response Type Alias

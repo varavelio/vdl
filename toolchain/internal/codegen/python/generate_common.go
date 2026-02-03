@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -31,51 +31,51 @@ func sanitizeIdentifier(name string) string {
 	return name
 }
 
-func toPythonType(parentName, fieldName string, t ir.TypeRef) string {
+func toPythonType(parentName, fieldName string, t irtypes.TypeRef) string {
 	switch t.Kind {
-	case ir.TypeKindPrimitive:
-		switch t.Primitive {
-		case ir.PrimitiveString:
+	case irtypes.TypeKindPrimitive:
+		switch t.GetPrimitiveName() {
+		case irtypes.PrimitiveTypeString:
 			return "str"
-		case ir.PrimitiveInt:
+		case irtypes.PrimitiveTypeInt:
 			return "int"
-		case ir.PrimitiveFloat:
+		case irtypes.PrimitiveTypeFloat:
 			return "float"
-		case ir.PrimitiveBool:
+		case irtypes.PrimitiveTypeBool:
 			return "bool"
-		case ir.PrimitiveDatetime:
+		case irtypes.PrimitiveTypeDatetime:
 			return "datetime.datetime"
 		}
-	case ir.TypeKindArray:
-		itemType := toPythonType(parentName, fieldName, *t.ArrayItem)
+	case irtypes.TypeKindArray:
+		itemType := toPythonType(parentName, fieldName, *t.ArrayType)
 		result := itemType
-		for i := 0; i < t.ArrayDimensions; i++ {
+		for i := int64(0); i < t.GetArrayDims(); i++ {
 			result = fmt.Sprintf("List[%s]", result)
 		}
 		return result
-	case ir.TypeKindMap:
-		return fmt.Sprintf("Dict[str, %s]", toPythonType(parentName, fieldName, *t.MapValue))
-	case ir.TypeKindType:
-		return t.Type
-	case ir.TypeKindEnum:
-		return t.Enum
-	case ir.TypeKindObject:
+	case irtypes.TypeKindMap:
+		return fmt.Sprintf("Dict[str, %s]", toPythonType(parentName, fieldName, *t.MapType))
+	case irtypes.TypeKindType:
+		return t.GetTypeName()
+	case irtypes.TypeKindEnum:
+		return t.GetEnumName()
+	case irtypes.TypeKindObject:
 		inlineName := parentName + strutil.ToPascalCase(fieldName)
 		return inlineName
 	}
 	return "Any"
 }
 
-func needsDictCheck(t ir.TypeRef) bool {
+func needsDictCheck(t irtypes.TypeRef) bool {
 	switch t.Kind {
-	case ir.TypeKindType, ir.TypeKindObject:
+	case irtypes.TypeKindType, irtypes.TypeKindObject:
 		return true
 	}
 	return false
 }
 
-func needsListCheck(t ir.TypeRef) bool {
-	return t.Kind == ir.TypeKindArray
+func needsListCheck(t irtypes.TypeRef) bool {
+	return t.Kind == irtypes.TypeKindArray
 }
 
 // renderDocstringPython renders a Python docstring.
@@ -92,12 +92,12 @@ func renderDocstringPython(g *gen.Generator, doc string) {
 }
 
 // renderDeprecatedPython renders a deprecation notice for Python.
-func renderDeprecatedPython(g *gen.Generator, deprecated *ir.Deprecation) {
+func renderDeprecatedPython(g *gen.Generator, deprecated *string) {
 	if deprecated == nil {
 		return
 	}
 	g.Line("    .. deprecated::")
-	if deprecated.Message != "" {
-		g.Linef("        %s", deprecated.Message)
+	if *deprecated != "" {
+		g.Linef("        %s", *deprecated)
 	}
 }

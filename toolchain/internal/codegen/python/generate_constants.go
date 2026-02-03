@@ -6,24 +6,24 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateConstants(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
+func generateConstants(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
 	g := gen.New()
 
 	for _, c := range schema.Constants {
-		if c.Doc != "" {
-			g.Linef("# %s", strings.ReplaceAll(c.Doc, "\n", "\n# "))
+		if c.GetDoc() != "" {
+			g.Linef("# %s", strings.ReplaceAll(c.GetDoc(), "\n", "\n# "))
 		}
 		name := strutil.ToUpperSnakeCase(c.Name)
 		val := c.Value
 
-		switch c.ValueType {
-		case ir.ConstValueTypeString:
+		switch c.ConstType {
+		case irtypes.ConstTypeString:
 			val = fmt.Sprintf("%q", c.Value)
-		case ir.ConstValueTypeBool:
+		case irtypes.ConstTypeBool:
 			if c.Value == "true" {
 				val = "True"
 			} else {

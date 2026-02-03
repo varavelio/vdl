@@ -5,10 +5,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateStreamTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
+func generateStreamTypes(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
 	if len(schema.Streams) == 0 {
 		return "", nil
 	}
@@ -16,7 +17,7 @@ func generateStreamTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, e
 	g := gen.New()
 
 	for _, stream := range schema.Streams {
-		fullName := stream.FullName()
+		fullName := strutil.ToPascalCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 
 		inputName := fmt.Sprintf("%sInput", fullName)
 		outputName := fmt.Sprintf("%sOutput", fullName)
@@ -24,14 +25,14 @@ func generateStreamTypes(schema *ir.Schema, cfg *config.PythonConfig) (string, e
 		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s stream.", inputName, fullName)
 		outputDesc := fmt.Sprintf("%s represents the output event data for the %s stream.", outputName, fullName)
 
-		g.Raw(GenerateDataclass(inputName, inputDesc, stream.Input))
+		g.Raw(GenerateDataclass(inputName, inputDesc, stream.InputFields))
 		g.Break()
-		g.Raw(renderInlineTypes(inputName, stream.Input))
+		g.Raw(renderInlineTypes(inputName, stream.InputFields))
 		g.Break()
 
-		g.Raw(GenerateDataclass(outputName, outputDesc, stream.Output))
+		g.Raw(GenerateDataclass(outputName, outputDesc, stream.OutputFields))
 		g.Break()
-		g.Raw(renderInlineTypes(outputName, stream.Output))
+		g.Raw(renderInlineTypes(outputName, stream.OutputFields))
 		g.Break()
 	}
 

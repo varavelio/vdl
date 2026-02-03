@@ -2,58 +2,58 @@ package python
 
 import (
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 type inlineTypeInfo struct {
 	name   string
 	doc    string
-	fields []ir.Field
+	fields []irtypes.Field
 }
 
-func extractInlineTypes(parentName string, tr ir.TypeRef) []inlineTypeInfo {
+func extractInlineTypes(parentName string, tr irtypes.TypeRef) []inlineTypeInfo {
 	var result []inlineTypeInfo
 
 	switch tr.Kind {
-	case ir.TypeKindObject:
-		if tr.Object != nil {
+	case irtypes.TypeKindObject:
+		if tr.ObjectFields != nil {
 			result = append(result, inlineTypeInfo{
 				name:   parentName,
 				doc:    "",
-				fields: tr.Object.Fields,
+				fields: *tr.ObjectFields,
 			})
-			for _, f := range tr.Object.Fields {
+			for _, f := range *tr.ObjectFields {
 				childName := parentName + strutil.ToPascalCase(f.Name)
-				result = append(result, extractInlineTypes(childName, f.Type)...)
+				result = append(result, extractInlineTypes(childName, f.TypeRef)...)
 			}
 		}
 
-	case ir.TypeKindArray:
-		if tr.ArrayItem != nil {
-			result = append(result, extractInlineTypes(parentName, *tr.ArrayItem)...)
+	case irtypes.TypeKindArray:
+		if tr.ArrayType != nil {
+			result = append(result, extractInlineTypes(parentName, *tr.ArrayType)...)
 		}
 
-	case ir.TypeKindMap:
-		if tr.MapValue != nil {
-			result = append(result, extractInlineTypes(parentName, *tr.MapValue)...)
+	case irtypes.TypeKindMap:
+		if tr.MapType != nil {
+			result = append(result, extractInlineTypes(parentName, *tr.MapType)...)
 		}
 	}
 
 	return result
 }
 
-func extractAllInlineTypes(parentName string, fields []ir.Field) []inlineTypeInfo {
+func extractAllInlineTypes(parentName string, fields []irtypes.Field) []inlineTypeInfo {
 	var result []inlineTypeInfo
 	for _, field := range fields {
 		childName := parentName + strutil.ToPascalCase(field.Name)
-		inlines := extractInlineTypes(childName, field.Type)
+		inlines := extractInlineTypes(childName, field.TypeRef)
 		result = append(result, inlines...)
 	}
 	return result
 }
 
-func renderInlineTypes(parentName string, fields []ir.Field) string {
+func renderInlineTypes(parentName string, fields []irtypes.Field) string {
 	inlineTypes := extractAllInlineTypes(parentName, fields)
 	if len(inlineTypes) == 0 {
 		return ""
@@ -67,7 +67,7 @@ func renderInlineTypes(parentName string, fields []ir.Field) string {
 	return g.String()
 }
 
-func renderInlineType(name, doc string, fields []ir.Field) string {
+func renderInlineType(name, doc string, fields []irtypes.Field) string {
 	if len(fields) == 0 {
 		return ""
 	}

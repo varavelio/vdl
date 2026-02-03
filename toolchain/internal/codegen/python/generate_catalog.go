@@ -3,12 +3,12 @@ package python
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, error) {
-	if len(schema.RPCs) == 0 {
+func generateRPCCatalog(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
+	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}
 
@@ -40,21 +40,40 @@ func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, er
 
 	// VDLPaths
 	g.Line("class VDLPaths:")
-	if len(schema.RPCs) == 0 {
+	if len(schema.Rpcs) == 0 {
 		g.Line("    pass")
 	}
-	for _, rpc := range schema.RPCs {
+
+	// Group procedures and streams by RPC name
+	procsByRpc := make(map[string][]irtypes.ProcedureDef)
+	for _, proc := range schema.Procedures {
+		procsByRpc[proc.RpcName] = append(procsByRpc[proc.RpcName], proc)
+	}
+	streamsByRpc := make(map[string][]irtypes.StreamDef)
+	for _, stream := range schema.Streams {
+		streamsByRpc[stream.RpcName] = append(streamsByRpc[stream.RpcName], stream)
+	}
+
+	for _, rpc := range schema.Rpcs {
 		g.Linef("    class %s:", strutil.ToSnakeCase(rpc.Name))
-		for _, proc := range rpc.Procs {
-			g.Linef("        %s = %q", strutil.ToSnakeCase(proc.Name), "/"+proc.Path())
+		hasOperations := false
+		for _, proc := range procsByRpc[rpc.Name] {
+			path := "/" + rpc.Name + "/" + proc.Name
+			g.Linef("        %s = %q", strutil.ToSnakeCase(proc.Name), path)
+			hasOperations = true
 		}
-		for _, stream := range rpc.Streams {
-			g.Linef("        %s = %q", strutil.ToSnakeCase(stream.Name), "/"+stream.Path())
+		for _, stream := range streamsByRpc[rpc.Name] {
+			path := "/" + rpc.Name + "/" + stream.Name
+			g.Linef("        %s = %q", strutil.ToSnakeCase(stream.Name), path)
+			hasOperations = true
+		}
+		if !hasOperations {
+			g.Line("        pass")
 		}
 		g.Break()
 	}
-	if len(schema.RPCs) > 0 {
-		for _, rpc := range schema.RPCs {
+	if len(schema.Rpcs) > 0 {
+		for _, rpc := range schema.Rpcs {
 			rpcName := strutil.ToSnakeCase(rpc.Name)
 			g.Linef("    %s = %s()", rpcName, rpcName)
 		}
@@ -65,7 +84,7 @@ func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, er
 	g.Line("VDL_PROCEDURES: List[OperationDefinition] = [")
 	for _, proc := range schema.Procedures {
 		g.Line("    OperationDefinition(")
-		g.Linef("        rpc_name=%q,", proc.RPCName)
+		g.Linef("        rpc_name=%q,", proc.RpcName)
 		g.Linef("        name=%q,", proc.Name)
 		g.Line("        type=OperationType.PROC,")
 		g.Line("    ),")
@@ -77,7 +96,7 @@ func generateRPCCatalog(schema *ir.Schema, cfg *config.PythonConfig) (string, er
 	g.Line("VDL_STREAMS: List[OperationDefinition] = [")
 	for _, stream := range schema.Streams {
 		g.Line("    OperationDefinition(")
-		g.Linef("        rpc_name=%q,", stream.RPCName)
+		g.Linef("        rpc_name=%q,", stream.RpcName)
 		g.Linef("        name=%q,", stream.Name)
 		g.Line("        type=OperationType.STREAM,")
 		g.Line("    ),")

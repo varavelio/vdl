@@ -7,7 +7,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
 )
@@ -45,7 +45,7 @@ func generateHeader() string {
 }
 
 // Generate produces Python source files from the IR schema.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	var files []File
 
 	// __init__.py - Exports all files
@@ -91,7 +91,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// catalog.py - RPC catalog for introspection (if any RPCs)
-	if len(schema.RPCs) > 0 {
+	if len(schema.Rpcs) > 0 {
 		catalogContent := g.generateRPCCatalogFile(schema)
 		files = append(files, File{
 			RelativePath: "catalog.py",
@@ -112,7 +112,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 }
 
 // generateCoreFile generates the core_types.py file.
-func (g *Generator) generateCoreFile(schema *ir.Schema) string {
+func (g *Generator) generateCoreFile(schema *irtypes.IrSchema) string {
 	builder := gen.New()
 	builder.Raw(generateHeader())
 
@@ -123,7 +123,7 @@ func (g *Generator) generateCoreFile(schema *ir.Schema) string {
 }
 
 // generateConstantsFile generates the constants.py file.
-func (g *Generator) generateConstantsFile(schema *ir.Schema) string {
+func (g *Generator) generateConstantsFile(schema *irtypes.IrSchema) string {
 	builder := gen.New()
 	builder.Raw(generateHeader())
 
@@ -134,7 +134,7 @@ func (g *Generator) generateConstantsFile(schema *ir.Schema) string {
 }
 
 // generatePatternsFile generates the patterns.py file.
-func (g *Generator) generatePatternsFile(schema *ir.Schema) string {
+func (g *Generator) generatePatternsFile(schema *irtypes.IrSchema) string {
 	builder := gen.New()
 	builder.Raw(generateHeader())
 
@@ -145,7 +145,7 @@ func (g *Generator) generatePatternsFile(schema *ir.Schema) string {
 }
 
 // generateTypesFile generates the types.py file.
-func (g *Generator) generateTypesFile(schema *ir.Schema) string {
+func (g *Generator) generateTypesFile(schema *irtypes.IrSchema) string {
 	builder := gen.New()
 	builder.Raw(generateHeader())
 
@@ -193,7 +193,7 @@ func (g *Generator) generateTypesFile(schema *ir.Schema) string {
 }
 
 // generateRPCCatalogFile generates the rpc_catalog.py file.
-func (g *Generator) generateRPCCatalogFile(schema *ir.Schema) string {
+func (g *Generator) generateRPCCatalogFile(schema *irtypes.IrSchema) string {
 	builder := gen.New()
 	builder.Raw(generateHeader())
 
@@ -204,7 +204,7 @@ func (g *Generator) generateRPCCatalogFile(schema *ir.Schema) string {
 }
 
 // generateIndexFile generates the __init__.py file.
-func (g *Generator) generateIndexFile(schema *ir.Schema) string {
+func (g *Generator) generateIndexFile(schema *irtypes.IrSchema) string {
 	builder := gen.New()
 	builder.Raw(generateHeader())
 
@@ -228,7 +228,7 @@ func (g *Generator) generateIndexFile(schema *ir.Schema) string {
 	}
 
 	// RPC Catalog
-	if len(schema.RPCs) > 0 {
+	if len(schema.Rpcs) > 0 {
 		builder.Line("from .catalog import *")
 	}
 
