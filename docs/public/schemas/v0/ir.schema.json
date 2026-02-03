@@ -505,6 +505,7 @@
       "type": "object"
     }
   },
+  "$id": "https://vdl.varavel.com/schemas/v0/ir.schema.json",
   "$ref": "#/$defs/IrSchema",
   "$schema": "https://json-schema.org/draft/2020-12/schema"
 }

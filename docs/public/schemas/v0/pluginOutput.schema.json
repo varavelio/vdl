@@ -32,6 +32,7 @@
       "type": "object"
     }
   },
+  "$id": "https://vdl.varavel.com/schemas/v0/pluginOutput.schema.json",
   "$ref": "#/$defs/PluginOutput",
   "$schema": "https://json-schema.org/draft/2020-12/schema"
 }

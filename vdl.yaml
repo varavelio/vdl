@@ -13,6 +13,7 @@ targets:
       schema: ./schemas/ir.vdl
       output: ./docs/public/schemas/v0
       filename: ir.schema.json
+      id: https://vdl.varavel.com/schemas/v0/ir.schema.json
       root: IrSchema
 
   - vdl:
@@ -30,6 +31,7 @@ targets:
       schema: ./schemas/config.vdl
       output: ./docs/public/schemas/v0
       filename: config.schema.json
+      id: https://vdl.varavel.com/schemas/v0/config.schema.json
       root: VdlCodegenConfig
 
   - vdl:
@@ -47,6 +49,7 @@ targets:
       schema: ./schemas/pluginInput.vdl
       output: ./docs/public/schemas/v0
       filename: pluginInput.schema.json
+      id: https://vdl.varavel.com/schemas/v0/pluginInput.schema.json
       root: PluginInput
 
   - vdl:
@@ -58,6 +61,7 @@ targets:
       schema: ./schemas/pluginOutput.vdl
       output: ./docs/public/schemas/v0
       filename: pluginOutput.schema.json
+      id: https://vdl.varavel.com/schemas/v0/pluginOutput.schema.json
       root: PluginOutput
 
   - vdl:
