@@ -4,5 +4,5 @@ targets:
   - dart:
       output: ./gen/dart
       clean: true
-      gen_patterns: false
-      gen_consts: true
+      genPatterns: false
+      genConsts: true

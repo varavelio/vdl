@@ -3,5 +3,5 @@ schema: ./schema.vdl
 targets:
   - go:
       output: ./gen/go
-      gen_client: "yes"
+      genClient: "yes"
       package: mypkg

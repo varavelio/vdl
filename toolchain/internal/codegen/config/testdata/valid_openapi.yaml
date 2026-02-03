@@ -6,4 +6,4 @@ targets:
       title: My API
       version: "1.0.0"
       description: A sample API
-      base_url: https://api.example.com
+      baseUrl: https://api.example.com

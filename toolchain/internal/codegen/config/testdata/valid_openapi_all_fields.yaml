@@ -8,7 +8,7 @@ targets:
       title: Complete API
       version: "2.0.0"
       description: A complete API specification
-      base_url: https://api.example.com/v2
-      contact_name: API Team
-      contact_email: api@example.com
-      license_name: MIT
+      baseUrl: https://api.example.com/v2
+      contactName: API Team
+      contactEmail: api@example.com
+      licenseName: MIT

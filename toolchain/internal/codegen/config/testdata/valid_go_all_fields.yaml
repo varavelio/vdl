@@ -5,8 +5,8 @@ targets:
       output: ./gen/go
       clean: true
       schema: ./custom-go.vdl
-      gen_client: true
-      gen_server: true
-      gen_patterns: false
-      gen_consts: false
+      genClient: true
+      genServer: true
+      genPatterns: false
+      genConsts: false
       package: mypkg

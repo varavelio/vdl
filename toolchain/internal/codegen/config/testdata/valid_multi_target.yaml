@@ -3,13 +3,13 @@ schema: ./schema.vdl
 targets:
   - go:
       output: ./gen/go
-      gen_client: true
-      gen_server: true
+      genClient: true
+      genServer: true
       package: api
   - typescript:
       output: ./gen/ts
-      gen_client: true
-      gen_server: false
+      genClient: true
+      genServer: false
   - openapi:
       output: ./gen/docs
       title: My Multi-Target API

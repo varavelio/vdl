@@ -3,7 +3,7 @@ schema: ./schema.vdl
 targets:
   - playground:
       output: ./gen/playground
-      default_base_url: https://api.example.com
-      default_headers:
+      defaultBaseUrl: https://api.example.com
+      defaultHeaders:
         - key: Authorization
           value: Bearer token

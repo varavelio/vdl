@@ -3,11 +3,11 @@ schema: ./schema.vdl
 targets:
   - typescript:
       output: ./gen/ts/client
-      gen_client: true
-      gen_server: false
+      genClient: true
+      genServer: false
   - typescript:
       output: ./gen/ts/server
-      gen_client: false
-      gen_server: true
+      genClient: false
+      genServer: true
   - typescript:
       output: ./gen/ts/shared

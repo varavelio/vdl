@@ -4,6 +4,6 @@ targets:
   - go:
       output: ./gen/go
       clean: true
-      gen_client: true
-      gen_server: true
+      genClient: true
+      genServer: true
       package: mypkg

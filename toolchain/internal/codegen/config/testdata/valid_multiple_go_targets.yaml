@@ -3,17 +3,17 @@ schema: ./schema.vdl
 targets:
   - go:
       output: ./gen/go/client
-      gen_client: true
-      gen_server: false
+      genClient: true
+      genServer: false
       package: client
   - go:
       output: ./gen/go/server
-      gen_client: false
-      gen_server: true
+      genClient: false
+      genServer: true
       package: server
   - go:
       output: ./gen/go/full
       clean: true
-      gen_client: true
-      gen_server: true
+      genClient: true
+      genServer: true
       package: full
