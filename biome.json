@@ -3,7 +3,6 @@
   "files": {
     "includes": [
       "**",
-      "!**/*.svelte",
       "!**/node_modules",
       "!**/dist",
       "!**/build",
@@ -42,5 +41,22 @@
         "organizeImports": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.svelte", "**/*.astro"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ]
 }
