@@ -48,7 +48,7 @@ export default defineConfig({
     svelte(),
     starlight({
       favicon: "/_vdl/assets/png/icon.png",
-      title: "UFO RPC",
+      title: "VDL",
       description:
         "Open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.",
       logo: {
