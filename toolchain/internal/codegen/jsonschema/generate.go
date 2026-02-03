@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // File represents a generated file.
@@ -33,7 +33,7 @@ func (g *Generator) Name() string {
 }
 
 // Generate produces JSON Schema files from the IR schema.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	cfg := g.config
 
 	// Root schema structure
@@ -58,25 +58,22 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		definitions[e.Name] = generateEnumSchema(e)
 	}
 
-	// Generate input/output types for RPCs
-	for _, rpc := range schema.RPCs {
-		// Procedures
-		for _, proc := range rpc.Procs {
-			inputName := rpc.Name + proc.Name + "Input"
-			outputName := rpc.Name + proc.Name + "Output"
+	// Generate input/output types for procedures (flattened list with RpcName)
+	for _, proc := range schema.Procedures {
+		inputName := proc.RpcName + proc.Name + "Input"
+		outputName := proc.RpcName + proc.Name + "Output"
 
-			definitions[inputName] = generateObjectSchema(proc.Input, fmt.Sprintf("Input for %s/%s procedure", rpc.Name, proc.Name))
-			definitions[outputName] = generateObjectSchema(proc.Output, fmt.Sprintf("Output for %s/%s procedure", rpc.Name, proc.Name))
-		}
+		definitions[inputName] = generateObjectSchema(proc.InputFields, fmt.Sprintf("Input for %s/%s procedure", proc.RpcName, proc.Name))
+		definitions[outputName] = generateObjectSchema(proc.OutputFields, fmt.Sprintf("Output for %s/%s procedure", proc.RpcName, proc.Name))
+	}
 
-		// Streams
-		for _, stream := range rpc.Streams {
-			inputName := rpc.Name + stream.Name + "Input"
-			outputName := rpc.Name + stream.Name + "Output"
+	// Generate input/output types for streams (flattened list with RpcName)
+	for _, stream := range schema.Streams {
+		inputName := stream.RpcName + stream.Name + "Input"
+		outputName := stream.RpcName + stream.Name + "Output"
 
-			definitions[inputName] = generateObjectSchema(stream.Input, fmt.Sprintf("Input for %s/%s stream", rpc.Name, stream.Name))
-			definitions[outputName] = generateObjectSchema(stream.Output, fmt.Sprintf("Output for %s/%s stream", rpc.Name, stream.Name))
-		}
+		definitions[inputName] = generateObjectSchema(stream.InputFields, fmt.Sprintf("Input for %s/%s stream", stream.RpcName, stream.Name))
+		definitions[outputName] = generateObjectSchema(stream.OutputFields, fmt.Sprintf("Output for %s/%s stream", stream.RpcName, stream.Name))
 	}
 
 	// Sort definitions to ensure deterministic output (map iteration is random)
@@ -102,7 +99,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 }
 
 // generateTypeSchema generates a JSON Schema for an IR type.
-func generateTypeSchema(t ir.Type) map[string]any {
+func generateTypeSchema(t irtypes.TypeDef) map[string]any {
 	properties, required := generatePropertiesFromFields(t.Fields)
 
 	schema := map[string]any{
@@ -110,8 +107,8 @@ func generateTypeSchema(t ir.Type) map[string]any {
 		"properties": properties,
 	}
 
-	if t.Doc != "" {
-		schema["description"] = t.Doc
+	if t.Doc != nil && *t.Doc != "" {
+		schema["description"] = *t.Doc
 	}
 
 	if len(required) > 0 {
@@ -122,10 +119,10 @@ func generateTypeSchema(t ir.Type) map[string]any {
 }
 
 // generateEnumSchema generates a JSON Schema for an IR enum.
-func generateEnumSchema(e ir.Enum) map[string]any {
+func generateEnumSchema(e irtypes.EnumDef) map[string]any {
 	schema := map[string]any{}
 
-	if e.ValueType == ir.EnumValueTypeString {
+	if e.EnumType == irtypes.EnumTypeString {
 		values := []string{}
 		for _, m := range e.Members {
 			values = append(values, m.Value)
@@ -142,15 +139,15 @@ func generateEnumSchema(e ir.Enum) map[string]any {
 		schema["enum"] = values
 	}
 
-	if e.Doc != "" {
-		schema["description"] = e.Doc
+	if e.Doc != nil && *e.Doc != "" {
+		schema["description"] = *e.Doc
 	}
 
 	return schema
 }
 
 // generateObjectSchema generates a generic object schema from fields.
-func generateObjectSchema(fields []ir.Field, description string) map[string]any {
+func generateObjectSchema(fields []irtypes.Field, description string) map[string]any {
 	properties, required := generatePropertiesFromFields(fields)
 
 	schema := map[string]any{
@@ -167,25 +164,25 @@ func generateObjectSchema(fields []ir.Field, description string) map[string]any 
 }
 
 // generatePropertiesFromFields generates JSON schema properties from IR fields.
-func generatePropertiesFromFields(fields []ir.Field) (map[string]any, []string) {
+func generatePropertiesFromFields(fields []irtypes.Field) (map[string]any, []string) {
 	properties := map[string]any{}
 	required := []string{}
 
 	for _, field := range fields {
-		prop := generateTypeRefSchema(field.Type)
+		prop := generateTypeRefSchema(field.TypeRef)
 
 		// Add description if present
-		if field.Doc != "" {
+		if field.Doc != nil && *field.Doc != "" {
 			// If prop is a $ref, we need to wrap it in allOf to add description
 			if _, hasRef := prop["$ref"]; hasRef {
 				prop = map[string]any{
 					"allOf": []map[string]any{
 						prop,
-						{"description": field.Doc},
+						{"description": *field.Doc},
 					},
 				}
 			} else {
-				prop["description"] = field.Doc
+				prop["description"] = *field.Doc
 			}
 		}
 
@@ -203,68 +200,90 @@ func generatePropertiesFromFields(fields []ir.Field) (map[string]any, []string) 
 }
 
 // generateTypeRefSchema converts an IR TypeRef to a JSON Schema representation.
-func generateTypeRefSchema(t ir.TypeRef) map[string]any {
+func generateTypeRefSchema(t irtypes.TypeRef) map[string]any {
 	switch t.Kind {
-	case ir.TypeKindPrimitive:
-		return primitiveToJSONSchema(t.Primitive)
-
-	case ir.TypeKindType:
-		return map[string]any{
-			"$ref": "#/$defs/" + t.Type,
+	case irtypes.TypeKindPrimitive:
+		if t.PrimitiveName != nil {
+			return primitiveToJSONSchema(*t.PrimitiveName)
 		}
+		return map[string]any{"type": "string"}
 
-	case ir.TypeKindEnum:
-		return map[string]any{
-			"$ref": "#/$defs/" + t.Enum,
+	case irtypes.TypeKindType:
+		if t.TypeName != nil {
+			return map[string]any{
+				"$ref": "#/$defs/" + *t.TypeName,
+			}
 		}
+		return map[string]any{}
 
-	case ir.TypeKindArray:
-		itemSchema := generateTypeRefSchema(*t.ArrayItem)
-		// For multi-dimensional arrays, we need to nest the array schema
-		for i := 1; i < t.ArrayDimensions; i++ {
-			itemSchema = map[string]any{
+	case irtypes.TypeKindEnum:
+		if t.EnumName != nil {
+			return map[string]any{
+				"$ref": "#/$defs/" + *t.EnumName,
+			}
+		}
+		return map[string]any{}
+
+	case irtypes.TypeKindArray:
+		if t.ArrayType != nil {
+			itemSchema := generateTypeRefSchema(*t.ArrayType)
+			// For multi-dimensional arrays, we need to nest the array schema
+			dims := int64(1)
+			if t.ArrayDims != nil {
+				dims = *t.ArrayDims
+			}
+			for i := int64(1); i < dims; i++ {
+				itemSchema = map[string]any{
+					"type":  "array",
+					"items": itemSchema,
+				}
+			}
+			return map[string]any{
 				"type":  "array",
 				"items": itemSchema,
 			}
 		}
-		return map[string]any{
-			"type":  "array",
-			"items": itemSchema,
-		}
+		return map[string]any{}
 
-	case ir.TypeKindMap:
-		return map[string]any{
-			"type":                 "object",
-			"additionalProperties": generateTypeRefSchema(*t.MapValue),
+	case irtypes.TypeKindMap:
+		if t.MapType != nil {
+			return map[string]any{
+				"type":                 "object",
+				"additionalProperties": generateTypeRefSchema(*t.MapType),
+			}
 		}
+		return map[string]any{}
 
-	case ir.TypeKindObject:
-		props, required := generatePropertiesFromFields(t.Object.Fields)
-		schema := map[string]any{
-			"type":       "object",
-			"properties": props,
+	case irtypes.TypeKindObject:
+		if t.ObjectFields != nil {
+			props, required := generatePropertiesFromFields(*t.ObjectFields)
+			schema := map[string]any{
+				"type":       "object",
+				"properties": props,
+			}
+			if len(required) > 0 {
+				schema["required"] = required
+			}
+			return schema
 		}
-		if len(required) > 0 {
-			schema["required"] = required
-		}
-		return schema
+		return map[string]any{}
 	}
 
 	return map[string]any{}
 }
 
 // primitiveToJSONSchema converts an IR primitive type to JSON Schema.
-func primitiveToJSONSchema(p ir.PrimitiveType) map[string]any {
+func primitiveToJSONSchema(p irtypes.PrimitiveType) map[string]any {
 	switch p {
-	case ir.PrimitiveString:
+	case irtypes.PrimitiveTypeString:
 		return map[string]any{"type": "string"}
-	case ir.PrimitiveInt:
+	case irtypes.PrimitiveTypeInt:
 		return map[string]any{"type": "integer"}
-	case ir.PrimitiveFloat:
+	case irtypes.PrimitiveTypeFloat:
 		return map[string]any{"type": "number"}
-	case ir.PrimitiveBool:
+	case irtypes.PrimitiveTypeBool:
 		return map[string]any{"type": "boolean"}
-	case ir.PrimitiveDatetime:
+	case irtypes.PrimitiveTypeDatetime:
 		return map[string]any{"type": "string", "format": "date-time"}
 	}
 	return map[string]any{"type": "string"}

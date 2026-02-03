@@ -13,6 +13,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
@@ -84,35 +85,42 @@ func TestGenerator_Generate(t *testing.T) {
 		Filename: "test.json",
 	})
 
-	schema := &ir.Schema{
-		Types: []ir.Type{
+	primString := irtypes.PrimitiveTypeString
+	schema := &irtypes.IrSchema{
+		Types: []irtypes.TypeDef{
 			{
 				Name: "User",
-				Fields: []ir.Field{
+				Fields: []irtypes.Field{
 					{
-						Name: "id",
-						Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+						Name:    "id",
+						TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
 					},
 				},
 			},
 		},
-		RPCs: []ir.RPC{
+		Rpcs: []irtypes.RpcDef{
 			{
 				Name: "UserService",
-				Procs: []ir.Procedure{
-					{
-						Name: "Create",
-						Input: []ir.Field{
-							{
-								Name: "name",
-								Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
-							},
-						},
-						Output: []ir.Field{},
-					},
-				},
 			},
 		},
+		Procedures: []irtypes.ProcedureDef{
+			{
+				RpcName: "UserService",
+				Name:    "Create",
+				InputFields: []irtypes.Field{
+					{
+						Name:    "name",
+						TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
+					},
+				},
+				OutputFields: []irtypes.Field{},
+			},
+		},
+		Streams:   []irtypes.StreamDef{},
+		Enums:     []irtypes.EnumDef{},
+		Constants: []irtypes.ConstantDef{},
+		Patterns:  []irtypes.PatternDef{},
+		Docs:      []irtypes.DocDef{},
 	}
 
 	files, err := gen.Generate(context.Background(), schema)
@@ -129,51 +137,59 @@ func TestGenerator_Generate(t *testing.T) {
 }
 
 func TestGenerateTypeRefSchema(t *testing.T) {
+	primString := irtypes.PrimitiveTypeString
+	primDatetime := irtypes.PrimitiveTypeDatetime
+	primFloat := irtypes.PrimitiveTypeFloat
+	typeName := "User"
+	enumName := "Status"
+	arrayDims1 := int64(1)
+	arrayDims2 := int64(2)
+
 	tests := []struct {
 		name     string
-		typeRef  ir.TypeRef
+		typeRef  irtypes.TypeRef
 		expected map[string]any
 	}{
 		{
 			name: "primitive string",
-			typeRef: ir.TypeRef{
-				Kind:      ir.TypeKindPrimitive,
-				Primitive: ir.PrimitiveString,
+			typeRef: irtypes.TypeRef{
+				Kind:          irtypes.TypeKindPrimitive,
+				PrimitiveName: &primString,
 			},
 			expected: map[string]any{"type": "string"},
 		},
 		{
 			name: "primitive datetime",
-			typeRef: ir.TypeRef{
-				Kind:      ir.TypeKindPrimitive,
-				Primitive: ir.PrimitiveDatetime,
+			typeRef: irtypes.TypeRef{
+				Kind:          irtypes.TypeKindPrimitive,
+				PrimitiveName: &primDatetime,
 			},
 			expected: map[string]any{"type": "string", "format": "date-time"},
 		},
 		{
 			name: "custom type reference",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindType,
-				Type: "User",
+			typeRef: irtypes.TypeRef{
+				Kind:     irtypes.TypeKindType,
+				TypeName: &typeName,
 			},
 			expected: map[string]any{"$ref": "#/$defs/User"},
 		},
 		{
 			name: "enum reference",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindEnum,
-				Enum: "Status",
+			typeRef: irtypes.TypeRef{
+				Kind:     irtypes.TypeKindEnum,
+				EnumName: &enumName,
 			},
 			expected: map[string]any{"$ref": "#/$defs/Status"},
 		},
 		{
 			name: "simple array",
-			typeRef: ir.TypeRef{
-				Kind:            ir.TypeKindArray,
-				ArrayDimensions: 1,
-				ArrayItem: &ir.TypeRef{
-					Kind:      ir.TypeKindPrimitive,
-					Primitive: ir.PrimitiveString,
+			typeRef: irtypes.TypeRef{
+				Kind:      irtypes.TypeKindArray,
+				ArrayDims: &arrayDims1,
+				ArrayType: &irtypes.TypeRef{
+					Kind:          irtypes.TypeKindPrimitive,
+					PrimitiveName: &primString,
 				},
 			},
 			expected: map[string]any{
@@ -183,12 +199,12 @@ func TestGenerateTypeRefSchema(t *testing.T) {
 		},
 		{
 			name: "nested array (matrix)",
-			typeRef: ir.TypeRef{
-				Kind:            ir.TypeKindArray,
-				ArrayDimensions: 2,
-				ArrayItem: &ir.TypeRef{
-					Kind:      ir.TypeKindPrimitive,
-					Primitive: ir.PrimitiveFloat,
+			typeRef: irtypes.TypeRef{
+				Kind:      irtypes.TypeKindArray,
+				ArrayDims: &arrayDims2,
+				ArrayType: &irtypes.TypeRef{
+					Kind:          irtypes.TypeKindPrimitive,
+					PrimitiveName: &primFloat,
 				},
 			},
 			expected: map[string]any{
@@ -201,11 +217,11 @@ func TestGenerateTypeRefSchema(t *testing.T) {
 		},
 		{
 			name: "map of strings",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindMap,
-				MapValue: &ir.TypeRef{
-					Kind:      ir.TypeKindPrimitive,
-					Primitive: ir.PrimitiveString,
+			typeRef: irtypes.TypeRef{
+				Kind: irtypes.TypeKindMap,
+				MapType: &irtypes.TypeRef{
+					Kind:          irtypes.TypeKindPrimitive,
+					PrimitiveName: &primString,
 				},
 			},
 			expected: map[string]any{
@@ -215,11 +231,11 @@ func TestGenerateTypeRefSchema(t *testing.T) {
 		},
 		{
 			name: "map of objects",
-			typeRef: ir.TypeRef{
-				Kind: ir.TypeKindMap,
-				MapValue: &ir.TypeRef{
-					Kind: ir.TypeKindType,
-					Type: "User",
+			typeRef: irtypes.TypeRef{
+				Kind: irtypes.TypeKindMap,
+				MapType: &irtypes.TypeRef{
+					Kind:     irtypes.TypeKindType,
+					TypeName: &typeName,
 				},
 			},
 			expected: map[string]any{
@@ -238,15 +254,19 @@ func TestGenerateTypeRefSchema(t *testing.T) {
 }
 
 func TestGeneratePropertiesFromFields(t *testing.T) {
-	fields := []ir.Field{
+	primString := irtypes.PrimitiveTypeString
+	typeName := "User"
+	userDoc := "The user object"
+
+	fields := []irtypes.Field{
 		{
-			Name: "id",
-			Type: ir.TypeRef{Kind: ir.TypeKindPrimitive, Primitive: ir.PrimitiveString},
+			Name:    "id",
+			TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
 		},
 		{
 			Name:     "user",
-			Doc:      "The user object",
-			Type:     ir.TypeRef{Kind: ir.TypeKindType, Type: "User"},
+			Doc:      &userDoc,
+			TypeRef:  irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &typeName},
 			Optional: false,
 		},
 	}
