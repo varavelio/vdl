@@ -77,13 +77,13 @@ func (e *TypescriptImportExtension) UnmarshalJSON(data []byte) error {
 // -----------------------------------------------------------------------------
 
 // Configuration for generating RPC clients
-type ClientConfig struct {
+type ClientTargetConfig struct {
 	// Generate RPC client code
 	GenClient *bool `json:"genClient,omitempty"`
 }
 
 // GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
-func (x *ClientConfig) GetGenClient() bool {
+func (x *ClientTargetConfig) GetGenClient() bool {
 	if x != nil && x.GenClient != nil {
 		return *x.GenClient
 	}
@@ -92,22 +92,22 @@ func (x *ClientConfig) GetGenClient() bool {
 }
 
 // GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
-func (x *ClientConfig) GetGenClientOr(defaultValue bool) bool {
+func (x *ClientTargetConfig) GetGenClientOr(defaultValue bool) bool {
 	if x != nil && x.GenClient != nil {
 		return *x.GenClient
 	}
 	return defaultValue
 }
 
-// preClientConfig is the version of ClientConfig previous to the required field validation
-type preClientConfig struct {
+// preClientTargetConfig is the version of ClientTargetConfig previous to the required field validation
+type preClientTargetConfig struct {
 	GenClient *bool `json:"genClient,omitempty"`
 }
 
-// validate validates the required fields of ClientConfig
-func (p *preClientConfig) validate() error {
+// validate validates the required fields of ClientTargetConfig
+func (p *preClientTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preClientConfig is nil")
+		return errorMissingRequiredField("preClientTargetConfig is nil")
 	}
 
 	// Validation for field "genClient"
@@ -115,19 +115,19 @@ func (p *preClientConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preClientConfig type to the final ClientConfig type
-func (p *preClientConfig) transform() ClientConfig {
+// transform transforms the preClientTargetConfig type to the final ClientTargetConfig type
+func (p *preClientTargetConfig) transform() ClientTargetConfig {
 	// Transformations
 	transGenClient := p.GenClient
 
 	// Assignments
-	return ClientConfig{
+	return ClientTargetConfig{
 		GenClient: transGenClient,
 	}
 }
 
 // Common configuration fields shared by all targets
-type CommonConfig struct {
+type CommonTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -137,7 +137,7 @@ type CommonConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *CommonConfig) GetOutput() string {
+func (x *CommonTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -146,7 +146,7 @@ func (x *CommonConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *CommonConfig) GetOutputOr(defaultValue string) string {
+func (x *CommonTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -154,7 +154,7 @@ func (x *CommonConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *CommonConfig) GetClean() bool {
+func (x *CommonTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -163,7 +163,7 @@ func (x *CommonConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *CommonConfig) GetCleanOr(defaultValue bool) bool {
+func (x *CommonTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -171,7 +171,7 @@ func (x *CommonConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *CommonConfig) GetSchema() string {
+func (x *CommonTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -180,24 +180,24 @@ func (x *CommonConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *CommonConfig) GetSchemaOr(defaultValue string) string {
+func (x *CommonTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
 	return defaultValue
 }
 
-// preCommonConfig is the version of CommonConfig previous to the required field validation
-type preCommonConfig struct {
+// preCommonTargetConfig is the version of CommonTargetConfig previous to the required field validation
+type preCommonTargetConfig struct {
 	Output *string `json:"output,omitempty"`
 	Clean  *bool   `json:"clean,omitempty"`
 	Schema *string `json:"schema,omitempty"`
 }
 
-// validate validates the required fields of CommonConfig
-func (p *preCommonConfig) validate() error {
+// validate validates the required fields of CommonTargetConfig
+func (p *preCommonTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preCommonConfig is nil")
+		return errorMissingRequiredField("preCommonTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -212,15 +212,15 @@ func (p *preCommonConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preCommonConfig type to the final CommonConfig type
-func (p *preCommonConfig) transform() CommonConfig {
+// transform transforms the preCommonTargetConfig type to the final CommonTargetConfig type
+func (p *preCommonTargetConfig) transform() CommonTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
 	transSchema := p.Schema
 
 	// Assignments
-	return CommonConfig{
+	return CommonTargetConfig{
 		Output: transOutput,
 		Clean:  transClean,
 		Schema: transSchema,
@@ -228,13 +228,13 @@ func (p *preCommonConfig) transform() CommonConfig {
 }
 
 // Configuration for generating constants
-type ConstsConfig struct {
+type ConstsTargetConfig struct {
 	// Generate constant definitions
 	GenConsts *bool `json:"genConsts,omitempty"`
 }
 
 // GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *ConstsConfig) GetGenConsts() bool {
+func (x *ConstsTargetConfig) GetGenConsts() bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -243,22 +243,22 @@ func (x *ConstsConfig) GetGenConsts() bool {
 }
 
 // GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *ConstsConfig) GetGenConstsOr(defaultValue bool) bool {
+func (x *ConstsTargetConfig) GetGenConstsOr(defaultValue bool) bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
 	return defaultValue
 }
 
-// preConstsConfig is the version of ConstsConfig previous to the required field validation
-type preConstsConfig struct {
+// preConstsTargetConfig is the version of ConstsTargetConfig previous to the required field validation
+type preConstsTargetConfig struct {
 	GenConsts *bool `json:"genConsts,omitempty"`
 }
 
-// validate validates the required fields of ConstsConfig
-func (p *preConstsConfig) validate() error {
+// validate validates the required fields of ConstsTargetConfig
+func (p *preConstsTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preConstsConfig is nil")
+		return errorMissingRequiredField("preConstsTargetConfig is nil")
 	}
 
 	// Validation for field "genConsts"
@@ -266,19 +266,19 @@ func (p *preConstsConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preConstsConfig type to the final ConstsConfig type
-func (p *preConstsConfig) transform() ConstsConfig {
+// transform transforms the preConstsTargetConfig type to the final ConstsTargetConfig type
+func (p *preConstsTargetConfig) transform() ConstsTargetConfig {
 	// Transformations
 	transGenConsts := p.GenConsts
 
 	// Assignments
-	return ConstsConfig{
+	return ConstsTargetConfig{
 		GenConsts: transGenConsts,
 	}
 }
 
 // Configuration for Dart code generation
-type DartConfig struct {
+type DartTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -292,7 +292,7 @@ type DartConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *DartConfig) GetOutput() string {
+func (x *DartTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -301,7 +301,7 @@ func (x *DartConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *DartConfig) GetOutputOr(defaultValue string) string {
+func (x *DartTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -309,7 +309,7 @@ func (x *DartConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *DartConfig) GetClean() bool {
+func (x *DartTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -318,7 +318,7 @@ func (x *DartConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *DartConfig) GetCleanOr(defaultValue bool) bool {
+func (x *DartTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -326,7 +326,7 @@ func (x *DartConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *DartConfig) GetSchema() string {
+func (x *DartTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -335,7 +335,7 @@ func (x *DartConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *DartConfig) GetSchemaOr(defaultValue string) string {
+func (x *DartTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -343,7 +343,7 @@ func (x *DartConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *DartConfig) GetGenPatterns() bool {
+func (x *DartTargetConfig) GetGenPatterns() bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -352,7 +352,7 @@ func (x *DartConfig) GetGenPatterns() bool {
 }
 
 // GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *DartConfig) GetGenPatternsOr(defaultValue bool) bool {
+func (x *DartTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -360,7 +360,7 @@ func (x *DartConfig) GetGenPatternsOr(defaultValue bool) bool {
 }
 
 // GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *DartConfig) GetGenConsts() bool {
+func (x *DartTargetConfig) GetGenConsts() bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -369,15 +369,15 @@ func (x *DartConfig) GetGenConsts() bool {
 }
 
 // GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *DartConfig) GetGenConstsOr(defaultValue bool) bool {
+func (x *DartTargetConfig) GetGenConstsOr(defaultValue bool) bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
 	return defaultValue
 }
 
-// preDartConfig is the version of DartConfig previous to the required field validation
-type preDartConfig struct {
+// preDartTargetConfig is the version of DartTargetConfig previous to the required field validation
+type preDartTargetConfig struct {
 	Output      *string `json:"output,omitempty"`
 	Clean       *bool   `json:"clean,omitempty"`
 	Schema      *string `json:"schema,omitempty"`
@@ -385,10 +385,10 @@ type preDartConfig struct {
 	GenConsts   *bool   `json:"genConsts,omitempty"`
 }
 
-// validate validates the required fields of DartConfig
-func (p *preDartConfig) validate() error {
+// validate validates the required fields of DartTargetConfig
+func (p *preDartTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preDartConfig is nil")
+		return errorMissingRequiredField("preDartTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -407,8 +407,8 @@ func (p *preDartConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preDartConfig type to the final DartConfig type
-func (p *preDartConfig) transform() DartConfig {
+// transform transforms the preDartTargetConfig type to the final DartTargetConfig type
+func (p *preDartTargetConfig) transform() DartTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -417,7 +417,7 @@ func (p *preDartConfig) transform() DartConfig {
 	transGenConsts := p.GenConsts
 
 	// Assignments
-	return DartConfig{
+	return DartTargetConfig{
 		Output:      transOutput,
 		Clean:       transClean,
 		Schema:      transSchema,
@@ -427,7 +427,7 @@ func (p *preDartConfig) transform() DartConfig {
 }
 
 // Configuration for Go code generation
-type GoConfig struct {
+type GoTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -447,7 +447,7 @@ type GoConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetOutput() string {
+func (x *GoTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -456,7 +456,7 @@ func (x *GoConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetOutputOr(defaultValue string) string {
+func (x *GoTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -464,7 +464,7 @@ func (x *GoConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetClean() bool {
+func (x *GoTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -473,7 +473,7 @@ func (x *GoConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetCleanOr(defaultValue bool) bool {
+func (x *GoTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -481,7 +481,7 @@ func (x *GoConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetSchema() string {
+func (x *GoTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -490,7 +490,7 @@ func (x *GoConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetSchemaOr(defaultValue string) string {
+func (x *GoTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -498,7 +498,7 @@ func (x *GoConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetGenPatterns() bool {
+func (x *GoTargetConfig) GetGenPatterns() bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -507,7 +507,7 @@ func (x *GoConfig) GetGenPatterns() bool {
 }
 
 // GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetGenPatternsOr(defaultValue bool) bool {
+func (x *GoTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -515,7 +515,7 @@ func (x *GoConfig) GetGenPatternsOr(defaultValue bool) bool {
 }
 
 // GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetGenConsts() bool {
+func (x *GoTargetConfig) GetGenConsts() bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -524,7 +524,7 @@ func (x *GoConfig) GetGenConsts() bool {
 }
 
 // GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetGenConstsOr(defaultValue bool) bool {
+func (x *GoTargetConfig) GetGenConstsOr(defaultValue bool) bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -532,7 +532,7 @@ func (x *GoConfig) GetGenConstsOr(defaultValue bool) bool {
 }
 
 // GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetGenClient() bool {
+func (x *GoTargetConfig) GetGenClient() bool {
 	if x != nil && x.GenClient != nil {
 		return *x.GenClient
 	}
@@ -541,7 +541,7 @@ func (x *GoConfig) GetGenClient() bool {
 }
 
 // GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetGenClientOr(defaultValue bool) bool {
+func (x *GoTargetConfig) GetGenClientOr(defaultValue bool) bool {
 	if x != nil && x.GenClient != nil {
 		return *x.GenClient
 	}
@@ -549,7 +549,7 @@ func (x *GoConfig) GetGenClientOr(defaultValue bool) bool {
 }
 
 // GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetGenServer() bool {
+func (x *GoTargetConfig) GetGenServer() bool {
 	if x != nil && x.GenServer != nil {
 		return *x.GenServer
 	}
@@ -558,7 +558,7 @@ func (x *GoConfig) GetGenServer() bool {
 }
 
 // GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetGenServerOr(defaultValue bool) bool {
+func (x *GoTargetConfig) GetGenServerOr(defaultValue bool) bool {
 	if x != nil && x.GenServer != nil {
 		return *x.GenServer
 	}
@@ -566,7 +566,7 @@ func (x *GoConfig) GetGenServerOr(defaultValue bool) bool {
 }
 
 // GetPackage returns the value of Package or the zero value if the receiver or field is nil.
-func (x *GoConfig) GetPackage() string {
+func (x *GoTargetConfig) GetPackage() string {
 	if x != nil {
 		return x.Package
 	}
@@ -575,15 +575,15 @@ func (x *GoConfig) GetPackage() string {
 }
 
 // GetPackageOr returns the value of Package or the provided default if the receiver or field is nil.
-func (x *GoConfig) GetPackageOr(defaultValue string) string {
+func (x *GoTargetConfig) GetPackageOr(defaultValue string) string {
 	if x != nil {
 		return x.Package
 	}
 	return defaultValue
 }
 
-// preGoConfig is the version of GoConfig previous to the required field validation
-type preGoConfig struct {
+// preGoTargetConfig is the version of GoTargetConfig previous to the required field validation
+type preGoTargetConfig struct {
 	Output      *string `json:"output,omitempty"`
 	Clean       *bool   `json:"clean,omitempty"`
 	Schema      *string `json:"schema,omitempty"`
@@ -594,10 +594,10 @@ type preGoConfig struct {
 	Package     *string `json:"package,omitempty"`
 }
 
-// validate validates the required fields of GoConfig
-func (p *preGoConfig) validate() error {
+// validate validates the required fields of GoTargetConfig
+func (p *preGoTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preGoConfig is nil")
+		return errorMissingRequiredField("preGoTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -625,8 +625,8 @@ func (p *preGoConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preGoConfig type to the final GoConfig type
-func (p *preGoConfig) transform() GoConfig {
+// transform transforms the preGoTargetConfig type to the final GoTargetConfig type
+func (p *preGoTargetConfig) transform() GoTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -638,7 +638,7 @@ func (p *preGoConfig) transform() GoConfig {
 	transPackage := *p.Package
 
 	// Assignments
-	return GoConfig{
+	return GoTargetConfig{
 		Output:      transOutput,
 		Clean:       transClean,
 		Schema:      transSchema,
@@ -651,7 +651,7 @@ func (p *preGoConfig) transform() GoConfig {
 }
 
 // Configuration for IR (Intermediate Representation) JSON generation
-type IrConfig struct {
+type IrTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -665,7 +665,7 @@ type IrConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *IrConfig) GetOutput() string {
+func (x *IrTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -674,7 +674,7 @@ func (x *IrConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *IrConfig) GetOutputOr(defaultValue string) string {
+func (x *IrTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -682,7 +682,7 @@ func (x *IrConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *IrConfig) GetClean() bool {
+func (x *IrTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -691,7 +691,7 @@ func (x *IrConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *IrConfig) GetCleanOr(defaultValue bool) bool {
+func (x *IrTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -699,7 +699,7 @@ func (x *IrConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *IrConfig) GetSchema() string {
+func (x *IrTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -708,7 +708,7 @@ func (x *IrConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *IrConfig) GetSchemaOr(defaultValue string) string {
+func (x *IrTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -716,7 +716,7 @@ func (x *IrConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
-func (x *IrConfig) GetFilename() string {
+func (x *IrTargetConfig) GetFilename() string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -725,7 +725,7 @@ func (x *IrConfig) GetFilename() string {
 }
 
 // GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
-func (x *IrConfig) GetFilenameOr(defaultValue string) string {
+func (x *IrTargetConfig) GetFilenameOr(defaultValue string) string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -733,7 +733,7 @@ func (x *IrConfig) GetFilenameOr(defaultValue string) string {
 }
 
 // GetMinify returns the value of Minify or the zero value if the receiver or field is nil.
-func (x *IrConfig) GetMinify() bool {
+func (x *IrTargetConfig) GetMinify() bool {
 	if x != nil && x.Minify != nil {
 		return *x.Minify
 	}
@@ -742,15 +742,15 @@ func (x *IrConfig) GetMinify() bool {
 }
 
 // GetMinifyOr returns the value of Minify or the provided default if the receiver or field is nil.
-func (x *IrConfig) GetMinifyOr(defaultValue bool) bool {
+func (x *IrTargetConfig) GetMinifyOr(defaultValue bool) bool {
 	if x != nil && x.Minify != nil {
 		return *x.Minify
 	}
 	return defaultValue
 }
 
-// preIrConfig is the version of IrConfig previous to the required field validation
-type preIrConfig struct {
+// preIrTargetConfig is the version of IrTargetConfig previous to the required field validation
+type preIrTargetConfig struct {
 	Output   *string `json:"output,omitempty"`
 	Clean    *bool   `json:"clean,omitempty"`
 	Schema   *string `json:"schema,omitempty"`
@@ -758,10 +758,10 @@ type preIrConfig struct {
 	Minify   *bool   `json:"minify,omitempty"`
 }
 
-// validate validates the required fields of IrConfig
-func (p *preIrConfig) validate() error {
+// validate validates the required fields of IrTargetConfig
+func (p *preIrTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preIrConfig is nil")
+		return errorMissingRequiredField("preIrTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -780,8 +780,8 @@ func (p *preIrConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preIrConfig type to the final IrConfig type
-func (p *preIrConfig) transform() IrConfig {
+// transform transforms the preIrTargetConfig type to the final IrTargetConfig type
+func (p *preIrTargetConfig) transform() IrTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -790,7 +790,7 @@ func (p *preIrConfig) transform() IrConfig {
 	transMinify := p.Minify
 
 	// Assignments
-	return IrConfig{
+	return IrTargetConfig{
 		Output:   transOutput,
 		Clean:    transClean,
 		Schema:   transSchema,
@@ -800,7 +800,7 @@ func (p *preIrConfig) transform() IrConfig {
 }
 
 // Configuration for JSON Schema generation
-type JsonSchemaConfig struct {
+type JsonSchemaTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -817,7 +817,7 @@ type JsonSchemaConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetOutput() string {
+func (x *JsonSchemaTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -826,7 +826,7 @@ func (x *JsonSchemaConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetOutputOr(defaultValue string) string {
+func (x *JsonSchemaTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -834,7 +834,7 @@ func (x *JsonSchemaConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetClean() bool {
+func (x *JsonSchemaTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -843,7 +843,7 @@ func (x *JsonSchemaConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetCleanOr(defaultValue bool) bool {
+func (x *JsonSchemaTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -851,7 +851,7 @@ func (x *JsonSchemaConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetSchema() string {
+func (x *JsonSchemaTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -860,7 +860,7 @@ func (x *JsonSchemaConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetSchemaOr(defaultValue string) string {
+func (x *JsonSchemaTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -868,7 +868,7 @@ func (x *JsonSchemaConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetId returns the value of Id or the zero value if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetId() string {
+func (x *JsonSchemaTargetConfig) GetId() string {
 	if x != nil && x.Id != nil {
 		return *x.Id
 	}
@@ -877,7 +877,7 @@ func (x *JsonSchemaConfig) GetId() string {
 }
 
 // GetIdOr returns the value of Id or the provided default if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetIdOr(defaultValue string) string {
+func (x *JsonSchemaTargetConfig) GetIdOr(defaultValue string) string {
 	if x != nil && x.Id != nil {
 		return *x.Id
 	}
@@ -885,7 +885,7 @@ func (x *JsonSchemaConfig) GetIdOr(defaultValue string) string {
 }
 
 // GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetFilename() string {
+func (x *JsonSchemaTargetConfig) GetFilename() string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -894,7 +894,7 @@ func (x *JsonSchemaConfig) GetFilename() string {
 }
 
 // GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetFilenameOr(defaultValue string) string {
+func (x *JsonSchemaTargetConfig) GetFilenameOr(defaultValue string) string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -902,7 +902,7 @@ func (x *JsonSchemaConfig) GetFilenameOr(defaultValue string) string {
 }
 
 // GetRoot returns the value of Root or the zero value if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetRoot() string {
+func (x *JsonSchemaTargetConfig) GetRoot() string {
 	if x != nil && x.Root != nil {
 		return *x.Root
 	}
@@ -911,15 +911,15 @@ func (x *JsonSchemaConfig) GetRoot() string {
 }
 
 // GetRootOr returns the value of Root or the provided default if the receiver or field is nil.
-func (x *JsonSchemaConfig) GetRootOr(defaultValue string) string {
+func (x *JsonSchemaTargetConfig) GetRootOr(defaultValue string) string {
 	if x != nil && x.Root != nil {
 		return *x.Root
 	}
 	return defaultValue
 }
 
-// preJsonSchemaConfig is the version of JsonSchemaConfig previous to the required field validation
-type preJsonSchemaConfig struct {
+// preJsonSchemaTargetConfig is the version of JsonSchemaTargetConfig previous to the required field validation
+type preJsonSchemaTargetConfig struct {
 	Output   *string `json:"output,omitempty"`
 	Clean    *bool   `json:"clean,omitempty"`
 	Schema   *string `json:"schema,omitempty"`
@@ -928,10 +928,10 @@ type preJsonSchemaConfig struct {
 	Root     *string `json:"root,omitempty"`
 }
 
-// validate validates the required fields of JsonSchemaConfig
-func (p *preJsonSchemaConfig) validate() error {
+// validate validates the required fields of JsonSchemaTargetConfig
+func (p *preJsonSchemaTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preJsonSchemaConfig is nil")
+		return errorMissingRequiredField("preJsonSchemaTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -952,8 +952,8 @@ func (p *preJsonSchemaConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preJsonSchemaConfig type to the final JsonSchemaConfig type
-func (p *preJsonSchemaConfig) transform() JsonSchemaConfig {
+// transform transforms the preJsonSchemaTargetConfig type to the final JsonSchemaTargetConfig type
+func (p *preJsonSchemaTargetConfig) transform() JsonSchemaTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -963,7 +963,7 @@ func (p *preJsonSchemaConfig) transform() JsonSchemaConfig {
 	transRoot := p.Root
 
 	// Assignments
-	return JsonSchemaConfig{
+	return JsonSchemaTargetConfig{
 		Output:   transOutput,
 		Clean:    transClean,
 		Schema:   transSchema,
@@ -974,7 +974,7 @@ func (p *preJsonSchemaConfig) transform() JsonSchemaConfig {
 }
 
 // Configuration for OpenAPI specification generation
-type OpenApiConfig struct {
+type OpenApiTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -1000,7 +1000,7 @@ type OpenApiConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetOutput() string {
+func (x *OpenApiTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -1009,7 +1009,7 @@ func (x *OpenApiConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetOutputOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -1017,7 +1017,7 @@ func (x *OpenApiConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetClean() bool {
+func (x *OpenApiTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -1026,7 +1026,7 @@ func (x *OpenApiConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetCleanOr(defaultValue bool) bool {
+func (x *OpenApiTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -1034,7 +1034,7 @@ func (x *OpenApiConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetSchema() string {
+func (x *OpenApiTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -1043,7 +1043,7 @@ func (x *OpenApiConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetSchemaOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -1051,7 +1051,7 @@ func (x *OpenApiConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetFilename() string {
+func (x *OpenApiTargetConfig) GetFilename() string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -1060,7 +1060,7 @@ func (x *OpenApiConfig) GetFilename() string {
 }
 
 // GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetFilenameOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetFilenameOr(defaultValue string) string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -1068,7 +1068,7 @@ func (x *OpenApiConfig) GetFilenameOr(defaultValue string) string {
 }
 
 // GetTitle returns the value of Title or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetTitle() string {
+func (x *OpenApiTargetConfig) GetTitle() string {
 	if x != nil {
 		return x.Title
 	}
@@ -1077,7 +1077,7 @@ func (x *OpenApiConfig) GetTitle() string {
 }
 
 // GetTitleOr returns the value of Title or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetTitleOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetTitleOr(defaultValue string) string {
 	if x != nil {
 		return x.Title
 	}
@@ -1085,7 +1085,7 @@ func (x *OpenApiConfig) GetTitleOr(defaultValue string) string {
 }
 
 // GetVersion returns the value of Version or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetVersion() string {
+func (x *OpenApiTargetConfig) GetVersion() string {
 	if x != nil {
 		return x.Version
 	}
@@ -1094,7 +1094,7 @@ func (x *OpenApiConfig) GetVersion() string {
 }
 
 // GetVersionOr returns the value of Version or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetVersionOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetVersionOr(defaultValue string) string {
 	if x != nil {
 		return x.Version
 	}
@@ -1102,7 +1102,7 @@ func (x *OpenApiConfig) GetVersionOr(defaultValue string) string {
 }
 
 // GetDescription returns the value of Description or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetDescription() string {
+func (x *OpenApiTargetConfig) GetDescription() string {
 	if x != nil && x.Description != nil {
 		return *x.Description
 	}
@@ -1111,7 +1111,7 @@ func (x *OpenApiConfig) GetDescription() string {
 }
 
 // GetDescriptionOr returns the value of Description or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetDescriptionOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetDescriptionOr(defaultValue string) string {
 	if x != nil && x.Description != nil {
 		return *x.Description
 	}
@@ -1119,7 +1119,7 @@ func (x *OpenApiConfig) GetDescriptionOr(defaultValue string) string {
 }
 
 // GetBaseUrl returns the value of BaseUrl or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetBaseUrl() string {
+func (x *OpenApiTargetConfig) GetBaseUrl() string {
 	if x != nil && x.BaseUrl != nil {
 		return *x.BaseUrl
 	}
@@ -1128,7 +1128,7 @@ func (x *OpenApiConfig) GetBaseUrl() string {
 }
 
 // GetBaseUrlOr returns the value of BaseUrl or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetBaseUrlOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetBaseUrlOr(defaultValue string) string {
 	if x != nil && x.BaseUrl != nil {
 		return *x.BaseUrl
 	}
@@ -1136,7 +1136,7 @@ func (x *OpenApiConfig) GetBaseUrlOr(defaultValue string) string {
 }
 
 // GetContactName returns the value of ContactName or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetContactName() string {
+func (x *OpenApiTargetConfig) GetContactName() string {
 	if x != nil && x.ContactName != nil {
 		return *x.ContactName
 	}
@@ -1145,7 +1145,7 @@ func (x *OpenApiConfig) GetContactName() string {
 }
 
 // GetContactNameOr returns the value of ContactName or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetContactNameOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetContactNameOr(defaultValue string) string {
 	if x != nil && x.ContactName != nil {
 		return *x.ContactName
 	}
@@ -1153,7 +1153,7 @@ func (x *OpenApiConfig) GetContactNameOr(defaultValue string) string {
 }
 
 // GetContactEmail returns the value of ContactEmail or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetContactEmail() string {
+func (x *OpenApiTargetConfig) GetContactEmail() string {
 	if x != nil && x.ContactEmail != nil {
 		return *x.ContactEmail
 	}
@@ -1162,7 +1162,7 @@ func (x *OpenApiConfig) GetContactEmail() string {
 }
 
 // GetContactEmailOr returns the value of ContactEmail or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetContactEmailOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetContactEmailOr(defaultValue string) string {
 	if x != nil && x.ContactEmail != nil {
 		return *x.ContactEmail
 	}
@@ -1170,7 +1170,7 @@ func (x *OpenApiConfig) GetContactEmailOr(defaultValue string) string {
 }
 
 // GetLicenseName returns the value of LicenseName or the zero value if the receiver or field is nil.
-func (x *OpenApiConfig) GetLicenseName() string {
+func (x *OpenApiTargetConfig) GetLicenseName() string {
 	if x != nil && x.LicenseName != nil {
 		return *x.LicenseName
 	}
@@ -1179,15 +1179,15 @@ func (x *OpenApiConfig) GetLicenseName() string {
 }
 
 // GetLicenseNameOr returns the value of LicenseName or the provided default if the receiver or field is nil.
-func (x *OpenApiConfig) GetLicenseNameOr(defaultValue string) string {
+func (x *OpenApiTargetConfig) GetLicenseNameOr(defaultValue string) string {
 	if x != nil && x.LicenseName != nil {
 		return *x.LicenseName
 	}
 	return defaultValue
 }
 
-// preOpenApiConfig is the version of OpenApiConfig previous to the required field validation
-type preOpenApiConfig struct {
+// preOpenApiTargetConfig is the version of OpenApiTargetConfig previous to the required field validation
+type preOpenApiTargetConfig struct {
 	Output       *string `json:"output,omitempty"`
 	Clean        *bool   `json:"clean,omitempty"`
 	Schema       *string `json:"schema,omitempty"`
@@ -1201,10 +1201,10 @@ type preOpenApiConfig struct {
 	LicenseName  *string `json:"licenseName,omitempty"`
 }
 
-// validate validates the required fields of OpenApiConfig
-func (p *preOpenApiConfig) validate() error {
+// validate validates the required fields of OpenApiTargetConfig
+func (p *preOpenApiTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preOpenApiConfig is nil")
+		return errorMissingRequiredField("preOpenApiTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -1241,8 +1241,8 @@ func (p *preOpenApiConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preOpenApiConfig type to the final OpenApiConfig type
-func (p *preOpenApiConfig) transform() OpenApiConfig {
+// transform transforms the preOpenApiTargetConfig type to the final OpenApiTargetConfig type
+func (p *preOpenApiTargetConfig) transform() OpenApiTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -1257,7 +1257,7 @@ func (p *preOpenApiConfig) transform() OpenApiConfig {
 	transLicenseName := p.LicenseName
 
 	// Assignments
-	return OpenApiConfig{
+	return OpenApiTargetConfig{
 		Output:       transOutput,
 		Clean:        transClean,
 		Schema:       transSchema,
@@ -1273,13 +1273,13 @@ func (p *preOpenApiConfig) transform() OpenApiConfig {
 }
 
 // Configuration for generating patterns
-type PatternsConfig struct {
+type PatternsTargetConfig struct {
 	// Generate helper functions for patterns
 	GenPatterns *bool `json:"genPatterns,omitempty"`
 }
 
 // GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *PatternsConfig) GetGenPatterns() bool {
+func (x *PatternsTargetConfig) GetGenPatterns() bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -1288,22 +1288,22 @@ func (x *PatternsConfig) GetGenPatterns() bool {
 }
 
 // GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *PatternsConfig) GetGenPatternsOr(defaultValue bool) bool {
+func (x *PatternsTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
 	return defaultValue
 }
 
-// prePatternsConfig is the version of PatternsConfig previous to the required field validation
-type prePatternsConfig struct {
+// prePatternsTargetConfig is the version of PatternsTargetConfig previous to the required field validation
+type prePatternsTargetConfig struct {
 	GenPatterns *bool `json:"genPatterns,omitempty"`
 }
 
-// validate validates the required fields of PatternsConfig
-func (p *prePatternsConfig) validate() error {
+// validate validates the required fields of PatternsTargetConfig
+func (p *prePatternsTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("prePatternsConfig is nil")
+		return errorMissingRequiredField("prePatternsTargetConfig is nil")
 	}
 
 	// Validation for field "genPatterns"
@@ -1311,180 +1311,14 @@ func (p *prePatternsConfig) validate() error {
 	return nil
 }
 
-// transform transforms the prePatternsConfig type to the final PatternsConfig type
-func (p *prePatternsConfig) transform() PatternsConfig {
+// transform transforms the prePatternsTargetConfig type to the final PatternsTargetConfig type
+func (p *prePatternsTargetConfig) transform() PatternsTargetConfig {
 	// Transformations
 	transGenPatterns := p.GenPatterns
 
 	// Assignments
-	return PatternsConfig{
+	return PatternsTargetConfig{
 		GenPatterns: transGenPatterns,
-	}
-}
-
-// Configuration for API playground generation
-type PlaygroundConfig struct {
-	// The output directory where generated files will be placed
-	Output string `json:"output"`
-	// If true, empties the output directory before generation
-	Clean *bool `json:"clean,omitempty"`
-	// Override the VDL schema file entrypoint for this target
-	Schema *string `json:"schema,omitempty"`
-	// Default base URL for API requests
-	DefaultBaseUrl *string `json:"defaultBaseUrl,omitempty"`
-	// Default headers to include in API requests
-	DefaultHeaders *[]PlaygroundHeader `json:"defaultHeaders,omitempty"`
-}
-
-// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *PlaygroundConfig) GetOutput() string {
-	if x != nil {
-		return x.Output
-	}
-	var zero string
-	return zero
-}
-
-// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *PlaygroundConfig) GetOutputOr(defaultValue string) string {
-	if x != nil {
-		return x.Output
-	}
-	return defaultValue
-}
-
-// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *PlaygroundConfig) GetClean() bool {
-	if x != nil && x.Clean != nil {
-		return *x.Clean
-	}
-	var zero bool
-	return zero
-}
-
-// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *PlaygroundConfig) GetCleanOr(defaultValue bool) bool {
-	if x != nil && x.Clean != nil {
-		return *x.Clean
-	}
-	return defaultValue
-}
-
-// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *PlaygroundConfig) GetSchema() string {
-	if x != nil && x.Schema != nil {
-		return *x.Schema
-	}
-	var zero string
-	return zero
-}
-
-// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *PlaygroundConfig) GetSchemaOr(defaultValue string) string {
-	if x != nil && x.Schema != nil {
-		return *x.Schema
-	}
-	return defaultValue
-}
-
-// GetDefaultBaseUrl returns the value of DefaultBaseUrl or the zero value if the receiver or field is nil.
-func (x *PlaygroundConfig) GetDefaultBaseUrl() string {
-	if x != nil && x.DefaultBaseUrl != nil {
-		return *x.DefaultBaseUrl
-	}
-	var zero string
-	return zero
-}
-
-// GetDefaultBaseUrlOr returns the value of DefaultBaseUrl or the provided default if the receiver or field is nil.
-func (x *PlaygroundConfig) GetDefaultBaseUrlOr(defaultValue string) string {
-	if x != nil && x.DefaultBaseUrl != nil {
-		return *x.DefaultBaseUrl
-	}
-	return defaultValue
-}
-
-// GetDefaultHeaders returns the value of DefaultHeaders or the zero value if the receiver or field is nil.
-func (x *PlaygroundConfig) GetDefaultHeaders() []PlaygroundHeader {
-	if x != nil && x.DefaultHeaders != nil {
-		return *x.DefaultHeaders
-	}
-	var zero []PlaygroundHeader
-	return zero
-}
-
-// GetDefaultHeadersOr returns the value of DefaultHeaders or the provided default if the receiver or field is nil.
-func (x *PlaygroundConfig) GetDefaultHeadersOr(defaultValue []PlaygroundHeader) []PlaygroundHeader {
-	if x != nil && x.DefaultHeaders != nil {
-		return *x.DefaultHeaders
-	}
-	return defaultValue
-}
-
-// prePlaygroundConfig is the version of PlaygroundConfig previous to the required field validation
-type prePlaygroundConfig struct {
-	Output         *string                `json:"output,omitempty"`
-	Clean          *bool                  `json:"clean,omitempty"`
-	Schema         *string                `json:"schema,omitempty"`
-	DefaultBaseUrl *string                `json:"defaultBaseUrl,omitempty"`
-	DefaultHeaders *[]prePlaygroundHeader `json:"defaultHeaders,omitempty"`
-}
-
-// validate validates the required fields of PlaygroundConfig
-func (p *prePlaygroundConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("prePlaygroundConfig is nil")
-	}
-
-	// Validation for field "output"
-	if p.Output == nil {
-		return errorMissingRequiredField("field output is required")
-	}
-
-	// Validation for field "clean"
-
-	// Validation for field "schema"
-
-	// Validation for field "defaultBaseUrl"
-
-	// Validation for field "defaultHeaders"
-	if p.DefaultHeaders != nil {
-		for _, item := range *p.DefaultHeaders {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field defaultHeaders: " + err.Error())
-			}
-		}
-	}
-
-	return nil
-}
-
-// transform transforms the prePlaygroundConfig type to the final PlaygroundConfig type
-func (p *prePlaygroundConfig) transform() PlaygroundConfig {
-	// Transformations
-	transOutput := *p.Output
-	transClean := p.Clean
-	transSchema := p.Schema
-	transDefaultBaseUrl := p.DefaultBaseUrl
-	var transDefaultHeaders *[]PlaygroundHeader
-	if p.DefaultHeaders != nil {
-		var valDefaultHeaders []PlaygroundHeader
-		valDefaultHeaders = make([]PlaygroundHeader, len(*p.DefaultHeaders))
-		for i, v := range *p.DefaultHeaders {
-			var tmp_ PlaygroundHeader
-			tmp_ = v.transform()
-			valDefaultHeaders[i] = tmp_
-		}
-		transDefaultHeaders = &valDefaultHeaders
-	}
-
-	// Assignments
-	return PlaygroundConfig{
-		Output:         transOutput,
-		Clean:          transClean,
-		Schema:         transSchema,
-		DefaultBaseUrl: transDefaultBaseUrl,
-		DefaultHeaders: transDefaultHeaders,
 	}
 }
 
@@ -1568,8 +1402,174 @@ func (p *prePlaygroundHeader) transform() PlaygroundHeader {
 	}
 }
 
+// Configuration for API playground generation
+type PlaygroundTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Default base URL for API requests
+	DefaultBaseUrl *string `json:"defaultBaseUrl,omitempty"`
+	// Default headers to include in API requests
+	DefaultHeaders *[]PlaygroundHeader `json:"defaultHeaders,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetDefaultBaseUrl returns the value of DefaultBaseUrl or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultBaseUrl() string {
+	if x != nil && x.DefaultBaseUrl != nil {
+		return *x.DefaultBaseUrl
+	}
+	var zero string
+	return zero
+}
+
+// GetDefaultBaseUrlOr returns the value of DefaultBaseUrl or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultBaseUrlOr(defaultValue string) string {
+	if x != nil && x.DefaultBaseUrl != nil {
+		return *x.DefaultBaseUrl
+	}
+	return defaultValue
+}
+
+// GetDefaultHeaders returns the value of DefaultHeaders or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultHeaders() []PlaygroundHeader {
+	if x != nil && x.DefaultHeaders != nil {
+		return *x.DefaultHeaders
+	}
+	var zero []PlaygroundHeader
+	return zero
+}
+
+// GetDefaultHeadersOr returns the value of DefaultHeaders or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue []PlaygroundHeader) []PlaygroundHeader {
+	if x != nil && x.DefaultHeaders != nil {
+		return *x.DefaultHeaders
+	}
+	return defaultValue
+}
+
+// prePlaygroundTargetConfig is the version of PlaygroundTargetConfig previous to the required field validation
+type prePlaygroundTargetConfig struct {
+	Output         *string                `json:"output,omitempty"`
+	Clean          *bool                  `json:"clean,omitempty"`
+	Schema         *string                `json:"schema,omitempty"`
+	DefaultBaseUrl *string                `json:"defaultBaseUrl,omitempty"`
+	DefaultHeaders *[]prePlaygroundHeader `json:"defaultHeaders,omitempty"`
+}
+
+// validate validates the required fields of PlaygroundTargetConfig
+func (p *prePlaygroundTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePlaygroundTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "defaultBaseUrl"
+
+	// Validation for field "defaultHeaders"
+	if p.DefaultHeaders != nil {
+		for _, item := range *p.DefaultHeaders {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field defaultHeaders: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the prePlaygroundTargetConfig type to the final PlaygroundTargetConfig type
+func (p *prePlaygroundTargetConfig) transform() PlaygroundTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transDefaultBaseUrl := p.DefaultBaseUrl
+	var transDefaultHeaders *[]PlaygroundHeader
+	if p.DefaultHeaders != nil {
+		var valDefaultHeaders []PlaygroundHeader
+		valDefaultHeaders = make([]PlaygroundHeader, len(*p.DefaultHeaders))
+		for i, v := range *p.DefaultHeaders {
+			var tmp_ PlaygroundHeader
+			tmp_ = v.transform()
+			valDefaultHeaders[i] = tmp_
+		}
+		transDefaultHeaders = &valDefaultHeaders
+	}
+
+	// Assignments
+	return PlaygroundTargetConfig{
+		Output:         transOutput,
+		Clean:          transClean,
+		Schema:         transSchema,
+		DefaultBaseUrl: transDefaultBaseUrl,
+		DefaultHeaders: transDefaultHeaders,
+	}
+}
+
 // Configuration for external plugin generators
-type PluginConfig struct {
+type PluginTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -1583,7 +1583,7 @@ type PluginConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *PluginConfig) GetOutput() string {
+func (x *PluginTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -1592,7 +1592,7 @@ func (x *PluginConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *PluginConfig) GetOutputOr(defaultValue string) string {
+func (x *PluginTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -1600,7 +1600,7 @@ func (x *PluginConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *PluginConfig) GetClean() bool {
+func (x *PluginTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -1609,7 +1609,7 @@ func (x *PluginConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *PluginConfig) GetCleanOr(defaultValue bool) bool {
+func (x *PluginTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -1617,7 +1617,7 @@ func (x *PluginConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *PluginConfig) GetSchema() string {
+func (x *PluginTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -1626,7 +1626,7 @@ func (x *PluginConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *PluginConfig) GetSchemaOr(defaultValue string) string {
+func (x *PluginTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -1634,7 +1634,7 @@ func (x *PluginConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetCommand returns the value of Command or the zero value if the receiver or field is nil.
-func (x *PluginConfig) GetCommand() []string {
+func (x *PluginTargetConfig) GetCommand() []string {
 	if x != nil {
 		return x.Command
 	}
@@ -1643,7 +1643,7 @@ func (x *PluginConfig) GetCommand() []string {
 }
 
 // GetCommandOr returns the value of Command or the provided default if the receiver or field is nil.
-func (x *PluginConfig) GetCommandOr(defaultValue []string) []string {
+func (x *PluginTargetConfig) GetCommandOr(defaultValue []string) []string {
 	if x != nil {
 		return x.Command
 	}
@@ -1651,7 +1651,7 @@ func (x *PluginConfig) GetCommandOr(defaultValue []string) []string {
 }
 
 // GetOptions returns the value of Options or the zero value if the receiver or field is nil.
-func (x *PluginConfig) GetOptions() map[string]string {
+func (x *PluginTargetConfig) GetOptions() map[string]string {
 	if x != nil && x.Options != nil {
 		return *x.Options
 	}
@@ -1660,15 +1660,15 @@ func (x *PluginConfig) GetOptions() map[string]string {
 }
 
 // GetOptionsOr returns the value of Options or the provided default if the receiver or field is nil.
-func (x *PluginConfig) GetOptionsOr(defaultValue map[string]string) map[string]string {
+func (x *PluginTargetConfig) GetOptionsOr(defaultValue map[string]string) map[string]string {
 	if x != nil && x.Options != nil {
 		return *x.Options
 	}
 	return defaultValue
 }
 
-// prePluginConfig is the version of PluginConfig previous to the required field validation
-type prePluginConfig struct {
+// prePluginTargetConfig is the version of PluginTargetConfig previous to the required field validation
+type prePluginTargetConfig struct {
 	Output  *string            `json:"output,omitempty"`
 	Clean   *bool              `json:"clean,omitempty"`
 	Schema  *string            `json:"schema,omitempty"`
@@ -1676,10 +1676,10 @@ type prePluginConfig struct {
 	Options *map[string]string `json:"options,omitempty"`
 }
 
-// validate validates the required fields of PluginConfig
-func (p *prePluginConfig) validate() error {
+// validate validates the required fields of PluginTargetConfig
+func (p *prePluginTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("prePluginConfig is nil")
+		return errorMissingRequiredField("prePluginTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -1701,8 +1701,8 @@ func (p *prePluginConfig) validate() error {
 	return nil
 }
 
-// transform transforms the prePluginConfig type to the final PluginConfig type
-func (p *prePluginConfig) transform() PluginConfig {
+// transform transforms the prePluginTargetConfig type to the final PluginTargetConfig type
+func (p *prePluginTargetConfig) transform() PluginTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -1711,7 +1711,7 @@ func (p *prePluginConfig) transform() PluginConfig {
 	transOptions := p.Options
 
 	// Assignments
-	return PluginConfig{
+	return PluginTargetConfig{
 		Output:  transOutput,
 		Clean:   transClean,
 		Schema:  transSchema,
@@ -1721,7 +1721,7 @@ func (p *prePluginConfig) transform() PluginConfig {
 }
 
 // Configuration for Python code generation
-type PythonConfig struct {
+type PythonTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -1735,7 +1735,7 @@ type PythonConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *PythonConfig) GetOutput() string {
+func (x *PythonTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -1744,7 +1744,7 @@ func (x *PythonConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *PythonConfig) GetOutputOr(defaultValue string) string {
+func (x *PythonTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -1752,7 +1752,7 @@ func (x *PythonConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *PythonConfig) GetClean() bool {
+func (x *PythonTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -1761,7 +1761,7 @@ func (x *PythonConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *PythonConfig) GetCleanOr(defaultValue bool) bool {
+func (x *PythonTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -1769,7 +1769,7 @@ func (x *PythonConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *PythonConfig) GetSchema() string {
+func (x *PythonTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -1778,7 +1778,7 @@ func (x *PythonConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *PythonConfig) GetSchemaOr(defaultValue string) string {
+func (x *PythonTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -1786,7 +1786,7 @@ func (x *PythonConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *PythonConfig) GetGenPatterns() bool {
+func (x *PythonTargetConfig) GetGenPatterns() bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -1795,7 +1795,7 @@ func (x *PythonConfig) GetGenPatterns() bool {
 }
 
 // GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *PythonConfig) GetGenPatternsOr(defaultValue bool) bool {
+func (x *PythonTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -1803,7 +1803,7 @@ func (x *PythonConfig) GetGenPatternsOr(defaultValue bool) bool {
 }
 
 // GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *PythonConfig) GetGenConsts() bool {
+func (x *PythonTargetConfig) GetGenConsts() bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -1812,15 +1812,15 @@ func (x *PythonConfig) GetGenConsts() bool {
 }
 
 // GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *PythonConfig) GetGenConstsOr(defaultValue bool) bool {
+func (x *PythonTargetConfig) GetGenConstsOr(defaultValue bool) bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
 	return defaultValue
 }
 
-// prePythonConfig is the version of PythonConfig previous to the required field validation
-type prePythonConfig struct {
+// prePythonTargetConfig is the version of PythonTargetConfig previous to the required field validation
+type prePythonTargetConfig struct {
 	Output      *string `json:"output,omitempty"`
 	Clean       *bool   `json:"clean,omitempty"`
 	Schema      *string `json:"schema,omitempty"`
@@ -1828,10 +1828,10 @@ type prePythonConfig struct {
 	GenConsts   *bool   `json:"genConsts,omitempty"`
 }
 
-// validate validates the required fields of PythonConfig
-func (p *prePythonConfig) validate() error {
+// validate validates the required fields of PythonTargetConfig
+func (p *prePythonTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("prePythonConfig is nil")
+		return errorMissingRequiredField("prePythonTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -1850,8 +1850,8 @@ func (p *prePythonConfig) validate() error {
 	return nil
 }
 
-// transform transforms the prePythonConfig type to the final PythonConfig type
-func (p *prePythonConfig) transform() PythonConfig {
+// transform transforms the prePythonTargetConfig type to the final PythonTargetConfig type
+func (p *prePythonTargetConfig) transform() PythonTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -1860,7 +1860,7 @@ func (p *prePythonConfig) transform() PythonConfig {
 	transGenConsts := p.GenConsts
 
 	// Assignments
-	return PythonConfig{
+	return PythonTargetConfig{
 		Output:      transOutput,
 		Clean:       transClean,
 		Schema:      transSchema,
@@ -1870,13 +1870,13 @@ func (p *prePythonConfig) transform() PythonConfig {
 }
 
 // Configuration for generating RPC servers
-type ServerConfig struct {
+type ServerTargetConfig struct {
 	// Generate RPC server interfaces and handlers
 	GenServer *bool `json:"genServer,omitempty"`
 }
 
 // GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
-func (x *ServerConfig) GetGenServer() bool {
+func (x *ServerTargetConfig) GetGenServer() bool {
 	if x != nil && x.GenServer != nil {
 		return *x.GenServer
 	}
@@ -1885,22 +1885,22 @@ func (x *ServerConfig) GetGenServer() bool {
 }
 
 // GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
-func (x *ServerConfig) GetGenServerOr(defaultValue bool) bool {
+func (x *ServerTargetConfig) GetGenServerOr(defaultValue bool) bool {
 	if x != nil && x.GenServer != nil {
 		return *x.GenServer
 	}
 	return defaultValue
 }
 
-// preServerConfig is the version of ServerConfig previous to the required field validation
-type preServerConfig struct {
+// preServerTargetConfig is the version of ServerTargetConfig previous to the required field validation
+type preServerTargetConfig struct {
 	GenServer *bool `json:"genServer,omitempty"`
 }
 
-// validate validates the required fields of ServerConfig
-func (p *preServerConfig) validate() error {
+// validate validates the required fields of ServerTargetConfig
+func (p *preServerTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preServerConfig is nil")
+		return errorMissingRequiredField("preServerTargetConfig is nil")
 	}
 
 	// Validation for field "genServer"
@@ -1908,13 +1908,13 @@ func (p *preServerConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preServerConfig type to the final ServerConfig type
-func (p *preServerConfig) transform() ServerConfig {
+// transform transforms the preServerTargetConfig type to the final ServerTargetConfig type
+func (p *preServerTargetConfig) transform() ServerTargetConfig {
 	// Transformations
 	transGenServer := p.GenServer
 
 	// Assignments
-	return ServerConfig{
+	return ServerTargetConfig{
 		GenServer: transGenServer,
 	}
 }
@@ -1922,38 +1922,38 @@ func (p *preServerConfig) transform() ServerConfig {
 // Configuration for a specific generation target, only one target type should be set per entry
 type TargetConfig struct {
 	// Go language target
-	Go *GoConfig `json:"go,omitempty"`
+	Go *GoTargetConfig `json:"go,omitempty"`
 	// TypeScript language target
-	Typescript *TypeScriptConfig `json:"typescript,omitempty"`
+	Typescript *TypeScriptTargetConfig `json:"typescript,omitempty"`
 	// Dart language target
-	Dart *DartConfig `json:"dart,omitempty"`
+	Dart *DartTargetConfig `json:"dart,omitempty"`
 	// Python language target
-	Python *PythonConfig `json:"python,omitempty"`
+	Python *PythonTargetConfig `json:"python,omitempty"`
 	// JSON Schema output target
-	Jsonschema *JsonSchemaConfig `json:"jsonschema,omitempty"`
+	Jsonschema *JsonSchemaTargetConfig `json:"jsonschema,omitempty"`
 	// OpenAPI specification output target
-	Openapi *OpenApiConfig `json:"openapi,omitempty"`
+	Openapi *OpenApiTargetConfig `json:"openapi,omitempty"`
 	// API Playground output target
-	Playground *PlaygroundConfig `json:"playground,omitempty"`
+	Playground *PlaygroundTargetConfig `json:"playground,omitempty"`
 	// External plugin target
-	Plugin *PluginConfig `json:"plugin,omitempty"`
+	Plugin *PluginTargetConfig `json:"plugin,omitempty"`
 	// IR (Intermediate Representation) JSON output target
-	Ir *IrConfig `json:"ir,omitempty"`
+	Ir *IrTargetConfig `json:"ir,omitempty"`
 	// Unified VDL schema output target (merges includes and external docs)
 	Vdl *VdlTargetConfig `json:"vdl,omitempty"`
 }
 
 // GetGo returns the value of Go or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetGo() GoConfig {
+func (x *TargetConfig) GetGo() GoTargetConfig {
 	if x != nil && x.Go != nil {
 		return *x.Go
 	}
-	var zero GoConfig
+	var zero GoTargetConfig
 	return zero
 }
 
 // GetGoOr returns the value of Go or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetGoOr(defaultValue GoConfig) GoConfig {
+func (x *TargetConfig) GetGoOr(defaultValue GoTargetConfig) GoTargetConfig {
 	if x != nil && x.Go != nil {
 		return *x.Go
 	}
@@ -1961,16 +1961,16 @@ func (x *TargetConfig) GetGoOr(defaultValue GoConfig) GoConfig {
 }
 
 // GetTypescript returns the value of Typescript or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetTypescript() TypeScriptConfig {
+func (x *TargetConfig) GetTypescript() TypeScriptTargetConfig {
 	if x != nil && x.Typescript != nil {
 		return *x.Typescript
 	}
-	var zero TypeScriptConfig
+	var zero TypeScriptTargetConfig
 	return zero
 }
 
 // GetTypescriptOr returns the value of Typescript or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetTypescriptOr(defaultValue TypeScriptConfig) TypeScriptConfig {
+func (x *TargetConfig) GetTypescriptOr(defaultValue TypeScriptTargetConfig) TypeScriptTargetConfig {
 	if x != nil && x.Typescript != nil {
 		return *x.Typescript
 	}
@@ -1978,16 +1978,16 @@ func (x *TargetConfig) GetTypescriptOr(defaultValue TypeScriptConfig) TypeScript
 }
 
 // GetDart returns the value of Dart or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetDart() DartConfig {
+func (x *TargetConfig) GetDart() DartTargetConfig {
 	if x != nil && x.Dart != nil {
 		return *x.Dart
 	}
-	var zero DartConfig
+	var zero DartTargetConfig
 	return zero
 }
 
 // GetDartOr returns the value of Dart or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetDartOr(defaultValue DartConfig) DartConfig {
+func (x *TargetConfig) GetDartOr(defaultValue DartTargetConfig) DartTargetConfig {
 	if x != nil && x.Dart != nil {
 		return *x.Dart
 	}
@@ -1995,16 +1995,16 @@ func (x *TargetConfig) GetDartOr(defaultValue DartConfig) DartConfig {
 }
 
 // GetPython returns the value of Python or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetPython() PythonConfig {
+func (x *TargetConfig) GetPython() PythonTargetConfig {
 	if x != nil && x.Python != nil {
 		return *x.Python
 	}
-	var zero PythonConfig
+	var zero PythonTargetConfig
 	return zero
 }
 
 // GetPythonOr returns the value of Python or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetPythonOr(defaultValue PythonConfig) PythonConfig {
+func (x *TargetConfig) GetPythonOr(defaultValue PythonTargetConfig) PythonTargetConfig {
 	if x != nil && x.Python != nil {
 		return *x.Python
 	}
@@ -2012,16 +2012,16 @@ func (x *TargetConfig) GetPythonOr(defaultValue PythonConfig) PythonConfig {
 }
 
 // GetJsonschema returns the value of Jsonschema or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetJsonschema() JsonSchemaConfig {
+func (x *TargetConfig) GetJsonschema() JsonSchemaTargetConfig {
 	if x != nil && x.Jsonschema != nil {
 		return *x.Jsonschema
 	}
-	var zero JsonSchemaConfig
+	var zero JsonSchemaTargetConfig
 	return zero
 }
 
 // GetJsonschemaOr returns the value of Jsonschema or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetJsonschemaOr(defaultValue JsonSchemaConfig) JsonSchemaConfig {
+func (x *TargetConfig) GetJsonschemaOr(defaultValue JsonSchemaTargetConfig) JsonSchemaTargetConfig {
 	if x != nil && x.Jsonschema != nil {
 		return *x.Jsonschema
 	}
@@ -2029,16 +2029,16 @@ func (x *TargetConfig) GetJsonschemaOr(defaultValue JsonSchemaConfig) JsonSchema
 }
 
 // GetOpenapi returns the value of Openapi or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetOpenapi() OpenApiConfig {
+func (x *TargetConfig) GetOpenapi() OpenApiTargetConfig {
 	if x != nil && x.Openapi != nil {
 		return *x.Openapi
 	}
-	var zero OpenApiConfig
+	var zero OpenApiTargetConfig
 	return zero
 }
 
 // GetOpenapiOr returns the value of Openapi or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetOpenapiOr(defaultValue OpenApiConfig) OpenApiConfig {
+func (x *TargetConfig) GetOpenapiOr(defaultValue OpenApiTargetConfig) OpenApiTargetConfig {
 	if x != nil && x.Openapi != nil {
 		return *x.Openapi
 	}
@@ -2046,16 +2046,16 @@ func (x *TargetConfig) GetOpenapiOr(defaultValue OpenApiConfig) OpenApiConfig {
 }
 
 // GetPlayground returns the value of Playground or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetPlayground() PlaygroundConfig {
+func (x *TargetConfig) GetPlayground() PlaygroundTargetConfig {
 	if x != nil && x.Playground != nil {
 		return *x.Playground
 	}
-	var zero PlaygroundConfig
+	var zero PlaygroundTargetConfig
 	return zero
 }
 
 // GetPlaygroundOr returns the value of Playground or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetPlaygroundOr(defaultValue PlaygroundConfig) PlaygroundConfig {
+func (x *TargetConfig) GetPlaygroundOr(defaultValue PlaygroundTargetConfig) PlaygroundTargetConfig {
 	if x != nil && x.Playground != nil {
 		return *x.Playground
 	}
@@ -2063,16 +2063,16 @@ func (x *TargetConfig) GetPlaygroundOr(defaultValue PlaygroundConfig) Playground
 }
 
 // GetPlugin returns the value of Plugin or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetPlugin() PluginConfig {
+func (x *TargetConfig) GetPlugin() PluginTargetConfig {
 	if x != nil && x.Plugin != nil {
 		return *x.Plugin
 	}
-	var zero PluginConfig
+	var zero PluginTargetConfig
 	return zero
 }
 
 // GetPluginOr returns the value of Plugin or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetPluginOr(defaultValue PluginConfig) PluginConfig {
+func (x *TargetConfig) GetPluginOr(defaultValue PluginTargetConfig) PluginTargetConfig {
 	if x != nil && x.Plugin != nil {
 		return *x.Plugin
 	}
@@ -2080,16 +2080,16 @@ func (x *TargetConfig) GetPluginOr(defaultValue PluginConfig) PluginConfig {
 }
 
 // GetIr returns the value of Ir or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetIr() IrConfig {
+func (x *TargetConfig) GetIr() IrTargetConfig {
 	if x != nil && x.Ir != nil {
 		return *x.Ir
 	}
-	var zero IrConfig
+	var zero IrTargetConfig
 	return zero
 }
 
 // GetIrOr returns the value of Ir or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetIrOr(defaultValue IrConfig) IrConfig {
+func (x *TargetConfig) GetIrOr(defaultValue IrTargetConfig) IrTargetConfig {
 	if x != nil && x.Ir != nil {
 		return *x.Ir
 	}
@@ -2115,16 +2115,16 @@ func (x *TargetConfig) GetVdlOr(defaultValue VdlTargetConfig) VdlTargetConfig {
 
 // preTargetConfig is the version of TargetConfig previous to the required field validation
 type preTargetConfig struct {
-	Go         *preGoConfig         `json:"go,omitempty"`
-	Typescript *preTypeScriptConfig `json:"typescript,omitempty"`
-	Dart       *preDartConfig       `json:"dart,omitempty"`
-	Python     *prePythonConfig     `json:"python,omitempty"`
-	Jsonschema *preJsonSchemaConfig `json:"jsonschema,omitempty"`
-	Openapi    *preOpenApiConfig    `json:"openapi,omitempty"`
-	Playground *prePlaygroundConfig `json:"playground,omitempty"`
-	Plugin     *prePluginConfig     `json:"plugin,omitempty"`
-	Ir         *preIrConfig         `json:"ir,omitempty"`
-	Vdl        *preVdlTargetConfig  `json:"vdl,omitempty"`
+	Go         *preGoTargetConfig         `json:"go,omitempty"`
+	Typescript *preTypeScriptTargetConfig `json:"typescript,omitempty"`
+	Dart       *preDartTargetConfig       `json:"dart,omitempty"`
+	Python     *prePythonTargetConfig     `json:"python,omitempty"`
+	Jsonschema *preJsonSchemaTargetConfig `json:"jsonschema,omitempty"`
+	Openapi    *preOpenApiTargetConfig    `json:"openapi,omitempty"`
+	Playground *prePlaygroundTargetConfig `json:"playground,omitempty"`
+	Plugin     *prePluginTargetConfig     `json:"plugin,omitempty"`
+	Ir         *preIrTargetConfig         `json:"ir,omitempty"`
+	Vdl        *preVdlTargetConfig        `json:"vdl,omitempty"`
 }
 
 // validate validates the required fields of TargetConfig
@@ -2209,57 +2209,57 @@ func (p *preTargetConfig) validate() error {
 // transform transforms the preTargetConfig type to the final TargetConfig type
 func (p *preTargetConfig) transform() TargetConfig {
 	// Transformations
-	var transGo *GoConfig
+	var transGo *GoTargetConfig
 	if p.Go != nil {
-		var valGo GoConfig
+		var valGo GoTargetConfig
 		valGo = p.Go.transform()
 		transGo = &valGo
 	}
-	var transTypescript *TypeScriptConfig
+	var transTypescript *TypeScriptTargetConfig
 	if p.Typescript != nil {
-		var valTypescript TypeScriptConfig
+		var valTypescript TypeScriptTargetConfig
 		valTypescript = p.Typescript.transform()
 		transTypescript = &valTypescript
 	}
-	var transDart *DartConfig
+	var transDart *DartTargetConfig
 	if p.Dart != nil {
-		var valDart DartConfig
+		var valDart DartTargetConfig
 		valDart = p.Dart.transform()
 		transDart = &valDart
 	}
-	var transPython *PythonConfig
+	var transPython *PythonTargetConfig
 	if p.Python != nil {
-		var valPython PythonConfig
+		var valPython PythonTargetConfig
 		valPython = p.Python.transform()
 		transPython = &valPython
 	}
-	var transJsonschema *JsonSchemaConfig
+	var transJsonschema *JsonSchemaTargetConfig
 	if p.Jsonschema != nil {
-		var valJsonschema JsonSchemaConfig
+		var valJsonschema JsonSchemaTargetConfig
 		valJsonschema = p.Jsonschema.transform()
 		transJsonschema = &valJsonschema
 	}
-	var transOpenapi *OpenApiConfig
+	var transOpenapi *OpenApiTargetConfig
 	if p.Openapi != nil {
-		var valOpenapi OpenApiConfig
+		var valOpenapi OpenApiTargetConfig
 		valOpenapi = p.Openapi.transform()
 		transOpenapi = &valOpenapi
 	}
-	var transPlayground *PlaygroundConfig
+	var transPlayground *PlaygroundTargetConfig
 	if p.Playground != nil {
-		var valPlayground PlaygroundConfig
+		var valPlayground PlaygroundTargetConfig
 		valPlayground = p.Playground.transform()
 		transPlayground = &valPlayground
 	}
-	var transPlugin *PluginConfig
+	var transPlugin *PluginTargetConfig
 	if p.Plugin != nil {
-		var valPlugin PluginConfig
+		var valPlugin PluginTargetConfig
 		valPlugin = p.Plugin.transform()
 		transPlugin = &valPlugin
 	}
-	var transIr *IrConfig
+	var transIr *IrTargetConfig
 	if p.Ir != nil {
-		var valIr IrConfig
+		var valIr IrTargetConfig
 		valIr = p.Ir.transform()
 		transIr = &valIr
 	}
@@ -2286,7 +2286,7 @@ func (p *preTargetConfig) transform() TargetConfig {
 }
 
 // Configuration for TypeScript code generation
-type TypeScriptConfig struct {
+type TypeScriptTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -2306,7 +2306,7 @@ type TypeScriptConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetOutput() string {
+func (x *TypeScriptTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -2315,7 +2315,7 @@ func (x *TypeScriptConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetOutputOr(defaultValue string) string {
+func (x *TypeScriptTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -2323,7 +2323,7 @@ func (x *TypeScriptConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetClean() bool {
+func (x *TypeScriptTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -2332,7 +2332,7 @@ func (x *TypeScriptConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetCleanOr(defaultValue bool) bool {
+func (x *TypeScriptTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -2340,7 +2340,7 @@ func (x *TypeScriptConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetSchema() string {
+func (x *TypeScriptTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -2349,7 +2349,7 @@ func (x *TypeScriptConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetSchemaOr(defaultValue string) string {
+func (x *TypeScriptTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -2357,7 +2357,7 @@ func (x *TypeScriptConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenPatterns() bool {
+func (x *TypeScriptTargetConfig) GetGenPatterns() bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -2366,7 +2366,7 @@ func (x *TypeScriptConfig) GetGenPatterns() bool {
 }
 
 // GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenPatternsOr(defaultValue bool) bool {
+func (x *TypeScriptTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
 	if x != nil && x.GenPatterns != nil {
 		return *x.GenPatterns
 	}
@@ -2374,7 +2374,7 @@ func (x *TypeScriptConfig) GetGenPatternsOr(defaultValue bool) bool {
 }
 
 // GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenConsts() bool {
+func (x *TypeScriptTargetConfig) GetGenConsts() bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -2383,7 +2383,7 @@ func (x *TypeScriptConfig) GetGenConsts() bool {
 }
 
 // GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenConstsOr(defaultValue bool) bool {
+func (x *TypeScriptTargetConfig) GetGenConstsOr(defaultValue bool) bool {
 	if x != nil && x.GenConsts != nil {
 		return *x.GenConsts
 	}
@@ -2391,7 +2391,7 @@ func (x *TypeScriptConfig) GetGenConstsOr(defaultValue bool) bool {
 }
 
 // GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenClient() bool {
+func (x *TypeScriptTargetConfig) GetGenClient() bool {
 	if x != nil && x.GenClient != nil {
 		return *x.GenClient
 	}
@@ -2400,7 +2400,7 @@ func (x *TypeScriptConfig) GetGenClient() bool {
 }
 
 // GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenClientOr(defaultValue bool) bool {
+func (x *TypeScriptTargetConfig) GetGenClientOr(defaultValue bool) bool {
 	if x != nil && x.GenClient != nil {
 		return *x.GenClient
 	}
@@ -2408,7 +2408,7 @@ func (x *TypeScriptConfig) GetGenClientOr(defaultValue bool) bool {
 }
 
 // GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenServer() bool {
+func (x *TypeScriptTargetConfig) GetGenServer() bool {
 	if x != nil && x.GenServer != nil {
 		return *x.GenServer
 	}
@@ -2417,7 +2417,7 @@ func (x *TypeScriptConfig) GetGenServer() bool {
 }
 
 // GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetGenServerOr(defaultValue bool) bool {
+func (x *TypeScriptTargetConfig) GetGenServerOr(defaultValue bool) bool {
 	if x != nil && x.GenServer != nil {
 		return *x.GenServer
 	}
@@ -2425,7 +2425,7 @@ func (x *TypeScriptConfig) GetGenServerOr(defaultValue bool) bool {
 }
 
 // GetImportExtension returns the value of ImportExtension or the zero value if the receiver or field is nil.
-func (x *TypeScriptConfig) GetImportExtension() TypescriptImportExtension {
+func (x *TypeScriptTargetConfig) GetImportExtension() TypescriptImportExtension {
 	if x != nil && x.ImportExtension != nil {
 		return *x.ImportExtension
 	}
@@ -2434,15 +2434,15 @@ func (x *TypeScriptConfig) GetImportExtension() TypescriptImportExtension {
 }
 
 // GetImportExtensionOr returns the value of ImportExtension or the provided default if the receiver or field is nil.
-func (x *TypeScriptConfig) GetImportExtensionOr(defaultValue TypescriptImportExtension) TypescriptImportExtension {
+func (x *TypeScriptTargetConfig) GetImportExtensionOr(defaultValue TypescriptImportExtension) TypescriptImportExtension {
 	if x != nil && x.ImportExtension != nil {
 		return *x.ImportExtension
 	}
 	return defaultValue
 }
 
-// preTypeScriptConfig is the version of TypeScriptConfig previous to the required field validation
-type preTypeScriptConfig struct {
+// preTypeScriptTargetConfig is the version of TypeScriptTargetConfig previous to the required field validation
+type preTypeScriptTargetConfig struct {
 	Output          *string                    `json:"output,omitempty"`
 	Clean           *bool                      `json:"clean,omitempty"`
 	Schema          *string                    `json:"schema,omitempty"`
@@ -2453,10 +2453,10 @@ type preTypeScriptConfig struct {
 	ImportExtension *TypescriptImportExtension `json:"importExtension,omitempty"`
 }
 
-// validate validates the required fields of TypeScriptConfig
-func (p *preTypeScriptConfig) validate() error {
+// validate validates the required fields of TypeScriptTargetConfig
+func (p *preTypeScriptTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preTypeScriptConfig is nil")
+		return errorMissingRequiredField("preTypeScriptTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -2481,8 +2481,8 @@ func (p *preTypeScriptConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preTypeScriptConfig type to the final TypeScriptConfig type
-func (p *preTypeScriptConfig) transform() TypeScriptConfig {
+// transform transforms the preTypeScriptTargetConfig type to the final TypeScriptTargetConfig type
+func (p *preTypeScriptTargetConfig) transform() TypeScriptTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -2494,7 +2494,7 @@ func (p *preTypeScriptConfig) transform() TypeScriptConfig {
 	transImportExtension := p.ImportExtension
 
 	// Assignments
-	return TypeScriptConfig{
+	return TypeScriptTargetConfig{
 		Output:          transOutput,
 		Clean:           transClean,
 		Schema:          transSchema,

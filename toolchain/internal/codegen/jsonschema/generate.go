@@ -21,11 +21,11 @@ type File struct {
 
 // Generator implements the JSON Schema generator.
 type Generator struct {
-	config *configtypes.JsonSchemaConfig
+	config *configtypes.JsonSchemaTargetConfig
 }
 
 // New creates a new JSON Schema generator with the given config.
-func New(config *configtypes.JsonSchemaConfig) *Generator {
+func New(config *configtypes.JsonSchemaTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 

@@ -16,7 +16,7 @@ var fetchAdapterRawPiece string
 var nodeAdapterRawPiece string
 
 // generateFetchAdapter generates the Fetch API compatible adapter.
-func generateFetchAdapter(cfg *configtypes.TypeScriptConfig) (string, error) {
+func generateFetchAdapter(cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	piece := strutil.GetStrAfter(fetchAdapterRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
 		return "", fmt.Errorf("adapters/fetch.ts: could not find start delimiter")
@@ -36,7 +36,7 @@ func generateFetchAdapter(cfg *configtypes.TypeScriptConfig) (string, error) {
 }
 
 // generateNodeAdapter generates the Node.js HTTP compatible adapter.
-func generateNodeAdapter(cfg *configtypes.TypeScriptConfig) (string, error) {
+func generateNodeAdapter(cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	piece := strutil.GetStrAfter(nodeAdapterRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
 		return "", fmt.Errorf("adapters/node.ts: could not find start delimiter")

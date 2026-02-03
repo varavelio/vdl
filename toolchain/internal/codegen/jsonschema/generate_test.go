@@ -42,7 +42,7 @@ func TestGenerate_Golden(t *testing.T) {
 
 			// Generate JSON Schema
 			filename := "schema.json"
-			gen := New(&configtypes.JsonSchemaConfig{
+			gen := New(&configtypes.JsonSchemaTargetConfig{
 				Filename: &filename,
 			})
 
@@ -76,14 +76,14 @@ func TestGenerate_Golden(t *testing.T) {
 }
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&configtypes.JsonSchemaConfig{})
+	gen := New(&configtypes.JsonSchemaTargetConfig{})
 	assert.Equal(t, "jsonschema", gen.Name())
 }
 
 func TestGenerator_Generate(t *testing.T) {
 	id := "https://example.com/schema.json"
 	filename := "test.json"
-	gen := New(&configtypes.JsonSchemaConfig{
+	gen := New(&configtypes.JsonSchemaTargetConfig{
 		Id:       &id,
 		Filename: &filename,
 	})
@@ -327,7 +327,7 @@ func TestGenerator_RootType(t *testing.T) {
 	t.Run("adds $ref at root when root type is specified", func(t *testing.T) {
 		rootType := "Config"
 		filename := "schema.json"
-		gen := New(&configtypes.JsonSchemaConfig{
+		gen := New(&configtypes.JsonSchemaTargetConfig{
 			Filename: &filename,
 			Root:     &rootType,
 		})
@@ -343,7 +343,7 @@ func TestGenerator_RootType(t *testing.T) {
 	t.Run("returns error when root type does not exist", func(t *testing.T) {
 		rootType := "NonExistent"
 		filename := "schema.json"
-		gen := New(&configtypes.JsonSchemaConfig{
+		gen := New(&configtypes.JsonSchemaTargetConfig{
 			Filename: &filename,
 			Root:     &rootType,
 		})
@@ -356,7 +356,7 @@ func TestGenerator_RootType(t *testing.T) {
 	t.Run("returns error with fuzzy suggestion when root type is similar to existing", func(t *testing.T) {
 		rootType := "Confg" // typo for Config
 		filename := "schema.json"
-		gen := New(&configtypes.JsonSchemaConfig{
+		gen := New(&configtypes.JsonSchemaTargetConfig{
 			Filename: &filename,
 			Root:     &rootType,
 		})
@@ -369,7 +369,7 @@ func TestGenerator_RootType(t *testing.T) {
 
 	t.Run("no $ref at root when root type is not specified", func(t *testing.T) {
 		filename := "schema.json"
-		gen := New(&configtypes.JsonSchemaConfig{
+		gen := New(&configtypes.JsonSchemaTargetConfig{
 			Filename: &filename,
 		})
 

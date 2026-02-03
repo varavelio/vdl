@@ -11,7 +11,7 @@ import (
 )
 
 // generatePatterns generates TypeScript pattern template functions.
-func generatePatterns(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+func generatePatterns(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	if !config.ShouldGenPatterns(cfg.GenPatterns) {
 		return "", nil
 	}

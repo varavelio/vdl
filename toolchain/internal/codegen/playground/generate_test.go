@@ -11,12 +11,12 @@ import (
 )
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&configtypes.PlaygroundConfig{}, "")
+	gen := New(&configtypes.PlaygroundTargetConfig{}, "")
 	assert.Equal(t, "playground", gen.Name())
 }
 
 func TestGenerator_Generate_BasicFiles(t *testing.T) {
-	gen := New(&configtypes.PlaygroundConfig{
+	gen := New(&configtypes.PlaygroundTargetConfig{
 		Output: "dist",
 	}, "")
 
@@ -52,7 +52,7 @@ rpc Users {
 }
 `
 
-	gen := New(&configtypes.PlaygroundConfig{
+	gen := New(&configtypes.PlaygroundTargetConfig{
 		Output: "dist",
 	}, schemaSource)
 
@@ -80,7 +80,7 @@ func TestGenerator_Generate_WithConfig(t *testing.T) {
 		{Key: "Authorization", Value: "Bearer token"},
 		{Key: "X-Custom", Value: "value"},
 	}
-	gen := New(&configtypes.PlaygroundConfig{
+	gen := New(&configtypes.PlaygroundTargetConfig{
 		Output:         "dist",
 		DefaultBaseUrl: &baseUrl,
 		DefaultHeaders: &headers,
@@ -111,7 +111,7 @@ func TestGenerator_Generate_WithConfig(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
-	gen := New(&configtypes.PlaygroundConfig{
+	gen := New(&configtypes.PlaygroundTargetConfig{
 		Output: "dist",
 		// No base URL or headers
 	}, "")
@@ -128,7 +128,7 @@ func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
-	gen := New(&configtypes.PlaygroundConfig{
+	gen := New(&configtypes.PlaygroundTargetConfig{
 		Output: "dist",
 	}, "")
 
@@ -148,7 +148,7 @@ func TestGenerateConfigJSON(t *testing.T) {
 	headers := []configtypes.PlaygroundHeader{
 		{Key: "Content-Type", Value: "application/json"},
 	}
-	gen := New(&configtypes.PlaygroundConfig{
+	gen := New(&configtypes.PlaygroundTargetConfig{
 		DefaultBaseUrl: &baseUrl,
 		DefaultHeaders: &headers,
 	}, "")

@@ -21,11 +21,11 @@ type File struct {
 
 // Generator implements the Python code generator.
 type Generator struct {
-	config *configtypes.PythonConfig
+	config *configtypes.PythonTargetConfig
 }
 
 // New creates a new Python generator with the given config.
-func New(config *configtypes.PythonConfig) *Generator {
+func New(config *configtypes.PythonTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 // generateConstants generates Dart constant definitions.
-func generateConstants(schema *irtypes.IrSchema, cfg *configtypes.DartConfig) (string, error) {
+func generateConstants(schema *irtypes.IrSchema, cfg *configtypes.DartTargetConfig) (string, error) {
 	if !config.ShouldGenConsts(cfg.GenConsts) {
 		return "", nil
 	}

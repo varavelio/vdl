@@ -14,7 +14,7 @@ import (
 //go:embed pieces/client.ts
 var clientRawPiece string
 
-func generateClient(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+func generateClient(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	if !config.ShouldGenClient(cfg.GenClient) {
 		return "", nil
 	}

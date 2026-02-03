@@ -7,7 +7,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateConstants(schema *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+func generateConstants(schema *irtypes.IrSchema, cfg *configtypes.GoTargetConfig) (string, error) {
 	if !config.ShouldGenConsts(cfg.GenConsts) {
 		return "", nil
 	}

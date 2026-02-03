@@ -53,7 +53,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenServer:   true,
 		})
 
-		gen := golang.New(&configtypes.GoConfig{
+		gen := golang.New(&configtypes.GoTargetConfig{
 			Package:     cfg.Package,
 			GenServer:   configtypes.Ptr(cfg.GenServer),
 			GenClient:   configtypes.Ptr(cfg.GenClient),
@@ -83,7 +83,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		})
 
 		importExt := configtypes.TypescriptImportExtension(cfg.ImportExtension.String())
-		gen := typescript.New(&configtypes.TypeScriptConfig{
+		gen := typescript.New(&configtypes.TypeScriptTargetConfig{
 			ImportExtension: &importExt,
 			GenServer:       configtypes.Ptr(cfg.GenServer),
 			GenClient:       configtypes.Ptr(cfg.GenClient),
@@ -109,7 +109,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenConsts:   true,
 		})
 
-		gen := dart.New(&configtypes.DartConfig{
+		gen := dart.New(&configtypes.DartTargetConfig{
 			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
 			GenConsts:   configtypes.Ptr(cfg.GenConsts),
 		})
@@ -132,7 +132,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenConsts:   true,
 		})
 
-		gen := python.New(&configtypes.PythonConfig{
+		gen := python.New(&configtypes.PythonTargetConfig{
 			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
 			GenConsts:   configtypes.Ptr(cfg.GenConsts),
 		})
@@ -155,7 +155,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			Version: "1.0.0",
 		})
 
-		gen := openapi.New(&configtypes.OpenApiConfig{
+		gen := openapi.New(&configtypes.OpenApiTargetConfig{
 			Title:        cfg.Title,
 			Version:      cfg.Version,
 			Description:  configtypes.Ptr(cfg.GetDescription()),
@@ -181,7 +181,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 	case wasmtypes.CodegenTargetJsonSchema:
 		cfg := input.GetJsonSchemaConfigOr(wasmtypes.CodegenInputJsonSchemaConfig{})
 
-		gen := jsonschema.New(&configtypes.JsonSchemaConfig{
+		gen := jsonschema.New(&configtypes.JsonSchemaTargetConfig{
 			Id:       configtypes.Ptr(cfg.SchemaId),
 			Filename: configtypes.Ptr("schema.json"),
 		})

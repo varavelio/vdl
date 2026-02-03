@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateStreamTypes(schema *irtypes.IrSchema, _ *configtypes.TypeScriptConfig) (string, error) {
+func generateStreamTypes(schema *irtypes.IrSchema, _ *configtypes.TypeScriptTargetConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	if len(schema.Streams) > 0 {

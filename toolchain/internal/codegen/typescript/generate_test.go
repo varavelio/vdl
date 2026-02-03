@@ -15,7 +15,7 @@ import (
 )
 
 func TestGenerator_Name(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{})
+	g := New(&configtypes.TypeScriptTargetConfig{})
 	assert.Equal(t, "typescript", g.Name())
 }
 
@@ -41,7 +41,7 @@ func findFile(files []File, name string) string {
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output:    "out",
 		GenClient: configtypes.Ptr(true),
 	})
@@ -62,7 +62,7 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output: "out",
 	})
 
@@ -98,7 +98,7 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithConstants(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output: "out",
 	})
 
@@ -126,7 +126,7 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output: "out",
 	})
 
@@ -152,7 +152,7 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output:    "out",
 		GenClient: configtypes.Ptr(true),
 	})
@@ -198,7 +198,7 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output:    "out",
 		GenClient: configtypes.Ptr(true),
 	})
@@ -240,7 +240,7 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output: "out",
 	})
 
@@ -426,7 +426,7 @@ func TestConvertPatternToTemplateLiteral(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoClient(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output:    "out",
 		GenClient: configtypes.Ptr(false),
 	})
@@ -462,7 +462,7 @@ func TestGenerator_Generate_NoClient(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithDeprecation(t *testing.T) {
-	g := New(&configtypes.TypeScriptConfig{
+	g := New(&configtypes.TypeScriptTargetConfig{
 		Output: "out",
 	})
 
@@ -518,7 +518,7 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := New(&configtypes.TypeScriptConfig{
+			g := New(&configtypes.TypeScriptTargetConfig{
 				Output:          "out",
 				ImportExtension: tt.extension,
 			})

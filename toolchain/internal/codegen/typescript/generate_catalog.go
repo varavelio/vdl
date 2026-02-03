@@ -7,7 +7,7 @@ import (
 )
 
 // generateCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateCatalog(schema *irtypes.IrSchema, config *configtypes.TypeScriptConfig) (string, error) {
+func generateCatalog(schema *irtypes.IrSchema, config *configtypes.TypeScriptTargetConfig) (string, error) {
 	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}

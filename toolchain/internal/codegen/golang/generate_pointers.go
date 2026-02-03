@@ -12,7 +12,7 @@ import (
 //go:embed pieces/pointers.go
 var pointersRawPiece string
 
-func generatePointers(_ *irtypes.IrSchema, _ *configtypes.GoConfig) (string, error) {
+func generatePointers(_ *irtypes.IrSchema, _ *configtypes.GoTargetConfig) (string, error) {
 	piece := strutil.GetStrAfter(pointersRawPiece, "/** START FROM HERE **/")
 	if piece == "" {
 		return "", fmt.Errorf("pointers.go: could not find start delimiter")

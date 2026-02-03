@@ -222,7 +222,7 @@ func Run(configPath string) (int, error) {
 	return totalFiles, nil
 }
 
-func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.PluginConfig, schema *irtypes.IrSchema) (int, error) {
+func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.PluginTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -245,7 +245,7 @@ func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.Plugin
 	return len(generatedFiles), nil
 }
 
-func runOpenAPI(ctx context.Context, absConfigDir string, cfg *configtypes.OpenApiConfig, schema *irtypes.IrSchema) (int, error) {
+func runOpenAPI(ctx context.Context, absConfigDir string, cfg *configtypes.OpenApiTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -268,7 +268,7 @@ func runOpenAPI(ctx context.Context, absConfigDir string, cfg *configtypes.OpenA
 	return len(generatedFiles), nil
 }
 
-func runPlayground(ctx context.Context, absConfigDir string, cfg *configtypes.PlaygroundConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
+func runPlayground(ctx context.Context, absConfigDir string, cfg *configtypes.PlaygroundTargetConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -290,7 +290,7 @@ func runPlayground(ctx context.Context, absConfigDir string, cfg *configtypes.Pl
 
 	// Generate the openapi.yaml file for the playground
 	filename := "openapi.yaml"
-	openAPIConfig := &configtypes.OpenApiConfig{
+	openAPIConfig := &configtypes.OpenApiTargetConfig{
 		Output:   cfg.Output,
 		Schema:   cfg.Schema,
 		Clean:    nil, // Don't clean again, we already cleaned above
@@ -308,7 +308,7 @@ func runPlayground(ctx context.Context, absConfigDir string, cfg *configtypes.Pl
 	return len(generatedFiles) + openAPICount, nil
 }
 
-func runGolang(ctx context.Context, absConfigDir string, cfg *configtypes.GoConfig, schema *irtypes.IrSchema) (int, error) {
+func runGolang(ctx context.Context, absConfigDir string, cfg *configtypes.GoTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -331,7 +331,7 @@ func runGolang(ctx context.Context, absConfigDir string, cfg *configtypes.GoConf
 	return len(generatedFiles), nil
 }
 
-func runTypeScript(ctx context.Context, absConfigDir string, cfg *configtypes.TypeScriptConfig, schema *irtypes.IrSchema) (int, error) {
+func runTypeScript(ctx context.Context, absConfigDir string, cfg *configtypes.TypeScriptTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -354,7 +354,7 @@ func runTypeScript(ctx context.Context, absConfigDir string, cfg *configtypes.Ty
 	return len(generatedFiles), nil
 }
 
-func runDart(ctx context.Context, absConfigDir string, cfg *configtypes.DartConfig, schema *irtypes.IrSchema) (int, error) {
+func runDart(ctx context.Context, absConfigDir string, cfg *configtypes.DartTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -377,7 +377,7 @@ func runDart(ctx context.Context, absConfigDir string, cfg *configtypes.DartConf
 	return len(generatedFiles), nil
 }
 
-func runPython(ctx context.Context, absConfigDir string, cfg *configtypes.PythonConfig, schema *irtypes.IrSchema) (int, error) {
+func runPython(ctx context.Context, absConfigDir string, cfg *configtypes.PythonTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -400,7 +400,7 @@ func runPython(ctx context.Context, absConfigDir string, cfg *configtypes.Python
 	return len(generatedFiles), nil
 }
 
-func runJSONSchema(ctx context.Context, absConfigDir string, cfg *configtypes.JsonSchemaConfig, schema *irtypes.IrSchema) (int, error) {
+func runJSONSchema(ctx context.Context, absConfigDir string, cfg *configtypes.JsonSchemaTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
@@ -423,7 +423,7 @@ func runJSONSchema(ctx context.Context, absConfigDir string, cfg *configtypes.Js
 	return len(generatedFiles), nil
 }
 
-func runIR(ctx context.Context, absConfigDir string, cfg *configtypes.IrConfig, schema *irtypes.IrSchema) (int, error) {
+func runIR(ctx context.Context, absConfigDir string, cfg *configtypes.IrTargetConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err

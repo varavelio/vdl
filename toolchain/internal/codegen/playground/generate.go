@@ -21,12 +21,12 @@ type File struct {
 
 // Generator implements the playground generator.
 type Generator struct {
-	config          *configtypes.PlaygroundConfig
+	config          *configtypes.PlaygroundTargetConfig
 	formattedSchema string
 }
 
 // New creates a new playground generator with the given config.
-func New(config *configtypes.PlaygroundConfig, formattedSchema string) *Generator {
+func New(config *configtypes.PlaygroundTargetConfig, formattedSchema string) *Generator {
 	return &Generator{
 		config:          config,
 		formattedSchema: formattedSchema,

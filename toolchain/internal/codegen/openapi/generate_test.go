@@ -49,7 +49,7 @@ func TestGenerate_Golden(t *testing.T) {
 
 			// 3. Generate OpenAPI
 			filename := "openapi.yaml"
-			gen := New(&configtypes.OpenApiConfig{
+			gen := New(&configtypes.OpenApiTargetConfig{
 				Filename: &filename,
 				Title:    "Test API",
 				Version:  "1.0.0",
@@ -96,13 +96,13 @@ func TestGenerate_Golden(t *testing.T) {
 
 // TestGenerator_Name tests that the generator returns the correct name.
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&configtypes.OpenApiConfig{})
+	gen := New(&configtypes.OpenApiTargetConfig{})
 	assert.Equal(t, "openapi", gen.Name())
 }
 
 // TestGenerator_DefaultConfig tests that defaults are applied.
 func TestGenerator_DefaultConfig(t *testing.T) {
-	gen := New(&configtypes.OpenApiConfig{})
+	gen := New(&configtypes.OpenApiTargetConfig{})
 
 	schema := &irtypes.IrSchema{
 		Types:      []irtypes.TypeDef{},
@@ -129,7 +129,7 @@ func TestGenerator_DefaultConfig(t *testing.T) {
 // TestGenerator_JSONOutput tests JSON output format.
 func TestGenerator_JSONOutput(t *testing.T) {
 	filename := "api.json"
-	gen := New(&configtypes.OpenApiConfig{
+	gen := New(&configtypes.OpenApiTargetConfig{
 		Filename: &filename,
 		Title:    "JSON Test API",
 	})

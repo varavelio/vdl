@@ -21,11 +21,11 @@ type GeneratedFile struct {
 
 // Generator implements codegen.Generator for external plugins.
 type Generator struct {
-	config *configtypes.PluginConfig
+	config *configtypes.PluginTargetConfig
 }
 
 // New creates a new PluginGenerator.
-func New(config *configtypes.PluginConfig) *Generator {
+func New(config *configtypes.PluginTargetConfig) *Generator {
 	return &Generator{
 		config: config,
 	}

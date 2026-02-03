@@ -15,7 +15,7 @@ import (
 var clientRawPiece string
 
 // generateClientCore generates the core client implementation (rpc_client.go).
-func generateClientCore(_ *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+func generateClientCore(_ *irtypes.IrSchema, cfg *configtypes.GoTargetConfig) (string, error) {
 	if !config.ShouldGenClient(cfg.GenClient) {
 		return "", nil
 	}
@@ -181,7 +181,7 @@ func generateClientCore(_ *irtypes.IrSchema, cfg *configtypes.GoConfig) (string,
 }
 
 // generateClientRPC generates the client implementation for a specific RPC (rpc_{rpcName}_client.go).
-func generateClientRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, cfg *configtypes.GoConfig) (string, error) {
+func generateClientRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, cfg *configtypes.GoTargetConfig) (string, error) {
 	if !config.ShouldGenClient(cfg.GenClient) {
 		return "", nil
 	}

@@ -15,7 +15,7 @@ import (
 var serverRawPiece string
 
 // generateServer generates the complete server implementation.
-func generateServer(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+func generateServer(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
@@ -48,7 +48,7 @@ func generateServer(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig)
 }
 
 // generateServerCore generates the core server implementation (server.ts).
-func generateServerCore(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+func generateServerCore(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
@@ -187,7 +187,7 @@ func generateServerCore(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptCon
 }
 
 // generateServerRPC generates the server implementation for a specific RPC.
-func generateServerRPC(rpc irtypes.RpcDef, schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+func generateServerRPC(rpc irtypes.RpcDef, schema *irtypes.IrSchema, cfg *configtypes.TypeScriptTargetConfig) (string, error) {
 	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}

@@ -21,11 +21,11 @@ type File struct {
 
 // Generator implements the OpenAPI generator.
 type Generator struct {
-	config *configtypes.OpenApiConfig
+	config *configtypes.OpenApiTargetConfig
 }
 
 // New creates a new OpenAPI generator with the given config.
-func New(config *configtypes.OpenApiConfig) *Generator {
+func New(config *configtypes.OpenApiTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -160,7 +160,7 @@ func generateTags(schema *irtypes.IrSchema) []Tag {
 	return tags
 }
 
-func encodeSpec(spec Spec, cfg *configtypes.OpenApiConfig) (string, error) {
+func encodeSpec(spec Spec, cfg *configtypes.OpenApiTargetConfig) (string, error) {
 	filename := cfg.GetFilenameOr("openapi.yaml")
 
 	isYAML := strings.HasSuffix(filename, ".yaml") || strings.HasSuffix(filename, ".yml")

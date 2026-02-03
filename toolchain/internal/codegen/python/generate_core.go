@@ -10,6 +10,6 @@ import (
 //go:embed pieces/core.py
 var coreTypesContent string
 
-func generateCore(_ *irtypes.IrSchema, _ *configtypes.PythonConfig) (string, error) {
+func generateCore(_ *irtypes.IrSchema, _ *configtypes.PythonTargetConfig) (string, error) {
 	return coreTypesContent, nil
 }

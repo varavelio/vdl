@@ -8,7 +8,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateDomainTypes(schema *irtypes.IrSchema, _ *configtypes.TypeScriptConfig) (string, error) {
+func generateDomainTypes(schema *irtypes.IrSchema, _ *configtypes.TypeScriptTargetConfig) (string, error) {
 	if len(schema.Types) == 0 {
 		return "", nil
 	}

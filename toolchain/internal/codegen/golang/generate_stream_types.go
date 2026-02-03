@@ -8,7 +8,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateStreamTypes(schema *irtypes.IrSchema, _ *configtypes.GoConfig) (string, error) {
+func generateStreamTypes(schema *irtypes.IrSchema, _ *configtypes.GoTargetConfig) (string, error) {
 	if len(schema.Streams) == 0 {
 		return "", nil
 	}

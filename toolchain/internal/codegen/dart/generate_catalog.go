@@ -7,7 +7,7 @@ import (
 )
 
 // generateRPCCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateRPCCatalog(schema *irtypes.IrSchema, _ *configtypes.DartConfig) (string, error) {
+func generateRPCCatalog(schema *irtypes.IrSchema, _ *configtypes.DartTargetConfig) (string, error) {
 	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}

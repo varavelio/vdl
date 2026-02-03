@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateDomainTypes(schema *irtypes.IrSchema, _ *configtypes.PythonConfig) (string, error) {
+func generateDomainTypes(schema *irtypes.IrSchema, _ *configtypes.PythonTargetConfig) (string, error) {
 	g := gen.New()
 
 	g.Line("def _require_field(name: str, value: Any) -> Any:")

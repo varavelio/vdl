@@ -17,11 +17,11 @@ type File struct {
 
 // Generator implements the IR JSON generator.
 type Generator struct {
-	config *configtypes.IrConfig
+	config *configtypes.IrTargetConfig
 }
 
 // New creates a new IR JSON generator with the given config.
-func New(config *configtypes.IrConfig) *Generator {
+func New(config *configtypes.IrTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 

@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateProcedureTypes(schema *irtypes.IrSchema, _ *configtypes.PythonConfig) (string, error) {
+func generateProcedureTypes(schema *irtypes.IrSchema, _ *configtypes.PythonTargetConfig) (string, error) {
 	if len(schema.Procedures) == 0 {
 		return "", nil
 	}

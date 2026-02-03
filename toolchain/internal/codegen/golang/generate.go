@@ -18,11 +18,11 @@ type File struct {
 
 // Generator implements the Go code generator.
 type Generator struct {
-	config *configtypes.GoConfig
+	config *configtypes.GoTargetConfig
 }
 
 // New creates a new Go generator with the given config.
-func New(config *configtypes.GoConfig) *Generator {
+func New(config *configtypes.GoTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -76,7 +76,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 
 	// Types (types.go) - Domain types
 	// Contains: Enums, Domain Types, Procedure Types, Stream Types
-	typeGenerators := []func(*irtypes.IrSchema, *configtypes.GoConfig) (string, error){
+	typeGenerators := []func(*irtypes.IrSchema, *configtypes.GoTargetConfig) (string, error){
 		generateEnums,
 		generateDomainTypes,
 		generateProcedureTypes,

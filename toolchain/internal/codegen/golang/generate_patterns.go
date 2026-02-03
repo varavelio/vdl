@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generatePatterns(schema *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+func generatePatterns(schema *irtypes.IrSchema, cfg *configtypes.GoTargetConfig) (string, error) {
 	if !config.ShouldGenPatterns(cfg.GenPatterns) {
 		return "", nil
 	}

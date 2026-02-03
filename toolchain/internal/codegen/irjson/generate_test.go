@@ -12,12 +12,12 @@ import (
 )
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&configtypes.IrConfig{})
+	gen := New(&configtypes.IrTargetConfig{})
 	assert.Equal(t, "ir", gen.Name())
 }
 
 func TestGenerator_Generate_DefaultFilename(t *testing.T) {
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 	})
 
@@ -42,7 +42,7 @@ func TestGenerator_Generate_DefaultFilename(t *testing.T) {
 
 func TestGenerator_Generate_CustomFilename(t *testing.T) {
 	filename := "custom-schema.json"
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output:   "dist",
 		Filename: &filename,
 	})
@@ -58,7 +58,7 @@ func TestGenerator_Generate_CustomFilename(t *testing.T) {
 
 func TestGenerator_Generate_EmptyFilenameUsesDefault(t *testing.T) {
 	empty := ""
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output:   "dist",
 		Filename: &empty,
 	})
@@ -74,7 +74,7 @@ func TestGenerator_Generate_EmptyFilenameUsesDefault(t *testing.T) {
 }
 
 func TestGenerator_Generate_ValidJSON(t *testing.T) {
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 	})
 
@@ -134,7 +134,7 @@ func TestGenerator_Generate_ValidJSON(t *testing.T) {
 }
 
 func TestGenerator_Generate_JSONContainsAllFields(t *testing.T) {
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 	})
 
@@ -224,7 +224,7 @@ func TestGenerator_Generate_JSONContainsAllFields(t *testing.T) {
 }
 
 func TestGenerator_Generate_Indented(t *testing.T) {
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 	})
 
@@ -243,7 +243,7 @@ func TestGenerator_Generate_Indented(t *testing.T) {
 }
 
 func TestGenerator_Generate_EmptySchema(t *testing.T) {
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 	})
 
@@ -261,7 +261,7 @@ func TestGenerator_Generate_EmptySchema(t *testing.T) {
 
 func TestGenerator_Generate_Minified(t *testing.T) {
 	minify := true
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 		Minify: &minify,
 	})
@@ -287,7 +287,7 @@ func TestGenerator_Generate_Minified(t *testing.T) {
 
 func TestGenerator_Generate_MinifyFalse(t *testing.T) {
 	minify := false
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 		Minify: &minify,
 	})
@@ -308,7 +308,7 @@ func TestGenerator_Generate_MinifyFalse(t *testing.T) {
 
 func TestGenerator_Generate_DefaultPretty(t *testing.T) {
 	// When minify is nil (not set), default should be pretty-printed
-	gen := New(&configtypes.IrConfig{
+	gen := New(&configtypes.IrTargetConfig{
 		Output: "dist",
 		// Minify not set
 	})

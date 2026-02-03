@@ -11,7 +11,7 @@ import (
 
 // formatImportPath returns a properly formatted import path based on the ImportExtension config.
 // For example, if ImportExtension is ".js", "./core" becomes "./core.js".
-func formatImportPath(path string, cfg *configtypes.TypeScriptConfig) string {
+func formatImportPath(path string, cfg *configtypes.TypeScriptTargetConfig) string {
 	ext := config.GetImportExtension(cfg.ImportExtension)
 	if ext == "" || ext == configtypes.TypescriptImportExtensionNone {
 		return path
@@ -22,7 +22,7 @@ func formatImportPath(path string, cfg *configtypes.TypeScriptConfig) string {
 // generateImport generates an import statement for a list of items.
 // If the list is empty, nothing is generated.
 // items can be simple names like "Response" or renamed ones like "Response as CoreResponse".
-func generateImport(g *gen.Generator, items []string, from string, isType bool, cfg *configtypes.TypeScriptConfig) {
+func generateImport(g *gen.Generator, items []string, from string, isType bool, cfg *configtypes.TypeScriptTargetConfig) {
 	if len(items) == 0 {
 		return
 	}
@@ -42,13 +42,13 @@ func generateImport(g *gen.Generator, items []string, from string, isType bool, 
 	g.Linef("%s { %s } from %q;", importKeyword, strings.Join(items, ", "), path)
 }
 
-func generateImportAll(g *gen.Generator, as string, from string, cfg *configtypes.TypeScriptConfig) {
+func generateImportAll(g *gen.Generator, as string, from string, cfg *configtypes.TypeScriptTargetConfig) {
 	path := formatImportPath(from, cfg)
 	g.Linef("import * as %s from %q;", as, path)
 }
 
 // generateExportAll returns a formatted export statement.
 // Example: generateExportAll("./core", cfg) -> `export * from "./core.js";`
-func generateExportAll(path string, cfg *configtypes.TypeScriptConfig) string {
+func generateExportAll(path string, cfg *configtypes.TypeScriptTargetConfig) string {
 	return fmt.Sprintf("export * from \"%s\";", formatImportPath(path, cfg))
 }

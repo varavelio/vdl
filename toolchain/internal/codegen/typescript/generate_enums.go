@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateEnums(schema *irtypes.IrSchema, _ *configtypes.TypeScriptConfig) (string, error) {
+func generateEnums(schema *irtypes.IrSchema, _ *configtypes.TypeScriptTargetConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}

@@ -195,7 +195,7 @@ func validateCommon(output, targetName string) error {
 	return nil
 }
 
-func validateGo(cfg *configtypes.GoConfig) error {
+func validateGo(cfg *configtypes.GoTargetConfig) error {
 	if err := validateCommon(cfg.Output, "go"); err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func validateGo(cfg *configtypes.GoConfig) error {
 	return nil
 }
 
-func validateOpenAPI(cfg *configtypes.OpenApiConfig) error {
+func validateOpenAPI(cfg *configtypes.OpenApiTargetConfig) error {
 	if err := validateCommon(cfg.Output, "openapi"); err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func validateOpenAPI(cfg *configtypes.OpenApiConfig) error {
 	return nil
 }
 
-func validatePlayground(cfg *configtypes.PlaygroundConfig) error {
+func validatePlayground(cfg *configtypes.PlaygroundTargetConfig) error {
 	if err := validateCommon(cfg.Output, "playground"); err != nil {
 		return err
 	}
@@ -235,7 +235,7 @@ func validatePlayground(cfg *configtypes.PlaygroundConfig) error {
 	return nil
 }
 
-func validatePlugin(cfg *configtypes.PluginConfig) error {
+func validatePlugin(cfg *configtypes.PluginTargetConfig) error {
 	if err := validateCommon(cfg.Output, "plugin"); err != nil {
 		return err
 	}
@@ -245,7 +245,7 @@ func validatePlugin(cfg *configtypes.PluginConfig) error {
 	return nil
 }
 
-func validateIr(cfg *configtypes.IrConfig) error {
+func validateIr(cfg *configtypes.IrTargetConfig) error {
 	if err := validateCommon(cfg.Output, "ir"); err != nil {
 		return err
 	}

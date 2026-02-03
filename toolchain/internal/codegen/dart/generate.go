@@ -21,11 +21,11 @@ type File struct {
 
 // Generator implements the Dart code generator.
 type Generator struct {
-	config *configtypes.DartConfig
+	config *configtypes.DartTargetConfig
 }
 
 // New creates a new Dart generator with the given config.
-func New(config *configtypes.DartConfig) *Generator {
+func New(config *configtypes.DartTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 

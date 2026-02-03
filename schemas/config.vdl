@@ -17,7 +17,7 @@ type VdlConfig {
 }
 
 """ Common configuration fields shared by all targets """
-type CommonConfig {
+type CommonTargetConfig {
   """ The output directory where generated files will be placed """
   output: string
 
@@ -29,25 +29,25 @@ type CommonConfig {
 }
 
 """ Configuration for generating patterns """
-type PatternsConfig {
+type PatternsTargetConfig {
   """ Generate helper functions for patterns """
   genPatterns?: bool
 }
 
 """ Configuration for generating constants """
-type ConstsConfig {
+type ConstsTargetConfig {
   """ Generate constant definitions """
   genConsts?: bool
 }
 
 """ Configuration for generating RPC clients """
-type ClientConfig {
+type ClientTargetConfig {
   """ Generate RPC client code """
   genClient?: bool
 }
 
 """ Configuration for generating RPC servers """
-type ServerConfig {
+type ServerTargetConfig {
   """ Generate RPC server interfaces and handlers """
   genServer?: bool
 }
@@ -57,55 +57,55 @@ Configuration for a specific generation target, only one target type should be s
 """
 type TargetConfig {
   """ Go language target """
-  go?: GoConfig
+  go?: GoTargetConfig
 
   """ TypeScript language target """
-  typescript?: TypeScriptConfig
+  typescript?: TypeScriptTargetConfig
 
   """ Dart language target """
-  dart?: DartConfig
+  dart?: DartTargetConfig
 
   """ Python language target """
-  python?: PythonConfig
+  python?: PythonTargetConfig
 
   """ JSON Schema output target """
-  jsonschema?: JsonSchemaConfig
+  jsonschema?: JsonSchemaTargetConfig
 
   """ OpenAPI specification output target """
-  openapi?: OpenApiConfig
+  openapi?: OpenApiTargetConfig
 
   """ API Playground output target """
-  playground?: PlaygroundConfig
+  playground?: PlaygroundTargetConfig
 
   """ External plugin target """
-  plugin?: PluginConfig
+  plugin?: PluginTargetConfig
 
   """ IR (Intermediate Representation) JSON output target """
-  ir?: IrConfig
+  ir?: IrTargetConfig
 
   """ Unified VDL schema output target (merges includes and external docs) """
   vdl?: VdlTargetConfig
 }
 
 """ Configuration for Go code generation """
-type GoConfig {
-  ...CommonConfig
-  ...PatternsConfig
-  ...ConstsConfig
-  ...ClientConfig
-  ...ServerConfig
+type GoTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
+  ...ClientTargetConfig
+  ...ServerTargetConfig
 
   """ The Go package name to use in generated files """
   package: string
 }
 
 """ Configuration for TypeScript code generation """
-type TypeScriptConfig {
-  ...CommonConfig
-  ...PatternsConfig
-  ...ConstsConfig
-  ...ClientConfig
-  ...ServerConfig
+type TypeScriptTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
+  ...ClientTargetConfig
+  ...ServerTargetConfig
 
   """ File extension to append to import paths """
   importExtension?: TypescriptImportExtension
@@ -119,22 +119,22 @@ enum TypescriptImportExtension {
 }
 
 """ Configuration for Dart code generation """
-type DartConfig {
-  ...CommonConfig
-  ...PatternsConfig
-  ...ConstsConfig
+type DartTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
 }
 
 """ Configuration for Python code generation """
-type PythonConfig {
-  ...CommonConfig
-  ...PatternsConfig
-  ...ConstsConfig
+type PythonTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
 }
 
 """ Configuration for JSON Schema generation """
-type JsonSchemaConfig {
-  ...CommonConfig
+type JsonSchemaTargetConfig {
+  ...CommonTargetConfig
 
   """ The $id of the generated schema """
   id?: string
@@ -150,8 +150,8 @@ type JsonSchemaConfig {
 }
 
 """ Configuration for OpenAPI specification generation """
-type OpenApiConfig {
-  ...CommonConfig
+type OpenApiTargetConfig {
+  ...CommonTargetConfig
 
   """ The name of the output file (can be .yml, .yaml or .json) """
   filename?: string
@@ -179,8 +179,8 @@ type OpenApiConfig {
 }
 
 """ Configuration for API playground generation """
-type PlaygroundConfig {
-  ...CommonConfig
+type PlaygroundTargetConfig {
+  ...CommonTargetConfig
 
   """ Default base URL for API requests """
   defaultBaseUrl?: string
@@ -199,8 +199,8 @@ type PlaygroundHeader {
 }
 
 """ Configuration for external plugin generators """
-type PluginConfig {
-  ...CommonConfig
+type PluginTargetConfig {
+  ...CommonTargetConfig
 
   """ Command to execute the plugin (executable + args) """
   command: string[]
@@ -210,8 +210,8 @@ type PluginConfig {
 }
 
 """ Configuration for IR (Intermediate Representation) JSON generation """
-type IrConfig {
-  ...CommonConfig
+type IrTargetConfig {
+  ...CommonTargetConfig
 
   """ The name of the output file """
   filename?: string
@@ -222,7 +222,7 @@ type IrConfig {
 
 """ Configuration for unified VDL schema generation (merges all includes and external docs) """
 type VdlTargetConfig {
-  ...CommonConfig
+  ...CommonTargetConfig
 
   """ The name of the output file """
   filename?: string

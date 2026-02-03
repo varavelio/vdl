@@ -12,6 +12,6 @@ var coreTypesRawPiece string
 
 // generateCore returns the core types content (Response, VdlError).
 // The header is added by the caller.
-func generateCore(_ *irtypes.IrSchema, _ *configtypes.DartConfig) (string, error) {
+func generateCore(_ *irtypes.IrSchema, _ *configtypes.DartTargetConfig) (string, error) {
 	return coreTypesRawPiece, nil
 }

@@ -51,7 +51,7 @@ json.dump(output, sys.stdout)
 
 	// Create configuration with options as map[string]string
 	options := map[string]string{"prefix": "TEST"}
-	cfg := &configtypes.PluginConfig{
+	cfg := &configtypes.PluginTargetConfig{
 		Output:  tmpDir,
 		Command: []string{"python3", pluginScript},
 		Options: &options,

@@ -8,7 +8,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateProcedureTypes(schema *irtypes.IrSchema, _ *configtypes.GoConfig) (string, error) {
+func generateProcedureTypes(schema *irtypes.IrSchema, _ *configtypes.GoTargetConfig) (string, error) {
 	if len(schema.Procedures) == 0 {
 		return "", nil
 	}

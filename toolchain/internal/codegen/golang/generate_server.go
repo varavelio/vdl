@@ -15,7 +15,7 @@ import (
 var serverRawPiece string
 
 // generateServerCore generates the core server implementation (rpc_server.go).
-func generateServerCore(_ *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+func generateServerCore(_ *irtypes.IrSchema, cfg *configtypes.GoTargetConfig) (string, error) {
 	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
@@ -136,7 +136,7 @@ func generateServerCore(_ *irtypes.IrSchema, cfg *configtypes.GoConfig) (string,
 }
 
 // generateServerRPC generates the server implementation for a specific RPC (rpc_{rpcName}_server.go).
-func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, cfg *configtypes.GoConfig) (string, error) {
+func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, cfg *configtypes.GoTargetConfig) (string, error) {
 	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}

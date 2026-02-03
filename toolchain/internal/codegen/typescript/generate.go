@@ -21,11 +21,11 @@ type File struct {
 
 // Generator implements the TypeScript code generator.
 type Generator struct {
-	config *configtypes.TypeScriptConfig
+	config *configtypes.TypeScriptTargetConfig
 }
 
 // New creates a new TypeScript generator with the given config.
-func New(config *configtypes.TypeScriptConfig) *Generator {
+func New(config *configtypes.TypeScriptTargetConfig) *Generator {
 	return &Generator{config: config}
 }
 
