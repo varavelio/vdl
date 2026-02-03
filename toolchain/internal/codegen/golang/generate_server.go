@@ -6,6 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -14,8 +15,8 @@ import (
 var serverRawPiece string
 
 // generateServerCore generates the core server implementation (rpc_server.go).
-func generateServerCore(_ *irtypes.IrSchema, config *config.GoConfig) (string, error) {
-	if !config.GenServer {
+func generateServerCore(_ *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
 
@@ -135,8 +136,8 @@ func generateServerCore(_ *irtypes.IrSchema, config *config.GoConfig) (string, e
 }
 
 // generateServerRPC generates the server implementation for a specific RPC (rpc_{rpcName}_server.go).
-func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, config *config.GoConfig) (string, error) {
-	if !config.GenServer {
+func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, cfg *configtypes.GoConfig) (string, error) {
+	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
 

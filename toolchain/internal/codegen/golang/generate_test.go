@@ -7,15 +7,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
+func boolPtr(b bool) *bool { return &b }
+
 func TestGenerator_Name(t *testing.T) {
-	g := New(&config.GoConfig{})
+	g := New(&configtypes.GoConfig{})
 	assert.Equal(t, "golang", g.Name())
 }
 
@@ -31,17 +33,11 @@ func parseAndBuildIR(t *testing.T, content string) *irtypes.IrSchema {
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
-		Package: "api",
-		ServerConfig: config.ServerConfig{
-			GenServer: true,
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.GoConfig{
+		Output:    "api.go",
+		Package:   "api",
+		GenServer: boolPtr(true),
+		GenClient: boolPtr(true),
 	})
 
 	schema := parseAndBuildIR(t, "")
@@ -67,17 +63,11 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
 
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
-		Package: "api",
-		ServerConfig: config.ServerConfig{
-			GenServer: true,
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.GoConfig{
+		Output:    "api.go",
+		Package:   "api",
+		GenServer: boolPtr(true),
+		GenClient: boolPtr(true),
 	})
 
 	vdl := `
@@ -115,10 +105,8 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
+	g := New(&configtypes.GoConfig{
+		Output:  "api.go",
 		Package: "api",
 	})
 
@@ -165,10 +153,8 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithConstants(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
+	g := New(&configtypes.GoConfig{
+		Output:  "api.go",
 		Package: "api",
 	})
 
@@ -204,10 +190,8 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
+	g := New(&configtypes.GoConfig{
+		Output:  "api.go",
 		Package: "api",
 	})
 
@@ -239,17 +223,11 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
-		Package: "api",
-		ServerConfig: config.ServerConfig{
-			GenServer: true,
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.GoConfig{
+		Output:    "api.go",
+		Package:   "api",
+		GenServer: boolPtr(true),
+		GenClient: boolPtr(true),
 	})
 
 	vdl := `
@@ -313,17 +291,11 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
-		Package: "api",
-		ServerConfig: config.ServerConfig{
-			GenServer: true,
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.GoConfig{
+		Output:    "api.go",
+		Package:   "api",
+		GenServer: boolPtr(true),
+		GenClient: boolPtr(true),
 	})
 
 	vdl := `
@@ -382,10 +354,8 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
-	g := New(&config.GoConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "api.go",
-		},
+	g := New(&configtypes.GoConfig{
+		Output:  "api.go",
 		Package: "api",
 	})
 

@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateStreamTypes(schema *irtypes.IrSchema, _ *config.TypeScriptConfig) (string, error) {
+func generateStreamTypes(schema *irtypes.IrSchema, _ *configtypes.TypeScriptConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	if len(schema.Streams) > 0 {

@@ -3,11 +3,12 @@ package golang
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateConstants(schema *irtypes.IrSchema, config *config.GoConfig) (string, error) {
-	if !config.ShouldGenConsts() {
+func generateConstants(schema *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+	if !config.ShouldGenConsts(cfg.GenConsts) {
 		return "", nil
 	}
 

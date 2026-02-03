@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	embedplayground "github.com/varavelio/vdl/playground"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
@@ -21,12 +21,12 @@ type File struct {
 
 // Generator implements the playground generator.
 type Generator struct {
-	config          *config.PlaygroundConfig
+	config          *configtypes.PlaygroundConfig
 	formattedSchema string
 }
 
 // New creates a new playground generator with the given config.
-func New(config *config.PlaygroundConfig, formattedSchema string) *Generator {
+func New(config *configtypes.PlaygroundConfig, formattedSchema string) *Generator {
 	return &Generator{
 		config:          config,
 		formattedSchema: formattedSchema,
@@ -77,7 +77,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	}
 
 	// 3. Add config.json if there's configuration to include
-	hasConfig := g.config.DefaultBaseURL != "" || len(g.config.DefaultHeaders) > 0
+	hasConfig := g.config.DefaultBaseUrl != nil || (g.config.DefaultHeaders != nil && len(*g.config.DefaultHeaders) > 0)
 	if hasConfig {
 		configJSON, err := g.generateConfigJSON()
 		if err != nil {
@@ -104,16 +104,24 @@ func (g *Generator) generateConfigJSON() ([]byte, error) {
 		Headers []jsonConfigHeader `json:"headers,omitempty"`
 	}
 
-	headers := make([]jsonConfigHeader, len(g.config.DefaultHeaders))
-	for i, header := range g.config.DefaultHeaders {
-		headers[i] = jsonConfigHeader{
-			Key:   header.Key,
-			Value: header.Value,
+	var headers []jsonConfigHeader
+	if g.config.DefaultHeaders != nil && len(*g.config.DefaultHeaders) > 0 {
+		headers = make([]jsonConfigHeader, len(*g.config.DefaultHeaders))
+		for i, header := range *g.config.DefaultHeaders {
+			headers[i] = jsonConfigHeader{
+				Key:   header.Key,
+				Value: header.Value,
+			}
 		}
 	}
 
+	var baseURL string
+	if g.config.DefaultBaseUrl != nil {
+		baseURL = *g.config.DefaultBaseUrl
+	}
+
 	conf := jsonConfig{
-		BaseURL: g.config.DefaultBaseURL,
+		BaseURL: baseURL,
 		Headers: headers,
 	}
 

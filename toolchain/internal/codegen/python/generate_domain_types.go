@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateDomainTypes(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
+func generateDomainTypes(schema *irtypes.IrSchema, _ *configtypes.PythonConfig) (string, error) {
 	g := gen.New()
 
 	g.Line("def _require_field(name: str, value: Any) -> Any:")

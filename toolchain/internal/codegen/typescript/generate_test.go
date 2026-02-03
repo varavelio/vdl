@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
@@ -14,7 +15,7 @@ import (
 )
 
 func TestGenerator_Name(t *testing.T) {
-	g := New(&config.TypeScriptConfig{})
+	g := New(&configtypes.TypeScriptConfig{})
 	assert.Equal(t, "typescript", g.Name())
 }
 
@@ -40,13 +41,9 @@ func findFile(files []File, name string) string {
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output:    "out",
+		GenClient: configtypes.Ptr(true),
 	})
 
 	schema := parseAndBuildIR(t, "")
@@ -65,10 +62,8 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output: "out",
 	})
 
 	vdl := `
@@ -103,10 +98,8 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithConstants(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output: "out",
 	})
 
 	vdl := `
@@ -133,10 +126,8 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output: "out",
 	})
 
 	vdl := `
@@ -161,13 +152,9 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output:    "out",
+		GenClient: configtypes.Ptr(true),
 	})
 
 	vdl := `
@@ -211,13 +198,9 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: true,
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output:    "out",
+		GenClient: configtypes.Ptr(true),
 	})
 
 	vdl := `
@@ -257,10 +240,8 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output: "out",
 	})
 
 	vdl := `
@@ -445,13 +426,9 @@ func TestConvertPatternToTemplateLiteral(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoClient(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
-		ClientConfig: config.ClientConfig{
-			GenClient: false,
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output:    "out",
+		GenClient: configtypes.Ptr(false),
 	})
 
 	vdl := `
@@ -485,10 +462,8 @@ func TestGenerator_Generate_NoClient(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithDeprecation(t *testing.T) {
-	g := New(&config.TypeScriptConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "out",
-		},
+	g := New(&configtypes.TypeScriptConfig{
+		Output: "out",
 	})
 
 	vdl := `
@@ -516,37 +491,35 @@ func TestGenerator_Generate_WithDeprecation(t *testing.T) {
 func TestGenerator_Generate_ImportExtension(t *testing.T) {
 	tests := []struct {
 		name      string
-		extension string
+		extension *configtypes.TypescriptImportExtension
 		expected  string
 	}{
 		{
 			name:      "none (default)",
-			extension: "",
+			extension: nil,
 			expected:  `from "./core";`,
 		},
 		{
 			name:      "explicit none",
-			extension: "none",
+			extension: configtypes.Ptr(configtypes.TypescriptImportExtensionNone),
 			expected:  `from "./core";`,
 		},
 		{
 			name:      ".js extension",
-			extension: ".js",
+			extension: configtypes.Ptr(configtypes.TypescriptImportExtensionJs),
 			expected:  `from "./core.js";`,
 		},
 		{
 			name:      ".ts extension",
-			extension: ".ts",
+			extension: configtypes.Ptr(configtypes.TypescriptImportExtensionTs),
 			expected:  `from "./core.ts";`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := New(&config.TypeScriptConfig{
-				CommonConfig: config.CommonConfig{
-					Output: "out",
-				},
+			g := New(&configtypes.TypeScriptConfig{
+				Output:          "out",
 				ImportExtension: tt.extension,
 			})
 
@@ -563,10 +536,11 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 			assert.Contains(t, typesContent, "import type { Response }")
 
 			indexContent := findFile(files, "index.ts")
-			if tt.extension == "" || tt.extension == "none" {
+			ext := config.GetImportExtension(tt.extension)
+			if ext == "" || ext == configtypes.TypescriptImportExtensionNone {
 				assert.Contains(t, indexContent, `export * from "./core";`)
 			} else {
-				assert.Contains(t, indexContent, `export * from "./core`+tt.extension+`";`)
+				assert.Contains(t, indexContent, `export * from "./core`+string(ext)+`";`)
 			}
 		})
 	}

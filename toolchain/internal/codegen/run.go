@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
@@ -108,7 +109,7 @@ func Run(configPath string) (int, error) {
 		// We pass the pointer to the config struct directly.
 
 		if target.Go != nil {
-			schema, _, err := getSchema(target.Go.Schema)
+			schema, _, err := getSchema(*target.Go.Schema)
 			if err != nil {
 				return 0, err
 			}
@@ -117,18 +118,18 @@ func Run(configPath string) (int, error) {
 				return 0, fmt.Errorf("target #%d (go): %w", i, err)
 			}
 			totalFiles += count
-		} else if target.TypeScript != nil {
-			schema, _, err := getSchema(target.TypeScript.Schema)
+		} else if target.Typescript != nil {
+			schema, _, err := getSchema(*target.Typescript.Schema)
 			if err != nil {
 				return 0, err
 			}
-			count, err := runTypeScript(ctx, absConfigDir, target.TypeScript, schema)
+			count, err := runTypeScript(ctx, absConfigDir, target.Typescript, schema)
 			if err != nil {
 				return 0, fmt.Errorf("target #%d (typescript): %w", i, err)
 			}
 			totalFiles += count
 		} else if target.Dart != nil {
-			schema, _, err := getSchema(target.Dart.Schema)
+			schema, _, err := getSchema(*target.Dart.Schema)
 			if err != nil {
 				return 0, err
 			}
@@ -138,7 +139,7 @@ func Run(configPath string) (int, error) {
 			}
 			totalFiles += count
 		} else if target.Python != nil {
-			schema, _, err := getSchema(target.Python.Schema)
+			schema, _, err := getSchema(*target.Python.Schema)
 			if err != nil {
 				return 0, err
 			}
@@ -147,28 +148,28 @@ func Run(configPath string) (int, error) {
 				return 0, fmt.Errorf("target #%d (python): %w", i, err)
 			}
 			totalFiles += count
-		} else if target.JSONSchema != nil {
-			schema, _, err := getSchema(target.JSONSchema.Schema)
+		} else if target.Jsonschema != nil {
+			schema, _, err := getSchema(*target.Jsonschema.Schema)
 			if err != nil {
 				return 0, err
 			}
-			count, err := runJSONSchema(ctx, absConfigDir, target.JSONSchema, schema)
+			count, err := runJSONSchema(ctx, absConfigDir, target.Jsonschema, schema)
 			if err != nil {
 				return 0, fmt.Errorf("target #%d (jsonschema): %w", i, err)
 			}
 			totalFiles += count
-		} else if target.OpenAPI != nil {
-			schema, _, err := getSchema(target.OpenAPI.Schema)
+		} else if target.Openapi != nil {
+			schema, _, err := getSchema(*target.Openapi.Schema)
 			if err != nil {
 				return 0, err
 			}
-			count, err := runOpenAPI(ctx, absConfigDir, target.OpenAPI, schema)
+			count, err := runOpenAPI(ctx, absConfigDir, target.Openapi, schema)
 			if err != nil {
 				return 0, fmt.Errorf("target #%d (openapi): %w", i, err)
 			}
 			totalFiles += count
 		} else if target.Playground != nil {
-			schema, program, err := getSchema(target.Playground.Schema)
+			schema, program, err := getSchema(*target.Playground.Schema)
 			if err != nil {
 				return 0, err
 			}
@@ -181,7 +182,7 @@ func Run(configPath string) (int, error) {
 			}
 			totalFiles += count
 		} else if target.Plugin != nil {
-			schema, _, err := getSchema(target.Plugin.Schema)
+			schema, _, err := getSchema(*target.Plugin.Schema)
 			if err != nil {
 				return 0, err
 			}
@@ -196,9 +197,9 @@ func Run(configPath string) (int, error) {
 	return totalFiles, nil
 }
 
-func runPlugin(ctx context.Context, absConfigDir string, cfg *config.PluginConfig, schema *irtypes.IrSchema) (int, error) {
+func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.PluginConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -219,9 +220,9 @@ func runPlugin(ctx context.Context, absConfigDir string, cfg *config.PluginConfi
 	return len(generatedFiles), nil
 }
 
-func runOpenAPI(ctx context.Context, absConfigDir string, cfg *config.OpenAPIConfig, schema *irtypes.IrSchema) (int, error) {
+func runOpenAPI(ctx context.Context, absConfigDir string, cfg *configtypes.OpenApiConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -242,9 +243,9 @@ func runOpenAPI(ctx context.Context, absConfigDir string, cfg *config.OpenAPICon
 	return len(generatedFiles), nil
 }
 
-func runPlayground(ctx context.Context, absConfigDir string, cfg *config.PlaygroundConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
+func runPlayground(ctx context.Context, absConfigDir string, cfg *configtypes.PlaygroundConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -263,16 +264,15 @@ func runPlayground(ctx context.Context, absConfigDir string, cfg *config.Playgro
 	}
 
 	// Generate the openapi.yaml file for the playground
-	openAPIConfig := &config.OpenAPIConfig{
-		CommonConfig: config.CommonConfig{
-			Output: cfg.Output,
-			Schema: cfg.Schema,
-			Clean:  false, // Don't clean again, we already cleaned above
-		},
-		Filename: "openapi.yaml",
+	filename := "openapi.yaml"
+	openAPIConfig := &configtypes.OpenApiConfig{
+		Output:   cfg.Output,
+		Schema:   cfg.Schema,
+		Clean:    nil, // Don't clean again, we already cleaned above
+		Filename: &filename,
 		Title:    "VDL API",
 		Version:  "1.0.0",
-		BaseURL:  cfg.DefaultBaseURL,
+		BaseUrl:  cfg.DefaultBaseUrl,
 	}
 
 	openAPICount, err := runOpenAPI(ctx, absConfigDir, openAPIConfig, schema)
@@ -283,9 +283,9 @@ func runPlayground(ctx context.Context, absConfigDir string, cfg *config.Playgro
 	return len(generatedFiles) + openAPICount, nil
 }
 
-func runGolang(ctx context.Context, absConfigDir string, cfg *config.GoConfig, schema *irtypes.IrSchema) (int, error) {
+func runGolang(ctx context.Context, absConfigDir string, cfg *configtypes.GoConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -306,9 +306,9 @@ func runGolang(ctx context.Context, absConfigDir string, cfg *config.GoConfig, s
 	return len(generatedFiles), nil
 }
 
-func runTypeScript(ctx context.Context, absConfigDir string, cfg *config.TypeScriptConfig, schema *irtypes.IrSchema) (int, error) {
+func runTypeScript(ctx context.Context, absConfigDir string, cfg *configtypes.TypeScriptConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -329,9 +329,9 @@ func runTypeScript(ctx context.Context, absConfigDir string, cfg *config.TypeScr
 	return len(generatedFiles), nil
 }
 
-func runDart(ctx context.Context, absConfigDir string, cfg *config.DartConfig, schema *irtypes.IrSchema) (int, error) {
+func runDart(ctx context.Context, absConfigDir string, cfg *configtypes.DartConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -352,9 +352,9 @@ func runDart(ctx context.Context, absConfigDir string, cfg *config.DartConfig, s
 	return len(generatedFiles), nil
 }
 
-func runPython(ctx context.Context, absConfigDir string, cfg *config.PythonConfig, schema *irtypes.IrSchema) (int, error) {
+func runPython(ctx context.Context, absConfigDir string, cfg *configtypes.PythonConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 
@@ -375,9 +375,9 @@ func runPython(ctx context.Context, absConfigDir string, cfg *config.PythonConfi
 	return len(generatedFiles), nil
 }
 
-func runJSONSchema(ctx context.Context, absConfigDir string, cfg *config.JSONSchemaConfig, schema *irtypes.IrSchema) (int, error) {
+func runJSONSchema(ctx context.Context, absConfigDir string, cfg *configtypes.JsonSchemaConfig, schema *irtypes.IrSchema) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
-	if err := prepareOutputDir(outputDir, cfg.Clean); err != nil {
+	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
 	}
 

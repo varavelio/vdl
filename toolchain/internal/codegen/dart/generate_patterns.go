@@ -6,12 +6,13 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generatePatterns generates Dart pattern template functions.
-func generatePatterns(schema *irtypes.IrSchema, config *config.DartConfig) (string, error) {
-	if !config.ShouldGenPatterns() {
+func generatePatterns(schema *irtypes.IrSchema, cfg *configtypes.DartConfig) (string, error) {
+	if !config.ShouldGenPatterns(cfg.GenPatterns) {
 		return "", nil
 	}
 

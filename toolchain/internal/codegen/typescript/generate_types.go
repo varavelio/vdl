@@ -4,11 +4,11 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateTypes(schema *irtypes.IrSchema, cfg *config.TypeScriptConfig) (string, error) {
+func generateTypes(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	if len(schema.Procedures) > 0 || len(schema.Streams) > 0 {
@@ -17,7 +17,7 @@ func generateTypes(schema *irtypes.IrSchema, cfg *config.TypeScriptConfig) (stri
 	g.Break()
 
 	// Helper to append content if not empty
-	appendContent := func(g *gen.Generator, genFunc func(*irtypes.IrSchema, *config.TypeScriptConfig) (string, error)) error {
+	appendContent := func(g *gen.Generator, genFunc func(*irtypes.IrSchema, *configtypes.TypeScriptConfig) (string, error)) error {
 		content, err := genFunc(schema, cfg)
 		if err != nil {
 			return err

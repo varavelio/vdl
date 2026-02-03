@@ -7,6 +7,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
@@ -20,11 +21,11 @@ type File struct {
 
 // Generator implements the Python code generator.
 type Generator struct {
-	config *config.PythonConfig
+	config *configtypes.PythonConfig
 }
 
 // New creates a new Python generator with the given config.
-func New(config *config.PythonConfig) *Generator {
+func New(config *configtypes.PythonConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -63,7 +64,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	})
 
 	// constants.py - Constants (if enabled and any exist)
-	if g.config.ShouldGenConsts() && len(schema.Constants) > 0 {
+	if config.ShouldGenConsts(g.config.GenConsts) && len(schema.Constants) > 0 {
 		constantsContent := g.generateConstantsFile(schema)
 		files = append(files, File{
 			RelativePath: "constants.py",
@@ -72,7 +73,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	}
 
 	// patterns.py - Pattern functions (if enabled and any exist)
-	if g.config.ShouldGenPatterns() && len(schema.Patterns) > 0 {
+	if config.ShouldGenPatterns(g.config.GenPatterns) && len(schema.Patterns) > 0 {
 		patternsContent := g.generatePatternsFile(schema)
 		files = append(files, File{
 			RelativePath: "patterns.py",
@@ -212,12 +213,12 @@ func (g *Generator) generateIndexFile(schema *irtypes.IrSchema) string {
 	builder.Line("from .core import *")
 
 	// Constants
-	if g.config.ShouldGenConsts() && len(schema.Constants) > 0 {
+	if config.ShouldGenConsts(g.config.GenConsts) && len(schema.Constants) > 0 {
 		builder.Line("from .constants import *")
 	}
 
 	// Patterns
-	if g.config.ShouldGenPatterns() && len(schema.Patterns) > 0 {
+	if config.ShouldGenPatterns(g.config.GenPatterns) && len(schema.Patterns) > 0 {
 		builder.Line("from .patterns import *")
 	}
 

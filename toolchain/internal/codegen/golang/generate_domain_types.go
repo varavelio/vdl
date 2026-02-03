@@ -2,11 +2,11 @@ package golang
 
 import (
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateDomainTypes(schema *irtypes.IrSchema, _ *config.GoConfig) (string, error) {
+func generateDomainTypes(schema *irtypes.IrSchema, _ *configtypes.GoConfig) (string, error) {
 	if len(schema.Types) == 0 {
 		return "", nil
 	}

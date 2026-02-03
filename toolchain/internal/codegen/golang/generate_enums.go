@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateEnums(schema *irtypes.IrSchema, config *config.GoConfig) (string, error) {
+func generateEnums(schema *irtypes.IrSchema, config *configtypes.GoConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}

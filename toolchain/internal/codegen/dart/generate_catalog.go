@@ -2,12 +2,12 @@ package dart
 
 import (
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateRPCCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateRPCCatalog(schema *irtypes.IrSchema, _ *config.DartConfig) (string, error) {
+func generateRPCCatalog(schema *irtypes.IrSchema, _ *configtypes.DartConfig) (string, error) {
 	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}

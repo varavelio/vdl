@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"golang.org/x/tools/imports"
 )
@@ -18,11 +18,11 @@ type File struct {
 
 // Generator implements the Go code generator.
 type Generator struct {
-	config *config.GoConfig
+	config *configtypes.GoConfig
 }
 
 // New creates a new Go generator with the given config.
-func New(config *config.GoConfig) *Generator {
+func New(config *configtypes.GoConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -76,7 +76,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 
 	// Types (types.go) - Domain types
 	// Contains: Enums, Domain Types, Procedure Types, Stream Types
-	typeGenerators := []func(*irtypes.IrSchema, *config.GoConfig) (string, error){
+	typeGenerators := []func(*irtypes.IrSchema, *configtypes.GoConfig) (string, error){
 		generateEnums,
 		generateDomainTypes,
 		generateProcedureTypes,

@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
@@ -41,8 +41,9 @@ func TestGenerate_Golden(t *testing.T) {
 			schema := ir.FromProgram(program)
 
 			// Generate JSON Schema
-			gen := New(&config.JSONSchemaConfig{
-				Filename: "schema.json",
+			filename := "schema.json"
+			gen := New(&configtypes.JsonSchemaConfig{
+				Filename: &filename,
 			})
 
 			files, err := gen.Generate(context.Background(), schema)
@@ -75,14 +76,16 @@ func TestGenerate_Golden(t *testing.T) {
 }
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&config.JSONSchemaConfig{})
+	gen := New(&configtypes.JsonSchemaConfig{})
 	assert.Equal(t, "jsonschema", gen.Name())
 }
 
 func TestGenerator_Generate(t *testing.T) {
-	gen := New(&config.JSONSchemaConfig{
-		ID:       "https://example.com/schema.json",
-		Filename: "test.json",
+	id := "https://example.com/schema.json"
+	filename := "test.json"
+	gen := New(&configtypes.JsonSchemaConfig{
+		Id:       &id,
+		Filename: &filename,
 	})
 
 	primString := irtypes.PrimitiveTypeString

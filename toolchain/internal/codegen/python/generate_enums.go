@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateEnums(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
+func generateEnums(schema *irtypes.IrSchema, _ *configtypes.PythonConfig) (string, error) {
 	g := gen.New()
 
 	for _, e := range schema.Enums {

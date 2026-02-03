@@ -7,6 +7,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
@@ -20,11 +21,11 @@ type File struct {
 
 // Generator implements the TypeScript code generator.
 type Generator struct {
-	config *config.TypeScriptConfig
+	config *configtypes.TypeScriptConfig
 }
 
 // New creates a new TypeScript generator with the given config.
-func New(config *config.TypeScriptConfig) *Generator {
+func New(config *configtypes.TypeScriptConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -111,7 +112,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	}
 
 	// client.ts
-	if g.config.GenClient && len(schema.Rpcs) > 0 {
+	if config.ShouldGenClient(g.config.GenClient) && len(schema.Rpcs) > 0 {
 		clientContent, err := generateClient(schema, g.config)
 		if err != nil {
 			return nil, err
@@ -120,7 +121,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	}
 
 	// server.ts
-	if g.config.GenServer && len(schema.Rpcs) > 0 {
+	if config.ShouldGenServer(g.config.GenServer) && len(schema.Rpcs) > 0 {
 		serverContent, err := generateServer(schema, g.config)
 		if err != nil {
 			return nil, err
@@ -155,10 +156,10 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	if strings.TrimSpace(catalogContent) != "" {
 		indexBuilder.Line(generateExportAll("./catalog", g.config))
 	}
-	if g.config.GenClient && len(schema.Rpcs) > 0 {
+	if config.ShouldGenClient(g.config.GenClient) && len(schema.Rpcs) > 0 {
 		indexBuilder.Line(generateExportAll("./client", g.config))
 	}
-	if g.config.GenServer && len(schema.Rpcs) > 0 {
+	if config.ShouldGenServer(g.config.GenServer) && len(schema.Rpcs) > 0 {
 		indexBuilder.Line(generateExportAll("./server", g.config))
 	}
 	addFile("index.ts", []byte(indexBuilder.String()))

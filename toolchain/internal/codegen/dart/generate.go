@@ -7,6 +7,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
@@ -20,11 +21,11 @@ type File struct {
 
 // Generator implements the Dart code generator.
 type Generator struct {
-	config *config.DartConfig
+	config *configtypes.DartConfig
 }
 
 // New creates a new Dart generator with the given config.
-func New(config *config.DartConfig) *Generator {
+func New(config *configtypes.DartConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -56,7 +57,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	})
 
 	// constants.dart - Constants (if enabled and any exist)
-	if g.config.ShouldGenConsts() && len(schema.Constants) > 0 {
+	if config.ShouldGenConsts(g.config.GenConsts) && len(schema.Constants) > 0 {
 		constantsContent := g.generateConstantsFile(schema)
 		files = append(files, File{
 			RelativePath: "constants.dart",
@@ -65,7 +66,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	}
 
 	// patterns.dart - Pattern functions (if enabled and any exist)
-	if g.config.ShouldGenPatterns() && len(schema.Patterns) > 0 {
+	if config.ShouldGenPatterns(g.config.GenPatterns) && len(schema.Patterns) > 0 {
 		patternsContent := g.generatePatternsFile(schema)
 		files = append(files, File{
 			RelativePath: "patterns.dart",
@@ -217,11 +218,11 @@ func (g *Generator) generateIndexFile(schema *irtypes.IrSchema) string {
 	builder.Line("export 'core.dart';")
 
 	// Conditionally export other files
-	if g.config.ShouldGenConsts() && len(schema.Constants) > 0 {
+	if config.ShouldGenConsts(g.config.GenConsts) && len(schema.Constants) > 0 {
 		builder.Line("export 'constants.dart';")
 	}
 
-	if g.config.ShouldGenPatterns() && len(schema.Patterns) > 0 {
+	if config.ShouldGenPatterns(g.config.GenPatterns) && len(schema.Patterns) > 0 {
 		builder.Line("export 'patterns.dart';")
 	}
 

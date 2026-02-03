@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
@@ -21,11 +21,11 @@ type GeneratedFile struct {
 
 // Generator implements codegen.Generator for external plugins.
 type Generator struct {
-	config *config.PluginConfig
+	config *configtypes.PluginConfig
 }
 
 // New creates a new PluginGenerator.
-func New(config *config.PluginConfig) *Generator {
+func New(config *configtypes.PluginConfig) *Generator {
 	return &Generator{
 		config: config,
 	}
@@ -62,10 +62,19 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]G
 		return nil, fmt.Errorf("failed to start plugin command: %w", err)
 	}
 
+	// Prepare options - convert map[string]string to map[string]any for JSON output
+	var options map[string]any
+	if g.config.Options != nil {
+		options = make(map[string]any)
+		for k, v := range *g.config.Options {
+			options[k] = v
+		}
+	}
+
 	// Prepare input
 	input := Input{
 		IR:      schema,
-		Options: g.config.Options,
+		Options: options,
 	}
 
 	// Write input to stdin in a goroutine to avoid deadlock if plugin reads slowly

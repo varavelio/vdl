@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"gopkg.in/yaml.v3"
 )
@@ -21,11 +21,11 @@ type File struct {
 
 // Generator implements the OpenAPI generator.
 type Generator struct {
-	config *config.OpenAPIConfig
+	config *configtypes.OpenApiConfig
 }
 
 // New creates a new OpenAPI generator with the given config.
-func New(config *config.OpenAPIConfig) *Generator {
+func New(config *configtypes.OpenApiConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -48,16 +48,8 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	spec := Spec{
 		OpenAPI: "3.0.0",
 		Info: Info{
-			Title:       cfg.Title,
-			Version:     cfg.Version,
-			Description: cfg.Description,
-			Contact: InfoContact{
-				Name:  cfg.ContactName,
-				Email: cfg.ContactEmail,
-			},
-			License: InfoLicense{
-				Name: cfg.LicenseName,
-			},
+			Title:   cfg.Title,
+			Version: cfg.Version,
 		},
 		Security: []map[string][]string{
 			{
@@ -66,10 +58,23 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 		},
 	}
 
-	if cfg.BaseURL != "" {
+	// Set optional Info fields
+	if cfg.Description != nil {
+		spec.Info.Description = *cfg.Description
+	}
+	if cfg.ContactName != nil {
+		spec.Info.Contact.Name = *cfg.ContactName
+	}
+	if cfg.ContactEmail != nil {
+		spec.Info.Contact.Email = *cfg.ContactEmail
+	}
+	if cfg.LicenseName != nil {
+		spec.Info.License.Name = *cfg.LicenseName
+	}
+	if cfg.BaseUrl != nil && *cfg.BaseUrl != "" {
 		spec.Servers = []Server{
 			{
-				URL: cfg.BaseURL,
+				URL: *cfg.BaseUrl,
 			},
 		}
 	}
@@ -89,10 +94,7 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 		return nil, fmt.Errorf("failed to generate spec file: %w", err)
 	}
 
-	filename := cfg.Filename
-	if filename == "" {
-		filename = "openapi.yaml"
-	}
+	filename := cfg.GetFilenameOr("openapi.yaml")
 
 	return []File{
 		{
@@ -158,11 +160,8 @@ func generateTags(schema *irtypes.IrSchema) []Tag {
 	return tags
 }
 
-func encodeSpec(spec Spec, cfg *config.OpenAPIConfig) (string, error) {
-	filename := cfg.Filename
-	if filename == "" {
-		filename = "openapi.yaml"
-	}
+func encodeSpec(spec Spec, cfg *configtypes.OpenApiConfig) (string, error) {
+	filename := cfg.GetFilenameOr("openapi.yaml")
 
 	isYAML := strings.HasSuffix(filename, ".yaml") || strings.HasSuffix(filename, ".yml")
 	var buf bytes.Buffer

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
@@ -53,12 +53,12 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenServer:   true,
 		})
 
-		gen := golang.New(&config.GoConfig{
-			Package:        cfg.Package,
-			ServerConfig:   config.ServerConfig{GenServer: cfg.GenServer},
-			ClientConfig:   config.ClientConfig{GenClient: cfg.GenClient},
-			PatternsConfig: config.PatternsConfig{GenPatterns: &cfg.GenPatterns},
-			ConstsConfig:   config.ConstsConfig{GenConsts: &cfg.GenConsts},
+		gen := golang.New(&configtypes.GoConfig{
+			Package:     cfg.Package,
+			GenServer:   configtypes.Ptr(cfg.GenServer),
+			GenClient:   configtypes.Ptr(cfg.GenClient),
+			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
+			GenConsts:   configtypes.Ptr(cfg.GenConsts),
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -82,12 +82,13 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenServer:       true,
 		})
 
-		gen := typescript.New(&config.TypeScriptConfig{
-			ImportExtension: cfg.ImportExtension.String(),
-			ServerConfig:    config.ServerConfig{GenServer: cfg.GenServer},
-			ClientConfig:    config.ClientConfig{GenClient: cfg.GenClient},
-			PatternsConfig:  config.PatternsConfig{GenPatterns: &cfg.GenPatterns},
-			ConstsConfig:    config.ConstsConfig{GenConsts: &cfg.GenConsts},
+		importExt := configtypes.TypescriptImportExtension(cfg.ImportExtension.String())
+		gen := typescript.New(&configtypes.TypeScriptConfig{
+			ImportExtension: &importExt,
+			GenServer:       configtypes.Ptr(cfg.GenServer),
+			GenClient:       configtypes.Ptr(cfg.GenClient),
+			GenPatterns:     configtypes.Ptr(cfg.GenPatterns),
+			GenConsts:       configtypes.Ptr(cfg.GenConsts),
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -108,9 +109,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenConsts:   true,
 		})
 
-		gen := dart.New(&config.DartConfig{
-			PatternsConfig: config.PatternsConfig{GenPatterns: &cfg.GenPatterns},
-			ConstsConfig:   config.ConstsConfig{GenConsts: &cfg.GenConsts},
+		gen := dart.New(&configtypes.DartConfig{
+			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
+			GenConsts:   configtypes.Ptr(cfg.GenConsts),
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -131,9 +132,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenConsts:   true,
 		})
 
-		gen := python.New(&config.PythonConfig{
-			PatternsConfig: config.PatternsConfig{GenPatterns: &cfg.GenPatterns},
-			ConstsConfig:   config.ConstsConfig{GenConsts: &cfg.GenConsts},
+		gen := python.New(&configtypes.PythonConfig{
+			GenPatterns: configtypes.Ptr(cfg.GenPatterns),
+			GenConsts:   configtypes.Ptr(cfg.GenConsts),
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -154,15 +155,15 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			Version: "1.0.0",
 		})
 
-		gen := openapi.New(&config.OpenAPIConfig{
+		gen := openapi.New(&configtypes.OpenApiConfig{
 			Title:        cfg.Title,
 			Version:      cfg.Version,
-			Description:  cfg.GetDescription(),
-			BaseURL:      cfg.GetBaseUrl(),
-			ContactName:  cfg.GetContactName(),
-			ContactEmail: cfg.GetContactEmail(),
-			LicenseName:  cfg.GetLicenseName(),
-			Filename:     "openapi.yaml",
+			Description:  configtypes.Ptr(cfg.GetDescription()),
+			BaseUrl:      configtypes.Ptr(cfg.GetBaseUrl()),
+			ContactName:  configtypes.Ptr(cfg.GetContactName()),
+			ContactEmail: configtypes.Ptr(cfg.GetContactEmail()),
+			LicenseName:  configtypes.Ptr(cfg.GetLicenseName()),
+			Filename:     configtypes.Ptr("openapi.yaml"),
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
@@ -180,9 +181,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 	case wasmtypes.CodegenTargetJsonSchema:
 		cfg := input.GetJsonSchemaConfigOr(wasmtypes.CodegenInputJsonSchemaConfig{})
 
-		gen := jsonschema.New(&config.JSONSchemaConfig{
-			ID:       cfg.SchemaId,
-			Filename: "schema.json",
+		gen := jsonschema.New(&configtypes.JsonSchemaConfig{
+			Id:       configtypes.Ptr(cfg.SchemaId),
+			Filename: configtypes.Ptr("schema.json"),
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)

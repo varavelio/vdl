@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
@@ -19,11 +19,11 @@ type File struct {
 
 // Generator implements the JSON Schema generator.
 type Generator struct {
-	config *config.JSONSchemaConfig
+	config *configtypes.JsonSchemaConfig
 }
 
 // New creates a new JSON Schema generator with the given config.
-func New(config *config.JSONSchemaConfig) *Generator {
+func New(config *configtypes.JsonSchemaConfig) *Generator {
 	return &Generator{config: config}
 }
 
@@ -42,8 +42,8 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 		"$defs":   map[string]any{},
 	}
 
-	if cfg.ID != "" {
-		root["$id"] = cfg.ID
+	if cfg.Id != nil && *cfg.Id != "" {
+		root["$id"] = *cfg.Id
 	}
 
 	definitions := root["$defs"].(map[string]any)
@@ -86,13 +86,14 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 	}
 
 	filename := cfg.Filename
-	if filename == "" {
-		filename = "schema.json"
+	if filename == nil || *filename == "" {
+		defaultFilename := "schema.json"
+		filename = &defaultFilename
 	}
 
 	return []File{
 		{
-			RelativePath: filename,
+			RelativePath: *filename,
 			Content:      content,
 		},
 	}, nil

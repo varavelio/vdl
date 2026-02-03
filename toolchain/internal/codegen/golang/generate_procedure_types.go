@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateProcedureTypes(schema *irtypes.IrSchema, _ *config.GoConfig) (string, error) {
+func generateProcedureTypes(schema *irtypes.IrSchema, _ *configtypes.GoConfig) (string, error) {
 	if len(schema.Procedures) == 0 {
 		return "", nil
 	}

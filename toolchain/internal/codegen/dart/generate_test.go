@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestGenerator_Name(t *testing.T) {
-	g := New(&config.DartConfig{})
+	g := New(&configtypes.DartConfig{})
 	assert.Equal(t, "dart", g.Name())
 }
 
@@ -40,10 +40,8 @@ func findFileContent(files []File, name string) string {
 }
 
 func TestGenerator_Generate_Empty(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	schema := parseAndBuildIR(t, "")
@@ -65,10 +63,8 @@ func TestGenerator_Generate_Empty(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithTypes(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -111,10 +107,8 @@ func TestGenerator_Generate_WithTypes(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithEnums(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -159,10 +153,8 @@ func TestGenerator_Generate_WithEnums(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithConstants(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -190,10 +182,8 @@ func TestGenerator_Generate_WithConstants(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithPatterns(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -219,10 +209,8 @@ func TestGenerator_Generate_WithPatterns(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithProcedures(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -263,10 +251,8 @@ func TestGenerator_Generate_WithProcedures(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithStreams(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -302,10 +288,8 @@ func TestGenerator_Generate_WithStreams(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -350,10 +334,8 @@ func TestGenerator_Generate_WithComplexTypes(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithRPCCatalog(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -412,10 +394,8 @@ func TestGenerator_Generate_WithRPCCatalog(t *testing.T) {
 }
 
 func TestGenerator_Generate_WithEnumInType(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -448,10 +428,8 @@ func TestGenerator_Generate_WithEnumInType(t *testing.T) {
 }
 
 func TestGenerator_Generate_MultipleFiles(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	vdl := `
@@ -496,10 +474,8 @@ func TestGenerator_Generate_MultipleFiles(t *testing.T) {
 }
 
 func TestGenerator_Generate_FileHeader(t *testing.T) {
-	g := New(&config.DartConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "output",
-		},
+	g := New(&configtypes.DartConfig{
+		Output: "output",
 	})
 
 	schema := parseAndBuildIR(t, "type User { id: string }")

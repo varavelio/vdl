@@ -2,12 +2,12 @@ package typescript
 
 import (
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateCatalog(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
+func generateCatalog(schema *irtypes.IrSchema, config *configtypes.TypeScriptConfig) (string, error) {
 	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}

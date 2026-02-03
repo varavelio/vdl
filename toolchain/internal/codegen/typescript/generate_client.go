@@ -6,6 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -13,8 +14,8 @@ import (
 //go:embed pieces/client.ts
 var clientRawPiece string
 
-func generateClient(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
-	if !config.GenClient {
+func generateClient(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+	if !config.ShouldGenClient(cfg.GenClient) {
 		return "", nil
 	}
 
@@ -25,10 +26,10 @@ func generateClient(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (
 
 	g := gen.New().WithSpaces(2)
 
-	generateImport(g, []string{"Response", "OperationType", "OperationDefinition"}, "./core", true, config)
-	generateImport(g, []string{"VdlError", "asError", "sleep"}, "./core", false, config)
-	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, config)
-	generateImportAll(g, "vdlTypes", "./types", config)
+	generateImport(g, []string{"Response", "OperationType", "OperationDefinition"}, "./core", true, cfg)
+	generateImport(g, []string{"VdlError", "asError", "sleep"}, "./core", false, cfg)
+	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, cfg)
+	generateImportAll(g, "vdlTypes", "./types", cfg)
 	g.Break()
 
 	g.Raw(piece)

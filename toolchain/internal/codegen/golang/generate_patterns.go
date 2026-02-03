@@ -5,11 +5,12 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generatePatterns(schema *irtypes.IrSchema, config *config.GoConfig) (string, error) {
-	if !config.ShouldGenPatterns() {
+func generatePatterns(schema *irtypes.IrSchema, cfg *configtypes.GoConfig) (string, error) {
+	if !config.ShouldGenPatterns(cfg.GenPatterns) {
 		return "", nil
 	}
 

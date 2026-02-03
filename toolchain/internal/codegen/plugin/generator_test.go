@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
@@ -49,15 +49,12 @@ json.dump(output, sys.stdout)
 		Rpcs: []irtypes.RpcDef{},
 	}
 
-	// Create configuration
-	cfg := &config.PluginConfig{
+	// Create configuration with options as map[string]string
+	options := map[string]string{"prefix": "TEST"}
+	cfg := &configtypes.PluginConfig{
+		Output:  tmpDir,
 		Command: []string{"python3", pluginScript},
-		Options: map[string]any{
-			"prefix": "TEST",
-		},
-		CommonConfig: config.CommonConfig{
-			Output: tmpDir, // Not used by Generator directly but passed in context
-		},
+		Options: &options,
 	}
 
 	// Run generator

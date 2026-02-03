@@ -6,6 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
@@ -14,20 +15,20 @@ import (
 var serverRawPiece string
 
 // generateServer generates the complete server implementation.
-func generateServer(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
-	if !config.GenServer {
+func generateServer(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
 
 	g := gen.New().WithSpaces(2)
 
-	generateImport(g, []string{"Response", "OperationDefinition", "OperationType"}, "./core", true, config)
-	generateImport(g, []string{"VdlError", "asError"}, "./core", false, config)
-	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, config)
-	generateImportAll(g, "vdlTypes", "./types", config)
+	generateImport(g, []string{"Response", "OperationDefinition", "OperationType"}, "./core", true, cfg)
+	generateImport(g, []string{"VdlError", "asError"}, "./core", false, cfg)
+	generateImport(g, []string{"VDLProcedures", "VDLStreams"}, "./catalog", false, cfg)
+	generateImportAll(g, "vdlTypes", "./types", cfg)
 	g.Break()
 
-	core, err := generateServerCore(schema, config)
+	core, err := generateServerCore(schema, cfg)
 	if err != nil {
 		return "", err
 	}
@@ -35,7 +36,7 @@ func generateServer(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (
 	g.Break()
 
 	for _, rpc := range schema.Rpcs {
-		rpcCode, err := generateServerRPC(rpc, schema, config)
+		rpcCode, err := generateServerRPC(rpc, schema, cfg)
 		if err != nil {
 			return "", err
 		}
@@ -47,8 +48,8 @@ func generateServer(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (
 }
 
 // generateServerCore generates the core server implementation (server.ts).
-func generateServerCore(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
-	if !config.GenServer {
+func generateServerCore(schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
 
@@ -186,8 +187,8 @@ func generateServerCore(schema *irtypes.IrSchema, config *config.TypeScriptConfi
 }
 
 // generateServerRPC generates the server implementation for a specific RPC.
-func generateServerRPC(rpc irtypes.RpcDef, schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
-	if !config.GenServer {
+func generateServerRPC(rpc irtypes.RpcDef, schema *irtypes.IrSchema, cfg *configtypes.TypeScriptConfig) (string, error) {
+	if !config.ShouldGenServer(cfg.GenServer) {
 		return "", nil
 	}
 

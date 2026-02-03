@@ -6,20 +6,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&config.PlaygroundConfig{}, "")
+	gen := New(&configtypes.PlaygroundConfig{}, "")
 	assert.Equal(t, "playground", gen.Name())
 }
 
 func TestGenerator_Generate_BasicFiles(t *testing.T) {
-	gen := New(&config.PlaygroundConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "dist",
-		},
+	gen := New(&configtypes.PlaygroundConfig{
+		Output: "dist",
 	}, "")
 
 	schema := &irtypes.IrSchema{
@@ -54,10 +52,8 @@ rpc Users {
 }
 `
 
-	gen := New(&config.PlaygroundConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "dist",
-		},
+	gen := New(&configtypes.PlaygroundConfig{
+		Output: "dist",
 	}, schemaSource)
 
 	schema := &irtypes.IrSchema{}
@@ -79,18 +75,15 @@ rpc Users {
 }
 
 func TestGenerator_Generate_WithConfig(t *testing.T) {
-	gen := New(&config.PlaygroundConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "dist",
-		},
-		DefaultBaseURL: "https://api.example.com",
-		DefaultHeaders: []struct {
-			Key   string `yaml:"key" json:"key"`
-			Value string `yaml:"value" json:"value"`
-		}{
-			{Key: "Authorization", Value: "Bearer token"},
-			{Key: "X-Custom", Value: "value"},
-		},
+	baseUrl := "https://api.example.com"
+	headers := []configtypes.PlaygroundHeader{
+		{Key: "Authorization", Value: "Bearer token"},
+		{Key: "X-Custom", Value: "value"},
+	}
+	gen := New(&configtypes.PlaygroundConfig{
+		Output:         "dist",
+		DefaultBaseUrl: &baseUrl,
+		DefaultHeaders: &headers,
 	}, "")
 
 	schema := &irtypes.IrSchema{}
@@ -118,10 +111,8 @@ func TestGenerator_Generate_WithConfig(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
-	gen := New(&config.PlaygroundConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "dist",
-		},
+	gen := New(&configtypes.PlaygroundConfig{
+		Output: "dist",
 		// No base URL or headers
 	}, "")
 
@@ -137,10 +128,8 @@ func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
 }
 
 func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
-	gen := New(&config.PlaygroundConfig{
-		CommonConfig: config.CommonConfig{
-			Output: "dist",
-		},
+	gen := New(&configtypes.PlaygroundConfig{
+		Output: "dist",
 	}, "")
 
 	schema := &irtypes.IrSchema{}
@@ -155,14 +144,13 @@ func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
 }
 
 func TestGenerateConfigJSON(t *testing.T) {
-	gen := New(&config.PlaygroundConfig{
-		DefaultBaseURL: "https://api.test.com",
-		DefaultHeaders: []struct {
-			Key   string `yaml:"key" json:"key"`
-			Value string `yaml:"value" json:"value"`
-		}{
-			{Key: "Content-Type", Value: "application/json"},
-		},
+	baseUrl := "https://api.test.com"
+	headers := []configtypes.PlaygroundHeader{
+		{Key: "Content-Type", Value: "application/json"},
+	}
+	gen := New(&configtypes.PlaygroundConfig{
+		DefaultBaseUrl: &baseUrl,
+		DefaultHeaders: &headers,
 	}, "")
 
 	jsonBytes, err := gen.generateConfigJSON()

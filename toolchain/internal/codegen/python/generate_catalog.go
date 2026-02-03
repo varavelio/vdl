@@ -2,12 +2,12 @@ package python
 
 import (
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateRPCCatalog(schema *irtypes.IrSchema, _ *config.PythonConfig) (string, error) {
+func generateRPCCatalog(schema *irtypes.IrSchema, _ *configtypes.PythonConfig) (string, error) {
 	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}
