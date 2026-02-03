@@ -15,6 +15,10 @@ temp/
 immutable/
 _app/
 
+# Astro
+.astro/
+_astro/
+
 # Generated JSON schemas
 *.schema.json
 
