@@ -20,15 +20,11 @@ def main():
     if actual_args != expected_args:
         errors.append(f"Expected args {expected_args}, got {actual_args}")
     
-    # Validate options from vdl.yaml
+    # Validate options from vdl.yaml (flat key-value)
     options = input_data.get("options", {})
     
     if options.get("target") != "client":
         errors.append(f"Expected options.target='client', got {options.get('target')}")
-    
-    expected_features = ["streaming", "validation"]
-    if options.get("features") != expected_features:
-        errors.append(f"Expected options.features={expected_features}, got {options.get('features')}")
     
     if errors:
         for err in errors:

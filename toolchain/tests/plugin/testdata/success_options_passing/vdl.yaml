@@ -7,9 +7,3 @@ targets:
       options:
         language: python
         version: "3.11"
-        features:
-          - async
-          - dataclasses
-        config:
-          indent: 4
-          use_slots: true

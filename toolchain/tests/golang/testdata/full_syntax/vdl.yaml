@@ -4,5 +4,5 @@ targets:
   - go:
       output: gen
       package: gen
-      gen_server: true
-      gen_client: true
+      genServer: true
+      genClient: true

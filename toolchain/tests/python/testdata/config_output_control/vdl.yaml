@@ -3,5 +3,5 @@ schema: schema.vdl
 targets:
   - python:
       output: gen
-      gen_consts: false
-      gen_patterns: false
+      genConsts: false
+      genPatterns: false

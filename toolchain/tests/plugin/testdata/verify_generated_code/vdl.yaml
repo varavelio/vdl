@@ -5,5 +5,5 @@ targets:
       output: gen
       command: ["python3", "plugin.py"]
       options:
-        language: "python"
-        includeTyping: true
+        language: python
+        includeTyping: "true"

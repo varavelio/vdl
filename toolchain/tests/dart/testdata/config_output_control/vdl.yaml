@@ -3,5 +3,5 @@ schema: schema.vdl
 targets:
   - dart:
       output: gen
-      gen_consts: false
-      gen_patterns: false
+      genConsts: false
+      genPatterns: false

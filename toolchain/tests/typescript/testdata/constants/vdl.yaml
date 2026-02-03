@@ -3,5 +3,5 @@ schema: schema.vdl
 targets:
   - typescript:
       output: gen
-      gen_server: false
-      gen_client: false
+      genServer: false
+      genClient: false

@@ -3,6 +3,6 @@ schema: schema.vdl
 targets:
   - typescript:
       output: gen
-      gen_server: true
-      gen_client: true
-      import_extension: ".ts"
+      genServer: true
+      genClient: true
+      importExtension: ".ts"

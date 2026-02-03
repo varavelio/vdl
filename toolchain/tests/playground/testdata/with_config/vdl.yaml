@@ -3,8 +3,8 @@ schema: schema.vdl
 targets:
   - playground:
       output: gen
-      default_base_url: https://api.example.com
-      default_headers:
+      defaultBaseUrl: https://api.example.com
+      defaultHeaders:
         - key: Authorization
           value: Bearer token123
         - key: X-API-Version
