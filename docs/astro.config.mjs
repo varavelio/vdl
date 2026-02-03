@@ -50,7 +50,9 @@ export default defineConfig({
       description:
         "Open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.",
       logo: {
-        src: "../assets/svg/vdl.svg",
+        light: "../assets/svg/vdl.svg",
+        dark: "../assets/svg/vdl-white.svg",
+        alt: "VDL Logo",
         replacesTitle: true,
       },
       social: [
