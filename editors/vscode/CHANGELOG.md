@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.1.3 - 2026-02-02
+
+- Fixed syntax highlighting for keywords used as field names (e.g., `input: string`, `output: int`, `type: bool`).
+
 ## v0.1.2 - 2026-02-01
 
 - Refactored VDL syntax highlighting with granular declarations and improved pattern matching.
