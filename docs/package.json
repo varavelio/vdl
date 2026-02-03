@@ -2,9 +2,7 @@
   "name": "vdl-docs",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "astro": "astro"
+    "-": "Run commands using the root's Taskfile.yml file"
   },
   "dependencies": {
     "@astrojs/starlight": "0.37.6",

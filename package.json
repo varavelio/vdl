@@ -1,6 +1,9 @@
 {
   "name": "vdl",
   "type": "module",
+  "scripts": {
+    "-": "Run commands using the root's Taskfile.yml file"
+  },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/node": "24.3.1",
