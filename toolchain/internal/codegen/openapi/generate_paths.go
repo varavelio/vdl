@@ -34,7 +34,7 @@ func generatePaths(schema *irtypes.IrSchema) Paths {
 			operation["description"] = doc
 		}
 
-		if proc.Deprecation != nil {
+		if proc.Deprecated != nil {
 			operation["deprecated"] = true
 		}
 
@@ -66,7 +66,7 @@ func generatePaths(schema *irtypes.IrSchema) Paths {
 			operation["description"] = doc
 		}
 
-		if stream.Deprecation != nil {
+		if stream.Deprecated != nil {
 			operation["deprecated"] = true
 		}
 

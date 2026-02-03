@@ -41,7 +41,7 @@ func generatePatterns(schema *irtypes.IrSchema, _ *config.PythonConfig) (string,
 			doc = fmt.Sprintf("%s\n\nTemplate: `%s`", doc, p.Template)
 		}
 		renderDocstringPython(g, doc)
-		renderDeprecatedPython(g, p.Deprecation)
+		renderDeprecatedPython(g, p.Deprecated)
 
 		// Convert template to python f-string
 		// VDL template uses {placeholder}. Python f-string also uses {placeholder}.

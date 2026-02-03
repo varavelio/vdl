@@ -49,7 +49,7 @@ func renderPattern(g *gen.Generator, pattern irtypes.PatternDef) {
 		g.Linef(" * Template: `%s`", pattern.Template)
 	}
 
-	renderDeprecated(g, pattern.Deprecation)
+	renderDeprecated(g, pattern.Deprecated)
 	g.Line(" */")
 
 	// Generate function signature with parameters

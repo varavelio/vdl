@@ -253,7 +253,7 @@ func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if proc.GetDoc() != "" {
 			renderDoc(g, proc.GetDoc(), true)
 		}
-		renderDeprecated(g, proc.Deprecation)
+		renderDeprecated(g, proc.Deprecated)
 		g.Linef("func (e proc%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next ProcHandlerFunc[T, any, any]) ProcHandlerFunc[T, any, any] {")
@@ -329,7 +329,7 @@ func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if proc.GetDoc() != "" {
 			renderDoc(g, proc.GetDoc(), true)
 		}
-		renderDeprecated(g, proc.Deprecation)
+		renderDeprecated(g, proc.Deprecated)
 		g.Linef("func (e proc%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any]) (any, error) {")
@@ -426,7 +426,7 @@ func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if stream.GetDoc() != "" {
 			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecation)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (e stream%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next StreamHandlerFunc[T, any, any]) StreamHandlerFunc[T, any, any] {")
@@ -499,7 +499,7 @@ func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if stream.GetDoc() != "" {
 			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecation)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (e stream%sEntry[T]) UseEmit(mw %sEmitMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next EmitFunc[T, any, any]) EmitFunc[T, any, any] {")
@@ -565,7 +565,7 @@ func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if stream.GetDoc() != "" {
 			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecation)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (e stream%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any], emitGeneric EmitFunc[T, any, any]) error {")

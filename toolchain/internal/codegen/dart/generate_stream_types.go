@@ -31,10 +31,10 @@ func generateStreamTypes(schema *irtypes.IrSchema, _ *config.DartConfig) (string
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, fullName)
 		responseDesc := fmt.Sprintf("%s is the typed event wrapper yielded by the %s stream.", responseName, fullName)
 
-		g.Line(renderDartType("", inputName, inputDesc, stream.InputFields))
+		g.Line(renderDartType("", inputName, inputDesc, stream.Input))
 		g.Break()
 
-		g.Line(renderDartType("", outputName, outputDesc, stream.OutputFields))
+		g.Line(renderDartType("", outputName, outputDesc, stream.Output))
 		g.Break()
 
 		g.Linef("/// %s", responseDesc)

@@ -39,8 +39,8 @@ func renderDartEnum(g *gen.Generator, enum irtypes.EnumDef) {
 	}
 
 	// Deprecation
-	if enum.Deprecation != nil {
-		renderDeprecatedDart(g, enum.Deprecation)
+	if enum.Deprecated != nil {
+		renderDeprecatedDart(g, enum.Deprecated)
 	}
 
 	if enum.EnumType == irtypes.EnumTypeString {

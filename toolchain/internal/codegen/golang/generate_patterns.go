@@ -49,7 +49,7 @@ func generatePattern(g *gen.Generator, pattern irtypes.PatternDef) {
 	}
 
 	// Deprecation
-	renderDeprecated(g, pattern.Deprecation)
+	renderDeprecated(g, pattern.Deprecated)
 
 	// Generate function signature
 	var params []string

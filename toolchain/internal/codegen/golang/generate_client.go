@@ -323,7 +323,7 @@ func generateClientRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if proc.GetDoc() != "" {
 			renderDoc(g, proc.GetDoc(), true)
 		}
-		renderDeprecated(g, proc.Deprecation)
+		renderDeprecated(g, proc.Deprecated)
 		g.Linef("func (registry *%s) %s() *%s {", procsStructName, proc.Name, builderName)
 		g.Block(func() {
 			g.Linef("return &%s{client: registry.intClient, headerProviders: []HeaderProvider{}, rpcName: %q, name: %q}", builderName, rpcName, proc.Name)
@@ -445,7 +445,7 @@ func generateClientRPC(rpcName string, procs []irtypes.ProcedureDef, streams []i
 		if stream.GetDoc() != "" {
 			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecation)
+		renderDeprecated(g, stream.Deprecated)
 		g.Linef("func (registry *%s) %s() *%s {", streamsStructName, stream.Name, builderStream)
 		g.Block(func() {
 			g.Linef("return &%s{client: registry.intClient, headerProviders: []HeaderProvider{}, rpcName: %q, name: %q}", builderStream, rpcName, stream.Name)

@@ -25,14 +25,14 @@ func generateProcedureTypes(schema *irtypes.IrSchema, _ *config.PythonConfig) (s
 		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s procedure.", inputName, fullName)
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s procedure.", outputName, fullName)
 
-		g.Raw(GenerateDataclass(inputName, inputDesc, proc.InputFields))
+		g.Raw(GenerateDataclass(inputName, inputDesc, proc.Input))
 		g.Break()
-		g.Raw(renderInlineTypes(inputName, proc.InputFields))
+		g.Raw(renderInlineTypes(inputName, proc.Input))
 		g.Break()
 
-		g.Raw(GenerateDataclass(outputName, outputDesc, proc.OutputFields))
+		g.Raw(GenerateDataclass(outputName, outputDesc, proc.Output))
 		g.Break()
-		g.Raw(renderInlineTypes(outputName, proc.OutputFields))
+		g.Raw(renderInlineTypes(outputName, proc.Output))
 		g.Break()
 
 		// Response Type Alias

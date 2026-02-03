@@ -50,12 +50,12 @@ func generateComponents(schema *irtypes.IrSchema) Components {
 		outputName := proc.RpcName + proc.Name + "Output"
 
 		components.RequestBodies[inputName] = generateRequestBody(
-			proc.InputFields,
+			proc.Input,
 			fmt.Sprintf("Request body for %s/%s procedure", proc.RpcName, proc.Name),
 		)
 
 		components.Responses[outputName] = generateProcedureResponse(
-			proc.OutputFields,
+			proc.Output,
 			fmt.Sprintf("Response for %s/%s procedure", proc.RpcName, proc.Name),
 		)
 	}
@@ -66,12 +66,12 @@ func generateComponents(schema *irtypes.IrSchema) Components {
 		outputName := stream.RpcName + stream.Name + "Output"
 
 		components.RequestBodies[inputName] = generateRequestBody(
-			stream.InputFields,
+			stream.Input,
 			fmt.Sprintf("Request body for %s/%s stream subscription", stream.RpcName, stream.Name),
 		)
 
 		components.Responses[outputName] = generateStreamResponse(
-			stream.OutputFields,
+			stream.Output,
 			fmt.Sprintf("Server-Sent Events for %s/%s stream", stream.RpcName, stream.Name),
 		)
 	}
@@ -93,15 +93,15 @@ func generateTypeSchema(t irtypes.TypeDef) map[string]any {
 		schema["description"] = doc
 	}
 
-	if t.Deprecation != nil {
+	if t.Deprecated != nil {
 		schema["deprecated"] = true
-		deprecation := t.GetDeprecation()
-		if deprecation != "" {
+		deprecated := t.GetDeprecated()
+		if deprecated != "" {
 			desc := schema["description"]
 			if desc == nil {
 				desc = ""
 			}
-			schema["description"] = fmt.Sprintf("%s\n\nDeprecated: %s", desc, deprecation)
+			schema["description"] = fmt.Sprintf("%s\n\nDeprecated: %s", desc, deprecated)
 		}
 	}
 
@@ -138,7 +138,7 @@ func generateEnumSchema(e irtypes.EnumDef) map[string]any {
 		schema["description"] = doc
 	}
 
-	if e.Deprecation != nil {
+	if e.Deprecated != nil {
 		schema["deprecated"] = true
 	}
 

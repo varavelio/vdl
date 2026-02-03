@@ -25,14 +25,14 @@ func generateStreamTypes(schema *irtypes.IrSchema, _ *config.PythonConfig) (stri
 		inputDesc := fmt.Sprintf("%s represents the input parameters for the %s stream.", inputName, fullName)
 		outputDesc := fmt.Sprintf("%s represents the output event data for the %s stream.", outputName, fullName)
 
-		g.Raw(GenerateDataclass(inputName, inputDesc, stream.InputFields))
+		g.Raw(GenerateDataclass(inputName, inputDesc, stream.Input))
 		g.Break()
-		g.Raw(renderInlineTypes(inputName, stream.InputFields))
+		g.Raw(renderInlineTypes(inputName, stream.Input))
 		g.Break()
 
-		g.Raw(GenerateDataclass(outputName, outputDesc, stream.OutputFields))
+		g.Raw(GenerateDataclass(outputName, outputDesc, stream.Output))
 		g.Break()
-		g.Raw(renderInlineTypes(outputName, stream.OutputFields))
+		g.Raw(renderInlineTypes(outputName, stream.Output))
 		g.Break()
 	}
 

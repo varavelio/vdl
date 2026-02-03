@@ -29,16 +29,16 @@ func generateStreamTypes(schema *irtypes.IrSchema, _ *config.TypeScriptConfig) (
 			outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, fullName)
 			responseDesc := fmt.Sprintf("%s represents the response for the %s stream.", responseName, fullName)
 
-			g.Line(renderType("", inputName, inputDesc, stream.InputFields))
+			g.Line(renderType("", inputName, inputDesc, stream.Input))
 			g.Break()
 
-			g.Line(renderType("", outputName, outputDesc, stream.OutputFields))
+			g.Line(renderType("", outputName, outputDesc, stream.Output))
 			g.Break()
 
-			g.Line(renderHydrateType("", outputName, stream.OutputFields))
+			g.Line(renderHydrateType("", outputName, stream.Output))
 			g.Break()
 
-			g.Line(renderValidateType("", inputName, stream.InputFields))
+			g.Line(renderValidateType("", inputName, stream.Input))
 			g.Break()
 
 			g.Linef("// %s", responseDesc)

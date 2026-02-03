@@ -45,9 +45,9 @@ func renderDartPattern(g *gen.Generator, pattern irtypes.PatternDef) {
 		renderMultilineCommentDart(g, "")
 		renderMultilineCommentDart(g, fmt.Sprintf("Template: `%s`", pattern.Template))
 	}
-	if pattern.Deprecation != nil {
+	if pattern.Deprecated != nil {
 		renderMultilineCommentDart(g, "")
-		renderDeprecatedDart(g, pattern.Deprecation)
+		renderDeprecatedDart(g, pattern.Deprecated)
 	}
 
 	// Generate function signature with parameters

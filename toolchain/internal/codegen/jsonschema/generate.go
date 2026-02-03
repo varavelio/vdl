@@ -63,8 +63,8 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 		inputName := proc.RpcName + proc.Name + "Input"
 		outputName := proc.RpcName + proc.Name + "Output"
 
-		definitions[inputName] = generateObjectSchema(proc.InputFields, fmt.Sprintf("Input for %s/%s procedure", proc.RpcName, proc.Name))
-		definitions[outputName] = generateObjectSchema(proc.OutputFields, fmt.Sprintf("Output for %s/%s procedure", proc.RpcName, proc.Name))
+		definitions[inputName] = generateObjectSchema(proc.Input, fmt.Sprintf("Input for %s/%s procedure", proc.RpcName, proc.Name))
+		definitions[outputName] = generateObjectSchema(proc.Output, fmt.Sprintf("Output for %s/%s procedure", proc.RpcName, proc.Name))
 	}
 
 	// Generate input/output types for streams (flattened list with RpcName)
@@ -72,8 +72,8 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 		inputName := stream.RpcName + stream.Name + "Input"
 		outputName := stream.RpcName + stream.Name + "Output"
 
-		definitions[inputName] = generateObjectSchema(stream.InputFields, fmt.Sprintf("Input for %s/%s stream", stream.RpcName, stream.Name))
-		definitions[outputName] = generateObjectSchema(stream.OutputFields, fmt.Sprintf("Output for %s/%s stream", stream.RpcName, stream.Name))
+		definitions[inputName] = generateObjectSchema(stream.Input, fmt.Sprintf("Input for %s/%s stream", stream.RpcName, stream.Name))
+		definitions[outputName] = generateObjectSchema(stream.Output, fmt.Sprintf("Output for %s/%s stream", stream.RpcName, stream.Name))
 	}
 
 	// Sort definitions to ensure deterministic output (map iteration is random)

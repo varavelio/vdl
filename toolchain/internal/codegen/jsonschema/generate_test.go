@@ -107,13 +107,13 @@ func TestGenerator_Generate(t *testing.T) {
 			{
 				RpcName: "UserService",
 				Name:    "Create",
-				InputFields: []irtypes.Field{
+				Input: []irtypes.Field{
 					{
 						Name:    "name",
 						TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
 					},
 				},
-				OutputFields: []irtypes.Field{},
+				Output: []irtypes.Field{},
 			},
 		},
 		Streams:   []irtypes.StreamDef{},

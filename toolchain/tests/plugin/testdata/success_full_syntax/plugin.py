@@ -89,7 +89,7 @@ def main():
         errors.append("Missing enum: LegacyStatus")
     else:
         legacy = enum_map["LegacyStatus"]
-        if legacy.get("deprecation") is None:
+        if legacy.get("deprecated") is None:
             errors.append("LegacyStatus should be deprecated")
     
     # =========================================================================
@@ -157,7 +157,7 @@ def main():
                 errors.append(f"User.role should reference Role enum")
         
         # Check deprecation
-        if user.get("deprecation") is None:
+        if user.get("deprecated") is None:
             errors.append("User type should be deprecated")
     
     # =========================================================================
@@ -190,7 +190,7 @@ def main():
     
     # Check CreateUser deprecation
     create_user = next((p for p in procedures if p["name"] == "CreateUser"), None)
-    if create_user and create_user.get("deprecation") is None:
+    if create_user and create_user.get("deprecated") is None:
         errors.append("CreateUser proc should be deprecated")
     
     # =========================================================================

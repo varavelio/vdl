@@ -27,12 +27,12 @@ func generateDomainTypes(schema *irtypes.IrSchema, _ *config.TypeScriptConfig) (
 			desc = strings.TrimSpace(typeNode.GetDoc())
 		}
 
-		if typeNode.Deprecation != nil {
+		if typeNode.Deprecated != nil {
 			desc += "\n\n@deprecated "
-			if *typeNode.Deprecation == "" {
+			if *typeNode.Deprecated == "" {
 				desc += "This type is deprecated and should not be used in new code."
 			} else {
-				desc += *typeNode.Deprecation
+				desc += *typeNode.Deprecated
 			}
 		}
 

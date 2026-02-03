@@ -31,10 +31,10 @@ func generateProcedureTypes(schema *irtypes.IrSchema, _ *config.DartConfig) (str
 		outputDesc := fmt.Sprintf("%s represents the output parameters for the %s procedure.", outputName, fullName)
 		responseDesc := fmt.Sprintf("%s is the typed result wrapper returned by %s calls.", responseName, fullName)
 
-		g.Line(renderDartType("", inputName, inputDesc, proc.InputFields))
+		g.Line(renderDartType("", inputName, inputDesc, proc.Input))
 		g.Break()
 
-		g.Line(renderDartType("", outputName, outputDesc, proc.OutputFields))
+		g.Line(renderDartType("", outputName, outputDesc, proc.Output))
 		g.Break()
 
 		g.Linef("/// %s", responseDesc)

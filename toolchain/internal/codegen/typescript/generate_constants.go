@@ -37,7 +37,7 @@ func generateConstant(g *gen.Generator, constant irtypes.ConstantDef) {
 	}
 
 	// Deprecation
-	renderDeprecated(g, constant.Deprecation)
+	renderDeprecated(g, constant.Deprecated)
 
 	// Constant definition
 	switch constant.ConstType {

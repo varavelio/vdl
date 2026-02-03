@@ -40,8 +40,8 @@ func renderDartConstant(g *gen.Generator, constant irtypes.ConstantDef) {
 		doc := strings.TrimSpace(constant.GetDoc())
 		renderMultilineCommentDart(g, doc)
 	}
-	if constant.Deprecation != nil {
-		renderDeprecatedDart(g, constant.Deprecation)
+	if constant.Deprecated != nil {
+		renderDeprecatedDart(g, constant.Deprecated)
 	}
 
 	// Determine the Dart type and value format

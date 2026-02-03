@@ -39,7 +39,7 @@ func generateEnum(g *gen.Generator, enum irtypes.EnumDef) {
 	}
 
 	// Deprecation
-	renderDeprecated(g, enum.Deprecation)
+	renderDeprecated(g, enum.Deprecated)
 
 	// Type definition
 	if enum.EnumType == irtypes.EnumTypeString {

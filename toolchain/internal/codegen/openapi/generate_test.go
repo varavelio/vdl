@@ -194,7 +194,7 @@ func TestGenerateTags(t *testing.T) {
 // TestGeneratePaths tests path generation with correct RPC structure.
 func TestGeneratePaths(t *testing.T) {
 	createUserDoc := "Creates a user"
-	deleteUserDeprecation := "Use RemoveUser"
+	deleteUserDeprecated := "Use RemoveUser"
 	schema := &irtypes.IrSchema{
 		Rpcs: []irtypes.RpcDef{
 			{Name: "Users"},
@@ -206,9 +206,9 @@ func TestGeneratePaths(t *testing.T) {
 				Doc:     &createUserDoc,
 			},
 			{
-				RpcName:     "Users",
-				Name:        "DeleteUser",
-				Deprecation: &deleteUserDeprecation,
+				RpcName:    "Users",
+				Name:       "DeleteUser",
+				Deprecated: &deleteUserDeprecated,
 			},
 		},
 		Streams: []irtypes.StreamDef{

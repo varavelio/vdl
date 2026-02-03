@@ -190,8 +190,8 @@ func generateProcedureImplementation(g *gen.Generator, schema *irtypes.IrSchema)
 
 			g.Linef("/**")
 			g.Linef(" * Creates a call builder for the %s procedure.", fullName)
-			if proc.Deprecation != nil {
-				renderDeprecated(g, proc.Deprecation)
+			if proc.Deprecated != nil {
+				renderDeprecated(g, proc.Deprecated)
 			}
 			g.Linef(" */")
 			g.Linef("%s(): %s {", methodName, builderName)
@@ -216,8 +216,8 @@ func generateProcedureImplementation(g *gen.Generator, schema *irtypes.IrSchema)
 
 		g.Linef("/**")
 		g.Linef(" * Fluent builder for the %s procedure.", fullName)
-		if proc.Deprecation != nil && *proc.Deprecation != "" {
-			g.Linef(" * @deprecated %s", *proc.Deprecation)
+		if proc.Deprecated != nil && *proc.Deprecated != "" {
+			g.Linef(" * @deprecated %s", *proc.Deprecated)
 		}
 		g.Linef(" */")
 		g.Linef("class %s {", builderName)
@@ -443,8 +443,8 @@ func generateStreamImplementation(g *gen.Generator, schema *irtypes.IrSchema) {
 
 			g.Linef("/**")
 			g.Linef(" * Creates a stream builder for the %s stream.", fullName)
-			if stream.Deprecation != nil {
-				renderDeprecated(g, stream.Deprecation)
+			if stream.Deprecated != nil {
+				renderDeprecated(g, stream.Deprecated)
 			}
 			g.Linef(" */")
 			g.Linef("%s(): %s {", methodName, builderName)
@@ -470,8 +470,8 @@ func generateStreamImplementation(g *gen.Generator, schema *irtypes.IrSchema) {
 
 		g.Linef("/**")
 		g.Linef(" * Fluent builder for the %s stream.", fullName)
-		if stream.Deprecation != nil && *stream.Deprecation != "" {
-			g.Linef(" * @deprecated %s", *stream.Deprecation)
+		if stream.Deprecated != nil && *stream.Deprecated != "" {
+			g.Linef(" * @deprecated %s", *stream.Deprecated)
 		}
 		g.Linef(" */")
 		g.Linef("class %s {", builderName)

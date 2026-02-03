@@ -42,7 +42,7 @@ func generateEnum(g *gen.Generator, enum irtypes.EnumDef) {
 	}
 
 	// Deprecation
-	renderDeprecated(g, enum.Deprecation)
+	renderDeprecated(g, enum.Deprecated)
 
 	// 1. Type definition
 	// export type Status = "active" | "inactive";

@@ -35,13 +35,13 @@ func generateProcedureTypes(schema *irtypes.IrSchema, _ *config.GoConfig) (strin
 			outputDesc += "\n\n" + proc.GetDoc()
 		}
 
-		g.Line(renderType("", inputName, inputDesc, proc.InputFields))
+		g.Line(renderType("", inputName, inputDesc, proc.Input))
 		g.Break()
 
-		g.Line(renderPreType("", inputName, proc.InputFields))
+		g.Line(renderPreType("", inputName, proc.Input))
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, proc.OutputFields))
+		g.Line(renderType("", outputName, outputDesc, proc.Output))
 		g.Break()
 
 		g.Linef("// %s", responseDesc)

@@ -35,13 +35,13 @@ func generateStreamTypes(schema *irtypes.IrSchema, _ *config.GoConfig) (string, 
 			outputDesc += "\n\n" + stream.GetDoc()
 		}
 
-		g.Line(renderType("", inputName, inputDesc, stream.InputFields))
+		g.Line(renderType("", inputName, inputDesc, stream.Input))
 		g.Break()
 
-		g.Line(renderPreType("", inputName, stream.InputFields))
+		g.Line(renderPreType("", inputName, stream.Input))
 		g.Break()
 
-		g.Line(renderType("", outputName, outputDesc, stream.OutputFields))
+		g.Line(renderType("", outputName, outputDesc, stream.Output))
 		g.Break()
 
 		g.Linef("// %s", responseDesc)
