@@ -11,6 +11,7 @@
     { "include": "#docstrings" },
     { "include": "#strings" },
     { "include": "#declarations" },
+    { "include": "#properties" },
     { "include": "#keywords" },
     { "include": "#functions-macros" },
     { "include": "#constants-language" },
@@ -19,8 +20,7 @@
     { "include": "#types-primitive" },
     { "include": "#types-container" },
     { "include": "#types-usage" },
-    { "include": "#operators" },
-    { "include": "#properties" }
+    { "include": "#operators" }
   ],
   "repository": {
     "comments": {
@@ -241,9 +241,9 @@
     "properties": {
       "patterns": [
         {
-          "comment": "Matches properties like field: Type",
+          "comment": "Matches field names (including keywords) when used as properties: field: Type or field?: Type",
           "name": "variable.object.property.vdl",
-          "match": "\\b[a-z][a-zA-Z0-9_]*\\b(?=\\s*(\\?|:))"
+          "match": "\\b(type|rpc|proc|stream|enum|const|pattern|input|output|include|deprecated|map|string|int|float|bool|datetime|true|false|[a-z][a-zA-Z0-9_]*)\\b(?=\\s*\\??\\s*:)"
         }
       ]
     }
