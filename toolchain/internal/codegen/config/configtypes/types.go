@@ -662,6 +662,9 @@ type JsonSchemaConfig struct {
 	Id *string `json:"id,omitempty"`
 	// The name of the output file
 	Filename *string `json:"filename,omitempty"`
+	// The name of a type from '$defs' to use as the main entry point (adds a $ref at the root).
+	// Must exist; VDL validates this and provides fuzzy suggestions for typos.
+	Root *string `json:"root,omitempty"`
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
@@ -749,6 +752,23 @@ func (x *JsonSchemaConfig) GetFilenameOr(defaultValue string) string {
 	return defaultValue
 }
 
+// GetRoot returns the value of Root or the zero value if the receiver or field is nil.
+func (x *JsonSchemaConfig) GetRoot() string {
+	if x != nil && x.Root != nil {
+		return *x.Root
+	}
+	var zero string
+	return zero
+}
+
+// GetRootOr returns the value of Root or the provided default if the receiver or field is nil.
+func (x *JsonSchemaConfig) GetRootOr(defaultValue string) string {
+	if x != nil && x.Root != nil {
+		return *x.Root
+	}
+	return defaultValue
+}
+
 // preJsonSchemaConfig is the version of JsonSchemaConfig previous to the required field validation
 type preJsonSchemaConfig struct {
 	Output   *string `json:"output,omitempty"`
@@ -756,6 +776,7 @@ type preJsonSchemaConfig struct {
 	Schema   *string `json:"schema,omitempty"`
 	Id       *string `json:"id,omitempty"`
 	Filename *string `json:"filename,omitempty"`
+	Root     *string `json:"root,omitempty"`
 }
 
 // validate validates the required fields of JsonSchemaConfig
@@ -777,6 +798,8 @@ func (p *preJsonSchemaConfig) validate() error {
 
 	// Validation for field "filename"
 
+	// Validation for field "root"
+
 	return nil
 }
 
@@ -788,6 +811,7 @@ func (p *preJsonSchemaConfig) transform() JsonSchemaConfig {
 	transSchema := p.Schema
 	transId := p.Id
 	transFilename := p.Filename
+	transRoot := p.Root
 
 	// Assignments
 	return JsonSchemaConfig{
@@ -796,6 +820,7 @@ func (p *preJsonSchemaConfig) transform() JsonSchemaConfig {
 		Schema:   transSchema,
 		Id:       transId,
 		Filename: transFilename,
+		Root:     transRoot,
 	}
 }
 

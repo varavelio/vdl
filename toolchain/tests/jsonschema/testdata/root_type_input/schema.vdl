@@ -1,0 +1,28 @@
+type User {
+  id: string
+  name: string
+}
+
+type Settings {
+  theme: string
+}
+
+rpc UserService {
+  proc Create {
+    input {
+      user: User
+    }
+    output {
+      id: string
+    }
+  }
+}
+
+rpc AdminService {
+  proc Delete {
+    input {
+      userId: string
+    }
+    output {}
+  }
+}

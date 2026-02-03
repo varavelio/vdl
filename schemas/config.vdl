@@ -135,6 +135,12 @@ type JsonSchemaConfig {
 
   """ The name of the output file """
   filename?: string
+
+  """
+  The name of a type from '$defs' to use as the main entry point (adds a $ref at the root).
+  Must exist; VDL validates this and provides fuzzy suggestions for typos.
+  """
+  root?: string
 }
 
 """ Configuration for OpenAPI specification generation """

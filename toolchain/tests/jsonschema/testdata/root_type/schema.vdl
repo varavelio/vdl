@@ -1,0 +1,22 @@
+// Tests the root type configuration option
+
+type Config {
+  version: string
+  debug: bool
+  maxRetries: int
+}
+
+type Settings {
+  theme: string
+  language: string
+}
+
+rpc Service {
+  proc GetConfig {
+    input {}
+
+    output {
+      config: Config
+    }
+  }
+}

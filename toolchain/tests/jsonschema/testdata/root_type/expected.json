@@ -1,0 +1,48 @@
+{
+  "$defs": {
+    "Config": {
+      "properties": {
+        "debug": {
+          "type": "boolean"
+        },
+        "maxRetries": {
+          "type": "integer"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": ["debug", "maxRetries", "version"],
+      "type": "object"
+    },
+    "ServiceGetConfigInput": {
+      "description": "Input for Service/GetConfig procedure",
+      "properties": {},
+      "type": "object"
+    },
+    "ServiceGetConfigOutput": {
+      "description": "Output for Service/GetConfig procedure",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/Config"
+        }
+      },
+      "required": ["config"],
+      "type": "object"
+    },
+    "Settings": {
+      "properties": {
+        "language": {
+          "type": "string"
+        },
+        "theme": {
+          "type": "string"
+        }
+      },
+      "required": ["language", "theme"],
+      "type": "object"
+    }
+  },
+  "$ref": "#/$defs/Config",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

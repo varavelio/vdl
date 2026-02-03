@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "AdminServiceDeleteInput": {
+      "description": "Input for AdminService/Delete procedure",
+      "properties": {
+        "userId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId"
+      ],
+      "type": "object"
+    },
+    "AdminServiceDeleteOutput": {
+      "description": "Output for AdminService/Delete procedure",
+      "properties": {},
+      "type": "object"
+    },
+    "Settings": {
+      "properties": {
+        "theme": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "theme"
+      ],
+      "type": "object"
+    },
+    "User": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "UserServiceCreateInput": {
+      "description": "Input for UserService/Create procedure",
+      "properties": {
+        "user": {
+          "$ref": "#/$defs/User"
+        }
+      },
+      "required": [
+        "user"
+      ],
+      "type": "object"
+    },
+    "UserServiceCreateOutput": {
+      "description": "Output for UserService/Create procedure",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    }
+  },
+  "$ref": "#/$defs/UserServiceCreateInput",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

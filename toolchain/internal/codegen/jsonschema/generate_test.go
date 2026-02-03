@@ -290,3 +290,95 @@ func TestGeneratePropertiesFromFields(t *testing.T) {
 	assert.Equal(t, "#/$defs/User", allOf[0]["$ref"])
 	assert.Equal(t, "The user object", allOf[1]["description"])
 }
+
+func TestGenerator_RootType(t *testing.T) {
+	primString := irtypes.PrimitiveTypeString
+
+	schema := &irtypes.IrSchema{
+		Types: []irtypes.TypeDef{
+			{
+				Name: "Config",
+				Fields: []irtypes.Field{
+					{
+						Name:    "version",
+						TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
+					},
+				},
+			},
+			{
+				Name: "Settings",
+				Fields: []irtypes.Field{
+					{
+						Name:    "theme",
+						TypeRef: irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: &primString},
+					},
+				},
+			},
+		},
+		Rpcs:       []irtypes.RpcDef{},
+		Procedures: []irtypes.ProcedureDef{},
+		Streams:    []irtypes.StreamDef{},
+		Enums:      []irtypes.EnumDef{},
+		Constants:  []irtypes.ConstantDef{},
+		Patterns:   []irtypes.PatternDef{},
+		Docs:       []irtypes.DocDef{},
+	}
+
+	t.Run("adds $ref at root when root type is specified", func(t *testing.T) {
+		rootType := "Config"
+		filename := "schema.json"
+		gen := New(&configtypes.JsonSchemaConfig{
+			Filename: &filename,
+			Root:     &rootType,
+		})
+
+		files, err := gen.Generate(context.Background(), schema)
+		require.NoError(t, err)
+		require.Len(t, files, 1)
+
+		content := string(files[0].Content)
+		assert.Contains(t, content, `"$ref": "#/$defs/Config"`)
+	})
+
+	t.Run("returns error when root type does not exist", func(t *testing.T) {
+		rootType := "NonExistent"
+		filename := "schema.json"
+		gen := New(&configtypes.JsonSchemaConfig{
+			Filename: &filename,
+			Root:     &rootType,
+		})
+
+		_, err := gen.Generate(context.Background(), schema)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "root type 'NonExistent' not found in schema definitions")
+	})
+
+	t.Run("returns error with fuzzy suggestion when root type is similar to existing", func(t *testing.T) {
+		rootType := "Confg" // typo for Config
+		filename := "schema.json"
+		gen := New(&configtypes.JsonSchemaConfig{
+			Filename: &filename,
+			Root:     &rootType,
+		})
+
+		_, err := gen.Generate(context.Background(), schema)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "root type 'Confg' not found in schema definitions")
+		assert.Contains(t, err.Error(), "Did you mean 'Config'?")
+	})
+
+	t.Run("no $ref at root when root type is not specified", func(t *testing.T) {
+		filename := "schema.json"
+		gen := New(&configtypes.JsonSchemaConfig{
+			Filename: &filename,
+		})
+
+		files, err := gen.Generate(context.Background(), schema)
+		require.NoError(t, err)
+		require.Len(t, files, 1)
+
+		content := string(files[0].Content)
+		// Should not have $ref at root level (only in $defs)
+		assert.NotContains(t, content, `"$ref": "#/$defs/Config"`)
+	})
+}

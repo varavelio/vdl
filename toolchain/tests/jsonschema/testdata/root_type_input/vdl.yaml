@@ -1,0 +1,7 @@
+version: 1
+schema: schema.vdl
+targets:
+  - jsonschema:
+      output: gen
+      filename: schema.json
+      root: UserServiceCreateInput

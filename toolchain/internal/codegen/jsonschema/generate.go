@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // File represents a generated file.
@@ -78,6 +80,41 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]F
 
 	// Sort definitions to ensure deterministic output (map iteration is random)
 	// Actually, encoding/json sorts map keys automatically, so we are good.
+
+	// Validate and add root $ref if specified
+	if cfg.Root != nil && *cfg.Root != "" {
+		rootName := *cfg.Root
+
+		// Check if the root type exists in definitions
+		if _, exists := definitions[rootName]; !exists {
+			// Build list of available definition names for fuzzy search
+			availableNames := make([]string, 0, len(definitions))
+			for name := range definitions {
+				availableNames = append(availableNames, name)
+			}
+
+			// Use fuzzy search to find similar names
+			suggestions, _ := strutil.FuzzySearch(availableNames, rootName)
+
+			errMsg := fmt.Sprintf("root type '%s' not found in schema definitions", rootName)
+			if len(suggestions) > 0 {
+				suggestionStr := ""
+				switch len(suggestions) {
+				case 1:
+					suggestionStr = fmt.Sprintf("'%s'", suggestions[0])
+				case 2:
+					suggestionStr = fmt.Sprintf("'%s' or '%s'", suggestions[0], suggestions[1])
+				default:
+					suggestionStr = fmt.Sprintf("'%s' or '%s'", strings.Join(suggestions[:len(suggestions)-1], "', '"), suggestions[len(suggestions)-1])
+				}
+				errMsg += fmt.Sprintf(". Did you mean %s?", suggestionStr)
+			}
+			return nil, fmt.Errorf("%s", errMsg)
+		}
+
+		// Add $ref at the root level pointing to the specified definition
+		root["$ref"] = "#/$defs/" + rootName
+	}
 
 	// Encode schema
 	content, err := json.MarshalIndent(root, "", "  ")
