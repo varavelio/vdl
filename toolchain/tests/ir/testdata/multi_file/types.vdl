@@ -1,0 +1,13 @@
+// Shared types
+type User {
+  id: string
+  name: string
+  email: string
+  status: UserStatus
+}
+
+enum UserStatus {
+  Active
+  Inactive
+  Pending
+}

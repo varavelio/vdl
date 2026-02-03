@@ -1,0 +1,14 @@
+// Main entry point
+include "./types.vdl"
+
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+}

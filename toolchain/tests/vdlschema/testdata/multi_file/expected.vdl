@@ -1,0 +1,44 @@
+// Shared types
+type User {
+  id: string
+  name: string
+  email: string
+}
+
+type Product {
+  id: string
+  name: string
+  price: float
+}
+
+enum Status {
+  Active
+  Inactive
+}
+// Service definitions
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+}
+
+rpc ProductService {
+  proc GetProduct {
+    input {
+      id: string
+    }
+
+    output {
+      product: Product
+    }
+  }
+}
+// Main entry point
+
+const API_VERSION = "1.0.0"

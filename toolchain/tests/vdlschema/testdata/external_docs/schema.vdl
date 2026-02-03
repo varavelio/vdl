@@ -1,0 +1,12 @@
+""" ./user.md """
+type User {
+  id: string
+  name: string
+}
+
+""" ./order.md """
+type Order {
+  id: string
+  userId: string
+  total: float
+}

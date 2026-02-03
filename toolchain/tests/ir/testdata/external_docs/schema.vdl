@@ -1,0 +1,40 @@
+""" ./user_docs.md """
+type User {
+  id: string
+  name: string
+  email: string
+}
+
+""" ./order_docs.md """
+type Order {
+  id: string
+  userId: string
+  total: float
+  status: OrderStatus
+}
+
+enum OrderStatus {
+  Pending = "pending"
+  Paid = "paid"
+  Shipped = "shipped"
+  Delivered = "delivered"
+}
+
+rpc OrderService {
+  proc CreateOrder {
+    input {
+      userId: string
+      items: OrderItem[]
+    }
+
+    output {
+      order: Order
+    }
+  }
+}
+
+type OrderItem {
+  productId: string
+  quantity: int
+  price: float
+}

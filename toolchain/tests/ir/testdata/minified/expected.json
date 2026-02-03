@@ -1,0 +1,35 @@
+{
+  "constants": [],
+  "patterns": [],
+  "enums": [
+    {
+      "name": "Status",
+      "enumType": "string",
+      "members": [
+        { "name": "Active", "value": "Active" },
+        { "name": "Inactive", "value": "Inactive" }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": { "kind": "primitive", "primitiveName": "string" }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "typeRef": { "kind": "primitive", "primitiveName": "string" }
+        }
+      ]
+    }
+  ],
+  "rpcs": [],
+  "procedures": [],
+  "streams": [],
+  "docs": []
+}

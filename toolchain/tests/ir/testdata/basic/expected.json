@@ -1,0 +1,64 @@
+{
+  "constants": [],
+  "patterns": [],
+  "enums": [
+    {
+      "name": "Status",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Active",
+          "value": "active"
+        },
+        {
+          "name": "Inactive",
+          "value": "inactive"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "User",
+      "doc": "A simple user type",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "age",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "active",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        }
+      ]
+    }
+  ],
+  "rpcs": [],
+  "procedures": [],
+  "streams": [],
+  "docs": []
+}

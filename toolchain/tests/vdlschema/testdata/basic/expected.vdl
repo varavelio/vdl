@@ -1,0 +1,11 @@
+""" A simple user type """
+type User {
+  id: string
+  name: string
+  age: int
+}
+
+enum Status {
+  Active = "active"
+  Inactive = "inactive"
+}

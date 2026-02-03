@@ -1,0 +1,9 @@
+type User {
+  id: string
+  name: string
+}
+
+enum Status {
+  Active
+  Inactive
+}

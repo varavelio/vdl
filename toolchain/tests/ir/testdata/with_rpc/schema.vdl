@@ -1,0 +1,61 @@
+""" Product type for the catalog """
+type Product {
+  id: string
+  name: string
+  price: float
+  inStock: bool
+}
+
+""" Pagination parameters """
+type Pagination {
+  page: int
+  limit: int
+}
+
+rpc CatalogService {
+  """ Get a single product by ID """
+  proc GetProduct {
+    input {
+      id: string
+    }
+
+    output {
+      product: Product
+    }
+  }
+
+  """ List all products with pagination """
+  proc ListProducts {
+    input {
+      ...Pagination
+      category?: string
+    }
+
+    output {
+      products: Product[]
+      total: int
+    }
+  }
+
+  """ Stream product updates """
+  stream ProductUpdates {
+    input {
+      categoryFilter?: string
+    }
+
+    output {
+      product: Product
+      action: UpdateAction
+    }
+  }
+}
+
+enum UpdateAction {
+  Created = "created"
+  Updated = "updated"
+  Deleted = "deleted"
+}
+
+const MAX_PAGE_SIZE = 100
+
+pattern ProductPath = "/products/{productId}"

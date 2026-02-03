@@ -1,0 +1,173 @@
+{
+  "constants": [],
+  "patterns": [],
+  "enums": [
+    {
+      "name": "OrderStatus",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Pending",
+          "value": "pending"
+        },
+        {
+          "name": "Paid",
+          "value": "paid"
+        },
+        {
+          "name": "Shipped",
+          "value": "shipped"
+        },
+        {
+          "name": "Delivered",
+          "value": "delivered"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Order",
+      "doc": "# Order Documentation\n\nThe Order type represents a purchase order.\n\n## Fields\n\n- **id**: Unique order identifier\n- **userId**: Reference to the ordering user\n- **total**: Total price of the order\n- **status**: Current status of the order",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "userId",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "total",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "float"
+          }
+        },
+        {
+          "name": "status",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "OrderStatus",
+            "enumType": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "OrderItem",
+      "fields": [
+        {
+          "name": "productId",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "quantity",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "price",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "float"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "doc": "# User Documentation\n\nThe User type represents a registered user in the system.\n\n## Fields\n\n- **id**: Unique identifier for the user\n- **name**: Display name\n- **email**: Email address for communications",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "email",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "rpcs": [
+    {
+      "name": "OrderService"
+    }
+  ],
+  "procedures": [
+    {
+      "rpcName": "OrderService",
+      "name": "CreateOrder",
+      "input": [
+        {
+          "name": "userId",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "items",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "OrderItem"
+            },
+            "arrayDims": 1
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "order",
+          "optional": false,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "Order"
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [],
+  "docs": []
+}

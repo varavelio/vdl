@@ -1,0 +1,220 @@
+{
+  "constants": [
+    {
+      "name": "MAX_PAGE_SIZE",
+      "constType": "int",
+      "value": "100"
+    }
+  ],
+  "patterns": [
+    {
+      "name": "ProductPath",
+      "template": "/products/{productId}",
+      "placeholders": ["productId"]
+    }
+  ],
+  "enums": [
+    {
+      "name": "UpdateAction",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Created",
+          "value": "created"
+        },
+        {
+          "name": "Updated",
+          "value": "updated"
+        },
+        {
+          "name": "Deleted",
+          "value": "deleted"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Pagination",
+      "doc": "Pagination parameters",
+      "fields": [
+        {
+          "name": "page",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "limit",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "doc": "Product type for the catalog",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "price",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "float"
+          }
+        },
+        {
+          "name": "inStock",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        }
+      ]
+    }
+  ],
+  "rpcs": [
+    {
+      "name": "CatalogService"
+    }
+  ],
+  "procedures": [
+    {
+      "rpcName": "CatalogService",
+      "name": "GetProduct",
+      "doc": "Get a single product by ID",
+      "input": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "product",
+          "optional": false,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "Product"
+          }
+        }
+      ]
+    },
+    {
+      "rpcName": "CatalogService",
+      "name": "ListProducts",
+      "doc": "List all products with pagination",
+      "input": [
+        {
+          "name": "page",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "limit",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "category",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "products",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "Product"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "total",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "rpcName": "CatalogService",
+      "name": "ProductUpdates",
+      "doc": "Stream product updates",
+      "input": [
+        {
+          "name": "categoryFilter",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "product",
+          "optional": false,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "Product"
+          }
+        },
+        {
+          "name": "action",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "UpdateAction",
+            "enumType": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "docs": []
+}

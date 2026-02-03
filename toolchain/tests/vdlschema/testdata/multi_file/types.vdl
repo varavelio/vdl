@@ -1,0 +1,17 @@
+// Shared types
+type User {
+  id: string
+  name: string
+  email: string
+}
+
+type Product {
+  id: string
+  name: string
+  price: float
+}
+
+enum Status {
+  Active
+  Inactive
+}

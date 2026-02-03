@@ -1,0 +1,97 @@
+{
+  "constants": [],
+  "patterns": [],
+  "enums": [
+    {
+      "name": "UserStatus",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Active",
+          "value": "Active"
+        },
+        {
+          "name": "Inactive",
+          "value": "Inactive"
+        },
+        {
+          "name": "Pending",
+          "value": "Pending"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "User",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "email",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "status",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "UserStatus",
+            "enumType": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "rpcs": [
+    {
+      "name": "UserService"
+    }
+  ],
+  "procedures": [
+    {
+      "rpcName": "UserService",
+      "name": "GetUser",
+      "input": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "user",
+          "optional": false,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "User"
+          }
+        }
+      ]
+    }
+  ],
+  "streams": [],
+  "docs": []
+}

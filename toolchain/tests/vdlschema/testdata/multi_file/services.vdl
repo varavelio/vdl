@@ -1,0 +1,24 @@
+// Service definitions
+rpc UserService {
+  proc GetUser {
+    input {
+      id: string
+    }
+
+    output {
+      user: User
+    }
+  }
+}
+
+rpc ProductService {
+  proc GetProduct {
+    input {
+      id: string
+    }
+
+    output {
+      product: Product
+    }
+  }
+}

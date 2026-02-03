@@ -1,0 +1,20 @@
+"""
+# User Type
+
+Represents a user in the system.
+"""
+type User {
+  id: string
+  name: string
+}
+
+"""
+# Order Type
+
+Represents an order placed by a user.
+"""
+type Order {
+  id: string
+  userId: string
+  total: float
+}
