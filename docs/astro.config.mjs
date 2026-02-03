@@ -1,5 +1,6 @@
 // @ts-check
 import starlight from "@astrojs/starlight";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import fse from "fs-extra";
 import { bundledLanguages } from "shiki";
@@ -38,6 +39,7 @@ export default defineConfig({
           },
         ],
       }),
+      tailwindcss(),
     ],
   },
 
@@ -82,6 +84,7 @@ export default defineConfig({
       editLink: {
         baseUrl: "https://github.com/varavelio/vdl/tree/main/docs/",
       },
+      customCss: ["./src/styles/global.css"],
     }),
   ],
 
