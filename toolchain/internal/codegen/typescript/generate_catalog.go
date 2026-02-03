@@ -3,12 +3,12 @@ package typescript
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
-	if len(schema.RPCs) == 0 {
+func generateCatalog(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
+	if len(schema.Rpcs) == 0 {
 		return "", nil
 	}
 
@@ -30,10 +30,8 @@ func generateCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string
 	g.Line(" */")
 	g.Line("export const VDLProcedures: OperationDefinition[] = [")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, proc := range rpc.Procs {
-				g.Linef("{ rpcName: \"%s\", name: \"%s\", type: \"proc\" },", rpc.Name, proc.Name)
-			}
+		for _, proc := range schema.Procedures {
+			g.Linef("{ rpcName: \"%s\", name: \"%s\", type: \"proc\" },", proc.RpcName, proc.Name)
 		}
 	})
 	g.Line("];")
@@ -47,10 +45,8 @@ func generateCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string
 	g.Line(" */")
 	g.Line("export const VDLStreams: OperationDefinition[] = [")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, stream := range rpc.Streams {
-				g.Linef("{ rpcName: \"%s\", name: \"%s\", type: \"stream\" },", rpc.Name, stream.Name)
-			}
+		for _, stream := range schema.Streams {
+			g.Linef("{ rpcName: \"%s\", name: \"%s\", type: \"stream\" },", stream.RpcName, stream.Name)
 		}
 	})
 	g.Line("];")
@@ -64,14 +60,18 @@ func generateCatalog(schema *ir.Schema, config *config.TypeScriptConfig) (string
 	g.Line(" */")
 	g.Line("export const VDLPaths = {")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
+		for _, rpc := range schema.Rpcs {
 			g.Linef("%s: {", rpc.Name)
 			g.Block(func() {
-				for _, proc := range rpc.Procs {
-					g.Linef("%s: \"/%s/%s\",", proc.Name, rpc.Name, proc.Name)
+				for _, proc := range schema.Procedures {
+					if proc.RpcName == rpc.Name {
+						g.Linef("%s: \"/%s/%s\",", proc.Name, rpc.Name, proc.Name)
+					}
 				}
-				for _, stream := range rpc.Streams {
-					g.Linef("%s: \"/%s/%s\",", stream.Name, rpc.Name, stream.Name)
+				for _, stream := range schema.Streams {
+					if stream.RpcName == rpc.Name {
+						g.Linef("%s: \"/%s/%s\",", stream.Name, rpc.Name, stream.Name)
+					}
 				}
 			})
 			g.Line("},")

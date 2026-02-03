@@ -6,10 +6,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateEnums(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
+func generateEnums(schema *irtypes.IrSchema, _ *config.TypeScriptConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}
@@ -33,16 +33,16 @@ func generateEnums(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error
 // 1. A type definition (union of literal types)
 // 2. An array of all values
 // 3. A type guard function
-func generateEnum(g *gen.Generator, enum ir.Enum) {
+func generateEnum(g *gen.Generator, enum irtypes.EnumDef) {
 	// Documentation
-	if enum.Doc != "" {
-		renderMultilineComment(g, enum.Doc)
+	if enum.GetDoc() != "" {
+		renderMultilineComment(g, enum.GetDoc())
 	} else {
 		g.Linef("/** %s is an enumeration type. */", enum.Name)
 	}
 
 	// Deprecation
-	renderDeprecated(g, enum.Deprecated)
+	renderDeprecated(g, enum.Deprecation)
 
 	// 1. Type definition
 	// export type Status = "active" | "inactive";
@@ -51,7 +51,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	} else {
 		var values []string
 		for _, member := range enum.Members {
-			if enum.ValueType == ir.EnumValueTypeString {
+			if enum.EnumType == irtypes.EnumTypeString {
 				values = append(values, strconv.Quote(member.Value))
 			} else {
 				// Integer value
@@ -68,7 +68,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	g.Linef("export const %sList: %s[] = [", enum.Name, enum.Name)
 	g.Block(func() {
 		for _, member := range enum.Members {
-			if enum.ValueType == ir.EnumValueTypeString {
+			if enum.EnumType == irtypes.EnumTypeString {
 				g.Linef("%q,", member.Value)
 			} else {
 				// Integer value

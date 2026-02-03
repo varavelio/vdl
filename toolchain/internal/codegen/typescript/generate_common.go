@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -15,28 +15,28 @@ import (
 
 // typeRefToTS converts an IR TypeRef to its TypeScript type string representation.
 // parentTypeName is used to generate names for inline object types.
-func typeRefToTS(parentTypeName string, tr ir.TypeRef) string {
+func typeRefToTS(parentTypeName string, tr irtypes.TypeRef) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		return primitiveToTS(tr.Primitive)
+	case irtypes.TypeKindPrimitive:
+		return primitiveToTS(tr.GetPrimitiveName())
 
-	case ir.TypeKindType:
-		return tr.Type
+	case irtypes.TypeKindType:
+		return tr.GetTypeName()
 
-	case ir.TypeKindEnum:
-		return tr.Enum
+	case irtypes.TypeKindEnum:
+		return tr.GetEnumName()
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		// Build the element type first, then wrap with array suffix
-		elementType := typeRefToTS(parentTypeName, *tr.ArrayItem)
+		elementType := typeRefToTS(parentTypeName, *tr.ArrayType)
 		// Add array suffix for each dimension
-		return elementType + strings.Repeat("[]", tr.ArrayDimensions)
+		return elementType + strings.Repeat("[]", int(tr.GetArrayDims()))
 
-	case ir.TypeKindMap:
-		valueType := typeRefToTS(parentTypeName, *tr.MapValue)
+	case irtypes.TypeKindMap:
+		valueType := typeRefToTS(parentTypeName, *tr.MapType)
 		return fmt.Sprintf("Record<string, %s>", valueType)
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		// Inline objects get a generated name based on parent
 		return parentTypeName
 	}
@@ -45,17 +45,17 @@ func typeRefToTS(parentTypeName string, tr ir.TypeRef) string {
 }
 
 // primitiveToTS converts an IR primitive type to its TypeScript equivalent.
-func primitiveToTS(p ir.PrimitiveType) string {
+func primitiveToTS(p irtypes.PrimitiveType) string {
 	switch p {
-	case ir.PrimitiveString:
+	case irtypes.PrimitiveTypeString:
 		return "string"
-	case ir.PrimitiveInt:
+	case irtypes.PrimitiveTypeInt:
 		return "number"
-	case ir.PrimitiveFloat:
+	case irtypes.PrimitiveTypeFloat:
 		return "number"
-	case ir.PrimitiveBool:
+	case irtypes.PrimitiveTypeBool:
 		return "boolean"
-	case ir.PrimitiveDatetime:
+	case irtypes.PrimitiveTypeDatetime:
 		return "Date"
 	}
 	return "any"
@@ -66,13 +66,13 @@ func primitiveToTS(p ir.PrimitiveType) string {
 // =============================================================================
 
 // renderField generates the TypeScript code for a single field.
-func renderField(parentTypeName string, field ir.Field) string {
+func renderField(parentTypeName string, field irtypes.Field) string {
 	namePascal := strutil.ToPascalCase(field.Name)
 	nameCamel := strutil.ToCamelCase(field.Name)
 
 	// Calculate the inline type name for objects
 	inlineTypeName := parentTypeName + namePascal
-	typeLiteral := typeRefToTS(inlineTypeName, field.Type)
+	typeLiteral := typeRefToTS(inlineTypeName, field.TypeRef)
 
 	finalName := nameCamel
 	if field.Optional {
@@ -87,7 +87,7 @@ func renderField(parentTypeName string, field ir.Field) string {
 // =============================================================================
 
 // renderType renders a complete type definition with all its fields.
-func renderType(parentName, name, desc string, fields []ir.Field) string {
+func renderType(parentName, name, desc string, fields []irtypes.Field) string {
 	fullName := parentName + name
 
 	g := gen.New().WithSpaces(2)
@@ -106,7 +106,7 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 	g.Break()
 
 	// Render children inline types
-	renderChildrenTypes(g, fullName, fields, func(p, n string, f []ir.Field) string {
+	renderChildrenTypes(g, fullName, fields, func(p, n string, f []irtypes.Field) string {
 		return renderType(p, n, "", f)
 	})
 
@@ -115,27 +115,27 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 
 // renderChildrenTypes iterates over fields and recursively renders nested object types
 // found within Object, Array, or Map types.
-func renderChildrenTypes(g *gen.Generator, parentName string, fields []ir.Field, renderFunc func(string, string, []ir.Field) string) {
+func renderChildrenTypes(g *gen.Generator, parentName string, fields []irtypes.Field, renderFunc func(string, string, []irtypes.Field) string) {
 	for _, field := range fields {
-		renderChildType(g, parentName, field.Name, field.Type, renderFunc)
+		renderChildType(g, parentName, field.Name, field.TypeRef, renderFunc)
 	}
 }
 
 // renderChildType recursively checks for Object types within TypeRefs and renders them.
-func renderChildType(g *gen.Generator, parentName, fieldName string, tr ir.TypeRef, renderFunc func(string, string, []ir.Field) string) {
+func renderChildType(g *gen.Generator, parentName, fieldName string, tr irtypes.TypeRef, renderFunc func(string, string, []irtypes.Field) string) {
 	switch tr.Kind {
-	case ir.TypeKindObject:
-		if tr.Object != nil {
+	case irtypes.TypeKindObject:
+		if tr.ObjectFields != nil {
 			childName := parentName + strutil.ToPascalCase(fieldName)
-			g.Line(renderFunc("", childName, tr.Object.Fields))
+			g.Line(renderFunc("", childName, *tr.ObjectFields))
 		}
-	case ir.TypeKindArray:
-		if tr.ArrayItem != nil {
-			renderChildType(g, parentName, fieldName, *tr.ArrayItem, renderFunc)
+	case irtypes.TypeKindArray:
+		if tr.ArrayType != nil {
+			renderChildType(g, parentName, fieldName, *tr.ArrayType, renderFunc)
 		}
-	case ir.TypeKindMap:
-		if tr.MapValue != nil {
-			renderChildType(g, parentName, fieldName, *tr.MapValue, renderFunc)
+	case irtypes.TypeKindMap:
+		if tr.MapType != nil {
+			renderChildType(g, parentName, fieldName, *tr.MapType, renderFunc)
 		}
 	}
 }
@@ -145,7 +145,7 @@ func renderChildType(g *gen.Generator, parentName, fieldName string, tr ir.TypeR
 // =============================================================================
 
 // renderHydrateField generates the code for a field in a hydrate function.
-func renderHydrateField(parentTypeName string, field ir.Field) string {
+func renderHydrateField(parentTypeName string, field irtypes.Field) string {
 	namePascal := strutil.ToPascalCase(field.Name)
 	nameCamel := strutil.ToCamelCase(field.Name)
 	hydratedName := "hydrated" + namePascal
@@ -156,10 +156,10 @@ func renderHydrateField(parentTypeName string, field ir.Field) string {
 	// Compose the final value literal, handling arrays vs single values.
 	valueLiteral := fmt.Sprintf(valueFmt, "input."+nameCamel)
 
-	if field.Type.Kind == ir.TypeKindArray && field.Type.ArrayDimensions > 0 {
+	if field.TypeRef.Kind == irtypes.TypeKindArray && field.TypeRef.GetArrayDims() > 0 {
 		// Handle array types
 		valueLiteral = buildArrayHydration(parentTypeName, field)
-	} else if field.Type.Kind == ir.TypeKindMap {
+	} else if field.TypeRef.Kind == irtypes.TypeKindMap {
 		// Handle map types
 		valueLiteral = buildMapHydration(parentTypeName, field)
 	}
@@ -172,19 +172,19 @@ func renderHydrateField(parentTypeName string, field ir.Field) string {
 }
 
 // buildHydrationExpr returns a format string for hydrating a single value.
-func buildHydrationExpr(parentTypeName string, field ir.Field) string {
+func buildHydrationExpr(parentTypeName string, field irtypes.Field) string {
 	namePascal := strutil.ToPascalCase(field.Name)
 
-	switch field.Type.Kind {
-	case ir.TypeKindObject:
+	switch field.TypeRef.Kind {
+	case irtypes.TypeKindObject:
 		return fmt.Sprintf("hydrate%s%s(%%s)", parentTypeName, namePascal)
 
-	case ir.TypeKindType:
-		typePascal := strutil.ToPascalCase(field.Type.Type)
+	case irtypes.TypeKindType:
+		typePascal := strutil.ToPascalCase(field.TypeRef.GetTypeName())
 		return fmt.Sprintf("hydrate%s(%%s)", typePascal)
 
-	case ir.TypeKindPrimitive:
-		if field.Type.Primitive == ir.PrimitiveDatetime {
+	case irtypes.TypeKindPrimitive:
+		if field.TypeRef.GetPrimitiveName() == irtypes.PrimitiveTypeDatetime {
 			return "new Date(%s)"
 		}
 		return "%s"
@@ -195,9 +195,9 @@ func buildHydrationExpr(parentTypeName string, field ir.Field) string {
 }
 
 // buildArrayHydration builds the hydration expression for array types.
-func buildArrayHydration(parentTypeName string, field ir.Field) string {
+func buildArrayHydration(parentTypeName string, field irtypes.Field) string {
 	nameCamel := strutil.ToCamelCase(field.Name)
-	itemType := *field.Type.ArrayItem
+	itemType := *field.TypeRef.ArrayType
 
 	// Get the hydration expression for the base item
 	itemExpr := getItemHydrationExpr(parentTypeName, field.Name, itemType)
@@ -207,10 +207,12 @@ func buildArrayHydration(parentTypeName string, field ir.Field) string {
 		return fmt.Sprintf("input.%s", nameCamel)
 	}
 
+	arrayDims := int(field.TypeRef.GetArrayDims())
+
 	// Build nested map calls for multi-dimensional arrays
 	result := fmt.Sprintf("input.%s", nameCamel)
-	for i := 0; i < field.Type.ArrayDimensions; i++ {
-		if i == field.Type.ArrayDimensions-1 {
+	for i := 0; i < arrayDims; i++ {
+		if i == arrayDims-1 {
 			result = fmt.Sprintf("%s.map(el => %s)", result, itemExpr)
 		} else {
 			result = fmt.Sprintf("%s.map(arr%d => arr%d", result, i, i)
@@ -218,8 +220,8 @@ func buildArrayHydration(parentTypeName string, field ir.Field) string {
 	}
 
 	// Close nested maps
-	if field.Type.ArrayDimensions > 1 {
-		for i := 0; i < field.Type.ArrayDimensions-1; i++ {
+	if arrayDims > 1 {
+		for i := 0; i < arrayDims-1; i++ {
 			result += ")"
 		}
 	}
@@ -228,9 +230,9 @@ func buildArrayHydration(parentTypeName string, field ir.Field) string {
 }
 
 // buildMapHydration builds the hydration expression for map types.
-func buildMapHydration(parentTypeName string, field ir.Field) string {
+func buildMapHydration(parentTypeName string, field irtypes.Field) string {
 	nameCamel := strutil.ToCamelCase(field.Name)
-	valueType := *field.Type.MapValue
+	valueType := *field.TypeRef.MapType
 
 	valueExpr := getItemHydrationExpr(parentTypeName, field.Name, valueType)
 
@@ -249,32 +251,32 @@ func buildMapHydration(parentTypeName string, field ir.Field) string {
 }
 
 // getItemHydrationExpr returns the hydration expression for an array/map item.
-func getItemHydrationExpr(parentTypeName, fieldName string, tr ir.TypeRef) string {
+func getItemHydrationExpr(parentTypeName, fieldName string, tr irtypes.TypeRef) string {
 	switch tr.Kind {
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		fieldPascal := strutil.ToPascalCase(fieldName)
 		return fmt.Sprintf("hydrate%s%s(el)", parentTypeName, fieldPascal)
 
-	case ir.TypeKindType:
-		typePascal := strutil.ToPascalCase(tr.Type)
+	case irtypes.TypeKindType:
+		typePascal := strutil.ToPascalCase(tr.GetTypeName())
 		return fmt.Sprintf("hydrate%s(el)", typePascal)
 
-	case ir.TypeKindPrimitive:
-		if tr.Primitive == ir.PrimitiveDatetime {
+	case irtypes.TypeKindPrimitive:
+		if tr.GetPrimitiveName() == irtypes.PrimitiveTypeDatetime {
 			return "new Date(el)"
 		}
 		return "el"
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		// Nested arrays need recursive handling
-		innerExpr := getItemHydrationExpr(parentTypeName, fieldName, *tr.ArrayItem)
+		innerExpr := getItemHydrationExpr(parentTypeName, fieldName, *tr.ArrayType)
 		if innerExpr == "el" {
 			return "el"
 		}
 		return fmt.Sprintf("el.map(inner => %s)", strings.ReplaceAll(innerExpr, "el", "inner"))
 
-	case ir.TypeKindMap:
-		innerExpr := getItemHydrationExpr(parentTypeName, fieldName, *tr.MapValue)
+	case irtypes.TypeKindMap:
+		innerExpr := getItemHydrationExpr(parentTypeName, fieldName, *tr.MapType)
 		if innerExpr == "el" {
 			return "el"
 		}
@@ -288,7 +290,7 @@ func getItemHydrationExpr(parentTypeName, fieldName string, tr ir.TypeRef) strin
 
 // renderHydrateType renders a function used to transform a type returned from JSON.parse
 // to its final type.
-func renderHydrateType(parentName string, name string, fields []ir.Field) string {
+func renderHydrateType(parentName string, name string, fields []irtypes.Field) string {
 	fullName := parentName + name
 
 	g := gen.New().WithSpaces(2)
@@ -336,16 +338,16 @@ func renderPartialMultilineComment(g *gen.Generator, text string) {
 }
 
 // renderDeprecated renders a deprecation comment for TypeScript.
-func renderDeprecated(g *gen.Generator, deprecated *ir.Deprecation) {
+func renderDeprecated(g *gen.Generator, deprecated *string) {
 	if deprecated == nil {
 		return
 	}
 
 	desc := "@deprecated "
-	if deprecated.Message == "" {
+	if *deprecated == "" {
 		desc += "This is deprecated and should not be used in new code."
 	} else {
-		desc += deprecated.Message
+		desc += *deprecated
 	}
 
 	g.Line(" *")
@@ -357,29 +359,29 @@ func renderDeprecated(g *gen.Generator, deprecated *ir.Deprecation) {
 // =============================================================================
 
 // needsValidation returns true if a field type requires validation (has enums or nested types).
-func needsValidation(tr ir.TypeRef) bool {
+func needsValidation(tr irtypes.TypeRef) bool {
 	switch tr.Kind {
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		return true
-	case ir.TypeKindType:
+	case irtypes.TypeKindType:
 		return true
-	case ir.TypeKindObject:
-		if tr.Object != nil {
-			for _, f := range tr.Object.Fields {
-				if needsValidation(f.Type) {
+	case irtypes.TypeKindObject:
+		if tr.ObjectFields != nil {
+			for _, f := range *tr.ObjectFields {
+				if needsValidation(f.TypeRef) {
 					return true
 				}
 			}
 		}
 		return false
-	case ir.TypeKindArray:
-		if tr.ArrayItem != nil {
-			return needsValidation(*tr.ArrayItem)
+	case irtypes.TypeKindArray:
+		if tr.ArrayType != nil {
+			return needsValidation(*tr.ArrayType)
 		}
 		return false
-	case ir.TypeKindMap:
-		if tr.MapValue != nil {
-			return needsValidation(*tr.MapValue)
+	case irtypes.TypeKindMap:
+		if tr.MapType != nil {
+			return needsValidation(*tr.MapType)
 		}
 		return false
 	default:
@@ -388,9 +390,9 @@ func needsValidation(tr ir.TypeRef) bool {
 }
 
 // fieldsNeedValidation returns true if any field in the list requires validation.
-func fieldsNeedValidation(fields []ir.Field) bool {
+func fieldsNeedValidation(fields []irtypes.Field) bool {
 	for _, field := range fields {
-		if needsValidation(field.Type) {
+		if needsValidation(field.TypeRef) {
 			return true
 		}
 	}
@@ -399,7 +401,7 @@ func fieldsNeedValidation(fields []ir.Field) bool {
 
 // renderValidateType renders a validation function for a type.
 // Returns empty string if no validation is needed.
-func renderValidateType(parentName string, name string, fields []ir.Field) string {
+func renderValidateType(parentName string, name string, fields []irtypes.Field) string {
 	fullName := parentName + name
 
 	// Check if any field needs validation
@@ -429,7 +431,7 @@ func renderValidateType(parentName string, name string, fields []ir.Field) strin
 		for _, field := range fields {
 			nameCamel := strutil.ToCamelCase(field.Name)
 
-			if !needsValidation(field.Type) {
+			if !needsValidation(field.TypeRef) {
 				continue
 			}
 
@@ -461,10 +463,10 @@ func renderValidateType(parentName string, name string, fields []ir.Field) strin
 }
 
 // renderFieldValidation generates validation code for a single field.
-func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Field, accessor string, pathExpr string) {
-	switch field.Type.Kind {
-	case ir.TypeKindEnum:
-		enumName := field.Type.Enum
+func renderFieldValidation(g *gen.Generator, parentTypeName string, field irtypes.Field, accessor string, pathExpr string) {
+	switch field.TypeRef.Kind {
+	case irtypes.TypeKindEnum:
+		enumName := field.TypeRef.GetEnumName()
 		g.Linef("{")
 		g.Block(func() {
 			g.Linef("if (!is%s(%s)) {", enumName, accessor)
@@ -475,8 +477,8 @@ func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Fie
 		})
 		g.Linef("}")
 
-	case ir.TypeKindType:
-		typeName := strutil.ToPascalCase(field.Type.Type)
+	case irtypes.TypeKindType:
+		typeName := strutil.ToPascalCase(field.TypeRef.GetTypeName())
 		g.Linef("{")
 		g.Block(func() {
 			g.Linef("const err = validate%s(%s, `%s`);", typeName, accessor, pathExpr)
@@ -484,7 +486,7 @@ func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Fie
 		})
 		g.Linef("}")
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		fieldPascal := strutil.ToPascalCase(field.Name)
 		inlineTypeName := parentTypeName + fieldPascal
 		g.Linef("{")
@@ -494,7 +496,7 @@ func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Fie
 		})
 		g.Linef("}")
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		g.Linef("{")
 		g.Block(func() {
 			g.Linef("if (!Array.isArray(%s)) {", accessor)
@@ -504,13 +506,13 @@ func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Fie
 			g.Line("}")
 			g.Linef("for (let i = 0; i < %s.length; i++) {", accessor)
 			g.Block(func() {
-				renderArrayItemValidation(g, parentTypeName, field.Name, *field.Type.ArrayItem, accessor+"[i]", pathExpr+"[${i}]")
+				renderArrayItemValidation(g, parentTypeName, field.Name, *field.TypeRef.ArrayType, accessor+"[i]", pathExpr+"[${i}]")
 			})
 			g.Line("}")
 		})
 		g.Linef("}")
 
-	case ir.TypeKindMap:
+	case irtypes.TypeKindMap:
 		g.Linef("{")
 		g.Block(func() {
 			g.Linef("if (typeof %s !== \"object\" || %s === null) {", accessor, accessor)
@@ -520,7 +522,7 @@ func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Fie
 			g.Line("}")
 			g.Linef("for (const [k, v] of Object.entries(%s)) {", accessor)
 			g.Block(func() {
-				renderMapValueValidation(g, parentTypeName, field.Name, *field.Type.MapValue, "v", pathExpr+"[${k}]")
+				renderMapValueValidation(g, parentTypeName, field.Name, *field.TypeRef.MapType, "v", pathExpr+"[${k}]")
 			})
 			g.Line("}")
 		})
@@ -529,18 +531,18 @@ func renderFieldValidation(g *gen.Generator, parentTypeName string, field ir.Fie
 }
 
 // renderArrayItemValidation generates validation code for array items.
-func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName string, tr ir.TypeRef, accessor, pathExpr string) {
+func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName string, tr irtypes.TypeRef, accessor, pathExpr string) {
 	switch tr.Kind {
-	case ir.TypeKindEnum:
-		enumName := tr.Enum
+	case irtypes.TypeKindEnum:
+		enumName := tr.GetEnumName()
 		g.Linef("if (!is%s(%s)) {", enumName, accessor)
 		g.Block(func() {
 			g.Linef("return `%s: invalid enum value '${%s}' for %s`;", pathExpr, accessor, enumName)
 		})
 		g.Line("}")
 
-	case ir.TypeKindType:
-		typeName := strutil.ToPascalCase(tr.Type)
+	case irtypes.TypeKindType:
+		typeName := strutil.ToPascalCase(tr.GetTypeName())
 		g.Linef("{")
 		g.Block(func() {
 			g.Linef("const err = validate%s(%s, `%s`);", typeName, accessor, pathExpr)
@@ -548,7 +550,7 @@ func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName strin
 		})
 		g.Linef("}")
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		fieldPascal := strutil.ToPascalCase(fieldName)
 		inlineTypeName := parentTypeName + fieldPascal
 		g.Linef("{")
@@ -558,8 +560,8 @@ func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName strin
 		})
 		g.Linef("}")
 
-	case ir.TypeKindArray:
-		if tr.ArrayItem != nil {
+	case irtypes.TypeKindArray:
+		if tr.ArrayType != nil {
 			g.Linef("if (!Array.isArray(%s)) {", accessor)
 			g.Block(func() {
 				g.Linef("return `%s: expected array, got ${typeof %s}`;", pathExpr, accessor)
@@ -567,13 +569,13 @@ func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName strin
 			g.Line("}")
 			g.Linef("for (let j = 0; j < %s.length; j++) {", accessor)
 			g.Block(func() {
-				renderArrayItemValidation(g, parentTypeName, fieldName, *tr.ArrayItem, accessor+"[j]", pathExpr+"[${j}]")
+				renderArrayItemValidation(g, parentTypeName, fieldName, *tr.ArrayType, accessor+"[j]", pathExpr+"[${j}]")
 			})
 			g.Line("}")
 		}
 
-	case ir.TypeKindMap:
-		if tr.MapValue != nil {
+	case irtypes.TypeKindMap:
+		if tr.MapType != nil {
 			g.Linef("if (typeof %s !== \"object\" || %s === null) {", accessor, accessor)
 			g.Block(func() {
 				g.Linef("return `%s: expected object, got ${typeof %s}`;", pathExpr, accessor)
@@ -581,7 +583,7 @@ func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName strin
 			g.Line("}")
 			g.Linef("for (const [mk, mv] of Object.entries(%s)) {", accessor)
 			g.Block(func() {
-				renderMapValueValidation(g, parentTypeName, fieldName, *tr.MapValue, "mv", pathExpr+"[${mk}]")
+				renderMapValueValidation(g, parentTypeName, fieldName, *tr.MapType, "mv", pathExpr+"[${mk}]")
 			})
 			g.Line("}")
 		}
@@ -589,18 +591,18 @@ func renderArrayItemValidation(g *gen.Generator, parentTypeName, fieldName strin
 }
 
 // renderMapValueValidation generates validation code for map values.
-func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string, tr ir.TypeRef, accessor, pathExpr string) {
+func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string, tr irtypes.TypeRef, accessor, pathExpr string) {
 	switch tr.Kind {
-	case ir.TypeKindEnum:
-		enumName := tr.Enum
+	case irtypes.TypeKindEnum:
+		enumName := tr.GetEnumName()
 		g.Linef("if (!is%s(%s)) {", enumName, accessor)
 		g.Block(func() {
 			g.Linef("return `%s: invalid enum value '${%s}' for %s`;", pathExpr, accessor, enumName)
 		})
 		g.Line("}")
 
-	case ir.TypeKindType:
-		typeName := strutil.ToPascalCase(tr.Type)
+	case irtypes.TypeKindType:
+		typeName := strutil.ToPascalCase(tr.GetTypeName())
 		g.Linef("{")
 		g.Block(func() {
 			g.Linef("const err = validate%s(%s, `%s`);", typeName, accessor, pathExpr)
@@ -608,7 +610,7 @@ func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string
 		})
 		g.Linef("}")
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		fieldPascal := strutil.ToPascalCase(fieldName)
 		inlineTypeName := parentTypeName + fieldPascal
 		g.Linef("{")
@@ -618,8 +620,8 @@ func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string
 		})
 		g.Linef("}")
 
-	case ir.TypeKindArray:
-		if tr.ArrayItem != nil {
+	case irtypes.TypeKindArray:
+		if tr.ArrayType != nil {
 			g.Linef("if (!Array.isArray(%s)) {", accessor)
 			g.Block(func() {
 				g.Linef("return `%s: expected array, got ${typeof %s}`;", pathExpr, accessor)
@@ -627,13 +629,13 @@ func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string
 			g.Line("}")
 			g.Linef("for (let mi = 0; mi < %s.length; mi++) {", accessor)
 			g.Block(func() {
-				renderArrayItemValidation(g, parentTypeName, fieldName, *tr.ArrayItem, accessor+"[mi]", pathExpr+"[${mi}]")
+				renderArrayItemValidation(g, parentTypeName, fieldName, *tr.ArrayType, accessor+"[mi]", pathExpr+"[${mi}]")
 			})
 			g.Line("}")
 		}
 
-	case ir.TypeKindMap:
-		if tr.MapValue != nil {
+	case irtypes.TypeKindMap:
+		if tr.MapType != nil {
 			g.Linef("if (typeof %s !== \"object\" || %s === null) {", accessor, accessor)
 			g.Block(func() {
 				g.Linef("return `%s: expected object, got ${typeof %s}`;", pathExpr, accessor)
@@ -641,7 +643,7 @@ func renderMapValueValidation(g *gen.Generator, parentTypeName, fieldName string
 			g.Line("}")
 			g.Linef("for (const [nk, nv] of Object.entries(%s)) {", accessor)
 			g.Block(func() {
-				renderMapValueValidation(g, parentTypeName, fieldName, *tr.MapValue, "nv", pathExpr+"[${nk}]")
+				renderMapValueValidation(g, parentTypeName, fieldName, *tr.MapType, "nv", pathExpr+"[${nk}]")
 			})
 			g.Line("}")
 		}

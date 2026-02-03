@@ -6,14 +6,14 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 //go:embed pieces/client.ts
 var clientRawPiece string
 
-func generateClient(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
+func generateClient(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}
@@ -161,7 +161,7 @@ func generateClientClass(g *gen.Generator) {
 }
 
 // generateProcedureImplementation generates all procedure-related code
-func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
+func generateProcedureImplementation(g *gen.Generator, schema *irtypes.IrSchema) {
 	g.Line("// =============================================================================")
 	g.Line("// Procedure Implementation")
 	g.Line("// =============================================================================")
@@ -184,19 +184,19 @@ func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 
 		// Generate method for each procedure
 		for _, proc := range schema.Procedures {
-			fullName := proc.FullName()
+			fullName := strutil.ToPascalCase(proc.RpcName) + strutil.ToPascalCase(proc.Name)
 			builderName := fmt.Sprintf("builder%s", fullName)
-			methodName := strutil.ToCamelCase(proc.RPCName) + strutil.ToPascalCase(proc.Name)
+			methodName := strutil.ToCamelCase(proc.RpcName) + strutil.ToPascalCase(proc.Name)
 
 			g.Linef("/**")
 			g.Linef(" * Creates a call builder for the %s procedure.", fullName)
-			if proc.Deprecated != nil {
-				renderDeprecated(g, proc.Deprecated)
+			if proc.Deprecation != nil {
+				renderDeprecated(g, proc.Deprecation)
 			}
 			g.Linef(" */")
 			g.Linef("%s(): %s {", methodName, builderName)
 			g.Block(func() {
-				g.Linef("return new %s(this.intClient, \"%s\", \"%s\");", builderName, proc.RPCName, proc.Name)
+				g.Linef("return new %s(this.intClient, \"%s\", \"%s\");", builderName, proc.RpcName, proc.Name)
 			})
 			g.Line("}")
 			g.Break()
@@ -207,17 +207,17 @@ func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 
 	// Generate individual procedure builders
 	for _, proc := range schema.Procedures {
-		fullName := proc.FullName()
+		fullName := strutil.ToPascalCase(proc.RpcName) + strutil.ToPascalCase(proc.Name)
 		builderName := fmt.Sprintf("builder%s", fullName)
 		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
 		inputType := fmt.Sprintf("%sInput", fullName)
 		outputType := fmt.Sprintf("%sOutput", fullName)
-		methodName := strutil.ToCamelCase(proc.RPCName) + strutil.ToPascalCase(proc.Name)
+		methodName := strutil.ToCamelCase(proc.RpcName) + strutil.ToPascalCase(proc.Name)
 
 		g.Linef("/**")
 		g.Linef(" * Fluent builder for the %s procedure.", fullName)
-		if proc.Deprecated != nil && proc.Deprecated.Message != "" {
-			g.Linef(" * @deprecated %s", proc.Deprecated.Message)
+		if proc.Deprecation != nil && *proc.Deprecation != "" {
+			g.Linef(" * @deprecated %s", *proc.Deprecation)
 		}
 		g.Linef(" */")
 		g.Linef("class %s {", builderName)
@@ -413,7 +413,7 @@ func generateProcedureImplementation(g *gen.Generator, schema *ir.Schema) {
 }
 
 // generateStreamImplementation generates all stream-related code
-func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
+func generateStreamImplementation(g *gen.Generator, schema *irtypes.IrSchema) {
 	g.Line("// =============================================================================")
 	g.Line("// Stream Implementation")
 	g.Line("// =============================================================================")
@@ -437,19 +437,19 @@ func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 
 		// Generate method for each stream
 		for _, stream := range schema.Streams {
-			fullName := stream.FullName()
+			fullName := strutil.ToPascalCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 			builderName := fmt.Sprintf("builder%sStream", fullName)
-			methodName := strutil.ToCamelCase(stream.RPCName) + strutil.ToPascalCase(stream.Name)
+			methodName := strutil.ToCamelCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 
 			g.Linef("/**")
 			g.Linef(" * Creates a stream builder for the %s stream.", fullName)
-			if stream.Deprecated != nil {
-				renderDeprecated(g, stream.Deprecated)
+			if stream.Deprecation != nil {
+				renderDeprecated(g, stream.Deprecation)
 			}
 			g.Linef(" */")
 			g.Linef("%s(): %s {", methodName, builderName)
 			g.Block(func() {
-				g.Linef("return new %s(this.intClient, \"%s\", \"%s\");", builderName, stream.RPCName, stream.Name)
+				g.Linef("return new %s(this.intClient, \"%s\", \"%s\");", builderName, stream.RpcName, stream.Name)
 			})
 			g.Line("}")
 			g.Break()
@@ -460,18 +460,18 @@ func generateStreamImplementation(g *gen.Generator, schema *ir.Schema) {
 
 	// Generate individual stream builders
 	for _, stream := range schema.Streams {
-		fullName := stream.FullName()
+		fullName := strutil.ToPascalCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 		builderName := fmt.Sprintf("builder%sStream", fullName)
 		hydrateFuncName := fmt.Sprintf("hydrate%sOutput", fullName)
 		inputType := fmt.Sprintf("%sInput", fullName)
 		outputType := fmt.Sprintf("%sOutput", fullName)
 		responseType := fmt.Sprintf("%sResponse", fullName)
-		methodName := strutil.ToCamelCase(stream.RPCName) + strutil.ToPascalCase(stream.Name)
+		methodName := strutil.ToCamelCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 
 		g.Linef("/**")
 		g.Linef(" * Fluent builder for the %s stream.", fullName)
-		if stream.Deprecated != nil && stream.Deprecated.Message != "" {
-			g.Linef(" * @deprecated %s", stream.Deprecated.Message)
+		if stream.Deprecation != nil && *stream.Deprecation != "" {
+			g.Linef(" * @deprecated %s", *stream.Deprecation)
 		}
 		g.Linef(" */")
 		g.Linef("class %s {", builderName)

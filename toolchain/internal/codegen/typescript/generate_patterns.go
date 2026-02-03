@@ -6,11 +6,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generatePatterns generates TypeScript pattern template functions.
-func generatePatterns(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
+func generatePatterns(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
 	if !config.ShouldGenPatterns() {
 		return "", nil
 	}
@@ -34,11 +34,11 @@ func generatePatterns(schema *ir.Schema, config *config.TypeScriptConfig) (strin
 }
 
 // renderPattern renders a single pattern template function.
-func renderPattern(g *gen.Generator, pattern ir.Pattern) {
+func renderPattern(g *gen.Generator, pattern irtypes.PatternDef) {
 	// Generate doc comment
 	g.Line("/**")
 
-	doc := pattern.Doc
+	doc := pattern.GetDoc()
 	if doc == "" {
 		doc = fmt.Sprintf("%s generates a string from the pattern template.", pattern.Name)
 	}
@@ -49,7 +49,7 @@ func renderPattern(g *gen.Generator, pattern ir.Pattern) {
 		g.Linef(" * Template: `%s`", pattern.Template)
 	}
 
-	renderDeprecated(g, pattern.Deprecated)
+	renderDeprecated(g, pattern.Deprecation)
 	g.Line(" */")
 
 	// Generate function signature with parameters

@@ -7,7 +7,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 	"github.com/varavelio/vdl/toolchain/internal/version"
 )
@@ -51,7 +51,7 @@ func FileHeader() string {
 }
 
 // Generate produces TypeScript source files from the IR schema.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	var files []File
 
 	// Track which optional files are generated
@@ -111,7 +111,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// client.ts
-	if g.config.GenClient && len(schema.RPCs) > 0 {
+	if g.config.GenClient && len(schema.Rpcs) > 0 {
 		clientContent, err := generateClient(schema, g.config)
 		if err != nil {
 			return nil, err
@@ -120,7 +120,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	}
 
 	// server.ts
-	if g.config.GenServer && len(schema.RPCs) > 0 {
+	if g.config.GenServer && len(schema.Rpcs) > 0 {
 		serverContent, err := generateServer(schema, g.config)
 		if err != nil {
 			return nil, err
@@ -155,10 +155,10 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 	if strings.TrimSpace(catalogContent) != "" {
 		indexBuilder.Line(generateExportAll("./catalog", g.config))
 	}
-	if g.config.GenClient && len(schema.RPCs) > 0 {
+	if g.config.GenClient && len(schema.Rpcs) > 0 {
 		indexBuilder.Line(generateExportAll("./client", g.config))
 	}
-	if g.config.GenServer && len(schema.RPCs) > 0 {
+	if g.config.GenServer && len(schema.Rpcs) > 0 {
 		indexBuilder.Line(generateExportAll("./server", g.config))
 	}
 	addFile("index.ts", []byte(indexBuilder.String()))

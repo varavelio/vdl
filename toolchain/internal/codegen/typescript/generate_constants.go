@@ -3,10 +3,10 @@ package typescript
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateConstants(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
+func generateConstants(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
 	if !config.ShouldGenConsts() {
 		return "", nil
 	}
@@ -30,24 +30,24 @@ func generateConstants(schema *ir.Schema, config *config.TypeScriptConfig) (stri
 }
 
 // generateConstant generates TypeScript code for a single constant.
-func generateConstant(g *gen.Generator, constant ir.Constant) {
+func generateConstant(g *gen.Generator, constant irtypes.ConstantDef) {
 	// Documentation
-	if constant.Doc != "" {
-		renderMultilineComment(g, constant.Doc)
+	if constant.GetDoc() != "" {
+		renderMultilineComment(g, constant.GetDoc())
 	}
 
 	// Deprecation
-	renderDeprecated(g, constant.Deprecated)
+	renderDeprecated(g, constant.Deprecation)
 
 	// Constant definition
-	switch constant.ValueType {
-	case ir.ConstValueTypeString:
+	switch constant.ConstType {
+	case irtypes.ConstTypeString:
 		g.Linef("export const %s: string = %q;", constant.Name, constant.Value)
-	case ir.ConstValueTypeInt:
+	case irtypes.ConstTypeInt:
 		g.Linef("export const %s: number = %s;", constant.Name, constant.Value)
-	case ir.ConstValueTypeFloat:
+	case irtypes.ConstTypeFloat:
 		g.Linef("export const %s: number = %s;", constant.Name, constant.Value)
-	case ir.ConstValueTypeBool:
+	case irtypes.ConstTypeBool:
 		g.Linef("export const %s: boolean = %s;", constant.Name, constant.Value)
 	default:
 		// Fallback: treat as string

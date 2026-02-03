@@ -5,10 +5,11 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func generateStreamTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string, error) {
+func generateStreamTypes(schema *irtypes.IrSchema, _ *config.TypeScriptConfig) (string, error) {
 	g := gen.New().WithSpaces(2)
 
 	if len(schema.Streams) > 0 {
@@ -18,7 +19,7 @@ func generateStreamTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string,
 		g.Break()
 
 		for _, stream := range schema.Streams {
-			fullName := stream.FullName()
+			fullName := strutil.ToPascalCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 
 			inputName := fmt.Sprintf("%sInput", fullName)
 			outputName := fmt.Sprintf("%sOutput", fullName)
@@ -28,16 +29,16 @@ func generateStreamTypes(schema *ir.Schema, _ *config.TypeScriptConfig) (string,
 			outputDesc := fmt.Sprintf("%s represents the output parameters for the %s stream.", outputName, fullName)
 			responseDesc := fmt.Sprintf("%s represents the response for the %s stream.", responseName, fullName)
 
-			g.Line(renderType("", inputName, inputDesc, stream.Input))
+			g.Line(renderType("", inputName, inputDesc, stream.InputFields))
 			g.Break()
 
-			g.Line(renderType("", outputName, outputDesc, stream.Output))
+			g.Line(renderType("", outputName, outputDesc, stream.OutputFields))
 			g.Break()
 
-			g.Line(renderHydrateType("", outputName, stream.Output))
+			g.Line(renderHydrateType("", outputName, stream.OutputFields))
 			g.Break()
 
-			g.Line(renderValidateType("", inputName, stream.Input))
+			g.Line(renderValidateType("", inputName, stream.InputFields))
 			g.Break()
 
 			g.Linef("// %s", responseDesc)

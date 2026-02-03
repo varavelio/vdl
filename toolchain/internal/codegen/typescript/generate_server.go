@@ -6,7 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -14,7 +14,7 @@ import (
 var serverRawPiece string
 
 // generateServer generates the complete server implementation.
-func generateServer(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
+func generateServer(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
@@ -34,8 +34,8 @@ func generateServer(schema *ir.Schema, config *config.TypeScriptConfig) (string,
 	g.Raw(core)
 	g.Break()
 
-	for _, rpc := range schema.RPCs {
-		rpcCode, err := generateServerRPC(rpc, config)
+	for _, rpc := range schema.Rpcs {
+		rpcCode, err := generateServerRPC(rpc, schema, config)
 		if err != nil {
 			return "", err
 		}
@@ -47,7 +47,7 @@ func generateServer(schema *ir.Schema, config *config.TypeScriptConfig) (string,
 }
 
 // generateServerCore generates the core server implementation (server.ts).
-func generateServerCore(schema *ir.Schema, config *config.TypeScriptConfig) (string, error) {
+func generateServerCore(schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
@@ -164,7 +164,7 @@ func generateServerCore(schema *ir.Schema, config *config.TypeScriptConfig) (str
 		g.Line("constructor(intServer: InternalServer<T>) { this.intServer = intServer; }")
 		g.Break()
 
-		for _, rpc := range schema.RPCs {
+		for _, rpc := range schema.Rpcs {
 			rpcName := rpc.Name
 			rpcPascal := strutil.ToPascalCase(rpcName)
 			methodName := strutil.ToCamelCase(rpcName)
@@ -186,7 +186,7 @@ func generateServerCore(schema *ir.Schema, config *config.TypeScriptConfig) (str
 }
 
 // generateServerRPC generates the server implementation for a specific RPC.
-func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, error) {
+func generateServerRPC(rpc irtypes.RpcDef, schema *irtypes.IrSchema, config *config.TypeScriptConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
@@ -254,7 +254,10 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 		g.Line("constructor(intServer: InternalServer<T>) { this.intServer = intServer; }")
 		g.Break()
 
-		for _, proc := range rpc.Procs {
+		for _, proc := range schema.Procedures {
+			if proc.RpcName != rpcName {
+				continue
+			}
 			uniqueName := rpcPascal + strutil.ToPascalCase(proc.Name)
 			entryName := fmt.Sprintf("Proc%sEntry", uniqueName)
 
@@ -277,7 +280,10 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 		g.Line("constructor(intServer: InternalServer<T>) { this.intServer = intServer; }")
 		g.Break()
 
-		for _, stream := range rpc.Streams {
+		for _, stream := range schema.Streams {
+			if stream.RpcName != rpcName {
+				continue
+			}
 			uniqueName := rpcPascal + strutil.ToPascalCase(stream.Name)
 			entryName := fmt.Sprintf("Stream%sEntry", uniqueName)
 
@@ -294,11 +300,15 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 	g.Break()
 
 	// 5. Procedure Entry Classes
-	for _, proc := range rpc.Procs {
+	for _, proc := range schema.Procedures {
+		if proc.RpcName != rpcName {
+			continue
+		}
+		fullName := strutil.ToPascalCase(proc.RpcName) + strutil.ToPascalCase(proc.Name)
 		uniqueName := rpcPascal + strutil.ToPascalCase(proc.Name)
 		entryName := fmt.Sprintf("Proc%sEntry", uniqueName)
-		inputName := fmt.Sprintf("%sInput", proc.FullName())
-		outputName := fmt.Sprintf("%sOutput", proc.FullName())
+		inputName := fmt.Sprintf("%sInput", fullName)
+		outputName := fmt.Sprintf("%sOutput", fullName)
 
 		g.Linef("export class %s<T> {", entryName)
 		g.Block(func() {
@@ -361,7 +371,7 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 				g.Break()
 				g.Line("const deserializer: DeserializerFunc = async (raw) => {")
 				g.Block(func() {
-					validateFnName := fmt.Sprintf("validate%sInput", proc.FullName())
+					validateFnName := fmt.Sprintf("validate%sInput", fullName)
 					g.Linef("const err = vdlTypes.%s(raw);", validateFnName)
 					g.Line("if (err !== null) {")
 					g.Block(func() {
@@ -381,11 +391,15 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 	}
 
 	// 6. Stream Entry Classes
-	for _, stream := range rpc.Streams {
+	for _, stream := range schema.Streams {
+		if stream.RpcName != rpcName {
+			continue
+		}
+		fullName := strutil.ToPascalCase(stream.RpcName) + strutil.ToPascalCase(stream.Name)
 		uniqueName := rpcPascal + strutil.ToPascalCase(stream.Name)
 		entryName := fmt.Sprintf("Stream%sEntry", uniqueName)
-		inputName := fmt.Sprintf("%sInput", stream.FullName())
-		outputName := fmt.Sprintf("%sOutput", stream.FullName())
+		inputName := fmt.Sprintf("%sInput", fullName)
+		outputName := fmt.Sprintf("%sOutput", fullName)
 
 		g.Linef("export class %s<T> {", entryName)
 		g.Block(func() {
@@ -494,7 +508,7 @@ func generateServerRPC(rpc ir.RPC, config *config.TypeScriptConfig) (string, err
 				g.Break()
 				g.Line("const deserializer: DeserializerFunc = async (raw) => {")
 				g.Block(func() {
-					validateFnName := fmt.Sprintf("validate%sInput", stream.FullName())
+					validateFnName := fmt.Sprintf("validate%sInput", fullName)
 					g.Linef("const err = vdlTypes.%s(raw);", validateFnName)
 					g.Line("if (err !== null) {")
 					g.Block(func() {
