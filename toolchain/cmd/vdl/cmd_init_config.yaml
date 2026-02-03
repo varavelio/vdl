@@ -12,13 +12,13 @@ targets:
   # - go:
   #     output: ./gen/go
   #     package: vdl
-  #     gen_server: false
-  #     gen_client: false
+  #     genServer: false
+  #     genClient: false
 
   # - typescript:
   #     output: ./gen/ts
-  #     gen_server: false
-  #     gen_client: false
+  #     genServer: false
+  #     genClient: false
 
   # - dart:
   #     output: ./gen/dart
@@ -30,6 +30,7 @@ targets:
   #     output: ./gen/jsonschema
   #     filename: schema.json
   #     id: https://example.com/schema.json
+  #     root: MyRpcBarProcInput
 
   # - openapi:
   #     output: ./gen/openapi
@@ -39,7 +40,7 @@ targets:
 
   # - playground:
   #     output: ./gen/playground
-  #     default_base_url: http://localhost:8080/rpc
+  #     defaultBaseUrl: http://localhost:8080/rpc
 
   # - plugin:
   #     output: ./gen/plugin
