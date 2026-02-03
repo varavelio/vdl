@@ -13,7 +13,7 @@ import (
 // For example, if ImportExtension is ".js", "./core" becomes "./core.js".
 func formatImportPath(path string, cfg *configtypes.TypeScriptTargetConfig) string {
 	ext := config.GetImportExtension(cfg.ImportExtension)
-	if ext == "" || ext == configtypes.TypescriptImportExtensionNone {
+	if ext == "" || ext == configtypes.TypescriptTargetImportExtensionNone {
 		return path
 	}
 	return path + string(ext)

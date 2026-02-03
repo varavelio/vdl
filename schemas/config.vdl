@@ -5,7 +5,7 @@ This schema defines the configuration format for the VDL code generator (vdl.yam
 
 It supports multiple target languages and output formats
 """
-type VdlConfig {
+type VdlCodegenConfig {
   """ Configuration version (must be 1) """
   version: int
 
@@ -108,11 +108,11 @@ type TypeScriptTargetConfig {
   ...ServerTargetConfig
 
   """ File extension to append to import paths """
-  importExtension?: TypescriptImportExtension
+  importExtension?: TypescriptTargetImportExtension
 }
 
 """ Import extension options for TypeScript target """
-enum TypescriptImportExtension {
+enum TypescriptTargetImportExtension {
   None = "none"
   Js = ".js"
   Ts = ".ts"
@@ -186,11 +186,11 @@ type PlaygroundTargetConfig {
   defaultBaseUrl?: string
 
   """ Default headers to include in API requests """
-  defaultHeaders?: PlaygroundHeader[]
+  defaultHeaders?: PlaygroundTargetHeader[]
 }
 
 """ Header key-value pair for playground configuration """
-type PlaygroundHeader {
+type PlaygroundTargetHeader {
   """ Header key """
   key: string
 

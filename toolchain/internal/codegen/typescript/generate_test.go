@@ -491,7 +491,7 @@ func TestGenerator_Generate_WithDeprecation(t *testing.T) {
 func TestGenerator_Generate_ImportExtension(t *testing.T) {
 	tests := []struct {
 		name      string
-		extension *configtypes.TypescriptImportExtension
+		extension *configtypes.TypescriptTargetImportExtension
 		expected  string
 	}{
 		{
@@ -501,17 +501,17 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 		},
 		{
 			name:      "explicit none",
-			extension: configtypes.Ptr(configtypes.TypescriptImportExtensionNone),
+			extension: configtypes.Ptr(configtypes.TypescriptTargetImportExtensionNone),
 			expected:  `from "./core";`,
 		},
 		{
 			name:      ".js extension",
-			extension: configtypes.Ptr(configtypes.TypescriptImportExtensionJs),
+			extension: configtypes.Ptr(configtypes.TypescriptTargetImportExtensionJs),
 			expected:  `from "./core.js";`,
 		},
 		{
 			name:      ".ts extension",
-			extension: configtypes.Ptr(configtypes.TypescriptImportExtensionTs),
+			extension: configtypes.Ptr(configtypes.TypescriptTargetImportExtensionTs),
 			expected:  `from "./core.ts";`,
 		},
 	}
@@ -537,7 +537,7 @@ func TestGenerator_Generate_ImportExtension(t *testing.T) {
 
 			indexContent := findFile(files, "index.ts")
 			ext := config.GetImportExtension(tt.extension)
-			if ext == "" || ext == configtypes.TypescriptImportExtensionNone {
+			if ext == "" || ext == configtypes.TypescriptTargetImportExtensionNone {
 				assert.Contains(t, indexContent, `export * from "./core";`)
 			} else {
 				assert.Contains(t, indexContent, `export * from "./core`+string(ext)+`";`)

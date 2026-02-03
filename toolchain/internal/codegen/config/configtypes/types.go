@@ -16,56 +16,56 @@ import (
 // -----------------------------------------------------------------------------
 
 // Import extension options for TypeScript target
-type TypescriptImportExtension string
+type TypescriptTargetImportExtension string
 
-// TypescriptImportExtension enum values
+// TypescriptTargetImportExtension enum values
 const (
-	TypescriptImportExtensionNone TypescriptImportExtension = "none"
-	TypescriptImportExtensionJs   TypescriptImportExtension = ".js"
-	TypescriptImportExtensionTs   TypescriptImportExtension = ".ts"
+	TypescriptTargetImportExtensionNone TypescriptTargetImportExtension = "none"
+	TypescriptTargetImportExtensionJs   TypescriptTargetImportExtension = ".js"
+	TypescriptTargetImportExtensionTs   TypescriptTargetImportExtension = ".ts"
 )
 
-// TypescriptImportExtensionList contains all valid TypescriptImportExtension values.
-var TypescriptImportExtensionList = []TypescriptImportExtension{
-	TypescriptImportExtensionNone,
-	TypescriptImportExtensionJs,
-	TypescriptImportExtensionTs,
+// TypescriptTargetImportExtensionList contains all valid TypescriptTargetImportExtension values.
+var TypescriptTargetImportExtensionList = []TypescriptTargetImportExtension{
+	TypescriptTargetImportExtensionNone,
+	TypescriptTargetImportExtensionJs,
+	TypescriptTargetImportExtensionTs,
 }
 
-// String returns the string representation of TypescriptImportExtension.
-func (e TypescriptImportExtension) String() string {
+// String returns the string representation of TypescriptTargetImportExtension.
+func (e TypescriptTargetImportExtension) String() string {
 	return string(e)
 }
 
-// IsValid returns true if the value is a valid TypescriptImportExtension.
-func (e TypescriptImportExtension) IsValid() bool {
+// IsValid returns true if the value is a valid TypescriptTargetImportExtension.
+func (e TypescriptTargetImportExtension) IsValid() bool {
 	switch e {
-	case TypescriptImportExtensionNone, TypescriptImportExtensionJs, TypescriptImportExtensionTs:
+	case TypescriptTargetImportExtensionNone, TypescriptTargetImportExtensionJs, TypescriptTargetImportExtensionTs:
 		return true
 	}
 	return false
 }
 
 // MarshalJSON implements json.Marshaler.
-// Returns an error if the value is not a valid TypescriptImportExtension member.
-func (e TypescriptImportExtension) MarshalJSON() ([]byte, error) {
+// Returns an error if the value is not a valid TypescriptTargetImportExtension member.
+func (e TypescriptTargetImportExtension) MarshalJSON() ([]byte, error) {
 	if !e.IsValid() {
-		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum TypescriptImportExtension", string(e))
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum TypescriptTargetImportExtension", string(e))
 	}
 	return json.Marshal(string(e))
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-// Returns an error if the value is not a valid TypescriptImportExtension member.
-func (e *TypescriptImportExtension) UnmarshalJSON(data []byte) error {
+// Returns an error if the value is not a valid TypescriptTargetImportExtension member.
+func (e *TypescriptTargetImportExtension) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
 
-	v := TypescriptImportExtension(s)
+	v := TypescriptTargetImportExtension(s)
 	if !v.IsValid() {
-		return fmt.Errorf("invalid value '%s' for enum TypescriptImportExtension", s)
+		return fmt.Errorf("invalid value '%s' for enum TypescriptTargetImportExtension", s)
 	}
 
 	*e = v
@@ -1322,86 +1322,6 @@ func (p *prePatternsTargetConfig) transform() PatternsTargetConfig {
 	}
 }
 
-// Header key-value pair for playground configuration
-type PlaygroundHeader struct {
-	// Header key
-	Key string `json:"key"`
-	// Header value
-	Value string `json:"value"`
-}
-
-// GetKey returns the value of Key or the zero value if the receiver or field is nil.
-func (x *PlaygroundHeader) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	var zero string
-	return zero
-}
-
-// GetKeyOr returns the value of Key or the provided default if the receiver or field is nil.
-func (x *PlaygroundHeader) GetKeyOr(defaultValue string) string {
-	if x != nil {
-		return x.Key
-	}
-	return defaultValue
-}
-
-// GetValue returns the value of Value or the zero value if the receiver or field is nil.
-func (x *PlaygroundHeader) GetValue() string {
-	if x != nil {
-		return x.Value
-	}
-	var zero string
-	return zero
-}
-
-// GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
-func (x *PlaygroundHeader) GetValueOr(defaultValue string) string {
-	if x != nil {
-		return x.Value
-	}
-	return defaultValue
-}
-
-// prePlaygroundHeader is the version of PlaygroundHeader previous to the required field validation
-type prePlaygroundHeader struct {
-	Key   *string `json:"key,omitempty"`
-	Value *string `json:"value,omitempty"`
-}
-
-// validate validates the required fields of PlaygroundHeader
-func (p *prePlaygroundHeader) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("prePlaygroundHeader is nil")
-	}
-
-	// Validation for field "key"
-	if p.Key == nil {
-		return errorMissingRequiredField("field key is required")
-	}
-
-	// Validation for field "value"
-	if p.Value == nil {
-		return errorMissingRequiredField("field value is required")
-	}
-
-	return nil
-}
-
-// transform transforms the prePlaygroundHeader type to the final PlaygroundHeader type
-func (p *prePlaygroundHeader) transform() PlaygroundHeader {
-	// Transformations
-	transKey := *p.Key
-	transValue := *p.Value
-
-	// Assignments
-	return PlaygroundHeader{
-		Key:   transKey,
-		Value: transValue,
-	}
-}
-
 // Configuration for API playground generation
 type PlaygroundTargetConfig struct {
 	// The output directory where generated files will be placed
@@ -1413,7 +1333,7 @@ type PlaygroundTargetConfig struct {
 	// Default base URL for API requests
 	DefaultBaseUrl *string `json:"defaultBaseUrl,omitempty"`
 	// Default headers to include in API requests
-	DefaultHeaders *[]PlaygroundHeader `json:"defaultHeaders,omitempty"`
+	DefaultHeaders *[]PlaygroundTargetHeader `json:"defaultHeaders,omitempty"`
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
@@ -1485,16 +1405,16 @@ func (x *PlaygroundTargetConfig) GetDefaultBaseUrlOr(defaultValue string) string
 }
 
 // GetDefaultHeaders returns the value of DefaultHeaders or the zero value if the receiver or field is nil.
-func (x *PlaygroundTargetConfig) GetDefaultHeaders() []PlaygroundHeader {
+func (x *PlaygroundTargetConfig) GetDefaultHeaders() []PlaygroundTargetHeader {
 	if x != nil && x.DefaultHeaders != nil {
 		return *x.DefaultHeaders
 	}
-	var zero []PlaygroundHeader
+	var zero []PlaygroundTargetHeader
 	return zero
 }
 
 // GetDefaultHeadersOr returns the value of DefaultHeaders or the provided default if the receiver or field is nil.
-func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue []PlaygroundHeader) []PlaygroundHeader {
+func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue []PlaygroundTargetHeader) []PlaygroundTargetHeader {
 	if x != nil && x.DefaultHeaders != nil {
 		return *x.DefaultHeaders
 	}
@@ -1503,11 +1423,11 @@ func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue []PlaygroundHe
 
 // prePlaygroundTargetConfig is the version of PlaygroundTargetConfig previous to the required field validation
 type prePlaygroundTargetConfig struct {
-	Output         *string                `json:"output,omitempty"`
-	Clean          *bool                  `json:"clean,omitempty"`
-	Schema         *string                `json:"schema,omitempty"`
-	DefaultBaseUrl *string                `json:"defaultBaseUrl,omitempty"`
-	DefaultHeaders *[]prePlaygroundHeader `json:"defaultHeaders,omitempty"`
+	Output         *string                      `json:"output,omitempty"`
+	Clean          *bool                        `json:"clean,omitempty"`
+	Schema         *string                      `json:"schema,omitempty"`
+	DefaultBaseUrl *string                      `json:"defaultBaseUrl,omitempty"`
+	DefaultHeaders *[]prePlaygroundTargetHeader `json:"defaultHeaders,omitempty"`
 }
 
 // validate validates the required fields of PlaygroundTargetConfig
@@ -1546,12 +1466,12 @@ func (p *prePlaygroundTargetConfig) transform() PlaygroundTargetConfig {
 	transClean := p.Clean
 	transSchema := p.Schema
 	transDefaultBaseUrl := p.DefaultBaseUrl
-	var transDefaultHeaders *[]PlaygroundHeader
+	var transDefaultHeaders *[]PlaygroundTargetHeader
 	if p.DefaultHeaders != nil {
-		var valDefaultHeaders []PlaygroundHeader
-		valDefaultHeaders = make([]PlaygroundHeader, len(*p.DefaultHeaders))
+		var valDefaultHeaders []PlaygroundTargetHeader
+		valDefaultHeaders = make([]PlaygroundTargetHeader, len(*p.DefaultHeaders))
 		for i, v := range *p.DefaultHeaders {
-			var tmp_ PlaygroundHeader
+			var tmp_ PlaygroundTargetHeader
 			tmp_ = v.transform()
 			valDefaultHeaders[i] = tmp_
 		}
@@ -1565,6 +1485,86 @@ func (p *prePlaygroundTargetConfig) transform() PlaygroundTargetConfig {
 		Schema:         transSchema,
 		DefaultBaseUrl: transDefaultBaseUrl,
 		DefaultHeaders: transDefaultHeaders,
+	}
+}
+
+// Header key-value pair for playground configuration
+type PlaygroundTargetHeader struct {
+	// Header key
+	Key string `json:"key"`
+	// Header value
+	Value string `json:"value"`
+}
+
+// GetKey returns the value of Key or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetHeader) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	var zero string
+	return zero
+}
+
+// GetKeyOr returns the value of Key or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetHeader) GetKeyOr(defaultValue string) string {
+	if x != nil {
+		return x.Key
+	}
+	return defaultValue
+}
+
+// GetValue returns the value of Value or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetHeader) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	var zero string
+	return zero
+}
+
+// GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetHeader) GetValueOr(defaultValue string) string {
+	if x != nil {
+		return x.Value
+	}
+	return defaultValue
+}
+
+// prePlaygroundTargetHeader is the version of PlaygroundTargetHeader previous to the required field validation
+type prePlaygroundTargetHeader struct {
+	Key   *string `json:"key,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// validate validates the required fields of PlaygroundTargetHeader
+func (p *prePlaygroundTargetHeader) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePlaygroundTargetHeader is nil")
+	}
+
+	// Validation for field "key"
+	if p.Key == nil {
+		return errorMissingRequiredField("field key is required")
+	}
+
+	// Validation for field "value"
+	if p.Value == nil {
+		return errorMissingRequiredField("field value is required")
+	}
+
+	return nil
+}
+
+// transform transforms the prePlaygroundTargetHeader type to the final PlaygroundTargetHeader type
+func (p *prePlaygroundTargetHeader) transform() PlaygroundTargetHeader {
+	// Transformations
+	transKey := *p.Key
+	transValue := *p.Value
+
+	// Assignments
+	return PlaygroundTargetHeader{
+		Key:   transKey,
+		Value: transValue,
 	}
 }
 
@@ -2302,7 +2302,7 @@ type TypeScriptTargetConfig struct {
 	// Generate RPC server interfaces and handlers
 	GenServer *bool `json:"genServer,omitempty"`
 	// File extension to append to import paths
-	ImportExtension *TypescriptImportExtension `json:"importExtension,omitempty"`
+	ImportExtension *TypescriptTargetImportExtension `json:"importExtension,omitempty"`
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
@@ -2425,16 +2425,16 @@ func (x *TypeScriptTargetConfig) GetGenServerOr(defaultValue bool) bool {
 }
 
 // GetImportExtension returns the value of ImportExtension or the zero value if the receiver or field is nil.
-func (x *TypeScriptTargetConfig) GetImportExtension() TypescriptImportExtension {
+func (x *TypeScriptTargetConfig) GetImportExtension() TypescriptTargetImportExtension {
 	if x != nil && x.ImportExtension != nil {
 		return *x.ImportExtension
 	}
-	var zero TypescriptImportExtension
+	var zero TypescriptTargetImportExtension
 	return zero
 }
 
 // GetImportExtensionOr returns the value of ImportExtension or the provided default if the receiver or field is nil.
-func (x *TypeScriptTargetConfig) GetImportExtensionOr(defaultValue TypescriptImportExtension) TypescriptImportExtension {
+func (x *TypeScriptTargetConfig) GetImportExtensionOr(defaultValue TypescriptTargetImportExtension) TypescriptTargetImportExtension {
 	if x != nil && x.ImportExtension != nil {
 		return *x.ImportExtension
 	}
@@ -2443,14 +2443,14 @@ func (x *TypeScriptTargetConfig) GetImportExtensionOr(defaultValue TypescriptImp
 
 // preTypeScriptTargetConfig is the version of TypeScriptTargetConfig previous to the required field validation
 type preTypeScriptTargetConfig struct {
-	Output          *string                    `json:"output,omitempty"`
-	Clean           *bool                      `json:"clean,omitempty"`
-	Schema          *string                    `json:"schema,omitempty"`
-	GenPatterns     *bool                      `json:"genPatterns,omitempty"`
-	GenConsts       *bool                      `json:"genConsts,omitempty"`
-	GenClient       *bool                      `json:"genClient,omitempty"`
-	GenServer       *bool                      `json:"genServer,omitempty"`
-	ImportExtension *TypescriptImportExtension `json:"importExtension,omitempty"`
+	Output          *string                          `json:"output,omitempty"`
+	Clean           *bool                            `json:"clean,omitempty"`
+	Schema          *string                          `json:"schema,omitempty"`
+	GenPatterns     *bool                            `json:"genPatterns,omitempty"`
+	GenConsts       *bool                            `json:"genConsts,omitempty"`
+	GenClient       *bool                            `json:"genClient,omitempty"`
+	GenServer       *bool                            `json:"genServer,omitempty"`
+	ImportExtension *TypescriptTargetImportExtension `json:"importExtension,omitempty"`
 }
 
 // validate validates the required fields of TypeScriptTargetConfig
@@ -2511,7 +2511,7 @@ func (p *preTypeScriptTargetConfig) transform() TypeScriptTargetConfig {
 // This schema defines the configuration format for the VDL code generator (vdl.yaml)
 //
 // It supports multiple target languages and output formats
-type VdlConfig struct {
+type VdlCodegenConfig struct {
 	// Configuration version (must be 1)
 	Version int64 `json:"version"`
 	// Path to the default global VDL schema file entrypoint
@@ -2521,7 +2521,7 @@ type VdlConfig struct {
 }
 
 // GetVersion returns the value of Version or the zero value if the receiver or field is nil.
-func (x *VdlConfig) GetVersion() int64 {
+func (x *VdlCodegenConfig) GetVersion() int64 {
 	if x != nil {
 		return x.Version
 	}
@@ -2530,7 +2530,7 @@ func (x *VdlConfig) GetVersion() int64 {
 }
 
 // GetVersionOr returns the value of Version or the provided default if the receiver or field is nil.
-func (x *VdlConfig) GetVersionOr(defaultValue int64) int64 {
+func (x *VdlCodegenConfig) GetVersionOr(defaultValue int64) int64 {
 	if x != nil {
 		return x.Version
 	}
@@ -2538,7 +2538,7 @@ func (x *VdlConfig) GetVersionOr(defaultValue int64) int64 {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *VdlConfig) GetSchema() string {
+func (x *VdlCodegenConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -2547,7 +2547,7 @@ func (x *VdlConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *VdlConfig) GetSchemaOr(defaultValue string) string {
+func (x *VdlCodegenConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -2555,7 +2555,7 @@ func (x *VdlConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetTargets returns the value of Targets or the zero value if the receiver or field is nil.
-func (x *VdlConfig) GetTargets() []TargetConfig {
+func (x *VdlCodegenConfig) GetTargets() []TargetConfig {
 	if x != nil {
 		return x.Targets
 	}
@@ -2564,24 +2564,24 @@ func (x *VdlConfig) GetTargets() []TargetConfig {
 }
 
 // GetTargetsOr returns the value of Targets or the provided default if the receiver or field is nil.
-func (x *VdlConfig) GetTargetsOr(defaultValue []TargetConfig) []TargetConfig {
+func (x *VdlCodegenConfig) GetTargetsOr(defaultValue []TargetConfig) []TargetConfig {
 	if x != nil {
 		return x.Targets
 	}
 	return defaultValue
 }
 
-// preVdlConfig is the version of VdlConfig previous to the required field validation
-type preVdlConfig struct {
+// preVdlCodegenConfig is the version of VdlCodegenConfig previous to the required field validation
+type preVdlCodegenConfig struct {
 	Version *int64             `json:"version,omitempty"`
 	Schema  *string            `json:"schema,omitempty"`
 	Targets *[]preTargetConfig `json:"targets,omitempty"`
 }
 
-// validate validates the required fields of VdlConfig
-func (p *preVdlConfig) validate() error {
+// validate validates the required fields of VdlCodegenConfig
+func (p *preVdlCodegenConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preVdlConfig is nil")
+		return errorMissingRequiredField("preVdlCodegenConfig is nil")
 	}
 
 	// Validation for field "version"
@@ -2606,8 +2606,8 @@ func (p *preVdlConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preVdlConfig type to the final VdlConfig type
-func (p *preVdlConfig) transform() VdlConfig {
+// transform transforms the preVdlCodegenConfig type to the final VdlCodegenConfig type
+func (p *preVdlCodegenConfig) transform() VdlCodegenConfig {
 	// Transformations
 	transVersion := *p.Version
 	transSchema := p.Schema
@@ -2620,7 +2620,7 @@ func (p *preVdlConfig) transform() VdlConfig {
 	}
 
 	// Assignments
-	return VdlConfig{
+	return VdlCodegenConfig{
 		Version: transVersion,
 		Schema:  transSchema,
 		Targets: transTargets,

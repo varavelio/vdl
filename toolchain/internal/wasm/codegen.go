@@ -82,7 +82,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 			GenServer:       true,
 		})
 
-		importExt := configtypes.TypescriptImportExtension(cfg.ImportExtension.String())
+		importExt := configtypes.TypescriptTargetImportExtension(cfg.ImportExtension.String())
 		gen := typescript.New(&configtypes.TypeScriptTargetConfig{
 			ImportExtension: &importExt,
 			GenServer:       configtypes.Ptr(cfg.GenServer),

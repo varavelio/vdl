@@ -11,7 +11,7 @@ import (
 )
 
 // LoadConfig loads and validates VDL configuration from a file path.
-func LoadConfig(path string) (*configtypes.VdlConfig, error) {
+func LoadConfig(path string) (*configtypes.VdlCodegenConfig, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
@@ -20,7 +20,7 @@ func LoadConfig(path string) (*configtypes.VdlConfig, error) {
 }
 
 // ParseConfig parses and validates VDL configuration from bytes.
-func ParseConfig(data []byte) (*configtypes.VdlConfig, error) {
+func ParseConfig(data []byte) (*configtypes.VdlCodegenConfig, error) {
 	// Parse YAML into intermediate representation
 	var raw any
 	if err := yaml.Unmarshal(data, &raw); err != nil {
@@ -34,7 +34,7 @@ func ParseConfig(data []byte) (*configtypes.VdlConfig, error) {
 	}
 
 	// Unmarshal with strict mode to catch unknown fields
-	var cfg configtypes.VdlConfig
+	var cfg configtypes.VdlCodegenConfig
 	decoder := json.NewDecoder(bytes.NewReader(jsonData))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&cfg); err != nil {
@@ -50,12 +50,12 @@ func ParseConfig(data []byte) (*configtypes.VdlConfig, error) {
 }
 
 // Validate is an alias for ParseConfig for backward compatibility.
-func Validate(data []byte) (*configtypes.VdlConfig, error) {
+func Validate(data []byte) (*configtypes.VdlCodegenConfig, error) {
 	return ParseConfig(data)
 }
 
 // validate performs logical validation on the parsed config.
-func validate(cfg *configtypes.VdlConfig) error {
+func validate(cfg *configtypes.VdlCodegenConfig) error {
 	if cfg.Version != 1 {
 		return fmt.Errorf("unsupported version: %d", cfg.Version)
 	}
@@ -307,9 +307,9 @@ func GetFilename(filename *string) string {
 }
 
 // GetImportExtension returns the import extension or the default (none) if not set.
-func GetImportExtension(ext *configtypes.TypescriptImportExtension) configtypes.TypescriptImportExtension {
+func GetImportExtension(ext *configtypes.TypescriptTargetImportExtension) configtypes.TypescriptTargetImportExtension {
 	if ext == nil {
-		return configtypes.TypescriptImportExtensionNone
+		return configtypes.TypescriptTargetImportExtensionNone
 	}
 	return *ext
 }
