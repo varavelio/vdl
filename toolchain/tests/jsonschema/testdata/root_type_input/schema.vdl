@@ -12,6 +12,7 @@ rpc UserService {
     input {
       user: User
     }
+
     output {
       id: string
     }
@@ -23,6 +24,7 @@ rpc AdminService {
     input {
       userId: string
     }
+
     output {}
   }
 }

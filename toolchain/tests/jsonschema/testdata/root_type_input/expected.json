@@ -7,9 +7,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "userId"
-      ],
+      "required": ["userId"],
       "type": "object"
     },
     "AdminServiceDeleteOutput": {
@@ -23,9 +21,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "theme"
-      ],
+      "required": ["theme"],
       "type": "object"
     },
     "User": {
@@ -37,10 +33,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "name"
-      ],
+      "required": ["id", "name"],
       "type": "object"
     },
     "UserServiceCreateInput": {
@@ -50,9 +43,7 @@
           "$ref": "#/$defs/User"
         }
       },
-      "required": [
-        "user"
-      ],
+      "required": ["user"],
       "type": "object"
     },
     "UserServiceCreateOutput": {
@@ -62,9 +53,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "type": "object"
     }
   },
