@@ -147,6 +147,28 @@ func validateTarget(t *configtypes.TargetConfig, globalSchema string) error {
 			return err
 		}
 	}
+	if t.Ir != nil {
+		count++
+		schemaPtr = &t.Ir.Schema
+		if err := validateIr(t.Ir); err != nil {
+			return err
+		}
+		// Set default filename
+		if t.Ir.Filename == nil {
+			t.Ir.Filename = ptr("ir.json")
+		}
+	}
+	if t.Vdlschema != nil {
+		count++
+		schemaPtr = &t.Vdlschema.Schema
+		if err := validateVdlSchema(t.Vdlschema); err != nil {
+			return err
+		}
+		// Set default filename
+		if t.Vdlschema.Filename == nil {
+			t.Vdlschema.Filename = ptr("schema.vdl")
+		}
+	}
 
 	if count == 0 {
 		return fmt.Errorf("no target configuration found")
@@ -219,6 +241,20 @@ func validatePlugin(cfg *configtypes.PluginConfig) error {
 	}
 	if len(cfg.Command) == 0 {
 		return fmt.Errorf("field 'command' is required for plugin target")
+	}
+	return nil
+}
+
+func validateIr(cfg *configtypes.IrConfig) error {
+	if err := validateCommon(cfg.Output, "ir"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateVdlSchema(cfg *configtypes.VdlSchemaConfig) error {
+	if err := validateCommon(cfg.Output, "vdlschema"); err != nil {
+		return err
 	}
 	return nil
 }

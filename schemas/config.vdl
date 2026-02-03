@@ -79,6 +79,12 @@ type TargetConfig {
 
   """ External plugin target """
   plugin?: PluginConfig
+
+  """ IR (Intermediate Representation) JSON output target """
+  ir?: IrConfig
+
+  """ Unified VDL schema output target (merges includes and external docs) """
+  vdlschema?: VdlSchemaConfig
 }
 
 """ Configuration for Go code generation """
@@ -201,4 +207,23 @@ type PluginConfig {
 
   """ Arbitrary options passed to the plugin (flat key-value pairs) """
   options?: map<string>
+}
+
+""" Configuration for IR (Intermediate Representation) JSON generation """
+type IrConfig {
+  ...CommonConfig
+
+  """ The name of the output file """
+  filename?: string
+
+  """ Output minified JSON (no indentation). Default is false (pretty-printed with 2-space indent) """
+  minify?: bool
+}
+
+""" Configuration for unified VDL schema generation (merges all includes and external docs) """
+type VdlSchemaConfig {
+  ...CommonConfig
+
+  """ The name of the output file """
+  filename?: string
 }
