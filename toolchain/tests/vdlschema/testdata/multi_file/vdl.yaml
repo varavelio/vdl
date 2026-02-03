@@ -1,6 +1,6 @@
 version: 1
 schema: schema.vdl
 targets:
-  - vdlschema:
+  - vdl:
       output: gen
       filename: unified.vdl

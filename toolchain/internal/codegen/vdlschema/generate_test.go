@@ -11,12 +11,12 @@ import (
 )
 
 func TestGenerator_Name(t *testing.T) {
-	gen := New(&configtypes.VdlSchemaConfig{}, "")
-	assert.Equal(t, "vdlschema", gen.Name())
+	gen := New(&configtypes.VdlTargetConfig{}, "")
+	assert.Equal(t, "vdl", gen.Name())
 }
 
 func TestGenerator_Generate_DefaultFilename(t *testing.T) {
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, "type User { id: string }")
 
@@ -32,7 +32,7 @@ func TestGenerator_Generate_DefaultFilename(t *testing.T) {
 
 func TestGenerator_Generate_CustomFilename(t *testing.T) {
 	filename := "unified.vdl"
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output:   "dist",
 		Filename: &filename,
 	}, "type User { id: string }")
@@ -48,7 +48,7 @@ func TestGenerator_Generate_CustomFilename(t *testing.T) {
 
 func TestGenerator_Generate_EmptyFilenameUsesDefault(t *testing.T) {
 	empty := ""
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output:   "dist",
 		Filename: &empty,
 	}, "type User { id: string }")
@@ -80,7 +80,7 @@ rpc UserService {
 }
 `
 
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, formattedSchema)
 
@@ -95,7 +95,7 @@ rpc UserService {
 }
 
 func TestGenerator_Generate_EmptySchema(t *testing.T) {
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, "")
 
@@ -129,7 +129,7 @@ rpc UserAPI {
 }
 `
 
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, mergedSchema)
 
@@ -162,7 +162,7 @@ type User {
 }
 `
 
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, schemaWithDocs)
 
@@ -197,7 +197,7 @@ rpc API {
 }
 `
 
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, schemaWithFormatting)
 
@@ -213,7 +213,7 @@ rpc API {
 func TestGenerator_Generate_DoesNotModifyIR(t *testing.T) {
 	// The VDL Schema generator should not use the IR parameter,
 	// it should only use the pre-formatted schema string
-	gen := New(&configtypes.VdlSchemaConfig{
+	gen := New(&configtypes.VdlTargetConfig{
 		Output: "dist",
 	}, "type Simple { id: string }")
 

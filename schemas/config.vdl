@@ -84,7 +84,7 @@ type TargetConfig {
   ir?: IrConfig
 
   """ Unified VDL schema output target (merges includes and external docs) """
-  vdlschema?: VdlSchemaConfig
+  vdl?: VdlTargetConfig
 }
 
 """ Configuration for Go code generation """
@@ -221,7 +221,7 @@ type IrConfig {
 }
 
 """ Configuration for unified VDL schema generation (merges all includes and external docs) """
-type VdlSchemaConfig {
+type VdlTargetConfig {
   ...CommonConfig
 
   """ The name of the output file """

@@ -1940,7 +1940,7 @@ type TargetConfig struct {
 	// IR (Intermediate Representation) JSON output target
 	Ir *IrConfig `json:"ir,omitempty"`
 	// Unified VDL schema output target (merges includes and external docs)
-	Vdlschema *VdlSchemaConfig `json:"vdlschema,omitempty"`
+	Vdl *VdlTargetConfig `json:"vdl,omitempty"`
 }
 
 // GetGo returns the value of Go or the zero value if the receiver or field is nil.
@@ -2096,19 +2096,19 @@ func (x *TargetConfig) GetIrOr(defaultValue IrConfig) IrConfig {
 	return defaultValue
 }
 
-// GetVdlschema returns the value of Vdlschema or the zero value if the receiver or field is nil.
-func (x *TargetConfig) GetVdlschema() VdlSchemaConfig {
-	if x != nil && x.Vdlschema != nil {
-		return *x.Vdlschema
+// GetVdl returns the value of Vdl or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetVdl() VdlTargetConfig {
+	if x != nil && x.Vdl != nil {
+		return *x.Vdl
 	}
-	var zero VdlSchemaConfig
+	var zero VdlTargetConfig
 	return zero
 }
 
-// GetVdlschemaOr returns the value of Vdlschema or the provided default if the receiver or field is nil.
-func (x *TargetConfig) GetVdlschemaOr(defaultValue VdlSchemaConfig) VdlSchemaConfig {
-	if x != nil && x.Vdlschema != nil {
-		return *x.Vdlschema
+// GetVdlOr returns the value of Vdl or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetVdlOr(defaultValue VdlTargetConfig) VdlTargetConfig {
+	if x != nil && x.Vdl != nil {
+		return *x.Vdl
 	}
 	return defaultValue
 }
@@ -2124,7 +2124,7 @@ type preTargetConfig struct {
 	Playground *prePlaygroundConfig `json:"playground,omitempty"`
 	Plugin     *prePluginConfig     `json:"plugin,omitempty"`
 	Ir         *preIrConfig         `json:"ir,omitempty"`
-	Vdlschema  *preVdlSchemaConfig  `json:"vdlschema,omitempty"`
+	Vdl        *preVdlTargetConfig  `json:"vdl,omitempty"`
 }
 
 // validate validates the required fields of TargetConfig
@@ -2196,10 +2196,10 @@ func (p *preTargetConfig) validate() error {
 		}
 	}
 
-	// Validation for field "vdlschema"
-	if p.Vdlschema != nil {
-		if err := p.Vdlschema.validate(); err != nil {
-			return errorMissingRequiredField("field vdlschema: " + err.Error())
+	// Validation for field "vdl"
+	if p.Vdl != nil {
+		if err := p.Vdl.validate(); err != nil {
+			return errorMissingRequiredField("field vdl: " + err.Error())
 		}
 	}
 
@@ -2263,11 +2263,11 @@ func (p *preTargetConfig) transform() TargetConfig {
 		valIr = p.Ir.transform()
 		transIr = &valIr
 	}
-	var transVdlschema *VdlSchemaConfig
-	if p.Vdlschema != nil {
-		var valVdlschema VdlSchemaConfig
-		valVdlschema = p.Vdlschema.transform()
-		transVdlschema = &valVdlschema
+	var transVdl *VdlTargetConfig
+	if p.Vdl != nil {
+		var valVdl VdlTargetConfig
+		valVdl = p.Vdl.transform()
+		transVdl = &valVdl
 	}
 
 	// Assignments
@@ -2281,7 +2281,7 @@ func (p *preTargetConfig) transform() TargetConfig {
 		Playground: transPlayground,
 		Plugin:     transPlugin,
 		Ir:         transIr,
-		Vdlschema:  transVdlschema,
+		Vdl:        transVdl,
 	}
 }
 
@@ -2628,7 +2628,7 @@ func (p *preVdlConfig) transform() VdlConfig {
 }
 
 // Configuration for unified VDL schema generation (merges all includes and external docs)
-type VdlSchemaConfig struct {
+type VdlTargetConfig struct {
 	// The output directory where generated files will be placed
 	Output string `json:"output"`
 	// If true, empties the output directory before generation
@@ -2640,7 +2640,7 @@ type VdlSchemaConfig struct {
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetOutput() string {
+func (x *VdlTargetConfig) GetOutput() string {
 	if x != nil {
 		return x.Output
 	}
@@ -2649,7 +2649,7 @@ func (x *VdlSchemaConfig) GetOutput() string {
 }
 
 // GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetOutputOr(defaultValue string) string {
+func (x *VdlTargetConfig) GetOutputOr(defaultValue string) string {
 	if x != nil {
 		return x.Output
 	}
@@ -2657,7 +2657,7 @@ func (x *VdlSchemaConfig) GetOutputOr(defaultValue string) string {
 }
 
 // GetClean returns the value of Clean or the zero value if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetClean() bool {
+func (x *VdlTargetConfig) GetClean() bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -2666,7 +2666,7 @@ func (x *VdlSchemaConfig) GetClean() bool {
 }
 
 // GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetCleanOr(defaultValue bool) bool {
+func (x *VdlTargetConfig) GetCleanOr(defaultValue bool) bool {
 	if x != nil && x.Clean != nil {
 		return *x.Clean
 	}
@@ -2674,7 +2674,7 @@ func (x *VdlSchemaConfig) GetCleanOr(defaultValue bool) bool {
 }
 
 // GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetSchema() string {
+func (x *VdlTargetConfig) GetSchema() string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -2683,7 +2683,7 @@ func (x *VdlSchemaConfig) GetSchema() string {
 }
 
 // GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetSchemaOr(defaultValue string) string {
+func (x *VdlTargetConfig) GetSchemaOr(defaultValue string) string {
 	if x != nil && x.Schema != nil {
 		return *x.Schema
 	}
@@ -2691,7 +2691,7 @@ func (x *VdlSchemaConfig) GetSchemaOr(defaultValue string) string {
 }
 
 // GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetFilename() string {
+func (x *VdlTargetConfig) GetFilename() string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
@@ -2700,25 +2700,25 @@ func (x *VdlSchemaConfig) GetFilename() string {
 }
 
 // GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
-func (x *VdlSchemaConfig) GetFilenameOr(defaultValue string) string {
+func (x *VdlTargetConfig) GetFilenameOr(defaultValue string) string {
 	if x != nil && x.Filename != nil {
 		return *x.Filename
 	}
 	return defaultValue
 }
 
-// preVdlSchemaConfig is the version of VdlSchemaConfig previous to the required field validation
-type preVdlSchemaConfig struct {
+// preVdlTargetConfig is the version of VdlTargetConfig previous to the required field validation
+type preVdlTargetConfig struct {
 	Output   *string `json:"output,omitempty"`
 	Clean    *bool   `json:"clean,omitempty"`
 	Schema   *string `json:"schema,omitempty"`
 	Filename *string `json:"filename,omitempty"`
 }
 
-// validate validates the required fields of VdlSchemaConfig
-func (p *preVdlSchemaConfig) validate() error {
+// validate validates the required fields of VdlTargetConfig
+func (p *preVdlTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preVdlSchemaConfig is nil")
+		return errorMissingRequiredField("preVdlTargetConfig is nil")
 	}
 
 	// Validation for field "output"
@@ -2735,8 +2735,8 @@ func (p *preVdlSchemaConfig) validate() error {
 	return nil
 }
 
-// transform transforms the preVdlSchemaConfig type to the final VdlSchemaConfig type
-func (p *preVdlSchemaConfig) transform() VdlSchemaConfig {
+// transform transforms the preVdlTargetConfig type to the final VdlTargetConfig type
+func (p *preVdlTargetConfig) transform() VdlTargetConfig {
 	// Transformations
 	transOutput := *p.Output
 	transClean := p.Clean
@@ -2744,7 +2744,7 @@ func (p *preVdlSchemaConfig) transform() VdlSchemaConfig {
 	transFilename := p.Filename
 
 	// Assignments
-	return VdlSchemaConfig{
+	return VdlTargetConfig{
 		Output:   transOutput,
 		Clean:    transClean,
 		Schema:   transSchema,

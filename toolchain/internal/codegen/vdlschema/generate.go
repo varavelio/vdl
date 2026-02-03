@@ -15,12 +15,12 @@ type File struct {
 
 // Generator implements the unified VDL schema generator.
 type Generator struct {
-	config          *configtypes.VdlSchemaConfig
+	config          *configtypes.VdlTargetConfig
 	formattedSchema string
 }
 
 // New creates a new VDL schema generator with the given config and pre-formatted schema.
-func New(config *configtypes.VdlSchemaConfig, formattedSchema string) *Generator {
+func New(config *configtypes.VdlTargetConfig, formattedSchema string) *Generator {
 	return &Generator{
 		config:          config,
 		formattedSchema: formattedSchema,
@@ -29,7 +29,7 @@ func New(config *configtypes.VdlSchemaConfig, formattedSchema string) *Generator
 
 // Name returns the generator name.
 func (g *Generator) Name() string {
-	return "vdlschema"
+	return "vdl"
 }
 
 // Generate produces a unified VDL schema file.

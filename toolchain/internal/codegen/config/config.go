@@ -158,15 +158,15 @@ func validateTarget(t *configtypes.TargetConfig, globalSchema string) error {
 			t.Ir.Filename = ptr("ir.json")
 		}
 	}
-	if t.Vdlschema != nil {
+	if t.Vdl != nil {
 		count++
-		schemaPtr = &t.Vdlschema.Schema
-		if err := validateVdlSchema(t.Vdlschema); err != nil {
+		schemaPtr = &t.Vdl.Schema
+		if err := validateVdl(t.Vdl); err != nil {
 			return err
 		}
 		// Set default filename
-		if t.Vdlschema.Filename == nil {
-			t.Vdlschema.Filename = ptr("schema.vdl")
+		if t.Vdl.Filename == nil {
+			t.Vdl.Filename = ptr("schema.vdl")
 		}
 	}
 
@@ -252,8 +252,8 @@ func validateIr(cfg *configtypes.IrConfig) error {
 	return nil
 }
 
-func validateVdlSchema(cfg *configtypes.VdlSchemaConfig) error {
-	if err := validateCommon(cfg.Output, "vdlschema"); err != nil {
+func validateVdl(cfg *configtypes.VdlTargetConfig) error {
+	if err := validateCommon(cfg.Output, "vdl"); err != nil {
 		return err
 	}
 	return nil

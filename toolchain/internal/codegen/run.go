@@ -203,17 +203,17 @@ func Run(configPath string) (int, error) {
 				return 0, fmt.Errorf("target #%d (ir): %w", i, err)
 			}
 			totalFiles += count
-		} else if target.Vdlschema != nil {
-			schema, program, err := getSchema(*target.Vdlschema.Schema)
+		} else if target.Vdl != nil {
+			schema, program, err := getSchema(*target.Vdl.Schema)
 			if err != nil {
 				return 0, err
 			}
 			// VDL Schema needs merged and formatted schema (all includes resolved into one file)
 			formatted := transform.MergeAndFormat(program)
 
-			count, err := runVdlSchema(ctx, absConfigDir, target.Vdlschema, schema, formatted)
+			count, err := runVdl(ctx, absConfigDir, target.Vdl, schema, formatted)
 			if err != nil {
-				return 0, fmt.Errorf("target #%d (vdlschema): %w", i, err)
+				return 0, fmt.Errorf("target #%d (vdl): %w", i, err)
 			}
 			totalFiles += count
 		}
@@ -446,7 +446,7 @@ func runIR(ctx context.Context, absConfigDir string, cfg *configtypes.IrConfig, 
 	return len(generatedFiles), nil
 }
 
-func runVdlSchema(ctx context.Context, absConfigDir string, cfg *configtypes.VdlSchemaConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
+func runVdl(ctx context.Context, absConfigDir string, cfg *configtypes.VdlTargetConfig, schema *irtypes.IrSchema, formattedSchema string) (int, error) {
 	outputDir := filepath.Join(absConfigDir, cfg.Output)
 	if err := prepareOutputDir(outputDir, config.ShouldClean(cfg.Clean)); err != nil {
 		return 0, err
