@@ -85,17 +85,17 @@ type PluginOutput {
 
   If no files are returned, VDL will not write anything.
   """
-  files?: PluginFile[]
+  files?: PluginOutputFile[]
 }
 
 """
-PluginFile represents a single generated file produced by the plugin.
+PluginOutputFile represents a single generated file produced by the plugin.
 
 This abstraction allows plugins to generate multiple files from a single
 invocation, enabling patterns like one-file-per-type or splitting large
 outputs across multiple modules.
 """
-type PluginFile {
+type PluginOutputFile {
   """
   Relative path from the output directory where this file should be written.
 

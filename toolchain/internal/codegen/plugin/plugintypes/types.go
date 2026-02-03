@@ -1387,97 +1387,6 @@ func (p *prePatternDef) transform() PatternDef {
 	}
 }
 
-// PluginFile represents a single generated file produced by the plugin.
-//
-// This abstraction allows plugins to generate multiple files from a single
-// invocation, enabling patterns like one-file-per-type or splitting large
-// outputs across multiple modules.
-type PluginFile struct {
-	// Relative path from the output directory where this file should be written.
-	//
-	// May include subdirectory separators (e.g., "src/models/user.py").
-	// Forward slashes are normalized to the appropriate separator for the
-	// current operating system.
-	Path string `json:"path"`
-	// The complete textual content of the generated file.
-	//
-	// This should be the final, formatted output ready to be written to disk.
-	// VDL writes this content as-is without additional processing.
-	Content string `json:"content"`
-}
-
-// GetPath returns the value of Path or the zero value if the receiver or field is nil.
-func (x *PluginFile) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	var zero string
-	return zero
-}
-
-// GetPathOr returns the value of Path or the provided default if the receiver or field is nil.
-func (x *PluginFile) GetPathOr(defaultValue string) string {
-	if x != nil {
-		return x.Path
-	}
-	return defaultValue
-}
-
-// GetContent returns the value of Content or the zero value if the receiver or field is nil.
-func (x *PluginFile) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	var zero string
-	return zero
-}
-
-// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
-func (x *PluginFile) GetContentOr(defaultValue string) string {
-	if x != nil {
-		return x.Content
-	}
-	return defaultValue
-}
-
-// prePluginFile is the version of PluginFile previous to the required field validation
-type prePluginFile struct {
-	Path    *string `json:"path,omitempty"`
-	Content *string `json:"content,omitempty"`
-}
-
-// validate validates the required fields of PluginFile
-func (p *prePluginFile) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("prePluginFile is nil")
-	}
-
-	// Validation for field "path"
-	if p.Path == nil {
-		return errorMissingRequiredField("field path is required")
-	}
-
-	// Validation for field "content"
-	if p.Content == nil {
-		return errorMissingRequiredField("field content is required")
-	}
-
-	return nil
-}
-
-// transform transforms the prePluginFile type to the final PluginFile type
-func (p *prePluginFile) transform() PluginFile {
-	// Transformations
-	transPath := *p.Path
-	transContent := *p.Content
-
-	// Assignments
-	return PluginFile{
-		Path:    transPath,
-		Content: transContent,
-	}
-}
-
 // PluginInput represents the data payload sent to a plugin via stdin.
 //
 // The plugin receives this as a single JSON object containing the complete
@@ -1643,20 +1552,20 @@ type PluginOutput struct {
 	// will create automatically.
 	//
 	// If no files are returned, VDL will not write anything.
-	Files *[]PluginFile `json:"files,omitempty"`
+	Files *[]PluginOutputFile `json:"files,omitempty"`
 }
 
 // GetFiles returns the value of Files or the zero value if the receiver or field is nil.
-func (x *PluginOutput) GetFiles() []PluginFile {
+func (x *PluginOutput) GetFiles() []PluginOutputFile {
 	if x != nil && x.Files != nil {
 		return *x.Files
 	}
-	var zero []PluginFile
+	var zero []PluginOutputFile
 	return zero
 }
 
 // GetFilesOr returns the value of Files or the provided default if the receiver or field is nil.
-func (x *PluginOutput) GetFilesOr(defaultValue []PluginFile) []PluginFile {
+func (x *PluginOutput) GetFilesOr(defaultValue []PluginOutputFile) []PluginOutputFile {
 	if x != nil && x.Files != nil {
 		return *x.Files
 	}
@@ -1665,7 +1574,7 @@ func (x *PluginOutput) GetFilesOr(defaultValue []PluginFile) []PluginFile {
 
 // prePluginOutput is the version of PluginOutput previous to the required field validation
 type prePluginOutput struct {
-	Files *[]prePluginFile `json:"files,omitempty"`
+	Files *[]prePluginOutputFile `json:"files,omitempty"`
 }
 
 // validate validates the required fields of PluginOutput
@@ -1689,12 +1598,12 @@ func (p *prePluginOutput) validate() error {
 // transform transforms the prePluginOutput type to the final PluginOutput type
 func (p *prePluginOutput) transform() PluginOutput {
 	// Transformations
-	var transFiles *[]PluginFile
+	var transFiles *[]PluginOutputFile
 	if p.Files != nil {
-		var valFiles []PluginFile
-		valFiles = make([]PluginFile, len(*p.Files))
+		var valFiles []PluginOutputFile
+		valFiles = make([]PluginOutputFile, len(*p.Files))
 		for i, v := range *p.Files {
-			var tmp_ PluginFile
+			var tmp_ PluginOutputFile
 			tmp_ = v.transform()
 			valFiles[i] = tmp_
 		}
@@ -1704,6 +1613,97 @@ func (p *prePluginOutput) transform() PluginOutput {
 	// Assignments
 	return PluginOutput{
 		Files: transFiles,
+	}
+}
+
+// PluginOutputFile represents a single generated file produced by the plugin.
+//
+// This abstraction allows plugins to generate multiple files from a single
+// invocation, enabling patterns like one-file-per-type or splitting large
+// outputs across multiple modules.
+type PluginOutputFile struct {
+	// Relative path from the output directory where this file should be written.
+	//
+	// May include subdirectory separators (e.g., "src/models/user.py").
+	// Forward slashes are normalized to the appropriate separator for the
+	// current operating system.
+	Path string `json:"path"`
+	// The complete textual content of the generated file.
+	//
+	// This should be the final, formatted output ready to be written to disk.
+	// VDL writes this content as-is without additional processing.
+	Content string `json:"content"`
+}
+
+// GetPath returns the value of Path or the zero value if the receiver or field is nil.
+func (x *PluginOutputFile) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	var zero string
+	return zero
+}
+
+// GetPathOr returns the value of Path or the provided default if the receiver or field is nil.
+func (x *PluginOutputFile) GetPathOr(defaultValue string) string {
+	if x != nil {
+		return x.Path
+	}
+	return defaultValue
+}
+
+// GetContent returns the value of Content or the zero value if the receiver or field is nil.
+func (x *PluginOutputFile) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	var zero string
+	return zero
+}
+
+// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
+func (x *PluginOutputFile) GetContentOr(defaultValue string) string {
+	if x != nil {
+		return x.Content
+	}
+	return defaultValue
+}
+
+// prePluginOutputFile is the version of PluginOutputFile previous to the required field validation
+type prePluginOutputFile struct {
+	Path    *string `json:"path,omitempty"`
+	Content *string `json:"content,omitempty"`
+}
+
+// validate validates the required fields of PluginOutputFile
+func (p *prePluginOutputFile) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePluginOutputFile is nil")
+	}
+
+	// Validation for field "path"
+	if p.Path == nil {
+		return errorMissingRequiredField("field path is required")
+	}
+
+	// Validation for field "content"
+	if p.Content == nil {
+		return errorMissingRequiredField("field content is required")
+	}
+
+	return nil
+}
+
+// transform transforms the prePluginOutputFile type to the final PluginOutputFile type
+func (p *prePluginOutputFile) transform() PluginOutputFile {
+	// Transformations
+	transPath := *p.Path
+	transContent := *p.Content
+
+	// Assignments
+	return PluginOutputFile{
+		Path:    transPath,
+		Content: transContent,
 	}
 }
 

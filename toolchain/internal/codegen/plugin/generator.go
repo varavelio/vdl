@@ -33,7 +33,7 @@ func (g *Generator) Name() string {
 }
 
 // Generate executes the plugin and returns the generated files.
-func (g *Generator) Generate(ctx context.Context, ir *irtypes.IrSchema, formattedSchema string) ([]plugintypes.PluginFile, error) {
+func (g *Generator) Generate(ctx context.Context, ir *irtypes.IrSchema, formattedSchema string) ([]plugintypes.PluginOutputFile, error) {
 	if len(g.config.Command) == 0 {
 		return nil, fmt.Errorf("plugin command is empty")
 	}
@@ -108,5 +108,5 @@ func (g *Generator) Generate(ctx context.Context, ir *irtypes.IrSchema, formatte
 		return nil, nil
 	}
 
-	return output.GetFilesOr([]plugintypes.PluginFile{}), nil
+	return output.GetFilesOr([]plugintypes.PluginOutputFile{}), nil
 }
