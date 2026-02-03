@@ -10,12 +10,20 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
+          src: "../assets/favicon.ico",
+          dest: "./",
+        },
+        {
+          src: "../assets/*",
+          dest: "./_app/vdl/assets",
+        },
+        {
           src: "../toolchain/dist/vdl.wasm",
-          dest: "_app/vdl",
+          dest: "./_app/vdl/wasm",
         },
         {
           src: "../toolchain/dist/wasm_exec.js",
-          dest: "_app/vdl",
+          dest: "./_app/vdl/wasm",
         },
         {
           src: "node_modules/web-tree-sitter/tree-sitter.wasm",

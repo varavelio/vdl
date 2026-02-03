@@ -14,8 +14,8 @@ declare global {
 }
 
 // Configuration constants
-const WASM_EXEC_URL = "./_app/vdl/wasm_exec.js";
-const WASM_BINARY_URL = "./_app/vdl/vdl.wasm";
+const WASM_EXEC_URL = "./_app/vdl/wasm/wasm_exec.js";
+const WASM_BINARY_URL = "./_app/vdl/wasm/vdl.wasm";
 
 export class WasmClient {
   /**
