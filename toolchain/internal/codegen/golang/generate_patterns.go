@@ -5,10 +5,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generatePatterns(schema *ir.Schema, config *config.GoConfig) (string, error) {
+func generatePatterns(schema *irtypes.IrSchema, config *config.GoConfig) (string, error) {
 	if !config.ShouldGenPatterns() {
 		return "", nil
 	}
@@ -32,10 +32,10 @@ func generatePatterns(schema *ir.Schema, config *config.GoConfig) (string, error
 }
 
 // generatePattern generates a Go function for a pattern template.
-func generatePattern(g *gen.Generator, pattern ir.Pattern) {
+func generatePattern(g *gen.Generator, pattern irtypes.PatternDef) {
 	// Documentation
-	if pattern.Doc != "" {
-		doc := pattern.Doc
+	if pattern.GetDoc() != "" {
+		doc := pattern.GetDoc()
 		if pattern.Template != "" {
 			doc += "\n\nTemplate: " + pattern.Template
 		}
@@ -49,7 +49,7 @@ func generatePattern(g *gen.Generator, pattern ir.Pattern) {
 	}
 
 	// Deprecation
-	renderDeprecated(g, pattern.Deprecated)
+	renderDeprecated(g, pattern.Deprecation)
 
 	// Generate function signature
 	var params []string

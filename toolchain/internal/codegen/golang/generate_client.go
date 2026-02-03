@@ -6,7 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -14,7 +14,7 @@ import (
 var clientRawPiece string
 
 // generateClientCore generates the core client implementation (rpc_client.go).
-func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
+func generateClientCore(_ *irtypes.IrSchema, config *config.GoConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}
@@ -180,14 +180,13 @@ func generateClientCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 }
 
 // generateClientRPC generates the client implementation for a specific RPC (rpc_{rpcName}_client.go).
-func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
+func generateClientRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, config *config.GoConfig) (string, error) {
 	if !config.GenClient {
 		return "", nil
 	}
 
 	g := gen.New().WithTabs()
 
-	rpcName := rpc.Name
 	rpcStructName := fmt.Sprintf("client%sRPC", rpcName)
 	procsStructName := fmt.Sprintf("client%sProcs", rpcName)
 	streamsStructName := fmt.Sprintf("client%sStreams", rpcName)
@@ -315,16 +314,16 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Line("}")
 	g.Break()
 
-	for _, proc := range rpc.Procs {
-		uniqueName := rpc.Name + proc.Name
+	for _, proc := range procs {
+		uniqueName := rpcName + proc.Name
 		builderName := "clientBuilder" + uniqueName
 
 		// Client method to create builder
-		g.Linef("// %s creates a call builder for the %s.%s procedure.", proc.Name, rpc.Name, proc.Name)
-		if proc.Doc != "" {
-			renderDoc(g, proc.Doc, true)
+		g.Linef("// %s creates a call builder for the %s.%s procedure.", proc.Name, rpcName, proc.Name)
+		if proc.GetDoc() != "" {
+			renderDoc(g, proc.GetDoc(), true)
 		}
-		renderDeprecated(g, proc.Deprecated)
+		renderDeprecated(g, proc.Deprecation)
 		g.Linef("func (registry *%s) %s() *%s {", procsStructName, proc.Name, builderName)
 		g.Block(func() {
 			g.Linef("return &%s{client: registry.intClient, headerProviders: []HeaderProvider{}, rpcName: %q, name: %q}", builderName, rpcName, proc.Name)
@@ -437,16 +436,16 @@ func generateClientRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Break()
 	}
 
-	for _, stream := range rpc.Streams {
-		uniqueName := rpc.Name + stream.Name
+	for _, stream := range streams {
+		uniqueName := rpcName + stream.Name
 		builderStream := "clientBuilder" + uniqueName + "Stream"
 
 		// Client method to create stream builder
-		g.Linef("// %s creates a stream builder for the %s.%s stream.", stream.Name, rpc.Name, stream.Name)
-		if stream.Doc != "" {
-			renderDoc(g, stream.Doc, true)
+		g.Linef("// %s creates a stream builder for the %s.%s stream.", stream.Name, rpcName, stream.Name)
+		if stream.GetDoc() != "" {
+			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecated)
+		renderDeprecated(g, stream.Deprecation)
 		g.Linef("func (registry *%s) %s() *%s {", streamsStructName, stream.Name, builderStream)
 		g.Block(func() {
 			g.Linef("return &%s{client: registry.intClient, headerProviders: []HeaderProvider{}, rpcName: %q, name: %q}", builderStream, rpcName, stream.Name)

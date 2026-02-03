@@ -6,7 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -14,7 +14,7 @@ import (
 var serverRawPiece string
 
 // generateServerCore generates the core server implementation (rpc_server.go).
-func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
+func generateServerCore(_ *irtypes.IrSchema, config *config.GoConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
@@ -135,14 +135,13 @@ func generateServerCore(_ *ir.Schema, config *config.GoConfig) (string, error) {
 }
 
 // generateServerRPC generates the server implementation for a specific RPC (rpc_{rpcName}_server.go).
-func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
+func generateServerRPC(rpcName string, procs []irtypes.ProcedureDef, streams []irtypes.StreamDef, config *config.GoConfig) (string, error) {
 	if !config.GenServer {
 		return "", nil
 	}
 
 	g := gen.New().WithTabs()
 
-	rpcName := rpc.Name
 	rpcStructName := fmt.Sprintf("server%sRPC", rpcName)
 	procsStructName := fmt.Sprintf("server%sProcs", rpcName)
 	streamsStructName := fmt.Sprintf("server%sStreams", rpcName)
@@ -216,8 +215,8 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	g.Break()
 
 	// Procedures
-	for _, proc := range rpc.Procs {
-		uniqueName := rpc.Name + proc.Name
+	for _, proc := range procs {
+		uniqueName := rpcName + proc.Name
 
 		g.Linef("// Register the %s procedure.", proc.Name)
 		g.Linef("func (r *%s[T]) %s() proc%sEntry[T] {", procsStructName, proc.Name, uniqueName)
@@ -251,10 +250,10 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("//")
 		g.Line("// Execution order: middlewares run in the order they were registered,")
 		g.Line("// then the final handler is invoked.")
-		if proc.Doc != "" {
-			renderDoc(g, proc.Doc, true)
+		if proc.GetDoc() != "" {
+			renderDoc(g, proc.GetDoc(), true)
 		}
-		renderDeprecated(g, proc.Deprecated)
+		renderDeprecated(g, proc.Deprecation)
 		g.Linef("func (e proc%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next ProcHandlerFunc[T, any, any]) ProcHandlerFunc[T, any, any] {")
@@ -327,10 +326,10 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("//  1) Deserialize and validate the input using generated pre* types")
 		g.Line("//  2) Build the procedure's middleware chain")
 		g.Line("//  3) Invoke your handler with a typed context")
-		if proc.Doc != "" {
-			renderDoc(g, proc.Doc, true)
+		if proc.GetDoc() != "" {
+			renderDoc(g, proc.GetDoc(), true)
 		}
-		renderDeprecated(g, proc.Deprecated)
+		renderDeprecated(g, proc.Deprecation)
 		g.Linef("func (e proc%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any]) (any, error) {")
@@ -378,8 +377,8 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 	}
 
 	// Streams
-	for _, stream := range rpc.Streams {
-		uniqueName := rpc.Name + stream.Name
+	for _, stream := range streams {
+		uniqueName := rpcName + stream.Name
 
 		g.Linef("// Register the %s stream.", stream.Name)
 		g.Linef("func (r *%s[T]) %s() stream%sEntry[T] {", streamsStructName, stream.Name, uniqueName)
@@ -424,10 +423,10 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Linef("// modify, or augment the handling of incoming stream requests for %s.", uniqueName)
 		g.Line("//")
 		g.Line("// Execution order: middlewares run in registration order, then the handler.")
-		if stream.Doc != "" {
-			renderDoc(g, stream.Doc, true)
+		if stream.GetDoc() != "" {
+			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecated)
+		renderDeprecated(g, stream.Deprecation)
 		g.Linef("func (e stream%sEntry[T]) Use(mw %sMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next StreamHandlerFunc[T, any, any]) StreamHandlerFunc[T, any, any] {")
@@ -497,10 +496,10 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("// transform, filter, decorate, or audit outgoing events in a type-safe way.")
 		g.Line("//")
 		g.Line("// Execution order: emit middlewares run in registration order for every event.")
-		if stream.Doc != "" {
-			renderDoc(g, stream.Doc, true)
+		if stream.GetDoc() != "" {
+			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecated)
+		renderDeprecated(g, stream.Deprecation)
 		g.Linef("func (e stream%sEntry[T]) UseEmit(mw %sEmitMiddlewareFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adapted := func(next EmitFunc[T, any, any]) EmitFunc[T, any, any] {")
@@ -563,10 +562,10 @@ func generateServerRPC(rpc ir.RPC, config *config.GoConfig) (string, error) {
 		g.Line("//  1) Deserialize and validate the input using generated pre* types")
 		g.Line("//  2) Build the stream's middleware chain and the emit chain")
 		g.Line("//  3) Provide a typed emit function and invoke your handler")
-		if stream.Doc != "" {
-			renderDoc(g, stream.Doc, true)
+		if stream.GetDoc() != "" {
+			renderDoc(g, stream.GetDoc(), true)
 		}
-		renderDeprecated(g, stream.Deprecated)
+		renderDeprecated(g, stream.Deprecation)
 		g.Linef("func (e stream%sEntry[T]) Handle(handler %sHandlerFunc[T]) {", uniqueName, uniqueName)
 		g.Block(func() {
 			g.Linef("adaptedHandler := func(cGeneric *HandlerContext[T, any], emitGeneric EmitFunc[T, any, any]) error {")

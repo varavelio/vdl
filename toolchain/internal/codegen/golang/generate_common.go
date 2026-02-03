@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -15,28 +15,28 @@ import (
 
 // typeRefToGo converts an IR TypeRef to its Go type string representation.
 // parentTypeName is used to generate names for inline object types.
-func typeRefToGo(parentTypeName string, tr ir.TypeRef) string {
+func typeRefToGo(parentTypeName string, tr irtypes.TypeRef) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		return primitiveToGo(tr.Primitive)
+	case irtypes.TypeKindPrimitive:
+		return primitiveToGo(tr.GetPrimitiveName())
 
-	case ir.TypeKindType:
-		return tr.Type
+	case irtypes.TypeKindType:
+		return tr.GetTypeName()
 
-	case ir.TypeKindEnum:
-		return tr.Enum
+	case irtypes.TypeKindEnum:
+		return tr.GetEnumName()
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		// Build array prefix based on dimensions
-		arrayPrefix := strings.Repeat("[]", tr.ArrayDimensions)
-		elementType := typeRefToGo(parentTypeName, *tr.ArrayItem)
+		arrayPrefix := strings.Repeat("[]", int(tr.GetArrayDims()))
+		elementType := typeRefToGo(parentTypeName, tr.GetArrayType())
 		return arrayPrefix + elementType
 
-	case ir.TypeKindMap:
-		valueType := typeRefToGo(parentTypeName, *tr.MapValue)
+	case irtypes.TypeKindMap:
+		valueType := typeRefToGo(parentTypeName, tr.GetMapType())
 		return "map[string]" + valueType
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		// Inline objects get a generated name based on parent
 		return parentTypeName
 	}
@@ -46,29 +46,29 @@ func typeRefToGo(parentTypeName string, tr ir.TypeRef) string {
 
 // typeRefToPreGo converts an IR TypeRef to its "pre" Go type string representation.
 // The "pre" types are used for unmarshaling and validation before transformation.
-func typeRefToPreGo(parentTypeName string, tr ir.TypeRef) string {
+func typeRefToPreGo(parentTypeName string, tr irtypes.TypeRef) string {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive:
-		return primitiveToGo(tr.Primitive)
+	case irtypes.TypeKindPrimitive:
+		return primitiveToGo(tr.GetPrimitiveName())
 
-	case ir.TypeKindType:
-		return "pre" + tr.Type
+	case irtypes.TypeKindType:
+		return "pre" + tr.GetTypeName()
 
-	case ir.TypeKindEnum:
+	case irtypes.TypeKindEnum:
 		// Enums don't need pre-types, they're validated at parse time
-		return tr.Enum
+		return tr.GetEnumName()
 
-	case ir.TypeKindArray:
+	case irtypes.TypeKindArray:
 		// Build array prefix based on dimensions
-		arrayPrefix := strings.Repeat("[]", tr.ArrayDimensions)
-		elementType := typeRefToPreGo(parentTypeName, *tr.ArrayItem)
+		arrayPrefix := strings.Repeat("[]", int(tr.GetArrayDims()))
+		elementType := typeRefToPreGo(parentTypeName, tr.GetArrayType())
 		return arrayPrefix + elementType
 
-	case ir.TypeKindMap:
-		valueType := typeRefToPreGo(parentTypeName, *tr.MapValue)
+	case irtypes.TypeKindMap:
+		valueType := typeRefToPreGo(parentTypeName, tr.GetMapType())
 		return "map[string]" + valueType
 
-	case ir.TypeKindObject:
+	case irtypes.TypeKindObject:
 		// Inline objects get a generated pre-name based on parent
 		return "pre" + parentTypeName
 	}
@@ -77,17 +77,17 @@ func typeRefToPreGo(parentTypeName string, tr ir.TypeRef) string {
 }
 
 // primitiveToGo converts an IR primitive type to its Go equivalent.
-func primitiveToGo(p ir.PrimitiveType) string {
+func primitiveToGo(p irtypes.PrimitiveType) string {
 	switch p {
-	case ir.PrimitiveString:
+	case irtypes.PrimitiveTypeString:
 		return "string"
-	case ir.PrimitiveInt:
+	case irtypes.PrimitiveTypeInt:
 		return "int64"
-	case ir.PrimitiveFloat:
+	case irtypes.PrimitiveTypeFloat:
 		return "float64"
-	case ir.PrimitiveBool:
+	case irtypes.PrimitiveTypeBool:
 		return "bool"
-	case ir.PrimitiveDatetime:
+	case irtypes.PrimitiveTypeDatetime:
 		return "time.Time"
 	}
 	return "any"
@@ -95,16 +95,16 @@ func primitiveToGo(p ir.PrimitiveType) string {
 
 // needsPreType returns true if the TypeRef requires pre-type validation.
 // Primitives and enums don't need pre-types.
-func needsPreType(tr ir.TypeRef) bool {
+func needsPreType(tr irtypes.TypeRef) bool {
 	switch tr.Kind {
-	case ir.TypeKindPrimitive, ir.TypeKindEnum:
+	case irtypes.TypeKindPrimitive, irtypes.TypeKindEnum:
 		return false
-	case ir.TypeKindType, ir.TypeKindObject:
+	case irtypes.TypeKindType, irtypes.TypeKindObject:
 		return true
-	case ir.TypeKindArray:
-		return needsPreType(*tr.ArrayItem)
-	case ir.TypeKindMap:
-		return needsPreType(*tr.MapValue)
+	case irtypes.TypeKindArray:
+		return needsPreType(tr.GetArrayType())
+	case irtypes.TypeKindMap:
+		return needsPreType(tr.GetMapType())
 	}
 	return false
 }
@@ -114,13 +114,13 @@ func needsPreType(tr ir.TypeRef) bool {
 // =============================================================================
 
 // renderField generates the Go struct field code for a single IR field.
-func renderField(parentTypeName string, field ir.Field) string {
+func renderField(parentTypeName string, field irtypes.Field) string {
 	namePascal := strutil.ToPascalCase(field.Name)
 	nameCamel := strutil.ToCamelCase(field.Name)
 
 	// Calculate the inline type name for objects
 	inlineTypeName := parentTypeName + namePascal
-	typeLiteral := typeRefToGo(inlineTypeName, field.Type)
+	typeLiteral := typeRefToGo(inlineTypeName, field.TypeRef)
 
 	// Optional fields use pointers
 	if field.Optional {
@@ -133,20 +133,20 @@ func renderField(parentTypeName string, field ir.Field) string {
 		jsonTag = fmt.Sprintf(" `json:\"%s,omitempty\"`", nameCamel)
 	}
 
-	doc := renderDocString(field.Doc, false)
+	doc := renderDocString(field.GetDoc(), false)
 	result := fmt.Sprintf("%s %s", namePascal, typeLiteral)
 	return doc + result + jsonTag
 }
 
 // renderPreField generates the Go struct field code for a pre-type field.
 // All fields in pre-types are pointers for validation.
-func renderPreField(parentTypeName string, field ir.Field) string {
+func renderPreField(parentTypeName string, field irtypes.Field) string {
 	namePascal := strutil.ToPascalCase(field.Name)
 	nameCamel := strutil.ToCamelCase(field.Name)
 
 	// Calculate the inline type name for objects
 	inlineTypeName := parentTypeName + namePascal
-	typeLiteral := typeRefToPreGo(inlineTypeName, field.Type)
+	typeLiteral := typeRefToPreGo(inlineTypeName, field.TypeRef)
 
 	// All pre-type fields are pointers for validation
 	typeLiteral = "*" + typeLiteral
@@ -156,16 +156,16 @@ func renderPreField(parentTypeName string, field ir.Field) string {
 	return result + jsonTag
 }
 
-// getInlineObject returns the inline object definition if the type is an object
+// getInlineObject returns the inline object fields if the type is an object
 // or contains one (recursively in arrays/maps). Returns nil otherwise.
-func getInlineObject(tr ir.TypeRef) *ir.InlineObject {
+func getInlineObject(tr irtypes.TypeRef) *[]irtypes.Field {
 	switch tr.Kind {
-	case ir.TypeKindObject:
-		return tr.Object
-	case ir.TypeKindArray:
-		return getInlineObject(*tr.ArrayItem)
-	case ir.TypeKindMap:
-		return getInlineObject(*tr.MapValue)
+	case irtypes.TypeKindObject:
+		return tr.ObjectFields
+	case irtypes.TypeKindArray:
+		return getInlineObject(tr.GetArrayType())
+	case irtypes.TypeKindMap:
+		return getInlineObject(tr.GetMapType())
 	}
 	return nil
 }
@@ -175,7 +175,7 @@ func getInlineObject(tr ir.TypeRef) *ir.InlineObject {
 // =============================================================================
 
 // renderType renders a complete type definition with all its fields.
-func renderType(parentName, name, desc string, fields []ir.Field) string {
+func renderType(parentName, name, desc string, fields []irtypes.Field) string {
 	fullName := parentName + name
 
 	g := gen.New().WithTabs()
@@ -194,9 +194,9 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 
 	// Render children inline types
 	for _, field := range fields {
-		if inlineObj := getInlineObject(field.Type); inlineObj != nil {
+		if inlineFields := getInlineObject(field.TypeRef); inlineFields != nil {
 			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderType("", childName, "", inlineObj.Fields))
+			g.Line(renderType("", childName, "", *inlineFields))
 		}
 	}
 
@@ -204,7 +204,7 @@ func renderType(parentName, name, desc string, fields []ir.Field) string {
 }
 
 // renderPreType renders a pre-type definition with validation and transform methods.
-func renderPreType(parentName, name string, fields []ir.Field) string {
+func renderPreType(parentName, name string, fields []irtypes.Field) string {
 	fullName := parentName + name
 
 	g := gen.New().WithTabs()
@@ -220,9 +220,9 @@ func renderPreType(parentName, name string, fields []ir.Field) string {
 
 	// Render children inline pre-types
 	for _, field := range fields {
-		if inlineObj := getInlineObject(field.Type); inlineObj != nil {
+		if inlineFields := getInlineObject(field.TypeRef); inlineFields != nil {
 			childName := fullName + strutil.ToPascalCase(field.Name)
-			g.Line(renderPreType("", childName, inlineObj.Fields))
+			g.Line(renderPreType("", childName, *inlineFields))
 		}
 	}
 
@@ -236,7 +236,7 @@ func renderPreType(parentName, name string, fields []ir.Field) string {
 }
 
 // renderValidateFunc generates the validate method for a pre-type.
-func renderValidateFunc(typeName string, fields []ir.Field) string {
+func renderValidateFunc(typeName string, fields []irtypes.Field) string {
 	g := gen.New().WithTabs()
 	g.Linef("// validate validates the required fields of %s", typeName)
 	g.Linef("func (p *pre%s) validate() error {", typeName)
@@ -251,7 +251,7 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 		for _, field := range fields {
 			fieldName := strutil.ToPascalCase(field.Name)
 			isRequired := !field.Optional
-			needsPre := needsPreType(field.Type)
+			needsPre := needsPreType(field.TypeRef)
 
 			g.Linef(`// Validation for field "%s"`, field.Name)
 
@@ -268,7 +268,7 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 				g.Block(func() {
 					source := fmt.Sprintf("p.%s", fieldName)
 					// Pre-type fields are pointers, so isPointer is true
-					renderNestedValidation(g, source, field.Type, field.Name, true)
+					renderNestedValidation(g, source, field.TypeRef, field.Name, true)
 				})
 				g.Line("}")
 			}
@@ -286,34 +286,35 @@ func renderValidateFunc(typeName string, fields []ir.Field) string {
 // renderNestedValidation renders validation code for nested types.
 // The source should be the field access expression (e.g., "p.Field" for pointer fields)
 // isPointer indicates whether the source is a pointer that needs dereferencing for range operations
-func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fieldName string, isPointer bool) {
+func renderNestedValidation(g *gen.Generator, source string, tr irtypes.TypeRef, fieldName string, isPointer bool) {
 	switch tr.Kind {
-	case ir.TypeKindType, ir.TypeKindObject:
+	case irtypes.TypeKindType, irtypes.TypeKindObject:
 		g.Linef("if err := %s.validate(); err != nil {", source)
 		g.Block(func() {
 			g.Linef("return errorMissingRequiredField(\"field %s: \" + err.Error())", fieldName)
 		})
 		g.Line("}")
 
-	case ir.TypeKindArray:
-		if needsPreType(*tr.ArrayItem) {
+	case irtypes.TypeKindArray:
+		if needsPreType(tr.GetArrayType()) {
 			// For pointer to slice, dereference first
 			rangeSource := source
 			if isPointer {
 				rangeSource = "*" + source
 			}
-			renderArrayValidation(g, rangeSource, tr.ArrayDimensions, *tr.ArrayItem, fieldName)
+			renderArrayValidation(g, rangeSource, int(tr.GetArrayDims()), tr.GetArrayType(), fieldName)
 		}
 
-	case ir.TypeKindMap:
-		if needsPreType(*tr.MapValue) {
+	case irtypes.TypeKindMap:
+		if needsPreType(tr.GetMapType()) {
 			// For pointer to map, dereference first
 			rangeSource := source
 			if isPointer {
 				rangeSource = "*" + source
 			}
+			mapType := tr.GetMapType()
 			// Use key in error message only for direct object types
-			if tr.MapValue.Kind == ir.TypeKindType || tr.MapValue.Kind == ir.TypeKindObject {
+			if mapType.Kind == irtypes.TypeKindType || mapType.Kind == irtypes.TypeKindObject {
 				g.Linef("for key, value := range %s {", rangeSource)
 				g.Block(func() {
 					g.Line("if err := value.validate(); err != nil {")
@@ -328,7 +329,7 @@ func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fiel
 				// The value from range is not a pointer, so isPointer is false
 				g.Linef("for _, value := range %s {", rangeSource)
 				g.Block(func() {
-					renderNestedValidation(g, "value", *tr.MapValue, fieldName, false)
+					renderNestedValidation(g, "value", mapType, fieldName, false)
 				})
 				g.Line("}")
 			}
@@ -337,7 +338,7 @@ func renderNestedValidation(g *gen.Generator, source string, tr ir.TypeRef, fiel
 }
 
 // renderArrayValidation recursively validates array elements based on dimensions.
-func renderArrayValidation(g *gen.Generator, source string, dims int, itemType ir.TypeRef, fieldName string) {
+func renderArrayValidation(g *gen.Generator, source string, dims int, itemType irtypes.TypeRef, fieldName string) {
 	if dims == 0 {
 		// When we get here from a range, the source is not a pointer
 		renderNestedValidation(g, source, itemType, fieldName, false)
@@ -352,7 +353,7 @@ func renderArrayValidation(g *gen.Generator, source string, dims int, itemType i
 }
 
 // renderTransformFunc generates the transform method for a pre-type.
-func renderTransformFunc(typeName string, fields []ir.Field) string {
+func renderTransformFunc(typeName string, fields []irtypes.Field) string {
 	g := gen.New().WithTabs()
 	g.Linef("// transform transforms the pre%s type to the final %s type", typeName, typeName)
 	g.Linef("func (p *pre%s) transform() %s {", typeName, typeName)
@@ -362,7 +363,7 @@ func renderTransformFunc(typeName string, fields []ir.Field) string {
 			fieldName := strutil.ToPascalCase(field.Name)
 			fieldNameTemp := "trans" + fieldName
 			isRequired := !field.Optional
-			needsPre := needsPreType(field.Type)
+			needsPre := needsPreType(field.TypeRef)
 
 			if !needsPre {
 				// Simple extraction for primitives and enums
@@ -396,14 +397,14 @@ func renderTransformFunc(typeName string, fields []ir.Field) string {
 }
 
 // renderFieldTransform renders the transformation code for a single field.
-func renderFieldTransform(g *gen.Generator, field ir.Field, fieldName, tempName, parentType string) {
+func renderFieldTransform(g *gen.Generator, field irtypes.Field, fieldName, tempName, parentType string) {
 	isRequired := !field.Optional
-	goType := typeRefToGo(parentType+fieldName, field.Type)
+	goType := typeRefToGo(parentType+fieldName, field.TypeRef)
 
 	// For Type and Object, use pointer source since preField is a pointer
 	// For Arrays and Maps, use dereferenced source since they are slices/maps directly
 	source := fmt.Sprintf("p.%s", fieldName)
-	needsDeref := field.Type.Kind == ir.TypeKindArray || field.Type.Kind == ir.TypeKindMap
+	needsDeref := field.TypeRef.Kind == irtypes.TypeKindArray || field.TypeRef.Kind == irtypes.TypeKindMap
 	if needsDeref {
 		source = fmt.Sprintf("*p.%s", fieldName)
 	}
@@ -415,36 +416,36 @@ func renderFieldTransform(g *gen.Generator, field ir.Field, fieldName, tempName,
 		g.Block(func() {
 			valTemp := "val" + strutil.ToPascalCase(fieldName)
 			g.Linef("var %s %s", valTemp, goType)
-			renderValueTransform(g, source, valTemp, field.Type, parentType+fieldName, "tmp")
+			renderValueTransform(g, source, valTemp, field.TypeRef, parentType+fieldName, "tmp")
 			g.Linef("%s = &%s", tempName, valTemp)
 		})
 		g.Line("}")
 	} else {
 		g.Linef("var %s %s", tempName, goType)
-		renderValueTransform(g, source, tempName, field.Type, parentType+fieldName, "tmp")
+		renderValueTransform(g, source, tempName, field.TypeRef, parentType+fieldName, "tmp")
 	}
 }
 
 // renderValueTransform generates code to transform source (of pre-type) to dest (of final type).
-func renderValueTransform(g *gen.Generator, source, dest string, tr ir.TypeRef, ctxName string, tempPrefix string) {
+func renderValueTransform(g *gen.Generator, source, dest string, tr irtypes.TypeRef, ctxName string, tempPrefix string) {
 	if !needsPreType(tr) {
 		g.Linef("%s = %s", dest, source)
 		return
 	}
 
 	switch tr.Kind {
-	case ir.TypeKindType, ir.TypeKindObject:
+	case irtypes.TypeKindType, irtypes.TypeKindObject:
 		g.Linef("%s = %s.transform()", dest, source)
 
-	case ir.TypeKindArray:
-		renderArrayTransform(g, source, dest, tr.ArrayDimensions, *tr.ArrayItem, ctxName, tempPrefix)
+	case irtypes.TypeKindArray:
+		renderArrayTransform(g, source, dest, int(tr.GetArrayDims()), tr.GetArrayType(), ctxName, tempPrefix)
 
-	case ir.TypeKindMap:
+	case irtypes.TypeKindMap:
 		destType := typeRefToGo(ctxName, tr)
 		g.Linef("%s = make(%s)", dest, destType)
 		g.Linef("for k, v := range %s {", source)
 		g.Block(func() {
-			itemType := *tr.MapValue
+			itemType := tr.GetMapType()
 			itemDestType := typeRefToGo(ctxName, itemType)
 			tempVar := tempPrefix + "_"
 			g.Linef("var %s %s", tempVar, itemDestType)
@@ -456,17 +457,17 @@ func renderValueTransform(g *gen.Generator, source, dest string, tr ir.TypeRef, 
 }
 
 // renderArrayTransform recursively generates array transformation code handling dimensions.
-func renderArrayTransform(g *gen.Generator, source, dest string, dims int, itemType ir.TypeRef, ctxName string, tempPrefix string) {
+func renderArrayTransform(g *gen.Generator, source, dest string, dims int, itemType irtypes.TypeRef, ctxName string, tempPrefix string) {
 	if dims == 0 {
 		renderValueTransform(g, source, dest, itemType, ctxName, tempPrefix)
 		return
 	}
 
 	// Calculate type for destination slice at this level
-	synthType := ir.TypeRef{
-		Kind:            ir.TypeKindArray,
-		ArrayDimensions: dims,
-		ArrayItem:       &itemType,
+	synthType := irtypes.TypeRef{
+		Kind:      irtypes.TypeKindArray,
+		ArrayDims: irtypes.Ptr(int64(dims)),
+		ArrayType: &itemType,
 	}
 	destType := typeRefToGo(ctxName, synthType)
 
@@ -478,10 +479,10 @@ func renderArrayTransform(g *gen.Generator, source, dest string, dims int, itemT
 		if dims == 1 {
 			nextLevelType = typeRefToGo(ctxName, itemType)
 		} else {
-			synthNext := ir.TypeRef{
-				Kind:            ir.TypeKindArray,
-				ArrayDimensions: dims - 1,
-				ArrayItem:       &itemType,
+			synthNext := irtypes.TypeRef{
+				Kind:      irtypes.TypeKindArray,
+				ArrayDims: irtypes.Ptr(int64(dims - 1)),
+				ArrayType: &itemType,
 			}
 			nextLevelType = typeRefToGo(ctxName, synthNext)
 		}
@@ -502,13 +503,13 @@ func renderArrayTransform(g *gen.Generator, source, dest string, dims int, itemT
 
 // renderAccessors generates getter methods for all fields in a struct.
 // Getters provide nil-safe access to fields, especially for optional pointers.
-func renderAccessors(typeName string, fields []ir.Field) string {
+func renderAccessors(typeName string, fields []irtypes.Field) string {
 	g := gen.New().WithTabs()
 
 	for _, field := range fields {
 		fieldName := strutil.ToPascalCase(field.Name)
 		inlineTypeName := typeName + fieldName
-		goType := typeRefToGo(inlineTypeName, field.Type)
+		goType := typeRefToGo(inlineTypeName, field.TypeRef)
 
 		// Generate Get{FieldName}()
 		g.Linef("// Get%s returns the value of %s or the zero value if the receiver or field is nil.", fieldName, fieldName)
@@ -602,16 +603,16 @@ func renderDoc(g *gen.Generator, doc string, newLineBefore bool) {
 }
 
 // renderDeprecated renders a deprecation comment.
-func renderDeprecated(g *gen.Generator, deprecated *ir.Deprecation) {
+func renderDeprecated(g *gen.Generator, deprecated *string) {
 	if deprecated == nil {
 		return
 	}
 
 	desc := "Deprecated: "
-	if deprecated.Message == "" {
+	if *deprecated == "" {
 		desc += "This is deprecated and should not be used in new code."
 	} else {
-		desc += deprecated.Message
+		desc += *deprecated
 	}
 
 	g.Line("//")

@@ -3,13 +3,23 @@ package golang
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // generateRPCCatalog generates introspection data: VDLProcedures, VDLStreams, and VDLPaths.
-func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
-	if len(schema.RPCs) == 0 {
+func generateRPCCatalog(schema *irtypes.IrSchema, _ *config.GoConfig) (string, error) {
+	if len(schema.Rpcs) == 0 {
 		return "", nil
+	}
+
+	// Build a map of RPC name to procedures and streams for efficient lookup
+	rpcProcs := make(map[string][]irtypes.ProcedureDef)
+	rpcStreams := make(map[string][]irtypes.StreamDef)
+	for _, proc := range schema.Procedures {
+		rpcProcs[proc.RpcName] = append(rpcProcs[proc.RpcName], proc)
+	}
+	for _, stream := range schema.Streams {
+		rpcStreams[stream.RpcName] = append(rpcStreams[stream.RpcName], stream)
 	}
 
 	g := gen.New().WithTabs()
@@ -25,10 +35,8 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 	g.Line("// It allows introspection of RPC procedures at runtime.")
 	g.Line("var VDLProcedures = []OperationDefinition{")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, proc := range rpc.Procs {
-				g.Linef("{RPCName: %q, Name: %q, Type: OperationTypeProc},", rpc.Name, proc.Name)
-			}
+		for _, proc := range schema.Procedures {
+			g.Linef("{RPCName: %q, Name: %q, Type: OperationTypeProc},", proc.RpcName, proc.Name)
 		}
 	})
 	g.Line("}")
@@ -40,10 +48,8 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 	g.Line("// It allows introspection of RPC streams at runtime.")
 	g.Line("var VDLStreams = []OperationDefinition{")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
-			for _, stream := range rpc.Streams {
-				g.Linef("{RPCName: %q, Name: %q, Type: OperationTypeStream},", rpc.Name, stream.Name)
-			}
+		for _, stream := range schema.Streams {
+			g.Linef("{RPCName: %q, Name: %q, Type: OperationTypeStream},", stream.RpcName, stream.Name)
 		}
 	})
 	g.Line("}")
@@ -55,13 +61,13 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 	g.Line("// It provides type-safe access to the URL paths.")
 	g.Line("var VDLPaths = struct {")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
+		for _, rpc := range schema.Rpcs {
 			g.Linef("%s struct {", rpc.Name)
 			g.Block(func() {
-				for _, proc := range rpc.Procs {
+				for _, proc := range rpcProcs[rpc.Name] {
 					g.Linef("%s string", proc.Name)
 				}
-				for _, stream := range rpc.Streams {
+				for _, stream := range rpcStreams[rpc.Name] {
 					g.Linef("%s string", stream.Name)
 				}
 			})
@@ -70,22 +76,22 @@ func generateRPCCatalog(schema *ir.Schema, _ *config.GoConfig) (string, error) {
 	})
 	g.Line("}{")
 	g.Block(func() {
-		for _, rpc := range schema.RPCs {
+		for _, rpc := range schema.Rpcs {
 			g.Linef("%s: struct {", rpc.Name)
 			g.Block(func() {
-				for _, proc := range rpc.Procs {
+				for _, proc := range rpcProcs[rpc.Name] {
 					g.Linef("%s string", proc.Name)
 				}
-				for _, stream := range rpc.Streams {
+				for _, stream := range rpcStreams[rpc.Name] {
 					g.Linef("%s string", stream.Name)
 				}
 			})
 			g.Line("}{")
 			g.Block(func() {
-				for _, proc := range rpc.Procs {
+				for _, proc := range rpcProcs[rpc.Name] {
 					g.Linef("%s: \"/%s/%s\",", proc.Name, rpc.Name, proc.Name)
 				}
-				for _, stream := range rpc.Streams {
+				for _, stream := range rpcStreams[rpc.Name] {
 					g.Linef("%s: \"/%s/%s\",", stream.Name, rpc.Name, stream.Name)
 				}
 			})

@@ -6,7 +6,7 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"golang.org/x/tools/imports"
 )
 
@@ -32,7 +32,7 @@ func (g *Generator) Name() string {
 }
 
 // Generate produces Go source files from the IR schema.
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	// Map of filename -> generator
 	builders := make(map[string]*gen.Generator)
 
@@ -76,7 +76,7 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 
 	// Types (types.go) - Domain types
 	// Contains: Enums, Domain Types, Procedure Types, Stream Types
-	typeGenerators := []func(*ir.Schema, *config.GoConfig) (string, error){
+	typeGenerators := []func(*irtypes.IrSchema, *config.GoConfig) (string, error){
 		generateEnums,
 		generateDomainTypes,
 		generateProcedureTypes,
@@ -137,8 +137,19 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b.Raw(code)
 		b.Break()
 	}
-	for _, rpc := range schema.RPCs {
-		code, err := generateServerRPC(rpc, g.config)
+
+	// Build maps of procedures and streams by RPC name for efficient lookup
+	rpcProcs := make(map[string][]irtypes.ProcedureDef)
+	rpcStreams := make(map[string][]irtypes.StreamDef)
+	for _, proc := range schema.Procedures {
+		rpcProcs[proc.RpcName] = append(rpcProcs[proc.RpcName], proc)
+	}
+	for _, stream := range schema.Streams {
+		rpcStreams[stream.RpcName] = append(rpcStreams[stream.RpcName], stream)
+	}
+
+	for _, rpc := range schema.Rpcs {
+		code, err := generateServerRPC(rpc.Name, rpcProcs[rpc.Name], rpcStreams[rpc.Name], g.config)
 		if err != nil {
 			return nil, err
 		}
@@ -159,8 +170,8 @@ func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, er
 		b.Raw(code)
 		b.Break()
 	}
-	for _, rpc := range schema.RPCs {
-		code, err := generateClientRPC(rpc, g.config)
+	for _, rpc := range schema.Rpcs {
+		code, err := generateClientRPC(rpc.Name, rpcProcs[rpc.Name], rpcStreams[rpc.Name], g.config)
 		if err != nil {
 			return nil, err
 		}

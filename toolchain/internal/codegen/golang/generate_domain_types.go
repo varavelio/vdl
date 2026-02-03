@@ -3,10 +3,10 @@ package golang
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateDomainTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) {
+func generateDomainTypes(schema *irtypes.IrSchema, _ *config.GoConfig) (string, error) {
 	if len(schema.Types) == 0 {
 		return "", nil
 	}
@@ -20,16 +20,16 @@ func generateDomainTypes(schema *ir.Schema, _ *config.GoConfig) (string, error) 
 
 	for _, typeNode := range schema.Types {
 		desc := typeNode.Name + " is a domain type defined in VDL."
-		if typeNode.Doc != "" {
-			desc = typeNode.Doc
+		if typeNode.GetDoc() != "" {
+			desc = typeNode.GetDoc()
 		}
 
-		if typeNode.Deprecated != nil {
+		if typeNode.Deprecation != nil {
 			desc += "\n\nDeprecated: "
-			if typeNode.Deprecated.Message == "" {
+			if *typeNode.Deprecation == "" {
 				desc += "This type is deprecated and should not be used in new code."
 			} else {
-				desc += typeNode.Deprecated.Message
+				desc += *typeNode.Deprecation
 			}
 		}
 

@@ -3,10 +3,10 @@ package golang
 import (
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateConstants(schema *ir.Schema, config *config.GoConfig) (string, error) {
+func generateConstants(schema *irtypes.IrSchema, config *config.GoConfig) (string, error) {
 	if !config.ShouldGenConsts() {
 		return "", nil
 	}
@@ -30,26 +30,26 @@ func generateConstants(schema *ir.Schema, config *config.GoConfig) (string, erro
 }
 
 // generateConstant generates Go code for a single constant.
-func generateConstant(g *gen.Generator, constant ir.Constant) {
+func generateConstant(g *gen.Generator, constant irtypes.ConstantDef) {
 	// Documentation
-	if constant.Doc != "" {
-		renderMultilineComment(g, constant.Doc)
+	if constant.GetDoc() != "" {
+		renderMultilineComment(g, constant.GetDoc())
 	} else {
 		g.Linef("// %s represents the constant %q.", constant.Name, constant.Value)
 	}
 
 	// Deprecation
-	renderDeprecated(g, constant.Deprecated)
+	renderDeprecated(g, constant.Deprecation)
 
 	// Constant definition
-	switch constant.ValueType {
-	case ir.ConstValueTypeString:
+	switch constant.ConstType {
+	case irtypes.ConstTypeString:
 		g.Linef("const %s = %q", constant.Name, constant.Value)
-	case ir.ConstValueTypeInt:
+	case irtypes.ConstTypeInt:
 		g.Linef("const %s = %s", constant.Name, constant.Value)
-	case ir.ConstValueTypeFloat:
+	case irtypes.ConstTypeFloat:
 		g.Linef("const %s = %s", constant.Name, constant.Value)
-	case ir.ConstValueTypeBool:
+	case irtypes.ConstTypeBool:
 		g.Linef("const %s = %s", constant.Name, constant.Value)
 	default:
 		// Fallback: treat as string

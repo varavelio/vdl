@@ -6,10 +6,10 @@ import (
 
 	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
-func generateEnums(schema *ir.Schema, config *config.GoConfig) (string, error) {
+func generateEnums(schema *irtypes.IrSchema, config *config.GoConfig) (string, error) {
 	if len(schema.Enums) == 0 {
 		return "", nil
 	}
@@ -29,20 +29,20 @@ func generateEnums(schema *ir.Schema, config *config.GoConfig) (string, error) {
 }
 
 // generateEnum generates Go code for a single enum type.
-func generateEnum(g *gen.Generator, enum ir.Enum) {
+func generateEnum(g *gen.Generator, enum irtypes.EnumDef) {
 	// Documentation
-	if enum.Doc != "" {
-		doc := enum.Doc
+	if enum.GetDoc() != "" {
+		doc := enum.GetDoc()
 		renderMultilineComment(g, doc)
 	} else {
 		g.Linef("// %s is an enumeration of values.", enum.Name)
 	}
 
 	// Deprecation
-	renderDeprecated(g, enum.Deprecated)
+	renderDeprecated(g, enum.Deprecation)
 
 	// Type definition
-	if enum.ValueType == ir.EnumValueTypeString {
+	if enum.EnumType == irtypes.EnumTypeString {
 		g.Linef("type %s string", enum.Name)
 	} else {
 		g.Linef("type %s int", enum.Name)
@@ -55,7 +55,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	g.Block(func() {
 		for _, member := range enum.Members {
 			constName := enum.Name + member.Name
-			if enum.ValueType == ir.EnumValueTypeString {
+			if enum.EnumType == irtypes.EnumTypeString {
 				g.Linef("%s %s = %q", constName, enum.Name, member.Value)
 			} else {
 				// Integer value
@@ -83,7 +83,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 	g.Linef("// String returns the string representation of %s.", enum.Name)
 	g.Linef("func (e %s) String() string {", enum.Name)
 	g.Block(func() {
-		if enum.ValueType == ir.EnumValueTypeString {
+		if enum.EnumType == irtypes.EnumTypeString {
 			g.Line("return string(e)")
 		} else {
 			// For int enums, create a switch statement
@@ -128,7 +128,7 @@ func generateEnum(g *gen.Generator, enum ir.Enum) {
 }
 
 // enumCaseList returns a comma-separated list of all enum constant names.
-func enumCaseList(enum ir.Enum) string {
+func enumCaseList(enum irtypes.EnumDef) string {
 	var result strings.Builder
 	for i, member := range enum.Members {
 		if i > 0 {
@@ -140,21 +140,21 @@ func enumCaseList(enum ir.Enum) string {
 }
 
 // generateEnumMarshalJSON generates the json.Marshaler implementation.
-func generateEnumMarshalJSON(g *gen.Generator, enum ir.Enum) {
+func generateEnumMarshalJSON(g *gen.Generator, enum irtypes.EnumDef) {
 	g.Linef("// MarshalJSON implements json.Marshaler.")
 	g.Linef("// Returns an error if the value is not a valid %s member.", enum.Name)
 	g.Linef("func (e %s) MarshalJSON() ([]byte, error) {", enum.Name)
 	g.Block(func() {
 		g.Line("if !e.IsValid() {")
 		g.Block(func() {
-			if enum.ValueType == ir.EnumValueTypeString {
+			if enum.EnumType == irtypes.EnumTypeString {
 				g.Linef("return nil, fmt.Errorf(\"cannot marshal invalid value '%%s' for enum %s\", string(e))", enum.Name)
 			} else {
 				g.Linef("return nil, fmt.Errorf(\"cannot marshal invalid value '%%d' for enum %s\", int(e))", enum.Name)
 			}
 		})
 		g.Line("}")
-		if enum.ValueType == ir.EnumValueTypeString {
+		if enum.EnumType == irtypes.EnumTypeString {
 			g.Line("return json.Marshal(string(e))")
 		} else {
 			g.Line("return json.Marshal(int(e))")
@@ -165,12 +165,12 @@ func generateEnumMarshalJSON(g *gen.Generator, enum ir.Enum) {
 }
 
 // generateEnumUnmarshalJSON generates the json.Unmarshaler implementation.
-func generateEnumUnmarshalJSON(g *gen.Generator, enum ir.Enum) {
+func generateEnumUnmarshalJSON(g *gen.Generator, enum irtypes.EnumDef) {
 	g.Linef("// UnmarshalJSON implements json.Unmarshaler.")
 	g.Linef("// Returns an error if the value is not a valid %s member.", enum.Name)
 	g.Linef("func (e *%s) UnmarshalJSON(data []byte) error {", enum.Name)
 	g.Block(func() {
-		if enum.ValueType == ir.EnumValueTypeString {
+		if enum.EnumType == irtypes.EnumTypeString {
 			g.Line("var s string")
 			g.Line("if err := json.Unmarshal(data, &s); err != nil {")
 			g.Block(func() {
@@ -191,7 +191,7 @@ func generateEnumUnmarshalJSON(g *gen.Generator, enum ir.Enum) {
 		}
 		g.Line("if !v.IsValid() {")
 		g.Block(func() {
-			if enum.ValueType == ir.EnumValueTypeString {
+			if enum.EnumType == irtypes.EnumTypeString {
 				g.Linef("return fmt.Errorf(\"invalid value '%%s' for enum %s\", s)", enum.Name)
 			} else {
 				g.Linef("return fmt.Errorf(\"invalid value '%%d' for enum %s\", n)", enum.Name)
