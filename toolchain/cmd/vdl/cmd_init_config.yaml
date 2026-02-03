@@ -1,4 +1,4 @@
-# yaml-language-server: $schema={{config_schema_id}}
+# yaml-language-server: $schema=https://vdl.varavel.com/schemas/v0/config.schema.json
 
 # VDL code generator config file
 # Star the repo at https://github.com/varavelio/vdl

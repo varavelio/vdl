@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/varavelio/vdl/toolchain/internal/version"
 )
 
 //go:embed cmd_init_schema.vdl
@@ -45,7 +43,6 @@ func cmdInit(args *cmdInitArgs) {
 	}
 
 	initConfigStr := strings.ReplaceAll(string(initConfig), "{{schema_path}}", "./"+schemaName)
-	initConfigStr = strings.ReplaceAll(initConfigStr, "{{config_schema_id}}", version.SchemaConfigID)
 	if err := os.WriteFile(configPath, []byte(initConfigStr), 0644); err != nil {
 		printFatal("VDL failed to write config file: %v", err)
 	}
