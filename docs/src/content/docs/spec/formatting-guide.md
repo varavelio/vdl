@@ -19,7 +19,7 @@ This document specifies the standard formatting rules for the VDL IDL. Consisten
 - Use **2 spaces** per indentation level.
 - Do not use tabs.
 
-```ufo
+```vdl
 type Example {
   field: string
 }
@@ -33,7 +33,7 @@ Top-level elements include `include`, `type`, `enum`, `const`, `pattern`, `rpc`,
 - **Separation:** Separate each top-level element with one blank line.
 - **Preservation:** Intentionally placed blank lines in the source are respected.
 
-```ufo
+```vdl
 include "./common.vdl"
 include "./auth.vdl"
 
@@ -57,7 +57,7 @@ rpc Orders {
 - Contents inside non-empty blocks start on a new, indented line.
 - The closing brace (`}`) is placed on its own line, aligned with the declaration.
 
-```ufo
+```vdl
 type User {
   id: string
   name: string
@@ -68,7 +68,7 @@ type User {
 
 Procedures (`proc`) and streams (`stream`) must be defined inside an `rpc` block. Separate each endpoint with one blank line.
 
-```ufo
+```vdl
 rpc Service {
   proc Get {
     input {
@@ -97,7 +97,7 @@ rpc Service {
 - When a field has a docstring, separate it from the preceding field with one blank line.
 - The spread operator (`...`) should be placed at the beginning of the block.
 
-```ufo
+```vdl
 type User {
   ...AuditMetadata
 
@@ -115,7 +115,7 @@ type User {
 
 In procedures and streams, separate the `input` and `output` blocks with one blank line.
 
-```ufo
+```vdl
 proc CreateUser {
   input {
     name: string
@@ -146,7 +146,7 @@ Comment content is preserved exactly, including internal whitespace.
 - **Standalone Comments:** Use `//` or `/* ... */` on their own lines, indented to the current block level.
 - **End-of-Line Comments:** Place after code on the same line, with at least one space separating them.
 
-```ufo
+```vdl
 // This is a standalone comment
 type Example {
   field: string  // End-of-line comment
@@ -159,7 +159,7 @@ type Example {
 - Enclose in triple quotes (`"""`), preserving internal newlines and formatting.
 - For fields, prefer concise, single-line docstrings.
 
-```ufo
+```vdl
 """
 Represents a user in the system.
 """
@@ -176,7 +176,7 @@ type User {
 
 The `deprecated` keyword marks elements as deprecated. Place it on its own line immediately before the element definition. If a docstring exists, place `deprecated` between the docstring and the element.
 
-```ufo
+```vdl
 deprecated type LegacyUser {
   // ...
 }
@@ -216,7 +216,7 @@ The formatter automatically enforces the following naming conventions:
 
 Acronyms longer than two letters are treated as regular words:
 
-```ufo
+```vdl
 // Correct
 type HttpRequest { ... }
 type JsonParser { ... }

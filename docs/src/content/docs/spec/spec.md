@@ -15,7 +15,7 @@ This IDL serves as the single source of truth for your projects, from which you 
 
 This is the syntax for the IDL.
 
-```ufo
+```vdl
 include "./foo.vdl"
 
 // <comment>
@@ -98,7 +98,7 @@ To maintain clean and maintainable projects, VDL allows you to split your schema
 
 You can include other `.vdl` files using the `include` keyword, typically at the top of your file.
 
-```ufo
+```vdl
 // auth.vdl
 type Session {
   token: string
@@ -145,7 +145,7 @@ You can combine primitive and custom types into more complex structures to repre
 
 Represent an ordered collection of elements. All elements in an array must share the same type.
 
-```ufo
+```vdl
 // Syntax: <Type>[]
 string[]      // A list of strings
 User[]        // A list of User objects
@@ -155,7 +155,7 @@ User[]        // A list of User objects
 
 Represent a collection of key-value pairs where keys are always strings. Maps are useful for lookups and dynamic dictionaries.
 
-```ufo
+```vdl
 // Syntax: map<<ValueType>>
 map<int>      // Example: { "active": 1, "pending": 5 }
 map<User>     // Example: { "user_123": { ... } }
@@ -165,7 +165,7 @@ map<User>     // Example: { "user_123": { ... } }
 
 Define a structure "on the fly" without naming it. This is useful for small, localized data structures that don't need to be reused elsewhere.
 
-```ufo
+```vdl
 {
   latitude: float
   longitude: float
@@ -176,7 +176,7 @@ Define a structure "on the fly" without naming it. This is useful for small, loc
 
 For reusable data structures, you can define named `type` blocks. These serve as the blueprint for your application's domain models.
 
-```ufo
+```vdl
 """
 Represents a user in the system.
 """
@@ -194,7 +194,7 @@ VDL provides two powerful ways to share fields between types, allowing you to bu
 **1. Composition (Nesting)**
 Include one type as a property of another. This creates a clear hierarchy and relationship between objects.
 
-```ufo
+```vdl
 type AuditMetadata {
   createdAt: datetime
   updatedAt: datetime
@@ -210,7 +210,7 @@ type Article {
 **2. Destructuring (Spreading)**
 Merge the fields of one type directly into another using the `...` operator. This is ideal for "inheriting" fields from a base structure.
 
-```ufo
+```vdl
 type Article {
   ...AuditMetadata        // Fields are flattened into Article
   title: string
@@ -228,7 +228,7 @@ type Article {
 
 You can destructure multiple types in a single definition:
 
-```ufo
+```vdl
 type FullEntity {
   ...AuditMetadata
   ...OwnershipInfo
@@ -242,7 +242,7 @@ type FullEntity {
 
 - **Required by Default:** All fields are mandatory. The compiler ensures that these fields are present during communication.
 - **Optional Fields:** Use the `?` suffix to mark a field as optional.
-  ```ufo
+  ```vdl
   type Profile {
     bio?: string  // This field can be omitted or null
   }
@@ -252,7 +252,7 @@ type FullEntity {
 
 Adding documentation to your types and fields is highly recommended. These comments are preserved by the compiler and used to generate readable documentation for API consumers.
 
-```ufo
+```vdl
 type Product {
   """ The unique identifier for the SKU. """
   sku: string
@@ -266,7 +266,7 @@ type Product {
 
 Constants allow you to define fixed values that can be referenced throughout your schema and in the generated code. They are useful for configuration values, limits, or any other static data that should be shared across your application.
 
-```ufo
+```vdl
 """
 Optional documentation for the constant.
 """
@@ -280,7 +280,7 @@ Constants support the following value types:
 - **Floats:** `const DEFAULT_TAX_RATE = 0.21`
 - **Booleans:** `const FEATURE_FLAG_ENABLED = true`
 
-```ufo
+```vdl
 """ The maximum number of items allowed per request. """
 const MAX_ITEMS = 50
 
@@ -292,7 +292,7 @@ const VERSION = "2.1.0"
 
 Enums define a set of named, discrete values. They are ideal for representing a fixed list of options, such as statuses, categories, or modes. VDL supports two types of enums: **string enums** and **integer enums**.
 
-```ufo
+```vdl
 """
 Optional documentation for the enum.
 """
@@ -315,7 +315,7 @@ All members within an enum must be of the same type. Mixing string and integer v
 
 String enums are the default. If no value is assigned, the member name itself is used as the value. You can also assign explicit string values.
 
-```ufo
+```vdl
 // Implicit values (member name is used as the value)
 enum OrderStatus {
   Pending
@@ -338,7 +338,7 @@ enum HttpMethod {
 
 If the first member is assigned an integer value, the enum becomes an integer enum. **All members must have explicit integer values**; there is no auto-increment behavior.
 
-```ufo
+```vdl
 enum Priority {
   Low = 1
   Medium = 2
@@ -351,7 +351,7 @@ enum Priority {
 
 Patterns are template strings that generate helper functions for constructing dynamic string values at runtime. They are particularly useful for defining message queue topics, cache keys, routing paths, or any other string that requires interpolation.
 
-```ufo
+```vdl
 """
 Optional documentation for the pattern.
 """
@@ -362,7 +362,7 @@ pattern <PatternName> = "<template_string>"
 
 A pattern template uses `{placeholder}` syntax for dynamic segments. Each placeholder becomes a `string` parameter in the generated function.
 
-```ufo
+```vdl
 """ Generates a NATS subject for user-specific events. """
 pattern UserEventSubject = "events.users.{userId}.{eventType}"
 
@@ -394,7 +394,7 @@ This makes patterns a powerful tool for ensuring consistency across your codebas
 
 An `rpc` block acts as a logical container for your API's communication endpoints. It allows you to group related **Procedures** and **Streams** under a single named service, providing better organization and a clearer structure for your generated clients and server implementation.
 
-```ufo
+```vdl
 """
 Optional documentation for the entire service.
 """
@@ -409,7 +409,7 @@ To facilitate large-scale project organization, VDL supports **RPC merging**. If
 
 This allows you to split a large service definition across multiple files by domain or feature:
 
-```ufo
+```vdl
 // users_procs.vdl
 rpc Users {
   proc GetUser { ... }
@@ -434,7 +434,7 @@ include "./users_streams.vdl"
 
 Procedures are the standard way to define request-response interactions. They represent discrete actions that a client can trigger on the server. They must be defined inside an `rpc` block.
 
-```ufo
+```vdl
 rpc <RPCName> {
   """
   Describes the purpose of this procedure.
@@ -457,7 +457,7 @@ rpc <RPCName> {
 
 Streams enable real-time, unidirectional communication from the server to the client using Server-Sent Events (SSE). They are designed for scenarios where the server needs to push updates as they happen. They must be defined inside an `rpc` block.
 
-```ufo
+```vdl
 rpc <RPCName> {
   """
   Describes the nature of the events being streamed.
@@ -482,7 +482,7 @@ The `input` and `output` blocks in procedures and streams behave exactly like **
 
 This is particularly useful for sharing common request or response fields across multiple endpoints:
 
-```ufo
+```vdl
 type PaginationParams {
   page: int
   limit: int
@@ -512,7 +512,7 @@ rpc Articles {
 
 Grouping related functionality makes your schema easier to maintain:
 
-```ufo
+```vdl
 rpc Messaging {
   """ Sends a new message to a specific channel. """
   proc SendMessage {
@@ -550,7 +550,7 @@ Docstrings can be used in two ways: associated with specific elements or as stan
 
 These are placed immediately before an element definition and provide specific documentation for that element. Associated docstrings can be used with: `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, and individual fields.
 
-```ufo
+```vdl
 """
 This is documentation for MyType.
 """
@@ -566,7 +566,7 @@ These provide general documentation for the schema (or an RPC block) and are not
 
 Standalone docstrings can be placed at the schema level (outside of any block) or inside an `rpc` block. When inside an RPC, they become part of that service's documentation, which is useful for adding section headers or contextual notes for a group of endpoints.
 
-```ufo
+```vdl
 """
 # Welcome
 This is general documentation for the entire schema.
@@ -600,7 +600,7 @@ _Example:_
 
 In the following docstring, the first line has 4 spaces of indentation, which will be removed from all lines.
 
-```ufo
+```vdl
 type MyType {
   """
     This is a multi-line docstring.
@@ -633,7 +633,7 @@ For extensive documentation, you can reference external Markdown files instead o
 
 **Important:** External file paths must always be **relative to the `.vdl` file** that references them. If the specified file does not exist, the compiler will raise an error.
 
-```ufo
+```vdl
 // Standalone documentation from external files
 """ ./docs/welcome.md """
 """ ./docs/authentication.md """
@@ -657,7 +657,7 @@ VDL provides a mechanism to mark elements as deprecated, signaling to API consum
 
 To mark an element as deprecated without a specific message, use the `deprecated` keyword directly before its definition:
 
-```ufo
+```vdl
 deprecated type LegacyUser {
   // ...
 }
@@ -689,7 +689,7 @@ rpc MyService {
 
 To provide additional context, such as a migration path or a removal timeline, include a message in parentheses:
 
-```ufo
+```vdl
 deprecated("Use UserV2 instead")
 type LegacyUser {
   // ...
@@ -705,7 +705,7 @@ rpc OldService {
 
 The `deprecated` keyword must be placed between any associated docstring and the element definition:
 
-```ufo
+```vdl
 """
 Original documentation for the type.
 """
@@ -727,7 +727,7 @@ Deprecated elements will:
 
 The following example demonstrates a comprehensive schema that uses all the features of the VDL IDL, including includes, constants, enums, patterns, types with composition and destructuring, and RPC services with procedures and streams.
 
-```ufo
+```vdl
 include "./foo.vdl"
 
 // ============================================================================
