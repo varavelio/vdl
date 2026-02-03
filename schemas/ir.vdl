@@ -138,7 +138,7 @@ type TypeDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 
   """ List of fields in the type in the same order in which they were written """
   fields: Field[]
@@ -153,7 +153,7 @@ type EnumDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 
   """ The type of this enum """
   enumType: EnumType
@@ -180,7 +180,7 @@ type ConstantDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 
   """ The type of the constant value """
   constType: ConstType
@@ -198,7 +198,7 @@ type PatternDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 
   """ The template string containing placeholders """
   template: string
@@ -216,7 +216,7 @@ type RpcDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 }
 
 """ Represents an RPC procedure """
@@ -231,13 +231,13 @@ type ProcedureDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 
   """ List of input fields in the same order in which they were written """
-  inputFields: Field[]
+  input: Field[]
 
   """ List of output fields in the same order in which they were written """
-  outputFields: Field[]
+  output: Field[]
 }
 
 """ Represents an RPC stream """
@@ -252,13 +252,13 @@ type StreamDef {
   doc?: string
 
   """ Deprecation status if deprecated """
-  deprecation?: string
+  deprecated?: string
 
   """ List of input fields in the same order in which they were written """
-  inputFields: Field[]
+  input: Field[]
 
   """ List of output fields in the same order in which they were written """
-  outputFields: Field[]
+  output: Field[]
 }
 
 """ Represents a standalone documentation block """

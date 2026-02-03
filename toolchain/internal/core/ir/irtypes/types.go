@@ -264,7 +264,7 @@ type ConstantDef struct {
 	// Documentation for the constant
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 	// The type of the constant value
 	ConstType ConstType `json:"constType"`
 	// The value of the constant as a string
@@ -305,19 +305,19 @@ func (x *ConstantDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *ConstantDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *ConstantDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
@@ -358,11 +358,11 @@ func (x *ConstantDef) GetValueOr(defaultValue string) string {
 
 // preConstantDef is the version of ConstantDef previous to the required field validation
 type preConstantDef struct {
-	Name        *string    `json:"name,omitempty"`
-	Doc         *string    `json:"doc,omitempty"`
-	Deprecation *string    `json:"deprecation,omitempty"`
-	ConstType   *ConstType `json:"constType,omitempty"`
-	Value       *string    `json:"value,omitempty"`
+	Name       *string    `json:"name,omitempty"`
+	Doc        *string    `json:"doc,omitempty"`
+	Deprecated *string    `json:"deprecated,omitempty"`
+	ConstType  *ConstType `json:"constType,omitempty"`
+	Value      *string    `json:"value,omitempty"`
 }
 
 // validate validates the required fields of ConstantDef
@@ -378,7 +378,7 @@ func (p *preConstantDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
 	// Validation for field "constType"
 	if p.ConstType == nil {
@@ -398,17 +398,17 @@ func (p *preConstantDef) transform() ConstantDef {
 	// Transformations
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
+	transDeprecated := p.Deprecated
 	transConstType := *p.ConstType
 	transValue := *p.Value
 
 	// Assignments
 	return ConstantDef{
-		Name:        transName,
-		Doc:         transDoc,
-		Deprecation: transDeprecation,
-		ConstType:   transConstType,
-		Value:       transValue,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		ConstType:  transConstType,
+		Value:      transValue,
 	}
 }
 
@@ -496,7 +496,7 @@ type EnumDef struct {
 	// Documentation for the enum
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 	// The type of this enum
 	EnumType EnumType `json:"enumType"`
 	// List of enum members
@@ -537,19 +537,19 @@ func (x *EnumDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *EnumDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *EnumDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
@@ -590,11 +590,11 @@ func (x *EnumDef) GetMembersOr(defaultValue []EnumDefMember) []EnumDefMember {
 
 // preEnumDef is the version of EnumDef previous to the required field validation
 type preEnumDef struct {
-	Name        *string             `json:"name,omitempty"`
-	Doc         *string             `json:"doc,omitempty"`
-	Deprecation *string             `json:"deprecation,omitempty"`
-	EnumType    *EnumType           `json:"enumType,omitempty"`
-	Members     *[]preEnumDefMember `json:"members,omitempty"`
+	Name       *string             `json:"name,omitempty"`
+	Doc        *string             `json:"doc,omitempty"`
+	Deprecated *string             `json:"deprecated,omitempty"`
+	EnumType   *EnumType           `json:"enumType,omitempty"`
+	Members    *[]preEnumDefMember `json:"members,omitempty"`
 }
 
 // validate validates the required fields of EnumDef
@@ -610,7 +610,7 @@ func (p *preEnumDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
 	// Validation for field "enumType"
 	if p.EnumType == nil {
@@ -637,7 +637,7 @@ func (p *preEnumDef) transform() EnumDef {
 	// Transformations
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
+	transDeprecated := p.Deprecated
 	transEnumType := *p.EnumType
 	var transMembers []EnumDefMember
 	transMembers = make([]EnumDefMember, len(*p.Members))
@@ -649,11 +649,11 @@ func (p *preEnumDef) transform() EnumDef {
 
 	// Assignments
 	return EnumDef{
-		Name:        transName,
-		Doc:         transDoc,
-		Deprecation: transDeprecation,
-		EnumType:    transEnumType,
-		Members:     transMembers,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		EnumType:   transEnumType,
+		Members:    transMembers,
 	}
 }
 
@@ -1239,7 +1239,7 @@ type PatternDef struct {
 	// Documentation for the pattern
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 	// The template string containing placeholders
 	Template string `json:"template"`
 	// List of placeholder names extracted from the template
@@ -1280,19 +1280,19 @@ func (x *PatternDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *PatternDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *PatternDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *PatternDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *PatternDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
@@ -1335,7 +1335,7 @@ func (x *PatternDef) GetPlaceholdersOr(defaultValue []string) []string {
 type prePatternDef struct {
 	Name         *string   `json:"name,omitempty"`
 	Doc          *string   `json:"doc,omitempty"`
-	Deprecation  *string   `json:"deprecation,omitempty"`
+	Deprecated   *string   `json:"deprecated,omitempty"`
 	Template     *string   `json:"template,omitempty"`
 	Placeholders *[]string `json:"placeholders,omitempty"`
 }
@@ -1353,7 +1353,7 @@ func (p *prePatternDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
 	// Validation for field "template"
 	if p.Template == nil {
@@ -1373,7 +1373,7 @@ func (p *prePatternDef) transform() PatternDef {
 	// Transformations
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
+	transDeprecated := p.Deprecated
 	transTemplate := *p.Template
 	transPlaceholders := *p.Placeholders
 
@@ -1381,7 +1381,7 @@ func (p *prePatternDef) transform() PatternDef {
 	return PatternDef{
 		Name:         transName,
 		Doc:          transDoc,
-		Deprecation:  transDeprecation,
+		Deprecated:   transDeprecated,
 		Template:     transTemplate,
 		Placeholders: transPlaceholders,
 	}
@@ -1396,11 +1396,11 @@ type ProcedureDef struct {
 	// Documentation for the procedure
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 	// List of input fields in the same order in which they were written
-	InputFields []Field `json:"inputFields"`
+	Input []Field `json:"input"`
 	// List of output fields in the same order in which they were written
-	OutputFields []Field `json:"outputFields"`
+	Output []Field `json:"output"`
 }
 
 // GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
@@ -1454,65 +1454,65 @@ func (x *ProcedureDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *ProcedureDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *ProcedureDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
 
-// GetInputFields returns the value of InputFields or the zero value if the receiver or field is nil.
-func (x *ProcedureDef) GetInputFields() []Field {
+// GetInput returns the value of Input or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetInput() []Field {
 	if x != nil {
-		return x.InputFields
+		return x.Input
 	}
 	var zero []Field
 	return zero
 }
 
-// GetInputFieldsOr returns the value of InputFields or the provided default if the receiver or field is nil.
-func (x *ProcedureDef) GetInputFieldsOr(defaultValue []Field) []Field {
+// GetInputOr returns the value of Input or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetInputOr(defaultValue []Field) []Field {
 	if x != nil {
-		return x.InputFields
+		return x.Input
 	}
 	return defaultValue
 }
 
-// GetOutputFields returns the value of OutputFields or the zero value if the receiver or field is nil.
-func (x *ProcedureDef) GetOutputFields() []Field {
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetOutput() []Field {
 	if x != nil {
-		return x.OutputFields
+		return x.Output
 	}
 	var zero []Field
 	return zero
 }
 
-// GetOutputFieldsOr returns the value of OutputFields or the provided default if the receiver or field is nil.
-func (x *ProcedureDef) GetOutputFieldsOr(defaultValue []Field) []Field {
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetOutputOr(defaultValue []Field) []Field {
 	if x != nil {
-		return x.OutputFields
+		return x.Output
 	}
 	return defaultValue
 }
 
 // preProcedureDef is the version of ProcedureDef previous to the required field validation
 type preProcedureDef struct {
-	RpcName      *string     `json:"rpcName,omitempty"`
-	Name         *string     `json:"name,omitempty"`
-	Doc          *string     `json:"doc,omitempty"`
-	Deprecation  *string     `json:"deprecation,omitempty"`
-	InputFields  *[]preField `json:"inputFields,omitempty"`
-	OutputFields *[]preField `json:"outputFields,omitempty"`
+	RpcName    *string     `json:"rpcName,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	Doc        *string     `json:"doc,omitempty"`
+	Deprecated *string     `json:"deprecated,omitempty"`
+	Input      *[]preField `json:"input,omitempty"`
+	Output     *[]preField `json:"output,omitempty"`
 }
 
 // validate validates the required fields of ProcedureDef
@@ -1533,28 +1533,28 @@ func (p *preProcedureDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
-	// Validation for field "inputFields"
-	if p.InputFields == nil {
-		return errorMissingRequiredField("field inputFields is required")
+	// Validation for field "input"
+	if p.Input == nil {
+		return errorMissingRequiredField("field input is required")
 	}
-	if p.InputFields != nil {
-		for _, item := range *p.InputFields {
+	if p.Input != nil {
+		for _, item := range *p.Input {
 			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field inputFields: " + err.Error())
+				return errorMissingRequiredField("field input: " + err.Error())
 			}
 		}
 	}
 
-	// Validation for field "outputFields"
-	if p.OutputFields == nil {
-		return errorMissingRequiredField("field outputFields is required")
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
 	}
-	if p.OutputFields != nil {
-		for _, item := range *p.OutputFields {
+	if p.Output != nil {
+		for _, item := range *p.Output {
 			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field outputFields: " + err.Error())
+				return errorMissingRequiredField("field output: " + err.Error())
 			}
 		}
 	}
@@ -1568,30 +1568,30 @@ func (p *preProcedureDef) transform() ProcedureDef {
 	transRpcName := *p.RpcName
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
-	var transInputFields []Field
-	transInputFields = make([]Field, len(*p.InputFields))
-	for i, v := range *p.InputFields {
+	transDeprecated := p.Deprecated
+	var transInput []Field
+	transInput = make([]Field, len(*p.Input))
+	for i, v := range *p.Input {
 		var tmp_ Field
 		tmp_ = v.transform()
-		transInputFields[i] = tmp_
+		transInput[i] = tmp_
 	}
-	var transOutputFields []Field
-	transOutputFields = make([]Field, len(*p.OutputFields))
-	for i, v := range *p.OutputFields {
+	var transOutput []Field
+	transOutput = make([]Field, len(*p.Output))
+	for i, v := range *p.Output {
 		var tmp_ Field
 		tmp_ = v.transform()
-		transOutputFields[i] = tmp_
+		transOutput[i] = tmp_
 	}
 
 	// Assignments
 	return ProcedureDef{
-		RpcName:      transRpcName,
-		Name:         transName,
-		Doc:          transDoc,
-		Deprecation:  transDeprecation,
-		InputFields:  transInputFields,
-		OutputFields: transOutputFields,
+		RpcName:    transRpcName,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		Input:      transInput,
+		Output:     transOutput,
 	}
 }
 
@@ -1602,7 +1602,7 @@ type RpcDef struct {
 	// Documentation for the RPC
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -1639,28 +1639,28 @@ func (x *RpcDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *RpcDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *RpcDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *RpcDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *RpcDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
 
 // preRpcDef is the version of RpcDef previous to the required field validation
 type preRpcDef struct {
-	Name        *string `json:"name,omitempty"`
-	Doc         *string `json:"doc,omitempty"`
-	Deprecation *string `json:"deprecation,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	Doc        *string `json:"doc,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 }
 
 // validate validates the required fields of RpcDef
@@ -1676,7 +1676,7 @@ func (p *preRpcDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
 	return nil
 }
@@ -1686,13 +1686,13 @@ func (p *preRpcDef) transform() RpcDef {
 	// Transformations
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
+	transDeprecated := p.Deprecated
 
 	// Assignments
 	return RpcDef{
-		Name:        transName,
-		Doc:         transDoc,
-		Deprecation: transDeprecation,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
 	}
 }
 
@@ -1705,11 +1705,11 @@ type StreamDef struct {
 	// Documentation for the stream
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 	// List of input fields in the same order in which they were written
-	InputFields []Field `json:"inputFields"`
+	Input []Field `json:"input"`
 	// List of output fields in the same order in which they were written
-	OutputFields []Field `json:"outputFields"`
+	Output []Field `json:"output"`
 }
 
 // GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
@@ -1763,65 +1763,65 @@ func (x *StreamDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *StreamDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *StreamDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
 
-// GetInputFields returns the value of InputFields or the zero value if the receiver or field is nil.
-func (x *StreamDef) GetInputFields() []Field {
+// GetInput returns the value of Input or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetInput() []Field {
 	if x != nil {
-		return x.InputFields
+		return x.Input
 	}
 	var zero []Field
 	return zero
 }
 
-// GetInputFieldsOr returns the value of InputFields or the provided default if the receiver or field is nil.
-func (x *StreamDef) GetInputFieldsOr(defaultValue []Field) []Field {
+// GetInputOr returns the value of Input or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetInputOr(defaultValue []Field) []Field {
 	if x != nil {
-		return x.InputFields
+		return x.Input
 	}
 	return defaultValue
 }
 
-// GetOutputFields returns the value of OutputFields or the zero value if the receiver or field is nil.
-func (x *StreamDef) GetOutputFields() []Field {
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetOutput() []Field {
 	if x != nil {
-		return x.OutputFields
+		return x.Output
 	}
 	var zero []Field
 	return zero
 }
 
-// GetOutputFieldsOr returns the value of OutputFields or the provided default if the receiver or field is nil.
-func (x *StreamDef) GetOutputFieldsOr(defaultValue []Field) []Field {
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetOutputOr(defaultValue []Field) []Field {
 	if x != nil {
-		return x.OutputFields
+		return x.Output
 	}
 	return defaultValue
 }
 
 // preStreamDef is the version of StreamDef previous to the required field validation
 type preStreamDef struct {
-	RpcName      *string     `json:"rpcName,omitempty"`
-	Name         *string     `json:"name,omitempty"`
-	Doc          *string     `json:"doc,omitempty"`
-	Deprecation  *string     `json:"deprecation,omitempty"`
-	InputFields  *[]preField `json:"inputFields,omitempty"`
-	OutputFields *[]preField `json:"outputFields,omitempty"`
+	RpcName    *string     `json:"rpcName,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	Doc        *string     `json:"doc,omitempty"`
+	Deprecated *string     `json:"deprecated,omitempty"`
+	Input      *[]preField `json:"input,omitempty"`
+	Output     *[]preField `json:"output,omitempty"`
 }
 
 // validate validates the required fields of StreamDef
@@ -1842,28 +1842,28 @@ func (p *preStreamDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
-	// Validation for field "inputFields"
-	if p.InputFields == nil {
-		return errorMissingRequiredField("field inputFields is required")
+	// Validation for field "input"
+	if p.Input == nil {
+		return errorMissingRequiredField("field input is required")
 	}
-	if p.InputFields != nil {
-		for _, item := range *p.InputFields {
+	if p.Input != nil {
+		for _, item := range *p.Input {
 			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field inputFields: " + err.Error())
+				return errorMissingRequiredField("field input: " + err.Error())
 			}
 		}
 	}
 
-	// Validation for field "outputFields"
-	if p.OutputFields == nil {
-		return errorMissingRequiredField("field outputFields is required")
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
 	}
-	if p.OutputFields != nil {
-		for _, item := range *p.OutputFields {
+	if p.Output != nil {
+		for _, item := range *p.Output {
 			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field outputFields: " + err.Error())
+				return errorMissingRequiredField("field output: " + err.Error())
 			}
 		}
 	}
@@ -1877,30 +1877,30 @@ func (p *preStreamDef) transform() StreamDef {
 	transRpcName := *p.RpcName
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
-	var transInputFields []Field
-	transInputFields = make([]Field, len(*p.InputFields))
-	for i, v := range *p.InputFields {
+	transDeprecated := p.Deprecated
+	var transInput []Field
+	transInput = make([]Field, len(*p.Input))
+	for i, v := range *p.Input {
 		var tmp_ Field
 		tmp_ = v.transform()
-		transInputFields[i] = tmp_
+		transInput[i] = tmp_
 	}
-	var transOutputFields []Field
-	transOutputFields = make([]Field, len(*p.OutputFields))
-	for i, v := range *p.OutputFields {
+	var transOutput []Field
+	transOutput = make([]Field, len(*p.Output))
+	for i, v := range *p.Output {
 		var tmp_ Field
 		tmp_ = v.transform()
-		transOutputFields[i] = tmp_
+		transOutput[i] = tmp_
 	}
 
 	// Assignments
 	return StreamDef{
-		RpcName:      transRpcName,
-		Name:         transName,
-		Doc:          transDoc,
-		Deprecation:  transDeprecation,
-		InputFields:  transInputFields,
-		OutputFields: transOutputFields,
+		RpcName:    transRpcName,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		Input:      transInput,
+		Output:     transOutput,
 	}
 }
 
@@ -1911,7 +1911,7 @@ type TypeDef struct {
 	// Documentation for the type
 	Doc *string `json:"doc,omitempty"`
 	// Deprecation status if deprecated
-	Deprecation *string `json:"deprecation,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
 	// List of fields in the type in the same order in which they were written
 	Fields []Field `json:"fields"`
 }
@@ -1950,19 +1950,19 @@ func (x *TypeDef) GetDocOr(defaultValue string) string {
 	return defaultValue
 }
 
-// GetDeprecation returns the value of Deprecation or the zero value if the receiver or field is nil.
-func (x *TypeDef) GetDeprecation() string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	var zero string
 	return zero
 }
 
-// GetDeprecationOr returns the value of Deprecation or the provided default if the receiver or field is nil.
-func (x *TypeDef) GetDeprecationOr(defaultValue string) string {
-	if x != nil && x.Deprecation != nil {
-		return *x.Deprecation
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
 	}
 	return defaultValue
 }
@@ -1986,10 +1986,10 @@ func (x *TypeDef) GetFieldsOr(defaultValue []Field) []Field {
 
 // preTypeDef is the version of TypeDef previous to the required field validation
 type preTypeDef struct {
-	Name        *string     `json:"name,omitempty"`
-	Doc         *string     `json:"doc,omitempty"`
-	Deprecation *string     `json:"deprecation,omitempty"`
-	Fields      *[]preField `json:"fields,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	Doc        *string     `json:"doc,omitempty"`
+	Deprecated *string     `json:"deprecated,omitempty"`
+	Fields     *[]preField `json:"fields,omitempty"`
 }
 
 // validate validates the required fields of TypeDef
@@ -2005,7 +2005,7 @@ func (p *preTypeDef) validate() error {
 
 	// Validation for field "doc"
 
-	// Validation for field "deprecation"
+	// Validation for field "deprecated"
 
 	// Validation for field "fields"
 	if p.Fields == nil {
@@ -2027,7 +2027,7 @@ func (p *preTypeDef) transform() TypeDef {
 	// Transformations
 	transName := *p.Name
 	transDoc := p.Doc
-	transDeprecation := p.Deprecation
+	transDeprecated := p.Deprecated
 	var transFields []Field
 	transFields = make([]Field, len(*p.Fields))
 	for i, v := range *p.Fields {
@@ -2038,10 +2038,10 @@ func (p *preTypeDef) transform() TypeDef {
 
 	// Assignments
 	return TypeDef{
-		Name:        transName,
-		Doc:         transDoc,
-		Deprecation: transDeprecation,
-		Fields:      transFields,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		Fields:     transFields,
 	}
 }
 
