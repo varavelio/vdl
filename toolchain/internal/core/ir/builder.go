@@ -102,10 +102,10 @@ func convertType(
 	enums map[string]*analysis.EnumSymbol,
 ) irtypes.TypeDef {
 	return irtypes.TypeDef{
-		Name:        typ.Name,
-		Doc:         normalizeDocPtr(typ.Docstring),
-		Deprecation: convertDeprecation(typ.Deprecated),
-		Fields:      flattenFields(typ.Fields, typ.Spreads, types, enums),
+		Name:       typ.Name,
+		Doc:        normalizeDocPtr(typ.Docstring),
+		Deprecated: convertDeprecation(typ.Deprecated),
+		Fields:     flattenFields(typ.Fields, typ.Spreads, types, enums),
 	}
 }
 
@@ -225,11 +225,11 @@ func convertEnum(enum *analysis.EnumSymbol) irtypes.EnumDef {
 	}
 
 	return irtypes.EnumDef{
-		Name:        enum.Name,
-		Doc:         normalizeDocPtr(enum.Docstring),
-		Deprecation: convertDeprecation(enum.Deprecated),
-		EnumType:    convertEnumType(enum.ValueType),
-		Members:     members,
+		Name:       enum.Name,
+		Doc:        normalizeDocPtr(enum.Docstring),
+		Deprecated: convertDeprecation(enum.Deprecated),
+		EnumType:   convertEnumType(enum.ValueType),
+		Members:    members,
 	}
 }
 
@@ -246,11 +246,11 @@ func convertEnumType(vt analysis.EnumValueType) irtypes.EnumType {
 
 func convertConstant(cnst *analysis.ConstSymbol) irtypes.ConstantDef {
 	return irtypes.ConstantDef{
-		Name:        cnst.Name,
-		Doc:         normalizeDocPtr(cnst.Docstring),
-		Deprecation: convertDeprecation(cnst.Deprecated),
-		ConstType:   convertConstType(cnst.ValueType),
-		Value:       cnst.Value,
+		Name:       cnst.Name,
+		Doc:        normalizeDocPtr(cnst.Docstring),
+		Deprecated: convertDeprecation(cnst.Deprecated),
+		ConstType:  convertConstType(cnst.ValueType),
+		Value:      cnst.Value,
 	}
 }
 
@@ -281,7 +281,7 @@ func convertPattern(pattern *analysis.PatternSymbol) irtypes.PatternDef {
 	return irtypes.PatternDef{
 		Name:         pattern.Name,
 		Doc:          normalizeDocPtr(pattern.Docstring),
-		Deprecation:  convertDeprecation(pattern.Deprecated),
+		Deprecated:   convertDeprecation(pattern.Deprecated),
 		Template:     pattern.Template,
 		Placeholders: placeholders,
 	}
@@ -293,9 +293,9 @@ func convertPattern(pattern *analysis.PatternSymbol) irtypes.PatternDef {
 
 func convertRPCDef(rpc *analysis.RPCSymbol) irtypes.RpcDef {
 	return irtypes.RpcDef{
-		Name:        rpc.Name,
-		Doc:         normalizeDocPtr(rpc.Docstring),
-		Deprecation: convertDeprecation(rpc.Deprecated),
+		Name:       rpc.Name,
+		Doc:        normalizeDocPtr(rpc.Docstring),
+		Deprecated: convertDeprecation(rpc.Deprecated),
 	}
 }
 
@@ -306,12 +306,12 @@ func convertProcedure(
 	rpcName string,
 ) irtypes.ProcedureDef {
 	return irtypes.ProcedureDef{
-		RpcName:      rpcName,
-		Name:         proc.Name,
-		Doc:          normalizeDocPtr(proc.Docstring),
-		Deprecation:  convertDeprecation(proc.Deprecated),
-		InputFields:  flattenBlockFields(proc.Input, types, enums),
-		OutputFields: flattenBlockFields(proc.Output, types, enums),
+		RpcName:    rpcName,
+		Name:       proc.Name,
+		Doc:        normalizeDocPtr(proc.Docstring),
+		Deprecated: convertDeprecation(proc.Deprecated),
+		Input:      flattenBlockFields(proc.Input, types, enums),
+		Output:     flattenBlockFields(proc.Output, types, enums),
 	}
 }
 
@@ -322,12 +322,12 @@ func convertStream(
 	rpcName string,
 ) irtypes.StreamDef {
 	return irtypes.StreamDef{
-		RpcName:      rpcName,
-		Name:         stream.Name,
-		Doc:          normalizeDocPtr(stream.Docstring),
-		Deprecation:  convertDeprecation(stream.Deprecated),
-		InputFields:  flattenBlockFields(stream.Input, types, enums),
-		OutputFields: flattenBlockFields(stream.Output, types, enums),
+		RpcName:    rpcName,
+		Name:       stream.Name,
+		Doc:        normalizeDocPtr(stream.Docstring),
+		Deprecated: convertDeprecation(stream.Deprecated),
+		Input:      flattenBlockFields(stream.Input, types, enums),
+		Output:     flattenBlockFields(stream.Output, types, enums),
 	}
 }
 

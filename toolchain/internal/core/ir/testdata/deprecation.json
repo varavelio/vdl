@@ -2,7 +2,7 @@
   "constants": [
     {
       "name": "OLD_LIMIT",
-      "deprecation": "Will be removed in v3.0",
+      "deprecated": "Will be removed in v3.0",
       "constType": "int",
       "value": "50"
     }
@@ -10,7 +10,7 @@
   "patterns": [
     {
       "name": "OldPattern",
-      "deprecation": "",
+      "deprecated": "",
       "template": "old:{id}",
       "placeholders": ["id"]
     }
@@ -18,7 +18,7 @@
   "enums": [
     {
       "name": "OldStatus",
-      "deprecation": "",
+      "deprecated": "",
       "enumType": "string",
       "members": [
         {
@@ -35,7 +35,7 @@
   "types": [
     {
       "name": "LegacyUser",
-      "deprecation": "",
+      "deprecated": "",
       "fields": [
         {
           "name": "id",
@@ -57,7 +57,7 @@
     },
     {
       "name": "OldUser",
-      "deprecation": "Use UserV2 instead",
+      "deprecated": "Use UserV2 instead",
       "fields": [
         {
           "name": "id",
@@ -79,8 +79,8 @@
     {
       "rpcName": "Legacy",
       "name": "OldMethod",
-      "deprecation": "",
-      "inputFields": [
+      "deprecated": "",
+      "input": [
         {
           "name": "id",
           "optional": false,
@@ -90,7 +90,7 @@
           }
         }
       ],
-      "outputFields": [
+      "output": [
         {
           "name": "result",
           "optional": false,
@@ -106,8 +106,8 @@
     {
       "rpcName": "Legacy",
       "name": "OldStream",
-      "deprecation": "Use NewStream instead",
-      "inputFields": [
+      "deprecated": "Use NewStream instead",
+      "input": [
         {
           "name": "id",
           "optional": false,
@@ -117,7 +117,7 @@
           }
         }
       ],
-      "outputFields": [
+      "output": [
         {
           "name": "data",
           "optional": false,
