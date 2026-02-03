@@ -12,7 +12,7 @@ When updating this document, do so with the context of the entire document in mi
 
 ## 2. General Instructions (The Constitution)
 
-- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`), Node/Svelte (`playground/`), and Editor Extensions (`editors/`).
+- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`), Node/Svelte (`playground/`), Editor Extensions (`editors/`), and Documentation (`docs/`).
 - **Command Authority**: The root `Taskfile.yml` is the **single source of truth** for orchestration.
   - **Do NOT** run `npm`, `go`, `vite`, or `vsce` commands manually.
   - **ALWAYS** run `task --list-all` from the project root to discover the available commands before starting any task.
@@ -23,9 +23,11 @@ When updating this document, do so with the context of the entire document in mi
 - **Dependency Management**:
   - Go: Manage in `toolchain/go.mod`.
   - Node: Manage in `playground/package.json` or root `package.json` for dev tools.
+  - Docs: Manage in `docs/package.json`.
 - **Code Style**:
   - Go: Idiomatic, `golangci-lint` strictness.
   - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4, DaisyUI v5.
+  - Docs: Markdown/MDX with Starlight frontmatter.
 - **Terminology**: The core tool is referred to as `toolchain`. The binary is named `vdl`.
 
 ## 3. Architecture & Organization
@@ -36,7 +38,8 @@ When updating this document, do so with the context of the entire document in mi
 - `toolchain/`: The Go backend/core (Compiler, CLI, WASM).
 - `playground/`: The Svelte 5 frontend (See `playground/AGENTS.md`).
 - `editors/`: Editor plugins (VS Code, Neovim).
-- `docs/`: Documentation and specifications (contains the VDL spec).
+- `docs/`: Documentation site (Astro/Starlight).
+- `schemas/`: VDL self-definitions (Internal structures defined in VDL).
 - `scripts/`: Build and maintenance scripts.
 - `assets/`: Static assets.
 
@@ -84,19 +87,30 @@ When updating this document, do so with the context of the entire document in mi
   - Generates Typescript definitions from Go schemas.
   - Builds to static files that are eventually embedded into the Go binary.
 
+### `schemas/` (Self-Definition)
+
+- **Role**: Contains the VDL definitions for the tool's internal structures. VDL eats its own dog food.
+- **Key Files**:
+  - `config.vdl`: Defines the structure of `vdl.yaml` configuration files.
+  - `ir.vdl`: Defines the Intermediate Representation (IR) passed to generators.
+  - `plugin.vdl`: Defines the protocol for External Plugins.
+  - `wasm.vdl`: Defines the JSON-RPC protocol between the Playground (JS) and Core (WASM).
+- **Usage**: These schemas are compiled into Go/TS structs to ensure type safety across boundaries.
+
+### `docs/` (Documentation)
+
+- **Role**: The official documentation site.
+- **Tech**: Astro, Starlight, Tailwind CSS.
+- **Key Directories**:
+  - `src/content/docs/`: Markdown/MDX files containing the actual documentation content.
+  - `public/`: Static assets for the docs site.
+
 ### `editors/` (IDE Integrations)
 
 - **Role**: Provides syntax highlighting and LSP support for VDL.
 - **Key Directories**:
   - `vscode/`: Visual Studio Code extension (Node.js/TS).
   - `neovim/`: Neovim plugin (Markdown instructions).
-
-### `docs/` (Documentation)
-
-- **Role**: Official documentation and specifications.
-- **Key Directories**:
-  - `spec/`: The formal VDL specification (`spec.md`, `rpc-request-lifecycle.md`).
-  - `public/`: Assets for the documentation site.
 
 ### Build Pipeline
 
@@ -167,6 +181,12 @@ Do NOT rely on memory. Run `task --list-all` to find the appropriate testing com
 - **Bundler**: Vite.
 - **Styles**: Tailwind CSS 4, DaisyUI 5.
 - **Linter/Formatter**: Biome.
+
+### Documentation
+
+- **Framework**: Astro 5 (Starlight).
+- **Content**: Markdown/MDX in `docs/src/content/docs`.
+- **Styles**: Tailwind CSS 4.
 
 ## 6. Operational Commands
 
