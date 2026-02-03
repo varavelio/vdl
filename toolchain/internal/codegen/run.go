@@ -11,14 +11,14 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/irjson"
+	irgen "github.com/varavelio/vdl/toolchain/internal/codegen/ir"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/playground"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/python"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/typescript"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/vdlschema"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/vdl"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
@@ -429,7 +429,7 @@ func runIR(ctx context.Context, absConfigDir string, cfg *configtypes.IrTargetCo
 		return 0, err
 	}
 
-	gen := irjson.New(cfg)
+	gen := irgen.New(cfg)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return 0, fmt.Errorf("failed to generate IR JSON: %w", err)
@@ -452,7 +452,7 @@ func runVdl(ctx context.Context, absConfigDir string, cfg *configtypes.VdlTarget
 		return 0, err
 	}
 
-	gen := vdlschema.New(cfg, formattedSchema)
+	gen := vdl.New(cfg, formattedSchema)
 	files, err := gen.Generate(ctx, schema)
 	if err != nil {
 		return 0, fmt.Errorf("failed to generate unified VDL schema: %w", err)

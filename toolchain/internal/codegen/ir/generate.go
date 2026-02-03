@@ -1,4 +1,4 @@
-package irjson
+package ir
 
 import (
 	"context"

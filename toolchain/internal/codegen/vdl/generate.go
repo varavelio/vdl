@@ -1,4 +1,4 @@
-package vdlschema
+package vdl
 
 import (
 	"context"
