@@ -1,0 +1,564 @@
+{
+  "$defs": {
+    "ClientTargetConfig": {
+      "description": "Configuration for generating RPC clients",
+      "properties": {
+        "genClient": {
+          "description": "Generate RPC client code",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "CommonTargetConfig": {
+      "description": "Common configuration fields shared by all targets",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "ConstsTargetConfig": {
+      "description": "Configuration for generating constants",
+      "properties": {
+        "genConsts": {
+          "description": "Generate constant definitions",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "DartTargetConfig": {
+      "description": "Configuration for Dart code generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "genConsts": {
+          "description": "Generate constant definitions",
+          "type": "boolean"
+        },
+        "genPatterns": {
+          "description": "Generate helper functions for patterns",
+          "type": "boolean"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "GoTargetConfig": {
+      "description": "Configuration for Go code generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "genClient": {
+          "description": "Generate RPC client code",
+          "type": "boolean"
+        },
+        "genConsts": {
+          "description": "Generate constant definitions",
+          "type": "boolean"
+        },
+        "genPatterns": {
+          "description": "Generate helper functions for patterns",
+          "type": "boolean"
+        },
+        "genServer": {
+          "description": "Generate RPC server interfaces and handlers",
+          "type": "boolean"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "package": {
+          "description": "The Go package name to use in generated files",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output",
+        "package"
+      ],
+      "type": "object"
+    },
+    "IrTargetConfig": {
+      "description": "Configuration for IR (Intermediate Representation) JSON generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "filename": {
+          "description": "The name of the output file",
+          "type": "string"
+        },
+        "minify": {
+          "description": "Output minified JSON (no indentation). Default is false (pretty-printed with 2-space indent)",
+          "type": "boolean"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "JsonSchemaTargetConfig": {
+      "description": "Configuration for JSON Schema generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "filename": {
+          "description": "The name of the output file",
+          "type": "string"
+        },
+        "id": {
+          "description": "The $id of the generated schema",
+          "type": "string"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "root": {
+          "description": "The name of a type from '$defs' to use as the main entry point (adds a $ref at the root).\nMust exist; VDL validates this and provides fuzzy suggestions for typos.",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "OpenApiTargetConfig": {
+      "description": "Configuration for OpenAPI specification generation",
+      "properties": {
+        "baseUrl": {
+          "description": "Base URL for API endpoints",
+          "type": "string"
+        },
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "contactEmail": {
+          "description": "Contact email",
+          "type": "string"
+        },
+        "contactName": {
+          "description": "Contact name",
+          "type": "string"
+        },
+        "description": {
+          "description": "API description",
+          "type": "string"
+        },
+        "filename": {
+          "description": "The name of the output file (can be .yml, .yaml or .json)",
+          "type": "string"
+        },
+        "licenseName": {
+          "description": "License name",
+          "type": "string"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        },
+        "title": {
+          "description": "API title",
+          "type": "string"
+        },
+        "version": {
+          "description": "API version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output",
+        "title",
+        "version"
+      ],
+      "type": "object"
+    },
+    "PatternsTargetConfig": {
+      "description": "Configuration for generating patterns",
+      "properties": {
+        "genPatterns": {
+          "description": "Generate helper functions for patterns",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "PlaygroundTargetConfig": {
+      "description": "Configuration for API playground generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "defaultBaseUrl": {
+          "description": "Default base URL for API requests",
+          "type": "string"
+        },
+        "defaultHeaders": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Default headers to include in API requests",
+          "type": "object"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "PluginTargetConfig": {
+      "description": "Configuration for external plugin generators",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "command": {
+          "description": "Command to execute the plugin (executable + args)",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "options": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary options passed to the plugin (flat key-value pairs)",
+          "type": "object"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "command",
+        "output"
+      ],
+      "type": "object"
+    },
+    "PythonTargetConfig": {
+      "description": "Configuration for Python code generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "genConsts": {
+          "description": "Generate constant definitions",
+          "type": "boolean"
+        },
+        "genPatterns": {
+          "description": "Generate helper functions for patterns",
+          "type": "boolean"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "ServerTargetConfig": {
+      "description": "Configuration for generating RPC servers",
+      "properties": {
+        "genServer": {
+          "description": "Generate RPC server interfaces and handlers",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "TargetConfig": {
+      "description": "Configuration for a specific generation target, only one target type should be set per entry",
+      "properties": {
+        "dart": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/DartTargetConfig"
+            },
+            {
+              "description": "Dart language target"
+            }
+          ]
+        },
+        "go": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/GoTargetConfig"
+            },
+            {
+              "description": "Go language target"
+            }
+          ]
+        },
+        "ir": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/IrTargetConfig"
+            },
+            {
+              "description": "IR (Intermediate Representation) JSON output target"
+            }
+          ]
+        },
+        "jsonschema": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/JsonSchemaTargetConfig"
+            },
+            {
+              "description": "JSON Schema output target"
+            }
+          ]
+        },
+        "openapi": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/OpenApiTargetConfig"
+            },
+            {
+              "description": "OpenAPI specification output target"
+            }
+          ]
+        },
+        "playground": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PlaygroundTargetConfig"
+            },
+            {
+              "description": "API Playground output target"
+            }
+          ]
+        },
+        "plugin": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PluginTargetConfig"
+            },
+            {
+              "description": "External plugin target"
+            }
+          ]
+        },
+        "python": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PythonTargetConfig"
+            },
+            {
+              "description": "Python language target"
+            }
+          ]
+        },
+        "typescript": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeScriptTargetConfig"
+            },
+            {
+              "description": "TypeScript language target"
+            }
+          ]
+        },
+        "vdl": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/VdlTargetConfig"
+            },
+            {
+              "description": "Unified VDL schema output target (merges includes and external docs)"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "TypeScriptTargetConfig": {
+      "description": "Configuration for TypeScript code generation",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "genClient": {
+          "description": "Generate RPC client code",
+          "type": "boolean"
+        },
+        "genConsts": {
+          "description": "Generate constant definitions",
+          "type": "boolean"
+        },
+        "genPatterns": {
+          "description": "Generate helper functions for patterns",
+          "type": "boolean"
+        },
+        "genServer": {
+          "description": "Generate RPC server interfaces and handlers",
+          "type": "boolean"
+        },
+        "importExtension": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypescriptTargetImportExtension"
+            },
+            {
+              "description": "File extension to append to import paths"
+            }
+          ]
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    },
+    "TypescriptTargetImportExtension": {
+      "description": "Import extension options for TypeScript target",
+      "enum": [
+        "none",
+        ".js",
+        ".ts"
+      ],
+      "type": "string"
+    },
+    "VdlCodegenConfig": {
+      "description": "VDL Configuration Schema\n\nThis schema defines the configuration format for the VDL code generator (vdl.yaml)\n\nIt supports multiple target languages and output formats",
+      "properties": {
+        "schema": {
+          "description": "Path to the default global VDL schema file entrypoint",
+          "type": "string"
+        },
+        "targets": {
+          "description": "List of generation targets",
+          "items": {
+            "$ref": "#/$defs/TargetConfig"
+          },
+          "type": "array"
+        },
+        "version": {
+          "description": "Configuration version (must be 1)",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "targets",
+        "version"
+      ],
+      "type": "object"
+    },
+    "VdlTargetConfig": {
+      "description": "Configuration for unified VDL schema generation (merges all includes and external docs)",
+      "properties": {
+        "clean": {
+          "description": "If true, empties the output directory before generation",
+          "type": "boolean"
+        },
+        "filename": {
+          "description": "The name of the output file",
+          "type": "string"
+        },
+        "output": {
+          "description": "The output directory where generated files will be placed",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Override the VDL schema file entrypoint for this target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "type": "object"
+    }
+  },
+  "$ref": "#/$defs/VdlCodegenConfig",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

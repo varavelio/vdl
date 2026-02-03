@@ -1,0 +1,547 @@
+{
+  "$defs": {
+    "ConstType": {
+      "description": "The type of a constant value",
+      "enum": [
+        "string",
+        "int",
+        "float",
+        "bool"
+      ],
+      "type": "string"
+    },
+    "ConstantDef": {
+      "description": "Represents a constant definition",
+      "properties": {
+        "constType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/ConstType"
+            },
+            {
+              "description": "The type of the constant value"
+            }
+          ]
+        },
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the constant",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the constant",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value of the constant as a string",
+          "type": "string"
+        }
+      },
+      "required": [
+        "constType",
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "DocDef": {
+      "description": "Represents a standalone documentation block",
+      "properties": {
+        "content": {
+          "description": "The content of the documentation",
+          "type": "string"
+        },
+        "rpcName": {
+          "description": "The name of the RPC this doc belongs to. If empty this is a global standalone documentation block.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "type": "object"
+    },
+    "EnumDef": {
+      "description": "Represents an enum definition",
+      "properties": {
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the enum",
+          "type": "string"
+        },
+        "enumType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/EnumType"
+            },
+            {
+              "description": "The type of this enum"
+            }
+          ]
+        },
+        "members": {
+          "description": "List of enum members",
+          "items": {
+            "$ref": "#/$defs/EnumDefMember"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "The name of the enum",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enumType",
+        "members",
+        "name"
+      ],
+      "type": "object"
+    },
+    "EnumDefMember": {
+      "description": "A member of an enum",
+      "properties": {
+        "name": {
+          "description": "The name of the enum member",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value of the enum member as a string",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "EnumType": {
+      "description": "The underlying value type of an enum",
+      "enum": [
+        "string",
+        "int"
+      ],
+      "type": "string"
+    },
+    "Field": {
+      "description": "Represents a field with its type fully resolved",
+      "properties": {
+        "doc": {
+          "description": "Documentation for the field",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the field",
+          "type": "string"
+        },
+        "optional": {
+          "description": "Whether the field is optional",
+          "type": "boolean"
+        },
+        "typeRef": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeRef"
+            },
+            {
+              "description": "The type definition of the field"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "optional",
+        "typeRef"
+      ],
+      "type": "object"
+    },
+    "IrSchema": {
+      "description": "IrSchema represents the root of the VDL Intermediate Representation (IR).\n\nIt acts as the canonical, simplified view of the domain model, abstracting away\nthe complexity of parsing, file structures, and syntactic sugar.\n\nThis structure is the \"Golden Platter\" for code generators, plugins, and analysis tools:\na flattened, fully resolved, and read-only data structure ready for consumption.\n\nTo ensure reproducible builds and consistent outputs across different environments,\nall collections within the IRSchema are strictly sorted alphabetically.\n\nThis is the structure on which code generators and plugins are executed, as it is the\npurest and simplest form of representation of the entire IDL.",
+      "properties": {
+        "constants": {
+          "description": "List of all constant definitions in the schema",
+          "items": {
+            "$ref": "#/$defs/ConstantDef"
+          },
+          "type": "array"
+        },
+        "docs": {
+          "description": "List of all standalone documentation blocks (even from all RPCs)",
+          "items": {
+            "$ref": "#/$defs/DocDef"
+          },
+          "type": "array"
+        },
+        "enums": {
+          "description": "List of all enum definitions in the schema",
+          "items": {
+            "$ref": "#/$defs/EnumDef"
+          },
+          "type": "array"
+        },
+        "patterns": {
+          "description": "List of all pattern definitions in the schema",
+          "items": {
+            "$ref": "#/$defs/PatternDef"
+          },
+          "type": "array"
+        },
+        "procedures": {
+          "description": "Flattened list of all procedures from all RPCs",
+          "items": {
+            "$ref": "#/$defs/ProcedureDef"
+          },
+          "type": "array"
+        },
+        "rpcs": {
+          "description": "List of all RPC definitions in the schema",
+          "items": {
+            "$ref": "#/$defs/RpcDef"
+          },
+          "type": "array"
+        },
+        "streams": {
+          "description": "Flattened list of all streams from all RPCs",
+          "items": {
+            "$ref": "#/$defs/StreamDef"
+          },
+          "type": "array"
+        },
+        "types": {
+          "description": "List of all type definitions in the schema",
+          "items": {
+            "$ref": "#/$defs/TypeDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "constants",
+        "docs",
+        "enums",
+        "patterns",
+        "procedures",
+        "rpcs",
+        "streams",
+        "types"
+      ],
+      "type": "object"
+    },
+    "PatternDef": {
+      "description": "Represents a pattern template for generating dynamic strings",
+      "properties": {
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the pattern",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the pattern",
+          "type": "string"
+        },
+        "placeholders": {
+          "description": "List of placeholder names extracted from the template",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "template": {
+          "description": "The template string containing placeholders",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "placeholders",
+        "template"
+      ],
+      "type": "object"
+    },
+    "PluginInput": {
+      "description": "PluginInput represents the data payload sent to a plugin via stdin.\n\nThe plugin receives this as a single JSON object containing the complete\nIntermediate Representation of the VDL schema along with any user-defined\nconfiguration options from vdl.yaml.",
+      "properties": {
+        "ir": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/IrSchema"
+            },
+            {
+              "description": "The complete VDL Intermediate Representation.\n\nContains all types, enums, constants, patterns, RPCs, procedures, streams,\nand documentation blocks from the compiled schema, fully resolved and ready\nfor code generation."
+            }
+          ]
+        },
+        "options": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Arbitrary key-value options passed from the vdl.yaml configuration.\n\nThese allow users to customize plugin behavior without modifying the plugin\nitself. Common use cases include specifying target frameworks, API versions,\nnaming conventions, or feature flags.",
+          "type": "object"
+        },
+        "schema": {
+          "description": "The complete VDL schema in plain text (with includes and external docstrings already resolved)",
+          "type": "string"
+        },
+        "version": {
+          "description": "The VDL binary version (without v prefix, e.g. 1.0.0)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ir",
+        "options",
+        "schema",
+        "version"
+      ],
+      "type": "object"
+    },
+    "PrimitiveType": {
+      "description": "Field primitive types",
+      "enum": [
+        "string",
+        "int",
+        "float",
+        "bool",
+        "datetime"
+      ],
+      "type": "string"
+    },
+    "ProcedureDef": {
+      "description": "Represents an RPC procedure",
+      "properties": {
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the procedure",
+          "type": "string"
+        },
+        "input": {
+          "description": "List of input fields in the same order in which they were written",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "The name of the procedure",
+          "type": "string"
+        },
+        "output": {
+          "description": "List of output fields in the same order in which they were written",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "rpcName": {
+          "description": "The name of the parent RPC",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input",
+        "name",
+        "output",
+        "rpcName"
+      ],
+      "type": "object"
+    },
+    "RpcDef": {
+      "description": "Represents an RPC definition",
+      "properties": {
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the RPC",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the RPC",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "StreamDef": {
+      "description": "Represents an RPC stream",
+      "properties": {
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the stream",
+          "type": "string"
+        },
+        "input": {
+          "description": "List of input fields in the same order in which they were written",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "The name of the stream",
+          "type": "string"
+        },
+        "output": {
+          "description": "List of output fields in the same order in which they were written",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "rpcName": {
+          "description": "The name of the parent RPC",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input",
+        "name",
+        "output",
+        "rpcName"
+      ],
+      "type": "object"
+    },
+    "TypeDef": {
+      "description": "Represents a type definition",
+      "properties": {
+        "deprecated": {
+          "description": "Deprecation status if deprecated",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Documentation for the type",
+          "type": "string"
+        },
+        "fields": {
+          "description": "List of fields in the type in the same order in which they were written",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "The name of the type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fields",
+        "name"
+      ],
+      "type": "object"
+    },
+    "TypeKind": {
+      "description": "Categories for a type",
+      "enum": [
+        "primitive",
+        "type",
+        "enum",
+        "array",
+        "map",
+        "object"
+      ],
+      "type": "string"
+    },
+    "TypeRef": {
+      "description": "Represents any referenced type in a unified way",
+      "properties": {
+        "arrayDims": {
+          "description": "Number of array dimensions (e.g. 2 for int[][]) if Kind is array",
+          "type": "integer"
+        },
+        "arrayType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeRef"
+            },
+            {
+              "description": "The type of elements in the array if Kind is array"
+            }
+          ]
+        },
+        "enumName": {
+          "description": "The name of the enum if Kind is enum",
+          "type": "string"
+        },
+        "enumType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/EnumType"
+            },
+            {
+              "description": "The type of the enum if Kind is enum"
+            }
+          ]
+        },
+        "kind": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeKind"
+            },
+            {
+              "description": "The category of the type"
+            }
+          ]
+        },
+        "mapType": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeRef"
+            },
+            {
+              "description": "The type of values in the map if Kind is map"
+            }
+          ]
+        },
+        "objectFields": {
+          "description": "Fields of the inline object if Kind is object, in the same order in which they were written",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "type": "array"
+        },
+        "primitiveName": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PrimitiveType"
+            },
+            {
+              "description": "The name of the primitive type if Kind is primitive"
+            }
+          ]
+        },
+        "typeName": {
+          "description": "The name of the type if Kind is type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    }
+  },
+  "$ref": "#/$defs/PluginInput",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

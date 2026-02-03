@@ -9,23 +9,67 @@ targets:
       clean: true
       package: irtypes
 
+  - jsonschema:
+      schema: ./schemas/ir.vdl
+      output: ./docs/public/schemas/v0
+      filename: ir.schema.json
+      root: IrSchema
+
+  - vdl:
+      schema: ./schemas/ir.vdl
+      output: ./docs/public/schemas/v0
+      filename: ir.vdl
+
   - go:
       schema: ./schemas/config.vdl
       output: ./toolchain/internal/codegen/config/configtypes
       clean: true
       package: configtypes
 
-  - go:
-      schema: ./schemas/wasm.vdl
-      output: ./toolchain/internal/wasm/wasmtypes
-      clean: true
-      package: wasmtypes
+  - jsonschema:
+      schema: ./schemas/config.vdl
+      output: ./docs/public/schemas/v0
+      filename: config.schema.json
+      root: VdlCodegenConfig
+
+  - vdl:
+      schema: ./schemas/config.vdl
+      output: ./docs/public/schemas/v0
+      filename: config.vdl
 
   - go:
       schema: ./schemas/plugin.vdl
       output: ./toolchain/internal/codegen/plugin/plugintypes
       clean: true
       package: plugintypes
+
+  - jsonschema:
+      schema: ./schemas/pluginInput.vdl
+      output: ./docs/public/schemas/v0
+      filename: pluginInput.schema.json
+      root: PluginInput
+
+  - vdl:
+      schema: ./schemas/pluginInput.vdl
+      output: ./docs/public/schemas/v0
+      filename: pluginInput.vdl
+
+  - jsonschema:
+      schema: ./schemas/pluginOutput.vdl
+      output: ./docs/public/schemas/v0
+      filename: pluginOutput.schema.json
+      root: PluginOutput
+
+  - vdl:
+      schema: ./schemas/pluginOutput.vdl
+      output: ./docs/public/schemas/v0
+      filename: pluginOutput.vdl
+
+  - go:
+      schema: ./schemas/wasm.vdl
+      output: ./toolchain/internal/wasm/wasmtypes
+      clean: true
+      package: wasmtypes
 
   - typescript:
       schema: ./schemas/wasm.vdl

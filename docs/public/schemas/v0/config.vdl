@@ -1,0 +1,220 @@
+"""
+VDL Configuration Schema
+
+This schema defines the configuration format for the VDL code generator (vdl.yaml)
+
+It supports multiple target languages and output formats
+"""
+type VdlCodegenConfig {
+  """ Configuration version (must be 1) """
+  version: int
+
+  """ Path to the default global VDL schema file entrypoint """
+  schema?: string
+
+  """ List of generation targets """
+  targets: TargetConfig[]
+}
+
+""" Common configuration fields shared by all targets """
+type CommonTargetConfig {
+  """ The output directory where generated files will be placed """
+  output: string
+
+  """ If true, empties the output directory before generation """
+  clean?: bool
+
+  """ Override the VDL schema file entrypoint for this target """
+  schema?: string
+}
+
+""" Configuration for generating patterns """
+type PatternsTargetConfig {
+  """ Generate helper functions for patterns """
+  genPatterns?: bool
+}
+
+""" Configuration for generating constants """
+type ConstsTargetConfig {
+  """ Generate constant definitions """
+  genConsts?: bool
+}
+
+""" Configuration for generating RPC clients """
+type ClientTargetConfig {
+  """ Generate RPC client code """
+  genClient?: bool
+}
+
+""" Configuration for generating RPC servers """
+type ServerTargetConfig {
+  """ Generate RPC server interfaces and handlers """
+  genServer?: bool
+}
+
+"""
+Configuration for a specific generation target, only one target type should be set per entry
+"""
+type TargetConfig {
+  """ Go language target """
+  go?: GoTargetConfig
+
+  """ TypeScript language target """
+  typescript?: TypeScriptTargetConfig
+
+  """ Dart language target """
+  dart?: DartTargetConfig
+
+  """ Python language target """
+  python?: PythonTargetConfig
+
+  """ JSON Schema output target """
+  jsonschema?: JsonSchemaTargetConfig
+
+  """ OpenAPI specification output target """
+  openapi?: OpenApiTargetConfig
+
+  """ API Playground output target """
+  playground?: PlaygroundTargetConfig
+
+  """ External plugin target """
+  plugin?: PluginTargetConfig
+
+  """ IR (Intermediate Representation) JSON output target """
+  ir?: IrTargetConfig
+
+  """ Unified VDL schema output target (merges includes and external docs) """
+  vdl?: VdlTargetConfig
+}
+
+""" Configuration for Go code generation """
+type GoTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
+  ...ClientTargetConfig
+  ...ServerTargetConfig
+
+  """ The Go package name to use in generated files """
+  package: string
+}
+
+""" Configuration for TypeScript code generation """
+type TypeScriptTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
+  ...ClientTargetConfig
+  ...ServerTargetConfig
+
+  """ File extension to append to import paths """
+  importExtension?: TypescriptTargetImportExtension
+}
+
+""" Import extension options for TypeScript target """
+enum TypescriptTargetImportExtension {
+  None = "none"
+  Js = ".js"
+  Ts = ".ts"
+}
+
+""" Configuration for Dart code generation """
+type DartTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
+}
+
+""" Configuration for Python code generation """
+type PythonTargetConfig {
+  ...CommonTargetConfig
+  ...PatternsTargetConfig
+  ...ConstsTargetConfig
+}
+
+""" Configuration for JSON Schema generation """
+type JsonSchemaTargetConfig {
+  ...CommonTargetConfig
+
+  """ The $id of the generated schema """
+  id?: string
+
+  """ The name of the output file """
+  filename?: string
+
+  """
+  The name of a type from '$defs' to use as the main entry point (adds a $ref at the root).
+  Must exist; VDL validates this and provides fuzzy suggestions for typos.
+  """
+  root?: string
+}
+
+""" Configuration for OpenAPI specification generation """
+type OpenApiTargetConfig {
+  ...CommonTargetConfig
+
+  """ The name of the output file (can be .yml, .yaml or .json) """
+  filename?: string
+
+  """ API title """
+  title: string
+
+  """ API version """
+  version: string
+
+  """ API description """
+  description?: string
+
+  """ Base URL for API endpoints """
+  baseUrl?: string
+
+  """ Contact name """
+  contactName?: string
+
+  """ Contact email """
+  contactEmail?: string
+
+  """ License name """
+  licenseName?: string
+}
+
+""" Configuration for API playground generation """
+type PlaygroundTargetConfig {
+  ...CommonTargetConfig
+
+  """ Default base URL for API requests """
+  defaultBaseUrl?: string
+
+  """ Default headers to include in API requests """
+  defaultHeaders?: map<string>
+}
+
+""" Configuration for external plugin generators """
+type PluginTargetConfig {
+  ...CommonTargetConfig
+
+  """ Command to execute the plugin (executable + args) """
+  command: string[]
+
+  """ Arbitrary options passed to the plugin (flat key-value pairs) """
+  options?: map<string>
+}
+
+""" Configuration for IR (Intermediate Representation) JSON generation """
+type IrTargetConfig {
+  ...CommonTargetConfig
+
+  """ The name of the output file """
+  filename?: string
+
+  """ Output minified JSON (no indentation). Default is false (pretty-printed with 2-space indent) """
+  minify?: bool
+}
+
+""" Configuration for unified VDL schema generation (merges all includes and external docs) """
+type VdlTargetConfig {
+  ...CommonTargetConfig
+
+  """ The name of the output file """
+  filename?: string
+}

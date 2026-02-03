@@ -1,0 +1,273 @@
+"""
+IrSchema represents the root of the VDL Intermediate Representation (IR).
+
+It acts as the canonical, simplified view of the domain model, abstracting away
+the complexity of parsing, file structures, and syntactic sugar.
+
+This structure is the "Golden Platter" for code generators, plugins, and analysis tools:
+a flattened, fully resolved, and read-only data structure ready for consumption.
+
+To ensure reproducible builds and consistent outputs across different environments,
+all collections within the IRSchema are strictly sorted alphabetically.
+
+This is the structure on which code generators and plugins are executed, as it is the
+purest and simplest form of representation of the entire IDL.
+"""
+type IrSchema {
+  """ List of all constant definitions in the schema """
+  constants: ConstantDef[]
+
+  """ List of all pattern definitions in the schema """
+  patterns: PatternDef[]
+
+  """ List of all enum definitions in the schema """
+  enums: EnumDef[]
+
+  """ List of all type definitions in the schema """
+  types: TypeDef[]
+
+  """ List of all RPC definitions in the schema """
+  rpcs: RpcDef[]
+
+  """ Flattened list of all procedures from all RPCs """
+  procedures: ProcedureDef[]
+
+  """ Flattened list of all streams from all RPCs """
+  streams: StreamDef[]
+
+  """ List of all standalone documentation blocks (even from all RPCs) """
+  docs: DocDef[]
+}
+
+/********
+* ENUMS *
+********/
+
+""" Categories for a type """
+enum TypeKind {
+  Primitive = "primitive"
+  Type = "type"
+  Enum = "enum"
+  Array = "array"
+  Map = "map"
+  Object = "object"
+}
+
+""" Field primitive types """
+enum PrimitiveType {
+  String = "string"
+  Int = "int"
+  Float = "float"
+  Bool = "bool"
+  Datetime = "datetime"
+}
+
+""" The underlying value type of an enum """
+enum EnumType {
+  String = "string"
+  Int = "int"
+}
+
+""" The type of a constant value """
+enum ConstType {
+  String = "string"
+  Int = "int"
+  Float = "float"
+  Bool = "bool"
+}
+
+/*******************
+* TYPE SYSTEM CORE *
+*******************/
+
+""" Represents any referenced type in a unified way """
+type TypeRef {
+  """ The category of the type """
+  kind: TypeKind
+
+  """ The name of the primitive type if Kind is primitive """
+  primitiveName?: PrimitiveType
+
+  """ The name of the type if Kind is type """
+  typeName?: string
+
+  """ The name of the enum if Kind is enum """
+  enumName?: string
+
+  """ The type of the enum if Kind is enum """
+  enumType?: EnumType
+
+  """ The type of elements in the array if Kind is array """
+  arrayType?: TypeRef
+
+  """ Number of array dimensions (e.g. 2 for int[][]) if Kind is array """
+  arrayDims?: int
+
+  """ The type of values in the map if Kind is map """
+  mapType?: TypeRef
+
+  """ Fields of the inline object if Kind is object, in the same order in which they were written """
+  objectFields?: Field[]
+}
+
+""" Represents a field with its type fully resolved """
+type Field {
+  """ The name of the field """
+  name: string
+
+  """ Documentation for the field """
+  doc?: string
+
+  """ Whether the field is optional """
+  optional: bool
+
+  """ The type definition of the field """
+  typeRef: TypeRef
+}
+
+/************************
+* TOP LEVEL DEFINITIONS *
+************************/
+
+""" Represents a type definition """
+type TypeDef {
+  """ The name of the type """
+  name: string
+
+  """ Documentation for the type """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+
+  """ List of fields in the type in the same order in which they were written """
+  fields: Field[]
+}
+
+""" Represents an enum definition """
+type EnumDef {
+  """ The name of the enum """
+  name: string
+
+  """ Documentation for the enum """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+
+  """ The type of this enum """
+  enumType: EnumType
+
+  """ List of enum members """
+  members: EnumDefMember[]
+}
+
+""" A member of an enum """
+type EnumDefMember {
+  """ The name of the enum member """
+  name: string
+
+  """ The value of the enum member as a string """
+  value: string
+}
+
+""" Represents a constant definition """
+type ConstantDef {
+  """ The name of the constant """
+  name: string
+
+  """ Documentation for the constant """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+
+  """ The type of the constant value """
+  constType: ConstType
+
+  """ The value of the constant as a string """
+  value: string
+}
+
+""" Represents a pattern template for generating dynamic strings """
+type PatternDef {
+  """ The name of the pattern """
+  name: string
+
+  """ Documentation for the pattern """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+
+  """ The template string containing placeholders """
+  template: string
+
+  """ List of placeholder names extracted from the template """
+  placeholders: string[]
+}
+
+""" Represents an RPC definition """
+type RpcDef {
+  """ The name of the RPC """
+  name: string
+
+  """ Documentation for the RPC """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+}
+
+""" Represents an RPC procedure """
+type ProcedureDef {
+  """ The name of the parent RPC """
+  rpcName: string
+
+  """ The name of the procedure """
+  name: string
+
+  """ Documentation for the procedure """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+
+  """ List of input fields in the same order in which they were written """
+  input: Field[]
+
+  """ List of output fields in the same order in which they were written """
+  output: Field[]
+}
+
+""" Represents an RPC stream """
+type StreamDef {
+  """ The name of the parent RPC """
+  rpcName: string
+
+  """ The name of the stream """
+  name: string
+
+  """ Documentation for the stream """
+  doc?: string
+
+  """ Deprecation status if deprecated """
+  deprecated?: string
+
+  """ List of input fields in the same order in which they were written """
+  input: Field[]
+
+  """ List of output fields in the same order in which they were written """
+  output: Field[]
+}
+
+""" Represents a standalone documentation block """
+type DocDef {
+  """
+  The name of the RPC this doc belongs to. If empty this is a global standalone documentation block.
+  """
+  rpcName?: string
+
+  """ The content of the documentation """
+  content: string
+}
