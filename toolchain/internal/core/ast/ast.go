@@ -527,11 +527,27 @@ type Spread struct {
 	TypeName string `parser:"Spread @Ident"`
 }
 
+// FieldName is a custom type that captures either an identifier or any keyword
+// token, allowing field names to use reserved keywords.
+type FieldName string
+
+// Capture implements the participle Capture interface.
+// It accepts any of the possible tokens that can be used as a field name.
+func (f *FieldName) Capture(values []string) error {
+	*f = FieldName(values[0])
+	return nil
+}
+
+// String returns the underlying string value.
+func (f FieldName) String() string {
+	return string(f)
+}
+
 // Field represents a field definition.
 type Field struct {
 	Positions
 	Docstring *Docstring `parser:"(@@ (?! Newline Newline))?"`
-	Name      string     `parser:"@Ident"`
+	Name      FieldName  `parser:"@(Ident | Include | Rpc | Const | Enum | Pattern | Map | Deprecated | Type | Proc | Stream | Input | Output | String | Int | Float | Bool | Datetime | True | False)"`
 	Optional  bool       `parser:"@Question?"`
 	Type      FieldType  `parser:"Colon @@"`
 }

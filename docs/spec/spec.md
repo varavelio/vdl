@@ -949,5 +949,4 @@ rpc Chat {
 
 The VDL IDL is designed to be simple and focused. As such, there are a few constraints to be aware of:
 
-1.  **Reserved Keywords:** All language keywords (e.g., `type`, `rpc`, `proc`, `stream`, `enum`, `const`, `pattern`, `input`, `output`, `include`, `deprecated`, etc.) cannot be used as identifiers for your types, fields, or services.
-2.  **Validation Logic:** The compiler handles type checking and ensures required fields are present. Any additional business validation logic (e.g., "rating must be between 1 and 5") must be implemented in your application code.
+1.  **Validation Logic:** The compiler handles type checking and ensures required fields are present. Any additional business validation logic (e.g., "rating must be between 1 and 5") must be implemented in your application code.

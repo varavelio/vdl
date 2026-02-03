@@ -158,10 +158,10 @@ func collectIdentifiersFromField(f *ast.Field, content string, identifiers *[]Id
 		startPos = f.Docstring.EndPos
 	}
 
-	namePos, nameEndPos := findIdentifierRange(content, startPos, f.Name)
+	namePos, nameEndPos := findIdentifierRange(content, startPos, string(f.Name))
 
 	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   f.Name,
+		Name:   string(f.Name),
 		Pos:    namePos,
 		EndPos: nameEndPos,
 	})

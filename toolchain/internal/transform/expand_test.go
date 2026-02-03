@@ -307,7 +307,7 @@ func TestExpandTypes_SimpleTypeReference(t *testing.T) {
 	if len(fields) != 2 {
 		t.Fatalf("expected 2 fields in expanded object, got %d", len(fields))
 	}
-	fieldNames := []string{fields[0].Name, fields[1].Name}
+	fieldNames := []string{string(fields[0].Name), string(fields[1].Name)}
 	if !contains(fieldNames, "id") || !contains(fieldNames, "name") {
 		t.Errorf("expected fields 'id' and 'name', got %v", fieldNames)
 	}
@@ -624,7 +624,7 @@ func TestExpandTypes_SpreadFlattening(t *testing.T) {
 	for _, child := range userType.Children {
 		if child.Field != nil {
 			fieldCount++
-			fieldNames = append(fieldNames, child.Field.Name)
+			fieldNames = append(fieldNames, string(child.Field.Name))
 		}
 		if child.Spread != nil {
 			spreadCount++
@@ -678,7 +678,7 @@ func TestExpandTypes_SpreadChain(t *testing.T) {
 	fieldNames := []string{}
 	for _, child := range level3Type.Children {
 		if child.Field != nil {
-			fieldNames = append(fieldNames, child.Field.Name)
+			fieldNames = append(fieldNames, string(child.Field.Name))
 		}
 		if child.Spread != nil {
 			t.Error("spread should not be present after expansion")
@@ -741,7 +741,7 @@ func TestExpandTypes_SpreadInInputOutput(t *testing.T) {
 		if child.Input != nil {
 			for _, ioc := range child.Input.Children {
 				if ioc.Field != nil {
-					inputFields = append(inputFields, ioc.Field.Name)
+					inputFields = append(inputFields, string(ioc.Field.Name))
 				}
 				if ioc.Spread != nil {
 					inputSpreads++
@@ -763,7 +763,7 @@ func TestExpandTypes_SpreadInInputOutput(t *testing.T) {
 		if child.Output != nil {
 			for _, ioc := range child.Output.Children {
 				if ioc.Field != nil {
-					outputFields = append(outputFields, ioc.Field.Name)
+					outputFields = append(outputFields, string(ioc.Field.Name))
 				}
 				if ioc.Spread != nil {
 					outputSpreads++
@@ -819,7 +819,7 @@ func TestExpandTypes_MultipleSpreads(t *testing.T) {
 	fieldNames := []string{}
 	for _, child := range entityType.Children {
 		if child.Field != nil {
-			fieldNames = append(fieldNames, child.Field.Name)
+			fieldNames = append(fieldNames, string(child.Field.Name))
 		}
 		if child.Spread != nil {
 			t.Error("spread should not be present after expansion")

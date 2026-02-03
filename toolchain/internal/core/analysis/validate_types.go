@@ -183,7 +183,7 @@ func buildFieldSymbol(field *ast.Field, file string) *FieldSymbol {
 
 	return &FieldSymbol{
 		Symbol: Symbol{
-			Name:      field.Name,
+			Name:      string(field.Name),
 			File:      file,
 			Pos:       field.Pos,
 			EndPos:    field.EndPos,

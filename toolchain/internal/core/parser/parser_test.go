@@ -1743,6 +1743,325 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 	})
 }
 
+////////////////////////////
+// KEYWORDS AS FIELD NAMES //
+////////////////////////////
+
+// TestParserKeywordsAsFieldNames tests that all language keywords can be used
+// as field names in types and RPC input/output blocks.
+func TestParserKeywordsAsFieldNames(t *testing.T) {
+	t.Run("All keywords as field names in type", func(t *testing.T) {
+		input := `
+			type KeywordFields {
+				type: string
+				rpc: string
+				proc: string
+				stream: string
+				enum: string
+				const: string
+				pattern: string
+				input: string
+				output: string
+				include: string
+				deprecated: string
+				map: string
+				string: string
+				int: string
+				float: string
+				bool: string
+				datetime: string
+				true: string
+				false: string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "KeywordFields",
+						Children: []*ast.TypeDeclChild{
+							{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "rpc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "proc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "stream", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "enum", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "const", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "pattern", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "include", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "deprecated", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "map", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "string", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "int", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "float", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "bool", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "datetime", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "true", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "false", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Keywords as field names in RPC input/output", func(t *testing.T) {
+		input := `
+			rpc TestService {
+				proc TestProc {
+					input {
+						input: int
+						output: string
+						type: bool
+						rpc: float
+					}
+					output {
+						proc: datetime
+						stream: int
+						enum: string
+						const: bool
+					}
+				}
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					RPC: &ast.RPCDecl{
+						Name: "TestService",
+						Children: []*ast.RPCChild{
+							{
+								Proc: &ast.ProcDecl{
+									Name: "TestProc",
+									Children: []*ast.ProcOrStreamDeclChild{
+										{
+											Input: &ast.ProcOrStreamDeclChildInput{
+												Children: []*ast.InputOutputChild{
+													{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+													{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+													{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
+													{Field: &ast.Field{Name: "rpc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
+												},
+											},
+										},
+										{
+											Output: &ast.ProcOrStreamDeclChildOutput{
+												Children: []*ast.InputOutputChild{
+													{Field: &ast.Field{Name: "proc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
+													{Field: &ast.Field{Name: "stream", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+													{Field: &ast.Field{Name: "enum", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+													{Field: &ast.Field{Name: "const", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Keywords as optional field names", func(t *testing.T) {
+		input := `
+			type OptionalKeywords {
+				input?: string
+				output?: int
+				type?: bool
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "OptionalKeywords",
+						Children: []*ast.TypeDeclChild{
+							{Field: &ast.Field{Name: "input", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+							{Field: &ast.Field{Name: "output", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+							{Field: &ast.Field{Name: "type", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Keywords as field names with arrays and maps", func(t *testing.T) {
+		input := `
+			type ArraysAndMaps {
+				input: string[]
+				output: int[][]
+				type: map<bool>
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "ArraysAndMaps",
+						Children: []*ast.TypeDeclChild{
+							{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1}}},
+							{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
+							{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}}}}},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Keywords as field names with inline objects", func(t *testing.T) {
+		input := `
+			type InlineKeywords {
+				input: {
+					output: string
+					type: int
+				}
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "InlineKeywords",
+						Children: []*ast.TypeDeclChild{
+							{
+								Field: &ast.Field{
+									Name: "input",
+									Type: ast.FieldType{
+										Base: &ast.FieldTypeBase{
+											Object: &ast.FieldTypeObject{
+												Children: []*ast.TypeDeclChild{
+													{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+													{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Keywords as field names with docstrings", func(t *testing.T) {
+		input := `
+			type DocstringKeywords {
+				""" The input field """
+				input: string
+				""" The output field """
+				output: int
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					Type: &ast.TypeDecl{
+						Name: "DocstringKeywords",
+						Children: []*ast.TypeDeclChild{
+							{Field: &ast.Field{
+								Docstring: &ast.Docstring{Value: " The input field "},
+								Name:      "input",
+								Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
+							}},
+							{Field: &ast.Field{
+								Docstring: &ast.Docstring{Value: " The output field "},
+								Name:      "output",
+								Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}},
+							}},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Keywords as field names in stream input/output", func(t *testing.T) {
+		input := `
+			rpc TestService {
+				stream TestStream {
+					input {
+						input: string
+						stream: int
+					}
+					output {
+						output: bool
+						rpc: datetime
+					}
+				}
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{
+			Children: []*ast.SchemaChild{
+				{
+					RPC: &ast.RPCDecl{
+						Name: "TestService",
+						Children: []*ast.RPCChild{
+							{
+								Stream: &ast.StreamDecl{
+									Name: "TestStream",
+									Children: []*ast.ProcOrStreamDeclChild{
+										{
+											Input: &ast.ProcOrStreamDeclChildInput{
+												Children: []*ast.InputOutputChild{
+													{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
+													{Field: &ast.Field{Name: "stream", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
+												},
+											},
+										},
+										{
+											Output: &ast.ProcOrStreamDeclChildOutput{
+												Children: []*ast.InputOutputChild{
+													{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
+													{Field: &ast.Field{Name: "rpc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+}
+
 //////////////////////
 // COMPLETE SCHEMA  //
 //////////////////////

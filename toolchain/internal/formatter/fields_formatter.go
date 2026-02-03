@@ -41,7 +41,7 @@ func formatField(g *gen.Generator, field *ast.Field, breakBefore bool, _ any) {
 	}
 
 	// Force strict camelCase
-	name := strutil.ToCamelCase(field.Name)
+	name := strutil.ToCamelCase(string(field.Name))
 	if field.Optional {
 		g.Inlinef("%s?: ", name)
 	} else {

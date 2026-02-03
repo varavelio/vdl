@@ -159,7 +159,7 @@ func TestFlattenedFields(t *testing.T) {
 		require.Len(t, flattened, len(expectedFieldNames), "should have correct number of fields")
 
 		for i, field := range flattened {
-			require.Equal(t, expectedFieldNames[i], field.Name, "field name should match")
+			require.Equal(t, expectedFieldNames[i], string(field.Name), "field name should match")
 		}
 
 		// Test pointer modification
@@ -177,7 +177,7 @@ func TestFlattenedFields(t *testing.T) {
 		require.Len(t, flattened, len(expectedFieldNames), "should have correct number of fields")
 
 		for i, field := range flattened {
-			require.Equal(t, expectedFieldNames[i], field.Name, "field name should match")
+			require.Equal(t, expectedFieldNames[i], string(field.Name), "field name should match")
 		}
 
 		// Test pointer modification
@@ -196,7 +196,7 @@ func TestFlattenedFields(t *testing.T) {
 		require.Len(t, flattened, len(expectedFieldNames), "should have correct number of fields")
 
 		for i, field := range flattened {
-			require.Equal(t, expectedFieldNames[i], field.Name, "field name should match")
+			require.Equal(t, expectedFieldNames[i], string(field.Name), "field name should match")
 		}
 
 		// Test pointer modification
@@ -212,7 +212,7 @@ func TestFlattenedFields(t *testing.T) {
 		require.Len(t, flattened, len(expected), "should have correct number of fields")
 
 		for i, field := range flattened {
-			require.Equal(t, expected[i], field.Name, "field name should match")
+			require.Equal(t, expected[i], string(field.Name), "field name should match")
 		}
 
 		// Test pointer modification
