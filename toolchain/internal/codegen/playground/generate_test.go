@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 func TestGenerator_Name(t *testing.T) {
@@ -22,10 +22,10 @@ func TestGenerator_Generate_BasicFiles(t *testing.T) {
 		},
 	}, "")
 
-	schema := &ir.Schema{
-		Types: []ir.Type{},
-		Enums: []ir.Enum{},
-		RPCs:  []ir.RPC{},
+	schema := &irtypes.IrSchema{
+		Types: []irtypes.TypeDef{},
+		Enums: []irtypes.EnumDef{},
+		Rpcs:  []irtypes.RpcDef{},
 	}
 
 	files, err := gen.Generate(context.Background(), schema)
@@ -60,7 +60,7 @@ rpc Users {
 		},
 	}, schemaSource)
 
-	schema := &ir.Schema{}
+	schema := &irtypes.IrSchema{}
 
 	files, err := gen.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -93,7 +93,7 @@ func TestGenerator_Generate_WithConfig(t *testing.T) {
 		},
 	}, "")
 
-	schema := &ir.Schema{}
+	schema := &irtypes.IrSchema{}
 
 	files, err := gen.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -125,7 +125,7 @@ func TestGenerator_Generate_NoConfigWithoutValues(t *testing.T) {
 		// No base URL or headers
 	}, "")
 
-	schema := &ir.Schema{}
+	schema := &irtypes.IrSchema{}
 
 	files, err := gen.Generate(context.Background(), schema)
 	require.NoError(t, err)
@@ -143,7 +143,7 @@ func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
 		},
 	}, "")
 
-	schema := &ir.Schema{}
+	schema := &irtypes.IrSchema{}
 
 	files, err := gen.Generate(context.Background(), schema)
 	require.NoError(t, err)

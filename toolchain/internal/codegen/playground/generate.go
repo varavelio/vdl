@@ -10,7 +10,7 @@ import (
 
 	embedplayground "github.com/varavelio/vdl/playground"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // File represents a generated file. This mirrors codegen.File to avoid import cycles.
@@ -43,7 +43,7 @@ func (g *Generator) Name() string {
 // - All static files from the embedded playground build
 // - schema.vdl: The formatted VDL schema (from g.formattedSchema)
 // - config.json: Optional configuration for base URL and headers
-func (g *Generator) Generate(ctx context.Context, schema *ir.Schema) ([]File, error) {
+func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]File, error) {
 	files := []File{}
 
 	// Files to skip from embedded content (we'll generate our own)
