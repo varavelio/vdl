@@ -1,0 +1,198 @@
+"""
+VDL Configuration Schema
+
+This schema defines the configuration format for the VDL code generator (vdl.yaml)
+
+It supports multiple target languages and output formats
+"""
+type VdlConfig {
+  """ Configuration version (must be 1) """
+  version: int
+
+  """ Path to the default global VDL schema file entrypoint """
+  schema?: string
+
+  """ List of generation targets """
+  targets: TargetConfig[]
+}
+
+""" Common configuration fields shared by all targets """
+type CommonConfig {
+  """ The output directory where generated files will be placed """
+  output: string
+
+  """ If true, empties the output directory before generation """
+  clean?: bool
+
+  """ Override the VDL schema file entrypoint for this target """
+  schema?: string
+}
+
+""" Configuration for generating patterns """
+type PatternsConfig {
+  """ Generate helper functions for patterns """
+  genPatterns?: bool
+}
+
+""" Configuration for generating constants """
+type ConstsConfig {
+  """ Generate constant definitions """
+  genConsts?: bool
+}
+
+""" Configuration for generating RPC clients """
+type ClientConfig {
+  """ Generate RPC client code """
+  genClient?: bool
+}
+
+""" Configuration for generating RPC servers """
+type ServerConfig {
+  """ Generate RPC server interfaces and handlers """
+  genServer?: bool
+}
+
+"""
+Configuration for a specific generation target, only one target type should be set per entry
+"""
+type TargetConfig {
+  """ Go language target """
+  go?: GoConfig
+
+  """ TypeScript language target """
+  typescript?: TypeScriptConfig
+
+  """ Dart language target """
+  dart?: DartConfig
+
+  """ Python language target """
+  python?: PythonConfig
+
+  """ JSON Schema output target """
+  jsonschema?: JsonSchemaConfig
+
+  """ OpenAPI specification output target """
+  openapi?: OpenApiConfig
+
+  """ API Playground output target """
+  playground?: PlaygroundConfig
+
+  """ External plugin target """
+  plugin?: PluginConfig
+}
+
+""" Configuration for Go code generation """
+type GoConfig {
+  ...CommonConfig
+  ...PatternsConfig
+  ...ConstsConfig
+  ...ClientConfig
+  ...ServerConfig
+
+  """ The Go package name to use in generated files """
+  package: string
+}
+
+""" Configuration for TypeScript code generation """
+type TypeScriptConfig {
+  ...CommonConfig
+  ...PatternsConfig
+  ...ConstsConfig
+  ...ClientConfig
+  ...ServerConfig
+
+  """ File extension to append to import paths """
+  importExtension?: TypescriptImportExtension
+}
+
+""" Import extension options for TypeScript target """
+enum TypescriptImportExtension {
+  None = "none"
+  Js = ".js"
+  Ts = ".ts"
+}
+
+""" Configuration for Dart code generation """
+type DartConfig {
+  ...CommonConfig
+  ...PatternsConfig
+  ...ConstsConfig
+}
+
+""" Configuration for Python code generation """
+type PythonConfig {
+  ...CommonConfig
+  ...PatternsConfig
+  ...ConstsConfig
+}
+
+""" Configuration for JSON Schema generation """
+type JsonSchemaConfig {
+  ...CommonConfig
+
+  """ The $id of the generated schema """
+  id?: string
+
+  """ The name of the output file """
+  filename?: string
+}
+
+""" Configuration for OpenAPI specification generation """
+type OpenApiConfig {
+  ...CommonConfig
+
+  """ The name of the output file (can be .yml, .yaml or .json) """
+  filename?: string
+
+  """ API title """
+  title: string
+
+  """ API version """
+  version: string
+
+  """ API description """
+  description?: string
+
+  """ Base URL for API endpoints """
+  baseUrl?: string
+
+  """ Contact name """
+  contactName?: string
+
+  """ Contact email """
+  contactEmail?: string
+
+  """ License name """
+  licenseName?: string
+}
+
+""" Configuration for API playground generation """
+type PlaygroundConfig {
+  ...CommonConfig
+
+  """ Default base URL for API requests """
+  defaultBaseUrl?: string
+
+  """ Default headers to include in API requests """
+  defaultHeaders?: PlaygroundHeader[]
+}
+
+""" Header key-value pair for playground configuration """
+type PlaygroundHeader {
+  """ Header key """
+  key: string
+
+  """ Header value """
+  value: string
+}
+
+""" Configuration for external plugin generators """
+type PluginConfig {
+  ...CommonConfig
+
+  """ Command to execute the plugin (executable + args) """
+  command: string[]
+
+  """ Arbitrary options passed to the plugin (flat key-value pairs) """
+  options?: map<string>
+}

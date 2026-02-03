@@ -19,3 +19,9 @@ targets:
       output: ./toolchain/internal/core/ir/irtypes
       clean: true
       package: irtypes
+
+  - go:
+      schema: ./schemas/config.vdl
+      output: ./toolchain/internal/codegen/config/configtypes
+      clean: true
+      package: configtypes
