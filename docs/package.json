@@ -4,9 +4,10 @@
   "scripts": {
     "-": "Run commands using the root's Taskfile.yml file"
   },
-  "dependencies": {
+  "devDependencies": {
     "@astrojs/starlight": "0.37.6",
     "astro": "5.17.1",
-    "sharp": "0.34.5"
+    "sharp": "0.34.5",
+    "vite-plugin-static-copy": "3.2.0"
   }
 }
