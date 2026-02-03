@@ -1,46 +1,25 @@
 {
-  "types": [
+  "constants": [
     {
-      "name": "LegacyUser",
-      "deprecated": {},
-      "fields": [
-        {
-          "name": "id",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "name",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
+      "name": "OLD_LIMIT",
+      "deprecation": "Will be removed in v3.0",
+      "constType": "int",
+      "value": "50"
+    }
+  ],
+  "patterns": [
     {
-      "name": "OldUser",
-      "deprecated": {
-        "message": "Use UserV2 instead"
-      },
-      "fields": [
-        {
-          "name": "id",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
+      "name": "OldPattern",
+      "deprecation": "",
+      "template": "old:{id}",
+      "placeholders": ["id"]
     }
   ],
   "enums": [
     {
       "name": "OldStatus",
-      "deprecated": {},
-      "valueType": "string",
+      "deprecation": "",
+      "enumType": "string",
       "members": [
         {
           "name": "Active",
@@ -53,101 +32,71 @@
       ]
     }
   ],
-  "constants": [
+  "types": [
     {
-      "name": "OLD_LIMIT",
-      "deprecated": {
-        "message": "Will be removed in v3.0"
-      },
-      "valueType": "int",
-      "value": "50"
-    }
-  ],
-  "patterns": [
+      "name": "LegacyUser",
+      "deprecation": "",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
     {
-      "name": "OldPattern",
-      "deprecated": {},
-      "template": "old:{id}",
-      "placeholders": ["id"]
+      "name": "OldUser",
+      "deprecation": "Use UserV2 instead",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
     }
   ],
   "rpcs": [
     {
-      "name": "Legacy",
-      "procs": [
-        {
-          "rpcName": "Legacy",
-          "name": "OldMethod",
-          "deprecated": {},
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "result",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": [
-        {
-          "rpcName": "Legacy",
-          "name": "OldStream",
-          "deprecated": {
-            "message": "Use NewStream instead"
-          },
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "data",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        }
-      ]
+      "name": "Legacy"
     }
   ],
   "procedures": [
     {
       "rpcName": "Legacy",
       "name": "OldMethod",
-      "deprecated": {},
-      "input": [
+      "deprecation": "",
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "result",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -157,24 +106,24 @@
     {
       "rpcName": "Legacy",
       "name": "OldStream",
-      "deprecated": {
-        "message": "Use NewStream instead"
-      },
-      "input": [
+      "deprecation": "Use NewStream instead",
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "data",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]

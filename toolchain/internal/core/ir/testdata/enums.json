@@ -1,43 +1,11 @@
 {
-  "types": [
-    {
-      "name": "Order",
-      "fields": [
-        {
-          "name": "id",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "status",
-          "type": {
-            "kind": "enum",
-            "enum": "OrderStatus",
-            "enumInfo": {
-              "valueType": "string"
-            }
-          }
-        },
-        {
-          "name": "priority",
-          "type": {
-            "kind": "enum",
-            "enum": "Priority",
-            "enumInfo": {
-              "valueType": "int"
-            }
-          }
-        }
-      ]
-    }
-  ],
+  "constants": [],
+  "patterns": [],
   "enums": [
     {
       "name": "HttpMethod",
       "doc": "HTTP methods with explicit string values.",
-      "valueType": "string",
+      "enumType": "string",
       "members": [
         {
           "name": "Get",
@@ -60,7 +28,7 @@
     {
       "name": "OrderStatus",
       "doc": "Order status enum with implicit string values.",
-      "valueType": "string",
+      "enumType": "string",
       "members": [
         {
           "name": "Pending",
@@ -87,7 +55,7 @@
     {
       "name": "Priority",
       "doc": "Priority levels with explicit int values.",
-      "valueType": "int",
+      "enumType": "int",
       "members": [
         {
           "name": "Low",
@@ -108,10 +76,41 @@
       ]
     }
   ],
-  "constants": [],
-  "patterns": [],
+  "types": [
+    {
+      "name": "Order",
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "status",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "OrderStatus",
+            "enumType": "string"
+          }
+        },
+        {
+          "name": "priority",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "Priority",
+            "enumType": "int"
+          }
+        }
+      ]
+    }
+  ],
   "rpcs": [],
-  "procedures": null,
-  "streams": null,
+  "procedures": [],
+  "streams": [],
   "docs": []
 }

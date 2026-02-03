@@ -1,984 +1,58 @@
 {
-  "types": [
-    {
-      "name": "AllOptionalPrimitives",
-      "fields": [
-        {
-          "name": "optString",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "optInt",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        },
-        {
-          "name": "optFloat",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "float"
-          }
-        },
-        {
-          "name": "optBool",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "bool"
-          }
-        },
-        {
-          "name": "optDatetime",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "datetime"
-          }
-        }
-      ]
-    },
-    {
-      "name": "AllPrimitives",
-      "fields": [
-        {
-          "name": "stringField",
-          "doc": "String field documentation.",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "intField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        },
-        {
-          "name": "floatField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "float"
-          }
-        },
-        {
-          "name": "boolField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "bool"
-          }
-        },
-        {
-          "name": "datetimeField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "datetime"
-          }
-        }
-      ]
-    },
-    {
-      "name": "ArrayTypes",
-      "fields": [
-        {
-          "name": "strings",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "string"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "ints",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "int"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "floats",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "float"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "bools",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "bool"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "datetimes",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "datetime"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "matrix2d",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "int"
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "matrix3d",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "float"
-            },
-            "arrayDimensions": 3
-          }
-        },
-        {
-          "name": "optionalArray",
-          "optional": true,
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "string"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "optionalMatrix",
-          "optional": true,
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "int"
-            },
-            "arrayDimensions": 2
-          }
-        }
-      ]
-    },
-    {
-      "name": "ComplexCombinations",
-      "fields": [
-        {
-          "name": "arrayOfMaps",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "nestedArrayOfMaps",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "mapOfArrays",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "array",
-              "arrayItem": {
-                "kind": "primitive",
-                "primitive": "string"
-              },
-              "arrayDimensions": 1
-            }
-          }
-        },
-        {
-          "name": "mapOfMatrices",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "array",
-              "arrayItem": {
-                "kind": "primitive",
-                "primitive": "int"
-              },
-              "arrayDimensions": 2
-            }
-          }
-        },
-        {
-          "name": "mapOfArrayOfMaps",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "array",
-              "arrayItem": {
-                "kind": "map",
-                "mapValue": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                }
-              },
-              "arrayDimensions": 1
-            }
-          }
-        },
-        {
-          "name": "arrayOfMapOfArrays",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "array",
-                "arrayItem": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                },
-                "arrayDimensions": 1
-              }
-            },
-            "arrayDimensions": 1
-          }
-        }
-      ]
-    },
-    {
-      "name": "DeprecatedType",
-      "deprecated": {},
-      "fields": [
-        {
-          "name": "field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "DeprecatedWithMessage",
-      "deprecated": {
-        "message": "Use NewType instead"
-      },
-      "fields": [
-        {
-          "name": "field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "DocAndDeprecated",
-      "doc": "Documented but deprecated.",
-      "deprecated": {
-        "message": "Documentation preserved"
-      },
-      "fields": [
-        {
-          "name": "field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "InlineObjectTypes",
-      "fields": [
-        {
-          "name": "simple",
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "x",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "int"
-                  }
-                },
-                {
-                  "name": "y",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "int"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "withOptional",
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "required",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "string"
-                  }
-                },
-                {
-                  "name": "optional",
-                  "optional": true,
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "int"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "nested",
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "level1",
-                  "type": {
-                    "kind": "object",
-                    "object": {
-                      "fields": [
-                        {
-                          "name": "level2",
-                          "type": {
-                            "kind": "object",
-                            "object": {
-                              "fields": [
-                                {
-                                  "name": "value",
-                                  "type": {
-                                    "kind": "primitive",
-                                    "primitive": "string"
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "optionalObject",
-          "optional": true,
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "data",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "string"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "arrayOfObjects",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "id",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "string"
-                    }
-                  },
-                  {
-                    "name": "name",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "mapOfObjects",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "key",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "string"
-                    }
-                  },
-                  {
-                    "name": "value",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "int"
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Level1",
-      "fields": [
-        {
-          "name": "level1Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Level2",
-      "fields": [
-        {
-          "name": "level1Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "level2Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Level3",
-      "fields": [
-        {
-          "name": "level1Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "level2Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        },
-        {
-          "name": "level3Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "bool"
-          }
-        }
-      ]
-    },
-    {
-      "name": "MapTypes",
-      "fields": [
-        {
-          "name": "stringMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "primitive",
-              "primitive": "string"
-            }
-          }
-        },
-        {
-          "name": "intMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "primitive",
-              "primitive": "int"
-            }
-          }
-        },
-        {
-          "name": "floatMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "primitive",
-              "primitive": "float"
-            }
-          }
-        },
-        {
-          "name": "boolMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "primitive",
-              "primitive": "bool"
-            }
-          }
-        },
-        {
-          "name": "datetimeMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "primitive",
-              "primitive": "datetime"
-            }
-          }
-        },
-        {
-          "name": "nestedMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          }
-        },
-        {
-          "name": "deeplyNestedMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "map",
-                "mapValue": {
-                  "kind": "primitive",
-                  "primitive": "int"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "optionalMap",
-          "optional": true,
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "primitive",
-              "primitive": "string"
-            }
-          }
-        },
-        {
-          "name": "optionalNestedMap",
-          "optional": true,
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "MultiSpread",
-      "fields": [
-        {
-          "name": "level1Field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "optString",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "optInt",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        },
-        {
-          "name": "optFloat",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "float"
-          }
-        },
-        {
-          "name": "optBool",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "bool"
-          }
-        },
-        {
-          "name": "optDatetime",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "datetime"
-          }
-        },
-        {
-          "name": "ownField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "datetime"
-          }
-        }
-      ]
-    },
-    {
-      "name": "TypeReferences",
-      "fields": [
-        {
-          "name": "primitiveHolder",
-          "type": {
-            "kind": "type",
-            "type": "AllPrimitives"
-          }
-        },
-        {
-          "name": "stringEnumRef",
-          "type": {
-            "kind": "enum",
-            "enum": "StringEnumImplicit",
-            "enumInfo": {
-              "valueType": "string"
-            }
-          }
-        },
-        {
-          "name": "intEnumRef",
-          "type": {
-            "kind": "enum",
-            "enum": "IntEnum",
-            "enumInfo": {
-              "valueType": "int"
-            }
-          }
-        },
-        {
-          "name": "typeArray",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "type",
-              "type": "AllPrimitives"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "enumArray",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "enum",
-              "enum": "StringEnumExplicit",
-              "enumInfo": {
-                "valueType": "string"
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "typeMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "type",
-              "type": "AllPrimitives"
-            }
-          }
-        },
-        {
-          "name": "enumMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "enum",
-              "enum": "IntEnum",
-              "enumInfo": {
-                "valueType": "int"
-              }
-            }
-          }
-        },
-        {
-          "name": "typeMatrix",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "type",
-              "type": "AllPrimitives"
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "enumMapArray",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "array",
-              "arrayItem": {
-                "kind": "enum",
-                "enum": "StringEnumImplicit",
-                "enumInfo": {
-                  "valueType": "string"
-                }
-              },
-              "arrayDimensions": 1
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "enums": [
-    {
-      "name": "DeprecatedEnum",
-      "deprecated": {},
-      "valueType": "string",
-      "members": [
-        {
-          "name": "Value",
-          "value": "Value"
-        }
-      ]
-    },
-    {
-      "name": "DeprecatedEnumWithMessage",
-      "deprecated": {
-        "message": "Use NewEnum instead"
-      },
-      "valueType": "int",
-      "members": [
-        {
-          "name": "Value",
-          "value": "1"
-        }
-      ]
-    },
-    {
-      "name": "IntEnum",
-      "doc": "Integer enum with explicit values.",
-      "valueType": "int",
-      "members": [
-        {
-          "name": "Low",
-          "value": "1"
-        },
-        {
-          "name": "Medium",
-          "value": "5"
-        },
-        {
-          "name": "High",
-          "value": "10"
-        },
-        {
-          "name": "Critical",
-          "value": "100"
-        }
-      ]
-    },
-    {
-      "name": "StringEnumExplicit",
-      "doc": "String enum with explicit values.",
-      "valueType": "string",
-      "members": [
-        {
-          "name": "Get",
-          "value": "GET"
-        },
-        {
-          "name": "Post",
-          "value": "POST"
-        },
-        {
-          "name": "Put",
-          "value": "PUT"
-        },
-        {
-          "name": "Delete",
-          "value": "DELETE"
-        }
-      ]
-    },
-    {
-      "name": "StringEnumImplicit",
-      "doc": "String enum with implicit values.",
-      "valueType": "string",
-      "members": [
-        {
-          "name": "Active",
-          "value": "Active"
-        },
-        {
-          "name": "Inactive",
-          "value": "Inactive"
-        },
-        {
-          "name": "Pending",
-          "value": "Pending"
-        }
-      ]
-    }
-  ],
   "constants": [
     {
       "name": "BOOL_FALSE",
       "doc": "Boolean constant (false).",
-      "valueType": "bool",
+      "constType": "bool",
       "value": "false"
     },
     {
       "name": "BOOL_TRUE",
       "doc": "Boolean constant (true).",
-      "valueType": "bool",
+      "constType": "bool",
       "value": "true"
     },
     {
       "name": "DEPRECATED_CONST",
-      "deprecated": {},
-      "valueType": "string",
+      "deprecation": "",
+      "constType": "string",
       "value": "old"
     },
     {
       "name": "DEPRECATED_CONST_MSG",
-      "deprecated": {
-        "message": "Use NEW_CONST instead"
-      },
-      "valueType": "int",
+      "deprecation": "Use NEW_CONST instead",
+      "constType": "int",
       "value": "123"
     },
     {
       "name": "FLOAT_CONST",
       "doc": "Float constant.",
-      "valueType": "float",
+      "constType": "float",
       "value": "3.14159"
     },
     {
       "name": "INT_CONST",
       "doc": "Integer constant.",
-      "valueType": "int",
+      "constType": "int",
       "value": "42"
     },
     {
       "name": "STRING_CONST",
       "doc": "String constant.",
-      "valueType": "string",
+      "constType": "string",
       "value": "hello world"
     }
   ],
   "patterns": [
     {
       "name": "DeprecatedPattern",
-      "deprecated": {},
+      "deprecation": "",
       "template": "old:{id}",
       "placeholders": ["id"]
     },
     {
       "name": "DeprecatedPatternMsg",
-      "deprecated": {
-        "message": "Use NewPattern instead"
-      },
+      "deprecation": "Use NewPattern instead",
       "template": "legacy:{id}",
       "placeholders": ["id"]
     },
@@ -1001,624 +75,972 @@
       "placeholders": []
     }
   ],
-  "rpcs": [
+  "enums": [
     {
-      "name": "ComprehensiveService",
-      "doc": "Comprehensive RPC service.\nTests all RPC features.",
-      "procs": [
+      "name": "DeprecatedEnum",
+      "deprecation": "",
+      "enumType": "string",
+      "members": [
         {
-          "rpcName": "ComprehensiveService",
-          "name": "ComplexTypes",
-          "doc": "Procedure with complex types.",
-          "input": [
-            {
-              "name": "data",
-              "type": {
-                "kind": "type",
-                "type": "AllPrimitives"
-              }
-            },
-            {
-              "name": "items",
-              "type": {
-                "kind": "array",
-                "arrayItem": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                },
-                "arrayDimensions": 1
-              }
-            },
-            {
-              "name": "metadata",
-              "type": {
-                "kind": "map",
-                "mapValue": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                }
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "results",
-              "type": {
-                "kind": "array",
-                "arrayItem": {
-                  "kind": "type",
-                  "type": "AllPrimitives"
-                },
-                "arrayDimensions": 1
-              }
-            },
-            {
-              "name": "lookup",
-              "type": {
-                "kind": "map",
-                "mapValue": {
-                  "kind": "primitive",
-                  "primitive": "int"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "InlineObjects",
-          "doc": "Procedure with inline objects.",
-          "input": [
-            {
-              "name": "point",
-              "type": {
-                "kind": "object",
-                "object": {
-                  "fields": [
-                    {
-                      "name": "x",
-                      "type": {
-                        "kind": "primitive",
-                        "primitive": "float"
-                      }
-                    },
-                    {
-                      "name": "y",
-                      "type": {
-                        "kind": "primitive",
-                        "primitive": "float"
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "bounds",
-              "type": {
-                "kind": "object",
-                "object": {
-                  "fields": [
-                    {
-                      "name": "min",
-                      "type": {
-                        "kind": "object",
-                        "object": {
-                          "fields": [
-                            {
-                              "name": "x",
-                              "type": {
-                                "kind": "primitive",
-                                "primitive": "float"
-                              }
-                            },
-                            {
-                              "name": "y",
-                              "type": {
-                                "kind": "primitive",
-                                "primitive": "float"
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      "name": "max",
-                      "type": {
-                        "kind": "object",
-                        "object": {
-                          "fields": [
-                            {
-                              "name": "x",
-                              "type": {
-                                "kind": "primitive",
-                                "primitive": "float"
-                              }
-                            },
-                            {
-                              "name": "y",
-                              "type": {
-                                "kind": "primitive",
-                                "primitive": "float"
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "OptionalFields",
-          "doc": "Procedure with optional fields.",
-          "input": [
-            {
-              "name": "required",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "optional",
-              "optional": true,
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "optionalArray",
-              "optional": true,
-              "type": {
-                "kind": "array",
-                "arrayItem": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                },
-                "arrayDimensions": 1
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "data",
-              "optional": true,
-              "type": {
-                "kind": "type",
-                "type": "AllPrimitives"
-              }
-            },
-            {
-              "name": "count",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "SimplePrimitive",
-          "doc": "Simple procedure with primitives.",
-          "input": [
-            {
-              "name": "name",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "count",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "success",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            },
-            {
-              "name": "message",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "WithEnums",
-          "doc": "Procedure with enum types.",
-          "input": [
-            {
-              "name": "status",
-              "type": {
-                "kind": "enum",
-                "enum": "StringEnumImplicit",
-                "enumInfo": {
-                  "valueType": "string"
-                }
-              }
-            },
-            {
-              "name": "priority",
-              "type": {
-                "kind": "enum",
-                "enum": "IntEnum",
-                "enumInfo": {
-                  "valueType": "int"
-                }
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "method",
-              "type": {
-                "kind": "enum",
-                "enum": "StringEnumExplicit",
-                "enumInfo": {
-                  "valueType": "string"
-                }
-              }
-            },
-            {
-              "name": "newStatus",
-              "type": {
-                "kind": "enum",
-                "enum": "StringEnumImplicit",
-                "enumInfo": {
-                  "valueType": "string"
-                }
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "WithSpreads",
-          "doc": "Procedure with spreads in input/output.",
-          "input": [
-            {
-              "name": "stringField",
-              "doc": "String field documentation.",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "intField",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "floatField",
-              "type": {
-                "kind": "primitive",
-                "primitive": "float"
-              }
-            },
-            {
-              "name": "boolField",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            },
-            {
-              "name": "datetimeField",
-              "type": {
-                "kind": "primitive",
-                "primitive": "datetime"
-              }
-            },
-            {
-              "name": "extraField",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "level1Field",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "level2Field",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "level3Field",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            },
-            {
-              "name": "result",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": [
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "ComplexStream",
-          "doc": "Stream with complex types.",
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "filters",
-              "type": {
-                "kind": "map",
-                "mapValue": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                }
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "eventType",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "payload",
-              "type": {
-                "kind": "map",
-                "mapValue": {
-                  "kind": "primitive",
-                  "primitive": "string"
-                }
-              }
-            },
-            {
-              "name": "sequence",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "ComprehensiveService",
-          "name": "SimpleStream",
-          "doc": "Simple stream.",
-          "input": [
-            {
-              "name": "channelId",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "message",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "timestamp",
-              "type": {
-                "kind": "primitive",
-                "primitive": "datetime"
-              }
-            }
-          ]
-        }
-      ],
-      "docs": ["# Section Header\nStandalone documentation inside RPC."]
-    },
-    {
-      "name": "DeprecatedRpc",
-      "procs": [
-        {
-          "rpcName": "DeprecatedRpc",
-          "name": "DeprecatedProc",
-          "deprecated": {},
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "ok",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "DeprecatedRpc",
-          "name": "DeprecatedProcMsg",
-          "deprecated": {
-            "message": "Use NewProc instead"
-          },
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "ok",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": [
-        {
-          "rpcName": "DeprecatedRpc",
-          "name": "DeprecatedStream",
-          "deprecated": {},
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "data",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "DeprecatedRpc",
-          "name": "DeprecatedStreamMsg",
-          "deprecated": {
-            "message": "Use NewStream instead"
-          },
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "data",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
+          "name": "Value",
+          "value": "Value"
         }
       ]
     },
     {
-      "name": "FullyDeprecatedRpc",
-      "deprecated": {},
-      "procs": [
+      "name": "DeprecatedEnumWithMessage",
+      "deprecation": "Use NewEnum instead",
+      "enumType": "int",
+      "members": [
         {
-          "rpcName": "FullyDeprecatedRpc",
-          "name": "SomeProc",
-          "input": [
-            {
-              "name": "x",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "y",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ]
+          "name": "Value",
+          "value": "1"
         }
-      ],
-      "streams": []
+      ]
+    },
+    {
+      "name": "IntEnum",
+      "doc": "Integer enum with explicit values.",
+      "enumType": "int",
+      "members": [
+        {
+          "name": "Low",
+          "value": "1"
+        },
+        {
+          "name": "Medium",
+          "value": "5"
+        },
+        {
+          "name": "High",
+          "value": "10"
+        },
+        {
+          "name": "Critical",
+          "value": "100"
+        }
+      ]
+    },
+    {
+      "name": "StringEnumExplicit",
+      "doc": "String enum with explicit values.",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Get",
+          "value": "GET"
+        },
+        {
+          "name": "Post",
+          "value": "POST"
+        },
+        {
+          "name": "Put",
+          "value": "PUT"
+        },
+        {
+          "name": "Delete",
+          "value": "DELETE"
+        }
+      ]
+    },
+    {
+      "name": "StringEnumImplicit",
+      "doc": "String enum with implicit values.",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Active",
+          "value": "Active"
+        },
+        {
+          "name": "Inactive",
+          "value": "Inactive"
+        },
+        {
+          "name": "Pending",
+          "value": "Pending"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AllOptionalPrimitives",
+      "fields": [
+        {
+          "name": "optString",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "optInt",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "optFloat",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "float"
+          }
+        },
+        {
+          "name": "optBool",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        },
+        {
+          "name": "optDatetime",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AllPrimitives",
+      "fields": [
+        {
+          "name": "stringField",
+          "doc": "String field documentation.",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "intField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "floatField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "float"
+          }
+        },
+        {
+          "name": "boolField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        },
+        {
+          "name": "datetimeField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ArrayTypes",
+      "fields": [
+        {
+          "name": "strings",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "ints",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "floats",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "float"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "bools",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "bool"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "datetimes",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "matrix2d",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "matrix3d",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "float"
+            },
+            "arrayDims": 3
+          }
+        },
+        {
+          "name": "optionalArray",
+          "optional": true,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "optionalMatrix",
+          "optional": true,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            },
+            "arrayDims": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "ComplexCombinations",
+      "fields": [
+        {
+          "name": "arrayOfMaps",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              }
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "nestedArrayOfMaps",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "int"
+              }
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "mapOfArrays",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              },
+              "arrayDims": 1
+            }
+          }
+        },
+        {
+          "name": "mapOfMatrices",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "int"
+              },
+              "arrayDims": 2
+            }
+          }
+        },
+        {
+          "name": "mapOfArrayOfMaps",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "map",
+                "mapType": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                }
+              },
+              "arrayDims": 1
+            }
+          }
+        },
+        {
+          "name": "arrayOfMapOfArrays",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "array",
+                "arrayType": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                },
+                "arrayDims": 1
+              }
+            },
+            "arrayDims": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "DeprecatedType",
+      "deprecation": "",
+      "fields": [
+        {
+          "name": "field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "DeprecatedWithMessage",
+      "deprecation": "Use NewType instead",
+      "fields": [
+        {
+          "name": "field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "DocAndDeprecated",
+      "doc": "Documented but deprecated.",
+      "deprecation": "Documentation preserved",
+      "fields": [
+        {
+          "name": "field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "InlineObjectTypes",
+      "fields": [
+        {
+          "name": "simple",
+          "optional": false,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "x",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              },
+              {
+                "name": "y",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "withOptional",
+          "optional": false,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "required",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                }
+              },
+              {
+                "name": "optional",
+                "optional": true,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "nested",
+          "optional": false,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "level1",
+                "optional": false,
+                "typeRef": {
+                  "kind": "object",
+                  "objectFields": [
+                    {
+                      "name": "level2",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "object",
+                        "objectFields": [
+                          {
+                            "name": "value",
+                            "optional": false,
+                            "typeRef": {
+                              "kind": "primitive",
+                              "primitiveName": "string"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "optionalObject",
+          "optional": true,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "data",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "arrayOfObjects",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "id",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "name": "name",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                }
+              ]
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "mapOfObjects",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "key",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "name": "value",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Level1",
+      "fields": [
+        {
+          "name": "level1Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Level2",
+      "fields": [
+        {
+          "name": "level1Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "level2Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Level3",
+      "fields": [
+        {
+          "name": "level1Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "level2Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "level3Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "name": "MapTypes",
+      "fields": [
+        {
+          "name": "stringMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        },
+        {
+          "name": "intMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          }
+        },
+        {
+          "name": "floatMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "primitive",
+              "primitiveName": "float"
+            }
+          }
+        },
+        {
+          "name": "boolMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "primitive",
+              "primitiveName": "bool"
+            }
+          }
+        },
+        {
+          "name": "datetimeMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          }
+        },
+        {
+          "name": "nestedMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "deeplyNestedMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "map",
+                "mapType": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "optionalMap",
+          "optional": true,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        },
+        {
+          "name": "optionalNestedMap",
+          "optional": true,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "bool"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MultiSpread",
+      "fields": [
+        {
+          "name": "level1Field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "optString",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "optInt",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "optFloat",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "float"
+          }
+        },
+        {
+          "name": "optBool",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        },
+        {
+          "name": "optDatetime",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "datetime"
+          }
+        },
+        {
+          "name": "ownField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TypeReferences",
+      "fields": [
+        {
+          "name": "primitiveHolder",
+          "optional": false,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "AllPrimitives"
+          }
+        },
+        {
+          "name": "stringEnumRef",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "StringEnumImplicit",
+            "enumType": "string"
+          }
+        },
+        {
+          "name": "intEnumRef",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "IntEnum",
+            "enumType": "int"
+          }
+        },
+        {
+          "name": "typeArray",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "AllPrimitives"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "enumArray",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "enum",
+              "enumName": "StringEnumExplicit",
+              "enumType": "string"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "typeMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "type",
+              "typeName": "AllPrimitives"
+            }
+          }
+        },
+        {
+          "name": "enumMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "enum",
+              "enumName": "IntEnum",
+              "enumType": "int"
+            }
+          }
+        },
+        {
+          "name": "typeMatrix",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "AllPrimitives"
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "enumMapArray",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "enum",
+                "enumName": "StringEnumImplicit",
+                "enumType": "string"
+              },
+              "arrayDims": 1
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "rpcs": [
+    {
+      "name": "ComprehensiveService",
+      "doc": "Comprehensive RPC service.\nTests all RPC features."
+    },
+    {
+      "name": "DeprecatedRpc"
+    },
+    {
+      "name": "FullyDeprecatedRpc",
+      "deprecation": ""
     },
     {
       "name": "FullyDeprecatedRpcMsg",
-      "deprecated": {
-        "message": "Entire service deprecated"
-      },
-      "procs": [
-        {
-          "rpcName": "FullyDeprecatedRpcMsg",
-          "name": "AnotherProc",
-          "input": [
-            {
-              "name": "a",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "b",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": []
+      "deprecation": "Entire service deprecated"
     }
   ],
   "procedures": [
@@ -1626,55 +1048,60 @@
       "rpcName": "ComprehensiveService",
       "name": "ComplexTypes",
       "doc": "Procedure with complex types.",
-      "input": [
+      "inputFields": [
         {
           "name": "data",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "type",
-            "type": "AllPrimitives"
+            "typeName": "AllPrimitives"
           }
         },
         {
           "name": "items",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         },
         {
           "name": "metadata",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             }
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "results",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "type",
-              "type": "AllPrimitives"
+              "typeName": "AllPrimitives"
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         },
         {
           "name": "lookup",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "primitive",
-              "primitive": "int"
+              "primitiveName": "int"
             }
           }
         }
@@ -1684,89 +1111,91 @@
       "rpcName": "ComprehensiveService",
       "name": "InlineObjects",
       "doc": "Procedure with inline objects.",
-      "input": [
+      "inputFields": [
         {
           "name": "point",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "x",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "float"
-                  }
-                },
-                {
-                  "name": "y",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "float"
-                  }
+            "objectFields": [
+              {
+                "name": "x",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "float"
                 }
-              ]
-            }
+              },
+              {
+                "name": "y",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "float"
+                }
+              }
+            ]
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "bounds",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "min",
-                  "type": {
-                    "kind": "object",
-                    "object": {
-                      "fields": [
-                        {
-                          "name": "x",
-                          "type": {
-                            "kind": "primitive",
-                            "primitive": "float"
-                          }
-                        },
-                        {
-                          "name": "y",
-                          "type": {
-                            "kind": "primitive",
-                            "primitive": "float"
-                          }
-                        }
-                      ]
+            "objectFields": [
+              {
+                "name": "min",
+                "optional": false,
+                "typeRef": {
+                  "kind": "object",
+                  "objectFields": [
+                    {
+                      "name": "x",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "primitive",
+                        "primitiveName": "float"
+                      }
+                    },
+                    {
+                      "name": "y",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "primitive",
+                        "primitiveName": "float"
+                      }
                     }
-                  }
-                },
-                {
-                  "name": "max",
-                  "type": {
-                    "kind": "object",
-                    "object": {
-                      "fields": [
-                        {
-                          "name": "x",
-                          "type": {
-                            "kind": "primitive",
-                            "primitive": "float"
-                          }
-                        },
-                        {
-                          "name": "y",
-                          "type": {
-                            "kind": "primitive",
-                            "primitive": "float"
-                          }
-                        }
-                      ]
-                    }
-                  }
+                  ]
                 }
-              ]
-            }
+              },
+              {
+                "name": "max",
+                "optional": false,
+                "typeRef": {
+                  "kind": "object",
+                  "objectFields": [
+                    {
+                      "name": "x",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "primitive",
+                        "primitiveName": "float"
+                      }
+                    },
+                    {
+                      "name": "y",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "primitive",
+                        "primitiveName": "float"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
@@ -1775,49 +1204,51 @@
       "rpcName": "ComprehensiveService",
       "name": "OptionalFields",
       "doc": "Procedure with optional fields.",
-      "input": [
+      "inputFields": [
         {
           "name": "required",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "optional",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "optionalArray",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "data",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "type",
-            "type": "AllPrimitives"
+            "typeName": "AllPrimitives"
           }
         },
         {
           "name": "count",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -1826,35 +1257,39 @@
       "rpcName": "ComprehensiveService",
       "name": "SimplePrimitive",
       "doc": "Simple procedure with primitives.",
-      "input": [
+      "inputFields": [
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "count",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "success",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         },
         {
           "name": "message",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -1863,47 +1298,43 @@
       "rpcName": "ComprehensiveService",
       "name": "WithEnums",
       "doc": "Procedure with enum types.",
-      "input": [
+      "inputFields": [
         {
           "name": "status",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "enum",
-            "enum": "StringEnumImplicit",
-            "enumInfo": {
-              "valueType": "string"
-            }
+            "enumName": "StringEnumImplicit",
+            "enumType": "string"
           }
         },
         {
           "name": "priority",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "enum",
-            "enum": "IntEnum",
-            "enumInfo": {
-              "valueType": "int"
-            }
+            "enumName": "IntEnum",
+            "enumType": "int"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "method",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "enum",
-            "enum": "StringEnumExplicit",
-            "enumInfo": {
-              "valueType": "string"
-            }
+            "enumName": "StringEnumExplicit",
+            "enumType": "string"
           }
         },
         {
           "name": "newStatus",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "enum",
-            "enum": "StringEnumImplicit",
-            "enumInfo": {
-              "valueType": "string"
-            }
+            "enumName": "StringEnumImplicit",
+            "enumType": "string"
           }
         }
       ]
@@ -1912,78 +1343,88 @@
       "rpcName": "ComprehensiveService",
       "name": "WithSpreads",
       "doc": "Procedure with spreads in input/output.",
-      "input": [
+      "inputFields": [
         {
           "name": "stringField",
           "doc": "String field documentation.",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "intField",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "floatField",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "float"
+            "primitiveName": "float"
           }
         },
         {
           "name": "boolField",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         },
         {
           "name": "datetimeField",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "extraField",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "level1Field",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "level2Field",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "level3Field",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         },
         {
           "name": "result",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         }
       ]
@@ -1991,22 +1432,24 @@
     {
       "rpcName": "DeprecatedRpc",
       "name": "DeprecatedProc",
-      "deprecated": {},
-      "input": [
+      "deprecation": "",
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "ok",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         }
       ]
@@ -2014,24 +1457,24 @@
     {
       "rpcName": "DeprecatedRpc",
       "name": "DeprecatedProcMsg",
-      "deprecated": {
-        "message": "Use NewProc instead"
-      },
-      "input": [
+      "deprecation": "Use NewProc instead",
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "ok",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         }
       ]
@@ -2039,21 +1482,23 @@
     {
       "rpcName": "FullyDeprecatedRpc",
       "name": "SomeProc",
-      "input": [
+      "inputFields": [
         {
           "name": "x",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "y",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -2061,21 +1506,23 @@
     {
       "rpcName": "FullyDeprecatedRpcMsg",
       "name": "AnotherProc",
-      "input": [
+      "inputFields": [
         {
           "name": "a",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "b",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -2086,48 +1533,53 @@
       "rpcName": "ComprehensiveService",
       "name": "ComplexStream",
       "doc": "Stream with complex types.",
-      "input": [
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "filters",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             }
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "eventType",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "payload",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             }
           }
         },
         {
           "name": "sequence",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -2136,28 +1588,31 @@
       "rpcName": "ComprehensiveService",
       "name": "SimpleStream",
       "doc": "Simple stream.",
-      "input": [
+      "inputFields": [
         {
           "name": "channelId",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "message",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         }
       ]
@@ -2165,22 +1620,24 @@
     {
       "rpcName": "DeprecatedRpc",
       "name": "DeprecatedStream",
-      "deprecated": {},
-      "input": [
+      "deprecation": "",
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "data",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -2188,24 +1645,24 @@
     {
       "rpcName": "DeprecatedRpc",
       "name": "DeprecatedStreamMsg",
-      "deprecated": {
-        "message": "Use NewStream instead"
-      },
-      "input": [
+      "deprecation": "Use NewStream instead",
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "data",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]

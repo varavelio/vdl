@@ -1,20 +1,25 @@
 {
+  "constants": [],
+  "patterns": [],
+  "enums": [],
   "types": [
     {
       "name": "AuditFields",
       "fields": [
         {
           "name": "createdAt",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "updatedAt",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         }
       ]
@@ -24,16 +29,18 @@
       "fields": [
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -43,30 +50,34 @@
       "fields": [
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "active",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         }
       ]
@@ -76,9 +87,10 @@
       "fields": [
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         }
       ]
@@ -88,40 +100,41 @@
       "fields": [
         {
           "name": "createdAt",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "updatedAt",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
     }
   ],
-  "enums": [],
-  "constants": [],
-  "patterns": [],
   "rpcs": [],
-  "procedures": null,
-  "streams": null,
+  "procedures": [],
+  "streams": [],
   "docs": []
 }

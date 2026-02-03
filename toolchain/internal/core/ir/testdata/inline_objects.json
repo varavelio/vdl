@@ -1,44 +1,50 @@
 {
+  "constants": [],
+  "patterns": [],
+  "enums": [],
   "types": [
     {
       "name": "Address",
       "fields": [
         {
           "name": "street",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "city",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "location",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "lat",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "float"
-                  }
-                },
-                {
-                  "name": "lng",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "float"
-                  }
+            "objectFields": [
+              {
+                "name": "lat",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "float"
                 }
-              ]
-            }
+              },
+              {
+                "name": "lng",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "float"
+                }
+              }
+            ]
           }
         }
       ]
@@ -48,57 +54,60 @@
       "fields": [
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "headquarters",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "address",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "string"
-                  }
-                },
-                {
-                  "name": "floors",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "int"
-                  }
-                },
-                {
-                  "name": "amenities",
-                  "type": {
-                    "kind": "object",
-                    "object": {
-                      "fields": [
-                        {
-                          "name": "hasGym",
-                          "type": {
-                            "kind": "primitive",
-                            "primitive": "bool"
-                          }
-                        },
-                        {
-                          "name": "hasCafeteria",
-                          "type": {
-                            "kind": "primitive",
-                            "primitive": "bool"
-                          }
-                        }
-                      ]
-                    }
-                  }
+            "objectFields": [
+              {
+                "name": "address",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
                 }
-              ]
-            }
+              },
+              {
+                "name": "floors",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              },
+              {
+                "name": "amenities",
+                "optional": false,
+                "typeRef": {
+                  "kind": "object",
+                  "objectFields": [
+                    {
+                      "name": "hasGym",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "primitive",
+                        "primitiveName": "bool"
+                      }
+                    },
+                    {
+                      "name": "hasCafeteria",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "primitive",
+                        "primitiveName": "bool"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
@@ -108,26 +117,25 @@
       "fields": [
         {
           "name": "latitude",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "float"
+            "primitiveName": "float"
           }
         },
         {
           "name": "longitude",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "float"
+            "primitiveName": "float"
           }
         }
       ]
     }
   ],
-  "enums": [],
-  "constants": [],
-  "patterns": [],
   "rpcs": [],
-  "procedures": null,
-  "streams": null,
+  "procedures": [],
+  "streams": [],
   "docs": []
 }

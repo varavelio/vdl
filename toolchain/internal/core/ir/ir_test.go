@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
 )
 
@@ -132,43 +133,8 @@ func TestNormalizeDoc(t *testing.T) {
 	}
 }
 
-// TestToJSON tests the Schema.ToJSON method.
-func TestToJSON(t *testing.T) {
-	schema := &Schema{
-		Types: []Type{
-			{
-				Name: "User",
-				Fields: []Field{
-					{
-						Name: "id",
-						Type: TypeRef{Kind: TypeKindPrimitive, Primitive: PrimitiveString},
-					},
-				},
-			},
-		},
-		Enums:     []Enum{},
-		Constants: []Constant{},
-		Patterns:  []Pattern{},
-		RPCs:      []RPC{},
-	}
-
-	jsonBytes, err := schema.ToJSON()
-	require.NoError(t, err)
-
-	// Parse back to verify it's valid JSON
-	var parsed Schema
-	err = json.Unmarshal(jsonBytes, &parsed)
-	require.NoError(t, err)
-
-	assert.Equal(t, "User", parsed.Types[0].Name)
-	assert.Equal(t, "id", parsed.Types[0].Fields[0].Name)
-}
-
 // TestSorting verifies that all collections are sorted alphabetically.
 func TestSorting(t *testing.T) {
-	// Create a program-like structure that would result in unsorted output
-	// The IR should sort everything alphabetically
-
 	fs := vfs.New()
 
 	// Parse a schema with multiple types in non-alphabetical order
@@ -223,15 +189,19 @@ func TestSorting(t *testing.T) {
 	assert.Equal(t, "APattern", schema.Patterns[0].Name)
 	assert.Equal(t, "ZPattern", schema.Patterns[1].Name)
 
-	// Check services are sorted
-	require.Len(t, schema.RPCs, 2)
-	assert.Equal(t, "AService", schema.RPCs[0].Name)
-	assert.Equal(t, "ZService", schema.RPCs[1].Name)
+	// Check RPCs are sorted
+	require.Len(t, schema.Rpcs, 2)
+	assert.Equal(t, "AService", schema.Rpcs[0].Name)
+	assert.Equal(t, "ZService", schema.Rpcs[1].Name)
 
-	// Check procs within service are sorted
-	require.Len(t, schema.RPCs[1].Procs, 2)
-	assert.Equal(t, "AProc", schema.RPCs[1].Procs[0].Name)
-	assert.Equal(t, "ZProc", schema.RPCs[1].Procs[1].Name)
+	// Check procedures are sorted (by RpcName, then Name)
+	require.Len(t, schema.Procedures, 3)
+	assert.Equal(t, "AService", schema.Procedures[0].RpcName)
+	assert.Equal(t, "Only", schema.Procedures[0].Name)
+	assert.Equal(t, "ZService", schema.Procedures[1].RpcName)
+	assert.Equal(t, "AProc", schema.Procedures[1].Name)
+	assert.Equal(t, "ZService", schema.Procedures[2].RpcName)
+	assert.Equal(t, "ZProc", schema.Procedures[2].Name)
 }
 
 // TestSpreadFlattening verifies that spreads are properly expanded.
@@ -259,7 +229,7 @@ func TestSpreadFlattening(t *testing.T) {
 	schema := FromProgram(program)
 
 	// Find Extended type
-	var extended *Type
+	var extended *irtypes.TypeDef
 	for i := range schema.Types {
 		if schema.Types[i].Name == "Extended" {
 			extended = &schema.Types[i]
@@ -278,8 +248,8 @@ func TestSpreadFlattening(t *testing.T) {
 	assert.Equal(t, "active", extended.Fields[3].Name)
 }
 
-// TestEnumInfo verifies that enum references include EnumInfo.
-func TestEnumInfo(t *testing.T) {
+// TestEnumTypeInfo verifies that enum references include EnumType.
+func TestEnumTypeInfo(t *testing.T) {
 	fs := vfs.New()
 
 	content := `
@@ -308,7 +278,7 @@ func TestEnumInfo(t *testing.T) {
 	schema := FromProgram(program)
 
 	// Find Item type
-	var item *Type
+	var item *irtypes.TypeDef
 	for i := range schema.Types {
 		if schema.Types[i].Name == "Item" {
 			item = &schema.Types[i]
@@ -318,32 +288,34 @@ func TestEnumInfo(t *testing.T) {
 	require.NotNil(t, item)
 	require.Len(t, item.Fields, 3)
 
-	// Find fields by name (they're sorted alphabetically: name, priority, status)
-	fieldsByName := make(map[string]*Field)
+	// Find fields by name (they're in original order: status, priority, name)
+	fieldsByName := make(map[string]*irtypes.Field)
 	for i := range item.Fields {
 		fieldsByName[item.Fields[i].Name] = &item.Fields[i]
 	}
 
-	// status field should have EnumInfo with string type
+	// status field should have EnumType with string type
 	statusField := fieldsByName["status"]
 	require.NotNil(t, statusField)
-	assert.Equal(t, TypeKindEnum, statusField.Type.Kind)
-	assert.Equal(t, "Status", statusField.Type.Enum)
-	require.NotNil(t, statusField.Type.EnumInfo)
-	assert.Equal(t, EnumValueTypeString, statusField.Type.EnumInfo.ValueType)
+	assert.Equal(t, irtypes.TypeKindEnum, statusField.TypeRef.Kind)
+	require.NotNil(t, statusField.TypeRef.EnumName)
+	assert.Equal(t, "Status", *statusField.TypeRef.EnumName)
+	require.NotNil(t, statusField.TypeRef.EnumType)
+	assert.Equal(t, irtypes.EnumTypeString, *statusField.TypeRef.EnumType)
 
-	// priority field should have EnumInfo with int type
+	// priority field should have EnumType with int type
 	priorityField := fieldsByName["priority"]
 	require.NotNil(t, priorityField)
-	assert.Equal(t, TypeKindEnum, priorityField.Type.Kind)
-	assert.Equal(t, "Priority", priorityField.Type.Enum)
-	require.NotNil(t, priorityField.Type.EnumInfo)
-	assert.Equal(t, EnumValueTypeInt, priorityField.Type.EnumInfo.ValueType)
+	assert.Equal(t, irtypes.TypeKindEnum, priorityField.TypeRef.Kind)
+	require.NotNil(t, priorityField.TypeRef.EnumName)
+	assert.Equal(t, "Priority", *priorityField.TypeRef.EnumName)
+	require.NotNil(t, priorityField.TypeRef.EnumType)
+	assert.Equal(t, irtypes.EnumTypeInt, *priorityField.TypeRef.EnumType)
 
-	// name field should NOT have EnumInfo (it's a primitive)
+	// name field should NOT have EnumType (it's a primitive)
 	nameField := fieldsByName["name"]
 	require.NotNil(t, nameField)
-	assert.Nil(t, nameField.Type.EnumInfo)
+	assert.Nil(t, nameField.TypeRef.EnumType)
 }
 
 // TestArrayTypes verifies array type handling.
@@ -369,7 +341,7 @@ func TestArrayTypes(t *testing.T) {
 	require.Len(t, typ.Fields, 2)
 
 	// Find simple field
-	var simple, nested *Field
+	var simple, nested *irtypes.Field
 	for i := range typ.Fields {
 		if typ.Fields[i].Name == "simple" {
 			simple = &typ.Fields[i]
@@ -381,19 +353,62 @@ func TestArrayTypes(t *testing.T) {
 
 	// simple: string[] -> array with 1 dimension of string
 	require.NotNil(t, simple)
-	assert.Equal(t, TypeKindArray, simple.Type.Kind)
-	assert.Equal(t, 1, simple.Type.ArrayDimensions)
-	require.NotNil(t, simple.Type.ArrayItem)
-	assert.Equal(t, TypeKindPrimitive, simple.Type.ArrayItem.Kind)
-	assert.Equal(t, PrimitiveString, simple.Type.ArrayItem.Primitive)
+	assert.Equal(t, irtypes.TypeKindArray, simple.TypeRef.Kind)
+	require.NotNil(t, simple.TypeRef.ArrayDims)
+	assert.Equal(t, int64(1), *simple.TypeRef.ArrayDims)
+	require.NotNil(t, simple.TypeRef.ArrayType)
+	assert.Equal(t, irtypes.TypeKindPrimitive, simple.TypeRef.ArrayType.Kind)
+	require.NotNil(t, simple.TypeRef.ArrayType.PrimitiveName)
+	assert.Equal(t, irtypes.PrimitiveTypeString, *simple.TypeRef.ArrayType.PrimitiveName)
 
 	// nested: int[][] -> array with 2 dimensions of int
 	require.NotNil(t, nested)
-	assert.Equal(t, TypeKindArray, nested.Type.Kind)
-	assert.Equal(t, 2, nested.Type.ArrayDimensions)
-	require.NotNil(t, nested.Type.ArrayItem)
-	assert.Equal(t, TypeKindPrimitive, nested.Type.ArrayItem.Kind)
-	assert.Equal(t, PrimitiveInt, nested.Type.ArrayItem.Primitive)
+	assert.Equal(t, irtypes.TypeKindArray, nested.TypeRef.Kind)
+	require.NotNil(t, nested.TypeRef.ArrayDims)
+	assert.Equal(t, int64(2), *nested.TypeRef.ArrayDims)
+	require.NotNil(t, nested.TypeRef.ArrayType)
+	assert.Equal(t, irtypes.TypeKindPrimitive, nested.TypeRef.ArrayType.Kind)
+	require.NotNil(t, nested.TypeRef.ArrayType.PrimitiveName)
+	assert.Equal(t, irtypes.PrimitiveTypeInt, *nested.TypeRef.ArrayType.PrimitiveName)
+}
+
+// TestIrSchemaJSONSerialization tests that IrSchema can be serialized to JSON.
+func TestIrSchemaJSONSerialization(t *testing.T) {
+	schema := &irtypes.IrSchema{
+		Types: []irtypes.TypeDef{
+			{
+				Name: "User",
+				Fields: []irtypes.Field{
+					{
+						Name:     "id",
+						Optional: false,
+						TypeRef: irtypes.TypeRef{
+							Kind:          irtypes.TypeKindPrimitive,
+							PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString),
+						},
+					},
+				},
+			},
+		},
+		Enums:      []irtypes.EnumDef{},
+		Constants:  []irtypes.ConstantDef{},
+		Patterns:   []irtypes.PatternDef{},
+		Rpcs:       []irtypes.RpcDef{},
+		Procedures: []irtypes.ProcedureDef{},
+		Streams:    []irtypes.StreamDef{},
+		Docs:       []irtypes.DocDef{},
+	}
+
+	jsonBytes, err := json.MarshalIndent(schema, "", "  ")
+	require.NoError(t, err)
+
+	// Parse back to verify it's valid JSON
+	var parsed irtypes.IrSchema
+	err = json.Unmarshal(jsonBytes, &parsed)
+	require.NoError(t, err)
+
+	assert.Equal(t, "User", parsed.Types[0].Name)
+	assert.Equal(t, "id", parsed.Types[0].Fields[0].Name)
 }
 
 // Helper function

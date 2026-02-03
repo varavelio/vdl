@@ -1,34 +1,39 @@
 {
+  "constants": [],
+  "patterns": [],
+  "enums": [],
   "types": [
     {
       "name": "Combined",
       "fields": [
         {
           "name": "items",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "array",
-              "arrayItem": {
+              "arrayType": {
                 "kind": "primitive",
-                "primitive": "string"
+                "primitiveName": "string"
               },
-              "arrayDimensions": 1
+              "arrayDims": 1
             }
           }
         },
         {
           "name": "lookup",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "map",
-              "mapValue": {
+              "mapType": {
                 "kind": "primitive",
-                "primitive": "int"
+                "primitiveName": "int"
               }
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         }
       ]
@@ -38,35 +43,38 @@
       "fields": [
         {
           "name": "tags",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         },
         {
           "name": "scores",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "primitive",
-              "primitive": "int"
+              "primitiveName": "int"
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         },
         {
           "name": "matrix",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "primitive",
-              "primitive": "float"
+              "primitiveName": "float"
             },
-            "arrayDimensions": 2
+            "arrayDims": 2
           }
         }
       ]
@@ -76,33 +84,36 @@
       "fields": [
         {
           "name": "metadata",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "primitive",
-              "primitive": "string"
+              "primitiveName": "string"
             }
           }
         },
         {
           "name": "counts",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "primitive",
-              "primitive": "int"
+              "primitiveName": "int"
             }
           }
         },
         {
           "name": "nested",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "map",
-            "mapValue": {
+            "mapType": {
               "kind": "map",
-              "mapValue": {
+              "mapType": {
                 "kind": "primitive",
-                "primitive": "bool"
+                "primitiveName": "bool"
               }
             }
           }
@@ -110,11 +121,8 @@
       ]
     }
   ],
-  "enums": [],
-  "constants": [],
-  "patterns": [],
   "rpcs": [],
-  "procedures": null,
-  "streams": null,
+  "procedures": [],
+  "streams": [],
   "docs": []
 }

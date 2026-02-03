@@ -1,20 +1,25 @@
 {
+  "constants": [],
+  "patterns": [],
+  "enums": [],
   "types": [
     {
       "name": "PaginatedResponse",
       "fields": [
         {
           "name": "totalItems",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "totalPages",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -24,16 +29,18 @@
       "fields": [
         {
           "name": "page",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "limit",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -43,252 +50,70 @@
       "fields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "email",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
     }
   ],
-  "enums": [],
-  "constants": [],
-  "patterns": [],
   "rpcs": [
     {
       "name": "Notifications",
-      "doc": "Notification service.",
-      "procs": [
-        {
-          "rpcName": "Notifications",
-          "name": "SendNotification",
-          "input": [
-            {
-              "name": "userId",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "message",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "sent",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": []
+      "doc": "Notification service."
     },
     {
       "name": "Users",
-      "doc": "User management service.",
-      "procs": [
-        {
-          "rpcName": "Users",
-          "name": "CreateUser",
-          "doc": "Creates a new user in the system.",
-          "input": [
-            {
-              "name": "name",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "email",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "user",
-              "type": {
-                "kind": "type",
-                "type": "User"
-              }
-            },
-            {
-              "name": "success",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "Users",
-          "name": "GetUser",
-          "doc": "Retrieves a user by ID.",
-          "input": [
-            {
-              "name": "id",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "user",
-              "type": {
-                "kind": "type",
-                "type": "User"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "Users",
-          "name": "ListUsers",
-          "doc": "Lists users with pagination.",
-          "input": [
-            {
-              "name": "page",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "limit",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "filterByName",
-              "optional": true,
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "totalItems",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "totalPages",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "users",
-              "type": {
-                "kind": "array",
-                "arrayItem": {
-                  "kind": "type",
-                  "type": "User"
-                },
-                "arrayDimensions": 1
-              }
-            }
-          ]
-        }
-      ],
-      "streams": [
-        {
-          "rpcName": "Users",
-          "name": "UserStatusUpdates",
-          "doc": "Stream of user status updates.",
-          "input": [
-            {
-              "name": "userId",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "status",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "timestamp",
-              "type": {
-                "kind": "primitive",
-                "primitive": "datetime"
-              }
-            }
-          ]
-        }
-      ],
-      "docs": [
-        "# User Operations\nThe following procedures handle user lifecycle."
-      ]
+      "doc": "User management service."
     }
   ],
   "procedures": [
     {
       "rpcName": "Notifications",
       "name": "SendNotification",
-      "input": [
+      "inputFields": [
         {
           "name": "userId",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "message",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "sent",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         }
       ]
@@ -297,35 +122,39 @@
       "rpcName": "Users",
       "name": "CreateUser",
       "doc": "Creates a new user in the system.",
-      "input": [
+      "inputFields": [
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "email",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "user",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "type",
-            "type": "User"
+            "typeName": "User"
           }
         },
         {
           "name": "success",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         }
       ]
@@ -334,21 +163,23 @@
       "rpcName": "Users",
       "name": "GetUser",
       "doc": "Retrieves a user by ID.",
-      "input": [
+      "inputFields": [
         {
           "name": "id",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "user",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "type",
-            "type": "User"
+            "typeName": "User"
           }
         }
       ]
@@ -357,54 +188,59 @@
       "rpcName": "Users",
       "name": "ListUsers",
       "doc": "Lists users with pagination.",
-      "input": [
+      "inputFields": [
         {
           "name": "page",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "limit",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "filterByName",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "totalItems",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "totalPages",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "users",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "array",
-            "arrayItem": {
+            "arrayType": {
               "kind": "type",
-              "type": "User"
+              "typeName": "User"
             },
-            "arrayDimensions": 1
+            "arrayDims": 1
           }
         }
       ]
@@ -415,28 +251,31 @@
       "rpcName": "Users",
       "name": "UserStatusUpdates",
       "doc": "Stream of user status updates.",
-      "input": [
+      "inputFields": [
         {
           "name": "userId",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "status",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         }
       ]

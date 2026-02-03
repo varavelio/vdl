@@ -1,29 +1,33 @@
 {
+  "constants": [],
+  "patterns": [],
+  "enums": [],
   "types": [
     {
       "name": "OptionalFields",
       "fields": [
         {
           "name": "required",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "optional",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "optionalInt",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -33,48 +37,50 @@
       "fields": [
         {
           "name": "name",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "age",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "score",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "float"
+            "primitiveName": "float"
           }
         },
         {
           "name": "active",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         },
         {
           "name": "createdAt",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         }
       ]
     }
   ],
-  "enums": [],
-  "constants": [],
-  "patterns": [],
   "rpcs": [],
-  "procedures": null,
-  "streams": null,
+  "procedures": [],
+  "streams": [],
   "docs": [
     {
       "content": "Basic types test schema."

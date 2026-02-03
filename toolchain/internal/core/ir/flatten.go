@@ -2,6 +2,7 @@ package ir
 
 import (
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 )
 
 // flattenFields expands all spreads into a flat list of fields.
@@ -12,8 +13,8 @@ func flattenFields(
 	spreads []*analysis.SpreadRef,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) []Field {
-	result := make([]Field, 0)
+) []irtypes.Field {
+	result := make([]irtypes.Field, 0)
 
 	// First, add fields from spreads (in order)
 	for _, spread := range spreads {
@@ -41,23 +42,22 @@ func flattenBlockFields(
 	block *analysis.BlockSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) []Field {
+) []irtypes.Field {
 	if block == nil {
-		return []Field{}
+		return []irtypes.Field{}
 	}
 	return flattenFields(block.Fields, block.Spreads, types, enums)
 }
 
-// flattenInlineObject expands spreads in an inline object type.
-func flattenInlineObject(
+// flattenInlineObjectFields expands spreads in an inline object type and returns the fields.
+func flattenInlineObjectFields(
 	obj *analysis.InlineObject,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) *InlineObject {
+) *[]irtypes.Field {
 	if obj == nil {
 		return nil
 	}
-	return &InlineObject{
-		Fields: flattenFields(obj.Fields, obj.Spreads, types, enums),
-	}
+	fields := flattenFields(obj.Fields, obj.Spreads, types, enums)
+	return &fields
 }

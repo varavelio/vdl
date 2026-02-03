@@ -1,662 +1,48 @@
 {
-  "types": [
-    {
-      "name": "AfterDocs",
-      "fields": [
-        {
-          "name": "field",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "CommonInput",
-      "fields": [
-        {
-          "name": "requestId",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "timestamp",
-          "type": {
-            "kind": "primitive",
-            "primitive": "datetime"
-          }
-        }
-      ]
-    },
-    {
-      "name": "CommonOutput",
-      "fields": [
-        {
-          "name": "success",
-          "type": {
-            "kind": "primitive",
-            "primitive": "bool"
-          }
-        },
-        {
-          "name": "errorCode",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        }
-      ]
-    },
-    {
-      "name": "DeeplyNested",
-      "fields": [
-        {
-          "name": "level1",
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "level2",
-                  "type": {
-                    "kind": "object",
-                    "object": {
-                      "fields": [
-                        {
-                          "name": "level3",
-                          "type": {
-                            "kind": "object",
-                            "object": {
-                              "fields": [
-                                {
-                                  "name": "level4",
-                                  "type": {
-                                    "kind": "object",
-                                    "object": {
-                                      "fields": [
-                                        {
-                                          "name": "level5",
-                                          "type": {
-                                            "kind": "object",
-                                            "object": {
-                                              "fields": [
-                                                {
-                                                  "name": "value",
-                                                  "type": {
-                                                    "kind": "primitive",
-                                                    "primitive": "string"
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "EmptyType",
-      "fields": []
-    },
-    {
-      "name": "EnumsEverywhere",
-      "fields": [
-        {
-          "name": "status",
-          "type": {
-            "kind": "enum",
-            "enum": "Status",
-            "enumInfo": {
-              "valueType": "string"
-            }
-          }
-        },
-        {
-          "name": "statusList",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "enum",
-              "enum": "Status",
-              "enumInfo": {
-                "valueType": "string"
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "statusMatrix",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "enum",
-              "enum": "Status",
-              "enumInfo": {
-                "valueType": "string"
-              }
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "statusMap",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "enum",
-              "enum": "Status",
-              "enumInfo": {
-                "valueType": "string"
-              }
-            }
-          }
-        },
-        {
-          "name": "statusMapArray",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "array",
-              "arrayItem": {
-                "kind": "enum",
-                "enum": "Status",
-                "enumInfo": {
-                  "valueType": "string"
-                }
-              },
-              "arrayDimensions": 1
-            }
-          }
-        },
-        {
-          "name": "statusArrayMap",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "enum",
-                "enum": "Status",
-                "enumInfo": {
-                  "valueType": "string"
-                }
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "optStatus",
-          "optional": true,
-          "type": {
-            "kind": "enum",
-            "enum": "Status",
-            "enumInfo": {
-              "valueType": "string"
-            }
-          }
-        },
-        {
-          "name": "optStatusList",
-          "optional": true,
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "enum",
-              "enum": "Status",
-              "enumInfo": {
-                "valueType": "string"
-              }
-            },
-            "arrayDimensions": 1
-          }
-        }
-      ]
-    },
-    {
-      "name": "InlineArrays",
-      "fields": [
-        {
-          "name": "arr1d",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "value",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "int"
-                    }
-                  }
-                ]
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "arr2d",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "x",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "int"
-                    }
-                  },
-                  {
-                    "name": "y",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "int"
-                    }
-                  }
-                ]
-              }
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "arr3d",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "data",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "arrayDimensions": 3
-          }
-        }
-      ]
-    },
-    {
-      "name": "InlineWithSpread",
-      "fields": [
-        {
-          "name": "baseField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        },
-        {
-          "name": "inlineObj",
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "nested",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "string"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "OptionalComplex",
-      "fields": [
-        {
-          "name": "optMatrix",
-          "optional": true,
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "primitive",
-              "primitive": "int"
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "optMapMap",
-          "optional": true,
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          }
-        },
-        {
-          "name": "optObject",
-          "optional": true,
-          "type": {
-            "kind": "object",
-            "object": {
-              "fields": [
-                {
-                  "name": "innerOpt",
-                  "optional": true,
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "string"
-                  }
-                },
-                {
-                  "name": "innerReq",
-                  "type": {
-                    "kind": "primitive",
-                    "primitive": "int"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "optArrayObj",
-          "optional": true,
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "id",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "optMapObj",
-          "optional": true,
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "object",
-              "object": {
-                "fields": [
-                  {
-                    "name": "key",
-                    "type": {
-                      "kind": "primitive",
-                      "primitive": "int"
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "SingleField",
-      "fields": [
-        {
-          "name": "only",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "SingleOptionalField",
-      "fields": [
-        {
-          "name": "maybeHere",
-          "optional": true,
-          "type": {
-            "kind": "primitive",
-            "primitive": "int"
-          }
-        }
-      ]
-    },
-    {
-      "name": "SpreadBase",
-      "fields": [
-        {
-          "name": "baseField",
-          "type": {
-            "kind": "primitive",
-            "primitive": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "TypesEverywhere",
-      "fields": [
-        {
-          "name": "single",
-          "type": {
-            "kind": "type",
-            "type": "SingleField"
-          }
-        },
-        {
-          "name": "list",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "type",
-              "type": "SingleField"
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "matrix",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "type",
-              "type": "SingleField"
-            },
-            "arrayDimensions": 2
-          }
-        },
-        {
-          "name": "lookup",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "type",
-              "type": "SingleField"
-            }
-          }
-        },
-        {
-          "name": "mapArray",
-          "type": {
-            "kind": "map",
-            "mapValue": {
-              "kind": "array",
-              "arrayItem": {
-                "kind": "type",
-                "type": "SingleField"
-              },
-              "arrayDimensions": 1
-            }
-          }
-        },
-        {
-          "name": "arrayMap",
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "map",
-              "mapValue": {
-                "kind": "type",
-                "type": "SingleField"
-              }
-            },
-            "arrayDimensions": 1
-          }
-        },
-        {
-          "name": "optSingle",
-          "optional": true,
-          "type": {
-            "kind": "type",
-            "type": "SingleField"
-          }
-        },
-        {
-          "name": "optList",
-          "optional": true,
-          "type": {
-            "kind": "array",
-            "arrayItem": {
-              "kind": "type",
-              "type": "SingleField"
-            },
-            "arrayDimensions": 1
-          }
-        }
-      ]
-    }
-  ],
-  "enums": [
-    {
-      "name": "SameName",
-      "valueType": "string",
-      "members": [
-        {
-          "name": "SameName",
-          "value": "SameName"
-        }
-      ]
-    },
-    {
-      "name": "SingleIntMember",
-      "valueType": "int",
-      "members": [
-        {
-          "name": "One",
-          "value": "1"
-        }
-      ]
-    },
-    {
-      "name": "SingleMemberEnum",
-      "valueType": "string",
-      "members": [
-        {
-          "name": "Only",
-          "value": "Only"
-        }
-      ]
-    },
-    {
-      "name": "Status",
-      "valueType": "string",
-      "members": [
-        {
-          "name": "On",
-          "value": "On"
-        },
-        {
-          "name": "Off",
-          "value": "Off"
-        }
-      ]
-    }
-  ],
   "constants": [
     {
       "name": "EMPTY_STRING",
-      "valueType": "string",
+      "constType": "string",
       "value": ""
     },
     {
       "name": "LARGE_INT",
-      "valueType": "int",
+      "constType": "int",
       "value": "9999999"
     },
     {
       "name": "POSITIVE_FLOAT",
-      "valueType": "float",
+      "constType": "float",
       "value": "3.14"
     },
     {
       "name": "POSITIVE_INT",
-      "valueType": "int",
+      "constType": "int",
       "value": "42"
     },
     {
       "name": "SMALL_FLOAT",
-      "valueType": "float",
+      "constType": "float",
       "value": "0.001"
     },
     {
       "name": "STRING_SIMPLE",
-      "valueType": "string",
+      "constType": "string",
       "value": "simple"
     },
     {
       "name": "STRING_WITH_SPACES",
-      "valueType": "string",
+      "constType": "string",
       "value": "hello world"
     },
     {
       "name": "ZERO_FLOAT",
-      "valueType": "float",
+      "constType": "float",
       "value": "0.0"
     },
     {
       "name": "ZERO_INT",
-      "valueType": "int",
+      "constType": "int",
       "value": "0"
     }
   ],
@@ -687,265 +73,655 @@
       "placeholders": ["x"]
     }
   ],
+  "enums": [
+    {
+      "name": "SameName",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "SameName",
+          "value": "SameName"
+        }
+      ]
+    },
+    {
+      "name": "SingleIntMember",
+      "enumType": "int",
+      "members": [
+        {
+          "name": "One",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "name": "SingleMemberEnum",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Only",
+          "value": "Only"
+        }
+      ]
+    },
+    {
+      "name": "Status",
+      "enumType": "string",
+      "members": [
+        {
+          "name": "On",
+          "value": "On"
+        },
+        {
+          "name": "Off",
+          "value": "Off"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AfterDocs",
+      "fields": [
+        {
+          "name": "field",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CommonInput",
+      "fields": [
+        {
+          "name": "requestId",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "timestamp",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "datetime"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CommonOutput",
+      "fields": [
+        {
+          "name": "success",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "bool"
+          }
+        },
+        {
+          "name": "errorCode",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        }
+      ]
+    },
+    {
+      "name": "DeeplyNested",
+      "fields": [
+        {
+          "name": "level1",
+          "optional": false,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "level2",
+                "optional": false,
+                "typeRef": {
+                  "kind": "object",
+                  "objectFields": [
+                    {
+                      "name": "level3",
+                      "optional": false,
+                      "typeRef": {
+                        "kind": "object",
+                        "objectFields": [
+                          {
+                            "name": "level4",
+                            "optional": false,
+                            "typeRef": {
+                              "kind": "object",
+                              "objectFields": [
+                                {
+                                  "name": "level5",
+                                  "optional": false,
+                                  "typeRef": {
+                                    "kind": "object",
+                                    "objectFields": [
+                                      {
+                                        "name": "value",
+                                        "optional": false,
+                                        "typeRef": {
+                                          "kind": "primitive",
+                                          "primitiveName": "string"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "EmptyType",
+      "fields": []
+    },
+    {
+      "name": "EnumsEverywhere",
+      "fields": [
+        {
+          "name": "status",
+          "optional": false,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "Status",
+            "enumType": "string"
+          }
+        },
+        {
+          "name": "statusList",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "enum",
+              "enumName": "Status",
+              "enumType": "string"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "statusMatrix",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "enum",
+              "enumName": "Status",
+              "enumType": "string"
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "statusMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "enum",
+              "enumName": "Status",
+              "enumType": "string"
+            }
+          }
+        },
+        {
+          "name": "statusMapArray",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "enum",
+                "enumName": "Status",
+                "enumType": "string"
+              },
+              "arrayDims": 1
+            }
+          }
+        },
+        {
+          "name": "statusArrayMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "enum",
+                "enumName": "Status",
+                "enumType": "string"
+              }
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "optStatus",
+          "optional": true,
+          "typeRef": {
+            "kind": "enum",
+            "enumName": "Status",
+            "enumType": "string"
+          }
+        },
+        {
+          "name": "optStatusList",
+          "optional": true,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "enum",
+              "enumName": "Status",
+              "enumType": "string"
+            },
+            "arrayDims": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "InlineArrays",
+      "fields": [
+        {
+          "name": "arr1d",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "value",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                }
+              ]
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "arr2d",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "x",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                },
+                {
+                  "name": "y",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                }
+              ]
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "arr3d",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "data",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                }
+              ]
+            },
+            "arrayDims": 3
+          }
+        }
+      ]
+    },
+    {
+      "name": "InlineWithSpread",
+      "fields": [
+        {
+          "name": "baseField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "inlineObj",
+          "optional": false,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "nested",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "OptionalComplex",
+      "fields": [
+        {
+          "name": "optMatrix",
+          "optional": true,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "optMapMap",
+          "optional": true,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              }
+            }
+          }
+        },
+        {
+          "name": "optObject",
+          "optional": true,
+          "typeRef": {
+            "kind": "object",
+            "objectFields": [
+              {
+                "name": "innerOpt",
+                "optional": true,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                }
+              },
+              {
+                "name": "innerReq",
+                "optional": false,
+                "typeRef": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "optArrayObj",
+          "optional": true,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "id",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                }
+              ]
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "optMapObj",
+          "optional": true,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "key",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SingleField",
+      "fields": [
+        {
+          "name": "only",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SingleOptionalField",
+      "fields": [
+        {
+          "name": "maybeHere",
+          "optional": true,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "int"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SpreadBase",
+      "fields": [
+        {
+          "name": "baseField",
+          "optional": false,
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "TypesEverywhere",
+      "fields": [
+        {
+          "name": "single",
+          "optional": false,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "SingleField"
+          }
+        },
+        {
+          "name": "list",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "SingleField"
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "matrix",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "SingleField"
+            },
+            "arrayDims": 2
+          }
+        },
+        {
+          "name": "lookup",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "type",
+              "typeName": "SingleField"
+            }
+          }
+        },
+        {
+          "name": "mapArray",
+          "optional": false,
+          "typeRef": {
+            "kind": "map",
+            "mapType": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "type",
+                "typeName": "SingleField"
+              },
+              "arrayDims": 1
+            }
+          }
+        },
+        {
+          "name": "arrayMap",
+          "optional": false,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "map",
+              "mapType": {
+                "kind": "type",
+                "typeName": "SingleField"
+              }
+            },
+            "arrayDims": 1
+          }
+        },
+        {
+          "name": "optSingle",
+          "optional": true,
+          "typeRef": {
+            "kind": "type",
+            "typeName": "SingleField"
+          }
+        },
+        {
+          "name": "optList",
+          "optional": true,
+          "typeRef": {
+            "kind": "array",
+            "arrayType": {
+              "kind": "type",
+              "typeName": "SingleField"
+            },
+            "arrayDims": 1
+          }
+        }
+      ]
+    }
+  ],
   "rpcs": [
     {
-      "name": "EmptyBlocks",
-      "procs": [
-        {
-          "rpcName": "EmptyBlocks",
-          "name": "BothEmpty",
-          "input": [],
-          "output": []
-        },
-        {
-          "rpcName": "EmptyBlocks",
-          "name": "EmptyInput",
-          "input": [],
-          "output": [
-            {
-              "name": "result",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        },
-        {
-          "rpcName": "EmptyBlocks",
-          "name": "EmptyOutput",
-          "input": [
-            {
-              "name": "query",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": []
-        }
-      ],
-      "streams": [
-        {
-          "rpcName": "EmptyBlocks",
-          "name": "EmptyStreamBlocks",
-          "input": [],
-          "output": []
-        }
-      ]
+      "name": "EmptyBlocks"
     },
     {
-      "name": "EmptyRpc",
-      "procs": [],
-      "streams": []
+      "name": "EmptyRpc"
     },
     {
-      "name": "MultiDocRpc",
-      "procs": [
-        {
-          "rpcName": "MultiDocRpc",
-          "name": "SomeProc",
-          "input": [
-            {
-              "name": "x",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "y",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": [],
-      "docs": ["First RPC standalone doc.", "Second RPC standalone doc."]
+      "name": "MultiDocRpc"
     },
     {
-      "name": "OnlyProcs",
-      "procs": [
-        {
-          "rpcName": "OnlyProcs",
-          "name": "TheOnlyProc",
-          "input": [
-            {
-              "name": "x",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "y",
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": []
+      "name": "OnlyProcs"
     },
     {
-      "name": "OnlyStreams",
-      "procs": [],
-      "streams": [
-        {
-          "rpcName": "OnlyStreams",
-          "name": "TheOnlyStream",
-          "input": [
-            {
-              "name": "channel",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "data",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        }
-      ]
+      "name": "OnlyStreams"
     },
     {
-      "name": "SpreadInRpc",
-      "procs": [
-        {
-          "rpcName": "SpreadInRpc",
-          "name": "UsingSpreads",
-          "input": [
-            {
-              "name": "requestId",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "timestamp",
-              "type": {
-                "kind": "primitive",
-                "primitive": "datetime"
-              }
-            },
-            {
-              "name": "payload",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "success",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            },
-            {
-              "name": "errorCode",
-              "optional": true,
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "data",
-              "optional": true,
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        }
-      ],
-      "streams": [
-        {
-          "rpcName": "SpreadInRpc",
-          "name": "UsingSpreadStream",
-          "input": [
-            {
-              "name": "requestId",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            },
-            {
-              "name": "timestamp",
-              "type": {
-                "kind": "primitive",
-                "primitive": "datetime"
-              }
-            }
-          ],
-          "output": [
-            {
-              "name": "success",
-              "type": {
-                "kind": "primitive",
-                "primitive": "bool"
-              }
-            },
-            {
-              "name": "errorCode",
-              "optional": true,
-              "type": {
-                "kind": "primitive",
-                "primitive": "int"
-              }
-            },
-            {
-              "name": "event",
-              "type": {
-                "kind": "primitive",
-                "primitive": "string"
-              }
-            }
-          ]
-        }
-      ]
+      "name": "SpreadInRpc"
     }
   ],
   "procedures": [
     {
       "rpcName": "EmptyBlocks",
       "name": "BothEmpty",
-      "input": [],
-      "output": []
+      "inputFields": [],
+      "outputFields": []
     },
     {
       "rpcName": "EmptyBlocks",
       "name": "EmptyInput",
-      "input": [],
-      "output": [
+      "inputFields": [],
+      "outputFields": [
         {
           "name": "result",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -953,35 +729,38 @@
     {
       "rpcName": "EmptyBlocks",
       "name": "EmptyOutput",
-      "input": [
+      "inputFields": [
         {
           "name": "query",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": []
+      "outputFields": []
     },
     {
       "rpcName": "MultiDocRpc",
       "name": "SomeProc",
-      "input": [
+      "inputFields": [
         {
           "name": "x",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "y",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -989,21 +768,23 @@
     {
       "rpcName": "OnlyProcs",
       "name": "TheOnlyProc",
-      "input": [
+      "inputFields": [
         {
           "name": "x",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "y",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         }
       ]
@@ -1011,51 +792,55 @@
     {
       "rpcName": "SpreadInRpc",
       "name": "UsingSpreads",
-      "input": [
+      "inputFields": [
         {
           "name": "requestId",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         },
         {
           "name": "payload",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "success",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         },
         {
           "name": "errorCode",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "data",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -1065,27 +850,29 @@
     {
       "rpcName": "EmptyBlocks",
       "name": "EmptyStreamBlocks",
-      "input": [],
-      "output": []
+      "inputFields": [],
+      "outputFields": []
     },
     {
       "rpcName": "OnlyStreams",
       "name": "TheOnlyStream",
-      "input": [
+      "inputFields": [
         {
           "name": "channel",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "data",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]
@@ -1093,43 +880,47 @@
     {
       "rpcName": "SpreadInRpc",
       "name": "UsingSpreadStream",
-      "input": [
+      "inputFields": [
         {
           "name": "requestId",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         },
         {
           "name": "timestamp",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "datetime"
+            "primitiveName": "datetime"
           }
         }
       ],
-      "output": [
+      "outputFields": [
         {
           "name": "success",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "bool"
+            "primitiveName": "bool"
           }
         },
         {
           "name": "errorCode",
           "optional": true,
-          "type": {
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "int"
+            "primitiveName": "int"
           }
         },
         {
           "name": "event",
-          "type": {
+          "optional": false,
+          "typeRef": {
             "kind": "primitive",
-            "primitive": "string"
+            "primitiveName": "string"
           }
         }
       ]

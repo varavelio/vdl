@@ -1,6 +1,4 @@
 {
-  "types": [],
-  "enums": [],
   "constants": [],
   "patterns": [
     {
@@ -22,8 +20,10 @@
       "placeholders": ["userId", "eventType"]
     }
   ],
+  "enums": [],
+  "types": [],
   "rpcs": [],
-  "procedures": null,
-  "streams": null,
+  "procedures": [],
+  "streams": [],
   "docs": []
 }

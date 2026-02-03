@@ -5,20 +5,23 @@ import (
 	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // FromProgram builds an IR Schema from a validated analysis.Program.
 // It assumes the Program has passed through analysis.Analyze() without errors.
 // All spreads are expanded, docs are normalized, and collections are sorted.
-func FromProgram(program *analysis.Program) *Schema {
-	schema := &Schema{
-		Types:     make([]Type, 0, len(program.Types)),
-		Enums:     make([]Enum, 0, len(program.Enums)),
-		Constants: make([]Constant, 0, len(program.Consts)),
-		Patterns:  make([]Pattern, 0, len(program.Patterns)),
-		RPCs:      make([]RPC, 0, len(program.RPCs)),
-		Docs:      make([]Doc, 0, len(program.StandaloneDocs)),
+func FromProgram(program *analysis.Program) *irtypes.IrSchema {
+	schema := &irtypes.IrSchema{
+		Types:      make([]irtypes.TypeDef, 0, len(program.Types)),
+		Enums:      make([]irtypes.EnumDef, 0, len(program.Enums)),
+		Constants:  make([]irtypes.ConstantDef, 0, len(program.Consts)),
+		Patterns:   make([]irtypes.PatternDef, 0, len(program.Patterns)),
+		Rpcs:       make([]irtypes.RpcDef, 0, len(program.RPCs)),
+		Procedures: make([]irtypes.ProcedureDef, 0),
+		Streams:    make([]irtypes.StreamDef, 0),
+		Docs:       make([]irtypes.DocDef, 0, len(program.StandaloneDocs)),
 	}
 
 	// Convert types
@@ -45,31 +48,42 @@ func FromProgram(program *analysis.Program) *Schema {
 	}
 	sortPatterns(schema.Patterns)
 
-	// Convert services (RPCs)
+	// Convert services (RPCs) - now we flatten procs/streams separately
 	for _, rpc := range program.RPCs {
-		schema.RPCs = append(schema.RPCs, convertRPC(rpc, program.Types, program.Enums))
-	}
-	sortRPCs(schema.RPCs)
+		// Add RPC definition
+		schema.Rpcs = append(schema.Rpcs, convertRPCDef(rpc))
 
-	// Populate flattened views
-	for _, rpc := range schema.RPCs {
-		schema.Procedures = append(schema.Procedures, rpc.Procs...)
-		schema.Streams = append(schema.Streams, rpc.Streams...)
+		// Add procedures
+		for _, proc := range rpc.Procs {
+			schema.Procedures = append(schema.Procedures, convertProcedure(proc, program.Types, program.Enums, rpc.Name))
+		}
+
+		// Add streams
+		for _, stream := range rpc.Streams {
+			schema.Streams = append(schema.Streams, convertStream(stream, program.Types, program.Enums, rpc.Name))
+		}
 
 		// Add RPC-level docs
-		for _, doc := range rpc.Docs {
-			schema.Docs = append(schema.Docs, Doc{
-				RPCName: rpc.Name,
-				Content: doc,
-			})
+		for _, doc := range rpc.StandaloneDocs {
+			normalized := normalizeDoc(&doc.Content)
+			if normalized != "" {
+				rpcName := rpc.Name
+				schema.Docs = append(schema.Docs, irtypes.DocDef{
+					RpcName: &rpcName,
+					Content: normalized,
+				})
+			}
 		}
 	}
+	sortRPCs(schema.Rpcs)
+	sortProcedures(schema.Procedures)
+	sortStreams(schema.Streams)
 
 	// Convert standalone docs
 	for _, doc := range program.StandaloneDocs {
 		normalized := normalizeDoc(&doc.Content)
 		if normalized != "" {
-			schema.Docs = append(schema.Docs, Doc{
+			schema.Docs = append(schema.Docs, irtypes.DocDef{
 				Content: normalized,
 			})
 		}
@@ -86,12 +100,12 @@ func convertType(
 	typ *analysis.TypeSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) Type {
-	return Type{
-		Name:       typ.Name,
-		Doc:        normalizeDoc(typ.Docstring),
-		Deprecated: convertDeprecation(typ.Deprecated),
-		Fields:     flattenFields(typ.Fields, typ.Spreads, types, enums),
+) irtypes.TypeDef {
+	return irtypes.TypeDef{
+		Name:        typ.Name,
+		Doc:         normalizeDocPtr(typ.Docstring),
+		Deprecation: convertDeprecation(typ.Deprecated),
+		Fields:      flattenFields(typ.Fields, typ.Spreads, types, enums),
 	}
 }
 
@@ -99,12 +113,12 @@ func convertField(
 	field *analysis.FieldSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) Field {
-	return Field{
+) irtypes.Field {
+	return irtypes.Field{
 		Name:     field.Name,
-		Doc:      normalizeDoc(field.Docstring),
+		Doc:      normalizeDocPtr(field.Docstring),
 		Optional: field.Optional,
-		Type:     convertFieldType(field.Type, types, enums),
+		TypeRef:  convertFieldType(field.Type, types, enums),
 	}
 }
 
@@ -112,9 +126,9 @@ func convertFieldType(
 	info *analysis.FieldTypeInfo,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) TypeRef {
+) irtypes.TypeRef {
 	if info == nil {
-		return TypeRef{Kind: TypeKindPrimitive, Primitive: PrimitiveString}
+		return irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString)}
 	}
 
 	// Get the base type first
@@ -122,10 +136,11 @@ func convertFieldType(
 
 	// If there are array dimensions, wrap the base type with array info
 	if info.ArrayDims > 0 {
-		return TypeRef{
-			Kind:            TypeKindArray,
-			ArrayItem:       &baseRef,
-			ArrayDimensions: info.ArrayDims,
+		dims := int64(info.ArrayDims)
+		return irtypes.TypeRef{
+			Kind:      irtypes.TypeKindArray,
+			ArrayType: &baseRef,
+			ArrayDims: &dims,
 		}
 	}
 
@@ -136,124 +151,121 @@ func convertBaseFieldType(
 	info *analysis.FieldTypeInfo,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-) TypeRef {
+) irtypes.TypeRef {
 	switch info.Kind {
 	case analysis.FieldTypeKindPrimitive:
-		return TypeRef{
-			Kind:      TypeKindPrimitive,
-			Primitive: convertPrimitiveType(info.Name),
+		primType := convertPrimitiveType(info.Name)
+		return irtypes.TypeRef{
+			Kind:          irtypes.TypeKindPrimitive,
+			PrimitiveName: &primType,
 		}
 
 	case analysis.FieldTypeKindCustom:
 		// Check if this is an enum or a type
 		if enum, ok := enums[info.Name]; ok {
-			return TypeRef{
-				Kind: TypeKindEnum,
-				Enum: info.Name,
-				EnumInfo: &EnumInfo{
-					ValueType: convertEnumValueType(enum.ValueType),
-				},
+			enumType := convertEnumType(enum.ValueType)
+			return irtypes.TypeRef{
+				Kind:     irtypes.TypeKindEnum,
+				EnumName: &info.Name,
+				EnumType: &enumType,
 			}
 		}
 		// It's a custom type
-		return TypeRef{
-			Kind: TypeKindType,
-			Type: info.Name,
+		return irtypes.TypeRef{
+			Kind:     irtypes.TypeKindType,
+			TypeName: &info.Name,
 		}
 
 	case analysis.FieldTypeKindMap:
-		return TypeRef{
-			Kind:     TypeKindMap,
-			MapValue: ptrTypeRef(convertFieldType(info.MapValue, types, enums)),
+		mapType := convertFieldType(info.MapValue, types, enums)
+		return irtypes.TypeRef{
+			Kind:    irtypes.TypeKindMap,
+			MapType: &mapType,
 		}
 
 	case analysis.FieldTypeKindObject:
-		return TypeRef{
-			Kind:   TypeKindObject,
-			Object: flattenInlineObject(info.ObjectDef, types, enums),
+		return irtypes.TypeRef{
+			Kind:         irtypes.TypeKindObject,
+			ObjectFields: flattenInlineObjectFields(info.ObjectDef, types, enums),
 		}
 
 	default:
-		return TypeRef{Kind: TypeKindPrimitive, Primitive: PrimitiveString}
+		return irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString)}
 	}
 }
 
-func convertPrimitiveType(name string) PrimitiveType {
+func convertPrimitiveType(name string) irtypes.PrimitiveType {
 	switch name {
 	case "string":
-		return PrimitiveString
+		return irtypes.PrimitiveTypeString
 	case "int":
-		return PrimitiveInt
+		return irtypes.PrimitiveTypeInt
 	case "float":
-		return PrimitiveFloat
+		return irtypes.PrimitiveTypeFloat
 	case "bool":
-		return PrimitiveBool
+		return irtypes.PrimitiveTypeBool
 	case "datetime":
-		return PrimitiveDatetime
+		return irtypes.PrimitiveTypeDatetime
 	default:
-		return PrimitiveString
+		return irtypes.PrimitiveTypeString
 	}
-}
-
-func ptrTypeRef(ref TypeRef) *TypeRef {
-	return &ref
 }
 
 // ============================================================================
 // ENUM CONVERSION
 // ============================================================================
 
-func convertEnum(enum *analysis.EnumSymbol) Enum {
-	members := make([]EnumMember, 0, len(enum.Members))
+func convertEnum(enum *analysis.EnumSymbol) irtypes.EnumDef {
+	members := make([]irtypes.EnumDefMember, 0, len(enum.Members))
 	for _, m := range enum.Members {
-		members = append(members, EnumMember{
+		members = append(members, irtypes.EnumDefMember{
 			Name:  m.Name,
 			Value: m.Value,
 		})
 	}
 
-	return Enum{
-		Name:       enum.Name,
-		Doc:        normalizeDoc(enum.Docstring),
-		Deprecated: convertDeprecation(enum.Deprecated),
-		ValueType:  convertEnumValueType(enum.ValueType),
-		Members:    members,
+	return irtypes.EnumDef{
+		Name:        enum.Name,
+		Doc:         normalizeDocPtr(enum.Docstring),
+		Deprecation: convertDeprecation(enum.Deprecated),
+		EnumType:    convertEnumType(enum.ValueType),
+		Members:     members,
 	}
 }
 
-func convertEnumValueType(vt analysis.EnumValueType) EnumValueType {
+func convertEnumType(vt analysis.EnumValueType) irtypes.EnumType {
 	if vt == analysis.EnumValueTypeInt {
-		return EnumValueTypeInt
+		return irtypes.EnumTypeInt
 	}
-	return EnumValueTypeString
+	return irtypes.EnumTypeString
 }
 
 // ============================================================================
 // CONSTANT CONVERSION
 // ============================================================================
 
-func convertConstant(cnst *analysis.ConstSymbol) Constant {
-	return Constant{
-		Name:       cnst.Name,
-		Doc:        normalizeDoc(cnst.Docstring),
-		Deprecated: convertDeprecation(cnst.Deprecated),
-		ValueType:  convertConstValueType(cnst.ValueType),
-		Value:      cnst.Value,
+func convertConstant(cnst *analysis.ConstSymbol) irtypes.ConstantDef {
+	return irtypes.ConstantDef{
+		Name:        cnst.Name,
+		Doc:         normalizeDocPtr(cnst.Docstring),
+		Deprecation: convertDeprecation(cnst.Deprecated),
+		ConstType:   convertConstType(cnst.ValueType),
+		Value:       cnst.Value,
 	}
 }
 
-func convertConstValueType(vt analysis.ConstValueType) ConstValueType {
+func convertConstType(vt analysis.ConstValueType) irtypes.ConstType {
 	switch vt {
 	case analysis.ConstValueTypeString:
-		return ConstValueTypeString
+		return irtypes.ConstTypeString
 	case analysis.ConstValueTypeInt:
-		return ConstValueTypeInt
+		return irtypes.ConstTypeInt
 	case analysis.ConstValueTypeFloat:
-		return ConstValueTypeFloat
+		return irtypes.ConstTypeFloat
 	case analysis.ConstValueTypeBool:
-		return ConstValueTypeBool
+		return irtypes.ConstTypeBool
 	default:
-		return ConstValueTypeString
+		return irtypes.ConstTypeString
 	}
 }
 
@@ -261,13 +273,17 @@ func convertConstValueType(vt analysis.ConstValueType) ConstValueType {
 // PATTERN CONVERSION
 // ============================================================================
 
-func convertPattern(pattern *analysis.PatternSymbol) Pattern {
-	return Pattern{
+func convertPattern(pattern *analysis.PatternSymbol) irtypes.PatternDef {
+	placeholders := pattern.Placeholders
+	if placeholders == nil {
+		placeholders = []string{}
+	}
+	return irtypes.PatternDef{
 		Name:         pattern.Name,
-		Doc:          normalizeDoc(pattern.Docstring),
-		Deprecated:   convertDeprecation(pattern.Deprecated),
+		Doc:          normalizeDocPtr(pattern.Docstring),
+		Deprecation:  convertDeprecation(pattern.Deprecated),
 		Template:     pattern.Template,
-		Placeholders: pattern.Placeholders,
+		Placeholders: placeholders,
 	}
 }
 
@@ -275,38 +291,11 @@ func convertPattern(pattern *analysis.PatternSymbol) Pattern {
 // RPC CONVERSION
 // ============================================================================
 
-func convertRPC(
-	rpc *analysis.RPCSymbol,
-	types map[string]*analysis.TypeSymbol,
-	enums map[string]*analysis.EnumSymbol,
-) RPC {
-	procs := make([]Procedure, 0, len(rpc.Procs))
-	for _, proc := range rpc.Procs {
-		procs = append(procs, convertProcedure(proc, types, enums, rpc.Name))
-	}
-	sortProcedures(procs)
-
-	streams := make([]Stream, 0, len(rpc.Streams))
-	for _, stream := range rpc.Streams {
-		streams = append(streams, convertStream(stream, types, enums, rpc.Name))
-	}
-	sortStreams(streams)
-
-	docs := make([]string, 0, len(rpc.StandaloneDocs))
-	for _, doc := range rpc.StandaloneDocs {
-		normalized := normalizeDoc(&doc.Content)
-		if normalized != "" {
-			docs = append(docs, normalized)
-		}
-	}
-
-	return RPC{
-		Name:       rpc.Name,
-		Doc:        normalizeDoc(rpc.Docstring),
-		Deprecated: convertDeprecation(rpc.Deprecated),
-		Procs:      procs,
-		Streams:    streams,
-		Docs:       docs,
+func convertRPCDef(rpc *analysis.RPCSymbol) irtypes.RpcDef {
+	return irtypes.RpcDef{
+		Name:        rpc.Name,
+		Doc:         normalizeDocPtr(rpc.Docstring),
+		Deprecation: convertDeprecation(rpc.Deprecated),
 	}
 }
 
@@ -315,14 +304,14 @@ func convertProcedure(
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
 	rpcName string,
-) Procedure {
-	return Procedure{
-		RPCName:    rpcName,
-		Name:       proc.Name,
-		Doc:        normalizeDoc(proc.Docstring),
-		Deprecated: convertDeprecation(proc.Deprecated),
-		Input:      flattenBlockFields(proc.Input, types, enums),
-		Output:     flattenBlockFields(proc.Output, types, enums),
+) irtypes.ProcedureDef {
+	return irtypes.ProcedureDef{
+		RpcName:      rpcName,
+		Name:         proc.Name,
+		Doc:          normalizeDocPtr(proc.Docstring),
+		Deprecation:  convertDeprecation(proc.Deprecated),
+		InputFields:  flattenBlockFields(proc.Input, types, enums),
+		OutputFields: flattenBlockFields(proc.Output, types, enums),
 	}
 }
 
@@ -331,14 +320,14 @@ func convertStream(
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
 	rpcName string,
-) Stream {
-	return Stream{
-		RPCName:    rpcName,
-		Name:       stream.Name,
-		Doc:        normalizeDoc(stream.Docstring),
-		Deprecated: convertDeprecation(stream.Deprecated),
-		Input:      flattenBlockFields(stream.Input, types, enums),
-		Output:     flattenBlockFields(stream.Output, types, enums),
+) irtypes.StreamDef {
+	return irtypes.StreamDef{
+		RpcName:      rpcName,
+		Name:         stream.Name,
+		Doc:          normalizeDocPtr(stream.Docstring),
+		Deprecation:  convertDeprecation(stream.Deprecated),
+		InputFields:  flattenBlockFields(stream.Input, types, enums),
+		OutputFields: flattenBlockFields(stream.Output, types, enums),
 	}
 }
 
@@ -346,57 +335,61 @@ func convertStream(
 // DEPRECATION CONVERSION
 // ============================================================================
 
-func convertDeprecation(dep *analysis.DeprecationInfo) *Deprecation {
+func convertDeprecation(dep *analysis.DeprecationInfo) *string {
 	if dep == nil {
 		return nil
 	}
-	return &Deprecation{
-		Message: dep.Message,
-	}
+	return &dep.Message
 }
 
 // ============================================================================
 // SORTING FUNCTIONS
 // ============================================================================
 
-func sortTypes(types []Type) {
+func sortTypes(types []irtypes.TypeDef) {
 	sort.Slice(types, func(i, j int) bool {
 		return types[i].Name < types[j].Name
 	})
 }
 
-func sortEnums(enums []Enum) {
+func sortEnums(enums []irtypes.EnumDef) {
 	sort.Slice(enums, func(i, j int) bool {
 		return enums[i].Name < enums[j].Name
 	})
 }
 
-func sortConstants(constants []Constant) {
+func sortConstants(constants []irtypes.ConstantDef) {
 	sort.Slice(constants, func(i, j int) bool {
 		return constants[i].Name < constants[j].Name
 	})
 }
 
-func sortPatterns(patterns []Pattern) {
+func sortPatterns(patterns []irtypes.PatternDef) {
 	sort.Slice(patterns, func(i, j int) bool {
 		return patterns[i].Name < patterns[j].Name
 	})
 }
 
-func sortRPCs(rpcs []RPC) {
+func sortRPCs(rpcs []irtypes.RpcDef) {
 	sort.Slice(rpcs, func(i, j int) bool {
 		return rpcs[i].Name < rpcs[j].Name
 	})
 }
 
-func sortProcedures(procs []Procedure) {
+func sortProcedures(procs []irtypes.ProcedureDef) {
 	sort.Slice(procs, func(i, j int) bool {
+		if procs[i].RpcName != procs[j].RpcName {
+			return procs[i].RpcName < procs[j].RpcName
+		}
 		return procs[i].Name < procs[j].Name
 	})
 }
 
-func sortStreams(streams []Stream) {
+func sortStreams(streams []irtypes.StreamDef) {
 	sort.Slice(streams, func(i, j int) bool {
+		if streams[i].RpcName != streams[j].RpcName {
+			return streams[i].RpcName < streams[j].RpcName
+		}
 		return streams[i].Name < streams[j].Name
 	})
 }
@@ -406,4 +399,15 @@ func normalizeDoc(raw *string) string {
 		return ""
 	}
 	return strings.TrimSpace(strutil.NormalizeIndent(*raw))
+}
+
+func normalizeDocPtr(raw *string) *string {
+	if raw == nil {
+		return nil
+	}
+	normalized := strings.TrimSpace(strutil.NormalizeIndent(*raw))
+	if normalized == "" {
+		return nil
+	}
+	return &normalized
 }
