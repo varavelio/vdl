@@ -27,16 +27,16 @@ def main():
     # Check constant types
     for c in constants:
         if c["name"] == "API_VERSION":
-            if c["valueType"] != "string" or c["value"] != "1.0.0":
+            if c["constType"] != "string" or c["value"] != "1.0.0":
                 errors.append(f"API_VERSION wrong: {c}")
         elif c["name"] == "MAX_RETRIES":
-            if c["valueType"] != "int" or c["value"] != "3":
+            if c["constType"] != "int" or c["value"] != "3":
                 errors.append(f"MAX_RETRIES wrong: {c}")
         elif c["name"] == "TIMEOUT_SECONDS":
-            if c["valueType"] != "float" or c["value"] != "30.5":
+            if c["constType"] != "float" or c["value"] != "30.5":
                 errors.append(f"TIMEOUT_SECONDS wrong: {c}")
         elif c["name"] == "DEBUG_MODE":
-            if c["valueType"] != "bool" or c["value"] != "true":
+            if c["constType"] != "bool" or c["value"] != "true":
                 errors.append(f"DEBUG_MODE wrong: {c}")
     
     # =========================================================================
@@ -71,8 +71,8 @@ def main():
         errors.append("Missing enum: Role")
     else:
         role = enum_map["Role"]
-        if role["valueType"] != "string":
-            errors.append(f"Role valueType wrong: {role['valueType']}")
+        if role["enumType"] != "string":
+            errors.append(f"Role enumType wrong: {role['enumType']}")
         # Note: VDL formatter normalizes enum member names to PascalCase
         member_names = {m["name"] for m in role["members"]}
         if member_names != {"Admin", "User", "Guest"}:
@@ -82,14 +82,14 @@ def main():
         errors.append("Missing enum: Priority")
     else:
         priority = enum_map["Priority"]
-        if priority["valueType"] != "int":
-            errors.append(f"Priority valueType wrong: {priority['valueType']}")
+        if priority["enumType"] != "int":
+            errors.append(f"Priority enumType wrong: {priority['enumType']}")
     
     if "LegacyStatus" not in enum_map:
         errors.append("Missing enum: LegacyStatus")
     else:
         legacy = enum_map["LegacyStatus"]
-        if legacy.get("deprecated") is None:
+        if legacy.get("deprecation") is None:
             errors.append("LegacyStatus should be deprecated")
     
     # =========================================================================
@@ -122,42 +122,42 @@ def main():
         # Check array field
         tags_field = next((f for f in user["fields"] if f["name"] == "tags"), None)
         if tags_field:
-            if tags_field["type"]["kind"] != "array":
-                errors.append(f"User.tags should be array, got {tags_field['type']['kind']}")
+            if tags_field["typeRef"]["kind"] != "array":
+                errors.append(f"User.tags should be array, got {tags_field['typeRef']['kind']}")
         
         # Check nested array (matrix)
         scores_field = next((f for f in user["fields"] if f["name"] == "scores"), None)
         if scores_field:
-            if scores_field["type"]["kind"] != "array":
+            if scores_field["typeRef"]["kind"] != "array":
                 errors.append(f"User.scores should be array")
             # Should be array of arrays
-            if scores_field["type"].get("arrayDimensions", 1) < 2:
+            if scores_field["typeRef"].get("arrayDims", 1) < 2:
                 errors.append(f"User.scores should be 2D array")
         
         # Check map field
         metadata_field = next((f for f in user["fields"] if f["name"] == "metadata"), None)
         if metadata_field:
-            if metadata_field["type"]["kind"] != "map":
-                errors.append(f"User.metadata should be map, got {metadata_field['type']['kind']}")
+            if metadata_field["typeRef"]["kind"] != "map":
+                errors.append(f"User.metadata should be map, got {metadata_field['typeRef']['kind']}")
         
         # Check inline object field
         prefs_field = next((f for f in user["fields"] if f["name"] == "preferences"), None)
         if prefs_field:
-            if prefs_field["type"]["kind"] != "object":
-                errors.append(f"User.preferences should be object, got {prefs_field['type']['kind']}")
-            if prefs_field["type"].get("object") is None:
+            if prefs_field["typeRef"]["kind"] != "object":
+                errors.append(f"User.preferences should be object, got {prefs_field['typeRef']['kind']}")
+            if prefs_field["typeRef"].get("objectFields") is None:
                 errors.append("User.preferences missing inline object definition")
         
         # Check enum reference
         role_field = next((f for f in user["fields"] if f["name"] == "role"), None)
         if role_field:
-            if role_field["type"]["kind"] != "enum":
-                errors.append(f"User.role should be enum, got {role_field['type']['kind']}")
-            if role_field["type"].get("enum") != "Role":
+            if role_field["typeRef"]["kind"] != "enum":
+                errors.append(f"User.role should be enum, got {role_field['typeRef']['kind']}")
+            if role_field["typeRef"].get("enumName") != "Role":
                 errors.append(f"User.role should reference Role enum")
         
         # Check deprecation
-        if user.get("deprecated") is None:
+        if user.get("deprecation") is None:
             errors.append("User type should be deprecated")
     
     # =========================================================================
@@ -168,24 +168,6 @@ def main():
     
     if "UserService" not in rpc_map:
         errors.append("Missing RPC: UserService")
-    else:
-        user_svc = rpc_map["UserService"]
-        proc_names = {p["name"] for p in user_svc.get("procs", [])}
-        stream_names = {s["name"] for s in user_svc.get("streams", [])}
-        
-        if "GetUser" not in proc_names:
-            errors.append("UserService missing proc: GetUser")
-        if "CreateUser" not in proc_names:
-            errors.append("UserService missing proc: CreateUser")
-        if "ListUsers" not in proc_names:
-            errors.append("UserService missing proc: ListUsers")
-        if "UserUpdates" not in stream_names:
-            errors.append("UserService missing stream: UserUpdates")
-        
-        # Check RPC-level docs (optional - standalone doc blocks, not docstrings)
-        # RPC.docs contains standalone `doc """..."""` blocks, not docstrings on procs
-        # We don't require these, but verify the field exists
-        _ = user_svc.get("docs", [])
     
     if "OrderService" not in rpc_map:
         errors.append("Missing RPC: OrderService")
@@ -208,7 +190,7 @@ def main():
     
     # Check CreateUser deprecation
     create_user = next((p for p in procedures if p["name"] == "CreateUser"), None)
-    if create_user and create_user.get("deprecated") is None:
+    if create_user and create_user.get("deprecation") is None:
         errors.append("CreateUser proc should be deprecated")
     
     # =========================================================================
