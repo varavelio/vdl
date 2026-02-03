@@ -21,6 +21,12 @@ targets:
       clean: true
       package: wasmtypes
 
+  - go:
+      schema: ./schemas/plugin.vdl
+      output: ./toolchain/internal/codegen/plugin/plugintypes
+      clean: true
+      package: plugintypes
+
   - typescript:
       schema: ./schemas/wasm.vdl
       output: ./playground/src/lib/wasm/wasmtypes
