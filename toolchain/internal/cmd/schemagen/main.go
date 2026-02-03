@@ -7,10 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/invopop/jsonschema"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/config"
-	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin"
-	"github.com/varavelio/vdl/toolchain/internal/core/ir"
-	"github.com/varavelio/vdl/toolchain/internal/version"
 )
 
 type schemaGenConfig struct {
@@ -23,34 +19,34 @@ type schemaGenConfig struct {
 
 func main() {
 	configs := []schemaGenConfig{
-		{
-			Struct:      &ir.Schema{},
-			ID:          version.SchemaIRID,
-			Title:       "VDL IR Schema",
-			Description: "JSON Schema for the VDL Intermediate Representation",
-			OutPath:     []string{"internal", "core", "ir", "ir.schema.json"},
-		},
-		{
-			Struct:      &config.VDLConfig{},
-			ID:          version.SchemaConfigID,
-			Title:       "VDL Config Schema",
-			Description: "JSON Schema for the VDL Config",
-			OutPath:     []string{"internal", "codegen", "config", "config.schema.json"},
-		},
-		{
-			Struct:      &plugin.Input{},
-			ID:          version.SchemaPluginInputID,
-			Title:       "VDL Plugin Input Schema",
-			Description: "JSON Schema for the VDL Plugin Input Protocol",
-			OutPath:     []string{"internal", "codegen", "plugin", "plugin_input.schema.json"},
-		},
-		{
-			Struct:      &plugin.Output{},
-			ID:          version.SchemaPluginOutputID,
-			Title:       "VDL Plugin Output Schema",
-			Description: "JSON Schema for the VDL Plugin Output Protocol",
-			OutPath:     []string{"internal", "codegen", "plugin", "plugin_output.schema.json"},
-		},
+		// {
+		// 	Struct:      &ir.Schema{},
+		// 	ID:          version.SchemaIRID,
+		// 	Title:       "VDL IR Schema",
+		// 	Description: "JSON Schema for the VDL Intermediate Representation",
+		// 	OutPath:     []string{"internal", "core", "ir", "ir.schema.json"},
+		// },
+		// {
+		// 	Struct:      &config.VDLConfig{},
+		// 	ID:          version.SchemaConfigID,
+		// 	Title:       "VDL Config Schema",
+		// 	Description: "JSON Schema for the VDL Config",
+		// 	OutPath:     []string{"internal", "codegen", "config", "config.schema.json"},
+		// },
+		// {
+		// 	Struct:      &plugin.Input{},
+		// 	ID:          version.SchemaPluginInputID,
+		// 	Title:       "VDL Plugin Input Schema",
+		// 	Description: "JSON Schema for the VDL Plugin Input Protocol",
+		// 	OutPath:     []string{"internal", "codegen", "plugin", "plugin_input.schema.json"},
+		// },
+		// {
+		// 	Struct:      &plugin.Output{},
+		// 	ID:          version.SchemaPluginOutputID,
+		// 	Title:       "VDL Plugin Output Schema",
+		// 	Description: "JSON Schema for the VDL Plugin Output Protocol",
+		// 	OutPath:     []string{"internal", "codegen", "plugin", "plugin_output.schema.json"},
+		// },
 	}
 
 	for _, cfg := range configs {
