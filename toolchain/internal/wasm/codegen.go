@@ -45,7 +45,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 
 	switch input.Target {
 	case wasmtypes.CodegenTargetGo:
-		cfg := input.GoConfig.Or(wasmtypes.CodegenInputGoConfig{
+		cfg := input.GetGoConfigOr(wasmtypes.CodegenInputGoConfig{
 			Package:     "vdl",
 			GenPatterns: true,
 			GenConsts:   true,
@@ -74,7 +74,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
 	case wasmtypes.CodegenTargetTypescript:
-		cfg := input.TypescriptConfig.Or(wasmtypes.CodegenInputTypescriptConfig{
+		cfg := input.GetTypescriptConfigOr(wasmtypes.CodegenInputTypescriptConfig{
 			ImportExtension: "none",
 			GenPatterns:     true,
 			GenConsts:       true,
@@ -103,7 +103,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
 	case wasmtypes.CodegenTargetDart:
-		cfg := input.DartConfig.Or(wasmtypes.CodegenInputDartConfig{
+		cfg := input.GetDartConfigOr(wasmtypes.CodegenInputDartConfig{
 			GenPatterns: true,
 			GenConsts:   true,
 		})
@@ -126,7 +126,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
 	case wasmtypes.CodegenTargetPython:
-		cfg := input.PythonConfig.Or(wasmtypes.CodegenInputPythonConfig{
+		cfg := input.GetPythonConfigOr(wasmtypes.CodegenInputPythonConfig{
 			GenPatterns: true,
 			GenConsts:   true,
 		})
@@ -149,7 +149,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
 	case wasmtypes.CodegenTargetOpenApi:
-		cfg := input.OpenApiConfig.Or(wasmtypes.CodegenInputOpenApiConfig{
+		cfg := input.GetOpenApiConfigOr(wasmtypes.CodegenInputOpenApiConfig{
 			Title:   "VDL RPC API",
 			Version: "1.0.0",
 		})
@@ -157,11 +157,11 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		gen := openapi.New(&config.OpenAPIConfig{
 			Title:        cfg.Title,
 			Version:      cfg.Version,
-			Description:  cfg.Description.Value,
-			BaseURL:      cfg.BaseUrl.Value,
-			ContactName:  cfg.ContactName.Value,
-			ContactEmail: cfg.ContactEmail.Value,
-			LicenseName:  cfg.LicenseName.Value,
+			Description:  cfg.GetDescription(),
+			BaseURL:      cfg.GetBaseUrl(),
+			ContactName:  cfg.GetContactName(),
+			ContactEmail: cfg.GetContactEmail(),
+			LicenseName:  cfg.GetLicenseName(),
 			Filename:     "openapi.yaml",
 		})
 
@@ -178,7 +178,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 
 	case wasmtypes.CodegenTargetJsonSchema:
-		cfg := input.JsonSchemaConfig.Or(wasmtypes.CodegenInputJsonSchemaConfig{})
+		cfg := input.GetJsonSchemaConfigOr(wasmtypes.CodegenInputJsonSchemaConfig{})
 
 		gen := jsonschema.New(&config.JSONSchemaConfig{
 			ID:       cfg.SchemaId,

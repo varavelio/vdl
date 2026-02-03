@@ -32,39 +32,39 @@ func RunString(input string) (string, error) {
 func Run(input wasmtypes.WasmInput) (*wasmtypes.WasmOutput, error) {
 	switch input.FunctionName {
 	case wasmtypes.WasmFunctionNameExpandTypes:
-		out, err := runExpandTypes(input.ExpandTypes.Value)
+		out, err := runExpandTypes(input.GetExpandTypes())
 		if err != nil {
 			return nil, fmt.Errorf("error while running expand types function: %w", err)
 		}
-		return &wasmtypes.WasmOutput{ExpandTypes: wasmtypes.Some(*out)}, nil
+		return &wasmtypes.WasmOutput{ExpandTypes: out}, nil
 
 	case wasmtypes.WasmFunctionNameExtractType:
-		out, err := runExtractType(input.ExtractType.Value)
+		out, err := runExtractType(input.GetExtractType())
 		if err != nil {
 			return nil, fmt.Errorf("error while running extract type function: %w", err)
 		}
-		return &wasmtypes.WasmOutput{ExtractType: wasmtypes.Some(*out)}, nil
+		return &wasmtypes.WasmOutput{ExtractType: out}, nil
 
 	case wasmtypes.WasmFunctionNameExtractProc:
-		out, err := runExtractProc(input.ExtractProc.Value)
+		out, err := runExtractProc(input.GetExtractProc())
 		if err != nil {
 			return nil, fmt.Errorf("error while running extract procedure function: %w", err)
 		}
-		return &wasmtypes.WasmOutput{ExtractProc: wasmtypes.Some(*out)}, nil
+		return &wasmtypes.WasmOutput{ExtractProc: out}, nil
 
 	case wasmtypes.WasmFunctionNameExtractStream:
-		out, err := runExtractStream(input.ExtractStream.Value)
+		out, err := runExtractStream(input.GetExtractStream())
 		if err != nil {
 			return nil, fmt.Errorf("error while running extract stream function: %w", err)
 		}
-		return &wasmtypes.WasmOutput{ExtractStream: wasmtypes.Some(*out)}, nil
+		return &wasmtypes.WasmOutput{ExtractStream: out}, nil
 
 	case wasmtypes.WasmFunctionNameCodegen:
-		out, err := runCodegen(input.Codegen.Value)
+		out, err := runCodegen(input.GetCodegen())
 		if err != nil {
 			return nil, fmt.Errorf("error while running codegen function: %w", err)
 		}
-		return &wasmtypes.WasmOutput{Codegen: wasmtypes.Some(*out)}, nil
+		return &wasmtypes.WasmOutput{Codegen: out}, nil
 	}
 
 	return nil, fmt.Errorf("%s function is not supported", input.FunctionName)
