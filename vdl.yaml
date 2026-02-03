@@ -4,17 +4,6 @@ version: 1
 
 targets:
   - go:
-      schema: ./schemas/wasm.vdl
-      output: ./toolchain/internal/wasm/wasmtypes
-      clean: true
-      package: wasmtypes
-
-  - typescript:
-      schema: ./schemas/wasm.vdl
-      output: ./playground/src/lib/wasm/wasmtypes
-      clean: true
-
-  - go:
       schema: ./schemas/ir.vdl
       output: ./toolchain/internal/core/ir/irtypes
       clean: true
@@ -25,3 +14,14 @@ targets:
       output: ./toolchain/internal/codegen/config/configtypes
       clean: true
       package: configtypes
+
+  - go:
+      schema: ./schemas/wasm.vdl
+      output: ./toolchain/internal/wasm/wasmtypes
+      clean: true
+      package: wasmtypes
+
+  - typescript:
+      schema: ./schemas/wasm.vdl
+      output: ./playground/src/lib/wasm/wasmtypes
+      clean: true
