@@ -184,11 +184,14 @@ func Run(configPath string) (int, error) {
 			}
 			totalFiles += count
 		} else if target.Plugin != nil {
-			schema, _, err := getSchema(*target.Plugin.Schema)
+			schema, program, err := getSchema(*target.Plugin.Schema)
 			if err != nil {
 				return 0, err
 			}
-			count, err := runPlugin(ctx, absConfigDir, target.Plugin, schema)
+			// Plugin needs merged and formatted schema (all includes resolved into one file)
+			formatted := transform.MergeAndFormat(program)
+
+			count, err := runPlugin(ctx, absConfigDir, target.Plugin, schema, formatted)
 			if err != nil {
 				return 0, fmt.Errorf("target #%d (plugin): %w", i, err)
 			}
@@ -222,9 +225,9 @@ func Run(configPath string) (int, error) {
 	return totalFiles, nil
 }
 
-func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.PluginTargetConfig, schema *irtypes.IrSchema) (int, error) {
+func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.PluginTargetConfig, ir *irtypes.IrSchema, formattedSchema string) (int, error) {
 	gen := plugin.New(cfg)
-	files, err := gen.Generate(ctx, schema)
+	files, err := gen.Generate(ctx, ir, formattedSchema)
 	if err != nil {
 		return 0, fmt.Errorf("failed to generate code: %w", err)
 	}
@@ -238,7 +241,7 @@ func runPlugin(ctx context.Context, absConfigDir string, cfg *configtypes.Plugin
 		}
 
 		for i, f := range files {
-			generatedFiles[i] = GeneratedFile{Path: f.Path, Content: f.Content}
+			generatedFiles[i] = GeneratedFile{Path: f.Path, Content: []byte(f.Content)}
 		}
 
 		if err := writeGeneratedFiles(outputDir, generatedFiles); err != nil {

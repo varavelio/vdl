@@ -44,8 +44,8 @@ def main():
     assert get_user is not None, "GetUser procedure not found"
     assert get_user["rpcName"] == "UserService", "GetUser should belong to UserService"
     
-    # Options should be None/null in this test
-    assert options is None, f"Expected no options, got {options}"
+    # Options should be empty dict in this test (no options configured)
+    assert options == {} or options is None, f"Expected empty options, got {options}"
     
     # Generate output
     output = {

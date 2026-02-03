@@ -59,7 +59,7 @@ json.dump(output, sys.stdout)
 
 	// Run generator
 	gen := New(cfg)
-	files, err := gen.Generate(context.Background(), schema)
+	files, err := gen.Generate(context.Background(), schema, "type Foo {}")
 	require.NoError(t, err)
 
 	// Verify output

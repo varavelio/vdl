@@ -10,14 +10,10 @@ import (
 	"os/exec"
 
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
+	"github.com/varavelio/vdl/toolchain/internal/codegen/plugin/plugintypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
+	"github.com/varavelio/vdl/toolchain/internal/version"
 )
-
-// GeneratedFile represents a generated file.
-type GeneratedFile struct {
-	Path    string
-	Content []byte
-}
 
 // Generator implements codegen.Generator for external plugins.
 type Generator struct {
@@ -37,7 +33,7 @@ func (g *Generator) Name() string {
 }
 
 // Generate executes the plugin and returns the generated files.
-func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]GeneratedFile, error) {
+func (g *Generator) Generate(ctx context.Context, ir *irtypes.IrSchema, formattedSchema string) ([]plugintypes.PluginFile, error) {
 	if len(g.config.Command) == 0 {
 		return nil, fmt.Errorf("plugin command is empty")
 	}
@@ -62,19 +58,22 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]G
 		return nil, fmt.Errorf("failed to start plugin command: %w", err)
 	}
 
-	// Prepare options - convert map[string]string to map[string]any for JSON output
-	var options map[string]any
-	if g.config.Options != nil {
-		options = make(map[string]any)
-		for k, v := range *g.config.Options {
-			options[k] = v
-		}
+	irJson, err := json.Marshal(ir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal ir: %w", err)
+	}
+
+	typedIrSchema := plugintypes.IrSchema{}
+	if err := json.Unmarshal(irJson, &typedIrSchema); err != nil {
+		return nil, fmt.Errorf("failed to marshal ir: %w", err)
 	}
 
 	// Prepare input
-	input := Input{
-		IR:      schema,
-		Options: options,
+	input := plugintypes.PluginInput{
+		Version: version.Version,
+		Ir:      typedIrSchema,
+		Schema:  formattedSchema,
+		Options: g.config.GetOptionsOr(map[string]string{}),
 	}
 
 	// Write input to stdin in a goroutine to avoid deadlock if plugin reads slowly
@@ -104,18 +103,10 @@ func (g *Generator) Generate(ctx context.Context, schema *irtypes.IrSchema) ([]G
 		return nil, nil
 	}
 
-	var output Output
+	var output plugintypes.PluginOutput
 	if err := json.Unmarshal(outputBytes, &output); err != nil {
 		return nil, nil
 	}
 
-	var files []GeneratedFile
-	for _, f := range output.Files {
-		files = append(files, GeneratedFile{
-			Path:    f.Path,
-			Content: []byte(f.Content),
-		})
-	}
-
-	return files, nil
+	return output.GetFilesOr([]plugintypes.PluginFile{}), nil
 }
