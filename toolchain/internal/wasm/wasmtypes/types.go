@@ -15,120 +15,295 @@ import (
 // Enumerations
 // -----------------------------------------------------------------------------
 
-// Represents a target for codegen function
-type CodegenTarget string
+// The type of a constant value
+type ConstType string
 
-// CodegenTarget enum values
+// ConstType enum values
 const (
-	CodegenTargetGo         CodegenTarget = "Go"
-	CodegenTargetTypescript CodegenTarget = "Typescript"
-	CodegenTargetDart       CodegenTarget = "Dart"
-	CodegenTargetPython     CodegenTarget = "Python"
-	CodegenTargetOpenApi    CodegenTarget = "OpenApi"
-	CodegenTargetJsonSchema CodegenTarget = "JsonSchema"
+	ConstTypeString ConstType = "string"
+	ConstTypeInt    ConstType = "int"
+	ConstTypeFloat  ConstType = "float"
+	ConstTypeBool   ConstType = "bool"
 )
 
-// CodegenTargetList contains all valid CodegenTarget values.
-var CodegenTargetList = []CodegenTarget{
-	CodegenTargetGo,
-	CodegenTargetTypescript,
-	CodegenTargetDart,
-	CodegenTargetPython,
-	CodegenTargetOpenApi,
-	CodegenTargetJsonSchema,
+// ConstTypeList contains all valid ConstType values.
+var ConstTypeList = []ConstType{
+	ConstTypeString,
+	ConstTypeInt,
+	ConstTypeFloat,
+	ConstTypeBool,
 }
 
-// String returns the string representation of CodegenTarget.
-func (e CodegenTarget) String() string {
+// String returns the string representation of ConstType.
+func (e ConstType) String() string {
 	return string(e)
 }
 
-// IsValid returns true if the value is a valid CodegenTarget.
-func (e CodegenTarget) IsValid() bool {
+// IsValid returns true if the value is a valid ConstType.
+func (e ConstType) IsValid() bool {
 	switch e {
-	case CodegenTargetGo, CodegenTargetTypescript, CodegenTargetDart, CodegenTargetPython, CodegenTargetOpenApi, CodegenTargetJsonSchema:
+	case ConstTypeString, ConstTypeInt, ConstTypeFloat, ConstTypeBool:
 		return true
 	}
 	return false
 }
 
 // MarshalJSON implements json.Marshaler.
-// Returns an error if the value is not a valid CodegenTarget member.
-func (e CodegenTarget) MarshalJSON() ([]byte, error) {
+// Returns an error if the value is not a valid ConstType member.
+func (e ConstType) MarshalJSON() ([]byte, error) {
 	if !e.IsValid() {
-		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum CodegenTarget", string(e))
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum ConstType", string(e))
 	}
 	return json.Marshal(string(e))
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-// Returns an error if the value is not a valid CodegenTarget member.
-func (e *CodegenTarget) UnmarshalJSON(data []byte) error {
+// Returns an error if the value is not a valid ConstType member.
+func (e *ConstType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
 
-	v := CodegenTarget(s)
+	v := ConstType(s)
 	if !v.IsValid() {
-		return fmt.Errorf("invalid value '%s' for enum CodegenTarget", s)
+		return fmt.Errorf("invalid value '%s' for enum ConstType", s)
 	}
 
 	*e = v
 	return nil
 }
 
-// Import extension for typescript code generator
-type CodegenTypescriptImportExtension string
+// The underlying value type of an enum
+type EnumType string
 
-// CodegenTypescriptImportExtension enum values
+// EnumType enum values
 const (
-	CodegenTypescriptImportExtensionNone CodegenTypescriptImportExtension = "none"
-	CodegenTypescriptImportExtensionJs   CodegenTypescriptImportExtension = ".js"
-	CodegenTypescriptImportExtensionTs   CodegenTypescriptImportExtension = ".ts"
+	EnumTypeString EnumType = "string"
+	EnumTypeInt    EnumType = "int"
 )
 
-// CodegenTypescriptImportExtensionList contains all valid CodegenTypescriptImportExtension values.
-var CodegenTypescriptImportExtensionList = []CodegenTypescriptImportExtension{
-	CodegenTypescriptImportExtensionNone,
-	CodegenTypescriptImportExtensionJs,
-	CodegenTypescriptImportExtensionTs,
+// EnumTypeList contains all valid EnumType values.
+var EnumTypeList = []EnumType{
+	EnumTypeString,
+	EnumTypeInt,
 }
 
-// String returns the string representation of CodegenTypescriptImportExtension.
-func (e CodegenTypescriptImportExtension) String() string {
+// String returns the string representation of EnumType.
+func (e EnumType) String() string {
 	return string(e)
 }
 
-// IsValid returns true if the value is a valid CodegenTypescriptImportExtension.
-func (e CodegenTypescriptImportExtension) IsValid() bool {
+// IsValid returns true if the value is a valid EnumType.
+func (e EnumType) IsValid() bool {
 	switch e {
-	case CodegenTypescriptImportExtensionNone, CodegenTypescriptImportExtensionJs, CodegenTypescriptImportExtensionTs:
+	case EnumTypeString, EnumTypeInt:
 		return true
 	}
 	return false
 }
 
 // MarshalJSON implements json.Marshaler.
-// Returns an error if the value is not a valid CodegenTypescriptImportExtension member.
-func (e CodegenTypescriptImportExtension) MarshalJSON() ([]byte, error) {
+// Returns an error if the value is not a valid EnumType member.
+func (e EnumType) MarshalJSON() ([]byte, error) {
 	if !e.IsValid() {
-		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum CodegenTypescriptImportExtension", string(e))
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum EnumType", string(e))
 	}
 	return json.Marshal(string(e))
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-// Returns an error if the value is not a valid CodegenTypescriptImportExtension member.
-func (e *CodegenTypescriptImportExtension) UnmarshalJSON(data []byte) error {
+// Returns an error if the value is not a valid EnumType member.
+func (e *EnumType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
 
-	v := CodegenTypescriptImportExtension(s)
+	v := EnumType(s)
 	if !v.IsValid() {
-		return fmt.Errorf("invalid value '%s' for enum CodegenTypescriptImportExtension", s)
+		return fmt.Errorf("invalid value '%s' for enum EnumType", s)
+	}
+
+	*e = v
+	return nil
+}
+
+// Field primitive types
+type PrimitiveType string
+
+// PrimitiveType enum values
+const (
+	PrimitiveTypeString   PrimitiveType = "string"
+	PrimitiveTypeInt      PrimitiveType = "int"
+	PrimitiveTypeFloat    PrimitiveType = "float"
+	PrimitiveTypeBool     PrimitiveType = "bool"
+	PrimitiveTypeDatetime PrimitiveType = "datetime"
+)
+
+// PrimitiveTypeList contains all valid PrimitiveType values.
+var PrimitiveTypeList = []PrimitiveType{
+	PrimitiveTypeString,
+	PrimitiveTypeInt,
+	PrimitiveTypeFloat,
+	PrimitiveTypeBool,
+	PrimitiveTypeDatetime,
+}
+
+// String returns the string representation of PrimitiveType.
+func (e PrimitiveType) String() string {
+	return string(e)
+}
+
+// IsValid returns true if the value is a valid PrimitiveType.
+func (e PrimitiveType) IsValid() bool {
+	switch e {
+	case PrimitiveTypeString, PrimitiveTypeInt, PrimitiveTypeFloat, PrimitiveTypeBool, PrimitiveTypeDatetime:
+		return true
+	}
+	return false
+}
+
+// MarshalJSON implements json.Marshaler.
+// Returns an error if the value is not a valid PrimitiveType member.
+func (e PrimitiveType) MarshalJSON() ([]byte, error) {
+	if !e.IsValid() {
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum PrimitiveType", string(e))
+	}
+	return json.Marshal(string(e))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+// Returns an error if the value is not a valid PrimitiveType member.
+func (e *PrimitiveType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	v := PrimitiveType(s)
+	if !v.IsValid() {
+		return fmt.Errorf("invalid value '%s' for enum PrimitiveType", s)
+	}
+
+	*e = v
+	return nil
+}
+
+// Categories for a type
+type TypeKind string
+
+// TypeKind enum values
+const (
+	TypeKindPrimitive TypeKind = "primitive"
+	TypeKindType      TypeKind = "type"
+	TypeKindEnum      TypeKind = "enum"
+	TypeKindArray     TypeKind = "array"
+	TypeKindMap       TypeKind = "map"
+	TypeKindObject    TypeKind = "object"
+)
+
+// TypeKindList contains all valid TypeKind values.
+var TypeKindList = []TypeKind{
+	TypeKindPrimitive,
+	TypeKindType,
+	TypeKindEnum,
+	TypeKindArray,
+	TypeKindMap,
+	TypeKindObject,
+}
+
+// String returns the string representation of TypeKind.
+func (e TypeKind) String() string {
+	return string(e)
+}
+
+// IsValid returns true if the value is a valid TypeKind.
+func (e TypeKind) IsValid() bool {
+	switch e {
+	case TypeKindPrimitive, TypeKindType, TypeKindEnum, TypeKindArray, TypeKindMap, TypeKindObject:
+		return true
+	}
+	return false
+}
+
+// MarshalJSON implements json.Marshaler.
+// Returns an error if the value is not a valid TypeKind member.
+func (e TypeKind) MarshalJSON() ([]byte, error) {
+	if !e.IsValid() {
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum TypeKind", string(e))
+	}
+	return json.Marshal(string(e))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+// Returns an error if the value is not a valid TypeKind member.
+func (e *TypeKind) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	v := TypeKind(s)
+	if !v.IsValid() {
+		return fmt.Errorf("invalid value '%s' for enum TypeKind", s)
+	}
+
+	*e = v
+	return nil
+}
+
+// Import extension options for TypeScript target
+type TypescriptTargetImportExtension string
+
+// TypescriptTargetImportExtension enum values
+const (
+	TypescriptTargetImportExtensionNone TypescriptTargetImportExtension = "none"
+	TypescriptTargetImportExtensionJs   TypescriptTargetImportExtension = ".js"
+	TypescriptTargetImportExtensionTs   TypescriptTargetImportExtension = ".ts"
+)
+
+// TypescriptTargetImportExtensionList contains all valid TypescriptTargetImportExtension values.
+var TypescriptTargetImportExtensionList = []TypescriptTargetImportExtension{
+	TypescriptTargetImportExtensionNone,
+	TypescriptTargetImportExtensionJs,
+	TypescriptTargetImportExtensionTs,
+}
+
+// String returns the string representation of TypescriptTargetImportExtension.
+func (e TypescriptTargetImportExtension) String() string {
+	return string(e)
+}
+
+// IsValid returns true if the value is a valid TypescriptTargetImportExtension.
+func (e TypescriptTargetImportExtension) IsValid() bool {
+	switch e {
+	case TypescriptTargetImportExtensionNone, TypescriptTargetImportExtensionJs, TypescriptTargetImportExtensionTs:
+		return true
+	}
+	return false
+}
+
+// MarshalJSON implements json.Marshaler.
+// Returns an error if the value is not a valid TypescriptTargetImportExtension member.
+func (e TypescriptTargetImportExtension) MarshalJSON() ([]byte, error) {
+	if !e.IsValid() {
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum TypescriptTargetImportExtension", string(e))
+	}
+	return json.Marshal(string(e))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+// Returns an error if the value is not a valid TypescriptTargetImportExtension member.
+func (e *TypescriptTargetImportExtension) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	v := TypescriptTargetImportExtension(s)
+	if !v.IsValid() {
+		return fmt.Errorf("invalid value '%s' for enum TypescriptTargetImportExtension", s)
 	}
 
 	*e = v
@@ -144,6 +319,7 @@ const (
 	WasmFunctionNameExtractType   WasmFunctionName = "ExtractType"
 	WasmFunctionNameExtractProc   WasmFunctionName = "ExtractProc"
 	WasmFunctionNameExtractStream WasmFunctionName = "ExtractStream"
+	WasmFunctionNameIrgen         WasmFunctionName = "Irgen"
 	WasmFunctionNameCodegen       WasmFunctionName = "Codegen"
 )
 
@@ -153,6 +329,7 @@ var WasmFunctionNameList = []WasmFunctionName{
 	WasmFunctionNameExtractType,
 	WasmFunctionNameExtractProc,
 	WasmFunctionNameExtractStream,
+	WasmFunctionNameIrgen,
 	WasmFunctionNameCodegen,
 }
 
@@ -164,7 +341,7 @@ func (e WasmFunctionName) String() string {
 // IsValid returns true if the value is a valid WasmFunctionName.
 func (e WasmFunctionName) IsValid() bool {
 	switch e {
-	case WasmFunctionNameExpandTypes, WasmFunctionNameExtractType, WasmFunctionNameExtractProc, WasmFunctionNameExtractStream, WasmFunctionNameCodegen:
+	case WasmFunctionNameExpandTypes, WasmFunctionNameExtractType, WasmFunctionNameExtractProc, WasmFunctionNameExtractStream, WasmFunctionNameIrgen, WasmFunctionNameCodegen:
 		return true
 	}
 	return false
@@ -200,81 +377,53 @@ func (e *WasmFunctionName) UnmarshalJSON(data []byte) error {
 // Domain Types
 // -----------------------------------------------------------------------------
 
-// Rrepresents a file generated by codegen function
-type CodegenFile struct {
-	Path    string `json:"path"`
-	Content string `json:"content"`
+// Configuration for generating RPC clients
+type ClientTargetConfig struct {
+	// Generate RPC client code
+	GenClient *bool `json:"genClient,omitempty"`
 }
 
-// GetPath returns the value of Path or the zero value if the receiver or field is nil.
-func (x *CodegenFile) GetPath() string {
-	if x != nil {
-		return x.Path
+// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
+func (x *ClientTargetConfig) GetGenClient() bool {
+	if x != nil && x.GenClient != nil {
+		return *x.GenClient
 	}
-	var zero string
+	var zero bool
 	return zero
 }
 
-// GetPathOr returns the value of Path or the provided default if the receiver or field is nil.
-func (x *CodegenFile) GetPathOr(defaultValue string) string {
-	if x != nil {
-		return x.Path
+// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
+func (x *ClientTargetConfig) GetGenClientOr(defaultValue bool) bool {
+	if x != nil && x.GenClient != nil {
+		return *x.GenClient
 	}
 	return defaultValue
 }
 
-// GetContent returns the value of Content or the zero value if the receiver or field is nil.
-func (x *CodegenFile) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	var zero string
-	return zero
+// preClientTargetConfig is the version of ClientTargetConfig previous to the required field validation
+type preClientTargetConfig struct {
+	GenClient *bool `json:"genClient,omitempty"`
 }
 
-// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
-func (x *CodegenFile) GetContentOr(defaultValue string) string {
-	if x != nil {
-		return x.Content
-	}
-	return defaultValue
-}
-
-// preCodegenFile is the version of CodegenFile previous to the required field validation
-type preCodegenFile struct {
-	Path    *string `json:"path,omitempty"`
-	Content *string `json:"content,omitempty"`
-}
-
-// validate validates the required fields of CodegenFile
-func (p *preCodegenFile) validate() error {
+// validate validates the required fields of ClientTargetConfig
+func (p *preClientTargetConfig) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preCodegenFile is nil")
+		return errorMissingRequiredField("preClientTargetConfig is nil")
 	}
 
-	// Validation for field "path"
-	if p.Path == nil {
-		return errorMissingRequiredField("field path is required")
-	}
-
-	// Validation for field "content"
-	if p.Content == nil {
-		return errorMissingRequiredField("field content is required")
-	}
+	// Validation for field "genClient"
 
 	return nil
 }
 
-// transform transforms the preCodegenFile type to the final CodegenFile type
-func (p *preCodegenFile) transform() CodegenFile {
+// transform transforms the preClientTargetConfig type to the final ClientTargetConfig type
+func (p *preClientTargetConfig) transform() ClientTargetConfig {
 	// Transformations
-	transPath := *p.Path
-	transContent := *p.Content
+	transGenClient := p.GenClient
 
 	// Assignments
-	return CodegenFile{
-		Path:    transPath,
-		Content: transContent,
+	return ClientTargetConfig{
+		GenClient: transGenClient,
 	}
 }
 
@@ -283,19 +432,7 @@ type CodegenInput struct {
 	// Schema to generate code from
 	VdlSchema string `json:"vdlSchema"`
 	// Target to generate code for
-	Target CodegenTarget `json:"target"`
-	// Configuration if the target is Go
-	GoConfig *CodegenInputGoConfig `json:"goConfig,omitempty"`
-	// Configuration if the target is Typescript
-	TypescriptConfig *CodegenInputTypescriptConfig `json:"typescriptConfig,omitempty"`
-	// Configuration if the target is Dart
-	DartConfig *CodegenInputDartConfig `json:"dartConfig,omitempty"`
-	// Configuration if the target is Python
-	PythonConfig *CodegenInputPythonConfig `json:"pythonConfig,omitempty"`
-	// Configuration if the target is JsonSchema
-	JsonSchemaConfig *CodegenInputJsonSchemaConfig `json:"jsonSchemaConfig,omitempty"`
-	// Configuration if the target is OpenApi
-	OpenApiConfig *CodegenInputOpenApiConfig `json:"openApiConfig,omitempty"`
+	Target TargetConfig `json:"target"`
 }
 
 // GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
@@ -316,841 +453,26 @@ func (x *CodegenInput) GetVdlSchemaOr(defaultValue string) string {
 }
 
 // GetTarget returns the value of Target or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetTarget() CodegenTarget {
+func (x *CodegenInput) GetTarget() TargetConfig {
 	if x != nil {
 		return x.Target
 	}
-	var zero CodegenTarget
+	var zero TargetConfig
 	return zero
 }
 
 // GetTargetOr returns the value of Target or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetTargetOr(defaultValue CodegenTarget) CodegenTarget {
+func (x *CodegenInput) GetTargetOr(defaultValue TargetConfig) TargetConfig {
 	if x != nil {
 		return x.Target
-	}
-	return defaultValue
-}
-
-// GetGoConfig returns the value of GoConfig or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetGoConfig() CodegenInputGoConfig {
-	if x != nil && x.GoConfig != nil {
-		return *x.GoConfig
-	}
-	var zero CodegenInputGoConfig
-	return zero
-}
-
-// GetGoConfigOr returns the value of GoConfig or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetGoConfigOr(defaultValue CodegenInputGoConfig) CodegenInputGoConfig {
-	if x != nil && x.GoConfig != nil {
-		return *x.GoConfig
-	}
-	return defaultValue
-}
-
-// GetTypescriptConfig returns the value of TypescriptConfig or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetTypescriptConfig() CodegenInputTypescriptConfig {
-	if x != nil && x.TypescriptConfig != nil {
-		return *x.TypescriptConfig
-	}
-	var zero CodegenInputTypescriptConfig
-	return zero
-}
-
-// GetTypescriptConfigOr returns the value of TypescriptConfig or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetTypescriptConfigOr(defaultValue CodegenInputTypescriptConfig) CodegenInputTypescriptConfig {
-	if x != nil && x.TypescriptConfig != nil {
-		return *x.TypescriptConfig
-	}
-	return defaultValue
-}
-
-// GetDartConfig returns the value of DartConfig or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetDartConfig() CodegenInputDartConfig {
-	if x != nil && x.DartConfig != nil {
-		return *x.DartConfig
-	}
-	var zero CodegenInputDartConfig
-	return zero
-}
-
-// GetDartConfigOr returns the value of DartConfig or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetDartConfigOr(defaultValue CodegenInputDartConfig) CodegenInputDartConfig {
-	if x != nil && x.DartConfig != nil {
-		return *x.DartConfig
-	}
-	return defaultValue
-}
-
-// GetPythonConfig returns the value of PythonConfig or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetPythonConfig() CodegenInputPythonConfig {
-	if x != nil && x.PythonConfig != nil {
-		return *x.PythonConfig
-	}
-	var zero CodegenInputPythonConfig
-	return zero
-}
-
-// GetPythonConfigOr returns the value of PythonConfig or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetPythonConfigOr(defaultValue CodegenInputPythonConfig) CodegenInputPythonConfig {
-	if x != nil && x.PythonConfig != nil {
-		return *x.PythonConfig
-	}
-	return defaultValue
-}
-
-// GetJsonSchemaConfig returns the value of JsonSchemaConfig or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetJsonSchemaConfig() CodegenInputJsonSchemaConfig {
-	if x != nil && x.JsonSchemaConfig != nil {
-		return *x.JsonSchemaConfig
-	}
-	var zero CodegenInputJsonSchemaConfig
-	return zero
-}
-
-// GetJsonSchemaConfigOr returns the value of JsonSchemaConfig or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetJsonSchemaConfigOr(defaultValue CodegenInputJsonSchemaConfig) CodegenInputJsonSchemaConfig {
-	if x != nil && x.JsonSchemaConfig != nil {
-		return *x.JsonSchemaConfig
-	}
-	return defaultValue
-}
-
-// GetOpenApiConfig returns the value of OpenApiConfig or the zero value if the receiver or field is nil.
-func (x *CodegenInput) GetOpenApiConfig() CodegenInputOpenApiConfig {
-	if x != nil && x.OpenApiConfig != nil {
-		return *x.OpenApiConfig
-	}
-	var zero CodegenInputOpenApiConfig
-	return zero
-}
-
-// GetOpenApiConfigOr returns the value of OpenApiConfig or the provided default if the receiver or field is nil.
-func (x *CodegenInput) GetOpenApiConfigOr(defaultValue CodegenInputOpenApiConfig) CodegenInputOpenApiConfig {
-	if x != nil && x.OpenApiConfig != nil {
-		return *x.OpenApiConfig
-	}
-	return defaultValue
-}
-
-type CodegenInputGoConfig struct {
-	Package     string `json:"package"`
-	GenPatterns bool   `json:"genPatterns"`
-	GenConsts   bool   `json:"genConsts"`
-	GenClient   bool   `json:"genClient"`
-	GenServer   bool   `json:"genServer"`
-}
-
-// GetPackage returns the value of Package or the zero value if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetPackage() string {
-	if x != nil {
-		return x.Package
-	}
-	var zero string
-	return zero
-}
-
-// GetPackageOr returns the value of Package or the provided default if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetPackageOr(defaultValue string) string {
-	if x != nil {
-		return x.Package
-	}
-	return defaultValue
-}
-
-// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenPatterns() bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenPatternsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	return defaultValue
-}
-
-// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenConsts() bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenConstsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	return defaultValue
-}
-
-// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenClient() bool {
-	if x != nil {
-		return x.GenClient
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenClientOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenClient
-	}
-	return defaultValue
-}
-
-// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenServer() bool {
-	if x != nil {
-		return x.GenServer
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
-func (x *CodegenInputGoConfig) GetGenServerOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenServer
-	}
-	return defaultValue
-}
-
-type CodegenInputTypescriptConfig struct {
-	ImportExtension CodegenTypescriptImportExtension `json:"importExtension"`
-	GenPatterns     bool                             `json:"genPatterns"`
-	GenConsts       bool                             `json:"genConsts"`
-	GenClient       bool                             `json:"genClient"`
-	GenServer       bool                             `json:"genServer"`
-}
-
-// GetImportExtension returns the value of ImportExtension or the zero value if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetImportExtension() CodegenTypescriptImportExtension {
-	if x != nil {
-		return x.ImportExtension
-	}
-	var zero CodegenTypescriptImportExtension
-	return zero
-}
-
-// GetImportExtensionOr returns the value of ImportExtension or the provided default if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetImportExtensionOr(defaultValue CodegenTypescriptImportExtension) CodegenTypescriptImportExtension {
-	if x != nil {
-		return x.ImportExtension
-	}
-	return defaultValue
-}
-
-// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenPatterns() bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenPatternsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	return defaultValue
-}
-
-// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenConsts() bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenConstsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	return defaultValue
-}
-
-// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenClient() bool {
-	if x != nil {
-		return x.GenClient
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenClientOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenClient
-	}
-	return defaultValue
-}
-
-// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenServer() bool {
-	if x != nil {
-		return x.GenServer
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
-func (x *CodegenInputTypescriptConfig) GetGenServerOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenServer
-	}
-	return defaultValue
-}
-
-type CodegenInputDartConfig struct {
-	GenPatterns bool `json:"genPatterns"`
-	GenConsts   bool `json:"genConsts"`
-}
-
-// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *CodegenInputDartConfig) GetGenPatterns() bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *CodegenInputDartConfig) GetGenPatternsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	return defaultValue
-}
-
-// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *CodegenInputDartConfig) GetGenConsts() bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *CodegenInputDartConfig) GetGenConstsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	return defaultValue
-}
-
-type CodegenInputPythonConfig struct {
-	GenPatterns bool `json:"genPatterns"`
-	GenConsts   bool `json:"genConsts"`
-}
-
-// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
-func (x *CodegenInputPythonConfig) GetGenPatterns() bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
-func (x *CodegenInputPythonConfig) GetGenPatternsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenPatterns
-	}
-	return defaultValue
-}
-
-// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
-func (x *CodegenInputPythonConfig) GetGenConsts() bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	var zero bool
-	return zero
-}
-
-// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
-func (x *CodegenInputPythonConfig) GetGenConstsOr(defaultValue bool) bool {
-	if x != nil {
-		return x.GenConsts
-	}
-	return defaultValue
-}
-
-type CodegenInputJsonSchemaConfig struct {
-	SchemaId string `json:"schemaId"`
-}
-
-// GetSchemaId returns the value of SchemaId or the zero value if the receiver or field is nil.
-func (x *CodegenInputJsonSchemaConfig) GetSchemaId() string {
-	if x != nil {
-		return x.SchemaId
-	}
-	var zero string
-	return zero
-}
-
-// GetSchemaIdOr returns the value of SchemaId or the provided default if the receiver or field is nil.
-func (x *CodegenInputJsonSchemaConfig) GetSchemaIdOr(defaultValue string) string {
-	if x != nil {
-		return x.SchemaId
-	}
-	return defaultValue
-}
-
-type CodegenInputOpenApiConfig struct {
-	Title        string  `json:"title"`
-	Version      string  `json:"version"`
-	Description  *string `json:"description,omitempty"`
-	BaseUrl      *string `json:"baseUrl,omitempty"`
-	ContactName  *string `json:"contactName,omitempty"`
-	ContactEmail *string `json:"contactEmail,omitempty"`
-	LicenseName  *string `json:"licenseName,omitempty"`
-}
-
-// GetTitle returns the value of Title or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	var zero string
-	return zero
-}
-
-// GetTitleOr returns the value of Title or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetTitleOr(defaultValue string) string {
-	if x != nil {
-		return x.Title
-	}
-	return defaultValue
-}
-
-// GetVersion returns the value of Version or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetVersion() string {
-	if x != nil {
-		return x.Version
-	}
-	var zero string
-	return zero
-}
-
-// GetVersionOr returns the value of Version or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetVersionOr(defaultValue string) string {
-	if x != nil {
-		return x.Version
-	}
-	return defaultValue
-}
-
-// GetDescription returns the value of Description or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetDescription() string {
-	if x != nil && x.Description != nil {
-		return *x.Description
-	}
-	var zero string
-	return zero
-}
-
-// GetDescriptionOr returns the value of Description or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetDescriptionOr(defaultValue string) string {
-	if x != nil && x.Description != nil {
-		return *x.Description
-	}
-	return defaultValue
-}
-
-// GetBaseUrl returns the value of BaseUrl or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetBaseUrl() string {
-	if x != nil && x.BaseUrl != nil {
-		return *x.BaseUrl
-	}
-	var zero string
-	return zero
-}
-
-// GetBaseUrlOr returns the value of BaseUrl or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetBaseUrlOr(defaultValue string) string {
-	if x != nil && x.BaseUrl != nil {
-		return *x.BaseUrl
-	}
-	return defaultValue
-}
-
-// GetContactName returns the value of ContactName or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetContactName() string {
-	if x != nil && x.ContactName != nil {
-		return *x.ContactName
-	}
-	var zero string
-	return zero
-}
-
-// GetContactNameOr returns the value of ContactName or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetContactNameOr(defaultValue string) string {
-	if x != nil && x.ContactName != nil {
-		return *x.ContactName
-	}
-	return defaultValue
-}
-
-// GetContactEmail returns the value of ContactEmail or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetContactEmail() string {
-	if x != nil && x.ContactEmail != nil {
-		return *x.ContactEmail
-	}
-	var zero string
-	return zero
-}
-
-// GetContactEmailOr returns the value of ContactEmail or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetContactEmailOr(defaultValue string) string {
-	if x != nil && x.ContactEmail != nil {
-		return *x.ContactEmail
-	}
-	return defaultValue
-}
-
-// GetLicenseName returns the value of LicenseName or the zero value if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetLicenseName() string {
-	if x != nil && x.LicenseName != nil {
-		return *x.LicenseName
-	}
-	var zero string
-	return zero
-}
-
-// GetLicenseNameOr returns the value of LicenseName or the provided default if the receiver or field is nil.
-func (x *CodegenInputOpenApiConfig) GetLicenseNameOr(defaultValue string) string {
-	if x != nil && x.LicenseName != nil {
-		return *x.LicenseName
 	}
 	return defaultValue
 }
 
 // preCodegenInput is the version of CodegenInput previous to the required field validation
 type preCodegenInput struct {
-	VdlSchema        *string                          `json:"vdlSchema,omitempty"`
-	Target           *CodegenTarget                   `json:"target,omitempty"`
-	GoConfig         *preCodegenInputGoConfig         `json:"goConfig,omitempty"`
-	TypescriptConfig *preCodegenInputTypescriptConfig `json:"typescriptConfig,omitempty"`
-	DartConfig       *preCodegenInputDartConfig       `json:"dartConfig,omitempty"`
-	PythonConfig     *preCodegenInputPythonConfig     `json:"pythonConfig,omitempty"`
-	JsonSchemaConfig *preCodegenInputJsonSchemaConfig `json:"jsonSchemaConfig,omitempty"`
-	OpenApiConfig    *preCodegenInputOpenApiConfig    `json:"openApiConfig,omitempty"`
-}
-
-// preCodegenInputGoConfig is the version of CodegenInputGoConfig previous to the required field validation
-type preCodegenInputGoConfig struct {
-	Package     *string `json:"package,omitempty"`
-	GenPatterns *bool   `json:"genPatterns,omitempty"`
-	GenConsts   *bool   `json:"genConsts,omitempty"`
-	GenClient   *bool   `json:"genClient,omitempty"`
-	GenServer   *bool   `json:"genServer,omitempty"`
-}
-
-// validate validates the required fields of CodegenInputGoConfig
-func (p *preCodegenInputGoConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preCodegenInputGoConfig is nil")
-	}
-
-	// Validation for field "package"
-	if p.Package == nil {
-		return errorMissingRequiredField("field package is required")
-	}
-
-	// Validation for field "genPatterns"
-	if p.GenPatterns == nil {
-		return errorMissingRequiredField("field genPatterns is required")
-	}
-
-	// Validation for field "genConsts"
-	if p.GenConsts == nil {
-		return errorMissingRequiredField("field genConsts is required")
-	}
-
-	// Validation for field "genClient"
-	if p.GenClient == nil {
-		return errorMissingRequiredField("field genClient is required")
-	}
-
-	// Validation for field "genServer"
-	if p.GenServer == nil {
-		return errorMissingRequiredField("field genServer is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preCodegenInputGoConfig type to the final CodegenInputGoConfig type
-func (p *preCodegenInputGoConfig) transform() CodegenInputGoConfig {
-	// Transformations
-	transPackage := *p.Package
-	transGenPatterns := *p.GenPatterns
-	transGenConsts := *p.GenConsts
-	transGenClient := *p.GenClient
-	transGenServer := *p.GenServer
-
-	// Assignments
-	return CodegenInputGoConfig{
-		Package:     transPackage,
-		GenPatterns: transGenPatterns,
-		GenConsts:   transGenConsts,
-		GenClient:   transGenClient,
-		GenServer:   transGenServer,
-	}
-}
-
-// preCodegenInputTypescriptConfig is the version of CodegenInputTypescriptConfig previous to the required field validation
-type preCodegenInputTypescriptConfig struct {
-	ImportExtension *CodegenTypescriptImportExtension `json:"importExtension,omitempty"`
-	GenPatterns     *bool                             `json:"genPatterns,omitempty"`
-	GenConsts       *bool                             `json:"genConsts,omitempty"`
-	GenClient       *bool                             `json:"genClient,omitempty"`
-	GenServer       *bool                             `json:"genServer,omitempty"`
-}
-
-// validate validates the required fields of CodegenInputTypescriptConfig
-func (p *preCodegenInputTypescriptConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preCodegenInputTypescriptConfig is nil")
-	}
-
-	// Validation for field "importExtension"
-	if p.ImportExtension == nil {
-		return errorMissingRequiredField("field importExtension is required")
-	}
-
-	// Validation for field "genPatterns"
-	if p.GenPatterns == nil {
-		return errorMissingRequiredField("field genPatterns is required")
-	}
-
-	// Validation for field "genConsts"
-	if p.GenConsts == nil {
-		return errorMissingRequiredField("field genConsts is required")
-	}
-
-	// Validation for field "genClient"
-	if p.GenClient == nil {
-		return errorMissingRequiredField("field genClient is required")
-	}
-
-	// Validation for field "genServer"
-	if p.GenServer == nil {
-		return errorMissingRequiredField("field genServer is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preCodegenInputTypescriptConfig type to the final CodegenInputTypescriptConfig type
-func (p *preCodegenInputTypescriptConfig) transform() CodegenInputTypescriptConfig {
-	// Transformations
-	transImportExtension := *p.ImportExtension
-	transGenPatterns := *p.GenPatterns
-	transGenConsts := *p.GenConsts
-	transGenClient := *p.GenClient
-	transGenServer := *p.GenServer
-
-	// Assignments
-	return CodegenInputTypescriptConfig{
-		ImportExtension: transImportExtension,
-		GenPatterns:     transGenPatterns,
-		GenConsts:       transGenConsts,
-		GenClient:       transGenClient,
-		GenServer:       transGenServer,
-	}
-}
-
-// preCodegenInputDartConfig is the version of CodegenInputDartConfig previous to the required field validation
-type preCodegenInputDartConfig struct {
-	GenPatterns *bool `json:"genPatterns,omitempty"`
-	GenConsts   *bool `json:"genConsts,omitempty"`
-}
-
-// validate validates the required fields of CodegenInputDartConfig
-func (p *preCodegenInputDartConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preCodegenInputDartConfig is nil")
-	}
-
-	// Validation for field "genPatterns"
-	if p.GenPatterns == nil {
-		return errorMissingRequiredField("field genPatterns is required")
-	}
-
-	// Validation for field "genConsts"
-	if p.GenConsts == nil {
-		return errorMissingRequiredField("field genConsts is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preCodegenInputDartConfig type to the final CodegenInputDartConfig type
-func (p *preCodegenInputDartConfig) transform() CodegenInputDartConfig {
-	// Transformations
-	transGenPatterns := *p.GenPatterns
-	transGenConsts := *p.GenConsts
-
-	// Assignments
-	return CodegenInputDartConfig{
-		GenPatterns: transGenPatterns,
-		GenConsts:   transGenConsts,
-	}
-}
-
-// preCodegenInputPythonConfig is the version of CodegenInputPythonConfig previous to the required field validation
-type preCodegenInputPythonConfig struct {
-	GenPatterns *bool `json:"genPatterns,omitempty"`
-	GenConsts   *bool `json:"genConsts,omitempty"`
-}
-
-// validate validates the required fields of CodegenInputPythonConfig
-func (p *preCodegenInputPythonConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preCodegenInputPythonConfig is nil")
-	}
-
-	// Validation for field "genPatterns"
-	if p.GenPatterns == nil {
-		return errorMissingRequiredField("field genPatterns is required")
-	}
-
-	// Validation for field "genConsts"
-	if p.GenConsts == nil {
-		return errorMissingRequiredField("field genConsts is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preCodegenInputPythonConfig type to the final CodegenInputPythonConfig type
-func (p *preCodegenInputPythonConfig) transform() CodegenInputPythonConfig {
-	// Transformations
-	transGenPatterns := *p.GenPatterns
-	transGenConsts := *p.GenConsts
-
-	// Assignments
-	return CodegenInputPythonConfig{
-		GenPatterns: transGenPatterns,
-		GenConsts:   transGenConsts,
-	}
-}
-
-// preCodegenInputJsonSchemaConfig is the version of CodegenInputJsonSchemaConfig previous to the required field validation
-type preCodegenInputJsonSchemaConfig struct {
-	SchemaId *string `json:"schemaId,omitempty"`
-}
-
-// validate validates the required fields of CodegenInputJsonSchemaConfig
-func (p *preCodegenInputJsonSchemaConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preCodegenInputJsonSchemaConfig is nil")
-	}
-
-	// Validation for field "schemaId"
-	if p.SchemaId == nil {
-		return errorMissingRequiredField("field schemaId is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preCodegenInputJsonSchemaConfig type to the final CodegenInputJsonSchemaConfig type
-func (p *preCodegenInputJsonSchemaConfig) transform() CodegenInputJsonSchemaConfig {
-	// Transformations
-	transSchemaId := *p.SchemaId
-
-	// Assignments
-	return CodegenInputJsonSchemaConfig{
-		SchemaId: transSchemaId,
-	}
-}
-
-// preCodegenInputOpenApiConfig is the version of CodegenInputOpenApiConfig previous to the required field validation
-type preCodegenInputOpenApiConfig struct {
-	Title        *string `json:"title,omitempty"`
-	Version      *string `json:"version,omitempty"`
-	Description  *string `json:"description,omitempty"`
-	BaseUrl      *string `json:"baseUrl,omitempty"`
-	ContactName  *string `json:"contactName,omitempty"`
-	ContactEmail *string `json:"contactEmail,omitempty"`
-	LicenseName  *string `json:"licenseName,omitempty"`
-}
-
-// validate validates the required fields of CodegenInputOpenApiConfig
-func (p *preCodegenInputOpenApiConfig) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preCodegenInputOpenApiConfig is nil")
-	}
-
-	// Validation for field "title"
-	if p.Title == nil {
-		return errorMissingRequiredField("field title is required")
-	}
-
-	// Validation for field "version"
-	if p.Version == nil {
-		return errorMissingRequiredField("field version is required")
-	}
-
-	// Validation for field "description"
-
-	// Validation for field "baseUrl"
-
-	// Validation for field "contactName"
-
-	// Validation for field "contactEmail"
-
-	// Validation for field "licenseName"
-
-	return nil
-}
-
-// transform transforms the preCodegenInputOpenApiConfig type to the final CodegenInputOpenApiConfig type
-func (p *preCodegenInputOpenApiConfig) transform() CodegenInputOpenApiConfig {
-	// Transformations
-	transTitle := *p.Title
-	transVersion := *p.Version
-	transDescription := p.Description
-	transBaseUrl := p.BaseUrl
-	transContactName := p.ContactName
-	transContactEmail := p.ContactEmail
-	transLicenseName := p.LicenseName
-
-	// Assignments
-	return CodegenInputOpenApiConfig{
-		Title:        transTitle,
-		Version:      transVersion,
-		Description:  transDescription,
-		BaseUrl:      transBaseUrl,
-		ContactName:  transContactName,
-		ContactEmail: transContactEmail,
-		LicenseName:  transLicenseName,
-	}
+	VdlSchema *string          `json:"vdlSchema,omitempty"`
+	Target    *preTargetConfig `json:"target,omitempty"`
 }
 
 // validate validates the required fields of CodegenInput
@@ -1168,46 +490,9 @@ func (p *preCodegenInput) validate() error {
 	if p.Target == nil {
 		return errorMissingRequiredField("field target is required")
 	}
-
-	// Validation for field "goConfig"
-	if p.GoConfig != nil {
-		if err := p.GoConfig.validate(); err != nil {
-			return errorMissingRequiredField("field goConfig: " + err.Error())
-		}
-	}
-
-	// Validation for field "typescriptConfig"
-	if p.TypescriptConfig != nil {
-		if err := p.TypescriptConfig.validate(); err != nil {
-			return errorMissingRequiredField("field typescriptConfig: " + err.Error())
-		}
-	}
-
-	// Validation for field "dartConfig"
-	if p.DartConfig != nil {
-		if err := p.DartConfig.validate(); err != nil {
-			return errorMissingRequiredField("field dartConfig: " + err.Error())
-		}
-	}
-
-	// Validation for field "pythonConfig"
-	if p.PythonConfig != nil {
-		if err := p.PythonConfig.validate(); err != nil {
-			return errorMissingRequiredField("field pythonConfig: " + err.Error())
-		}
-	}
-
-	// Validation for field "jsonSchemaConfig"
-	if p.JsonSchemaConfig != nil {
-		if err := p.JsonSchemaConfig.validate(); err != nil {
-			return errorMissingRequiredField("field jsonSchemaConfig: " + err.Error())
-		}
-	}
-
-	// Validation for field "openApiConfig"
-	if p.OpenApiConfig != nil {
-		if err := p.OpenApiConfig.validate(); err != nil {
-			return errorMissingRequiredField("field openApiConfig: " + err.Error())
+	if p.Target != nil {
+		if err := p.Target.validate(); err != nil {
+			return errorMissingRequiredField("field target: " + err.Error())
 		}
 	}
 
@@ -1218,74 +503,33 @@ func (p *preCodegenInput) validate() error {
 func (p *preCodegenInput) transform() CodegenInput {
 	// Transformations
 	transVdlSchema := *p.VdlSchema
-	transTarget := *p.Target
-	var transGoConfig *CodegenInputGoConfig
-	if p.GoConfig != nil {
-		var valGoConfig CodegenInputGoConfig
-		valGoConfig = p.GoConfig.transform()
-		transGoConfig = &valGoConfig
-	}
-	var transTypescriptConfig *CodegenInputTypescriptConfig
-	if p.TypescriptConfig != nil {
-		var valTypescriptConfig CodegenInputTypescriptConfig
-		valTypescriptConfig = p.TypescriptConfig.transform()
-		transTypescriptConfig = &valTypescriptConfig
-	}
-	var transDartConfig *CodegenInputDartConfig
-	if p.DartConfig != nil {
-		var valDartConfig CodegenInputDartConfig
-		valDartConfig = p.DartConfig.transform()
-		transDartConfig = &valDartConfig
-	}
-	var transPythonConfig *CodegenInputPythonConfig
-	if p.PythonConfig != nil {
-		var valPythonConfig CodegenInputPythonConfig
-		valPythonConfig = p.PythonConfig.transform()
-		transPythonConfig = &valPythonConfig
-	}
-	var transJsonSchemaConfig *CodegenInputJsonSchemaConfig
-	if p.JsonSchemaConfig != nil {
-		var valJsonSchemaConfig CodegenInputJsonSchemaConfig
-		valJsonSchemaConfig = p.JsonSchemaConfig.transform()
-		transJsonSchemaConfig = &valJsonSchemaConfig
-	}
-	var transOpenApiConfig *CodegenInputOpenApiConfig
-	if p.OpenApiConfig != nil {
-		var valOpenApiConfig CodegenInputOpenApiConfig
-		valOpenApiConfig = p.OpenApiConfig.transform()
-		transOpenApiConfig = &valOpenApiConfig
-	}
+	var transTarget TargetConfig
+	transTarget = p.Target.transform()
 
 	// Assignments
 	return CodegenInput{
-		VdlSchema:        transVdlSchema,
-		Target:           transTarget,
-		GoConfig:         transGoConfig,
-		TypescriptConfig: transTypescriptConfig,
-		DartConfig:       transDartConfig,
-		PythonConfig:     transPythonConfig,
-		JsonSchemaConfig: transJsonSchemaConfig,
-		OpenApiConfig:    transOpenApiConfig,
+		VdlSchema: transVdlSchema,
+		Target:    transTarget,
 	}
 }
 
 // Output for codegen function
 type CodegenOutput struct {
 	// The files generated for the picked code generator target
-	Files []CodegenFile `json:"files"`
+	Files []CodegenOutputFile `json:"files"`
 }
 
 // GetFiles returns the value of Files or the zero value if the receiver or field is nil.
-func (x *CodegenOutput) GetFiles() []CodegenFile {
+func (x *CodegenOutput) GetFiles() []CodegenOutputFile {
 	if x != nil {
 		return x.Files
 	}
-	var zero []CodegenFile
+	var zero []CodegenOutputFile
 	return zero
 }
 
 // GetFilesOr returns the value of Files or the provided default if the receiver or field is nil.
-func (x *CodegenOutput) GetFilesOr(defaultValue []CodegenFile) []CodegenFile {
+func (x *CodegenOutput) GetFilesOr(defaultValue []CodegenOutputFile) []CodegenOutputFile {
 	if x != nil {
 		return x.Files
 	}
@@ -1294,7 +538,7 @@ func (x *CodegenOutput) GetFilesOr(defaultValue []CodegenFile) []CodegenFile {
 
 // preCodegenOutput is the version of CodegenOutput previous to the required field validation
 type preCodegenOutput struct {
-	Files *[]preCodegenFile `json:"files,omitempty"`
+	Files *[]preCodegenOutputFile `json:"files,omitempty"`
 }
 
 // validate validates the required fields of CodegenOutput
@@ -1321,10 +565,10 @@ func (p *preCodegenOutput) validate() error {
 // transform transforms the preCodegenOutput type to the final CodegenOutput type
 func (p *preCodegenOutput) transform() CodegenOutput {
 	// Transformations
-	var transFiles []CodegenFile
-	transFiles = make([]CodegenFile, len(*p.Files))
+	var transFiles []CodegenOutputFile
+	transFiles = make([]CodegenOutputFile, len(*p.Files))
 	for i, v := range *p.Files {
-		var tmp_ CodegenFile
+		var tmp_ CodegenOutputFile
 		tmp_ = v.transform()
 		transFiles[i] = tmp_
 	}
@@ -1332,6 +576,864 @@ func (p *preCodegenOutput) transform() CodegenOutput {
 	// Assignments
 	return CodegenOutput{
 		Files: transFiles,
+	}
+}
+
+// Rrepresents a file generated by codegen function
+type CodegenOutputFile struct {
+	Path    string `json:"path"`
+	Content string `json:"content"`
+}
+
+// GetPath returns the value of Path or the zero value if the receiver or field is nil.
+func (x *CodegenOutputFile) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	var zero string
+	return zero
+}
+
+// GetPathOr returns the value of Path or the provided default if the receiver or field is nil.
+func (x *CodegenOutputFile) GetPathOr(defaultValue string) string {
+	if x != nil {
+		return x.Path
+	}
+	return defaultValue
+}
+
+// GetContent returns the value of Content or the zero value if the receiver or field is nil.
+func (x *CodegenOutputFile) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	var zero string
+	return zero
+}
+
+// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
+func (x *CodegenOutputFile) GetContentOr(defaultValue string) string {
+	if x != nil {
+		return x.Content
+	}
+	return defaultValue
+}
+
+// preCodegenOutputFile is the version of CodegenOutputFile previous to the required field validation
+type preCodegenOutputFile struct {
+	Path    *string `json:"path,omitempty"`
+	Content *string `json:"content,omitempty"`
+}
+
+// validate validates the required fields of CodegenOutputFile
+func (p *preCodegenOutputFile) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preCodegenOutputFile is nil")
+	}
+
+	// Validation for field "path"
+	if p.Path == nil {
+		return errorMissingRequiredField("field path is required")
+	}
+
+	// Validation for field "content"
+	if p.Content == nil {
+		return errorMissingRequiredField("field content is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preCodegenOutputFile type to the final CodegenOutputFile type
+func (p *preCodegenOutputFile) transform() CodegenOutputFile {
+	// Transformations
+	transPath := *p.Path
+	transContent := *p.Content
+
+	// Assignments
+	return CodegenOutputFile{
+		Path:    transPath,
+		Content: transContent,
+	}
+}
+
+// Common configuration fields shared by all targets
+type CommonTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *CommonTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *CommonTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *CommonTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *CommonTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *CommonTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *CommonTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// preCommonTargetConfig is the version of CommonTargetConfig previous to the required field validation
+type preCommonTargetConfig struct {
+	Output *string `json:"output,omitempty"`
+	Clean  *bool   `json:"clean,omitempty"`
+	Schema *string `json:"schema,omitempty"`
+}
+
+// validate validates the required fields of CommonTargetConfig
+func (p *preCommonTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preCommonTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	return nil
+}
+
+// transform transforms the preCommonTargetConfig type to the final CommonTargetConfig type
+func (p *preCommonTargetConfig) transform() CommonTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+
+	// Assignments
+	return CommonTargetConfig{
+		Output: transOutput,
+		Clean:  transClean,
+		Schema: transSchema,
+	}
+}
+
+// Represents a constant definition
+type ConstantDef struct {
+	// The name of the constant
+	Name string `json:"name"`
+	// Documentation for the constant
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+	// The type of the constant value
+	ConstType ConstType `json:"constType"`
+	// The value of the constant as a string
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// GetConstType returns the value of ConstType or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetConstType() ConstType {
+	if x != nil {
+		return x.ConstType
+	}
+	var zero ConstType
+	return zero
+}
+
+// GetConstTypeOr returns the value of ConstType or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetConstTypeOr(defaultValue ConstType) ConstType {
+	if x != nil {
+		return x.ConstType
+	}
+	return defaultValue
+}
+
+// GetValue returns the value of Value or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	var zero string
+	return zero
+}
+
+// GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetValueOr(defaultValue string) string {
+	if x != nil {
+		return x.Value
+	}
+	return defaultValue
+}
+
+// preConstantDef is the version of ConstantDef previous to the required field validation
+type preConstantDef struct {
+	Name       *string    `json:"name,omitempty"`
+	Doc        *string    `json:"doc,omitempty"`
+	Deprecated *string    `json:"deprecated,omitempty"`
+	ConstType  *ConstType `json:"constType,omitempty"`
+	Value      *string    `json:"value,omitempty"`
+}
+
+// validate validates the required fields of ConstantDef
+func (p *preConstantDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preConstantDef is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	// Validation for field "constType"
+	if p.ConstType == nil {
+		return errorMissingRequiredField("field constType is required")
+	}
+
+	// Validation for field "value"
+	if p.Value == nil {
+		return errorMissingRequiredField("field value is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preConstantDef type to the final ConstantDef type
+func (p *preConstantDef) transform() ConstantDef {
+	// Transformations
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+	transConstType := *p.ConstType
+	transValue := *p.Value
+
+	// Assignments
+	return ConstantDef{
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		ConstType:  transConstType,
+		Value:      transValue,
+	}
+}
+
+// Configuration for generating constants
+type ConstsTargetConfig struct {
+	// Generate constant definitions
+	GenConsts *bool `json:"genConsts,omitempty"`
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *ConstsTargetConfig) GetGenConsts() bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *ConstsTargetConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	return defaultValue
+}
+
+// preConstsTargetConfig is the version of ConstsTargetConfig previous to the required field validation
+type preConstsTargetConfig struct {
+	GenConsts *bool `json:"genConsts,omitempty"`
+}
+
+// validate validates the required fields of ConstsTargetConfig
+func (p *preConstsTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preConstsTargetConfig is nil")
+	}
+
+	// Validation for field "genConsts"
+
+	return nil
+}
+
+// transform transforms the preConstsTargetConfig type to the final ConstsTargetConfig type
+func (p *preConstsTargetConfig) transform() ConstsTargetConfig {
+	// Transformations
+	transGenConsts := p.GenConsts
+
+	// Assignments
+	return ConstsTargetConfig{
+		GenConsts: transGenConsts,
+	}
+}
+
+// Configuration for Dart code generation
+type DartTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Generate helper functions for patterns
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+	// Generate constant definitions
+	GenConsts *bool `json:"genConsts,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *DartTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *DartTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *DartTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *DartTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *DartTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *DartTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *DartTargetConfig) GetGenPatterns() bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *DartTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *DartTargetConfig) GetGenConsts() bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *DartTargetConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	return defaultValue
+}
+
+// preDartTargetConfig is the version of DartTargetConfig previous to the required field validation
+type preDartTargetConfig struct {
+	Output      *string `json:"output,omitempty"`
+	Clean       *bool   `json:"clean,omitempty"`
+	Schema      *string `json:"schema,omitempty"`
+	GenPatterns *bool   `json:"genPatterns,omitempty"`
+	GenConsts   *bool   `json:"genConsts,omitempty"`
+}
+
+// validate validates the required fields of DartTargetConfig
+func (p *preDartTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preDartTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "genPatterns"
+
+	// Validation for field "genConsts"
+
+	return nil
+}
+
+// transform transforms the preDartTargetConfig type to the final DartTargetConfig type
+func (p *preDartTargetConfig) transform() DartTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transGenPatterns := p.GenPatterns
+	transGenConsts := p.GenConsts
+
+	// Assignments
+	return DartTargetConfig{
+		Output:      transOutput,
+		Clean:       transClean,
+		Schema:      transSchema,
+		GenPatterns: transGenPatterns,
+		GenConsts:   transGenConsts,
+	}
+}
+
+// Represents a standalone documentation block
+type DocDef struct {
+	// The name of the RPC this doc belongs to. If empty this is a global standalone documentation block.
+	RpcName *string `json:"rpcName,omitempty"`
+	// The content of the documentation
+	Content string `json:"content"`
+}
+
+// GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
+func (x *DocDef) GetRpcName() string {
+	if x != nil && x.RpcName != nil {
+		return *x.RpcName
+	}
+	var zero string
+	return zero
+}
+
+// GetRpcNameOr returns the value of RpcName or the provided default if the receiver or field is nil.
+func (x *DocDef) GetRpcNameOr(defaultValue string) string {
+	if x != nil && x.RpcName != nil {
+		return *x.RpcName
+	}
+	return defaultValue
+}
+
+// GetContent returns the value of Content or the zero value if the receiver or field is nil.
+func (x *DocDef) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	var zero string
+	return zero
+}
+
+// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
+func (x *DocDef) GetContentOr(defaultValue string) string {
+	if x != nil {
+		return x.Content
+	}
+	return defaultValue
+}
+
+// preDocDef is the version of DocDef previous to the required field validation
+type preDocDef struct {
+	RpcName *string `json:"rpcName,omitempty"`
+	Content *string `json:"content,omitempty"`
+}
+
+// validate validates the required fields of DocDef
+func (p *preDocDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preDocDef is nil")
+	}
+
+	// Validation for field "rpcName"
+
+	// Validation for field "content"
+	if p.Content == nil {
+		return errorMissingRequiredField("field content is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preDocDef type to the final DocDef type
+func (p *preDocDef) transform() DocDef {
+	// Transformations
+	transRpcName := p.RpcName
+	transContent := *p.Content
+
+	// Assignments
+	return DocDef{
+		RpcName: transRpcName,
+		Content: transContent,
+	}
+}
+
+// Represents an enum definition
+type EnumDef struct {
+	// The name of the enum
+	Name string `json:"name"`
+	// Documentation for the enum
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+	// The type of this enum
+	EnumType EnumType `json:"enumType"`
+	// List of enum members
+	Members []EnumDefMember `json:"members"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// GetEnumType returns the value of EnumType or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetEnumType() EnumType {
+	if x != nil {
+		return x.EnumType
+	}
+	var zero EnumType
+	return zero
+}
+
+// GetEnumTypeOr returns the value of EnumType or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetEnumTypeOr(defaultValue EnumType) EnumType {
+	if x != nil {
+		return x.EnumType
+	}
+	return defaultValue
+}
+
+// GetMembers returns the value of Members or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetMembers() []EnumDefMember {
+	if x != nil {
+		return x.Members
+	}
+	var zero []EnumDefMember
+	return zero
+}
+
+// GetMembersOr returns the value of Members or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetMembersOr(defaultValue []EnumDefMember) []EnumDefMember {
+	if x != nil {
+		return x.Members
+	}
+	return defaultValue
+}
+
+// preEnumDef is the version of EnumDef previous to the required field validation
+type preEnumDef struct {
+	Name       *string             `json:"name,omitempty"`
+	Doc        *string             `json:"doc,omitempty"`
+	Deprecated *string             `json:"deprecated,omitempty"`
+	EnumType   *EnumType           `json:"enumType,omitempty"`
+	Members    *[]preEnumDefMember `json:"members,omitempty"`
+}
+
+// validate validates the required fields of EnumDef
+func (p *preEnumDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preEnumDef is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	// Validation for field "enumType"
+	if p.EnumType == nil {
+		return errorMissingRequiredField("field enumType is required")
+	}
+
+	// Validation for field "members"
+	if p.Members == nil {
+		return errorMissingRequiredField("field members is required")
+	}
+	if p.Members != nil {
+		for _, item := range *p.Members {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field members: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preEnumDef type to the final EnumDef type
+func (p *preEnumDef) transform() EnumDef {
+	// Transformations
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+	transEnumType := *p.EnumType
+	var transMembers []EnumDefMember
+	transMembers = make([]EnumDefMember, len(*p.Members))
+	for i, v := range *p.Members {
+		var tmp_ EnumDefMember
+		tmp_ = v.transform()
+		transMembers[i] = tmp_
+	}
+
+	// Assignments
+	return EnumDef{
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		EnumType:   transEnumType,
+		Members:    transMembers,
+	}
+}
+
+// A member of an enum
+type EnumDefMember struct {
+	// The name of the enum member
+	Name string `json:"name"`
+	// The value of the enum member as a string
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *EnumDefMember) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *EnumDefMember) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetValue returns the value of Value or the zero value if the receiver or field is nil.
+func (x *EnumDefMember) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	var zero string
+	return zero
+}
+
+// GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
+func (x *EnumDefMember) GetValueOr(defaultValue string) string {
+	if x != nil {
+		return x.Value
+	}
+	return defaultValue
+}
+
+// preEnumDefMember is the version of EnumDefMember previous to the required field validation
+type preEnumDefMember struct {
+	Name  *string `json:"name,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// validate validates the required fields of EnumDefMember
+func (p *preEnumDefMember) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preEnumDefMember is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "value"
+	if p.Value == nil {
+		return errorMissingRequiredField("field value is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preEnumDefMember type to the final EnumDefMember type
+func (p *preEnumDefMember) transform() EnumDefMember {
+	// Transformations
+	transName := *p.Name
+	transValue := *p.Value
+
+	// Assignments
+	return EnumDefMember{
+		Name:  transName,
+		Value: transValue,
 	}
 }
 
@@ -1881,6 +1983,4224 @@ func (p *preExtractTypeOutput) transform() ExtractTypeOutput {
 	}
 }
 
+// Represents a field with its type fully resolved
+type Field struct {
+	// The name of the field
+	Name string `json:"name"`
+	// Documentation for the field
+	Doc *string `json:"doc,omitempty"`
+	// Whether the field is optional
+	Optional bool `json:"optional"`
+	// The type definition of the field
+	TypeRef TypeRef `json:"typeRef"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *Field) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *Field) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *Field) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *Field) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetOptional returns the value of Optional or the zero value if the receiver or field is nil.
+func (x *Field) GetOptional() bool {
+	if x != nil {
+		return x.Optional
+	}
+	var zero bool
+	return zero
+}
+
+// GetOptionalOr returns the value of Optional or the provided default if the receiver or field is nil.
+func (x *Field) GetOptionalOr(defaultValue bool) bool {
+	if x != nil {
+		return x.Optional
+	}
+	return defaultValue
+}
+
+// GetTypeRef returns the value of TypeRef or the zero value if the receiver or field is nil.
+func (x *Field) GetTypeRef() TypeRef {
+	if x != nil {
+		return x.TypeRef
+	}
+	var zero TypeRef
+	return zero
+}
+
+// GetTypeRefOr returns the value of TypeRef or the provided default if the receiver or field is nil.
+func (x *Field) GetTypeRefOr(defaultValue TypeRef) TypeRef {
+	if x != nil {
+		return x.TypeRef
+	}
+	return defaultValue
+}
+
+// preField is the version of Field previous to the required field validation
+type preField struct {
+	Name     *string     `json:"name,omitempty"`
+	Doc      *string     `json:"doc,omitempty"`
+	Optional *bool       `json:"optional,omitempty"`
+	TypeRef  *preTypeRef `json:"typeRef,omitempty"`
+}
+
+// validate validates the required fields of Field
+func (p *preField) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preField is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "optional"
+	if p.Optional == nil {
+		return errorMissingRequiredField("field optional is required")
+	}
+
+	// Validation for field "typeRef"
+	if p.TypeRef == nil {
+		return errorMissingRequiredField("field typeRef is required")
+	}
+	if p.TypeRef != nil {
+		if err := p.TypeRef.validate(); err != nil {
+			return errorMissingRequiredField("field typeRef: " + err.Error())
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preField type to the final Field type
+func (p *preField) transform() Field {
+	// Transformations
+	transName := *p.Name
+	transDoc := p.Doc
+	transOptional := *p.Optional
+	var transTypeRef TypeRef
+	transTypeRef = p.TypeRef.transform()
+
+	// Assignments
+	return Field{
+		Name:     transName,
+		Doc:      transDoc,
+		Optional: transOptional,
+		TypeRef:  transTypeRef,
+	}
+}
+
+// Configuration for Go code generation
+type GoTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Generate helper functions for patterns
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+	// Generate constant definitions
+	GenConsts *bool `json:"genConsts,omitempty"`
+	// Generate RPC client code
+	GenClient *bool `json:"genClient,omitempty"`
+	// Generate RPC server interfaces and handlers
+	GenServer *bool `json:"genServer,omitempty"`
+	// The Go package name to use in generated files
+	Package string `json:"package"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenPatterns() bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenConsts() bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	return defaultValue
+}
+
+// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenClient() bool {
+	if x != nil && x.GenClient != nil {
+		return *x.GenClient
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenClientOr(defaultValue bool) bool {
+	if x != nil && x.GenClient != nil {
+		return *x.GenClient
+	}
+	return defaultValue
+}
+
+// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenServer() bool {
+	if x != nil && x.GenServer != nil {
+		return *x.GenServer
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetGenServerOr(defaultValue bool) bool {
+	if x != nil && x.GenServer != nil {
+		return *x.GenServer
+	}
+	return defaultValue
+}
+
+// GetPackage returns the value of Package or the zero value if the receiver or field is nil.
+func (x *GoTargetConfig) GetPackage() string {
+	if x != nil {
+		return x.Package
+	}
+	var zero string
+	return zero
+}
+
+// GetPackageOr returns the value of Package or the provided default if the receiver or field is nil.
+func (x *GoTargetConfig) GetPackageOr(defaultValue string) string {
+	if x != nil {
+		return x.Package
+	}
+	return defaultValue
+}
+
+// preGoTargetConfig is the version of GoTargetConfig previous to the required field validation
+type preGoTargetConfig struct {
+	Output      *string `json:"output,omitempty"`
+	Clean       *bool   `json:"clean,omitempty"`
+	Schema      *string `json:"schema,omitempty"`
+	GenPatterns *bool   `json:"genPatterns,omitempty"`
+	GenConsts   *bool   `json:"genConsts,omitempty"`
+	GenClient   *bool   `json:"genClient,omitempty"`
+	GenServer   *bool   `json:"genServer,omitempty"`
+	Package     *string `json:"package,omitempty"`
+}
+
+// validate validates the required fields of GoTargetConfig
+func (p *preGoTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preGoTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "genPatterns"
+
+	// Validation for field "genConsts"
+
+	// Validation for field "genClient"
+
+	// Validation for field "genServer"
+
+	// Validation for field "package"
+	if p.Package == nil {
+		return errorMissingRequiredField("field package is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preGoTargetConfig type to the final GoTargetConfig type
+func (p *preGoTargetConfig) transform() GoTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transGenPatterns := p.GenPatterns
+	transGenConsts := p.GenConsts
+	transGenClient := p.GenClient
+	transGenServer := p.GenServer
+	transPackage := *p.Package
+
+	// Assignments
+	return GoTargetConfig{
+		Output:      transOutput,
+		Clean:       transClean,
+		Schema:      transSchema,
+		GenPatterns: transGenPatterns,
+		GenConsts:   transGenConsts,
+		GenClient:   transGenClient,
+		GenServer:   transGenServer,
+		Package:     transPackage,
+	}
+}
+
+// IrSchema represents the root of the VDL Intermediate Representation (IR).
+//
+// It acts as the canonical, simplified view of the domain model, abstracting away
+// the complexity of parsing, file structures, and syntactic sugar.
+//
+// This structure is the "Golden Platter" for code generators, plugins, and analysis tools:
+// a flattened, fully resolved, and read-only data structure ready for consumption.
+//
+// To ensure reproducible builds and consistent outputs across different environments,
+// all collections within the IRSchema are strictly sorted alphabetically.
+//
+// This is the structure on which code generators and plugins are executed, as it is the
+// purest and simplest form of representation of the entire IDL.
+type IrSchema struct {
+	// List of all constant definitions in the schema
+	Constants []ConstantDef `json:"constants"`
+	// List of all pattern definitions in the schema
+	Patterns []PatternDef `json:"patterns"`
+	// List of all enum definitions in the schema
+	Enums []EnumDef `json:"enums"`
+	// List of all type definitions in the schema
+	Types []TypeDef `json:"types"`
+	// List of all RPC definitions in the schema
+	Rpcs []RpcDef `json:"rpcs"`
+	// Flattened list of all procedures from all RPCs
+	Procedures []ProcedureDef `json:"procedures"`
+	// Flattened list of all streams from all RPCs
+	Streams []StreamDef `json:"streams"`
+	// List of all standalone documentation blocks (even from all RPCs)
+	Docs []DocDef `json:"docs"`
+}
+
+// GetConstants returns the value of Constants or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetConstants() []ConstantDef {
+	if x != nil {
+		return x.Constants
+	}
+	var zero []ConstantDef
+	return zero
+}
+
+// GetConstantsOr returns the value of Constants or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetConstantsOr(defaultValue []ConstantDef) []ConstantDef {
+	if x != nil {
+		return x.Constants
+	}
+	return defaultValue
+}
+
+// GetPatterns returns the value of Patterns or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetPatterns() []PatternDef {
+	if x != nil {
+		return x.Patterns
+	}
+	var zero []PatternDef
+	return zero
+}
+
+// GetPatternsOr returns the value of Patterns or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetPatternsOr(defaultValue []PatternDef) []PatternDef {
+	if x != nil {
+		return x.Patterns
+	}
+	return defaultValue
+}
+
+// GetEnums returns the value of Enums or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetEnums() []EnumDef {
+	if x != nil {
+		return x.Enums
+	}
+	var zero []EnumDef
+	return zero
+}
+
+// GetEnumsOr returns the value of Enums or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetEnumsOr(defaultValue []EnumDef) []EnumDef {
+	if x != nil {
+		return x.Enums
+	}
+	return defaultValue
+}
+
+// GetTypes returns the value of Types or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetTypes() []TypeDef {
+	if x != nil {
+		return x.Types
+	}
+	var zero []TypeDef
+	return zero
+}
+
+// GetTypesOr returns the value of Types or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetTypesOr(defaultValue []TypeDef) []TypeDef {
+	if x != nil {
+		return x.Types
+	}
+	return defaultValue
+}
+
+// GetRpcs returns the value of Rpcs or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetRpcs() []RpcDef {
+	if x != nil {
+		return x.Rpcs
+	}
+	var zero []RpcDef
+	return zero
+}
+
+// GetRpcsOr returns the value of Rpcs or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetRpcsOr(defaultValue []RpcDef) []RpcDef {
+	if x != nil {
+		return x.Rpcs
+	}
+	return defaultValue
+}
+
+// GetProcedures returns the value of Procedures or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetProcedures() []ProcedureDef {
+	if x != nil {
+		return x.Procedures
+	}
+	var zero []ProcedureDef
+	return zero
+}
+
+// GetProceduresOr returns the value of Procedures or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetProceduresOr(defaultValue []ProcedureDef) []ProcedureDef {
+	if x != nil {
+		return x.Procedures
+	}
+	return defaultValue
+}
+
+// GetStreams returns the value of Streams or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetStreams() []StreamDef {
+	if x != nil {
+		return x.Streams
+	}
+	var zero []StreamDef
+	return zero
+}
+
+// GetStreamsOr returns the value of Streams or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetStreamsOr(defaultValue []StreamDef) []StreamDef {
+	if x != nil {
+		return x.Streams
+	}
+	return defaultValue
+}
+
+// GetDocs returns the value of Docs or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetDocs() []DocDef {
+	if x != nil {
+		return x.Docs
+	}
+	var zero []DocDef
+	return zero
+}
+
+// GetDocsOr returns the value of Docs or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetDocsOr(defaultValue []DocDef) []DocDef {
+	if x != nil {
+		return x.Docs
+	}
+	return defaultValue
+}
+
+// preIrSchema is the version of IrSchema previous to the required field validation
+type preIrSchema struct {
+	Constants  *[]preConstantDef  `json:"constants,omitempty"`
+	Patterns   *[]prePatternDef   `json:"patterns,omitempty"`
+	Enums      *[]preEnumDef      `json:"enums,omitempty"`
+	Types      *[]preTypeDef      `json:"types,omitempty"`
+	Rpcs       *[]preRpcDef       `json:"rpcs,omitempty"`
+	Procedures *[]preProcedureDef `json:"procedures,omitempty"`
+	Streams    *[]preStreamDef    `json:"streams,omitempty"`
+	Docs       *[]preDocDef       `json:"docs,omitempty"`
+}
+
+// validate validates the required fields of IrSchema
+func (p *preIrSchema) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preIrSchema is nil")
+	}
+
+	// Validation for field "constants"
+	if p.Constants == nil {
+		return errorMissingRequiredField("field constants is required")
+	}
+	if p.Constants != nil {
+		for _, item := range *p.Constants {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field constants: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "patterns"
+	if p.Patterns == nil {
+		return errorMissingRequiredField("field patterns is required")
+	}
+	if p.Patterns != nil {
+		for _, item := range *p.Patterns {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field patterns: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "enums"
+	if p.Enums == nil {
+		return errorMissingRequiredField("field enums is required")
+	}
+	if p.Enums != nil {
+		for _, item := range *p.Enums {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field enums: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "types"
+	if p.Types == nil {
+		return errorMissingRequiredField("field types is required")
+	}
+	if p.Types != nil {
+		for _, item := range *p.Types {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field types: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "rpcs"
+	if p.Rpcs == nil {
+		return errorMissingRequiredField("field rpcs is required")
+	}
+	if p.Rpcs != nil {
+		for _, item := range *p.Rpcs {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field rpcs: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "procedures"
+	if p.Procedures == nil {
+		return errorMissingRequiredField("field procedures is required")
+	}
+	if p.Procedures != nil {
+		for _, item := range *p.Procedures {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field procedures: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "streams"
+	if p.Streams == nil {
+		return errorMissingRequiredField("field streams is required")
+	}
+	if p.Streams != nil {
+		for _, item := range *p.Streams {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field streams: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "docs"
+	if p.Docs == nil {
+		return errorMissingRequiredField("field docs is required")
+	}
+	if p.Docs != nil {
+		for _, item := range *p.Docs {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field docs: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preIrSchema type to the final IrSchema type
+func (p *preIrSchema) transform() IrSchema {
+	// Transformations
+	var transConstants []ConstantDef
+	transConstants = make([]ConstantDef, len(*p.Constants))
+	for i, v := range *p.Constants {
+		var tmp_ ConstantDef
+		tmp_ = v.transform()
+		transConstants[i] = tmp_
+	}
+	var transPatterns []PatternDef
+	transPatterns = make([]PatternDef, len(*p.Patterns))
+	for i, v := range *p.Patterns {
+		var tmp_ PatternDef
+		tmp_ = v.transform()
+		transPatterns[i] = tmp_
+	}
+	var transEnums []EnumDef
+	transEnums = make([]EnumDef, len(*p.Enums))
+	for i, v := range *p.Enums {
+		var tmp_ EnumDef
+		tmp_ = v.transform()
+		transEnums[i] = tmp_
+	}
+	var transTypes []TypeDef
+	transTypes = make([]TypeDef, len(*p.Types))
+	for i, v := range *p.Types {
+		var tmp_ TypeDef
+		tmp_ = v.transform()
+		transTypes[i] = tmp_
+	}
+	var transRpcs []RpcDef
+	transRpcs = make([]RpcDef, len(*p.Rpcs))
+	for i, v := range *p.Rpcs {
+		var tmp_ RpcDef
+		tmp_ = v.transform()
+		transRpcs[i] = tmp_
+	}
+	var transProcedures []ProcedureDef
+	transProcedures = make([]ProcedureDef, len(*p.Procedures))
+	for i, v := range *p.Procedures {
+		var tmp_ ProcedureDef
+		tmp_ = v.transform()
+		transProcedures[i] = tmp_
+	}
+	var transStreams []StreamDef
+	transStreams = make([]StreamDef, len(*p.Streams))
+	for i, v := range *p.Streams {
+		var tmp_ StreamDef
+		tmp_ = v.transform()
+		transStreams[i] = tmp_
+	}
+	var transDocs []DocDef
+	transDocs = make([]DocDef, len(*p.Docs))
+	for i, v := range *p.Docs {
+		var tmp_ DocDef
+		tmp_ = v.transform()
+		transDocs[i] = tmp_
+	}
+
+	// Assignments
+	return IrSchema{
+		Constants:  transConstants,
+		Patterns:   transPatterns,
+		Enums:      transEnums,
+		Types:      transTypes,
+		Rpcs:       transRpcs,
+		Procedures: transProcedures,
+		Streams:    transStreams,
+		Docs:       transDocs,
+	}
+}
+
+// Configuration for IR (Intermediate Representation) JSON generation
+type IrTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// The name of the output file
+	Filename *string `json:"filename,omitempty"`
+	// Output minified JSON (no indentation). Default is false (pretty-printed with 2-space indent)
+	Minify *bool `json:"minify,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *IrTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *IrTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *IrTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *IrTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *IrTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *IrTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
+func (x *IrTargetConfig) GetFilename() string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	var zero string
+	return zero
+}
+
+// GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
+func (x *IrTargetConfig) GetFilenameOr(defaultValue string) string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	return defaultValue
+}
+
+// GetMinify returns the value of Minify or the zero value if the receiver or field is nil.
+func (x *IrTargetConfig) GetMinify() bool {
+	if x != nil && x.Minify != nil {
+		return *x.Minify
+	}
+	var zero bool
+	return zero
+}
+
+// GetMinifyOr returns the value of Minify or the provided default if the receiver or field is nil.
+func (x *IrTargetConfig) GetMinifyOr(defaultValue bool) bool {
+	if x != nil && x.Minify != nil {
+		return *x.Minify
+	}
+	return defaultValue
+}
+
+// preIrTargetConfig is the version of IrTargetConfig previous to the required field validation
+type preIrTargetConfig struct {
+	Output   *string `json:"output,omitempty"`
+	Clean    *bool   `json:"clean,omitempty"`
+	Schema   *string `json:"schema,omitempty"`
+	Filename *string `json:"filename,omitempty"`
+	Minify   *bool   `json:"minify,omitempty"`
+}
+
+// validate validates the required fields of IrTargetConfig
+func (p *preIrTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preIrTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "filename"
+
+	// Validation for field "minify"
+
+	return nil
+}
+
+// transform transforms the preIrTargetConfig type to the final IrTargetConfig type
+func (p *preIrTargetConfig) transform() IrTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transFilename := p.Filename
+	transMinify := p.Minify
+
+	// Assignments
+	return IrTargetConfig{
+		Output:   transOutput,
+		Clean:    transClean,
+		Schema:   transSchema,
+		Filename: transFilename,
+		Minify:   transMinify,
+	}
+}
+
+// Input for irgen function
+type IrgenInput struct {
+	// Schema to generate IR from
+	VdlSchema string `json:"vdlSchema"`
+}
+
+// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
+func (x *IrgenInput) GetVdlSchema() string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	var zero string
+	return zero
+}
+
+// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
+func (x *IrgenInput) GetVdlSchemaOr(defaultValue string) string {
+	if x != nil {
+		return x.VdlSchema
+	}
+	return defaultValue
+}
+
+// preIrgenInput is the version of IrgenInput previous to the required field validation
+type preIrgenInput struct {
+	VdlSchema *string `json:"vdlSchema,omitempty"`
+}
+
+// validate validates the required fields of IrgenInput
+func (p *preIrgenInput) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preIrgenInput is nil")
+	}
+
+	// Validation for field "vdlSchema"
+	if p.VdlSchema == nil {
+		return errorMissingRequiredField("field vdlSchema is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preIrgenInput type to the final IrgenInput type
+func (p *preIrgenInput) transform() IrgenInput {
+	// Transformations
+	transVdlSchema := *p.VdlSchema
+
+	// Assignments
+	return IrgenInput{
+		VdlSchema: transVdlSchema,
+	}
+}
+
+// Output for irgen function
+type IrgenOutput struct {
+	// List of all constant definitions in the schema
+	Constants []ConstantDef `json:"constants"`
+	// List of all pattern definitions in the schema
+	Patterns []PatternDef `json:"patterns"`
+	// List of all enum definitions in the schema
+	Enums []EnumDef `json:"enums"`
+	// List of all type definitions in the schema
+	Types []TypeDef `json:"types"`
+	// List of all RPC definitions in the schema
+	Rpcs []RpcDef `json:"rpcs"`
+	// Flattened list of all procedures from all RPCs
+	Procedures []ProcedureDef `json:"procedures"`
+	// Flattened list of all streams from all RPCs
+	Streams []StreamDef `json:"streams"`
+	// List of all standalone documentation blocks (even from all RPCs)
+	Docs []DocDef `json:"docs"`
+}
+
+// GetConstants returns the value of Constants or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetConstants() []ConstantDef {
+	if x != nil {
+		return x.Constants
+	}
+	var zero []ConstantDef
+	return zero
+}
+
+// GetConstantsOr returns the value of Constants or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetConstantsOr(defaultValue []ConstantDef) []ConstantDef {
+	if x != nil {
+		return x.Constants
+	}
+	return defaultValue
+}
+
+// GetPatterns returns the value of Patterns or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetPatterns() []PatternDef {
+	if x != nil {
+		return x.Patterns
+	}
+	var zero []PatternDef
+	return zero
+}
+
+// GetPatternsOr returns the value of Patterns or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetPatternsOr(defaultValue []PatternDef) []PatternDef {
+	if x != nil {
+		return x.Patterns
+	}
+	return defaultValue
+}
+
+// GetEnums returns the value of Enums or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetEnums() []EnumDef {
+	if x != nil {
+		return x.Enums
+	}
+	var zero []EnumDef
+	return zero
+}
+
+// GetEnumsOr returns the value of Enums or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetEnumsOr(defaultValue []EnumDef) []EnumDef {
+	if x != nil {
+		return x.Enums
+	}
+	return defaultValue
+}
+
+// GetTypes returns the value of Types or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetTypes() []TypeDef {
+	if x != nil {
+		return x.Types
+	}
+	var zero []TypeDef
+	return zero
+}
+
+// GetTypesOr returns the value of Types or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetTypesOr(defaultValue []TypeDef) []TypeDef {
+	if x != nil {
+		return x.Types
+	}
+	return defaultValue
+}
+
+// GetRpcs returns the value of Rpcs or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetRpcs() []RpcDef {
+	if x != nil {
+		return x.Rpcs
+	}
+	var zero []RpcDef
+	return zero
+}
+
+// GetRpcsOr returns the value of Rpcs or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetRpcsOr(defaultValue []RpcDef) []RpcDef {
+	if x != nil {
+		return x.Rpcs
+	}
+	return defaultValue
+}
+
+// GetProcedures returns the value of Procedures or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetProcedures() []ProcedureDef {
+	if x != nil {
+		return x.Procedures
+	}
+	var zero []ProcedureDef
+	return zero
+}
+
+// GetProceduresOr returns the value of Procedures or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetProceduresOr(defaultValue []ProcedureDef) []ProcedureDef {
+	if x != nil {
+		return x.Procedures
+	}
+	return defaultValue
+}
+
+// GetStreams returns the value of Streams or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetStreams() []StreamDef {
+	if x != nil {
+		return x.Streams
+	}
+	var zero []StreamDef
+	return zero
+}
+
+// GetStreamsOr returns the value of Streams or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetStreamsOr(defaultValue []StreamDef) []StreamDef {
+	if x != nil {
+		return x.Streams
+	}
+	return defaultValue
+}
+
+// GetDocs returns the value of Docs or the zero value if the receiver or field is nil.
+func (x *IrgenOutput) GetDocs() []DocDef {
+	if x != nil {
+		return x.Docs
+	}
+	var zero []DocDef
+	return zero
+}
+
+// GetDocsOr returns the value of Docs or the provided default if the receiver or field is nil.
+func (x *IrgenOutput) GetDocsOr(defaultValue []DocDef) []DocDef {
+	if x != nil {
+		return x.Docs
+	}
+	return defaultValue
+}
+
+// preIrgenOutput is the version of IrgenOutput previous to the required field validation
+type preIrgenOutput struct {
+	Constants  *[]preConstantDef  `json:"constants,omitempty"`
+	Patterns   *[]prePatternDef   `json:"patterns,omitempty"`
+	Enums      *[]preEnumDef      `json:"enums,omitempty"`
+	Types      *[]preTypeDef      `json:"types,omitempty"`
+	Rpcs       *[]preRpcDef       `json:"rpcs,omitempty"`
+	Procedures *[]preProcedureDef `json:"procedures,omitempty"`
+	Streams    *[]preStreamDef    `json:"streams,omitempty"`
+	Docs       *[]preDocDef       `json:"docs,omitempty"`
+}
+
+// validate validates the required fields of IrgenOutput
+func (p *preIrgenOutput) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preIrgenOutput is nil")
+	}
+
+	// Validation for field "constants"
+	if p.Constants == nil {
+		return errorMissingRequiredField("field constants is required")
+	}
+	if p.Constants != nil {
+		for _, item := range *p.Constants {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field constants: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "patterns"
+	if p.Patterns == nil {
+		return errorMissingRequiredField("field patterns is required")
+	}
+	if p.Patterns != nil {
+		for _, item := range *p.Patterns {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field patterns: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "enums"
+	if p.Enums == nil {
+		return errorMissingRequiredField("field enums is required")
+	}
+	if p.Enums != nil {
+		for _, item := range *p.Enums {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field enums: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "types"
+	if p.Types == nil {
+		return errorMissingRequiredField("field types is required")
+	}
+	if p.Types != nil {
+		for _, item := range *p.Types {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field types: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "rpcs"
+	if p.Rpcs == nil {
+		return errorMissingRequiredField("field rpcs is required")
+	}
+	if p.Rpcs != nil {
+		for _, item := range *p.Rpcs {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field rpcs: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "procedures"
+	if p.Procedures == nil {
+		return errorMissingRequiredField("field procedures is required")
+	}
+	if p.Procedures != nil {
+		for _, item := range *p.Procedures {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field procedures: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "streams"
+	if p.Streams == nil {
+		return errorMissingRequiredField("field streams is required")
+	}
+	if p.Streams != nil {
+		for _, item := range *p.Streams {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field streams: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "docs"
+	if p.Docs == nil {
+		return errorMissingRequiredField("field docs is required")
+	}
+	if p.Docs != nil {
+		for _, item := range *p.Docs {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field docs: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preIrgenOutput type to the final IrgenOutput type
+func (p *preIrgenOutput) transform() IrgenOutput {
+	// Transformations
+	var transConstants []ConstantDef
+	transConstants = make([]ConstantDef, len(*p.Constants))
+	for i, v := range *p.Constants {
+		var tmp_ ConstantDef
+		tmp_ = v.transform()
+		transConstants[i] = tmp_
+	}
+	var transPatterns []PatternDef
+	transPatterns = make([]PatternDef, len(*p.Patterns))
+	for i, v := range *p.Patterns {
+		var tmp_ PatternDef
+		tmp_ = v.transform()
+		transPatterns[i] = tmp_
+	}
+	var transEnums []EnumDef
+	transEnums = make([]EnumDef, len(*p.Enums))
+	for i, v := range *p.Enums {
+		var tmp_ EnumDef
+		tmp_ = v.transform()
+		transEnums[i] = tmp_
+	}
+	var transTypes []TypeDef
+	transTypes = make([]TypeDef, len(*p.Types))
+	for i, v := range *p.Types {
+		var tmp_ TypeDef
+		tmp_ = v.transform()
+		transTypes[i] = tmp_
+	}
+	var transRpcs []RpcDef
+	transRpcs = make([]RpcDef, len(*p.Rpcs))
+	for i, v := range *p.Rpcs {
+		var tmp_ RpcDef
+		tmp_ = v.transform()
+		transRpcs[i] = tmp_
+	}
+	var transProcedures []ProcedureDef
+	transProcedures = make([]ProcedureDef, len(*p.Procedures))
+	for i, v := range *p.Procedures {
+		var tmp_ ProcedureDef
+		tmp_ = v.transform()
+		transProcedures[i] = tmp_
+	}
+	var transStreams []StreamDef
+	transStreams = make([]StreamDef, len(*p.Streams))
+	for i, v := range *p.Streams {
+		var tmp_ StreamDef
+		tmp_ = v.transform()
+		transStreams[i] = tmp_
+	}
+	var transDocs []DocDef
+	transDocs = make([]DocDef, len(*p.Docs))
+	for i, v := range *p.Docs {
+		var tmp_ DocDef
+		tmp_ = v.transform()
+		transDocs[i] = tmp_
+	}
+
+	// Assignments
+	return IrgenOutput{
+		Constants:  transConstants,
+		Patterns:   transPatterns,
+		Enums:      transEnums,
+		Types:      transTypes,
+		Rpcs:       transRpcs,
+		Procedures: transProcedures,
+		Streams:    transStreams,
+		Docs:       transDocs,
+	}
+}
+
+// Configuration for JSON Schema generation
+type JsonSchemaTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// The $id of the generated schema
+	Id *string `json:"id,omitempty"`
+	// The name of the output file
+	Filename *string `json:"filename,omitempty"`
+	// The name of a type from '$defs' to use as the main entry point (adds a $ref at the root).
+	// Must exist; VDL validates this and provides fuzzy suggestions for typos.
+	Root *string `json:"root,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetId returns the value of Id or the zero value if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetId() string {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	var zero string
+	return zero
+}
+
+// GetIdOr returns the value of Id or the provided default if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetIdOr(defaultValue string) string {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return defaultValue
+}
+
+// GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetFilename() string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	var zero string
+	return zero
+}
+
+// GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetFilenameOr(defaultValue string) string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	return defaultValue
+}
+
+// GetRoot returns the value of Root or the zero value if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetRoot() string {
+	if x != nil && x.Root != nil {
+		return *x.Root
+	}
+	var zero string
+	return zero
+}
+
+// GetRootOr returns the value of Root or the provided default if the receiver or field is nil.
+func (x *JsonSchemaTargetConfig) GetRootOr(defaultValue string) string {
+	if x != nil && x.Root != nil {
+		return *x.Root
+	}
+	return defaultValue
+}
+
+// preJsonSchemaTargetConfig is the version of JsonSchemaTargetConfig previous to the required field validation
+type preJsonSchemaTargetConfig struct {
+	Output   *string `json:"output,omitempty"`
+	Clean    *bool   `json:"clean,omitempty"`
+	Schema   *string `json:"schema,omitempty"`
+	Id       *string `json:"id,omitempty"`
+	Filename *string `json:"filename,omitempty"`
+	Root     *string `json:"root,omitempty"`
+}
+
+// validate validates the required fields of JsonSchemaTargetConfig
+func (p *preJsonSchemaTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preJsonSchemaTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "id"
+
+	// Validation for field "filename"
+
+	// Validation for field "root"
+
+	return nil
+}
+
+// transform transforms the preJsonSchemaTargetConfig type to the final JsonSchemaTargetConfig type
+func (p *preJsonSchemaTargetConfig) transform() JsonSchemaTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transId := p.Id
+	transFilename := p.Filename
+	transRoot := p.Root
+
+	// Assignments
+	return JsonSchemaTargetConfig{
+		Output:   transOutput,
+		Clean:    transClean,
+		Schema:   transSchema,
+		Id:       transId,
+		Filename: transFilename,
+		Root:     transRoot,
+	}
+}
+
+// Configuration for OpenAPI specification generation
+type OpenApiTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// The name of the output file (can be .yml, .yaml or .json)
+	Filename *string `json:"filename,omitempty"`
+	// API title
+	Title string `json:"title"`
+	// API version
+	Version string `json:"version"`
+	// API description
+	Description *string `json:"description,omitempty"`
+	// Base URL for API endpoints
+	BaseUrl *string `json:"baseUrl,omitempty"`
+	// Contact name
+	ContactName *string `json:"contactName,omitempty"`
+	// Contact email
+	ContactEmail *string `json:"contactEmail,omitempty"`
+	// License name
+	LicenseName *string `json:"licenseName,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetFilename() string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	var zero string
+	return zero
+}
+
+// GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetFilenameOr(defaultValue string) string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	return defaultValue
+}
+
+// GetTitle returns the value of Title or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	var zero string
+	return zero
+}
+
+// GetTitleOr returns the value of Title or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetTitleOr(defaultValue string) string {
+	if x != nil {
+		return x.Title
+	}
+	return defaultValue
+}
+
+// GetVersion returns the value of Version or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	var zero string
+	return zero
+}
+
+// GetVersionOr returns the value of Version or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetVersionOr(defaultValue string) string {
+	if x != nil {
+		return x.Version
+	}
+	return defaultValue
+}
+
+// GetDescription returns the value of Description or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	var zero string
+	return zero
+}
+
+// GetDescriptionOr returns the value of Description or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetDescriptionOr(defaultValue string) string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return defaultValue
+}
+
+// GetBaseUrl returns the value of BaseUrl or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetBaseUrl() string {
+	if x != nil && x.BaseUrl != nil {
+		return *x.BaseUrl
+	}
+	var zero string
+	return zero
+}
+
+// GetBaseUrlOr returns the value of BaseUrl or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetBaseUrlOr(defaultValue string) string {
+	if x != nil && x.BaseUrl != nil {
+		return *x.BaseUrl
+	}
+	return defaultValue
+}
+
+// GetContactName returns the value of ContactName or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetContactName() string {
+	if x != nil && x.ContactName != nil {
+		return *x.ContactName
+	}
+	var zero string
+	return zero
+}
+
+// GetContactNameOr returns the value of ContactName or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetContactNameOr(defaultValue string) string {
+	if x != nil && x.ContactName != nil {
+		return *x.ContactName
+	}
+	return defaultValue
+}
+
+// GetContactEmail returns the value of ContactEmail or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetContactEmail() string {
+	if x != nil && x.ContactEmail != nil {
+		return *x.ContactEmail
+	}
+	var zero string
+	return zero
+}
+
+// GetContactEmailOr returns the value of ContactEmail or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetContactEmailOr(defaultValue string) string {
+	if x != nil && x.ContactEmail != nil {
+		return *x.ContactEmail
+	}
+	return defaultValue
+}
+
+// GetLicenseName returns the value of LicenseName or the zero value if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetLicenseName() string {
+	if x != nil && x.LicenseName != nil {
+		return *x.LicenseName
+	}
+	var zero string
+	return zero
+}
+
+// GetLicenseNameOr returns the value of LicenseName or the provided default if the receiver or field is nil.
+func (x *OpenApiTargetConfig) GetLicenseNameOr(defaultValue string) string {
+	if x != nil && x.LicenseName != nil {
+		return *x.LicenseName
+	}
+	return defaultValue
+}
+
+// preOpenApiTargetConfig is the version of OpenApiTargetConfig previous to the required field validation
+type preOpenApiTargetConfig struct {
+	Output       *string `json:"output,omitempty"`
+	Clean        *bool   `json:"clean,omitempty"`
+	Schema       *string `json:"schema,omitempty"`
+	Filename     *string `json:"filename,omitempty"`
+	Title        *string `json:"title,omitempty"`
+	Version      *string `json:"version,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	BaseUrl      *string `json:"baseUrl,omitempty"`
+	ContactName  *string `json:"contactName,omitempty"`
+	ContactEmail *string `json:"contactEmail,omitempty"`
+	LicenseName  *string `json:"licenseName,omitempty"`
+}
+
+// validate validates the required fields of OpenApiTargetConfig
+func (p *preOpenApiTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preOpenApiTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "filename"
+
+	// Validation for field "title"
+	if p.Title == nil {
+		return errorMissingRequiredField("field title is required")
+	}
+
+	// Validation for field "version"
+	if p.Version == nil {
+		return errorMissingRequiredField("field version is required")
+	}
+
+	// Validation for field "description"
+
+	// Validation for field "baseUrl"
+
+	// Validation for field "contactName"
+
+	// Validation for field "contactEmail"
+
+	// Validation for field "licenseName"
+
+	return nil
+}
+
+// transform transforms the preOpenApiTargetConfig type to the final OpenApiTargetConfig type
+func (p *preOpenApiTargetConfig) transform() OpenApiTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transFilename := p.Filename
+	transTitle := *p.Title
+	transVersion := *p.Version
+	transDescription := p.Description
+	transBaseUrl := p.BaseUrl
+	transContactName := p.ContactName
+	transContactEmail := p.ContactEmail
+	transLicenseName := p.LicenseName
+
+	// Assignments
+	return OpenApiTargetConfig{
+		Output:       transOutput,
+		Clean:        transClean,
+		Schema:       transSchema,
+		Filename:     transFilename,
+		Title:        transTitle,
+		Version:      transVersion,
+		Description:  transDescription,
+		BaseUrl:      transBaseUrl,
+		ContactName:  transContactName,
+		ContactEmail: transContactEmail,
+		LicenseName:  transLicenseName,
+	}
+}
+
+// Represents a pattern template for generating dynamic strings
+type PatternDef struct {
+	// The name of the pattern
+	Name string `json:"name"`
+	// Documentation for the pattern
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+	// The template string containing placeholders
+	Template string `json:"template"`
+	// List of placeholder names extracted from the template
+	Placeholders []string `json:"placeholders"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *PatternDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *PatternDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *PatternDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *PatternDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *PatternDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *PatternDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// GetTemplate returns the value of Template or the zero value if the receiver or field is nil.
+func (x *PatternDef) GetTemplate() string {
+	if x != nil {
+		return x.Template
+	}
+	var zero string
+	return zero
+}
+
+// GetTemplateOr returns the value of Template or the provided default if the receiver or field is nil.
+func (x *PatternDef) GetTemplateOr(defaultValue string) string {
+	if x != nil {
+		return x.Template
+	}
+	return defaultValue
+}
+
+// GetPlaceholders returns the value of Placeholders or the zero value if the receiver or field is nil.
+func (x *PatternDef) GetPlaceholders() []string {
+	if x != nil {
+		return x.Placeholders
+	}
+	var zero []string
+	return zero
+}
+
+// GetPlaceholdersOr returns the value of Placeholders or the provided default if the receiver or field is nil.
+func (x *PatternDef) GetPlaceholdersOr(defaultValue []string) []string {
+	if x != nil {
+		return x.Placeholders
+	}
+	return defaultValue
+}
+
+// prePatternDef is the version of PatternDef previous to the required field validation
+type prePatternDef struct {
+	Name         *string   `json:"name,omitempty"`
+	Doc          *string   `json:"doc,omitempty"`
+	Deprecated   *string   `json:"deprecated,omitempty"`
+	Template     *string   `json:"template,omitempty"`
+	Placeholders *[]string `json:"placeholders,omitempty"`
+}
+
+// validate validates the required fields of PatternDef
+func (p *prePatternDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePatternDef is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	// Validation for field "template"
+	if p.Template == nil {
+		return errorMissingRequiredField("field template is required")
+	}
+
+	// Validation for field "placeholders"
+	if p.Placeholders == nil {
+		return errorMissingRequiredField("field placeholders is required")
+	}
+
+	return nil
+}
+
+// transform transforms the prePatternDef type to the final PatternDef type
+func (p *prePatternDef) transform() PatternDef {
+	// Transformations
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+	transTemplate := *p.Template
+	transPlaceholders := *p.Placeholders
+
+	// Assignments
+	return PatternDef{
+		Name:         transName,
+		Doc:          transDoc,
+		Deprecated:   transDeprecated,
+		Template:     transTemplate,
+		Placeholders: transPlaceholders,
+	}
+}
+
+// Configuration for generating patterns
+type PatternsTargetConfig struct {
+	// Generate helper functions for patterns
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *PatternsTargetConfig) GetGenPatterns() bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *PatternsTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	return defaultValue
+}
+
+// prePatternsTargetConfig is the version of PatternsTargetConfig previous to the required field validation
+type prePatternsTargetConfig struct {
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+}
+
+// validate validates the required fields of PatternsTargetConfig
+func (p *prePatternsTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePatternsTargetConfig is nil")
+	}
+
+	// Validation for field "genPatterns"
+
+	return nil
+}
+
+// transform transforms the prePatternsTargetConfig type to the final PatternsTargetConfig type
+func (p *prePatternsTargetConfig) transform() PatternsTargetConfig {
+	// Transformations
+	transGenPatterns := p.GenPatterns
+
+	// Assignments
+	return PatternsTargetConfig{
+		GenPatterns: transGenPatterns,
+	}
+}
+
+// Configuration for API playground generation
+type PlaygroundTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Default base URL for API requests
+	DefaultBaseUrl *string `json:"defaultBaseUrl,omitempty"`
+	// Default headers to include in API requests
+	DefaultHeaders *map[string]string `json:"defaultHeaders,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetDefaultBaseUrl returns the value of DefaultBaseUrl or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultBaseUrl() string {
+	if x != nil && x.DefaultBaseUrl != nil {
+		return *x.DefaultBaseUrl
+	}
+	var zero string
+	return zero
+}
+
+// GetDefaultBaseUrlOr returns the value of DefaultBaseUrl or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultBaseUrlOr(defaultValue string) string {
+	if x != nil && x.DefaultBaseUrl != nil {
+		return *x.DefaultBaseUrl
+	}
+	return defaultValue
+}
+
+// GetDefaultHeaders returns the value of DefaultHeaders or the zero value if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultHeaders() map[string]string {
+	if x != nil && x.DefaultHeaders != nil {
+		return *x.DefaultHeaders
+	}
+	var zero map[string]string
+	return zero
+}
+
+// GetDefaultHeadersOr returns the value of DefaultHeaders or the provided default if the receiver or field is nil.
+func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue map[string]string) map[string]string {
+	if x != nil && x.DefaultHeaders != nil {
+		return *x.DefaultHeaders
+	}
+	return defaultValue
+}
+
+// prePlaygroundTargetConfig is the version of PlaygroundTargetConfig previous to the required field validation
+type prePlaygroundTargetConfig struct {
+	Output         *string            `json:"output,omitempty"`
+	Clean          *bool              `json:"clean,omitempty"`
+	Schema         *string            `json:"schema,omitempty"`
+	DefaultBaseUrl *string            `json:"defaultBaseUrl,omitempty"`
+	DefaultHeaders *map[string]string `json:"defaultHeaders,omitempty"`
+}
+
+// validate validates the required fields of PlaygroundTargetConfig
+func (p *prePlaygroundTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePlaygroundTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "defaultBaseUrl"
+
+	// Validation for field "defaultHeaders"
+
+	return nil
+}
+
+// transform transforms the prePlaygroundTargetConfig type to the final PlaygroundTargetConfig type
+func (p *prePlaygroundTargetConfig) transform() PlaygroundTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transDefaultBaseUrl := p.DefaultBaseUrl
+	transDefaultHeaders := p.DefaultHeaders
+
+	// Assignments
+	return PlaygroundTargetConfig{
+		Output:         transOutput,
+		Clean:          transClean,
+		Schema:         transSchema,
+		DefaultBaseUrl: transDefaultBaseUrl,
+		DefaultHeaders: transDefaultHeaders,
+	}
+}
+
+// Configuration for external plugin generators
+type PluginTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Command to execute the plugin (executable + args)
+	Command []string `json:"command"`
+	// Arbitrary options passed to the plugin (flat key-value pairs)
+	Options *map[string]string `json:"options,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *PluginTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *PluginTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *PluginTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *PluginTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *PluginTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *PluginTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetCommand returns the value of Command or the zero value if the receiver or field is nil.
+func (x *PluginTargetConfig) GetCommand() []string {
+	if x != nil {
+		return x.Command
+	}
+	var zero []string
+	return zero
+}
+
+// GetCommandOr returns the value of Command or the provided default if the receiver or field is nil.
+func (x *PluginTargetConfig) GetCommandOr(defaultValue []string) []string {
+	if x != nil {
+		return x.Command
+	}
+	return defaultValue
+}
+
+// GetOptions returns the value of Options or the zero value if the receiver or field is nil.
+func (x *PluginTargetConfig) GetOptions() map[string]string {
+	if x != nil && x.Options != nil {
+		return *x.Options
+	}
+	var zero map[string]string
+	return zero
+}
+
+// GetOptionsOr returns the value of Options or the provided default if the receiver or field is nil.
+func (x *PluginTargetConfig) GetOptionsOr(defaultValue map[string]string) map[string]string {
+	if x != nil && x.Options != nil {
+		return *x.Options
+	}
+	return defaultValue
+}
+
+// prePluginTargetConfig is the version of PluginTargetConfig previous to the required field validation
+type prePluginTargetConfig struct {
+	Output  *string            `json:"output,omitempty"`
+	Clean   *bool              `json:"clean,omitempty"`
+	Schema  *string            `json:"schema,omitempty"`
+	Command *[]string          `json:"command,omitempty"`
+	Options *map[string]string `json:"options,omitempty"`
+}
+
+// validate validates the required fields of PluginTargetConfig
+func (p *prePluginTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePluginTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "command"
+	if p.Command == nil {
+		return errorMissingRequiredField("field command is required")
+	}
+
+	// Validation for field "options"
+
+	return nil
+}
+
+// transform transforms the prePluginTargetConfig type to the final PluginTargetConfig type
+func (p *prePluginTargetConfig) transform() PluginTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transCommand := *p.Command
+	transOptions := p.Options
+
+	// Assignments
+	return PluginTargetConfig{
+		Output:  transOutput,
+		Clean:   transClean,
+		Schema:  transSchema,
+		Command: transCommand,
+		Options: transOptions,
+	}
+}
+
+// Represents an RPC procedure
+type ProcedureDef struct {
+	// The name of the parent RPC
+	RpcName string `json:"rpcName"`
+	// The name of the procedure
+	Name string `json:"name"`
+	// Documentation for the procedure
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+	// List of input fields in the same order in which they were written
+	Input []Field `json:"input"`
+	// List of output fields in the same order in which they were written
+	Output []Field `json:"output"`
+}
+
+// GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetRpcName() string {
+	if x != nil {
+		return x.RpcName
+	}
+	var zero string
+	return zero
+}
+
+// GetRpcNameOr returns the value of RpcName or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetRpcNameOr(defaultValue string) string {
+	if x != nil {
+		return x.RpcName
+	}
+	return defaultValue
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// GetInput returns the value of Input or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetInput() []Field {
+	if x != nil {
+		return x.Input
+	}
+	var zero []Field
+	return zero
+}
+
+// GetInputOr returns the value of Input or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetInputOr(defaultValue []Field) []Field {
+	if x != nil {
+		return x.Input
+	}
+	return defaultValue
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *ProcedureDef) GetOutput() []Field {
+	if x != nil {
+		return x.Output
+	}
+	var zero []Field
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *ProcedureDef) GetOutputOr(defaultValue []Field) []Field {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// preProcedureDef is the version of ProcedureDef previous to the required field validation
+type preProcedureDef struct {
+	RpcName    *string     `json:"rpcName,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	Doc        *string     `json:"doc,omitempty"`
+	Deprecated *string     `json:"deprecated,omitempty"`
+	Input      *[]preField `json:"input,omitempty"`
+	Output     *[]preField `json:"output,omitempty"`
+}
+
+// validate validates the required fields of ProcedureDef
+func (p *preProcedureDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preProcedureDef is nil")
+	}
+
+	// Validation for field "rpcName"
+	if p.RpcName == nil {
+		return errorMissingRequiredField("field rpcName is required")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	// Validation for field "input"
+	if p.Input == nil {
+		return errorMissingRequiredField("field input is required")
+	}
+	if p.Input != nil {
+		for _, item := range *p.Input {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field input: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+	if p.Output != nil {
+		for _, item := range *p.Output {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field output: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preProcedureDef type to the final ProcedureDef type
+func (p *preProcedureDef) transform() ProcedureDef {
+	// Transformations
+	transRpcName := *p.RpcName
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+	var transInput []Field
+	transInput = make([]Field, len(*p.Input))
+	for i, v := range *p.Input {
+		var tmp_ Field
+		tmp_ = v.transform()
+		transInput[i] = tmp_
+	}
+	var transOutput []Field
+	transOutput = make([]Field, len(*p.Output))
+	for i, v := range *p.Output {
+		var tmp_ Field
+		tmp_ = v.transform()
+		transOutput[i] = tmp_
+	}
+
+	// Assignments
+	return ProcedureDef{
+		RpcName:    transRpcName,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		Input:      transInput,
+		Output:     transOutput,
+	}
+}
+
+// Configuration for Python code generation
+type PythonTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Generate helper functions for patterns
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+	// Generate constant definitions
+	GenConsts *bool `json:"genConsts,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *PythonTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *PythonTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *PythonTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *PythonTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *PythonTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *PythonTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *PythonTargetConfig) GetGenPatterns() bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *PythonTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *PythonTargetConfig) GetGenConsts() bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *PythonTargetConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	return defaultValue
+}
+
+// prePythonTargetConfig is the version of PythonTargetConfig previous to the required field validation
+type prePythonTargetConfig struct {
+	Output      *string `json:"output,omitempty"`
+	Clean       *bool   `json:"clean,omitempty"`
+	Schema      *string `json:"schema,omitempty"`
+	GenPatterns *bool   `json:"genPatterns,omitempty"`
+	GenConsts   *bool   `json:"genConsts,omitempty"`
+}
+
+// validate validates the required fields of PythonTargetConfig
+func (p *prePythonTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePythonTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "genPatterns"
+
+	// Validation for field "genConsts"
+
+	return nil
+}
+
+// transform transforms the prePythonTargetConfig type to the final PythonTargetConfig type
+func (p *prePythonTargetConfig) transform() PythonTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transGenPatterns := p.GenPatterns
+	transGenConsts := p.GenConsts
+
+	// Assignments
+	return PythonTargetConfig{
+		Output:      transOutput,
+		Clean:       transClean,
+		Schema:      transSchema,
+		GenPatterns: transGenPatterns,
+		GenConsts:   transGenConsts,
+	}
+}
+
+// Represents an RPC definition
+type RpcDef struct {
+	// The name of the RPC
+	Name string `json:"name"`
+	// Documentation for the RPC
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *RpcDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *RpcDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *RpcDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *RpcDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *RpcDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *RpcDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// preRpcDef is the version of RpcDef previous to the required field validation
+type preRpcDef struct {
+	Name       *string `json:"name,omitempty"`
+	Doc        *string `json:"doc,omitempty"`
+	Deprecated *string `json:"deprecated,omitempty"`
+}
+
+// validate validates the required fields of RpcDef
+func (p *preRpcDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preRpcDef is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	return nil
+}
+
+// transform transforms the preRpcDef type to the final RpcDef type
+func (p *preRpcDef) transform() RpcDef {
+	// Transformations
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+
+	// Assignments
+	return RpcDef{
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+	}
+}
+
+// Configuration for generating RPC servers
+type ServerTargetConfig struct {
+	// Generate RPC server interfaces and handlers
+	GenServer *bool `json:"genServer,omitempty"`
+}
+
+// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
+func (x *ServerTargetConfig) GetGenServer() bool {
+	if x != nil && x.GenServer != nil {
+		return *x.GenServer
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
+func (x *ServerTargetConfig) GetGenServerOr(defaultValue bool) bool {
+	if x != nil && x.GenServer != nil {
+		return *x.GenServer
+	}
+	return defaultValue
+}
+
+// preServerTargetConfig is the version of ServerTargetConfig previous to the required field validation
+type preServerTargetConfig struct {
+	GenServer *bool `json:"genServer,omitempty"`
+}
+
+// validate validates the required fields of ServerTargetConfig
+func (p *preServerTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preServerTargetConfig is nil")
+	}
+
+	// Validation for field "genServer"
+
+	return nil
+}
+
+// transform transforms the preServerTargetConfig type to the final ServerTargetConfig type
+func (p *preServerTargetConfig) transform() ServerTargetConfig {
+	// Transformations
+	transGenServer := p.GenServer
+
+	// Assignments
+	return ServerTargetConfig{
+		GenServer: transGenServer,
+	}
+}
+
+// Represents an RPC stream
+type StreamDef struct {
+	// The name of the parent RPC
+	RpcName string `json:"rpcName"`
+	// The name of the stream
+	Name string `json:"name"`
+	// Documentation for the stream
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+	// List of input fields in the same order in which they were written
+	Input []Field `json:"input"`
+	// List of output fields in the same order in which they were written
+	Output []Field `json:"output"`
+}
+
+// GetRpcName returns the value of RpcName or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetRpcName() string {
+	if x != nil {
+		return x.RpcName
+	}
+	var zero string
+	return zero
+}
+
+// GetRpcNameOr returns the value of RpcName or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetRpcNameOr(defaultValue string) string {
+	if x != nil {
+		return x.RpcName
+	}
+	return defaultValue
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// GetInput returns the value of Input or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetInput() []Field {
+	if x != nil {
+		return x.Input
+	}
+	var zero []Field
+	return zero
+}
+
+// GetInputOr returns the value of Input or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetInputOr(defaultValue []Field) []Field {
+	if x != nil {
+		return x.Input
+	}
+	return defaultValue
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *StreamDef) GetOutput() []Field {
+	if x != nil {
+		return x.Output
+	}
+	var zero []Field
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *StreamDef) GetOutputOr(defaultValue []Field) []Field {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// preStreamDef is the version of StreamDef previous to the required field validation
+type preStreamDef struct {
+	RpcName    *string     `json:"rpcName,omitempty"`
+	Name       *string     `json:"name,omitempty"`
+	Doc        *string     `json:"doc,omitempty"`
+	Deprecated *string     `json:"deprecated,omitempty"`
+	Input      *[]preField `json:"input,omitempty"`
+	Output     *[]preField `json:"output,omitempty"`
+}
+
+// validate validates the required fields of StreamDef
+func (p *preStreamDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preStreamDef is nil")
+	}
+
+	// Validation for field "rpcName"
+	if p.RpcName == nil {
+		return errorMissingRequiredField("field rpcName is required")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	// Validation for field "input"
+	if p.Input == nil {
+		return errorMissingRequiredField("field input is required")
+	}
+	if p.Input != nil {
+		for _, item := range *p.Input {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field input: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+	if p.Output != nil {
+		for _, item := range *p.Output {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field output: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preStreamDef type to the final StreamDef type
+func (p *preStreamDef) transform() StreamDef {
+	// Transformations
+	transRpcName := *p.RpcName
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+	var transInput []Field
+	transInput = make([]Field, len(*p.Input))
+	for i, v := range *p.Input {
+		var tmp_ Field
+		tmp_ = v.transform()
+		transInput[i] = tmp_
+	}
+	var transOutput []Field
+	transOutput = make([]Field, len(*p.Output))
+	for i, v := range *p.Output {
+		var tmp_ Field
+		tmp_ = v.transform()
+		transOutput[i] = tmp_
+	}
+
+	// Assignments
+	return StreamDef{
+		RpcName:    transRpcName,
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		Input:      transInput,
+		Output:     transOutput,
+	}
+}
+
+// Configuration for a specific generation target, only one target type should be set per entry
+type TargetConfig struct {
+	// Go language target
+	Go *GoTargetConfig `json:"go,omitempty"`
+	// TypeScript language target
+	Typescript *TypeScriptTargetConfig `json:"typescript,omitempty"`
+	// Dart language target
+	Dart *DartTargetConfig `json:"dart,omitempty"`
+	// Python language target
+	Python *PythonTargetConfig `json:"python,omitempty"`
+	// JSON Schema output target
+	Jsonschema *JsonSchemaTargetConfig `json:"jsonschema,omitempty"`
+	// OpenAPI specification output target
+	Openapi *OpenApiTargetConfig `json:"openapi,omitempty"`
+	// API Playground output target
+	Playground *PlaygroundTargetConfig `json:"playground,omitempty"`
+	// External plugin target
+	Plugin *PluginTargetConfig `json:"plugin,omitempty"`
+	// IR (Intermediate Representation) JSON output target
+	Ir *IrTargetConfig `json:"ir,omitempty"`
+	// Unified VDL schema output target (merges includes and external docs)
+	Vdl *VdlTargetConfig `json:"vdl,omitempty"`
+}
+
+// GetGo returns the value of Go or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetGo() GoTargetConfig {
+	if x != nil && x.Go != nil {
+		return *x.Go
+	}
+	var zero GoTargetConfig
+	return zero
+}
+
+// GetGoOr returns the value of Go or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetGoOr(defaultValue GoTargetConfig) GoTargetConfig {
+	if x != nil && x.Go != nil {
+		return *x.Go
+	}
+	return defaultValue
+}
+
+// GetTypescript returns the value of Typescript or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetTypescript() TypeScriptTargetConfig {
+	if x != nil && x.Typescript != nil {
+		return *x.Typescript
+	}
+	var zero TypeScriptTargetConfig
+	return zero
+}
+
+// GetTypescriptOr returns the value of Typescript or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetTypescriptOr(defaultValue TypeScriptTargetConfig) TypeScriptTargetConfig {
+	if x != nil && x.Typescript != nil {
+		return *x.Typescript
+	}
+	return defaultValue
+}
+
+// GetDart returns the value of Dart or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetDart() DartTargetConfig {
+	if x != nil && x.Dart != nil {
+		return *x.Dart
+	}
+	var zero DartTargetConfig
+	return zero
+}
+
+// GetDartOr returns the value of Dart or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetDartOr(defaultValue DartTargetConfig) DartTargetConfig {
+	if x != nil && x.Dart != nil {
+		return *x.Dart
+	}
+	return defaultValue
+}
+
+// GetPython returns the value of Python or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetPython() PythonTargetConfig {
+	if x != nil && x.Python != nil {
+		return *x.Python
+	}
+	var zero PythonTargetConfig
+	return zero
+}
+
+// GetPythonOr returns the value of Python or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetPythonOr(defaultValue PythonTargetConfig) PythonTargetConfig {
+	if x != nil && x.Python != nil {
+		return *x.Python
+	}
+	return defaultValue
+}
+
+// GetJsonschema returns the value of Jsonschema or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetJsonschema() JsonSchemaTargetConfig {
+	if x != nil && x.Jsonschema != nil {
+		return *x.Jsonschema
+	}
+	var zero JsonSchemaTargetConfig
+	return zero
+}
+
+// GetJsonschemaOr returns the value of Jsonschema or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetJsonschemaOr(defaultValue JsonSchemaTargetConfig) JsonSchemaTargetConfig {
+	if x != nil && x.Jsonschema != nil {
+		return *x.Jsonschema
+	}
+	return defaultValue
+}
+
+// GetOpenapi returns the value of Openapi or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetOpenapi() OpenApiTargetConfig {
+	if x != nil && x.Openapi != nil {
+		return *x.Openapi
+	}
+	var zero OpenApiTargetConfig
+	return zero
+}
+
+// GetOpenapiOr returns the value of Openapi or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetOpenapiOr(defaultValue OpenApiTargetConfig) OpenApiTargetConfig {
+	if x != nil && x.Openapi != nil {
+		return *x.Openapi
+	}
+	return defaultValue
+}
+
+// GetPlayground returns the value of Playground or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetPlayground() PlaygroundTargetConfig {
+	if x != nil && x.Playground != nil {
+		return *x.Playground
+	}
+	var zero PlaygroundTargetConfig
+	return zero
+}
+
+// GetPlaygroundOr returns the value of Playground or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetPlaygroundOr(defaultValue PlaygroundTargetConfig) PlaygroundTargetConfig {
+	if x != nil && x.Playground != nil {
+		return *x.Playground
+	}
+	return defaultValue
+}
+
+// GetPlugin returns the value of Plugin or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetPlugin() PluginTargetConfig {
+	if x != nil && x.Plugin != nil {
+		return *x.Plugin
+	}
+	var zero PluginTargetConfig
+	return zero
+}
+
+// GetPluginOr returns the value of Plugin or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetPluginOr(defaultValue PluginTargetConfig) PluginTargetConfig {
+	if x != nil && x.Plugin != nil {
+		return *x.Plugin
+	}
+	return defaultValue
+}
+
+// GetIr returns the value of Ir or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetIr() IrTargetConfig {
+	if x != nil && x.Ir != nil {
+		return *x.Ir
+	}
+	var zero IrTargetConfig
+	return zero
+}
+
+// GetIrOr returns the value of Ir or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetIrOr(defaultValue IrTargetConfig) IrTargetConfig {
+	if x != nil && x.Ir != nil {
+		return *x.Ir
+	}
+	return defaultValue
+}
+
+// GetVdl returns the value of Vdl or the zero value if the receiver or field is nil.
+func (x *TargetConfig) GetVdl() VdlTargetConfig {
+	if x != nil && x.Vdl != nil {
+		return *x.Vdl
+	}
+	var zero VdlTargetConfig
+	return zero
+}
+
+// GetVdlOr returns the value of Vdl or the provided default if the receiver or field is nil.
+func (x *TargetConfig) GetVdlOr(defaultValue VdlTargetConfig) VdlTargetConfig {
+	if x != nil && x.Vdl != nil {
+		return *x.Vdl
+	}
+	return defaultValue
+}
+
+// preTargetConfig is the version of TargetConfig previous to the required field validation
+type preTargetConfig struct {
+	Go         *preGoTargetConfig         `json:"go,omitempty"`
+	Typescript *preTypeScriptTargetConfig `json:"typescript,omitempty"`
+	Dart       *preDartTargetConfig       `json:"dart,omitempty"`
+	Python     *prePythonTargetConfig     `json:"python,omitempty"`
+	Jsonschema *preJsonSchemaTargetConfig `json:"jsonschema,omitempty"`
+	Openapi    *preOpenApiTargetConfig    `json:"openapi,omitempty"`
+	Playground *prePlaygroundTargetConfig `json:"playground,omitempty"`
+	Plugin     *prePluginTargetConfig     `json:"plugin,omitempty"`
+	Ir         *preIrTargetConfig         `json:"ir,omitempty"`
+	Vdl        *preVdlTargetConfig        `json:"vdl,omitempty"`
+}
+
+// validate validates the required fields of TargetConfig
+func (p *preTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preTargetConfig is nil")
+	}
+
+	// Validation for field "go"
+	if p.Go != nil {
+		if err := p.Go.validate(); err != nil {
+			return errorMissingRequiredField("field go: " + err.Error())
+		}
+	}
+
+	// Validation for field "typescript"
+	if p.Typescript != nil {
+		if err := p.Typescript.validate(); err != nil {
+			return errorMissingRequiredField("field typescript: " + err.Error())
+		}
+	}
+
+	// Validation for field "dart"
+	if p.Dart != nil {
+		if err := p.Dart.validate(); err != nil {
+			return errorMissingRequiredField("field dart: " + err.Error())
+		}
+	}
+
+	// Validation for field "python"
+	if p.Python != nil {
+		if err := p.Python.validate(); err != nil {
+			return errorMissingRequiredField("field python: " + err.Error())
+		}
+	}
+
+	// Validation for field "jsonschema"
+	if p.Jsonschema != nil {
+		if err := p.Jsonschema.validate(); err != nil {
+			return errorMissingRequiredField("field jsonschema: " + err.Error())
+		}
+	}
+
+	// Validation for field "openapi"
+	if p.Openapi != nil {
+		if err := p.Openapi.validate(); err != nil {
+			return errorMissingRequiredField("field openapi: " + err.Error())
+		}
+	}
+
+	// Validation for field "playground"
+	if p.Playground != nil {
+		if err := p.Playground.validate(); err != nil {
+			return errorMissingRequiredField("field playground: " + err.Error())
+		}
+	}
+
+	// Validation for field "plugin"
+	if p.Plugin != nil {
+		if err := p.Plugin.validate(); err != nil {
+			return errorMissingRequiredField("field plugin: " + err.Error())
+		}
+	}
+
+	// Validation for field "ir"
+	if p.Ir != nil {
+		if err := p.Ir.validate(); err != nil {
+			return errorMissingRequiredField("field ir: " + err.Error())
+		}
+	}
+
+	// Validation for field "vdl"
+	if p.Vdl != nil {
+		if err := p.Vdl.validate(); err != nil {
+			return errorMissingRequiredField("field vdl: " + err.Error())
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preTargetConfig type to the final TargetConfig type
+func (p *preTargetConfig) transform() TargetConfig {
+	// Transformations
+	var transGo *GoTargetConfig
+	if p.Go != nil {
+		var valGo GoTargetConfig
+		valGo = p.Go.transform()
+		transGo = &valGo
+	}
+	var transTypescript *TypeScriptTargetConfig
+	if p.Typescript != nil {
+		var valTypescript TypeScriptTargetConfig
+		valTypescript = p.Typescript.transform()
+		transTypescript = &valTypescript
+	}
+	var transDart *DartTargetConfig
+	if p.Dart != nil {
+		var valDart DartTargetConfig
+		valDart = p.Dart.transform()
+		transDart = &valDart
+	}
+	var transPython *PythonTargetConfig
+	if p.Python != nil {
+		var valPython PythonTargetConfig
+		valPython = p.Python.transform()
+		transPython = &valPython
+	}
+	var transJsonschema *JsonSchemaTargetConfig
+	if p.Jsonschema != nil {
+		var valJsonschema JsonSchemaTargetConfig
+		valJsonschema = p.Jsonschema.transform()
+		transJsonschema = &valJsonschema
+	}
+	var transOpenapi *OpenApiTargetConfig
+	if p.Openapi != nil {
+		var valOpenapi OpenApiTargetConfig
+		valOpenapi = p.Openapi.transform()
+		transOpenapi = &valOpenapi
+	}
+	var transPlayground *PlaygroundTargetConfig
+	if p.Playground != nil {
+		var valPlayground PlaygroundTargetConfig
+		valPlayground = p.Playground.transform()
+		transPlayground = &valPlayground
+	}
+	var transPlugin *PluginTargetConfig
+	if p.Plugin != nil {
+		var valPlugin PluginTargetConfig
+		valPlugin = p.Plugin.transform()
+		transPlugin = &valPlugin
+	}
+	var transIr *IrTargetConfig
+	if p.Ir != nil {
+		var valIr IrTargetConfig
+		valIr = p.Ir.transform()
+		transIr = &valIr
+	}
+	var transVdl *VdlTargetConfig
+	if p.Vdl != nil {
+		var valVdl VdlTargetConfig
+		valVdl = p.Vdl.transform()
+		transVdl = &valVdl
+	}
+
+	// Assignments
+	return TargetConfig{
+		Go:         transGo,
+		Typescript: transTypescript,
+		Dart:       transDart,
+		Python:     transPython,
+		Jsonschema: transJsonschema,
+		Openapi:    transOpenapi,
+		Playground: transPlayground,
+		Plugin:     transPlugin,
+		Ir:         transIr,
+		Vdl:        transVdl,
+	}
+}
+
+// Represents a type definition
+type TypeDef struct {
+	// The name of the type
+	Name string `json:"name"`
+	// Documentation for the type
+	Doc *string `json:"doc,omitempty"`
+	// Deprecation status if deprecated
+	Deprecated *string `json:"deprecated,omitempty"`
+	// List of fields in the type in the same order in which they were written
+	Fields []Field `json:"fields"`
+}
+
+// GetName returns the value of Name or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	var zero string
+	return zero
+}
+
+// GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetNameOr(defaultValue string) string {
+	if x != nil {
+		return x.Name
+	}
+	return defaultValue
+}
+
+// GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetDoc() string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	var zero string
+	return zero
+}
+
+// GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetDocOr(defaultValue string) string {
+	if x != nil && x.Doc != nil {
+		return *x.Doc
+	}
+	return defaultValue
+}
+
+// GetDeprecated returns the value of Deprecated or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetDeprecated() string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	var zero string
+	return zero
+}
+
+// GetDeprecatedOr returns the value of Deprecated or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetDeprecatedOr(defaultValue string) string {
+	if x != nil && x.Deprecated != nil {
+		return *x.Deprecated
+	}
+	return defaultValue
+}
+
+// GetFields returns the value of Fields or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetFields() []Field {
+	if x != nil {
+		return x.Fields
+	}
+	var zero []Field
+	return zero
+}
+
+// GetFieldsOr returns the value of Fields or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetFieldsOr(defaultValue []Field) []Field {
+	if x != nil {
+		return x.Fields
+	}
+	return defaultValue
+}
+
+// preTypeDef is the version of TypeDef previous to the required field validation
+type preTypeDef struct {
+	Name       *string     `json:"name,omitempty"`
+	Doc        *string     `json:"doc,omitempty"`
+	Deprecated *string     `json:"deprecated,omitempty"`
+	Fields     *[]preField `json:"fields,omitempty"`
+}
+
+// validate validates the required fields of TypeDef
+func (p *preTypeDef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preTypeDef is nil")
+	}
+
+	// Validation for field "name"
+	if p.Name == nil {
+		return errorMissingRequiredField("field name is required")
+	}
+
+	// Validation for field "doc"
+
+	// Validation for field "deprecated"
+
+	// Validation for field "fields"
+	if p.Fields == nil {
+		return errorMissingRequiredField("field fields is required")
+	}
+	if p.Fields != nil {
+		for _, item := range *p.Fields {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field fields: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preTypeDef type to the final TypeDef type
+func (p *preTypeDef) transform() TypeDef {
+	// Transformations
+	transName := *p.Name
+	transDoc := p.Doc
+	transDeprecated := p.Deprecated
+	var transFields []Field
+	transFields = make([]Field, len(*p.Fields))
+	for i, v := range *p.Fields {
+		var tmp_ Field
+		tmp_ = v.transform()
+		transFields[i] = tmp_
+	}
+
+	// Assignments
+	return TypeDef{
+		Name:       transName,
+		Doc:        transDoc,
+		Deprecated: transDeprecated,
+		Fields:     transFields,
+	}
+}
+
+// Represents any referenced type in a unified way
+type TypeRef struct {
+	// The category of the type
+	Kind TypeKind `json:"kind"`
+	// The name of the primitive type if Kind is primitive
+	PrimitiveName *PrimitiveType `json:"primitiveName,omitempty"`
+	// The name of the type if Kind is type
+	TypeName *string `json:"typeName,omitempty"`
+	// The name of the enum if Kind is enum
+	EnumName *string `json:"enumName,omitempty"`
+	// The type of the enum if Kind is enum
+	EnumType *EnumType `json:"enumType,omitempty"`
+	// The type of elements in the array if Kind is array
+	ArrayType *TypeRef `json:"arrayType,omitempty"`
+	// Number of array dimensions (e.g. 2 for int[][]) if Kind is array
+	ArrayDims *int64 `json:"arrayDims,omitempty"`
+	// The type of values in the map if Kind is map
+	MapType *TypeRef `json:"mapType,omitempty"`
+	// Fields of the inline object if Kind is object, in the same order in which they were written
+	ObjectFields *[]Field `json:"objectFields,omitempty"`
+}
+
+// GetKind returns the value of Kind or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetKind() TypeKind {
+	if x != nil {
+		return x.Kind
+	}
+	var zero TypeKind
+	return zero
+}
+
+// GetKindOr returns the value of Kind or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetKindOr(defaultValue TypeKind) TypeKind {
+	if x != nil {
+		return x.Kind
+	}
+	return defaultValue
+}
+
+// GetPrimitiveName returns the value of PrimitiveName or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetPrimitiveName() PrimitiveType {
+	if x != nil && x.PrimitiveName != nil {
+		return *x.PrimitiveName
+	}
+	var zero PrimitiveType
+	return zero
+}
+
+// GetPrimitiveNameOr returns the value of PrimitiveName or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetPrimitiveNameOr(defaultValue PrimitiveType) PrimitiveType {
+	if x != nil && x.PrimitiveName != nil {
+		return *x.PrimitiveName
+	}
+	return defaultValue
+}
+
+// GetTypeName returns the value of TypeName or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetTypeName() string {
+	if x != nil && x.TypeName != nil {
+		return *x.TypeName
+	}
+	var zero string
+	return zero
+}
+
+// GetTypeNameOr returns the value of TypeName or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetTypeNameOr(defaultValue string) string {
+	if x != nil && x.TypeName != nil {
+		return *x.TypeName
+	}
+	return defaultValue
+}
+
+// GetEnumName returns the value of EnumName or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetEnumName() string {
+	if x != nil && x.EnumName != nil {
+		return *x.EnumName
+	}
+	var zero string
+	return zero
+}
+
+// GetEnumNameOr returns the value of EnumName or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetEnumNameOr(defaultValue string) string {
+	if x != nil && x.EnumName != nil {
+		return *x.EnumName
+	}
+	return defaultValue
+}
+
+// GetEnumType returns the value of EnumType or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetEnumType() EnumType {
+	if x != nil && x.EnumType != nil {
+		return *x.EnumType
+	}
+	var zero EnumType
+	return zero
+}
+
+// GetEnumTypeOr returns the value of EnumType or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetEnumTypeOr(defaultValue EnumType) EnumType {
+	if x != nil && x.EnumType != nil {
+		return *x.EnumType
+	}
+	return defaultValue
+}
+
+// GetArrayType returns the value of ArrayType or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetArrayType() TypeRef {
+	if x != nil && x.ArrayType != nil {
+		return *x.ArrayType
+	}
+	var zero TypeRef
+	return zero
+}
+
+// GetArrayTypeOr returns the value of ArrayType or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetArrayTypeOr(defaultValue TypeRef) TypeRef {
+	if x != nil && x.ArrayType != nil {
+		return *x.ArrayType
+	}
+	return defaultValue
+}
+
+// GetArrayDims returns the value of ArrayDims or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetArrayDims() int64 {
+	if x != nil && x.ArrayDims != nil {
+		return *x.ArrayDims
+	}
+	var zero int64
+	return zero
+}
+
+// GetArrayDimsOr returns the value of ArrayDims or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetArrayDimsOr(defaultValue int64) int64 {
+	if x != nil && x.ArrayDims != nil {
+		return *x.ArrayDims
+	}
+	return defaultValue
+}
+
+// GetMapType returns the value of MapType or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetMapType() TypeRef {
+	if x != nil && x.MapType != nil {
+		return *x.MapType
+	}
+	var zero TypeRef
+	return zero
+}
+
+// GetMapTypeOr returns the value of MapType or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetMapTypeOr(defaultValue TypeRef) TypeRef {
+	if x != nil && x.MapType != nil {
+		return *x.MapType
+	}
+	return defaultValue
+}
+
+// GetObjectFields returns the value of ObjectFields or the zero value if the receiver or field is nil.
+func (x *TypeRef) GetObjectFields() []Field {
+	if x != nil && x.ObjectFields != nil {
+		return *x.ObjectFields
+	}
+	var zero []Field
+	return zero
+}
+
+// GetObjectFieldsOr returns the value of ObjectFields or the provided default if the receiver or field is nil.
+func (x *TypeRef) GetObjectFieldsOr(defaultValue []Field) []Field {
+	if x != nil && x.ObjectFields != nil {
+		return *x.ObjectFields
+	}
+	return defaultValue
+}
+
+// preTypeRef is the version of TypeRef previous to the required field validation
+type preTypeRef struct {
+	Kind          *TypeKind      `json:"kind,omitempty"`
+	PrimitiveName *PrimitiveType `json:"primitiveName,omitempty"`
+	TypeName      *string        `json:"typeName,omitempty"`
+	EnumName      *string        `json:"enumName,omitempty"`
+	EnumType      *EnumType      `json:"enumType,omitempty"`
+	ArrayType     *preTypeRef    `json:"arrayType,omitempty"`
+	ArrayDims     *int64         `json:"arrayDims,omitempty"`
+	MapType       *preTypeRef    `json:"mapType,omitempty"`
+	ObjectFields  *[]preField    `json:"objectFields,omitempty"`
+}
+
+// validate validates the required fields of TypeRef
+func (p *preTypeRef) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preTypeRef is nil")
+	}
+
+	// Validation for field "kind"
+	if p.Kind == nil {
+		return errorMissingRequiredField("field kind is required")
+	}
+
+	// Validation for field "primitiveName"
+
+	// Validation for field "typeName"
+
+	// Validation for field "enumName"
+
+	// Validation for field "enumType"
+
+	// Validation for field "arrayType"
+	if p.ArrayType != nil {
+		if err := p.ArrayType.validate(); err != nil {
+			return errorMissingRequiredField("field arrayType: " + err.Error())
+		}
+	}
+
+	// Validation for field "arrayDims"
+
+	// Validation for field "mapType"
+	if p.MapType != nil {
+		if err := p.MapType.validate(); err != nil {
+			return errorMissingRequiredField("field mapType: " + err.Error())
+		}
+	}
+
+	// Validation for field "objectFields"
+	if p.ObjectFields != nil {
+		for _, item := range *p.ObjectFields {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field objectFields: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preTypeRef type to the final TypeRef type
+func (p *preTypeRef) transform() TypeRef {
+	// Transformations
+	transKind := *p.Kind
+	transPrimitiveName := p.PrimitiveName
+	transTypeName := p.TypeName
+	transEnumName := p.EnumName
+	transEnumType := p.EnumType
+	var transArrayType *TypeRef
+	if p.ArrayType != nil {
+		var valArrayType TypeRef
+		valArrayType = p.ArrayType.transform()
+		transArrayType = &valArrayType
+	}
+	transArrayDims := p.ArrayDims
+	var transMapType *TypeRef
+	if p.MapType != nil {
+		var valMapType TypeRef
+		valMapType = p.MapType.transform()
+		transMapType = &valMapType
+	}
+	var transObjectFields *[]Field
+	if p.ObjectFields != nil {
+		var valObjectFields []Field
+		valObjectFields = make([]Field, len(*p.ObjectFields))
+		for i, v := range *p.ObjectFields {
+			var tmp_ Field
+			tmp_ = v.transform()
+			valObjectFields[i] = tmp_
+		}
+		transObjectFields = &valObjectFields
+	}
+
+	// Assignments
+	return TypeRef{
+		Kind:          transKind,
+		PrimitiveName: transPrimitiveName,
+		TypeName:      transTypeName,
+		EnumName:      transEnumName,
+		EnumType:      transEnumType,
+		ArrayType:     transArrayType,
+		ArrayDims:     transArrayDims,
+		MapType:       transMapType,
+		ObjectFields:  transObjectFields,
+	}
+}
+
+// Configuration for TypeScript code generation
+type TypeScriptTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// Generate helper functions for patterns
+	GenPatterns *bool `json:"genPatterns,omitempty"`
+	// Generate constant definitions
+	GenConsts *bool `json:"genConsts,omitempty"`
+	// Generate RPC client code
+	GenClient *bool `json:"genClient,omitempty"`
+	// Generate RPC server interfaces and handlers
+	GenServer *bool `json:"genServer,omitempty"`
+	// File extension to append to import paths
+	ImportExtension *TypescriptTargetImportExtension `json:"importExtension,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetGenPatterns returns the value of GenPatterns or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenPatterns() bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenPatternsOr returns the value of GenPatterns or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenPatternsOr(defaultValue bool) bool {
+	if x != nil && x.GenPatterns != nil {
+		return *x.GenPatterns
+	}
+	return defaultValue
+}
+
+// GetGenConsts returns the value of GenConsts or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenConsts() bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenConstsOr returns the value of GenConsts or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenConstsOr(defaultValue bool) bool {
+	if x != nil && x.GenConsts != nil {
+		return *x.GenConsts
+	}
+	return defaultValue
+}
+
+// GetGenClient returns the value of GenClient or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenClient() bool {
+	if x != nil && x.GenClient != nil {
+		return *x.GenClient
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenClientOr returns the value of GenClient or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenClientOr(defaultValue bool) bool {
+	if x != nil && x.GenClient != nil {
+		return *x.GenClient
+	}
+	return defaultValue
+}
+
+// GetGenServer returns the value of GenServer or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenServer() bool {
+	if x != nil && x.GenServer != nil {
+		return *x.GenServer
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenServerOr returns the value of GenServer or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetGenServerOr(defaultValue bool) bool {
+	if x != nil && x.GenServer != nil {
+		return *x.GenServer
+	}
+	return defaultValue
+}
+
+// GetImportExtension returns the value of ImportExtension or the zero value if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetImportExtension() TypescriptTargetImportExtension {
+	if x != nil && x.ImportExtension != nil {
+		return *x.ImportExtension
+	}
+	var zero TypescriptTargetImportExtension
+	return zero
+}
+
+// GetImportExtensionOr returns the value of ImportExtension or the provided default if the receiver or field is nil.
+func (x *TypeScriptTargetConfig) GetImportExtensionOr(defaultValue TypescriptTargetImportExtension) TypescriptTargetImportExtension {
+	if x != nil && x.ImportExtension != nil {
+		return *x.ImportExtension
+	}
+	return defaultValue
+}
+
+// preTypeScriptTargetConfig is the version of TypeScriptTargetConfig previous to the required field validation
+type preTypeScriptTargetConfig struct {
+	Output          *string                          `json:"output,omitempty"`
+	Clean           *bool                            `json:"clean,omitempty"`
+	Schema          *string                          `json:"schema,omitempty"`
+	GenPatterns     *bool                            `json:"genPatterns,omitempty"`
+	GenConsts       *bool                            `json:"genConsts,omitempty"`
+	GenClient       *bool                            `json:"genClient,omitempty"`
+	GenServer       *bool                            `json:"genServer,omitempty"`
+	ImportExtension *TypescriptTargetImportExtension `json:"importExtension,omitempty"`
+}
+
+// validate validates the required fields of TypeScriptTargetConfig
+func (p *preTypeScriptTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preTypeScriptTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "genPatterns"
+
+	// Validation for field "genConsts"
+
+	// Validation for field "genClient"
+
+	// Validation for field "genServer"
+
+	// Validation for field "importExtension"
+
+	return nil
+}
+
+// transform transforms the preTypeScriptTargetConfig type to the final TypeScriptTargetConfig type
+func (p *preTypeScriptTargetConfig) transform() TypeScriptTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transGenPatterns := p.GenPatterns
+	transGenConsts := p.GenConsts
+	transGenClient := p.GenClient
+	transGenServer := p.GenServer
+	transImportExtension := p.ImportExtension
+
+	// Assignments
+	return TypeScriptTargetConfig{
+		Output:          transOutput,
+		Clean:           transClean,
+		Schema:          transSchema,
+		GenPatterns:     transGenPatterns,
+		GenConsts:       transGenConsts,
+		GenClient:       transGenClient,
+		GenServer:       transGenServer,
+		ImportExtension: transImportExtension,
+	}
+}
+
+// VDL Configuration Schema
+//
+// This schema defines the configuration format for the VDL code generator (vdl.yaml)
+//
+// It supports multiple target languages and output formats
+type VdlCodegenConfig struct {
+	// Configuration version (must be 1)
+	Version int64 `json:"version"`
+	// Path to the default global VDL schema file entrypoint
+	Schema *string `json:"schema,omitempty"`
+	// List of generation targets
+	Targets []TargetConfig `json:"targets"`
+}
+
+// GetVersion returns the value of Version or the zero value if the receiver or field is nil.
+func (x *VdlCodegenConfig) GetVersion() int64 {
+	if x != nil {
+		return x.Version
+	}
+	var zero int64
+	return zero
+}
+
+// GetVersionOr returns the value of Version or the provided default if the receiver or field is nil.
+func (x *VdlCodegenConfig) GetVersionOr(defaultValue int64) int64 {
+	if x != nil {
+		return x.Version
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *VdlCodegenConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *VdlCodegenConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetTargets returns the value of Targets or the zero value if the receiver or field is nil.
+func (x *VdlCodegenConfig) GetTargets() []TargetConfig {
+	if x != nil {
+		return x.Targets
+	}
+	var zero []TargetConfig
+	return zero
+}
+
+// GetTargetsOr returns the value of Targets or the provided default if the receiver or field is nil.
+func (x *VdlCodegenConfig) GetTargetsOr(defaultValue []TargetConfig) []TargetConfig {
+	if x != nil {
+		return x.Targets
+	}
+	return defaultValue
+}
+
+// preVdlCodegenConfig is the version of VdlCodegenConfig previous to the required field validation
+type preVdlCodegenConfig struct {
+	Version *int64             `json:"version,omitempty"`
+	Schema  *string            `json:"schema,omitempty"`
+	Targets *[]preTargetConfig `json:"targets,omitempty"`
+}
+
+// validate validates the required fields of VdlCodegenConfig
+func (p *preVdlCodegenConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preVdlCodegenConfig is nil")
+	}
+
+	// Validation for field "version"
+	if p.Version == nil {
+		return errorMissingRequiredField("field version is required")
+	}
+
+	// Validation for field "schema"
+
+	// Validation for field "targets"
+	if p.Targets == nil {
+		return errorMissingRequiredField("field targets is required")
+	}
+	if p.Targets != nil {
+		for _, item := range *p.Targets {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field targets: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preVdlCodegenConfig type to the final VdlCodegenConfig type
+func (p *preVdlCodegenConfig) transform() VdlCodegenConfig {
+	// Transformations
+	transVersion := *p.Version
+	transSchema := p.Schema
+	var transTargets []TargetConfig
+	transTargets = make([]TargetConfig, len(*p.Targets))
+	for i, v := range *p.Targets {
+		var tmp_ TargetConfig
+		tmp_ = v.transform()
+		transTargets[i] = tmp_
+	}
+
+	// Assignments
+	return VdlCodegenConfig{
+		Version: transVersion,
+		Schema:  transSchema,
+		Targets: transTargets,
+	}
+}
+
+// Configuration for unified VDL schema generation (merges all includes and external docs)
+type VdlTargetConfig struct {
+	// The output directory where generated files will be placed
+	Output string `json:"output"`
+	// If true, empties the output directory before generation
+	Clean *bool `json:"clean,omitempty"`
+	// Override the VDL schema file entrypoint for this target
+	Schema *string `json:"schema,omitempty"`
+	// The name of the output file
+	Filename *string `json:"filename,omitempty"`
+}
+
+// GetOutput returns the value of Output or the zero value if the receiver or field is nil.
+func (x *VdlTargetConfig) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	var zero string
+	return zero
+}
+
+// GetOutputOr returns the value of Output or the provided default if the receiver or field is nil.
+func (x *VdlTargetConfig) GetOutputOr(defaultValue string) string {
+	if x != nil {
+		return x.Output
+	}
+	return defaultValue
+}
+
+// GetClean returns the value of Clean or the zero value if the receiver or field is nil.
+func (x *VdlTargetConfig) GetClean() bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	var zero bool
+	return zero
+}
+
+// GetCleanOr returns the value of Clean or the provided default if the receiver or field is nil.
+func (x *VdlTargetConfig) GetCleanOr(defaultValue bool) bool {
+	if x != nil && x.Clean != nil {
+		return *x.Clean
+	}
+	return defaultValue
+}
+
+// GetSchema returns the value of Schema or the zero value if the receiver or field is nil.
+func (x *VdlTargetConfig) GetSchema() string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	var zero string
+	return zero
+}
+
+// GetSchemaOr returns the value of Schema or the provided default if the receiver or field is nil.
+func (x *VdlTargetConfig) GetSchemaOr(defaultValue string) string {
+	if x != nil && x.Schema != nil {
+		return *x.Schema
+	}
+	return defaultValue
+}
+
+// GetFilename returns the value of Filename or the zero value if the receiver or field is nil.
+func (x *VdlTargetConfig) GetFilename() string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	var zero string
+	return zero
+}
+
+// GetFilenameOr returns the value of Filename or the provided default if the receiver or field is nil.
+func (x *VdlTargetConfig) GetFilenameOr(defaultValue string) string {
+	if x != nil && x.Filename != nil {
+		return *x.Filename
+	}
+	return defaultValue
+}
+
+// preVdlTargetConfig is the version of VdlTargetConfig previous to the required field validation
+type preVdlTargetConfig struct {
+	Output   *string `json:"output,omitempty"`
+	Clean    *bool   `json:"clean,omitempty"`
+	Schema   *string `json:"schema,omitempty"`
+	Filename *string `json:"filename,omitempty"`
+}
+
+// validate validates the required fields of VdlTargetConfig
+func (p *preVdlTargetConfig) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preVdlTargetConfig is nil")
+	}
+
+	// Validation for field "output"
+	if p.Output == nil {
+		return errorMissingRequiredField("field output is required")
+	}
+
+	// Validation for field "clean"
+
+	// Validation for field "schema"
+
+	// Validation for field "filename"
+
+	return nil
+}
+
+// transform transforms the preVdlTargetConfig type to the final VdlTargetConfig type
+func (p *preVdlTargetConfig) transform() VdlTargetConfig {
+	// Transformations
+	transOutput := *p.Output
+	transClean := p.Clean
+	transSchema := p.Schema
+	transFilename := p.Filename
+
+	// Assignments
+	return VdlTargetConfig{
+		Output:   transOutput,
+		Clean:    transClean,
+		Schema:   transSchema,
+		Filename: transFilename,
+	}
+}
+
 // The input for the WASM function call
 type WasmInput struct {
 	FunctionName  WasmFunctionName    `json:"functionName"`
@@ -1888,6 +6208,7 @@ type WasmInput struct {
 	ExtractType   *ExtractTypeInput   `json:"extractType,omitempty"`
 	ExtractProc   *ExtractProcInput   `json:"extractProc,omitempty"`
 	ExtractStream *ExtractStreamInput `json:"extractStream,omitempty"`
+	Irgen         *IrgenInput         `json:"irgen,omitempty"`
 	Codegen       *CodegenInput       `json:"codegen,omitempty"`
 }
 
@@ -1976,6 +6297,23 @@ func (x *WasmInput) GetExtractStreamOr(defaultValue ExtractStreamInput) ExtractS
 	return defaultValue
 }
 
+// GetIrgen returns the value of Irgen or the zero value if the receiver or field is nil.
+func (x *WasmInput) GetIrgen() IrgenInput {
+	if x != nil && x.Irgen != nil {
+		return *x.Irgen
+	}
+	var zero IrgenInput
+	return zero
+}
+
+// GetIrgenOr returns the value of Irgen or the provided default if the receiver or field is nil.
+func (x *WasmInput) GetIrgenOr(defaultValue IrgenInput) IrgenInput {
+	if x != nil && x.Irgen != nil {
+		return *x.Irgen
+	}
+	return defaultValue
+}
+
 // GetCodegen returns the value of Codegen or the zero value if the receiver or field is nil.
 func (x *WasmInput) GetCodegen() CodegenInput {
 	if x != nil && x.Codegen != nil {
@@ -2000,6 +6338,7 @@ type preWasmInput struct {
 	ExtractType   *preExtractTypeInput   `json:"extractType,omitempty"`
 	ExtractProc   *preExtractProcInput   `json:"extractProc,omitempty"`
 	ExtractStream *preExtractStreamInput `json:"extractStream,omitempty"`
+	Irgen         *preIrgenInput         `json:"irgen,omitempty"`
 	Codegen       *preCodegenInput       `json:"codegen,omitempty"`
 }
 
@@ -2042,6 +6381,13 @@ func (p *preWasmInput) validate() error {
 		}
 	}
 
+	// Validation for field "irgen"
+	if p.Irgen != nil {
+		if err := p.Irgen.validate(); err != nil {
+			return errorMissingRequiredField("field irgen: " + err.Error())
+		}
+	}
+
 	// Validation for field "codegen"
 	if p.Codegen != nil {
 		if err := p.Codegen.validate(); err != nil {
@@ -2080,6 +6426,12 @@ func (p *preWasmInput) transform() WasmInput {
 		valExtractStream = p.ExtractStream.transform()
 		transExtractStream = &valExtractStream
 	}
+	var transIrgen *IrgenInput
+	if p.Irgen != nil {
+		var valIrgen IrgenInput
+		valIrgen = p.Irgen.transform()
+		transIrgen = &valIrgen
+	}
 	var transCodegen *CodegenInput
 	if p.Codegen != nil {
 		var valCodegen CodegenInput
@@ -2094,6 +6446,7 @@ func (p *preWasmInput) transform() WasmInput {
 		ExtractType:   transExtractType,
 		ExtractProc:   transExtractProc,
 		ExtractStream: transExtractStream,
+		Irgen:         transIrgen,
 		Codegen:       transCodegen,
 	}
 }
@@ -2104,6 +6457,7 @@ type WasmOutput struct {
 	ExtractType   *ExtractTypeOutput   `json:"extractType,omitempty"`
 	ExtractProc   *ExtractProcOutput   `json:"extractProc,omitempty"`
 	ExtractStream *ExtractStreamOutput `json:"extractStream,omitempty"`
+	Irgen         *IrgenOutput         `json:"irgen,omitempty"`
 	Codegen       *CodegenOutput       `json:"codegen,omitempty"`
 }
 
@@ -2175,6 +6529,23 @@ func (x *WasmOutput) GetExtractStreamOr(defaultValue ExtractStreamOutput) Extrac
 	return defaultValue
 }
 
+// GetIrgen returns the value of Irgen or the zero value if the receiver or field is nil.
+func (x *WasmOutput) GetIrgen() IrgenOutput {
+	if x != nil && x.Irgen != nil {
+		return *x.Irgen
+	}
+	var zero IrgenOutput
+	return zero
+}
+
+// GetIrgenOr returns the value of Irgen or the provided default if the receiver or field is nil.
+func (x *WasmOutput) GetIrgenOr(defaultValue IrgenOutput) IrgenOutput {
+	if x != nil && x.Irgen != nil {
+		return *x.Irgen
+	}
+	return defaultValue
+}
+
 // GetCodegen returns the value of Codegen or the zero value if the receiver or field is nil.
 func (x *WasmOutput) GetCodegen() CodegenOutput {
 	if x != nil && x.Codegen != nil {
@@ -2198,6 +6569,7 @@ type preWasmOutput struct {
 	ExtractType   *preExtractTypeOutput   `json:"extractType,omitempty"`
 	ExtractProc   *preExtractProcOutput   `json:"extractProc,omitempty"`
 	ExtractStream *preExtractStreamOutput `json:"extractStream,omitempty"`
+	Irgen         *preIrgenOutput         `json:"irgen,omitempty"`
 	Codegen       *preCodegenOutput       `json:"codegen,omitempty"`
 }
 
@@ -2232,6 +6604,13 @@ func (p *preWasmOutput) validate() error {
 	if p.ExtractStream != nil {
 		if err := p.ExtractStream.validate(); err != nil {
 			return errorMissingRequiredField("field extractStream: " + err.Error())
+		}
+	}
+
+	// Validation for field "irgen"
+	if p.Irgen != nil {
+		if err := p.Irgen.validate(); err != nil {
+			return errorMissingRequiredField("field irgen: " + err.Error())
 		}
 	}
 
@@ -2272,6 +6651,12 @@ func (p *preWasmOutput) transform() WasmOutput {
 		valExtractStream = p.ExtractStream.transform()
 		transExtractStream = &valExtractStream
 	}
+	var transIrgen *IrgenOutput
+	if p.Irgen != nil {
+		var valIrgen IrgenOutput
+		valIrgen = p.Irgen.transform()
+		transIrgen = &valIrgen
+	}
 	var transCodegen *CodegenOutput
 	if p.Codegen != nil {
 		var valCodegen CodegenOutput
@@ -2285,6 +6670,7 @@ func (p *preWasmOutput) transform() WasmOutput {
 		ExtractType:   transExtractType,
 		ExtractProc:   transExtractProc,
 		ExtractStream: transExtractStream,
+		Irgen:         transIrgen,
 		Codegen:       transCodegen,
 	}
 }
