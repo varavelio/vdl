@@ -222,16 +222,6 @@ func validatePlayground(cfg *configtypes.PlaygroundTargetConfig) error {
 	if err := validateCommon(cfg.Output, "playground"); err != nil {
 		return err
 	}
-	if cfg.DefaultHeaders != nil {
-		for i, h := range *cfg.DefaultHeaders {
-			if h.Key == "" {
-				return fmt.Errorf("defaultHeaders[%d]: field 'key' is required", i)
-			}
-			if h.Value == "" {
-				return fmt.Errorf("defaultHeaders[%d]: field 'value' is required", i)
-			}
-		}
-	}
 	return nil
 }
 

@@ -106,12 +106,12 @@ func (g *Generator) generateConfigJSON() ([]byte, error) {
 
 	var headers []jsonConfigHeader
 	if g.config.DefaultHeaders != nil && len(*g.config.DefaultHeaders) > 0 {
-		headers = make([]jsonConfigHeader, len(*g.config.DefaultHeaders))
-		for i, header := range *g.config.DefaultHeaders {
-			headers[i] = jsonConfigHeader{
-				Key:   header.Key,
-				Value: header.Value,
-			}
+		headers = make([]jsonConfigHeader, 0, len(*g.config.DefaultHeaders))
+		for key, val := range *g.config.DefaultHeaders {
+			headers = append(headers, jsonConfigHeader{
+				Key:   key,
+				Value: val,
+			})
 		}
 	}
 

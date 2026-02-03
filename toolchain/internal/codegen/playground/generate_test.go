@@ -76,9 +76,9 @@ rpc Users {
 
 func TestGenerator_Generate_WithConfig(t *testing.T) {
 	baseUrl := "https://api.example.com"
-	headers := []configtypes.PlaygroundTargetHeader{
-		{Key: "Authorization", Value: "Bearer token"},
-		{Key: "X-Custom", Value: "value"},
+	headers := map[string]string{
+		"Authorization": "Bearer token",
+		"X-Custom":      "value",
 	}
 	gen := New(&configtypes.PlaygroundTargetConfig{
 		Output:         "dist",
@@ -145,9 +145,7 @@ func TestGenerator_Generate_NoSchemaWithoutFormattedSchema(t *testing.T) {
 
 func TestGenerateConfigJSON(t *testing.T) {
 	baseUrl := "https://api.test.com"
-	headers := []configtypes.PlaygroundTargetHeader{
-		{Key: "Content-Type", Value: "application/json"},
-	}
+	headers := map[string]string{"Content-Type": "application/json"}
 	gen := New(&configtypes.PlaygroundTargetConfig{
 		DefaultBaseUrl: &baseUrl,
 		DefaultHeaders: &headers,

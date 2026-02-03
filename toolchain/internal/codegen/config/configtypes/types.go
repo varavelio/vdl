@@ -1333,7 +1333,7 @@ type PlaygroundTargetConfig struct {
 	// Default base URL for API requests
 	DefaultBaseUrl *string `json:"defaultBaseUrl,omitempty"`
 	// Default headers to include in API requests
-	DefaultHeaders *[]PlaygroundTargetHeader `json:"defaultHeaders,omitempty"`
+	DefaultHeaders *map[string]string `json:"defaultHeaders,omitempty"`
 }
 
 // GetOutput returns the value of Output or the zero value if the receiver or field is nil.
@@ -1405,16 +1405,16 @@ func (x *PlaygroundTargetConfig) GetDefaultBaseUrlOr(defaultValue string) string
 }
 
 // GetDefaultHeaders returns the value of DefaultHeaders or the zero value if the receiver or field is nil.
-func (x *PlaygroundTargetConfig) GetDefaultHeaders() []PlaygroundTargetHeader {
+func (x *PlaygroundTargetConfig) GetDefaultHeaders() map[string]string {
 	if x != nil && x.DefaultHeaders != nil {
 		return *x.DefaultHeaders
 	}
-	var zero []PlaygroundTargetHeader
+	var zero map[string]string
 	return zero
 }
 
 // GetDefaultHeadersOr returns the value of DefaultHeaders or the provided default if the receiver or field is nil.
-func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue []PlaygroundTargetHeader) []PlaygroundTargetHeader {
+func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue map[string]string) map[string]string {
 	if x != nil && x.DefaultHeaders != nil {
 		return *x.DefaultHeaders
 	}
@@ -1423,11 +1423,11 @@ func (x *PlaygroundTargetConfig) GetDefaultHeadersOr(defaultValue []PlaygroundTa
 
 // prePlaygroundTargetConfig is the version of PlaygroundTargetConfig previous to the required field validation
 type prePlaygroundTargetConfig struct {
-	Output         *string                      `json:"output,omitempty"`
-	Clean          *bool                        `json:"clean,omitempty"`
-	Schema         *string                      `json:"schema,omitempty"`
-	DefaultBaseUrl *string                      `json:"defaultBaseUrl,omitempty"`
-	DefaultHeaders *[]prePlaygroundTargetHeader `json:"defaultHeaders,omitempty"`
+	Output         *string            `json:"output,omitempty"`
+	Clean          *bool              `json:"clean,omitempty"`
+	Schema         *string            `json:"schema,omitempty"`
+	DefaultBaseUrl *string            `json:"defaultBaseUrl,omitempty"`
+	DefaultHeaders *map[string]string `json:"defaultHeaders,omitempty"`
 }
 
 // validate validates the required fields of PlaygroundTargetConfig
@@ -1448,13 +1448,6 @@ func (p *prePlaygroundTargetConfig) validate() error {
 	// Validation for field "defaultBaseUrl"
 
 	// Validation for field "defaultHeaders"
-	if p.DefaultHeaders != nil {
-		for _, item := range *p.DefaultHeaders {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field defaultHeaders: " + err.Error())
-			}
-		}
-	}
 
 	return nil
 }
@@ -1466,17 +1459,7 @@ func (p *prePlaygroundTargetConfig) transform() PlaygroundTargetConfig {
 	transClean := p.Clean
 	transSchema := p.Schema
 	transDefaultBaseUrl := p.DefaultBaseUrl
-	var transDefaultHeaders *[]PlaygroundTargetHeader
-	if p.DefaultHeaders != nil {
-		var valDefaultHeaders []PlaygroundTargetHeader
-		valDefaultHeaders = make([]PlaygroundTargetHeader, len(*p.DefaultHeaders))
-		for i, v := range *p.DefaultHeaders {
-			var tmp_ PlaygroundTargetHeader
-			tmp_ = v.transform()
-			valDefaultHeaders[i] = tmp_
-		}
-		transDefaultHeaders = &valDefaultHeaders
-	}
+	transDefaultHeaders := p.DefaultHeaders
 
 	// Assignments
 	return PlaygroundTargetConfig{
@@ -1485,86 +1468,6 @@ func (p *prePlaygroundTargetConfig) transform() PlaygroundTargetConfig {
 		Schema:         transSchema,
 		DefaultBaseUrl: transDefaultBaseUrl,
 		DefaultHeaders: transDefaultHeaders,
-	}
-}
-
-// Header key-value pair for playground configuration
-type PlaygroundTargetHeader struct {
-	// Header key
-	Key string `json:"key"`
-	// Header value
-	Value string `json:"value"`
-}
-
-// GetKey returns the value of Key or the zero value if the receiver or field is nil.
-func (x *PlaygroundTargetHeader) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	var zero string
-	return zero
-}
-
-// GetKeyOr returns the value of Key or the provided default if the receiver or field is nil.
-func (x *PlaygroundTargetHeader) GetKeyOr(defaultValue string) string {
-	if x != nil {
-		return x.Key
-	}
-	return defaultValue
-}
-
-// GetValue returns the value of Value or the zero value if the receiver or field is nil.
-func (x *PlaygroundTargetHeader) GetValue() string {
-	if x != nil {
-		return x.Value
-	}
-	var zero string
-	return zero
-}
-
-// GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
-func (x *PlaygroundTargetHeader) GetValueOr(defaultValue string) string {
-	if x != nil {
-		return x.Value
-	}
-	return defaultValue
-}
-
-// prePlaygroundTargetHeader is the version of PlaygroundTargetHeader previous to the required field validation
-type prePlaygroundTargetHeader struct {
-	Key   *string `json:"key,omitempty"`
-	Value *string `json:"value,omitempty"`
-}
-
-// validate validates the required fields of PlaygroundTargetHeader
-func (p *prePlaygroundTargetHeader) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("prePlaygroundTargetHeader is nil")
-	}
-
-	// Validation for field "key"
-	if p.Key == nil {
-		return errorMissingRequiredField("field key is required")
-	}
-
-	// Validation for field "value"
-	if p.Value == nil {
-		return errorMissingRequiredField("field value is required")
-	}
-
-	return nil
-}
-
-// transform transforms the prePlaygroundTargetHeader type to the final PlaygroundTargetHeader type
-func (p *prePlaygroundTargetHeader) transform() PlaygroundTargetHeader {
-	// Transformations
-	transKey := *p.Key
-	transValue := *p.Value
-
-	// Assignments
-	return PlaygroundTargetHeader{
-		Key:   transKey,
-		Value: transValue,
 	}
 }
 

@@ -186,16 +186,7 @@ type PlaygroundTargetConfig {
   defaultBaseUrl?: string
 
   """ Default headers to include in API requests """
-  defaultHeaders?: PlaygroundTargetHeader[]
-}
-
-""" Header key-value pair for playground configuration """
-type PlaygroundTargetHeader {
-  """ Header key """
-  key: string
-
-  """ Header value """
-  value: string
+  defaultHeaders?: map<string>
 }
 
 """ Configuration for external plugin generators """
