@@ -77,6 +77,7 @@ export interface StoreSettings {
   vdlSchema: string;
   vdlSchemaExpanded: string;
   irSchema: IrSchema;
+  openApiSchema: string;
 }
 
 const fetchConfig = async () => {
@@ -132,6 +133,7 @@ async function storeSettingsGetInitialValue(): Promise<StoreSettings> {
     headers,
     vdlSchema: "",
     vdlSchemaExpanded: "",
+    openApiSchema: "",
     irSchema: {
       constants: [],
       enums: [],
@@ -279,17 +281,37 @@ export const loadVdlSchema = async (url: string) => {
  * This function directly sets the `vdlSchema` store to the provided schema string,
  * allowing for immediate updates to the schema without fetching from a URL.
  *
- * It also expands the types in the provided schema and updates the `vdlSchemaExpanded` store.
+ * It also populates the rest of the derived schemas to the store.
  *
  * @param vdlSchema The URPC schema string to be loaded into the store.
  */
 const loadVdlSchemaFromString = async (vdlSchema: string) => {
-  storeSettings.store.vdlSchema = vdlSchema;
-  storeSettings.store.vdlSchemaExpanded =
-    await wasmClient.expandTypes(vdlSchema);
-  storeSettings.store.irSchema = await wasmClient.irgen({
-    vdlSchema: vdlSchema,
+  const expanded = await wasmClient.expandTypes(vdlSchema);
+  const irSchema = await wasmClient.irgen({ vdlSchema });
+
+  const { files } = await wasmClient.codegen({
+    vdlSchema,
+    target: {
+      openapi: {
+        title: "VDL OpenAPI",
+        version: "1.0.0",
+        output: "",
+      },
+    },
   });
+
+  let openapi = "";
+  for (const file of files) {
+    if (file.path.endsWith(".json")) openapi = file.content;
+    if (file.path.endsWith(".yml")) openapi = file.content;
+    if (file.path.endsWith(".yaml")) openapi = file.content;
+  }
+
+  storeSettings.store.vdlSchema = vdlSchema;
+  storeSettings.store.vdlSchemaExpanded = expanded;
+  storeSettings.store.irSchema = irSchema;
+  storeSettings.store.openApiSchema = openapi;
+
   await indexSearchItems();
 };
 
