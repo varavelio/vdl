@@ -286,28 +286,41 @@ export const loadVdlSchema = async (url: string) => {
  * @param vdlSchema The URPC schema string to be loaded into the store.
  */
 const loadVdlSchemaFromString = async (vdlSchema: string) => {
-  const [expanded, irSchema, { files }] = await Promise.all([
+  const [expanded, ir, oapi] = await Promise.all([
     wasmClient.expandTypes(vdlSchema),
-    wasmClient.irgen({ vdlSchema }),
+    wasmClient.codegen({
+      vdlSchema,
+      target: {
+        ir: {
+          filename: "ir.json",
+          output: "",
+        },
+      },
+    }),
     wasmClient.codegen({
       vdlSchema,
       target: {
         openapi: {
           title: "VDL OpenAPI",
           version: "1.0.0",
+          filename: "openapi.yaml",
           output: "",
         },
       },
     }),
   ]);
 
+  let irSchema = "";
+  for (const file of ir.files) {
+    if (file.path.endsWith(".json")) {
+      irSchema = file.content;
+      break;
+    }
+  }
+
   let openapi = "";
-  for (const file of files) {
-    if (
-      file.path.endsWith(".yaml") ||
-      file.path.endsWith(".yml") ||
-      file.path.endsWith(".json")
-    ) {
+  for (const file of oapi.files) {
+    if (file.path.endsWith(".yaml")) {
       openapi = file.content;
       break;
     }
@@ -315,7 +328,7 @@ const loadVdlSchemaFromString = async (vdlSchema: string) => {
 
   storeSettings.store.vdlSchema = vdlSchema;
   storeSettings.store.vdlSchemaExpanded = expanded;
-  storeSettings.store.irSchema = irSchema;
+  storeSettings.store.irSchema = JSON.parse(irSchema) as IrSchema;
   storeSettings.store.openApiSchema = openapi;
 
   await indexSearchItems();
