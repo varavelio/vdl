@@ -295,24 +295,7 @@ func runPlayground(ctx context.Context, absConfigDir string, cfg *configtypes.Pl
 		return 0, err
 	}
 
-	// Generate the openapi.yaml file for the playground
-	filename := "openapi.yaml"
-	openAPIConfig := &configtypes.OpenApiTargetConfig{
-		Output:   cfg.Output,
-		Schema:   cfg.Schema,
-		Clean:    nil, // Don't clean again, we already cleaned above
-		Filename: &filename,
-		Title:    "VDL API",
-		Version:  "1.0.0",
-		BaseUrl:  cfg.DefaultBaseUrl,
-	}
-
-	openAPICount, err := runOpenAPI(ctx, absConfigDir, openAPIConfig, schema)
-	if err != nil {
-		return 0, fmt.Errorf("failed to generate openapi.yaml for playground: %w", err)
-	}
-
-	return len(generatedFiles) + openAPICount, nil
+	return len(generatedFiles), nil
 }
 
 func runGolang(ctx context.Context, absConfigDir string, cfg *configtypes.GoTargetConfig, schema *irtypes.IrSchema) (int, error) {
