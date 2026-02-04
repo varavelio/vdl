@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    BookOpen,
+    BookOpenText,
     Braces,
     FileText,
     House,
@@ -124,7 +124,7 @@
       items.push({
         kind: "collapse",
         label: "Docs",
-        icon: BookOpen,
+        icon: BookOpenText,
         storageKey: "asideDocsOpen",
         children: globalDocsItems,
       });
