@@ -29,7 +29,7 @@
     <div class="mb-16 text-center">
       {#if !storeUi.store.isMobile}
         <div class="mb-8">
-          <Logo class="mx-auto h-full max-w-[400px]" />
+          <Logo class="mx-auto h-full max-w-100" />
         </div>
       {/if}
 
@@ -42,10 +42,6 @@
         Test and experiment with VDL in this interactive playground using the
         left sidebar to navigate the schema.
       </p>
-
-      <div class="mb-8 flex items-center justify-center">
-        <Logo class="w-[200px]" />
-      </div>
 
       <div class="mb-8 flex flex-wrap items-center justify-center gap-2">
         <a
