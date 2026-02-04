@@ -6,14 +6,34 @@ import { getCurrentHost } from "./helpers/getCurrentHost.ts";
 import { getMarkdownTitle } from "./helpers/getMarkdownTitle.ts";
 import { markdownToText } from "./helpers/markdownToText.ts";
 import { slugify } from "./helpers/slugify.ts";
-import { cmdExpandTypes, transpileUrpcToJson } from "./urpc.ts";
-import type { Schema } from "./urpcTypes.ts";
+import { wasmClient } from "./wasm/index.ts";
+import type {
+  ConstantDef,
+  DocDef,
+  EnumDef,
+  IrSchema,
+  PatternDef,
+  ProcedureDef,
+  RpcDef,
+  StreamDef,
+  TypeDef,
+} from "./wasm/wasmtypes/types.ts";
 
 export const primitiveTypes = ["string", "int", "float", "bool", "datetime"];
 
+type SearchItemKind =
+  | "constant"
+  | "pattern"
+  | "enum"
+  | "type"
+  | "rpc"
+  | "proc"
+  | "stream"
+  | "doc";
+
 type SearchItem = {
   id: number;
-  kind: "doc" | "type" | "proc" | "stream";
+  kind: SearchItemKind;
   name: string;
   slug: string;
   doc: string;
@@ -21,7 +41,7 @@ type SearchItem = {
 
 export const miniSearch = new MiniSearch({
   fields: ["kind", "name", "doc"],
-  storeFields: ["kind", "name", "slug", "doc"],
+  storeFields: ["kind", "name", "doc", "slug"],
   searchOptions: {
     boost: { title: 2 },
     fuzzy: 0.2,
@@ -54,12 +74,12 @@ export interface Header {
 export interface StoreSettings {
   baseUrl: string;
   headers: Header[];
-  urpcSchema: string;
-  urpcSchemaExpanded: string;
-  jsonSchema: Schema;
+  vdlSchema: string;
+  vdlSchemaExpanded: string;
+  irSchema: IrSchema;
 }
 
-export const fetchConfig = async () => {
+const fetchConfig = async () => {
   // biome-ignore lint/suspicious/noExplicitAny: the fetch can return anything
   let config: any = {};
 
@@ -72,7 +92,7 @@ export const fetchConfig = async () => {
   } catch (error) {
     console.error("Failed to fetch default config", error);
     return {
-      baseUrl: `${getCurrentHost()}/api/v1/urpc`,
+      baseUrl: `${getCurrentHost()}/rpc`,
       headers: [],
     };
   }
@@ -83,7 +103,7 @@ export const fetchConfig = async () => {
   if (typeof config.baseUrl === "string" && config.baseUrl.trim() !== "") {
     baseUrl = config.baseUrl;
   } else {
-    baseUrl = `${getCurrentHost()}/api/v1/urpc`;
+    baseUrl = `${getCurrentHost()}/rpc`;
   }
 
   if (Array.isArray(config.headers)) {
@@ -110,14 +130,21 @@ async function storeSettingsGetInitialValue(): Promise<StoreSettings> {
   return {
     baseUrl,
     headers,
-    urpcSchema: "version 1",
-    urpcSchemaExpanded: "version 1",
-    jsonSchema: { version: 1, nodes: [] },
+    vdlSchema: "",
+    vdlSchemaExpanded: "",
+    irSchema: {
+      constants: [],
+      enums: [],
+      types: [],
+      patterns: [],
+      rpcs: [],
+      procedures: [],
+      streams: [],
+      docs: [],
+    },
   };
 }
 
-// Cannot use createStore because of the http request needed
-// maybe it can be refactored later
 export const storeSettings = createStore<StoreSettings>({
   initialValue: storeSettingsGetInitialValue,
   keysToPersist: ["baseUrl", "headers"],
@@ -225,24 +252,77 @@ const normalizeHeaders = (raw: unknown): Header[] => {
 };
 
 /**
- * Transpiles the current URPC schema to JSON format and updates the `jsonSchema` store.
+ * Fetches and loads an VDL schema from a specified URL.
  *
- * This asynchronous function takes the current value of `urpcSchema`, transpiles it to JSON
- * using the `transpileUrpcToJson` utility, and then updates the `jsonSchema` store with the result.
+ * This function attempts to retrieve a schema from the given URL and, if successful,
+ * updates the `vdlSchema` store with the fetched content. If the fetch fails,
+ * an error is logged to the console.
+ *
+ * It also expands the types in the fetched schema and updates the `vdlSchemaExpanded` store.
+ *
+ * @param url The URL from which to fetch the VDL schema.
+ * @throws Logs an error to the console if the fetch operation fails.
  */
-export const loadJsonSchemaFromCurrentUrpcSchema = async () => {
-  storeSettings.store.jsonSchema = await transpileUrpcToJson(
-    storeSettings.store.urpcSchema,
-  );
+export const loadVdlSchema = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    console.error(`Failed to fetch schema from ${url}`);
+    return;
+  }
+  const sch = await response.text();
+  await loadVdlSchemaFromString(sch);
+};
+
+/**
+ * Updates the `vdlSchema` store with a provided URPC schema string.
+ *
+ * This function directly sets the `vdlSchema` store to the provided schema string,
+ * allowing for immediate updates to the schema without fetching from a URL.
+ *
+ * It also expands the types in the provided schema and updates the `vdlSchemaExpanded` store.
+ *
+ * @param vdlSchema The URPC schema string to be loaded into the store.
+ */
+const loadVdlSchemaFromString = async (vdlSchema: string) => {
+  storeSettings.store.vdlSchema = vdlSchema;
+  storeSettings.store.vdlSchemaExpanded =
+    await wasmClient.expandTypes(vdlSchema);
+  storeSettings.store.irSchema = await wasmClient.irgen({
+    vdlSchema: vdlSchema,
+  });
   await indexSearchItems();
 };
 
 /**
- * Indexes the search items for the current URPC JSON schema.
+ * Indexes the search items for the current VDL IR schema.
  */
 const indexSearchItems = async () => {
+  type Node =
+    | (ConstantDef & { kind: "constant" })
+    | (PatternDef & { kind: "pattern" })
+    | (EnumDef & { kind: "enum" })
+    | (TypeDef & { kind: "type" })
+    | (RpcDef & { kind: "rpc" })
+    | (ProcedureDef & { kind: "proc" })
+    | (StreamDef & { kind: "stream" })
+    | (DocDef & { kind: "doc" });
+
+  const addKind = <T, K extends SearchItemKind>(items: T[], kind: K) => {
+    return items.map((item) => ({ ...item, kind }));
+  };
+
+  const nodes: Node[] = [
+    ...addKind(storeSettings.store.irSchema.constants, "constant"),
+    ...addKind(storeSettings.store.irSchema.patterns, "pattern"),
+    ...addKind(storeSettings.store.irSchema.enums, "enum"),
+    ...addKind(storeSettings.store.irSchema.types, "type"),
+    ...addKind(storeSettings.store.irSchema.rpcs, "rpc"),
+    ...addKind(storeSettings.store.irSchema.procedures, "proc"),
+    ...addKind(storeSettings.store.irSchema.streams, "stream"),
+  ];
+
   const searchItems = await Promise.all(
-    storeSettings.store.jsonSchema.nodes.map(async (node, index) => {
+    nodes.map(async (node, index) => {
       let name = "";
       let doc = "";
 
@@ -270,74 +350,4 @@ const indexSearchItems = async () => {
 
   miniSearch.removeAll();
   miniSearch.addAll(searchItems);
-};
-
-/**
- * Fetches and loads an URPC schema from a specified URL.
- *
- * This function attempts to retrieve a schema from the given URL and, if successful,
- * updates the `urpcSchema` store with the fetched content. If the fetch fails,
- * an error is logged to the console.
- *
- * It also expands the types in the fetched schema and updates the `urpcSchemaExpanded` store.
- *
- * @param url The URL from which to fetch the URPC schema.
- * @throws Logs an error to the console if the fetch operation fails.
- */
-export const loadUrpcSchemaFromUrl = async (url: string) => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    console.error(`Failed to fetch schema from ${url}`);
-    return;
-  }
-
-  const sch = await response.text();
-  await loadUrpcSchemaFromString(sch);
-};
-
-/**
- * Updates the `urpcSchema` store with a provided URPC schema string.
- *
- * This function directly sets the `urpcSchema` store to the provided schema string,
- * allowing for immediate updates to the schema without fetching from a URL.
- *
- * It also expands the types in the provided schema and updates the `urpcSchemaExpanded` store.
- *
- * @param sch The URPC schema string to be loaded into the store.
- */
-export const loadUrpcSchemaFromString = async (sch: string) => {
-  storeSettings.store.urpcSchema = sch;
-  storeSettings.store.urpcSchemaExpanded = await cmdExpandTypes(sch);
-};
-
-/**
- * Fetches an URPC schema from a URL, loads it, and then transpiles it to JSON.
- *
- * This function combines the operations of `loadUrpcSchemaFromUrl` and
- * `loadJsonSchemaFromCurrentUrpcSchema`. It first fetches and loads the URPC schema
- * from the specified URL, then transpiles that schema to JSON, updating both
- * the `urpcSchema` and `jsonSchema` stores in the process.
- *
- * @param url The URL from which to fetch the URPC schema.
- */
-export const loadJsonSchemaFromUrpcSchemaUrl = async (url: string) => {
-  await loadUrpcSchemaFromUrl(url);
-  await loadJsonSchemaFromCurrentUrpcSchema();
-};
-
-/**
- * Loads an URPC schema from a string and transpiles it to JSON.
- *
- * This function takes an URPC schema as a string, loads it into the `urpcSchema` store,
- * and then transpiles it to JSON, updating both the `urpcSchema` and `jsonSchema` stores.
- * It's useful for processing schemas that are already available as strings without needing
- * to fetch from a URL.
- *
- * It also expands the types in the provided schema and updates the `urpcSchemaExpanded` store.
- *
- * @param sch The URPC schema string to load and transpile.
- */
-export const loadJsonSchemaFromUrpcSchemaString = async (sch: string) => {
-  await loadUrpcSchemaFromString(sch);
-  await loadJsonSchemaFromCurrentUrpcSchema();
 };
