@@ -189,4 +189,4 @@ export class WasmClient {
 }
 
 // Export a singleton instance for ease of use
-export const vdlWasm = new WasmClient();
+export const wasmClient = new WasmClient();
