@@ -2851,405 +2851,6 @@ func (p *preIrTargetConfig) transform() IrTargetConfig {
 	}
 }
 
-// Input for irgen function
-type IrgenInput struct {
-	// Schema to generate IR from
-	VdlSchema string `json:"vdlSchema"`
-}
-
-// GetVdlSchema returns the value of VdlSchema or the zero value if the receiver or field is nil.
-func (x *IrgenInput) GetVdlSchema() string {
-	if x != nil {
-		return x.VdlSchema
-	}
-	var zero string
-	return zero
-}
-
-// GetVdlSchemaOr returns the value of VdlSchema or the provided default if the receiver or field is nil.
-func (x *IrgenInput) GetVdlSchemaOr(defaultValue string) string {
-	if x != nil {
-		return x.VdlSchema
-	}
-	return defaultValue
-}
-
-// preIrgenInput is the version of IrgenInput previous to the required field validation
-type preIrgenInput struct {
-	VdlSchema *string `json:"vdlSchema,omitempty"`
-}
-
-// validate validates the required fields of IrgenInput
-func (p *preIrgenInput) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preIrgenInput is nil")
-	}
-
-	// Validation for field "vdlSchema"
-	if p.VdlSchema == nil {
-		return errorMissingRequiredField("field vdlSchema is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preIrgenInput type to the final IrgenInput type
-func (p *preIrgenInput) transform() IrgenInput {
-	// Transformations
-	transVdlSchema := *p.VdlSchema
-
-	// Assignments
-	return IrgenInput{
-		VdlSchema: transVdlSchema,
-	}
-}
-
-// Output for irgen function
-type IrgenOutput struct {
-	// List of all constant definitions in the schema
-	Constants []ConstantDef `json:"constants"`
-	// List of all pattern definitions in the schema
-	Patterns []PatternDef `json:"patterns"`
-	// List of all enum definitions in the schema
-	Enums []EnumDef `json:"enums"`
-	// List of all type definitions in the schema
-	Types []TypeDef `json:"types"`
-	// List of all RPC definitions in the schema
-	Rpcs []RpcDef `json:"rpcs"`
-	// Flattened list of all procedures from all RPCs
-	Procedures []ProcedureDef `json:"procedures"`
-	// Flattened list of all streams from all RPCs
-	Streams []StreamDef `json:"streams"`
-	// List of all standalone documentation blocks (even from all RPCs)
-	Docs []DocDef `json:"docs"`
-}
-
-// GetConstants returns the value of Constants or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetConstants() []ConstantDef {
-	if x != nil {
-		return x.Constants
-	}
-	var zero []ConstantDef
-	return zero
-}
-
-// GetConstantsOr returns the value of Constants or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetConstantsOr(defaultValue []ConstantDef) []ConstantDef {
-	if x != nil {
-		return x.Constants
-	}
-	return defaultValue
-}
-
-// GetPatterns returns the value of Patterns or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetPatterns() []PatternDef {
-	if x != nil {
-		return x.Patterns
-	}
-	var zero []PatternDef
-	return zero
-}
-
-// GetPatternsOr returns the value of Patterns or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetPatternsOr(defaultValue []PatternDef) []PatternDef {
-	if x != nil {
-		return x.Patterns
-	}
-	return defaultValue
-}
-
-// GetEnums returns the value of Enums or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetEnums() []EnumDef {
-	if x != nil {
-		return x.Enums
-	}
-	var zero []EnumDef
-	return zero
-}
-
-// GetEnumsOr returns the value of Enums or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetEnumsOr(defaultValue []EnumDef) []EnumDef {
-	if x != nil {
-		return x.Enums
-	}
-	return defaultValue
-}
-
-// GetTypes returns the value of Types or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetTypes() []TypeDef {
-	if x != nil {
-		return x.Types
-	}
-	var zero []TypeDef
-	return zero
-}
-
-// GetTypesOr returns the value of Types or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetTypesOr(defaultValue []TypeDef) []TypeDef {
-	if x != nil {
-		return x.Types
-	}
-	return defaultValue
-}
-
-// GetRpcs returns the value of Rpcs or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetRpcs() []RpcDef {
-	if x != nil {
-		return x.Rpcs
-	}
-	var zero []RpcDef
-	return zero
-}
-
-// GetRpcsOr returns the value of Rpcs or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetRpcsOr(defaultValue []RpcDef) []RpcDef {
-	if x != nil {
-		return x.Rpcs
-	}
-	return defaultValue
-}
-
-// GetProcedures returns the value of Procedures or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetProcedures() []ProcedureDef {
-	if x != nil {
-		return x.Procedures
-	}
-	var zero []ProcedureDef
-	return zero
-}
-
-// GetProceduresOr returns the value of Procedures or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetProceduresOr(defaultValue []ProcedureDef) []ProcedureDef {
-	if x != nil {
-		return x.Procedures
-	}
-	return defaultValue
-}
-
-// GetStreams returns the value of Streams or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetStreams() []StreamDef {
-	if x != nil {
-		return x.Streams
-	}
-	var zero []StreamDef
-	return zero
-}
-
-// GetStreamsOr returns the value of Streams or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetStreamsOr(defaultValue []StreamDef) []StreamDef {
-	if x != nil {
-		return x.Streams
-	}
-	return defaultValue
-}
-
-// GetDocs returns the value of Docs or the zero value if the receiver or field is nil.
-func (x *IrgenOutput) GetDocs() []DocDef {
-	if x != nil {
-		return x.Docs
-	}
-	var zero []DocDef
-	return zero
-}
-
-// GetDocsOr returns the value of Docs or the provided default if the receiver or field is nil.
-func (x *IrgenOutput) GetDocsOr(defaultValue []DocDef) []DocDef {
-	if x != nil {
-		return x.Docs
-	}
-	return defaultValue
-}
-
-// preIrgenOutput is the version of IrgenOutput previous to the required field validation
-type preIrgenOutput struct {
-	Constants  *[]preConstantDef  `json:"constants,omitempty"`
-	Patterns   *[]prePatternDef   `json:"patterns,omitempty"`
-	Enums      *[]preEnumDef      `json:"enums,omitempty"`
-	Types      *[]preTypeDef      `json:"types,omitempty"`
-	Rpcs       *[]preRpcDef       `json:"rpcs,omitempty"`
-	Procedures *[]preProcedureDef `json:"procedures,omitempty"`
-	Streams    *[]preStreamDef    `json:"streams,omitempty"`
-	Docs       *[]preDocDef       `json:"docs,omitempty"`
-}
-
-// validate validates the required fields of IrgenOutput
-func (p *preIrgenOutput) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preIrgenOutput is nil")
-	}
-
-	// Validation for field "constants"
-	if p.Constants == nil {
-		return errorMissingRequiredField("field constants is required")
-	}
-	if p.Constants != nil {
-		for _, item := range *p.Constants {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field constants: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "patterns"
-	if p.Patterns == nil {
-		return errorMissingRequiredField("field patterns is required")
-	}
-	if p.Patterns != nil {
-		for _, item := range *p.Patterns {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field patterns: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "enums"
-	if p.Enums == nil {
-		return errorMissingRequiredField("field enums is required")
-	}
-	if p.Enums != nil {
-		for _, item := range *p.Enums {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field enums: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "types"
-	if p.Types == nil {
-		return errorMissingRequiredField("field types is required")
-	}
-	if p.Types != nil {
-		for _, item := range *p.Types {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field types: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "rpcs"
-	if p.Rpcs == nil {
-		return errorMissingRequiredField("field rpcs is required")
-	}
-	if p.Rpcs != nil {
-		for _, item := range *p.Rpcs {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field rpcs: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "procedures"
-	if p.Procedures == nil {
-		return errorMissingRequiredField("field procedures is required")
-	}
-	if p.Procedures != nil {
-		for _, item := range *p.Procedures {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field procedures: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "streams"
-	if p.Streams == nil {
-		return errorMissingRequiredField("field streams is required")
-	}
-	if p.Streams != nil {
-		for _, item := range *p.Streams {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field streams: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "docs"
-	if p.Docs == nil {
-		return errorMissingRequiredField("field docs is required")
-	}
-	if p.Docs != nil {
-		for _, item := range *p.Docs {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field docs: " + err.Error())
-			}
-		}
-	}
-
-	return nil
-}
-
-// transform transforms the preIrgenOutput type to the final IrgenOutput type
-func (p *preIrgenOutput) transform() IrgenOutput {
-	// Transformations
-	var transConstants []ConstantDef
-	transConstants = make([]ConstantDef, len(*p.Constants))
-	for i, v := range *p.Constants {
-		var tmp_ ConstantDef
-		tmp_ = v.transform()
-		transConstants[i] = tmp_
-	}
-	var transPatterns []PatternDef
-	transPatterns = make([]PatternDef, len(*p.Patterns))
-	for i, v := range *p.Patterns {
-		var tmp_ PatternDef
-		tmp_ = v.transform()
-		transPatterns[i] = tmp_
-	}
-	var transEnums []EnumDef
-	transEnums = make([]EnumDef, len(*p.Enums))
-	for i, v := range *p.Enums {
-		var tmp_ EnumDef
-		tmp_ = v.transform()
-		transEnums[i] = tmp_
-	}
-	var transTypes []TypeDef
-	transTypes = make([]TypeDef, len(*p.Types))
-	for i, v := range *p.Types {
-		var tmp_ TypeDef
-		tmp_ = v.transform()
-		transTypes[i] = tmp_
-	}
-	var transRpcs []RpcDef
-	transRpcs = make([]RpcDef, len(*p.Rpcs))
-	for i, v := range *p.Rpcs {
-		var tmp_ RpcDef
-		tmp_ = v.transform()
-		transRpcs[i] = tmp_
-	}
-	var transProcedures []ProcedureDef
-	transProcedures = make([]ProcedureDef, len(*p.Procedures))
-	for i, v := range *p.Procedures {
-		var tmp_ ProcedureDef
-		tmp_ = v.transform()
-		transProcedures[i] = tmp_
-	}
-	var transStreams []StreamDef
-	transStreams = make([]StreamDef, len(*p.Streams))
-	for i, v := range *p.Streams {
-		var tmp_ StreamDef
-		tmp_ = v.transform()
-		transStreams[i] = tmp_
-	}
-	var transDocs []DocDef
-	transDocs = make([]DocDef, len(*p.Docs))
-	for i, v := range *p.Docs {
-		var tmp_ DocDef
-		tmp_ = v.transform()
-		transDocs[i] = tmp_
-	}
-
-	// Assignments
-	return IrgenOutput{
-		Constants:  transConstants,
-		Patterns:   transPatterns,
-		Enums:      transEnums,
-		Types:      transTypes,
-		Rpcs:       transRpcs,
-		Procedures: transProcedures,
-		Streams:    transStreams,
-		Docs:       transDocs,
-	}
-}
-
 // Configuration for JSON Schema generation
 type JsonSchemaTargetConfig struct {
 	// The output directory where generated files will be placed
@@ -6208,7 +5809,6 @@ type WasmInput struct {
 	ExtractType   *ExtractTypeInput   `json:"extractType,omitempty"`
 	ExtractProc   *ExtractProcInput   `json:"extractProc,omitempty"`
 	ExtractStream *ExtractStreamInput `json:"extractStream,omitempty"`
-	Irgen         *IrgenInput         `json:"irgen,omitempty"`
 	Codegen       *CodegenInput       `json:"codegen,omitempty"`
 }
 
@@ -6297,23 +5897,6 @@ func (x *WasmInput) GetExtractStreamOr(defaultValue ExtractStreamInput) ExtractS
 	return defaultValue
 }
 
-// GetIrgen returns the value of Irgen or the zero value if the receiver or field is nil.
-func (x *WasmInput) GetIrgen() IrgenInput {
-	if x != nil && x.Irgen != nil {
-		return *x.Irgen
-	}
-	var zero IrgenInput
-	return zero
-}
-
-// GetIrgenOr returns the value of Irgen or the provided default if the receiver or field is nil.
-func (x *WasmInput) GetIrgenOr(defaultValue IrgenInput) IrgenInput {
-	if x != nil && x.Irgen != nil {
-		return *x.Irgen
-	}
-	return defaultValue
-}
-
 // GetCodegen returns the value of Codegen or the zero value if the receiver or field is nil.
 func (x *WasmInput) GetCodegen() CodegenInput {
 	if x != nil && x.Codegen != nil {
@@ -6338,7 +5921,6 @@ type preWasmInput struct {
 	ExtractType   *preExtractTypeInput   `json:"extractType,omitempty"`
 	ExtractProc   *preExtractProcInput   `json:"extractProc,omitempty"`
 	ExtractStream *preExtractStreamInput `json:"extractStream,omitempty"`
-	Irgen         *preIrgenInput         `json:"irgen,omitempty"`
 	Codegen       *preCodegenInput       `json:"codegen,omitempty"`
 }
 
@@ -6381,13 +5963,6 @@ func (p *preWasmInput) validate() error {
 		}
 	}
 
-	// Validation for field "irgen"
-	if p.Irgen != nil {
-		if err := p.Irgen.validate(); err != nil {
-			return errorMissingRequiredField("field irgen: " + err.Error())
-		}
-	}
-
 	// Validation for field "codegen"
 	if p.Codegen != nil {
 		if err := p.Codegen.validate(); err != nil {
@@ -6426,12 +6001,6 @@ func (p *preWasmInput) transform() WasmInput {
 		valExtractStream = p.ExtractStream.transform()
 		transExtractStream = &valExtractStream
 	}
-	var transIrgen *IrgenInput
-	if p.Irgen != nil {
-		var valIrgen IrgenInput
-		valIrgen = p.Irgen.transform()
-		transIrgen = &valIrgen
-	}
 	var transCodegen *CodegenInput
 	if p.Codegen != nil {
 		var valCodegen CodegenInput
@@ -6446,7 +6015,6 @@ func (p *preWasmInput) transform() WasmInput {
 		ExtractType:   transExtractType,
 		ExtractProc:   transExtractProc,
 		ExtractStream: transExtractStream,
-		Irgen:         transIrgen,
 		Codegen:       transCodegen,
 	}
 }
@@ -6457,7 +6025,6 @@ type WasmOutput struct {
 	ExtractType   *ExtractTypeOutput   `json:"extractType,omitempty"`
 	ExtractProc   *ExtractProcOutput   `json:"extractProc,omitempty"`
 	ExtractStream *ExtractStreamOutput `json:"extractStream,omitempty"`
-	Irgen         *IrgenOutput         `json:"irgen,omitempty"`
 	Codegen       *CodegenOutput       `json:"codegen,omitempty"`
 }
 
@@ -6529,23 +6096,6 @@ func (x *WasmOutput) GetExtractStreamOr(defaultValue ExtractStreamOutput) Extrac
 	return defaultValue
 }
 
-// GetIrgen returns the value of Irgen or the zero value if the receiver or field is nil.
-func (x *WasmOutput) GetIrgen() IrgenOutput {
-	if x != nil && x.Irgen != nil {
-		return *x.Irgen
-	}
-	var zero IrgenOutput
-	return zero
-}
-
-// GetIrgenOr returns the value of Irgen or the provided default if the receiver or field is nil.
-func (x *WasmOutput) GetIrgenOr(defaultValue IrgenOutput) IrgenOutput {
-	if x != nil && x.Irgen != nil {
-		return *x.Irgen
-	}
-	return defaultValue
-}
-
 // GetCodegen returns the value of Codegen or the zero value if the receiver or field is nil.
 func (x *WasmOutput) GetCodegen() CodegenOutput {
 	if x != nil && x.Codegen != nil {
@@ -6569,7 +6119,6 @@ type preWasmOutput struct {
 	ExtractType   *preExtractTypeOutput   `json:"extractType,omitempty"`
 	ExtractProc   *preExtractProcOutput   `json:"extractProc,omitempty"`
 	ExtractStream *preExtractStreamOutput `json:"extractStream,omitempty"`
-	Irgen         *preIrgenOutput         `json:"irgen,omitempty"`
 	Codegen       *preCodegenOutput       `json:"codegen,omitempty"`
 }
 
@@ -6604,13 +6153,6 @@ func (p *preWasmOutput) validate() error {
 	if p.ExtractStream != nil {
 		if err := p.ExtractStream.validate(); err != nil {
 			return errorMissingRequiredField("field extractStream: " + err.Error())
-		}
-	}
-
-	// Validation for field "irgen"
-	if p.Irgen != nil {
-		if err := p.Irgen.validate(); err != nil {
-			return errorMissingRequiredField("field irgen: " + err.Error())
 		}
 	}
 
@@ -6651,12 +6193,6 @@ func (p *preWasmOutput) transform() WasmOutput {
 		valExtractStream = p.ExtractStream.transform()
 		transExtractStream = &valExtractStream
 	}
-	var transIrgen *IrgenOutput
-	if p.Irgen != nil {
-		var valIrgen IrgenOutput
-		valIrgen = p.Irgen.transform()
-		transIrgen = &valIrgen
-	}
 	var transCodegen *CodegenOutput
 	if p.Codegen != nil {
 		var valCodegen CodegenOutput
@@ -6670,7 +6206,6 @@ func (p *preWasmOutput) transform() WasmOutput {
 		ExtractType:   transExtractType,
 		ExtractProc:   transExtractProc,
 		ExtractStream: transExtractStream,
-		Irgen:         transIrgen,
 		Codegen:       transCodegen,
 	}
 }

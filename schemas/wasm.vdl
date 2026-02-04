@@ -22,7 +22,6 @@ type WasmInput {
   extractType?: ExtractTypeInput
   extractProc?: ExtractProcInput
   extractStream?: ExtractStreamInput
-  irgen?: IrgenInput
   codegen?: CodegenInput
 }
 
@@ -32,7 +31,6 @@ type WasmOutput {
   extractType?: ExtractTypeOutput
   extractProc?: ExtractProcOutput
   extractStream?: ExtractStreamOutput
-  irgen?: IrgenOutput
   codegen?: CodegenOutput
 }
 
@@ -87,21 +85,6 @@ type ExtractStreamInput {
 """ Output for extractStream function """
 type ExtractStreamOutput {
   streamSchema: string
-}
-
-/********
-* IRGEN *
-********/
-
-""" Input for irgen function """
-type IrgenInput {
-  """ Schema to generate IR from """
-  vdlSchema: string
-}
-
-""" Output for irgen function """
-type IrgenOutput {
-  ...IrSchema
 }
 
 /**********

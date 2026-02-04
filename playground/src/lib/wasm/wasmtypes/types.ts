@@ -872,180 +872,6 @@ export function validateIrTargetConfig(_input: unknown, _path = "IrTargetConfig"
 }
 
 /**
- * IrgenInput Input for irgen function
- */
-export type IrgenInput = {
-  vdlSchema: string
-}
-
-export function hydrateIrgenInput(input: IrgenInput): IrgenInput {
-  const hydratedVdlSchema = input.vdlSchema
-  return {
-    vdlSchema: hydratedVdlSchema,
-  }
-}
-
-export function validateIrgenInput(_input: unknown, _path = "IrgenInput"): string | null {
-  return null;
-}
-
-/**
- * IrgenOutput Output for irgen function
- */
-export type IrgenOutput = {
-  constants: ConstantDef[]
-  patterns: PatternDef[]
-  enums: EnumDef[]
-  types: TypeDef[]
-  rpcs: RpcDef[]
-  procedures: ProcedureDef[]
-  streams: StreamDef[]
-  docs: DocDef[]
-}
-
-export function hydrateIrgenOutput(input: IrgenOutput): IrgenOutput {
-  const hydratedConstants = input.constants.map(el => hydrateConstantDef(el))
-  const hydratedPatterns = input.patterns.map(el => hydratePatternDef(el))
-  const hydratedEnums = input.enums.map(el => hydrateEnumDef(el))
-  const hydratedTypes = input.types.map(el => hydrateTypeDef(el))
-  const hydratedRpcs = input.rpcs.map(el => hydrateRpcDef(el))
-  const hydratedProcedures = input.procedures.map(el => hydrateProcedureDef(el))
-  const hydratedStreams = input.streams.map(el => hydrateStreamDef(el))
-  const hydratedDocs = input.docs.map(el => hydrateDocDef(el))
-  return {
-    constants: hydratedConstants,
-    patterns: hydratedPatterns,
-    enums: hydratedEnums,
-    types: hydratedTypes,
-    rpcs: hydratedRpcs,
-    procedures: hydratedProcedures,
-    streams: hydratedStreams,
-    docs: hydratedDocs,
-  }
-}
-
-export function validateIrgenOutput(input: unknown, path = "IrgenOutput"): string | null {
-  if (input === null || input === undefined || typeof input !== "object") {
-    return `${path}: expected object, got ${typeof input}`;
-  }
-  const obj = input as Record<string, unknown>;
-
-  if (obj.constants === undefined || obj.constants === null) {
-    return `${path}.constants: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.constants)) {
-      return `${path}.constants: expected array, got ${typeof obj.constants}`;
-    }
-    for (let i = 0; i < obj.constants.length; i++) {
-      {
-        const err = validateConstantDef(obj.constants[i], `${path}.constants[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.patterns === undefined || obj.patterns === null) {
-    return `${path}.patterns: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.patterns)) {
-      return `${path}.patterns: expected array, got ${typeof obj.patterns}`;
-    }
-    for (let i = 0; i < obj.patterns.length; i++) {
-      {
-        const err = validatePatternDef(obj.patterns[i], `${path}.patterns[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.enums === undefined || obj.enums === null) {
-    return `${path}.enums: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.enums)) {
-      return `${path}.enums: expected array, got ${typeof obj.enums}`;
-    }
-    for (let i = 0; i < obj.enums.length; i++) {
-      {
-        const err = validateEnumDef(obj.enums[i], `${path}.enums[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.types === undefined || obj.types === null) {
-    return `${path}.types: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.types)) {
-      return `${path}.types: expected array, got ${typeof obj.types}`;
-    }
-    for (let i = 0; i < obj.types.length; i++) {
-      {
-        const err = validateTypeDef(obj.types[i], `${path}.types[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.rpcs === undefined || obj.rpcs === null) {
-    return `${path}.rpcs: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.rpcs)) {
-      return `${path}.rpcs: expected array, got ${typeof obj.rpcs}`;
-    }
-    for (let i = 0; i < obj.rpcs.length; i++) {
-      {
-        const err = validateRpcDef(obj.rpcs[i], `${path}.rpcs[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.procedures === undefined || obj.procedures === null) {
-    return `${path}.procedures: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.procedures)) {
-      return `${path}.procedures: expected array, got ${typeof obj.procedures}`;
-    }
-    for (let i = 0; i < obj.procedures.length; i++) {
-      {
-        const err = validateProcedureDef(obj.procedures[i], `${path}.procedures[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.streams === undefined || obj.streams === null) {
-    return `${path}.streams: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.streams)) {
-      return `${path}.streams: expected array, got ${typeof obj.streams}`;
-    }
-    for (let i = 0; i < obj.streams.length; i++) {
-      {
-        const err = validateStreamDef(obj.streams[i], `${path}.streams[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  if (obj.docs === undefined || obj.docs === null) {
-    return `${path}.docs: required field is missing`;
-  }
-  {
-    if (!Array.isArray(obj.docs)) {
-      return `${path}.docs: expected array, got ${typeof obj.docs}`;
-    }
-    for (let i = 0; i < obj.docs.length; i++) {
-      {
-        const err = validateDocDef(obj.docs[i], `${path}.docs[${i}]`);
-        if (err !== null) return err;
-      }
-    }
-  }
-  return null;
-}
-
-/**
  * JsonSchemaTargetConfig Configuration for JSON Schema generation
  */
 export type JsonSchemaTargetConfig = {
@@ -1822,7 +1648,6 @@ export type WasmInput = {
   extractType?: ExtractTypeInput
   extractProc?: ExtractProcInput
   extractStream?: ExtractStreamInput
-  irgen?: IrgenInput
   codegen?: CodegenInput
 }
 
@@ -1832,7 +1657,6 @@ export function hydrateWasmInput(input: WasmInput): WasmInput {
   const hydratedExtractType = input.extractType ? hydrateExtractTypeInput(input.extractType) : input.extractType
   const hydratedExtractProc = input.extractProc ? hydrateExtractProcInput(input.extractProc) : input.extractProc
   const hydratedExtractStream = input.extractStream ? hydrateExtractStreamInput(input.extractStream) : input.extractStream
-  const hydratedIrgen = input.irgen ? hydrateIrgenInput(input.irgen) : input.irgen
   const hydratedCodegen = input.codegen ? hydrateCodegenInput(input.codegen) : input.codegen
   return {
     functionName: hydratedFunctionName,
@@ -1840,7 +1664,6 @@ export function hydrateWasmInput(input: WasmInput): WasmInput {
     extractType: hydratedExtractType,
     extractProc: hydratedExtractProc,
     extractStream: hydratedExtractStream,
-    irgen: hydratedIrgen,
     codegen: hydratedCodegen,
   }
 }
@@ -1883,12 +1706,6 @@ export function validateWasmInput(input: unknown, path = "WasmInput"): string | 
       if (err !== null) return err;
     }
   }
-  if (obj.irgen !== undefined && obj.irgen !== null) {
-    {
-      const err = validateIrgenInput(obj.irgen, `${path}.irgen`);
-      if (err !== null) return err;
-    }
-  }
   if (obj.codegen !== undefined && obj.codegen !== null) {
     {
       const err = validateCodegenInput(obj.codegen, `${path}.codegen`);
@@ -1906,7 +1723,6 @@ export type WasmOutput = {
   extractType?: ExtractTypeOutput
   extractProc?: ExtractProcOutput
   extractStream?: ExtractStreamOutput
-  irgen?: IrgenOutput
   codegen?: CodegenOutput
 }
 
@@ -1915,14 +1731,12 @@ export function hydrateWasmOutput(input: WasmOutput): WasmOutput {
   const hydratedExtractType = input.extractType ? hydrateExtractTypeOutput(input.extractType) : input.extractType
   const hydratedExtractProc = input.extractProc ? hydrateExtractProcOutput(input.extractProc) : input.extractProc
   const hydratedExtractStream = input.extractStream ? hydrateExtractStreamOutput(input.extractStream) : input.extractStream
-  const hydratedIrgen = input.irgen ? hydrateIrgenOutput(input.irgen) : input.irgen
   const hydratedCodegen = input.codegen ? hydrateCodegenOutput(input.codegen) : input.codegen
   return {
     expandTypes: hydratedExpandTypes,
     extractType: hydratedExtractType,
     extractProc: hydratedExtractProc,
     extractStream: hydratedExtractStream,
-    irgen: hydratedIrgen,
     codegen: hydratedCodegen,
   }
 }
@@ -1954,12 +1768,6 @@ export function validateWasmOutput(input: unknown, path = "WasmOutput"): string 
   if (obj.extractStream !== undefined && obj.extractStream !== null) {
     {
       const err = validateExtractStreamOutput(obj.extractStream, `${path}.extractStream`);
-      if (err !== null) return err;
-    }
-  }
-  if (obj.irgen !== undefined && obj.irgen !== null) {
-    {
-      const err = validateIrgenOutput(obj.irgen, `${path}.irgen`);
       if (err !== null) return err;
     }
   }
