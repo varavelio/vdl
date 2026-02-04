@@ -33,8 +33,8 @@
   // Initialize playground
   let initialized = $state(false);
   let loadingSteps = $state<LoadingStep[]>([
-    { id: "wasm", label: "Load WebAssembly binary", status: "loading" },
-    { id: "highlighter", label: "Load Code highlighter", status: "pending" },
+    { id: "wasm", label: "Load WebAssembly Binary", status: "loading" },
+    { id: "highlighter", label: "Load VDL Syntax", status: "pending" },
     { id: "config", label: "Load Configuration", status: "pending" },
     { id: "schema", label: "Load VDL Schema", status: "pending" },
   ]);
