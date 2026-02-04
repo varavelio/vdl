@@ -26,6 +26,10 @@ export default defineConfig({
           dest: "./_app/vdl/wasm",
         },
         {
+          src: "../editors/vscode/language/vdl.tmLanguage.json",
+          dest: "./_app/vdl/vscode",
+        },
+        {
           src: "node_modules/web-tree-sitter/tree-sitter.wasm",
           dest: "_app/curlconverter",
         },

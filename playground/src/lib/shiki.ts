@@ -36,49 +36,44 @@ const langs: BundledLanguage[] = [
 
 /**
  * Returns the provided language if it's supported, otherwise falls back to plain text.
- * @param {string} lang - The language identifier to check
- * @returns {string} The original language if supported, or "text" as fallback
+ * @param lang - The language identifier to check
+ * @returns The original language if supported, or "text" as fallback
  */
-export const getOrFallbackLanguage = (lang: string) => {
-  const supportedLangs = ["urpc", ...langs];
+export const getOrFallbackLanguage = (lang: string): string => {
+  const supportedLangs = ["vdl", ...langs];
   if (supportedLangs.includes(lang)) return lang;
   return "text"; // https://shiki.matsu.io/languages#plain-text
 };
 
+export const vdlSyntaxUrl = "./_app/vdl/vscode/vdl.tmLanguage.json";
 export const lightTheme: BundledTheme = "github-light";
 export const darkTheme: BundledTheme = "github-dark";
+
 let highlighterInstance: Highlighter | null = null;
 let highlighterPromise: Promise<Highlighter> | null = null;
 
 /**
- * Returns a Shiki highlighter instance with URPC and bundled languages support.
+ * Returns a Shiki highlighter instance with VDL and bundled languages support.
  * This function implements a singleton pattern, returning an existing instance
  * or promise if available, otherwise creating a new highlighter.
  *
  * The highlighter is configured with both light and dark GitHub themes,
- * and includes URPC syntax highlighting loaded from a remote source in
+ * and includes VDL syntax highlighting loaded from a remote source in
  * addition to the bundled languages.
  *
  * @returns {Promise<Highlighter>} A promise that resolves to a Shiki highlighter instance
  */
 export const getHighlighter = async (): Promise<Highlighter> => {
-  if (highlighterInstance) {
-    return highlighterInstance;
-  }
-
-  if (highlighterPromise) {
-    return highlighterPromise;
-  }
+  if (highlighterInstance) return highlighterInstance;
+  if (highlighterPromise) return highlighterPromise;
 
   highlighterPromise = (async () => {
-    const urpcSyntaxUrl =
-      "https://cdn.jsdelivr.net/gh/uforg/uforpc-vscode@0.1.7/syntaxes/urpc.tmLanguage.json";
-    const urpcSyntax = await fetch(urpcSyntaxUrl);
-    const urpcSyntaxJson = await urpcSyntax.json();
-    urpcSyntaxJson.name = "urpc";
+    const vdlSyntax = await fetch(vdlSyntaxUrl);
+    const vdlSyntaxJson = await vdlSyntax.json();
+    vdlSyntaxJson.name = "vdl";
 
     highlighterInstance = await createHighlighter({
-      langs: [urpcSyntaxJson, ...langs],
+      langs: [vdlSyntaxJson, ...langs],
       themes: [lightTheme, darkTheme],
     });
 
