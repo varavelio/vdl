@@ -136,7 +136,7 @@
     out:fade={{ duration: 200 }}
     class="fixed top-0 left-0 flex h-[100dvh] w-[100dvw] flex-col items-center justify-center"
   >
-    <Logo class="mb-12 h-auto w-[90dvw] max-w-[600px]" />
+    <Logo class="mb-12 h-auto w-[90dvw] max-w-[400px]" />
 
     <div class="space-y-2">
       {#each loadingSteps as step (step.id)}
