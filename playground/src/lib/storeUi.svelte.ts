@@ -3,7 +3,6 @@ import { debounce } from "lodash-es";
 import type { Action } from "svelte/action";
 
 import { createStore } from "./createStore.svelte";
-import type { CodegenGenerator } from "./urpc";
 
 export interface StoreUiDimensions {
   element: HTMLElement | null;
@@ -59,7 +58,13 @@ export interface StoreUi {
   historyTab: "input" | "output";
   codeSnippetsTab: "sdk" | "curl";
   codeSnippetsCurlLang: string;
-  codeSnippetsSdkLang: CodegenGenerator;
+  codeSnippetsSdkLang:
+    | "typescript"
+    | "go"
+    | "dart"
+    | "python"
+    | "openapi"
+    | "jsonschema";
   codeSnippetsSdkStep: "download" | "setup" | "usage" | "";
   codeSnippetsSdkDartPackageName: string;
   codeSnippetsSdkGolangPackageName: string;
@@ -133,7 +138,7 @@ const storeUiDefault: StoreUi = {
   historyTab: "input",
   codeSnippetsTab: "curl",
   codeSnippetsCurlLang: "Curl",
-  codeSnippetsSdkLang: "typescript-client",
+  codeSnippetsSdkLang: "typescript",
   codeSnippetsSdkStep: "download",
   codeSnippetsSdkDartPackageName: "uforpc",
   codeSnippetsSdkGolangPackageName: "uforpc",
