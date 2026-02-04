@@ -5,7 +5,7 @@ description: Standard formatting conventions for the VDL IDL
 
 This document specifies the standard formatting rules for the VDL IDL. Consistent formatting enhances code readability, maintainability, and collaboration.
 
-> **Note:** All style conventions are automatically enforced by the official VDL formatter. Run it manually with `vdl fmt ./schema.vdl`, or let the built-in LSP formatter (bundled with the VS Code extension) format files on save.
+> **Note:** All style conventions are automatically enforced by the official VDL formatter. Run it manually with `vdl format ./schema.vdl`, or let the built-in LSP formatter (bundled with the VS Code extension) format files on save.
 
 ## 1. General Principles
 

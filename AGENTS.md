@@ -60,7 +60,7 @@ When updating this document, do so with the context of the entire document in mi
     - `transform/`: AST Transformations (Used by Playground/LSP).
       - `expand.go`: Handles type flattening (spreads) and circular reference protection.
       - `extract.go`: Logic to extract specific AST nodes (Types, RPCs, Procs, Streams) as standalone strings.
-    - `formatter/`: Source code formatting logic (`vdl fmt`).
+    - `formatter/`: Source code formatting logic (`vdl format`).
     - `lsp/`: Language Server Protocol implementation.
     - `codegen/`: Code Generators (Go, TS, Dart, etc.).
     - `cmd/schemagen/`: Internal tool to generate JSON schemas for IR and Config.
