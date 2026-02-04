@@ -1,20 +1,18 @@
 <script lang="ts">
   import { onNavigate } from "$app/navigation";
+  import { CircleCheck, CircleDashed, CircleX, Loader } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { toast, Toaster } from "svelte-sonner";
   import { fade } from "svelte/transition";
 
   import { initializeShiki } from "$lib/shiki";
-  import {
-    loadJsonSchemaFromUrpcSchemaUrl,
-    storeSettings,
-  } from "$lib/storeSettings.svelte";
+  import { loadVdlSchema, storeSettings } from "$lib/storeSettings.svelte";
   import {
     dimensionschangeAction,
     initTheme,
     storeUi,
   } from "$lib/storeUi.svelte";
-  import { initWasm, waitUntilInitialized } from "$lib/urpc";
+  import { wasmClient } from "$lib/wasm";
 
   import Logo from "$lib/components/Logo.svelte";
 
@@ -26,9 +24,26 @@
 
   let { children } = $props();
 
+  type LoadingStep = {
+    id: string;
+    label: string;
+    status: "pending" | "loading" | "completed" | "error";
+  };
+
   // Initialize playground
   let initialized = $state(false);
-  let message = $state("Starting playground");
+  let loadingSteps = $state<LoadingStep[]>([
+    { id: "wasm", label: "Load WebAssembly binary", status: "loading" },
+    { id: "highlighter", label: "Load Code highlighter", status: "pending" },
+    { id: "config", label: "Load Configuration", status: "pending" },
+    { id: "schema", label: "Load VDL Schema", status: "pending" },
+  ]);
+
+  function updateStepStatus(id: string, status: LoadingStep["status"]) {
+    const step = loadingSteps.find((s) => s.id === id);
+    if (step) step.status = status;
+  }
+
   onMount(async () => {
     const handleError = (error: unknown) => {
       console.error(error);
@@ -38,40 +53,48 @@
       });
     };
 
-    message = "Loading configuration";
+    updateStepStatus("wasm", "loading");
+    try {
+      await wasmClient.init();
+      updateStepStatus("wasm", "completed");
+    } catch (error) {
+      updateStepStatus("wasm", "error");
+      handleError(error);
+      return;
+    }
+
+    updateStepStatus("highlighter", "loading");
+    try {
+      await initializeShiki();
+      updateStepStatus("highlighter", "completed");
+    } catch (error) {
+      updateStepStatus("highlighter", "error");
+      handleError(error);
+      return;
+    }
+
+    updateStepStatus("config", "loading");
     try {
       await Promise.all([
         storeSettings.status.waitUntilReady(),
         storeUi.status.waitUntilReady(),
       ]);
       initTheme();
+      updateStepStatus("config", "completed");
     } catch (error) {
+      updateStepStatus("config", "error");
       handleError(error);
       return;
     }
 
-    message = "Loading code highlighter";
+    updateStepStatus("schema", "loading");
     try {
-      await initializeShiki();
+      await loadVdlSchema("./schema.vdl");
+      updateStepStatus("schema", "completed");
     } catch (error) {
+      updateStepStatus("schema", "error");
       handleError(error);
       return;
-    }
-
-    message = "Loading URPC WebAssembly binary";
-    try {
-      await initWasm();
-      await waitUntilInitialized();
-    } catch (error) {
-      handleError(error);
-      return;
-    }
-
-    message = "Loading URPC Schema";
-    try {
-      await loadJsonSchemaFromUrpcSchemaUrl("./schema.urpc");
-    } catch (error) {
-      handleError(error);
     }
 
     initialized = true;
@@ -113,8 +136,27 @@
     out:fade={{ duration: 200 }}
     class="fixed top-0 left-0 flex h-[100dvh] w-[100dvw] flex-col items-center justify-center"
   >
-    <Logo class="mb-6 h-auto w-[90dvw] max-w-[600px]" />
-    <h2>{message}...</h2>
+    <Logo class="mb-12 h-auto w-[90dvw] max-w-[600px]" />
+
+    <div class="space-y-2">
+      {#each loadingSteps as step (step.id)}
+        <div class="flex items-center space-x-2">
+          <div class="flex-shrink-0">
+            {#if step.status === "pending"}
+              <CircleDashed class="size-4" />
+            {:else if step.status === "loading"}
+              <Loader class="size-4 animate-spin" />
+            {:else if step.status === "completed"}
+              <CircleCheck class="text-success size-4" />
+            {:else if step.status === "error"}
+              <CircleX class="text-error size-4" />
+            {/if}
+          </div>
+
+          <span class="text-sm font-medium">{step.label}</span>
+        </div>
+      {/each}
+    </div>
   </main>
 {/if}
 
