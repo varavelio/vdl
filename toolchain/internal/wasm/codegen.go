@@ -9,6 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/config/configtypes"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/dart"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/golang"
+	irgen "github.com/varavelio/vdl/toolchain/internal/codegen/ir"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/jsonschema"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/openapi"
 	"github.com/varavelio/vdl/toolchain/internal/codegen/python"
@@ -162,6 +163,25 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		genFiles, err := gen.Generate(ctx, schema)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate jsonschema code: %w", err)
+		}
+
+		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
+		for i, genFile := range genFiles {
+			outFiles[i] = wasmtypes.CodegenOutputFile{Path: genFile.RelativePath, Content: string(genFile.Content)}
+		}
+
+		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
+	}
+
+	if input.Target.Ir != nil {
+		gen := irgen.New(&configtypes.IrTargetConfig{
+			Minify:   configtypes.Ptr(false),
+			Filename: input.Target.Jsonschema.Filename,
+		})
+
+		genFiles, err := gen.Generate(ctx, schema)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate ir code: %w", err)
 		}
 
 		outFiles := make([]wasmtypes.CodegenOutputFile, len(genFiles))
