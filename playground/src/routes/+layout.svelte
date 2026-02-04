@@ -134,14 +134,14 @@
 {#if !initialized}
   <main
     out:fade={{ duration: 200 }}
-    class="fixed top-0 left-0 flex h-[100dvh] w-[100dvw] flex-col items-center justify-center"
+    class="fixed top-0 left-0 flex h-dvh w-dvw flex-col items-center justify-center"
   >
-    <Logo class="mb-6 h-auto w-[70dvw] max-w-[400px]" />
+    <Logo class="mb-6 h-auto w-[70dvw] max-w-100" />
 
     <div class="space-y-2">
       {#each loadingSteps as step (step.id)}
         <div class="flex items-center space-x-2">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             {#if step.status === "pending"}
               <CircleDashed class="size-4" />
             {:else if step.status === "loading"}
@@ -165,13 +165,13 @@
     transition:fade={{ duration: 200 }}
     use:dimensionschangeAction
     ondimensionschange={(e) => (storeUi.store.app = e.detail)}
-    class="flex h-[100dvh] w-[100dvw] justify-start"
+    class="flex h-dvh w-dvw justify-start"
   >
     <LayoutAside />
     <div
       use:dimensionschangeAction
       ondimensionschange={(e) => (storeUi.store.contentWrapper = e.detail)}
-      class="h-[100dvh] flex-grow scroll-p-[90px]"
+      class="h-dvh grow scroll-p-22.5"
     >
       <LayoutHeader />
       <main
