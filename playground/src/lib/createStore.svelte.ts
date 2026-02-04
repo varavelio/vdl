@@ -260,7 +260,7 @@ export function createStore<
  *
  * @returns A prefix string based on the current URL path, suitable for use in database names.
  */
-function createGlobalDbNamePrefix(): string {
+export function createGlobalDbNamePrefix(): string {
   if (!browser) return "";
 
   const prefix = globalThis.location.pathname
