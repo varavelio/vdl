@@ -176,7 +176,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 	if input.Target.Ir != nil {
 		gen := irgen.New(&configtypes.IrTargetConfig{
 			Minify:   configtypes.Ptr(false),
-			Filename: input.Target.Jsonschema.Filename,
+			Filename: input.Target.Ir.Filename,
 		})
 
 		genFiles, err := gen.Generate(ctx, schema)
