@@ -19,6 +19,16 @@ import type {
   TypeDef,
 } from "./wasm/wasmtypes/types.ts";
 
+export type IrNode =
+  | (ConstantDef & { kind: "constant" })
+  | (PatternDef & { kind: "pattern" })
+  | (EnumDef & { kind: "enum" })
+  | (TypeDef & { kind: "type" })
+  | (RpcDef & { kind: "rpc" })
+  | (ProcedureDef & { kind: "proc" })
+  | (StreamDef & { kind: "stream" })
+  | (DocDef & { kind: "doc" });
+
 export const primitiveTypes = ["string", "int", "float", "bool", "datetime"];
 
 type SearchItemKind =
@@ -152,6 +162,38 @@ export const storeSettings = createStore<StoreSettings>({
   keysToPersist: ["baseUrl", "headers"],
   dbName: "storeSettings",
 });
+
+export function getIrNodes(): IrNode[] {
+  const addKind = <T, K extends IrNode["kind"]>(items: T[], kind: K) => {
+    return items.map((item) => ({ ...item, kind }));
+  };
+
+  return [
+    ...addKind(storeSettings.store.irSchema.constants, "constant"),
+    ...addKind(storeSettings.store.irSchema.patterns, "pattern"),
+    ...addKind(storeSettings.store.irSchema.enums, "enum"),
+    ...addKind(storeSettings.store.irSchema.types, "type"),
+    ...addKind(storeSettings.store.irSchema.rpcs, "rpc"),
+    ...addKind(storeSettings.store.irSchema.procedures, "proc"),
+    ...addKind(storeSettings.store.irSchema.streams, "stream"),
+    ...addKind(storeSettings.store.irSchema.docs, "doc"),
+  ];
+}
+
+export function getNodeSlug(node: IrNode): string {
+  const name = getNodeName(node);
+  if (node.kind === "rpc") return slugify(`rpc-${name}`);
+  if (node.kind === "proc") return slugify(`rproc-${node.rpcName}-${name}`);
+  if (node.kind === "stream") return slugify(`rstream-${node.rpcName}-${name}`);
+  if (node.kind === "doc" && node.rpcName) return slugify(`rdoc-${name}`);
+  if (node.kind === "doc" && !node.rpcName) return slugify(`doc-${name}`);
+  return "";
+}
+
+export function getNodeName(node: IrNode): string {
+  if (node.kind === "doc") return getMarkdownTitle(node.content);
+  return node.name;
+}
 
 /**
  * Add or update a header in the store.headers array.
@@ -338,32 +380,8 @@ const loadVdlSchemaFromString = async (vdlSchema: string) => {
  * Indexes the search items for the current VDL IR schema.
  */
 const indexSearchItems = async () => {
-  type Node =
-    | (ConstantDef & { kind: "constant" })
-    | (PatternDef & { kind: "pattern" })
-    | (EnumDef & { kind: "enum" })
-    | (TypeDef & { kind: "type" })
-    | (RpcDef & { kind: "rpc" })
-    | (ProcedureDef & { kind: "proc" })
-    | (StreamDef & { kind: "stream" })
-    | (DocDef & { kind: "doc" });
-
-  const addKind = <T, K extends SearchItemKind>(items: T[], kind: K) => {
-    return items.map((item) => ({ ...item, kind }));
-  };
-
-  const nodes: Node[] = [
-    ...addKind(storeSettings.store.irSchema.constants, "constant"),
-    ...addKind(storeSettings.store.irSchema.patterns, "pattern"),
-    ...addKind(storeSettings.store.irSchema.enums, "enum"),
-    ...addKind(storeSettings.store.irSchema.types, "type"),
-    ...addKind(storeSettings.store.irSchema.rpcs, "rpc"),
-    ...addKind(storeSettings.store.irSchema.procedures, "proc"),
-    ...addKind(storeSettings.store.irSchema.streams, "stream"),
-  ];
-
   const searchItems = await Promise.all(
-    nodes.map(async (node, index) => {
+    getIrNodes().map(async (node, index) => {
       let name = "";
       let doc = "";
 
