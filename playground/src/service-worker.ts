@@ -32,8 +32,6 @@ const NETWORK_FIRST_FILES = [
   "version.json",
   "config.json",
   "schema.vdl",
-  "openapi.yaml",
-  "openapi.yml",
 ];
 
 /**
