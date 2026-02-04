@@ -119,21 +119,6 @@ export class WasmClient {
   /**
    * Generate code based on the provided configuration.
    */
-  async irgen(input: vdl.IrgenInput): Promise<vdl.IrgenOutput> {
-    const res = await this.call({
-      functionName: "Codegen",
-      irgen: input,
-    });
-
-    if (!res.irgen) {
-      throw new Error("WASM Error: Output missing 'irgen' field");
-    }
-    return res.irgen;
-  }
-
-  /**
-   * Generate code based on the provided configuration.
-   */
   async codegen(input: vdl.CodegenInput): Promise<vdl.CodegenOutput> {
     const res = await this.call({
       functionName: "Codegen",
