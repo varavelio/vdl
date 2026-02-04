@@ -150,11 +150,12 @@
         });
 
         if (rpc.doc) {
+          const slug = getNodeSlug({ kind: "rpc", ...rpc });
           rpcDocsItems.unshift({
             kind: "link",
             label: rpc.name,
             icon: FileText,
-            href: `#/TODO`, // Pending to defines
+            href: `#/${slug}`,
           });
         }
 

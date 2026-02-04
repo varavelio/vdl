@@ -180,12 +180,17 @@ export function getIrNodes(): IrNode[] {
   ];
 }
 
+// prettier-ignore
 export function getNodeSlug(node: IrNode): string {
   const name = getNodeName(node);
+  if (node.kind === "constant") return slugify(`constants#${name}`);
+  if (node.kind === "pattern") return slugify(`patterns#${name}`);
+  if (node.kind === "enum") return slugify(`enums#${name}`);
+  if (node.kind === "type") return slugify(`types#${name}`);
   if (node.kind === "rpc") return slugify(`rpc-${name}`);
-  if (node.kind === "proc") return slugify(`rproc-${node.rpcName}-${name}`);
-  if (node.kind === "stream") return slugify(`rstream-${node.rpcName}-${name}`);
-  if (node.kind === "doc" && node.rpcName) return slugify(`rdoc-${name}`);
+  if (node.kind === "proc") return slugify(`rpc-proc-${node.rpcName}-${name}`);
+  if (node.kind === "stream") return slugify(`rpc-stream-${node.rpcName}-${name}`);
+  if (node.kind === "doc" && node.rpcName) return slugify(`rpc-doc-${node.rpcName}-${name}`);
   if (node.kind === "doc" && !node.rpcName) return slugify(`doc-${name}`);
   return "";
 }
@@ -398,7 +403,7 @@ const indexSearchItems = async () => {
         kind: node.kind,
         name,
         doc,
-        slug: slugify(`${node.kind}-${name}`),
+        slug: getNodeSlug(node),
       };
 
       item.doc = await markdownToText(item.doc);
