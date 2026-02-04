@@ -2,7 +2,7 @@
   import { ExternalLink } from "@lucide/svelte";
 
   import { mergeClasses } from "$lib/helpers/mergeClasses";
-  import { versionWithPrefix } from "$lib/version";
+  import { getVersion } from "$lib/version";
 
   interface Props {
     class?: string;
@@ -12,12 +12,12 @@
 </script>
 
 <a
-  href="https://github.com/varavelio/vdl/releases/tag/{versionWithPrefix}"
+  href="https://github.com/varavelio/vdl/releases/tag/v{getVersion()}"
   target="_blank"
   class={mergeClasses("btn btn-ghost flex items-center", className)}
 >
   <ExternalLink class="size-4" />
   <span>
-    UFO RPC {versionWithPrefix}
+    VDL v{getVersion()}
   </span>
 </a>

@@ -31,7 +31,7 @@
   </div>
 
   <Code
-    lang="urpc"
+    lang="vdl"
     code={storeSettings.store.urpcSchema}
     class="min-h-0 flex-1"
   />

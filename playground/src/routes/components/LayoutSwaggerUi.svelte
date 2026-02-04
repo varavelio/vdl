@@ -37,8 +37,8 @@
 </header>
 
 <p class="text-base-content/50 mt-8 block px-4 text-center text-sm">
-  UFO RPC is not affiliated with OpenAPI or Swagger. It just generates OpenAPI
-  schemas from UFO RPC code.
+  VDL is not affiliated with OpenAPI or Swagger. It just generates OpenAPI
+  schemas from VDL code.
 </p>
 
 <div class="mt-2 flex justify-center">

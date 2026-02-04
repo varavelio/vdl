@@ -8,7 +8,7 @@
  */
 export function getLangExtension(lang: string, fallback = "txt"): string {
   const extensions: Record<string, string> = {
-    urpc: "urpc",
+    vdl: "vdl",
     json: "json",
     yaml: "yaml",
     yml: "yaml",

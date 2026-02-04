@@ -55,7 +55,7 @@ describe("getLangExtension", () => {
     expect(getLangExtension("wget")).toBe("sh");
   });
 
-  it("should return correct extension for urpc", () => {
-    expect(getLangExtension("urpc")).toBe("urpc");
+  it("should return correct extension for vdl", () => {
+    expect(getLangExtension("vdl")).toBe("vdl");
   });
 });

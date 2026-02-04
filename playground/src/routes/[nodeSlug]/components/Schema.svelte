@@ -86,6 +86,6 @@
       />
     </div>
 
-    <Code lang="urpc" code={schemaToShow} />
+    <Code lang="vdl" code={schemaToShow} />
   </div>
 {/if}

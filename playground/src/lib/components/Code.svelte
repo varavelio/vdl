@@ -17,7 +17,7 @@
 
   interface Props {
     code: string;
-    lang: "urpc" | string;
+    lang: "vdl" | string;
     class?: ClassValue;
     rounded?: boolean;
     withBorder?: boolean;

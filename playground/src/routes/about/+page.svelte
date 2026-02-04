@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>About | UFO RPC Playground</title>
+  <title>About | VDL Playground</title>
 </svelte:head>
 
 <div
@@ -58,31 +58,8 @@
         <h2 class="card-title mb-4 text-2xl">License</h2>
         <div class="space-y-4">
           <p class="text-base-content/80 leading-relaxed">
-            UFO RPC is 100% open source and uses a dual-license approach:
+            VDL is 100% open source and is released under MIT license:
           </p>
-
-          <ul class="list-inside list-disc">
-            <li>
-              <a
-                href="https://vdl.varavel.com/license"
-                target="_blank"
-                class="link"
-              >
-                VDL Generator: MIT
-              </a>
-              - Ensures this project remains free and open source forever
-            </li>
-            <li>
-              <a
-                href="https://vdl.varavel.com/license"
-                target="_blank"
-                class="link"
-              >
-                Generated Code: MIT
-              </a>
-              - Your generated code is yours to use freely in any way you want
-            </li>
-          </ul>
 
           <p class="text-base-content/80 leading-relaxed">
             VDL is provided "AS IS" without warranty of any kind. The authors
@@ -105,11 +82,11 @@
           <ul class="list-inside list-disc">
             <li>
               <a
-                href="https://github.com/varavelio/vdl/blob/main/urpc/go.mod"
+                href="https://github.com/varavelio/vdl/blob/main/toolchain/go.mod"
                 target="_blank"
                 class="link"
               >
-                URPC dependencies
+                VDL dependencies
               </a>
             </li>
             <li>
@@ -119,63 +96,6 @@
                 class="link"
               >
                 Playground dependencies
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="card bg-base-200 shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title mb-4 text-2xl">Author</h2>
-        <div class="space-y-4">
-          <p class="text-base-content/80 leading-relaxed">
-            This project was created and is maintained with ❤️ by
-            <a
-              href="https://vdl.varavel.com/author"
-              target="_blank"
-              class="link"
-            >
-              Luis Eduardo
-            </a>
-          </p>
-
-          <ul class="list-inside list-disc">
-            <li>
-              <a
-                href="https://vdl.varavel.com/author"
-                target="_blank"
-                class="link"
-              >
-                Website
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://vdl.varavel.com/author/github"
-                target="_blank"
-                class="link"
-              >
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://vdl.varavel.com/author/linkedin"
-                target="_blank"
-                class="link"
-              >
-                LinkedIn
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://vdl.varavel.com/author/x"
-                target="_blank"
-                class="link"
-              >
-                X (Twitter)
               </a>
             </li>
           </ul>

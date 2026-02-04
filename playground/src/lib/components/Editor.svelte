@@ -18,7 +18,7 @@
   }
 
   let {
-    lang = "urpc",
+    lang = "vdl",
     value = $bindable(),
     onChange = undefined,
     class: className,
@@ -37,7 +37,7 @@
     ]);
 
     monaco = monacoEditor;
-    monaco.languages.register({ id: "urpc" });
+    monaco.languages.register({ id: "vdl" });
     shikiToMonaco(highlighter, monaco);
 
     editor = monaco.editor.create(editorContainer, {

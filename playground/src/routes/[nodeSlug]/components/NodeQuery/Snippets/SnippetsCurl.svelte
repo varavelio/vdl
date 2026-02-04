@@ -47,7 +47,7 @@
   {#if type === "stream"}
     <p class="pb-4 text-sm">
       Streams use Server-Sent Events. Only curl examples are provided. Build a
-      client manually, or generate one with the urpc CLI if your language is
+      client manually, or generate one with the vdl CLI if your language is
       supported.
       <br />
       <a href="https://vdl.varavel.com/sse" target="_blank" class="link">

@@ -60,9 +60,9 @@
   });
 
   let title = $derived.by(() => {
-    if (!nodeExists) return "UFO RPC Playground";
+    if (!nodeExists) return "VDL Playground";
 
-    return `${name} ${humanKind} | UFO RPC Playground`;
+    return `${name} ${humanKind} | VDL Playground`;
   });
 
   // Scroll to top of page when node changes

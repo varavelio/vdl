@@ -90,7 +90,7 @@
             type="url"
             class="grow"
             spellcheck="false"
-            placeholder="https://example.com/api/v1/urpc"
+            placeholder="https://api.example.com/rpc"
             bind:value={storeSettings.store.baseUrl}
           />
         </label>
@@ -104,10 +104,8 @@
         </Tooltip>
       </div>
       <p class="label text-wrap">
-        This is the base URL where the UFO RPC server is running, all requests
-        will be sent to {`<base-url>/{operationName}`}
-        where {`{operationName}`} is the name of the procedure or stream you want
-        to call.
+        This is the base URL where the VDL RPC server is running, all requests
+        will be sent to {`<base-url>/{rpcName}/{operationName}`}.
       </p>
     </fieldset>
 

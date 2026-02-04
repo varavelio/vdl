@@ -276,14 +276,14 @@ export const loadVdlSchema = async (url: string) => {
 };
 
 /**
- * Updates the `vdlSchema` store with a provided URPC schema string.
+ * Updates the `vdlSchema` store with a provided VDL schema string.
  *
  * This function directly sets the `vdlSchema` store to the provided schema string,
  * allowing for immediate updates to the schema without fetching from a URL.
  *
  * It also populates the rest of the derived schemas to the store.
  *
- * @param vdlSchema The URPC schema string to be loaded into the store.
+ * @param vdlSchema The VDL schema string to be loaded into the store.
  */
 const loadVdlSchemaFromString = async (vdlSchema: string) => {
   const [expanded, ir, oapi] = await Promise.all([
