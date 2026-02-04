@@ -1,4 +1,4 @@
-import * as vdl from "./wasmtypes";
+import type * as vdl from "./wasmtypes";
 
 // Docs: https://go.dev/wiki/WebAssembly
 
@@ -9,6 +9,7 @@ declare global {
     // Flag to check if WASM is ready
     __vdlWasmReady?: boolean;
     // Go's wasm_exec.js loader
+    // biome-ignore lint/suspicious/noExplicitAny: IDK the correct type, we follow the official go guide
     Go: any;
   }
 }
@@ -45,21 +46,6 @@ export class WasmClient {
    */
   isInitialized(): boolean {
     return !!window.__vdlWasmReady;
-  }
-
-  /**
-   * Generate code based on the provided configuration.
-   */
-  async codegen(input: vdl.CodegenInput): Promise<vdl.CodegenOutput> {
-    const res = await this.call({
-      functionName: "Codegen",
-      codegen: input,
-    });
-
-    if (!res.codegen) {
-      throw new Error("WASM Error: Output missing 'codegen' field");
-    }
-    return res.codegen;
   }
 
   /**
@@ -128,6 +114,36 @@ export class WasmClient {
       throw new Error("WASM Error: Output missing 'extractStream' field");
     }
     return res.extractStream.streamSchema;
+  }
+
+  /**
+   * Generate code based on the provided configuration.
+   */
+  async irgen(input: vdl.IrgenInput): Promise<vdl.IrgenOutput> {
+    const res = await this.call({
+      functionName: "Codegen",
+      irgen: input,
+    });
+
+    if (!res.irgen) {
+      throw new Error("WASM Error: Output missing 'irgen' field");
+    }
+    return res.irgen;
+  }
+
+  /**
+   * Generate code based on the provided configuration.
+   */
+  async codegen(input: vdl.CodegenInput): Promise<vdl.CodegenOutput> {
+    const res = await this.call({
+      functionName: "Codegen",
+      codegen: input,
+    });
+
+    if (!res.codegen) {
+      throw new Error("WASM Error: Output missing 'codegen' field");
+    }
+    return res.codegen;
   }
 
   // --- Internal Helpers ---
