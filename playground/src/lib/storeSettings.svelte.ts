@@ -286,25 +286,31 @@ export const loadVdlSchema = async (url: string) => {
  * @param vdlSchema The URPC schema string to be loaded into the store.
  */
 const loadVdlSchemaFromString = async (vdlSchema: string) => {
-  const expanded = await wasmClient.expandTypes(vdlSchema);
-  const irSchema = await wasmClient.irgen({ vdlSchema });
-
-  const { files } = await wasmClient.codegen({
-    vdlSchema,
-    target: {
-      openapi: {
-        title: "VDL OpenAPI",
-        version: "1.0.0",
-        output: "",
+  const [expanded, irSchema, { files }] = await Promise.all([
+    wasmClient.expandTypes(vdlSchema),
+    wasmClient.irgen({ vdlSchema }),
+    wasmClient.codegen({
+      vdlSchema,
+      target: {
+        openapi: {
+          title: "VDL OpenAPI",
+          version: "1.0.0",
+          output: "",
+        },
       },
-    },
-  });
+    }),
+  ]);
 
   let openapi = "";
   for (const file of files) {
-    if (file.path.endsWith(".json")) openapi = file.content;
-    if (file.path.endsWith(".yml")) openapi = file.content;
-    if (file.path.endsWith(".yaml")) openapi = file.content;
+    if (
+      file.path.endsWith(".yaml") ||
+      file.path.endsWith(".yml") ||
+      file.path.endsWith(".json")
+    ) {
+      openapi = file.content;
+      break;
+    }
   }
 
   storeSettings.store.vdlSchema = vdlSchema;
