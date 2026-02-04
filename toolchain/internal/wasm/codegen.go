@@ -2,6 +2,7 @@ package wasm
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -43,8 +44,7 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 	// Convert to IR Schema
 	schema := ir.FromProgram(program)
 
-	switch {
-	case input.Target.Go != nil:
+	if input.Target.Go != nil {
 		gen := golang.New(&configtypes.GoTargetConfig{
 			Package:     input.Target.Go.Package,
 			GenServer:   input.Target.Go.GenServer,
@@ -64,8 +64,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
+	}
 
-	case input.Target.Typescript != nil:
+	if input.Target.Typescript != nil {
 		importExt := configtypes.TypescriptTargetImportExtension(input.Target.Typescript.ImportExtension.String())
 		gen := typescript.New(&configtypes.TypeScriptTargetConfig{
 			ImportExtension: &importExt,
@@ -86,8 +87,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
+	}
 
-	case input.Target.Dart != nil:
+	if input.Target.Dart != nil {
 		gen := dart.New(&configtypes.DartTargetConfig{
 			GenPatterns: input.Target.Dart.GenPatterns,
 			GenConsts:   input.Target.Dart.GenConsts,
@@ -104,8 +106,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
+	}
 
-	case input.Target.Python != nil:
+	if input.Target.Python != nil {
 		gen := python.New(&configtypes.PythonTargetConfig{
 			GenPatterns: input.Target.Python.GenPatterns,
 			GenConsts:   input.Target.Python.GenConsts,
@@ -122,8 +125,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
+	}
 
-	case input.Target.Openapi != nil:
+	if input.Target.Openapi != nil {
 		gen := openapi.New(&configtypes.OpenApiTargetConfig{
 			Title:        input.Target.Openapi.Title,
 			Version:      input.Target.Openapi.Version,
@@ -146,8 +150,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		}
 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
+	}
 
-	case input.Target.Jsonschema != nil:
+	if input.Target.Jsonschema != nil {
 		gen := jsonschema.New(&configtypes.JsonSchemaTargetConfig{
 			Filename: input.Target.Jsonschema.Filename,
 			Id:       input.Target.Jsonschema.Id,
@@ -167,5 +172,9 @@ func runCodegen(input wasmtypes.CodegenInput) (*wasmtypes.CodegenOutput, error) 
 		return &wasmtypes.CodegenOutput{Files: outFiles}, nil
 	}
 
-	return nil, fmt.Errorf("target is not supported in WASM")
+	jsonInput, err := json.MarshalIndent(input, "", " ")
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling json input for reporting an error: %w", err)
+	}
+	return nil, fmt.Errorf("target is not supported in WASM for input: %s", string(jsonInput))
 }
