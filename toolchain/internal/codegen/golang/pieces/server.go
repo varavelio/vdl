@@ -544,7 +544,7 @@ func (s *internalServer[T]) setStreamHandler(
 //
 // Parameters:
 //   - ctx: The request context
-//   - props: The UFO context containing user-defined data
+//   - props: The VDL context containing user-defined data
 //   - rpcName: The name of the RPC service to invoke
 //   - operationName: The name of the procedure or stream to invoke
 //   - httpAdapter: The HTTP adapter for reading requests and writing responses

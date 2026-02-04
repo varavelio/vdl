@@ -177,8 +177,8 @@ func withGlobalMaxMessageSize(size int64) internalClientOption {
 	}
 }
 
-// newInternalClient creates a new internalClient capable of talking to the UFO
-// RPC server described by procNames and streamNames.
+// newInternalClient creates a new internalClient capable of talking to the VDL
+// server described by procNames and streamNames.
 //
 // The caller can optionally pass functional options to tweak the configuration
 // (base URL, custom *http.Client, …).

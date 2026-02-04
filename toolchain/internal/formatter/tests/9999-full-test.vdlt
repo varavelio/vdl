@@ -1,4 +1,4 @@
-include "./foo.ufo"
+include "./foo.vdl"
 
 // ============================================================================
 // External Documentation
@@ -233,7 +233,7 @@ timestamp :   datetime
 
 // >>>>
 
-include "./foo.ufo"
+include "./foo.vdl"
 
 // ============================================================================
 // External Documentation

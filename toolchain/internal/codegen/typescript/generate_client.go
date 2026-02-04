@@ -371,7 +371,7 @@ func generateProcedureImplementation(g *gen.Generator, schema *irtypes.IrSchema)
 			g.Linef(" * Executes the %s procedure.", fullName)
 			g.Line(" *")
 			g.Linef(" * @param input - The %s input parameters", fullName)
-			g.Linef(" * @returns Promise resolving to %s or throws UfoError if something went wrong", outputType)
+			g.Linef(" * @returns Promise resolving to %s or throws VdlError if something went wrong", outputType)
 			g.Line(" */")
 			g.Linef("async execute(input: vdlTypes.%s): Promise<vdlTypes.%s> {", inputType, outputType)
 			g.Block(func() {
