@@ -1,14 +1,11 @@
 <script>
   import H1 from "$lib/components/H1.svelte";
-  import LogoUfo from "$lib/components/LogoUfo.svelte";
 </script>
 
 <div class="h-full overflow-y-auto p-4">
   <div
     class="flex h-full flex-col items-center justify-center space-y-4 pb-[100px] text-center"
   >
-    <LogoUfo class="w-[100px]" />
-
     <H1>Not Found</H1>
 
     <p>

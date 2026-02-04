@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
-  import LogoUfo from "$lib/components/LogoUfo.svelte";
+  import Logo from "$lib/components/Logo.svelte";
   import SwaggerLogo from "$lib/components/SwaggerLogo.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
 
@@ -13,7 +13,7 @@
   const toggle = () => (isOpen = !isOpen);
 
   let tooltipContent = $derived(
-    isOpen ? "Switch to UFO RPC" : "Switch to Swagger UI (OpenAPI)",
+    isOpen ? "Switch to VDL" : "Switch to Swagger UI (OpenAPI)",
   );
 
   const handleEscapeKey = (event: KeyboardEvent) => {
@@ -44,7 +44,7 @@
     {/if}
     {#if isOpen}
       <span in:fade={{ duration: animationDuration }}>
-        <LogoUfo class="size-10" />
+        <Logo class="size-10" />
       </span>
     {/if}
   </button>

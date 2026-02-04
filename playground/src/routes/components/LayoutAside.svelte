@@ -5,7 +5,7 @@
 
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { dimensionschangeAction, storeUi } from "$lib/storeUi.svelte";
-  import { versionWithPrefix } from "$lib/version";
+  import { getVersion } from "$lib/version";
 
   import Logo from "$lib/components/Logo.svelte";
   import Offcanvas from "$lib/components/Offcanvas.svelte";
@@ -82,15 +82,15 @@
           href="https://vdl.varavel.com"
           target="_blank"
         >
-          <Tooltip content={versionWithPrefix} placement="right">
-            <Logo class="mx-auto w-[180px]" />
+          <Tooltip content={getVersion()} placement="right">
+            <Logo class="mx-auto w-[120px]" />
           </Tooltip>
         </a>
       {/if}
 
       {#if storeUi.store.isMobile}
         <div class="flex items-center justify-between p-4">
-          <Logo class="mx-3 w-[180px]" />
+          <Logo class="mx-3 w-[110px]" />
 
           <button
             class="btn btn-ghost btn-square btn-sm"
@@ -120,9 +120,9 @@
         </a>
       </Tooltip>
 
-      {#each storeSettings.store.jsonSchema.nodes as node}
+      <!-- {#each storeSettings.store.jsonSchema.nodes as node}
         <LayoutAsideItemWrapper {node} />
-      {/each}
+      {/each} -->
     </nav>
   </aside>
 
