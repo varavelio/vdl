@@ -70,12 +70,6 @@ export interface StoreUi {
   codeSnippetsSdkGolangPackageName: string;
   schemaViewMode: "compact" | "expanded";
   asideOpen: boolean;
-  asideSearchOpen: boolean;
-  asideSearchQuery: string;
-  asideHideDocs: boolean;
-  asideHideTypes: boolean;
-  asideHideProcs: boolean;
-  asideHideStreams: boolean;
   app: StoreUiDimensions;
   aside: StoreUiDimensions;
   contentWrapper: StoreUiDimensions;
@@ -145,12 +139,6 @@ const storeUiDefault: StoreUi = {
   schemaViewMode: "expanded",
   asideOpen: false,
   asideWidth: 280,
-  asideSearchOpen: false,
-  asideSearchQuery: "",
-  asideHideDocs: false,
-  asideHideTypes: true,
-  asideHideProcs: false,
-  asideHideStreams: false,
   app: { ...defaultStoreUiDimensions },
   aside: { ...defaultStoreUiDimensions },
   contentWrapper: { ...defaultStoreUiDimensions },
@@ -170,12 +158,6 @@ const storeUiKeysToPersist: StoreUiKey[] = [
   "codeSnippetsSdkGolangPackageName",
   "schemaViewMode",
   "asideWidth",
-  "asideSearchOpen",
-  "asideSearchQuery",
-  "asideHideDocs",
-  "asideHideTypes",
-  "asideHideProcs",
-  "asideHideStreams",
 ];
 
 export const storeUi = createStore<StoreUi>({
