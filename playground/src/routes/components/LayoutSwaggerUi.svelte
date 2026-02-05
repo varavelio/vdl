@@ -1,7 +1,11 @@
 <script lang="ts">
   import { Download, X } from "@lucide/svelte";
+  import { untrack } from "svelte";
+  import { toast } from "svelte-sonner";
   import SwaggerUI from "swagger-ui";
   import "swagger-ui/dist/swagger-ui.css";
+
+  import { storeSettings } from "$lib/storeSettings.svelte";
 
   import Logo from "$lib/components/Logo.svelte";
 
@@ -11,13 +15,61 @@
 
   const { onClose }: Props = $props();
 
-  const elId = $props.id();
+  // Debounced states to prevent lag during typing
+  let debouncedJson = $state(storeSettings.store.openApiJsonSchema);
+  let debouncedYaml = $state(storeSettings.store.openApiYamlSchema);
+  let debouncedBaseUrl = $state(storeSettings.store.baseUrl);
 
+  let yamlSchemaURL = $state("");
+
+  // Debounce logic: Updates internal state after 500ms of inactivity
   $effect(() => {
-    SwaggerUI({
-      domNode: document.getElementById(elId),
-      url: "./openapi.yaml",
-    });
+    const json = storeSettings.store.openApiJsonSchema;
+    const yaml = storeSettings.store.openApiYamlSchema;
+    const base = storeSettings.store.baseUrl;
+
+    const timeout = setTimeout(() => {
+      debouncedJson = json;
+      debouncedYaml = yaml;
+      debouncedBaseUrl = base;
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  });
+
+  // SwaggerUI Initialization
+  $effect(() => {
+    const jsonStr = debouncedJson;
+    const yamlStr = debouncedYaml;
+    const baseUrl = debouncedBaseUrl;
+    const container = document.getElementById("swagger-container");
+
+    if (container && jsonStr) {
+      untrack(() => {
+        try {
+          container.innerHTML = "";
+          const jsonSpec = JSON.parse(jsonStr);
+          jsonSpec.servers = [{ url: baseUrl }];
+
+          SwaggerUI({
+            domNode: container,
+            spec: jsonSpec,
+          });
+
+          // Update Download Blob
+          if (yamlSchemaURL) URL.revokeObjectURL(yamlSchemaURL);
+          const blob = new Blob([yamlStr], { type: "text/yaml" });
+          yamlSchemaURL = URL.createObjectURL(blob);
+        } catch (error) {
+          console.error("Swagger render error:", error);
+          toast.error("Failed to render OpenAPI spec");
+        }
+      });
+    }
+
+    return () => {
+      if (yamlSchemaURL) URL.revokeObjectURL(yamlSchemaURL);
+    };
   });
 </script>
 
@@ -42,15 +94,16 @@
 </p>
 
 <div class="mt-2 flex justify-center">
-  <a href="./openapi.yaml" class="btn btn-sm btn-ghost" download>
+  <a href={yamlSchemaURL} class="btn btn-sm btn-ghost" download="openapi.yaml">
     <Download class="size-4" />
     <span>Download OpenAPI schema</span>
   </a>
 </div>
 
-<div id={elId}></div>
+{#key debouncedBaseUrl}
+  <div id="swagger-container"></div>
+{/key}
 
-<!-- Space for the switch button to avoid hiding content behind it -->
 <div class="h-18.75"></div>
 
 <style>
