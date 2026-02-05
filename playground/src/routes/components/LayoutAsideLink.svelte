@@ -15,7 +15,7 @@
   const { icon: Icon, label: rawLabel, href, deprecated }: Props = $props();
 
   let id = $derived(`navlink-${href.replaceAll("#/", "")}`);
-  let isActive = $derived(page.url.hash == href);
+  let isActive = $derived(page.url.hash.startsWith(href));
   let isDeprecated = $derived(deprecated || deprecated === "");
   let label = $derived(isDeprecated ? `${rawLabel} (Deprecated)` : rawLabel);
 </script>
