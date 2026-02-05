@@ -22,7 +22,7 @@
     use:dimensionschangeAction
     ondimensionschange={(e) => (storeUi.store.header = e.detail)}
     class={[
-      "sticky top-0 z-30 flex h-[72px] w-full items-center justify-between space-x-2 p-4",
+      "sticky top-0 z-30 flex h-18 w-full items-center justify-between space-x-2 p-4",
       "bg-base-100 shadow-xs",
     ]}
   >
@@ -57,7 +57,7 @@
     use:dimensionschangeAction
     ondimensionschange={(e) => (storeUi.store.header = e.detail)}
     class={[
-      "sticky top-0 z-30 flex h-[72px] w-full items-center justify-between space-x-2 p-4",
+      "sticky top-0 z-30 flex h-18 w-full items-center justify-between space-x-2 p-4",
       "bg-base-100 shadow-xs",
     ]}
   >

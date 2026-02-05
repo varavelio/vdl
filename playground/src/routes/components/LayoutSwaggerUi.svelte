@@ -27,9 +27,9 @@
     "sticky top-0 left-0 z-50",
   ]}
 >
-  <div class="flex-grow"></div>
-  <Logo class="h-[32px] flex-grow" />
-  <div class="flex flex-grow justify-end">
+  <div class="grow"></div>
+  <Logo class="h-8 grow" />
+  <div class="flex grow justify-end">
     <button class="btn btn-ghost btn-circle" onclick={onClose}>
       <X class="size-6" />
     </button>
@@ -51,7 +51,7 @@
 <div id={elId}></div>
 
 <!-- Space for the switch button to avoid hiding content behind it -->
-<div class="h-[75px]"></div>
+<div class="h-18.75"></div>
 
 <style>
   :global([data-theme="dark"] .swagger-ui) {

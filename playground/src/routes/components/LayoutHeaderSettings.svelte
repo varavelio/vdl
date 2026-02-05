@@ -70,7 +70,7 @@
   {/if}
 </button>
 
-<Modal bind:isOpen class="max-w-3xl">
+<Modal bind:isOpen class="size-[80%] max-h-200 max-w-200">
   <div class="flex w-full items-center justify-between">
     <h3 class="text-xl font-bold">Settings</h3>
     <button class="btn btn-circle btn-ghost" onclick={closeModal}>
@@ -78,7 +78,7 @@
     </button>
   </div>
 
-  <p>Settings are saved in your browser's local storage.</p>
+  <p>Settings are saved in your browser's storage.</p>
 
   <div class="mt-4 space-y-4">
     <fieldset class="fieldset">
@@ -115,7 +115,7 @@
 
       {#if storeSettings.store.headers.length > 0}
         <div class="overflow-x-auto">
-          <table class="table-xs table w-full min-w-[720px]">
+          <table class="table-xs table w-full min-w-180">
             <thead>
               <tr>
                 <th class="w-0"></th>
