@@ -1,6 +1,6 @@
 import { createStore } from "$lib/createStore.svelte";
 
-type Input = object;
+type Input = Record<string, unknown>;
 type Output = string;
 type Date = string;
 type HistoryInput = string;
