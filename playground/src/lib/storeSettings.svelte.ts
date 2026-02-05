@@ -87,7 +87,8 @@ export interface StoreSettings {
   vdlSchema: string;
   vdlSchemaExpanded: string;
   irSchema: IrSchema;
-  openApiSchema: string;
+  openApiYamlSchema: string;
+  openApiJsonSchema: string;
 }
 
 const fetchConfig = async () => {
@@ -143,7 +144,8 @@ async function storeSettingsGetInitialValue(): Promise<StoreSettings> {
     headers,
     vdlSchema: "",
     vdlSchemaExpanded: "",
-    openApiSchema: "",
+    openApiYamlSchema: "",
+    openApiJsonSchema: "",
     irSchema: {
       constants: [],
       enums: [],
@@ -333,7 +335,7 @@ export const loadVdlSchema = async (url: string) => {
  * @param vdlSchema The VDL schema string to be loaded into the store.
  */
 const loadVdlSchemaFromString = async (vdlSchema: string) => {
-  const [expanded, ir, oapi] = await Promise.all([
+  const [expanded, ir, oapi, oapiJson] = await Promise.all([
     wasmClient.expandTypes(vdlSchema),
     wasmClient.codegen({
       vdlSchema,
@@ -351,6 +353,17 @@ const loadVdlSchemaFromString = async (vdlSchema: string) => {
           title: "VDL OpenAPI",
           version: "1.0.0",
           filename: "openapi.yaml",
+          output: "",
+        },
+      },
+    }),
+    wasmClient.codegen({
+      vdlSchema,
+      target: {
+        openapi: {
+          title: "VDL OpenAPI",
+          version: "1.0.0",
+          filename: "openapi.json",
           output: "",
         },
       },
@@ -373,10 +386,19 @@ const loadVdlSchemaFromString = async (vdlSchema: string) => {
     }
   }
 
+  let openapiJson = "";
+  for (const file of oapiJson.files) {
+    if (file.path.endsWith(".json")) {
+      openapiJson = file.content;
+      break;
+    }
+  }
+
   storeSettings.store.vdlSchema = vdlSchema;
   storeSettings.store.vdlSchemaExpanded = expanded;
   storeSettings.store.irSchema = JSON.parse(irSchema) as IrSchema;
-  storeSettings.store.openApiSchema = openapi;
+  storeSettings.store.openApiYamlSchema = openapi;
+  storeSettings.store.openApiJsonSchema = openapiJson;
 
   await indexSearchItems();
 };

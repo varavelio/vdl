@@ -32,7 +32,7 @@
 
   <Code
     lang="yaml"
-    code={storeSettings.store.openApiSchema}
+    code={storeSettings.store.openApiYamlSchema}
     class="min-h-0 flex-1"
   />
 </Modal>
