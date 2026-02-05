@@ -1,16 +1,16 @@
 <script lang="ts">
   import {
     BookOpenText,
-    Braces,
     FileText,
     House,
     LibraryIcon,
-    List,
     Lock,
     NetworkIcon,
     Radio,
     Regex,
     ServerCog,
+    Tags,
+    Type,
     X,
     Zap,
   } from "@lucide/svelte";
@@ -230,7 +230,7 @@
         referenceItems.push({
           kind: "link",
           label: "Enums",
-          icon: List,
+          icon: Tags,
           href: `#/enums`,
         });
       }
@@ -238,7 +238,7 @@
         referenceItems.push({
           kind: "link",
           label: "Types",
-          icon: Braces,
+          icon: Type,
           href: `#/types`,
         });
       }
