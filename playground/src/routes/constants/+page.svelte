@@ -1,6 +1,6 @@
 <script lang="ts">
   import { pushState } from "$app/navigation";
-  import { Copy, Hash, Link, TriangleAlert } from "@lucide/svelte";
+  import { Copy, Link, Lock, TriangleAlert } from "@lucide/svelte";
   import { onMount } from "svelte";
 
   import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
@@ -59,7 +59,7 @@
     >
       <div class="card bg-base-200 w-full max-w-md shadow-lg">
         <div class="card-body items-center text-center">
-          <Hash class="text-base-content/40 mb-4 size-16" />
+          <Lock class="text-base-content/40 mb-4 size-16" />
           <H1 class="text-2xl">No Constants Defined</H1>
           <p class="text-base-content/60 mt-2">
             Your schema doesn't have any constants yet.
