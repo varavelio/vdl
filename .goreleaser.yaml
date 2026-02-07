@@ -6,7 +6,7 @@
 version: 2
 
 project_name: vdl
-dist: ./toolchain/dist/goreleaser
+dist: ./dist
 
 before:
   hooks:

@@ -2,5 +2,10 @@
 temp/
 tmp/
 
+# Build outputs
+dist/
+out/
+build/
+
 # NodeJS
 node_modules/
