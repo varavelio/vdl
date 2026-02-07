@@ -22,25 +22,14 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: >
-            /bin/bash -c "
-              task deps &&
-              task setversion &&
-              task fmt-check &&
-              task lint &&
-              task test &&
-              task build
-            "
+          runCmd: /bin/bash -c "task release"
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            ./toolchain/dist/vdl-darwin-amd64
-            ./toolchain/dist/vdl-darwin-arm64
-            ./toolchain/dist/vdl-linux-amd64
-            ./toolchain/dist/vdl-linux-arm64
-            ./toolchain/dist/vdl-windows-amd64.exe
-            ./toolchain/dist/vdl-windows-arm64.exe
-            ./toolchain/dist/vdl.wasm
-            ./toolchain/dist/wasm_exec.js
+        files: |
+          ./toolchain/dist/goreleaser/*.tar.gz
+          ./toolchain/dist/goreleaser/*.zip
+          ./toolchain/dist/goreleaser/*.txt
+          ./toolchain/dist/goreleaser/*.js
+          ./toolchain/dist/goreleaser/*.wasm
