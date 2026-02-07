@@ -53,10 +53,6 @@ tasks:
       - task tc:install
       - vdl generate
 
-  setversion:
-    desc: "Sync project version from git tag to all files"
-    cmd: node ./scripts/set-version.ts
-
   format:
     desc: "Format all code"
     cmds:

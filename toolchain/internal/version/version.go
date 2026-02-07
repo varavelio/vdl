@@ -9,29 +9,20 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
+// These variables are set at build time using ldflags
+var (
+	// Version is the vdl version, set at build time using ldflags. This string does not contain the "v" prefix.
+	Version = "0.0.0-dev"
+	// Commit is the git commit hash, set at build time using ldflags.
+	Commit = "unknown"
+	// Date is the build date, set at build time using ldflags.
+	Date = "unknown"
+)
+
 func init() {
 	// Clean up the Version
-	Version = strings.TrimPrefix(strings.TrimSpace(Version), "v")
-
-	// Set VersionMajor based on Version
-	parts := strings.Split(Version, ".")
-	if len(parts) > 0 {
-		VersionMajor = parts[0]
-	}
+	Version = strings.TrimPrefix(strings.TrimSpace(strings.ToLower(Version)), "v")
 }
-
-var (
-	// Version is replaced during the release process by the latest Git tag
-	// and should not be manually edited.
-	//
-	// This string does not contain the "v" prefix.
-	Version = "0.0.0-dev"
-
-	// VersionMajor is the major version extracted from Version.
-	//
-	// This string does not contain the "v" prefix.
-	VersionMajor = "0"
-)
 
 // asciiArtRaw is used to generate AsciiArt
 var asciiArtRaw = strings.TrimSpace(`
