@@ -43,3 +43,6 @@ archives:
 checksum:
   name_template: checksums.txt
   algorithm: sha256
+  extra_files:
+    - glob: ./toolchain/dist/vdl.wasm
+    - glob: ./toolchain/dist/wasm_exec.js

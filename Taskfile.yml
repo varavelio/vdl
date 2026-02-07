@@ -33,7 +33,10 @@ tasks:
 
   release:
     desc: "Build all for release using goreleaser"
-    cmd: goreleaser release --clean --fail-fast --auto-snapshot --skip=publish --config=.goreleaser.yaml
+    cmds:
+      - goreleaser release --clean --fail-fast --auto-snapshot --skip=publish --config=.goreleaser.yaml
+      - cp ./toolchain/dist/vdl.wasm ./dist/ # Goreleaser cant copy this with vdl deploy workflow
+      - cp ./toolchain/dist/wasm_exec.js ./dist/ # Goreleaser cant copy this with vdl deploy workflow
 
   deps:
     desc: "Install dependencies for all subprojects (Go, Node, etc)"
