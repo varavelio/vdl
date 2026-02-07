@@ -8,6 +8,7 @@ jobs:
   build-and-upload:
     name: Build and upload release
     runs-on: ubuntu-latest
+    if: "!contains(github.event.release.tag_name, 'vscode')"
     timeout-minutes: 20
 
     steps:
