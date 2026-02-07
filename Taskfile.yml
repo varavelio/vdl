@@ -33,7 +33,7 @@ tasks:
 
   release:
     desc: "Build all for release using goreleaser"
-    cmd: goreleaser release --clean --skip=publish
+    cmd: goreleaser release --clean --fail-fast --skip=publish --config=.goreleaser.yaml
 
   deps:
     desc: "Install dependencies for all subprojects (Go, Node, etc)"
