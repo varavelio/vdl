@@ -35,6 +35,8 @@ tasks:
     desc: "Build all for release by running ./scripts/release"
     cmds:
       - task: deps
+      - task: tc:build:wasm
+      - rm -rf ./dist && mkdir ./dist
       - go run -C ./scripts ./release/.
 
   deps:

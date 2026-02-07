@@ -53,6 +53,7 @@ func run() error {
 	if err := os.Chdir(root); err != nil {
 		return fmt.Errorf("could not chdir to project root: %w", err)
 	}
+	distDir := filepath.Join(root, "dist")
 	fmt.Printf("Working directory: %s\n", root)
 
 	// Initialize Version Variables
@@ -60,24 +61,6 @@ func run() error {
 		return fmt.Errorf("failed to init variables: %w", err)
 	}
 	fmt.Printf("Releasing Version: %s (Commit: %s, Date: %s)\n", Version, Commit, Date)
-
-	// Clean and Create dist/ directory
-	distDir := filepath.Join(root, "dist")
-	if err := os.RemoveAll(distDir); err != nil {
-		return fmt.Errorf("failed to clean dist directory: %w", err)
-	}
-	if err := os.MkdirAll(distDir, 0755); err != nil {
-		return fmt.Errorf("failed to create dist directory: %w", err)
-	}
-
-	// Build WASM
-	fmt.Println("Building WASM...")
-	cmd := exec.Command("task", "tc:build:wasm")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to run task tc:build:wasm: %w", err)
-	}
 
 	// Copy WASM Artifacts to dist/
 	wasmSource := filepath.Join(root, "toolchain", "dist", "vdl.wasm")
