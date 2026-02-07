@@ -44,8 +44,6 @@ func main() {
 
 func run() error {
 	// Setup and Move CWD to the repository root
-	// Assuming this script is run via `go run ./scripts/release/main.go` from root or `go run .` from scripts/release
-	// We want to be at the project root.
 	root, err := findProjectRoot()
 	if err != nil {
 		return fmt.Errorf("could not find project root: %w", err)
@@ -62,17 +60,17 @@ func run() error {
 	}
 	fmt.Printf("Releasing Version: %s (Commit: %s, Date: %s)\n", Version, Commit, Date)
 
-	// Copy WASM Artifacts to dist/
-	wasmSource := filepath.Join(root, "toolchain", "dist", "vdl.wasm")
-	wasmDest := filepath.Join(distDir, "vdl.wasm")
-	if err := copyFile(wasmSource, wasmDest); err != nil {
-		return fmt.Errorf("failed to copy vdl.wasm: %w", err)
+	// Clean and Create dist/ directory
+	if err := os.RemoveAll(distDir); err != nil {
+		return fmt.Errorf("failed to clean dist directory: %w", err)
+	}
+	if err := os.MkdirAll(distDir, 0755); err != nil {
+		return fmt.Errorf("failed to create dist directory: %w", err)
 	}
 
-	wasmExecSource := filepath.Join(root, "toolchain", "dist", "wasm_exec.js")
-	wasmExecDest := filepath.Join(distDir, "wasm_exec.js")
-	if err := copyFile(wasmExecSource, wasmExecDest); err != nil {
-		return fmt.Errorf("failed to copy wasm_exec.js: %w", err)
+	// Build and archive WASM
+	if err := buildAndArchiveWasm(root, distDir); err != nil {
+		return fmt.Errorf("failed to build and archive wasm: %w", err)
 	}
 
 	// Build and Archive CLI Binaries
@@ -99,11 +97,9 @@ func findProjectRoot() (string, error) {
 		return "", err
 	}
 	for {
-		// Check for Taskfile.yml as the indicator of project root
 		if _, err := os.Stat(filepath.Join(dir, "Taskfile.yml")); err == nil {
 			return dir, nil
 		}
-
 		parent := filepath.Dir(dir)
 		if parent == dir {
 			return "", fmt.Errorf("root not found")
@@ -125,6 +121,57 @@ func initVariables() error {
 		return fmt.Errorf("git rev-parse failed: %w", err)
 	}
 	Commit = strings.TrimSpace(string(out))
+	return nil
+}
+
+func buildAndArchiveWasm(root, distDir string) error {
+	fmt.Println("Building WASM...")
+
+	// Build vdl.wasm
+	wasmPath := filepath.Join(distDir, "vdl.wasm")
+	cmd := exec.Command("go", "build", "-o", wasmPath, "./cmd/vdlwasm/.")
+	cmd.Dir = filepath.Join(root, "toolchain")
+	cmd.Env = append(os.Environ(), "GOOS=js", "GOARCH=wasm")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to build wasm: %w", err)
+	}
+
+	// Copy wasm_exec.js
+	// We need to locate where Go is installed to find wasm_exec.js
+	// Usually GOROOT is set, or we can use `go env GOROOT`
+	goRootOut, err := exec.Command("go", "env", "GOROOT").Output()
+	if err != nil {
+		return fmt.Errorf("failed to get GOROOT: %w", err)
+	}
+	goRoot := strings.TrimSpace(string(goRootOut))
+	wasmExecSrc := filepath.Join(goRoot, "lib/wasm/wasm_exec.js")
+	wasmExecDst := filepath.Join(distDir, "wasm_exec.js")
+
+	if err := copyFile(wasmExecSrc, wasmExecDst); err != nil {
+		return fmt.Errorf("failed to copy wasm_exec.js: %w", err)
+	}
+
+	// Prepare extra files for archive (README, LICENSE)
+	extraFiles := []string{"README.md", "LICENSE"}
+
+	filesToArchive := make(map[string]string) // src -> name in archive
+	filesToArchive[wasmPath] = "vdl.wasm"
+	filesToArchive[wasmExecDst] = "wasm_exec.js"
+
+	for _, f := range extraFiles {
+		src := filepath.Join(root, f)
+		if _, err := os.Stat(src); err == nil {
+			filesToArchive[src] = f
+		}
+	}
+
+	// Create vdl_wasm.tar.gz
+	archivePath := filepath.Join(distDir, "vdl_wasm.tar.gz")
+	if err := createTarGz(archivePath, filesToArchive); err != nil {
+		return fmt.Errorf("failed to create wasm archive: %w", err)
+	}
 
 	return nil
 }
@@ -158,16 +205,28 @@ func buildAndArchive(root, distDir string, bin Binary) error {
 		return fmt.Errorf("go build failed: %w", err)
 	}
 
+	// Prepare files for archive
+	filesToArchive := make(map[string]string)
+	filesToArchive[rawBinPath] = binaryName
+
+	extraFiles := []string{"README.md", "LICENSE"}
+	for _, f := range extraFiles {
+		src := filepath.Join(root, f)
+		if _, err := os.Stat(src); err == nil {
+			filesToArchive[src] = f
+		}
+	}
+
 	// Archive
 	archiveName := fmt.Sprintf("vdl_%s_%s.%s", bin.OS, bin.Arch, archiveType)
 	archivePath := filepath.Join(distDir, archiveName)
 
 	if archiveType == "zip" {
-		if err := zipFile(rawBinPath, archivePath, binaryName); err != nil {
+		if err := createZip(archivePath, filesToArchive); err != nil {
 			return err
 		}
 	} else {
-		if err := tarGzFile(rawBinPath, archivePath, binaryName); err != nil {
+		if err := createTarGz(archivePath, filesToArchive); err != nil {
 			return err
 		}
 	}
@@ -197,7 +256,7 @@ func copyFile(src, dst string) error {
 	return err
 }
 
-func zipFile(source, target, nameInArchive string) error {
+func createZip(target string, files map[string]string) error {
 	zipfile, err := os.Create(target)
 	if err != nil {
 		return err
@@ -207,7 +266,16 @@ func zipFile(source, target, nameInArchive string) error {
 	archive := zip.NewWriter(zipfile)
 	defer archive.Close()
 
-	info, err := os.Stat(source)
+	for src, name := range files {
+		if err := addFileToZip(archive, src, name); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func addFileToZip(archive *zip.Writer, src, name string) error {
+	info, err := os.Stat(src)
 	if err != nil {
 		return err
 	}
@@ -216,7 +284,7 @@ func zipFile(source, target, nameInArchive string) error {
 	if err != nil {
 		return err
 	}
-	header.Name = nameInArchive
+	header.Name = name
 	header.Method = zip.Deflate
 
 	writer, err := archive.CreateHeader(header)
@@ -224,7 +292,7 @@ func zipFile(source, target, nameInArchive string) error {
 		return err
 	}
 
-	file, err := os.Open(source)
+	file, err := os.Open(src)
 	if err != nil {
 		return err
 	}
@@ -234,7 +302,7 @@ func zipFile(source, target, nameInArchive string) error {
 	return err
 }
 
-func tarGzFile(source, target, nameInArchive string) error {
+func createTarGz(target string, files map[string]string) error {
 	file, err := os.Create(target)
 	if err != nil {
 		return err
@@ -247,7 +315,16 @@ func tarGzFile(source, target, nameInArchive string) error {
 	tw := tar.NewWriter(gw)
 	defer tw.Close()
 
-	info, err := os.Stat(source)
+	for src, name := range files {
+		if err := addFileToTar(tw, src, name); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func addFileToTar(tw *tar.Writer, src, name string) error {
+	info, err := os.Stat(src)
 	if err != nil {
 		return err
 	}
@@ -256,13 +333,13 @@ func tarGzFile(source, target, nameInArchive string) error {
 	if err != nil {
 		return err
 	}
-	header.Name = nameInArchive
+	header.Name = name
 
 	if err := tw.WriteHeader(header); err != nil {
 		return err
 	}
 
-	srcFile, err := os.Open(source)
+	srcFile, err := os.Open(src)
 	if err != nil {
 		return err
 	}
