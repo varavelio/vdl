@@ -19,11 +19,6 @@ var (
 	Date = "unknown"
 )
 
-func init() {
-	// Clean up the Version
-	Version = strings.TrimPrefix(strings.TrimSpace(strings.ToLower(Version)), "v")
-}
-
 // asciiArtRaw is used to generate AsciiArt
 var asciiArtRaw = strings.TrimSpace(`
 ██╗  ██╗█████╗ ██╗
