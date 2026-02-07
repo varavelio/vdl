@@ -32,5 +32,3 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.zip
             ./dist/*.txt
-            ./dist/*.js
-            ./dist/*.wasm
