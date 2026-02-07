@@ -26,14 +26,16 @@ tasks:
   ci:
     desc: "Run full CI pipeline (deps, test, lint, build)"
     cmds:
-      - task deps
-      - task test
-      - task lint
-      - task build
+      - task: deps
+      - task: test
+      - task: lint
+      - task: build
 
   release:
     desc: "Build all for release by running ./scripts/release"
-    cmd: go run -C ./scripts ./release/.
+    cmds:
+      - task: deps
+      - go run -C ./scripts ./release/.
 
   deps:
     desc: "Install dependencies for all subprojects (Go, Node, etc)"
@@ -53,7 +55,7 @@ tasks:
   codegen:
     desc: "Run all code generators"
     cmds:
-      - task tc:install
+      - task: tc:install
       - vdl generate
 
   format:
