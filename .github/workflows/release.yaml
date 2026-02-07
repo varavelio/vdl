@@ -1,4 +1,4 @@
-name: Release Build and Upload
+name: Release
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-upload:
-    name: Build and Upload to Release
+    name: Build and upload release
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
