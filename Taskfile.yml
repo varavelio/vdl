@@ -32,11 +32,8 @@ tasks:
       - task build
 
   release:
-    desc: "Build all for release using goreleaser"
-    cmds:
-      - goreleaser release --clean --fail-fast --auto-snapshot --skip=publish --config=.goreleaser.yaml
-      - cp ./toolchain/dist/vdl.wasm ./dist/ # Goreleaser cant copy this with vdl deploy workflow
-      - cp ./toolchain/dist/wasm_exec.js ./dist/ # Goreleaser cant copy this with vdl deploy workflow
+    desc: "Build all for release by running ./scripts/release"
+    cmd: go run -C ./scripts ./release/.
 
   deps:
     desc: "Install dependencies for all subprojects (Go, Node, etc)"
@@ -45,7 +42,6 @@ tasks:
       - cd ./toolchain && go mod download
       - cd ./playground && npm install
       - cd ./docs && npm install
-      - npm i -g @goreleaser/goreleaser@2.13.3
 
   build:
     desc: "Build everything for current system (WASM, Playground, and VDL CLI)"
