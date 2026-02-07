@@ -12,7 +12,7 @@ before:
   hooks:
     - task deps
     - task tc:build:wasm
-    - task pg:build
+    # - task pg:build
 
 builds:
   - dir: ./toolchain
