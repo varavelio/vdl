@@ -31,6 +31,10 @@ tasks:
       - task lint
       - task build
 
+  release:
+    desc: "Build all for release using goreleaser"
+    cmd: goreleaser release --clean --skip=publish
+
   deps:
     desc: "Install dependencies for all subprojects (Go, Node, etc)"
     cmds:
@@ -41,11 +45,11 @@ tasks:
       - npm i -g @goreleaser/goreleaser@2.13.3
 
   build:
-    desc: "Build everything (WASM, Playground, and VDL CLI)"
+    desc: "Build everything for current system (WASM, Playground, and VDL CLI)"
     cmds:
-      - cd ./toolchain && task build:wasm # <- Required by the playground
-      - cd ./playground && npm run build # <- Required by the final VDL binary
-      - cd ./toolchain && task build:vdl
+      - task: tc:build:wasm # <- Required by the playground
+      - task: pg:build # <- Required by the final VDL binary
+      - task: tc:build:vdl
 
   codegen:
     desc: "Run all code generators"
