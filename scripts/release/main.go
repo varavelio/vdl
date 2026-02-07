@@ -173,6 +173,14 @@ func buildAndArchiveWasm(root, distDir string) error {
 		return fmt.Errorf("failed to create wasm archive: %w", err)
 	}
 
+	// Cleanup raw WASM files
+	if err := os.Remove(wasmPath); err != nil {
+		return fmt.Errorf("failed to remove vdl.wasm: %w", err)
+	}
+	if err := os.Remove(wasmExecDst); err != nil {
+		return fmt.Errorf("failed to remove wasm_exec.js: %w", err)
+	}
+
 	return nil
 }
 
