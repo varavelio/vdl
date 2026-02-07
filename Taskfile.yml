@@ -38,6 +38,7 @@ tasks:
       - cd ./toolchain && go mod download
       - cd ./playground && npm install
       - cd ./docs && npm install
+      - npm i -g @goreleaser/goreleaser@2.13.3
 
   build:
     desc: "Build everything (WASM, Playground, and VDL CLI)"
