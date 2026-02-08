@@ -1,16 +1,50 @@
-# VDL
-
 <center>
-  <img src="./assets/icon.png" width="100" height="100"/>
+  <img src="./assets/png/vdl.png" height="100"/>
 </center>
 
 <center>
-  <h2>Modern RPC framework that puts developer experience first.</h2>
+  <h1>Varavel Definition Language</h1>
 </center>
 
-VDL is a complete and modern API development ecosystem, designed for building robust, strongly-typed, and maintainable network services. It was born from the need for a tool that combines the simplicity and readability of REST APIs with the type safety and performance of more complex RPC frameworks.
+VDL is the open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.
 
-Learn more at [Docs](./docs).
+Learn more at [https://varavel.com/vdl](https://varavel.com/vdl).
+
+## Installation
+
+### macOS & Linux
+
+```bash
+curl -fsSL https://get.varavel.com/vdl | sh
+```
+
+For more installation options using this installer, visit [https://get.varavel.com/vdl](https://get.varavel.com/vdl).
+
+### Windows
+
+```powershell
+irm https://get.varavel.com/vdl.ps1 | iex
+```
+
+For more installation options using this installer, visit [https://get.varavel.com/vdl.ps1](https://get.varavel.com/vdl.ps1).
+
+### NPM (Cross platform)
+
+**Local (Recommended):**
+Ensures version consistency across your team. Use it via `npx vdl` or from `package.json` scripts.
+
+```bash
+npm install --save-dev @varavel/vdl
+```
+
+**Global:**
+Makes `vdl` available system-wide.
+
+```bash
+npm install --global @varavel/vdl
+```
+
+For more details using this package, visit the [npm package page](https://www.npmjs.com/package/@varavel/vdl).
 
 ## What is VDL?
 
