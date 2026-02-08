@@ -80,10 +80,6 @@ trap cleanup EXIT
 
 # Dependency Check
 check_dependencies() {
-  if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
-    log_error "Missing dependency: curl or wget is required."
-    exit 1
-  fi
   if ! command -v tar >/dev/null 2>&1; then
     log_error "Missing dependency: tar is required."
     exit 1
@@ -124,14 +120,7 @@ detect_platform() {
 get_version() {
   if [ -z "$VERSION" ] || [ "$VERSION" = "latest" ]; then
     log_info "Fetching latest version..."
-    # Use header inspection to avoid API rate limits
-    if command -v curl >/dev/null 2>&1; then
-      URL_LATEST="https://github.com/$REPO/releases/latest"
-      VERSION=$(curl -sSfI "$URL_LATEST" | grep -i "location:" | sed -E 's/.*\/tag\/v?([^\r\n]+).*/v\1/')
-    else
-      URL_LATEST="https://github.com/$REPO/releases/latest"
-      VERSION=$(wget -S --spider "$URL_LATEST" 2>&1 | grep -i "location:" | sed -E 's/.*\/tag\/v?([^\r\n]+).*/v\1/')
-    fi
+    VERSION=$(curl -sSfI "https://github.com/$REPO/releases/latest" | grep -i "location:" | sed -E 's/.*\/tag\/v?([^\r\n]+).*/v\1/')
   fi
 
   # Ensure version starts with 'v'
@@ -157,16 +146,10 @@ download_and_install() {
   log_info "Installing version: $VERSION"
   log_info "Downloading $FILENAME..."
 
-  if command -v curl >/dev/null 2>&1; then
-    curl -sSfL "$DOWNLOAD_URL" -o "$TMP_DIR/$FILENAME" || { log_error "Download failed."; exit 1; }
-    curl -sSfL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt" || { log_error "Checksum download failed."; exit 1; }
-  else
-    wget -q "$DOWNLOAD_URL" -O "$TMP_DIR/$FILENAME" || { log_error "Download failed."; exit 1; }
-    wget -q "$CHECKSUMS_URL" -O "$TMP_DIR/checksums.txt" || { log_error "Checksum download failed."; exit 1; }
-  fi
+  curl -sSfL "$DOWNLOAD_URL" -o "$TMP_DIR/$FILENAME" || { log_error "Download failed."; exit 1; }
+  curl -sSfL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt" || { log_error "Checksum download failed."; exit 1; }
 
   log_info "Verifying checksum..."
-  # Verify checksum
   cd "$TMP_DIR"
   if command -v sha256sum >/dev/null 2>&1; then
     grep "$FILENAME" checksums.txt | sha256sum -c - >/dev/null 2>&1 || { log_error "Checksum verification failed!"; exit 1; }
@@ -188,15 +171,12 @@ download_and_install() {
 
   log_info "Installing to $INSTALL_DIR..."
 
-  # Check if install dir exists, create if needed (requires permissions)
   if [ ! -d "$INSTALL_DIR" ]; then
-    mkdir -p "$INSTALL_DIR" || {
-      if [ -w "$(dirname "$INSTALL_DIR")" ]; then
-        mkdir -p "$INSTALL_DIR"
-      elif command -v sudo >/dev/null 2>&1; then
+    mkdir -p "$INSTALL_DIR" 2>/dev/null || {
+      if command -v sudo >/dev/null 2>&1; then
         sudo mkdir -p "$INSTALL_DIR"
       else
-        log_error "Cannot create directory $INSTALL_DIR. Permission denied."
+        log_error "Cannot create directory $INSTALL_DIR. Permission denied. Retry with sudo."
         exit 1
       fi
     }
@@ -208,18 +188,17 @@ download_and_install() {
     chmod +x "$INSTALL_DIR/$BINARY_NAME"
   else
     if command -v sudo >/dev/null 2>&1; then
-      # Check if interactive terminal is available for sudo prompt
       if [ -t 0 ]; then
         log_warn "$INSTALL_DIR is not writable. Attempting sudo..."
         sudo mv "$BIN_SOURCE" "$INSTALL_DIR/"
         sudo chmod +x "$INSTALL_DIR/$BINARY_NAME"
       else
         log_error "Cannot install to $INSTALL_DIR (permission denied) and no TTY for sudo."
-        log_info "Try installing to a user directory: INSTALL_DIR=\$HOME/.local/bin sh install.sh"
+        log_info "Try: curl -fsSL https://get.varavel.com/vdl | INSTALL_DIR=\$HOME/.local/bin sh"
         exit 1
       fi
     else
-      log_error "Cannot install to $INSTALL_DIR. Permission denied and sudo not available."
+      log_error "Cannot install to $INSTALL_DIR. Permission denied."
       exit 1
     fi
   fi
@@ -228,7 +207,6 @@ download_and_install() {
   log_info "Run '$BINARY_NAME --version' to verify."
 }
 
-# Main execution flow
 setup_colors
 print_banner
 check_dependencies
