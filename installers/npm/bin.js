@@ -2,9 +2,22 @@
 
 const { spawn } = require("node:child_process");
 const { getBinaryPath } = require("./index.js");
+const { install } = require("./install.js");
 
-try {
-  const binPath = getBinaryPath();
+async function main() {
+  let binPath;
+  try {
+    binPath = getBinaryPath();
+  } catch (_) {
+    try {
+      await install();
+      binPath = getBinaryPath();
+    } catch (installError) {
+      console.error(installError.message);
+      process.exit(1);
+    }
+  }
+
   const args = process.argv.slice(2);
 
   // Spawn vdl
@@ -28,7 +41,9 @@ try {
     console.error(err.message);
     process.exit(1);
   });
-} catch (e) {
-  console.error(e.message);
-  process.exit(1);
 }
+
+main().catch((err) => {
+  console.error(err.message);
+  process.exit(1);
+});

@@ -33,7 +33,6 @@ function getVersion() {
 module.exports = {
   getBinaryPath,
   getVersion,
-  binaryPath: getBinaryPath(),
 };
 
 // If run directly, print the binary path
