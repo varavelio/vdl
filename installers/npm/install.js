@@ -362,8 +362,8 @@ async function install() {
     console.log(`VDL: Installation complete!`);
     console.log(`VDL: Run 'vdl --version' to verify.`);
   } catch (error) {
-    console.error("Installation failed:");
-    console.error(error.message);
+    console.error("VDL: Installation failed");
+    console.error(`VDL: ${error.message}`);
     process.exit(1);
   }
 }
