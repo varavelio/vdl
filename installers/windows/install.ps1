@@ -6,13 +6,22 @@
   Downloads and installs the VDL binary for Windows.
 
 .EXAMPLE
+  # Install or update to latest version
   irm https://get.varavel.com/vdl.ps1 | iex
 
 .EXAMPLE
+  # Install specific version
   $env:VERSION = "vx.x.x"; irm https://get.varavel.com/vdl.ps1 | iex
 
 .EXAMPLE
+  # Install to a custom directory quietly
   $env:INSTALL_DIR = "$HOME\.local\bin"; $env:QUIET = "true"; irm https://get.varavel.com/vdl.ps1 | iex
+
+.EXAMPLE
+  # If you encounter an execution policy error, use this command instead:
+  powershell -ExecutionPolicy ByPass -Command "irm https://get.varavel.com/vdl.ps1 | iex"
+  # Or with configuration
+  powershell -ExecutionPolicy ByPass -Command "`$env:VERSION = 'vx.x.x'; irm https://get.varavel.com/vdl.ps1 | iex"
 
 .NOTES
   Options (environment variables):
@@ -222,8 +231,7 @@ function Install-Vdl {
     }
 
     Write-Info "Installation complete!"
-    Write-Info "Run '$script:BinaryName --version' to verify."
-    Write-Info "Restart your terminal to use vdl."
+    Write-info "Restart your terminal and run 'vdl --version' to verify."
 
   } finally {
     Invoke-Cleanup
