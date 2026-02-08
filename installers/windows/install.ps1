@@ -9,14 +9,14 @@
   irm https://get.varavel.com/vdl.ps1 | iex
 
 .EXAMPLE
-  $env:VERSION = "v0.4.0"; irm https://get.varavel.com/vdl.ps1 | iex
+  $env:VERSION = "vx.x.x"; irm https://get.varavel.com/vdl.ps1 | iex
 
 .EXAMPLE
   $env:INSTALL_DIR = "$HOME\.local\bin"; $env:QUIET = "true"; irm https://get.varavel.com/vdl.ps1 | iex
 
 .NOTES
   Options (environment variables):
-    VERSION      : Version to install (e.g., v0.4.0). Defaults to "latest".
+    VERSION      : Version to install (e.g., vx.x.x). Defaults to "latest".
     INSTALL_DIR  : Install directory. Defaults to "$env:LOCALAPPDATA\Programs\vdl".
     QUIET        : Set to "true" to suppress output.
 #>
