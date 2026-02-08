@@ -53,5 +53,12 @@ jobs:
           # Update package.json version (this automatically removes v prefix)
           npm version $VERSION --no-git-tag-version --allow-same-version
 
+          if [[ "$VERSION" == *"-"* ]]; then
+            NPM_TAG="next"
+          else
+            NPM_TAG="latest"
+          fi
+          echo "Using npm tag: $NPM_TAG"
+
           # Publish to npm
-          npm publish --provenance --access public
+          npm publish --provenance --access public --tag $NPM_TAG
