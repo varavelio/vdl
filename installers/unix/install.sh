@@ -1,46 +1,77 @@
 #!/bin/sh
 set -e
 
-# ██╗  ██╗█████╗ ██╗
-# ██║  ██║██╔═██╗██║
-# ╚██╗██╔╝██║ ██║██║
-#  ╚███╔╝ █████╔╝█████╗
-#   ╚══╝  ╚════╝ ╚════╝
-#
-# Installer Script (macOS/Linux)
+# ======================================================================================
+# VDL Installer Script (macOS/Linux)
 #
 # Usage:
-#   curl -fsSL https://vdl.varavel.com/install.sh | sh
+#   curl -fsSL https://get.varavel.com/vdl | sh
 #
 # Options:
-#   VERSION      : Specify a version (e.g., v0.4.0). Defaults to "latest".
+#   VERSION      : Specify a version (e.g., vx.x.x). Defaults to "latest".
 #   INSTALL_DIR  : Directory to install the binary. Defaults to "/usr/local/bin".
+#   QUIET        : Set to "true" to suppress all output (e.g., QUIET=true).
 #
 # Examples:
 #   # Install or update to latest version
-#   curl -fsSL https://vdl.varavel.com/install.sh | sh
+#   curl -fsSL https://get.varavel.com/vdl | sh
 #
 #   # Install specific version
-#   curl -fsSL https://vdl.varavel.com/install.sh | VERSION=v0.4.0 sh
+#   curl -fsSL https://get.varavel.com/vdl | VERSION=vx.x.x sh
 #
-#   # Install to a custom directory
-#   curl -fsSL https://vdl.varavel.com/install.sh | INSTALL_DIR=$HOME/.local/bin sh
+#   # Install to a custom directory quietly
+#   curl -fsSL https://get.varavel.com/vdl | INSTALL_DIR=$HOME/.local/bin QUIET=true sh
+# ======================================================================================
 
 # Configuration
 REPO="varavelio/vdl"
 BINARY_NAME="vdl"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 VERSION="${VERSION:-}"
+QUIET="${QUIET:-false}"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
+# Colors and formatting
+setup_colors() {
+  if [ -t 1 ] && [ "$QUIET" != "true" ]; then
+    RED='\033[31m'
+    GREEN='\033[32m'
+    YELLOW='\033[33m'
+    BLUE='\033[34m'
+    BOLD='\033[1m'
+    NC='\033[0m'
+  else
+    RED=''
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    BOLD=''
+    NC=''
+  fi
+}
 
-log_info() { printf "${GREEN}[INFO]${NC} %s\n" "$1"; }
-log_warn() { printf "${YELLOW}[WARN]${NC} %s\n" "$1"; }
-log_error() { printf "${RED}[ERROR]${NC} %s\n" "$1" >&2; }
+log_info() {
+  if [ "$QUIET" != "true" ]; then printf "${GREEN}[INFO]${NC} %s\n" "$1"; fi
+}
+
+log_warn() {
+  if [ "$QUIET" != "true" ]; then printf "${YELLOW}[WARN]${NC} %s\n" "$1"; fi
+}
+
+log_error() {
+  if [ "$QUIET" != "true" ]; then printf "${RED}[ERROR]${NC} %s\n" "$1" >&2; fi
+}
+
+print_banner() {
+  if [ "$QUIET" != "true" ]; then
+    printf "${BLUE}${BOLD}"
+    printf "██╗  ██╗█████╗ ██╗\n"
+    printf "██║  ██║██╔═██╗██║\n"
+    printf "╚██╗██╔╝██║ ██║██║\n"
+    printf " ╚███╔╝ █████╔╝█████╗\n"
+    printf "  ╚══╝  ╚════╝ ╚════╝"
+    printf "${NC}\n"
+  fi
+}
 
 cleanup() {
   if [ -d "$TMP_DIR" ]; then rm -rf "$TMP_DIR"; fi
@@ -99,7 +130,7 @@ get_version() {
       VERSION=$(curl -sSfI "$URL_LATEST" | grep -i "location:" | sed -E 's/.*\/tag\/v?([^\r\n]+).*/v\1/')
     else
       URL_LATEST="https://github.com/$REPO/releases/latest"
-      VERSION=$(wget -S --spider "$URL_LATEST" 2>&1 | grep "Location:" | sed -E 's/.*\/tag\/v?([^\r\n]+).*/v\1/')
+      VERSION=$(wget -S --spider "$URL_LATEST" 2>&1 | grep -i "location:" | sed -E 's/.*\/tag\/v?([^\r\n]+).*/v\1/')
     fi
   fi
 
@@ -113,19 +144,19 @@ get_version() {
     log_error "Failed to determine version."
     exit 1
   fi
-  log_info "Installing version: $VERSION"
 }
 
 # Download and Verify
 download_and_install() {
   TMP_DIR=$(mktemp -d)
-  
+
   FILENAME="${BINARY_NAME}_${PLATFORM_OS}_${PLATFORM_ARCH}.tar.gz"
   DOWNLOAD_URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
   CHECKSUMS_URL="https://github.com/$REPO/releases/download/$VERSION/checksums.txt"
 
+  log_info "Installing version: $VERSION"
   log_info "Downloading $FILENAME..."
-  
+
   if command -v curl >/dev/null 2>&1; then
     curl -sSfL "$DOWNLOAD_URL" -o "$TMP_DIR/$FILENAME" || { log_error "Download failed."; exit 1; }
     curl -sSfL "$CHECKSUMS_URL" -o "$TMP_DIR/checksums.txt" || { log_error "Checksum download failed."; exit 1; }
@@ -156,7 +187,7 @@ download_and_install() {
   fi
 
   log_info "Installing to $INSTALL_DIR..."
-  
+
   # Check if install dir exists, create if needed (requires permissions)
   if [ ! -d "$INSTALL_DIR" ]; then
     mkdir -p "$INSTALL_DIR" || {
@@ -198,6 +229,8 @@ download_and_install() {
 }
 
 # Main execution flow
+setup_colors
+print_banner
 check_dependencies
 detect_platform
 get_version
