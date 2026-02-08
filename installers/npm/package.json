@@ -1,0 +1,48 @@
+{
+  "name": "@varavel/vdl",
+  "version": "0.0.0-dev",
+  "description": "Open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.",
+  "author": "Varavel",
+  "license": "MIT",
+  "homepage": "https://varavel.com/vdl",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varavelio/vdl.git",
+    "directory": "installers/npm"
+  },
+  "bugs": {
+    "url": "https://github.com/varavelio/vdl/issues"
+  },
+  "main": "index.js",
+  "bin": {
+    "vdl": "bin/vdl"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "keywords": [
+    "rpc",
+    "schema",
+    "codegen",
+    "api",
+    "varavel"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "files": [
+    "bin/",
+    "install.js",
+    "index.js",
+    "README.md"
+  ]
+}

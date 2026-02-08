@@ -1,0 +1,25 @@
+# Only include what's necessary for the npm package
+# Everything else should be excluded
+
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+*.test.js
+test/

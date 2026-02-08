@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+bin/vdl
+bin/vdl.exe
+
+# Temp files
+*.tar.gz
+*.zip
+temp.tar.gz
+temp.zip
+temp_extract/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
