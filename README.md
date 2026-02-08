@@ -1,10 +1,5 @@
-<center>
-  <img src="./assets/png/vdl.png" height="100"/>
-</center>
-
-<center>
-  <h1>Varavel Definition Language</h1>
-</center>
+<img src="./assets/png/vdl.png" height="100"/>
+<h1>Varavel Definition Language</h1>
 
 VDL is the open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.
 
