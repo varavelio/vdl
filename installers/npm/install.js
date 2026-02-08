@@ -256,8 +256,6 @@ function download(url) {
         }
 
         const chunks = [];
-        let totalLength = 0;
-
         response.on("data", (chunk) => {
           chunks.push(chunk);
           totalLength += chunk.length;
