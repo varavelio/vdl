@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+
 jobs:
   build-and-upload:
     name: Build and upload release
@@ -32,3 +35,22 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.zip
             ./dist/*.txt
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Publish to npm
+        run: |
+          cd ./installers/npm
+
+          VERSION=${{ github.event.release.tag_name }}
+          echo "Publishing version: $VERSION"
+
+          # Update package.json version (this automatically removes v prefix)
+          npm version $VERSION --no-git-tag-version --allow-same-version
+
+          # Publish to npm
+          npm publish --provenance --access public
