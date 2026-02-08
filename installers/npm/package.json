@@ -15,8 +15,15 @@
   },
   "main": "index.js",
   "bin": {
-    "vdl": "bin/vdl"
+    "vdl": "bin.js"
   },
+  "files": [
+    "bin.js",
+    "install.js",
+    "index.js",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "postinstall": "node install.js"
   },
@@ -38,11 +45,5 @@
   "cpu": [
     "x64",
     "arm64"
-  ],
-  "files": [
-    "bin/",
-    "install.js",
-    "index.js",
-    "README.md"
   ]
 }

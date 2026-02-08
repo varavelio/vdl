@@ -14,7 +14,7 @@ function getBinaryPath() {
   if (!fs.existsSync(binaryPath)) {
     throw new Error(
       `VDL binary not found at ${binaryPath}. ` +
-        `Installation may have failed. Try reinstalling: npm install @varavel/vdl`,
+        `Installation may have failed. Try reinstalling: npm install --global @varavel/vdl`,
     );
   }
 
