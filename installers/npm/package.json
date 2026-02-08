@@ -13,6 +13,7 @@
   "bugs": {
     "url": "https://github.com/varavelio/vdl/issues"
   },
+  "type": "commonjs",
   "main": "index.js",
   "bin": {
     "vdl": "bin.js"
