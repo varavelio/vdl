@@ -7,7 +7,7 @@
   "homepage": "https://varavel.com/vdl",
   "repository": {
     "type": "git",
-    "url": "https://github.com/varavelio/vdl.git",
+    "url": "git+https://github.com/varavelio/vdl.git",
     "directory": "installers/npm"
   },
   "bugs": {
