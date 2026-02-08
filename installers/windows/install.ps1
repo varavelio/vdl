@@ -74,9 +74,9 @@ function Show-Banner {
   ╚══╝  ╚════╝ ╚════╝
 "@
     if ($script:UseColors) {
-      Write-Host $banner.TrimStart() -ForegroundColor Blue
+      Write-Host $banner -ForegroundColor Blue
     } else {
-      Write-Host $banner.TrimStart()
+      Write-Host $banner
     }
   }
 }
