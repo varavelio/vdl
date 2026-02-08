@@ -64,8 +64,9 @@ tasks:
       - task: tc:format
       - task: pg:format
       - task: vs:format
+      - task: in:format
       - task: dc:format
-      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' '!docs/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' '!installers/npm/**' '!docs/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   test:
     desc: "Run all tests (Toolchain, Toolchain E2E and Playground)"
@@ -79,8 +80,9 @@ tasks:
       - task: tc:lint
       - task: pg:lint
       - task: vs:lint
+      - task: in:lint
       - task: dc:lint
-      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' '!docs/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' '!installers/npm/**' '!docs/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
 
   ###################
   # TOOLCHAIN TASKS #
@@ -231,6 +233,22 @@ tasks:
     desc: "VSCode: Lint code"
     dir: ./editors/vscode
     cmd: npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+
+  ####################
+  # INSTALLERS TASKS #
+  ####################
+
+  in:format:
+    desc: "Installers: Format code"
+    dir: ./installers/npm
+    cmd: npx --no prettier . --write --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+
+  in:lint:
+    desc: "Installers: Lint code"
+    dir: ./installers/npm
+    cmds:
+      - npx --no biome lint . --config-path ../../biome.json
+      - npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
 
   ##############
   # DOCS TASKS #
