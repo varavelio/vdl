@@ -6,9 +6,10 @@ This directory contains the npm package installer for VDL. It provides a seamles
 
 1. **User installs**: `npm install -g @varavel/vdl`
 2. **Postinstall runs**: `install.js` executes automatically
-3. **Binary downloads**: Downloads from GitHub releases based on platform/arch
-4. **Binary extracts**: Extracts to `bin/` directory
-5. **Ready to use**: `vdl` command is now available
+3. **Archive downloads**: Downloads from GitHub releases based on platform/arch
+4. **Archive check**: Check if the file is not corrupted by checking its sha256 hash
+5. **Binary extracts**: Extracts to `bin/` directory
+6. **Ready to use**: `vdl` command is now available
 
 ## Publishing to npm
 
