@@ -4,6 +4,7 @@ const { execSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
 const https = require("node:https");
+const crypto = require("node:crypto");
 
 const PLATFORM_MAP = {
   darwin: "darwin",
@@ -64,17 +65,65 @@ function getBinaryName() {
 }
 
 /**
+ * Gets the release filename for the current platform/arch.
+ * @returns {string} Filename (e.g., vdl_linux_amd64.tar.gz)
+ */
+function getReleaseFilename() {
+  const platform = getPlatform();
+  const arch = getArch();
+  const ext = platform === "windows" ? "zip" : "tar.gz";
+  return `vdl_${platform}_${arch}.${ext}`;
+}
+
+/**
  * Constructs the GitHub release download URL for the current platform.
  * @returns {string} Download URL
  */
 function getDownloadURL() {
   const version = getVersion();
-  const platform = getPlatform();
-  const arch = getArch();
-  const ext = platform === "windows" ? "zip" : "tar.gz";
-  const filename = `vdl_${platform}_${arch}.${ext}`;
-
+  const filename = getReleaseFilename();
   return `https://github.com/varavelio/vdl/releases/download/v${version}/${filename}`;
+}
+
+/**
+ * Constructs the GitHub release checksums URL.
+ * @returns {string} Checksums URL
+ */
+function getChecksumsURL() {
+  const version = getVersion();
+  return `https://github.com/varavelio/vdl/releases/download/v${version}/checksums.txt`;
+}
+
+/**
+ * Verifies the SHA256 checksum of the downloaded buffer.
+ * @param {Buffer} binaryBuffer - The downloaded file buffer
+ * @param {Buffer} checksumsBuffer - The downloaded checksums.txt buffer
+ * @param {string} filename - The expected filename in checksums.txt
+ * @throws {Error} If checksum verification fails
+ */
+function verifyChecksum(binaryBuffer, checksumsBuffer, filename) {
+  const checksums = checksumsBuffer.toString("utf8");
+  const expectedLine = checksums
+    .split("\n")
+    .find((line) => line.trim().endsWith(filename));
+
+  if (!expectedLine) {
+    throw new Error(`Checksum for ${filename} not found in checksums.txt`);
+  }
+
+  // Checksums file format is: <hash>  <filename>
+  const expectedHash = expectedLine.split(/\s+/)[0].trim();
+
+  const calculatedHash = crypto
+    .createHash("sha256")
+    .update(binaryBuffer)
+    .digest("hex");
+
+  if (expectedHash !== calculatedHash) {
+    throw new Error(
+      `Checksum verification failed for ${filename}.\nExpected: ${expectedHash}\nCalculated: ${calculatedHash}`,
+    );
+  }
 }
 
 /**
@@ -258,7 +307,6 @@ function download(url) {
         const chunks = [];
         response.on("data", (chunk) => {
           chunks.push(chunk);
-          totalLength += chunk.length;
         });
 
         response.on("end", () => {
@@ -280,15 +328,26 @@ async function install() {
   try {
     const platform = getPlatform();
     const binaryName = getBinaryName();
-    const url = getDownloadURL();
+    const filename = getReleaseFilename();
+    const downloadUrl = getDownloadURL();
+    const checksumsUrl = getChecksumsURL();
     const binDir = ensureBinDir();
 
-    const buffer = await download(url);
+    console.log(`VDL: Downloading ${filename}...`);
 
+    const [binaryBuffer, checksumsBuffer] = await Promise.all([
+      download(downloadUrl),
+      download(checksumsUrl),
+    ]);
+
+    console.log("VDL: Verifying checksum...");
+    verifyChecksum(binaryBuffer, checksumsBuffer, filename);
+
+    console.log("VDL: Extracting...");
     if (platform === "windows") {
-      await extractZip(buffer, binDir, binaryName);
+      await extractZip(binaryBuffer, binDir, binaryName);
     } else {
-      await extractTarGz(buffer, binDir, binaryName);
+      await extractTarGz(binaryBuffer, binDir, binaryName);
     }
 
     const binaryPath = path.join(binDir, binaryName);
@@ -299,6 +358,9 @@ async function install() {
     if (process.platform !== "win32") {
       fs.chmodSync(binaryPath, 0o755);
     }
+
+    console.log(`VDL: Installation complete!`);
+    console.log(`VDL: Run 'vdl --version' to verify.`);
   } catch (error) {
     console.error("Installation failed:");
     console.error(error.message);
