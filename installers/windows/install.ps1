@@ -97,12 +97,17 @@ function Invoke-Cleanup {
 }
 
 function Get-Platform {
-  $arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
-  switch ($arch) {
-    "x64" { return "amd64" }
-    "arm64" { return "arm64" }
+  $arch = $env:PROCESSOR_ARCHITECTURE
+  if ([string]::IsNullOrEmpty($arch)) {
+    Write-Err "Unable to detect system architecture from PROCESSOR_ARCHITECTURE environment variable."
+    exit 1
+  }
+  switch ($arch.ToUpper()) {
+    "AMD64" { return "amd64" }
+    "X86_64" { return "amd64" }
+    "ARM64" { return "arm64" }
     default {
-      Write-Err "Unsupported architecture: $arch"
+      Write-Err "Unsupported architecture: $arch. Only AMD64, X86_64 and ARM64 are supported."
       exit 1
     }
   }
