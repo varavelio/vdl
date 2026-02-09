@@ -9,11 +9,19 @@ Learn more at [https://varavel.com/vdl](https://varavel.com/vdl).
 
 ### Linux & macOS
 
+**Shell script:**
+
 ```bash
 curl -fsSL https://get.varavel.com/vdl | sh
 ```
 
 For more installation options using this installer, visit [https://get.varavel.com/vdl](https://get.varavel.com/vdl).
+
+**Homebrew:**
+
+```bash
+brew install varavelio/tap/vdl
+```
 
 ### Windows
 
