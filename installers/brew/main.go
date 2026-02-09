@@ -190,7 +190,7 @@ func getClassName(fileName string) string {
 	fileName = strings.ReplaceAll(fileName, ".rb", "")
 	fileName = strings.ReplaceAll(fileName, "-", " ")
 	fileName = strings.ReplaceAll(fileName, ".", " ")
-	fileName = strings.ReplaceAll(fileName, "@", " At ")
+	fileName = strings.ReplaceAll(fileName, "@", " AT ")
 
 	// Capitalize
 	fileName = strings.Title(fileName)
