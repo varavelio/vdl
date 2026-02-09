@@ -7,7 +7,7 @@ Learn more at [https://varavel.com/vdl](https://varavel.com/vdl).
 
 ## Installation
 
-### macOS & Linux
+### Linux & macOS
 
 ```bash
 curl -fsSL https://get.varavel.com/vdl | sh
