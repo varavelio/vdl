@@ -7,6 +7,16 @@ Learn more at [https://varavel.com/vdl](https://varavel.com/vdl).
 
 ## Installation
 
+The easiest way to get VDL on your system. Select the method that best fits your workflow.
+
+| Platform          | Method     | Command                                                        |
+| ----------------- | ---------- | -------------------------------------------------------------- |
+| **Linux / macOS** | Shell      | `curl -fsSL https://get.varavel.com/vdl \| sh`                 |
+| **Linux / macOS** | Homebrew   | `brew install varavelio/tap/vdl`                               |
+| **Windows**       | PowerShell | `irm https://get.varavel.com/vdl.ps1 \| iex`                   |
+| **Any**           | NPM        | `npm install -D @varavel/vdl`                                  |
+| **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
+
 ### Linux & macOS
 
 **Shell script:**
@@ -15,7 +25,10 @@ Learn more at [https://varavel.com/vdl](https://varavel.com/vdl).
 curl -fsSL https://get.varavel.com/vdl | sh
 ```
 
-For more installation options using this installer, visit [https://get.varavel.com/vdl](https://get.varavel.com/vdl).
+> [!TIP]
+> For more installation options using this installer, visit [https://get.varavel.com/vdl](https://get.varavel.com/vdl).
+>
+> To install a specific version: `curl -fsSL https://get.varavel.com/vdl | VERSION=vx.x.x sh`.
 
 **Homebrew:**
 
@@ -23,18 +36,26 @@ For more installation options using this installer, visit [https://get.varavel.c
 brew install varavelio/tap/vdl
 ```
 
+> [!TIP]
+> To install the latest experimental release: `brew install varavelio/tap/vdl-next`.
+>
+> To install a specific version: `brew install varavelio/tap/vdl@x.x.x`.
+
 ### Windows
 
 ```powershell
 irm https://get.varavel.com/vdl.ps1 | iex
 ```
 
-For more installation options using this installer, visit [https://get.varavel.com/vdl.ps1](https://get.varavel.com/vdl.ps1).
+> [!TIP]
+> For more installation options using this installer, visit [https://get.varavel.com/vdl.ps1](https://get.varavel.com/vdl.ps1).
+>
+> To install a specific version: `$env:VERSION = "vx.x.x"; irm https://get.varavel.com/vdl.ps1 | iex`.
 
 ### NPM (Cross platform)
 
 **Local (Recommended):**
-Ensures version consistency across your team. Use it via `npx vdl` or from `package.json` scripts.
+Ensures version consistency across your team. Use it from your `package.json` scripts.
 
 ```bash
 npm install --save-dev @varavel/vdl
@@ -47,7 +68,12 @@ Makes `vdl` available system-wide.
 npm install --global @varavel/vdl
 ```
 
-For more details using this package, visit the [npm package page](https://www.npmjs.com/package/@varavel/vdl).
+> [!TIP]
+> For more details using this package, visit the [npm package page](https://www.npmjs.com/package/@varavel/vdl).
+>
+> To install the latest experimental release: `npm install --global @varavel/vdl@next`.
+>
+> To install a specific version: `npm install --global @varavel/vdl@x.x.x`.
 
 ## What is VDL?
 
