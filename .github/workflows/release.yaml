@@ -62,3 +62,36 @@ jobs:
 
           # Publish to npm
           npm publish --provenance --access public --tag $NPM_TAG
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Generate Homebrew Formulas
+        run: go run -C ./installers/brew main.go ${{ github.event.release.tag_name }}
+
+      - name: Update Homebrew Tap
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          # Setup identity
+          git config --global user.name "Varavel Release Bot"
+          git config --global user.email "release-bot@varavel.com"
+
+          # Clone the varavelio/homebrew-tap repository
+          git clone https://x-access-token:${{ secrets.HOMEBREW_TAP_TOKEN }}@github.com/varavelio/homebrew-tap.git temp-tap
+
+          # Copy the generated Homebrew Formulas
+          mkdir -p ./temp-tap/Formula
+          rsync -rv ./installers/brew/Formula/ ./temp-tap/Formula/
+
+          # Commit and push
+          cd ./temp-tap
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes detected in Formula directory"
+          else
+            git commit -m "chore: update vdl to ${{ github.event.release.tag_name }}"
+            git push origin main
+          fi
