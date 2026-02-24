@@ -12,7 +12,7 @@
   import { get, set, unset } from "lodash-es";
   import { onMount, untrack } from "svelte";
 
-  import type { FieldDefinition } from "$lib/urpcTypes";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
 
   import Menu from "$lib/components/Menu.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
@@ -22,25 +22,19 @@
 
   interface Props {
     path: string;
-    field: FieldDefinition;
-    input: Record<string, any>;
+    field: FieldType;
+    input: Record<string, unknown>;
     disableDelete?: boolean;
   }
 
   let { field, input = $bindable(), path, disableDelete }: Props = $props();
   const fieldId = $props.id();
 
-  // We can't bind directly to input[path] because Svelte doesn't support dynamic bindings.
-  // So we create a local reactive variable and update input[path] whenever it changes.
-  let localValue = $state(get(input, path) ?? undefined);
+  // biome-ignore lint/suspicious/noExplicitAny: localValue can be any primitive type
+  let localValue = $state<any>(get(input, path) ?? undefined);
 
-  // Effect to sinchronize localValue changes to external input[path]
-  // This runs whenever localValue changes.
   $effect(() => {
     const reactiveLocalValue = localValue;
-    // From here we must use untrack to avoid the effect
-    // from being triggered by input[path] changes as
-    // we want it to only run when localValue changes
     untrack(() => {
       if (get(input, path) !== reactiveLocalValue) {
         set(input, path, reactiveLocalValue);
@@ -48,13 +42,8 @@
     });
   });
 
-  // Effect to synchronize external input[path] changes to localValue
-  // this only runs when the input changes externally
   $effect(() => {
     const reactiveInputValue = get(input, path);
-    // From here we must use untrack to avoid the effect
-    // from being triggered by localValue changes as
-    // we want it to only run when input[path] changes
     untrack(() => {
       if (reactiveInputValue !== localValue) {
         localValue = reactiveInputValue;
@@ -69,11 +58,12 @@
   };
 
   export const clearValue = () => {
-    if (field.typeName === "string") localValue = "";
-    if (field.typeName === "int") localValue = 0;
-    if (field.typeName === "float") localValue = 0;
-    if (field.typeName === "bool") localValue = false;
-    if (field.typeName === "datetime") {
+    const typeName = field.typeRef.primitiveName;
+    if (typeName === "string") localValue = "";
+    if (typeName === "int") localValue = 0;
+    if (typeName === "float") localValue = 0;
+    if (typeName === "bool") localValue = false;
+    if (typeName === "datetime") {
       let now = new Date();
       if (flatpickrInstance) flatpickrInstance.setDate(now);
       localValue = now;
@@ -81,40 +71,27 @@
   };
 
   let inputType = $derived.by(() => {
-    if (!field.typeName) {
-      return "text";
-    }
+    const typeName = field.typeRef.primitiveName;
+    if (!typeName) return "text";
 
-    if (field.typeName === "string") {
-      return "text";
-    }
+    if (typeName === "string") return "text";
+    if (typeName === "int" || typeName === "float") return "number";
+    if (typeName === "bool") return "checkbox";
+    if (typeName === "datetime") return "datetime";
 
-    if (["int", "float"].includes(field.typeName)) {
-      return "number";
-    }
-
-    if (field.typeName === "bool") {
-      return "checkbox";
-    }
-
-    if (field.typeName === "datetime") {
-      return "datetime";
-    }
+    return "text";
   });
 
   let inputStep = $derived.by(() => {
-    if (field.typeName === "float") {
-      return 0.01;
-    }
-
-    if (field.typeName === "int") {
-      return 1;
-    }
+    const typeName = field.typeRef.primitiveName;
+    if (typeName === "float") return 0.01;
+    if (typeName === "int") return 1;
+    return undefined;
   });
 
   let flatpickrInstance: flatpickr.Instance | null = $state(null);
   onMount(() => {
-    if (field.typeName !== "datetime") return;
+    if (field.typeRef.primitiveName !== "datetime") return;
     let inst = flatpickr(`#${fieldId}`, {
       enableTime: true,
       enableSeconds: true,

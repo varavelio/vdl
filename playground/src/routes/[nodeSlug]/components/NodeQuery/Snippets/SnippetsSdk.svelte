@@ -32,9 +32,10 @@
     class="select w-full"
     bind:value={storeUi.store.codeSnippetsSdkLang}
   >
-    <option value="typescript-client">TypeScript</option>
-    <option value="golang-client">Go</option>
-    <option value="dart-client">Dart</option>
+    <option value="typescript">TypeScript</option>
+    <option value="go">Go</option>
+    <option value="dart">Dart</option>
+    <option value="python">Python</option>
   </select>
   <div class="prose prose-sm text-base-content/50 max-w-none">
     <b>Can't find your language?</b> No problem. You can still use the HTTP

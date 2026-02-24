@@ -11,9 +11,12 @@
 
   import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
   import { joinPath } from "$lib/helpers/joinPath";
-  import { getHeadersObject, storeSettings } from "$lib/storeSettings.svelte";
+  import {
+    getHeadersObject,
+    type ProcedureDef,
+    storeSettings,
+  } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-  import type { ProcedureDefinitionNode } from "$lib/urpcTypes";
 
   import H2 from "$lib/components/H2.svelte";
   import Menu from "$lib/components/Menu.svelte";
@@ -27,7 +30,7 @@
   import Snippets from "./Snippets/Snippets.svelte";
 
   interface Props {
-    proc: ProcedureDefinitionNode;
+    proc: ProcedureDef & { kind: "proc" };
     storeNode: StoreNodeInstance;
   }
 
@@ -52,7 +55,11 @@
         toast.info("Procedure call cancelled");
       };
 
-      const endpoint = joinPath([storeSettings.store.baseUrl, proc.name]);
+      const endpoint = joinPath([
+        storeSettings.store.baseUrl,
+        proc.rpcName,
+        proc.name,
+      ]);
       const response = await fetch(endpoint, {
         method: "POST",
         body: JSON.stringify(storeNode.store.input ?? {}),
@@ -79,7 +86,6 @@
   }
 
   async function executeProcedureFromKbd(event: KeyboardEvent) {
-    // CTRL/CMD + ENTER to execute
     if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
       await executeProcedure();
@@ -122,7 +128,7 @@
       block: tab === "input",
     }}
   >
-    {#if proc.input}
+    {#if proc.input && proc.input.length > 0}
       <div
         class="space-y-4"
         onkeydown={executeProcedureFromKbd}

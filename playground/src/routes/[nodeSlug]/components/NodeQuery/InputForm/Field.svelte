@@ -1,19 +1,23 @@
-<!-- 
+<!--
   This component is responsible for initiating the rendering of a field based on its type.
-  It handles four scenarios:
+  It handles different scenarios based on the typeRef.kind:
 
-    1. Inline Single: A field defined inline and is not an array.
-    2. Inline Array: A field defined inline and is an array.
-    3. Named Single: A field that references a named type and is not an array.
-    4. Named Array: A field that references a named type and is an array.
+    - primitive: A primitive type field (string, int, float, bool, datetime)
+    - type: A named type reference (expands to its fields)
+    - enum: An enum reference
+    - array: An array of items
+    - map: A map type
+    - object: An inline object with nested fields
 
   If the named type is a custom type (not a primitive), it expands the underlying fields
   and treats it as an inline type for rendering purposes.
 -->
 
 <script lang="ts">
-  import { primitiveTypes, storeSettings } from "$lib/storeSettings.svelte";
-  import type { FieldDefinition } from "$lib/urpcTypes";
+  import {
+    type Field as FieldType,
+    storeSettings,
+  } from "$lib/storeSettings.svelte";
 
   import FieldInlineArray from "./FieldInlineArray.svelte";
   import FieldInlineSingle from "./FieldInlineSingle.svelte";
@@ -22,8 +26,8 @@
 
   interface Props {
     path: string;
-    field: FieldDefinition;
-    input: Record<string, any>;
+    field: FieldType;
+    input: Record<string, unknown>;
     disableDelete?: boolean;
   }
 
@@ -34,41 +38,66 @@
     disableDelete,
   }: Props = $props();
 
-  /**
-   * Get fields of a custom type
-   * @param typeName Name of the custom type
-   */
-  function getCustomTypeFields(typeName: string): FieldDefinition[] {
-    for (const node of storeSettings.store.jsonSchema.nodes) {
-      if (node.kind !== "type") continue;
-      if (node.name !== typeName) continue;
-      if (!node.fields) break;
-      return node.fields;
+  function getTypeDefFields(typeName: string): FieldType[] {
+    for (const typeDef of storeSettings.store.irSchema.types) {
+      if (typeDef.name === typeName) {
+        return typeDef.fields;
+      }
     }
-
     return [];
   }
 
-  /**
-   * This is the field with expanded typeInline if it's a custom type
-   */
-  let field = $derived.by(() => {
-    if (!originalField.typeName) return originalField;
-    if (primitiveTypes.includes(originalField.typeName)) return originalField;
+  let field = $derived.by((): FieldType => {
+    const typeRef = originalField.typeRef;
 
-    return {
-      ...originalField,
-      typeName: undefined,
-      typeInline: {
-        fields: getCustomTypeFields(originalField.typeName),
-      },
-    } satisfies FieldDefinition;
+    if (typeRef.kind === "type" && typeRef.typeName) {
+      const typeFields = getTypeDefFields(typeRef.typeName);
+      if (typeFields.length > 0) {
+        return {
+          ...originalField,
+          typeRef: {
+            kind: "object",
+            objectFields: typeFields,
+          },
+        };
+      }
+    }
+
+    if (
+      typeRef.kind === "array" &&
+      typeRef.arrayType?.kind === "type" &&
+      typeRef.arrayType.typeName
+    ) {
+      const typeFields = getTypeDefFields(typeRef.arrayType.typeName);
+      if (typeFields.length > 0) {
+        return {
+          ...originalField,
+          typeRef: {
+            kind: "array",
+            arrayType: {
+              kind: "object",
+              objectFields: typeFields,
+            },
+          },
+        };
+      }
+    }
+
+    return originalField;
   });
 
-  let isInlineArray = $derived(field.typeInline && field.isArray);
-  let isInlineSingle = $derived(field.typeInline && !field.isArray);
-  let isNamedArray = $derived(field.typeName && field.isArray);
-  let isNamedSingle = $derived(field.typeName && !field.isArray);
+  let isArray = $derived(field.typeRef.kind === "array");
+  let isObject = $derived(field.typeRef.kind === "object");
+  let isPrimitive = $derived(field.typeRef.kind === "primitive");
+
+  let isInlineArray = $derived(
+    isArray && field.typeRef.arrayType?.kind === "object",
+  );
+  let isInlineSingle = $derived(isObject && !isArray);
+  let isNamedArray = $derived(
+    isArray && field.typeRef.arrayType?.kind === "primitive",
+  );
+  let isNamedSingle = $derived(isPrimitive && !isArray);
 </script>
 
 {#if isInlineArray}

@@ -1,4 +1,4 @@
-<!-- 
+<!--
   This component handles the case where a field is an inline single object, it acts only
   as a container for preparing and rendering its sub-fields.
 
@@ -9,7 +9,7 @@
   import { BrushCleaning, Trash } from "@lucide/svelte";
   import { set, unset } from "lodash-es";
 
-  import type { FieldDefinition } from "$lib/urpcTypes";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
 
   import Tooltip from "$lib/components/Tooltip.svelte";
 
@@ -20,8 +20,8 @@
 
   interface Props {
     path: string;
-    field: FieldDefinition;
-    input: Record<string, any>;
+    field: FieldType;
+    input: Record<string, unknown>;
     disableDelete?: boolean;
   }
 
@@ -43,7 +43,7 @@
 
   <CommonFieldDoc doc={field.doc} class="-mt-2" />
 
-  {#each field.typeInline!.fields as childField}
+  {#each field.typeRef.objectFields! as childField}
     <Field field={childField} path={`${path}.${childField.name}`} bind:input />
   {/each}
 

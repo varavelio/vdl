@@ -89,6 +89,20 @@ await for (final event in handle.stream) {
 
 handle.cancel();`,
   );
+
+  const pythonProc = $derived.by(
+    () => `# Assuming \`client\` is already created (see Setup)
+result = client.procs.${nameCamel}().execute(...)
+print(result)`,
+  );
+
+  const pythonStream = $derived.by(
+    () => `# Assuming \`client\` is already created (see Setup)
+stream = client.streams.${nameCamel}().execute(...)
+
+for event in stream:
+    print(event)`,
+  );
 </script>
 
 <div class="prose prose-sm text-base-content max-w-none space-y-4">
@@ -100,17 +114,21 @@ handle.cancel();`,
 
   <p>Use your editor/IDE to help you with the types, the SDK is fully typed.</p>
 
-  {#if storeUi.store.codeSnippetsSdkLang === "typescript-client"}
+  {#if storeUi.store.codeSnippetsSdkLang === "typescript"}
     <div class="not-prose">
       <Code code={isProc ? tsProc : tsStream} lang="ts" />
     </div>
-  {:else if storeUi.store.codeSnippetsSdkLang === "golang-client"}
+  {:else if storeUi.store.codeSnippetsSdkLang === "go"}
     <div class="not-prose">
       <Code code={isProc ? goProc : goStream} lang="go" />
     </div>
-  {:else if storeUi.store.codeSnippetsSdkLang === "dart-client"}
+  {:else if storeUi.store.codeSnippetsSdkLang === "dart"}
     <div class="not-prose">
       <Code code={isProc ? dartProc : dartStream} lang="dart" />
+    </div>
+  {:else if storeUi.store.codeSnippetsSdkLang === "python"}
+    <div class="not-prose">
+      <Code code={isProc ? pythonProc : pythonStream} lang="python" />
     </div>
   {/if}
 </div>

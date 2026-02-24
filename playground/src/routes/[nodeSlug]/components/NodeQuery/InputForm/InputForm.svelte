@@ -2,8 +2,8 @@
   import { BookText, Braces, Copy, Info } from "@lucide/svelte";
 
   import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-  import type { FieldDefinition } from "$lib/urpcTypes";
 
   import Tabs from "$lib/components/Tabs.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
@@ -12,8 +12,8 @@
   import JsonEditor from "./JsonEditor.svelte";
 
   interface Props {
-    fields: FieldDefinition[];
-    input: Record<string, any>;
+    fields: FieldType[];
+    input: Record<string, unknown>;
   }
 
   let { fields, input = $bindable() }: Props = $props();

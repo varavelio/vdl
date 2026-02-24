@@ -3,7 +3,7 @@
 
   import { getMarkdownTitle } from "$lib/helpers/getMarkdownTitle";
   import { slugify } from "$lib/helpers/slugify";
-  import { storeSettings } from "$lib/storeSettings.svelte";
+  import { getIrNodes, type IrNode } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
 
   import type { PageProps } from "./$types";
@@ -13,49 +13,54 @@
 
   let { data }: PageProps = $props();
 
-  // Create a per-slug store and recreate it whenever the slug changes
   let storeNode = $state(createStoreNode(data.nodeSlug));
   $effect(() => {
     storeNode = createStoreNode(data.nodeSlug);
   });
 
-  let nodeIndex = $derived.by(() => {
-    for (const [
-      index,
-      node,
-    ] of storeSettings.store.jsonSchema.nodes.entries()) {
+  let nodes = $derived(getIrNodes());
+
+  let foundNode = $derived.by((): IrNode | undefined => {
+    for (const node of nodes) {
+      if (data.nodeKind === "rpc") {
+        if (node.kind !== "proc" && node.kind !== "stream") continue;
+        if (node.rpcName !== data.rpcName) continue;
+        if (slugify(node.name) !== slugify(data.nodeName)) continue;
+        return node;
+      }
+
       if (node.kind !== data.nodeKind) continue;
 
       const isDoc = node.kind === "doc";
       let nodeName = isDoc ? getMarkdownTitle(node.content) : node.name;
       nodeName = slugify(nodeName);
 
-      if (data.nodeName === nodeName) return index;
+      if (data.nodeName === nodeName) return node;
     }
 
-    return -1; // Node not found in store
+    return undefined;
   });
 
-  let nodeExists = $derived(nodeIndex !== -1);
-
-  let node = $derived(storeSettings.store.jsonSchema.nodes[nodeIndex]);
+  let nodeExists = $derived(foundNode !== undefined);
 
   let name = $derived.by(() => {
-    if (node.kind === "type") return node.name;
-    if (node.kind === "proc") return node.name;
-    if (node.kind === "stream") return node.name;
-    if (node.kind === "doc") {
-      return getMarkdownTitle(node.content);
+    if (!foundNode) return "unknown";
+    if (foundNode.kind === "type") return foundNode.name;
+    if (foundNode.kind === "proc") return foundNode.name;
+    if (foundNode.kind === "stream") return foundNode.name;
+    if (foundNode.kind === "doc") {
+      return getMarkdownTitle(foundNode.content);
     }
 
     return "unknown";
   });
 
   let humanKind = $derived.by(() => {
-    if (node.kind === "type") return "type";
-    if (node.kind === "proc") return "procedure";
-    if (node.kind === "stream") return "stream";
-    if (node.kind === "doc") return "documentation";
+    if (!foundNode) return "unknown";
+    if (foundNode.kind === "type") return "type";
+    if (foundNode.kind === "proc") return "procedure";
+    if (foundNode.kind === "stream") return "stream";
+    if (foundNode.kind === "doc") return "documentation";
     return "unknown";
   });
 
@@ -65,11 +70,9 @@
     return `${name} ${humanKind} | VDL Playground`;
   });
 
-  // Scroll to top of page when node changes
   $effect(() => {
-    nodeIndex; // Just to add a dependency to trigger the effect
+    data.nodeSlug;
     untrack(() => {
-      // Untrack the storeUi.contentWrapper.element to avoid infinite loop
       storeUi.store.contentWrapper.element?.scrollTo({
         top: 0,
         behavior: "smooth",
@@ -86,8 +89,8 @@
   <NotFound />
 {/if}
 
-{#if nodeExists && storeNode.status.ready}
-  {#key nodeIndex}
-    <Node {node} bind:storeNode />
+{#if nodeExists && foundNode && storeNode.status.ready}
+  {#key data.nodeSlug}
+    <Node node={foundNode} bind:storeNode />
   {/key}
 {/if}

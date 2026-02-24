@@ -1,16 +1,16 @@
 <script lang="ts">
   import { Expand, Minimize } from "@lucide/svelte";
 
-  import { storeSettings } from "$lib/storeSettings.svelte";
+  import { type IrNode, storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-  import { cmdExtractProc, cmdExtractStream, cmdExtractType } from "$lib/urpc";
+  import { wasmClient } from "$lib/wasm/index";
 
   import Code from "$lib/components/Code.svelte";
   import H2 from "$lib/components/H2.svelte";
   import Tabs from "$lib/components/Tabs.svelte";
 
   interface Props {
-    node: (typeof storeSettings.store.jsonSchema.nodes)[number];
+    node: IrNode;
   }
 
   let { node }: Props = $props();
@@ -27,23 +27,54 @@
     if (isExtended && extractedSchemaExpanded !== "") return;
 
     (async () => {
-      let extractFunc = async (_input: string, _name: string) => "";
-      if (node.kind === "type") extractFunc = cmdExtractType;
-      if (node.kind === "proc") extractFunc = cmdExtractProc;
-      if (node.kind === "stream") extractFunc = cmdExtractStream;
+      const schemaCompact = storeSettings.store.vdlSchema;
+      const schemaExpanded = storeSettings.store.vdlSchemaExpanded;
 
-      if (isCompact) {
-        extractedSchemaCompact = await extractFunc(
-          storeSettings.store.urpcSchema,
-          node.name,
-        );
+      if (node.kind === "type") {
+        if (isCompact) {
+          extractedSchemaCompact = await wasmClient.extractType(
+            schemaCompact,
+            node.name,
+          );
+        }
+        if (isExtended) {
+          extractedSchemaExpanded = await wasmClient.extractType(
+            schemaExpanded,
+            node.name,
+          );
+        }
       }
-
-      if (isExtended) {
-        extractedSchemaExpanded = await extractFunc(
-          storeSettings.store.urpcSchemaExpanded,
-          node.name,
-        );
+      if (node.kind === "proc") {
+        if (isCompact) {
+          extractedSchemaCompact = await wasmClient.extractProc(
+            schemaCompact,
+            node.rpcName,
+            node.name,
+          );
+        }
+        if (isExtended) {
+          extractedSchemaExpanded = await wasmClient.extractProc(
+            schemaExpanded,
+            node.rpcName,
+            node.name,
+          );
+        }
+      }
+      if (node.kind === "stream") {
+        if (isCompact) {
+          extractedSchemaCompact = await wasmClient.extractStream(
+            schemaCompact,
+            node.rpcName,
+            node.name,
+          );
+        }
+        if (isExtended) {
+          extractedSchemaExpanded = await wasmClient.extractStream(
+            schemaExpanded,
+            node.rpcName,
+            node.name,
+          );
+        }
       }
     })();
   });

@@ -11,9 +11,12 @@
 
   import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
   import { joinPath } from "$lib/helpers/joinPath";
-  import { getHeadersObject, storeSettings } from "$lib/storeSettings.svelte";
+  import {
+    getHeadersObject,
+    storeSettings,
+    type StreamDef,
+  } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-  import type { StreamDefinitionNode } from "$lib/urpcTypes";
 
   import H2 from "$lib/components/H2.svelte";
   import Menu from "$lib/components/Menu.svelte";
@@ -27,17 +30,16 @@
   import Snippets from "./Snippets/Snippets.svelte";
 
   interface Props {
-    stream: StreamDefinitionNode;
+    stream: StreamDef & { kind: "stream" };
     storeNode: StoreNodeInstance;
   }
 
   let { stream, storeNode = $bindable() }: Props = $props();
 
-  let outputArray: any[] = $state([]);
+  let outputArray: unknown[] = $state([]);
   let isExecuting = $state(false);
   let cancelRequest = $state<() => void>(() => {});
 
-  // Synchronize the output string with the output array
   $effect(() => {
     if (outputArray.length === 0) {
       storeNode.actions.clearOutput();
@@ -62,7 +64,11 @@
         toast.info("Stream stopped");
       };
 
-      const endpoint = joinPath([storeSettings.store.baseUrl, stream.name]);
+      const endpoint = joinPath([
+        storeSettings.store.baseUrl,
+        stream.rpcName,
+        stream.name,
+      ]);
       const headers = getHeadersObject();
       headers.set("Accept", "text/event-stream");
       headers.set("Cache-Control", "no-cache");
@@ -95,7 +101,6 @@
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
 
-        // Keep the last incomplete line in buffer
         buffer = lines.pop() || "";
 
         for (const line of lines) {
@@ -104,7 +109,6 @@
           if (line.startsWith("data: ")) {
             const eventData = line.slice(6);
 
-            // Skip heartbeat or keep-alive messages
             if (eventData.trim() === "" || eventData.trim() === "heartbeat") {
               continue;
             }
@@ -136,7 +140,6 @@
   }
 
   async function executeStreamFromKbd(event: KeyboardEvent) {
-    // CTRL/CMD + ENTER to execute
     if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
       await executeStream();
@@ -179,7 +182,7 @@
       block: tab === "input",
     }}
   >
-    {#if stream.input}
+    {#if stream.input && stream.input.length > 0}
       <div
         class="space-y-4"
         onkeydown={executeStreamFromKbd}

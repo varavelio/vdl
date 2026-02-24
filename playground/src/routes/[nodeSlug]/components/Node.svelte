@@ -4,7 +4,7 @@
   import { deleteMarkdownHeadings } from "$lib/helpers/deleteMarkdownHeadings";
   import { getMarkdownTitle } from "$lib/helpers/getMarkdownTitle";
   import { markdownToHtml } from "$lib/helpers/markdownToHtml";
-  import { storeSettings } from "$lib/storeSettings.svelte";
+  import { type IrNode } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
 
   import BottomSpace from "$lib/components/BottomSpace.svelte";
@@ -17,7 +17,7 @@
   import Schema from "./Schema.svelte";
 
   interface Props {
-    node: (typeof storeSettings.store.jsonSchema.nodes)[number];
+    node: IrNode;
     storeNode: StoreNodeInstance;
   }
 

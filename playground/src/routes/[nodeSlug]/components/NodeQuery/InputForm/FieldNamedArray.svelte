@@ -1,4 +1,4 @@
-<!-- 
+<!--
   This component handles the case where a field is an array of named fields, it acts only
   as a container for preparing and rendering its sub-fields.
 
@@ -16,7 +16,7 @@
   } from "@lucide/svelte";
   import { get, set, unset } from "lodash-es";
 
-  import type { FieldDefinition } from "$lib/urpcTypes";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
 
   import Tooltip from "$lib/components/Tooltip.svelte";
 
@@ -27,14 +27,18 @@
 
   interface Props {
     path: string;
-    field: FieldDefinition;
-    input: Record<string, any>;
+    field: FieldType;
+    input: Record<string, unknown>;
   }
 
   let { field, input = $bindable(), path }: Props = $props();
 
-  let noArrayField = $derived({ ...field, isArray: false, doc: undefined });
-  let arrayLen = $derived(get(input, path)?.length || 0);
+  let noArrayField = $derived({
+    ...field,
+    doc: undefined,
+    typeRef: field.typeRef.arrayType!,
+  } as FieldType);
+  let arrayLen = $derived((get(input, path) as unknown[])?.length || 0);
   let arrayIndexes = $derived(Array.from({ length: arrayLen }, (_, i) => i));
   let lastIndex = $derived(arrayIndexes[arrayIndexes.length - 1]);
 
