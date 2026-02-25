@@ -29,6 +29,9 @@
         "editor.formatOnSave": true,
         "editor.foldingStrategy": "indentation",
         "editor.defaultFormatter": "dprint.dprint",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.biome": "explicit"
+        },
         "css.validate": false,
         "svelte.enable-ts-plugin": true,
         "[javascript]": {
