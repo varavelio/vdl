@@ -2,7 +2,17 @@
   "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "files": {
     "includes": [
-      "**",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.mts",
+      "**/*.cts",
+      "**/*.svelte",
+      "**/*.astro",
+      "!**/*.test.ts",
       "!**/node_modules",
       "!**/dist",
       "!**/build",
@@ -27,26 +37,10 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "lineWidth": 100,
-    "includes": [
-      "**/*.js",
-      "**/*.jsx",
-      "**/*.mjs",
-      "**/*.cjs",
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.mts",
-      "**/*.cts",
-      "**/*.svelte",
-      "**/*.astro"
-    ]
+    "lineWidth": 100
   },
   "linter": {
     "enabled": true,
-    "includes": [
-      "**",
-      "!**/*.test.ts"
-    ],
     "rules": {
       "recommended": true,
       "style": {
