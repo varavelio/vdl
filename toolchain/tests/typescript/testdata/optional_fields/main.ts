@@ -1,7 +1,8 @@
 // Verifies optional field behavior: fields can be omitted or provided with values.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -54,9 +55,7 @@ async function main() {
     throw new Error(`Expected optional=undefined, got '${result1.optional}'`);
   }
   if (result1.optionalInt !== undefined) {
-    throw new Error(
-      `Expected optionalInt=undefined, got '${result1.optionalInt}'`,
-    );
+    throw new Error(`Expected optionalInt=undefined, got '${result1.optionalInt}'`);
   }
 
   // Test 2: All optional fields present with values
@@ -75,22 +74,15 @@ async function main() {
     throw new Error(`Expected optionalInt=42, got '${result2.optionalInt}'`);
   }
   if (result2.optionalBool !== true) {
-    throw new Error(
-      `Expected optionalBool=true, got '${result2.optionalBool}'`,
-    );
+    throw new Error(`Expected optionalBool=true, got '${result2.optionalBool}'`);
   }
-  if (
-    !Array.isArray(result2.optionalArray) ||
-    result2.optionalArray.length !== 3
-  ) {
+  if (!Array.isArray(result2.optionalArray) || result2.optionalArray.length !== 3) {
     throw new Error(
       `Expected optionalArray=['a','b','c'], got '${JSON.stringify(result2.optionalArray)}'`,
     );
   }
   if (result2.optionalObject?.city !== "NYC") {
-    throw new Error(
-      `Expected optionalObject.city='NYC', got '${result2.optionalObject?.city}'`,
-    );
+    throw new Error(`Expected optionalObject.city='NYC', got '${result2.optionalObject?.city}'`);
   }
 
   // Test 3: Optional fields with "zero" values (empty string, 0, false)
@@ -107,9 +99,7 @@ async function main() {
     throw new Error(`Expected optionalInt=0, got '${result3.optionalInt}'`);
   }
   if (result3.optionalBool !== false) {
-    throw new Error(
-      `Expected optionalBool=false, got '${result3.optionalBool}'`,
-    );
+    throw new Error(`Expected optionalBool=false, got '${result3.optionalBool}'`);
   }
 
   // Test 4: Mixed - some optional present, some absent
@@ -123,14 +113,10 @@ async function main() {
     throw new Error(`Expected optional='present', got '${result4.optional}'`);
   }
   if (result4.optionalInt !== undefined) {
-    throw new Error(
-      `Expected optionalInt=undefined, got '${result4.optionalInt}'`,
-    );
+    throw new Error(`Expected optionalInt=undefined, got '${result4.optionalInt}'`);
   }
   if (result4.optionalBool !== true) {
-    throw new Error(
-      `Expected optionalBool=true, got '${result4.optionalBool}'`,
-    );
+    throw new Error(`Expected optionalBool=true, got '${result4.optionalBool}'`);
   }
 
   console.log("Success");

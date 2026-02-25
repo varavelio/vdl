@@ -1,6 +1,6 @@
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -35,9 +35,7 @@ async function main() {
   const client = NewClient(baseUrl).build();
 
   try {
-    const response = await client.procs
-      .greeterHello()
-      .execute({ name: "World" });
+    const response = await client.procs.greeterHello().execute({ name: "World" });
     console.log("Response:", response);
 
     if (response.result !== "Hello World!") {

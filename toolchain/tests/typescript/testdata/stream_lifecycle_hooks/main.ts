@@ -1,7 +1,8 @@
 // Verifies stream lifecycle hooks (onConnect, onDisconnect, onReconnect) work correctly.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -81,9 +82,7 @@ async function main() {
 
     // Normal completion should have null error
     if (disconnectError !== null) {
-      throw new Error(
-        "onDisconnect should have null error on normal completion",
-      );
+      throw new Error("onDisconnect should have null error on normal completion");
     }
 
     if (received !== 3) {
@@ -165,9 +164,7 @@ async function main() {
         delayMultiplier: 1.5,
       })
       .onReconnect((attempt, delayMs) => {
-        console.log(
-          `onReconnect called: attempt=${attempt}, delayMs=${delayMs}`,
-        );
+        console.log(`onReconnect called: attempt=${attempt}, delayMs=${delayMs}`);
         reconnectCalled = true;
         reconnectAttempt = attempt;
         reconnectDelayMs = delayMs;

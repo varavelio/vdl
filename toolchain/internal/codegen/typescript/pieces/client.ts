@@ -1,12 +1,12 @@
 // This imports are just to prevent errors in the IDE when developing, this imports
 // are handled in the generator for the generated code
 import {
-  Response,
-  VdlError,
   asError,
+  type OperationDefinition,
+  type OperationType,
+  type Response,
   sleep,
-  OperationType,
-  OperationDefinition,
+  VdlError,
 } from "./core";
 
 /** START FROM HERE **/
@@ -161,10 +161,7 @@ type Invoker = (req: RequestInfo) => Promise<Response<unknown>>;
  * };
  * ```
  */
-type Interceptor = (
-  req: RequestInfo,
-  next: Invoker,
-) => Promise<Response<unknown>>;
+type Interceptor = (req: RequestInfo, next: Invoker) => Promise<Response<unknown>>;
 
 // =============================================================================
 // Fetch Interface
@@ -290,10 +287,7 @@ function calculateBackoff(config: RetryConfig, attempt: number): number {
  * @param attempt - Current attempt number (1-based).
  * @returns Delay in milliseconds before the next reconnection.
  */
-function calculateReconnectBackoff(
-  config: ReconnectConfig,
-  attempt: number,
-): number {
+function calculateReconnectBackoff(config: ReconnectConfig, attempt: number): number {
   let delay = config.initialDelayMs;
 
   for (let i = 1; i < attempt; i++) {
@@ -530,10 +524,7 @@ class internalClient {
   /**
    * Resolves the effective retry configuration for a request.
    */
-  private mergeRetryConfig(
-    rpcName: string,
-    opConf: RetryConfig | undefined,
-  ): RetryConfig {
+  private mergeRetryConfig(rpcName: string, opConf: RetryConfig | undefined): RetryConfig {
     if (opConf) return opConf;
     if (this.rpcRetryConf.has(rpcName)) return this.rpcRetryConf.get(rpcName)!;
     if (this.globalRetryConf) return this.globalRetryConf;
@@ -543,13 +534,9 @@ class internalClient {
   /**
    * Resolves the effective timeout configuration for a request.
    */
-  private mergeTimeoutConfig(
-    rpcName: string,
-    opConf: TimeoutConfig | undefined,
-  ): TimeoutConfig {
+  private mergeTimeoutConfig(rpcName: string, opConf: TimeoutConfig | undefined): TimeoutConfig {
     if (opConf) return opConf;
-    if (this.rpcTimeoutConf.has(rpcName))
-      return this.rpcTimeoutConf.get(rpcName)!;
+    if (this.rpcTimeoutConf.has(rpcName)) return this.rpcTimeoutConf.get(rpcName)!;
     if (this.globalTimeoutConf) return this.globalTimeoutConf;
     return defaultTimeoutConfig;
   }
@@ -562,8 +549,7 @@ class internalClient {
     opConf: ReconnectConfig | undefined,
   ): ReconnectConfig {
     if (opConf) return opConf;
-    if (this.rpcReconnectConf.has(rpcName))
-      return this.rpcReconnectConf.get(rpcName)!;
+    if (this.rpcReconnectConf.has(rpcName)) return this.rpcReconnectConf.get(rpcName)!;
     if (this.globalReconnectConf) return this.globalReconnectConf;
     return defaultReconnectConfig;
   }
@@ -594,10 +580,7 @@ class internalClient {
    * Interceptors are wrapped in reverse order so they execute in registration order.
    * The chain is: interceptor[0] → interceptor[1] → ... → invoker
    */
-  private async executeChain(
-    req: RequestInfo,
-    final: Invoker,
-  ): Promise<Response<unknown>> {
+  private async executeChain(req: RequestInfo, final: Invoker): Promise<Response<unknown>> {
     let chain = final;
 
     // Wrap interceptors in reverse order
@@ -770,8 +753,7 @@ class internalClient {
             await this.applyHeaders(req.rpcName, hdrs, opHeaderProviders);
           } catch (err) {
             if (timeoutId !== undefined) clearTimeout(timeoutId);
-            if (opSignal)
-              opSignal.removeEventListener("abort", onExternalAbort);
+            if (opSignal) opSignal.removeEventListener("abort", onExternalAbort);
             return { ok: false, error: asError(err) };
           }
 
@@ -999,14 +981,8 @@ class internalClient {
         }
 
         // Resolve effective configurations
-        const reconnectConf = self.mergeReconnectConfig(
-          rpcName,
-          opReconnectConf,
-        );
-        const maxMessageSize = self.mergeMaxMessageSize(
-          rpcName,
-          opMaxMessageSize ?? 0,
-        );
+        const reconnectConf = self.mergeReconnectConfig(rpcName, opReconnectConf);
+        const maxMessageSize = self.mergeMaxMessageSize(rpcName, opMaxMessageSize ?? 0);
 
         // Serialize input to JSON
         let payload: string;
@@ -1050,14 +1026,8 @@ class internalClient {
             });
 
             // Server error (5xx): attempt reconnection
-            if (
-              fetchResp.status >= 500 &&
-              reconnectAttempt < reconnectConf.maxAttempts
-            ) {
-              const delayMs = calculateReconnectBackoff(
-                reconnectConf,
-                reconnectAttempt + 1,
-              );
+            if (fetchResp.status >= 500 && reconnectAttempt < reconnectConf.maxAttempts) {
+              const delayMs = calculateReconnectBackoff(reconnectConf, reconnectAttempt + 1);
               if (onReconnect) onReconnect(reconnectAttempt + 1, delayMs);
               reconnectAttempt++;
               await sleep(delayMs);
@@ -1171,14 +1141,8 @@ class internalClient {
               if (!isCancelled) return;
             } catch (readError) {
               // Connection interrupted during read: attempt reconnection
-              if (
-                !isCancelled &&
-                reconnectAttempt < reconnectConf.maxAttempts
-              ) {
-                const delayMs = calculateReconnectBackoff(
-                  reconnectConf,
-                  reconnectAttempt + 1,
-                );
+              if (!isCancelled && reconnectAttempt < reconnectConf.maxAttempts) {
+                const delayMs = calculateReconnectBackoff(reconnectConf, reconnectAttempt + 1);
                 if (onReconnect) onReconnect(reconnectAttempt + 1, delayMs);
                 reconnectAttempt++;
                 await sleep(delayMs);
@@ -1195,10 +1159,7 @@ class internalClient {
           } catch (fetchError) {
             // Connection failed: attempt reconnection
             if (!isCancelled && reconnectAttempt < reconnectConf.maxAttempts) {
-              const delayMs = calculateReconnectBackoff(
-                reconnectConf,
-                reconnectAttempt + 1,
-              );
+              const delayMs = calculateReconnectBackoff(reconnectConf, reconnectAttempt + 1);
               if (onReconnect) onReconnect(reconnectAttempt + 1, delayMs);
               reconnectAttempt++;
               await sleep(delayMs);
@@ -1293,9 +1254,7 @@ function withGlobalTimeoutConfig(conf: TimeoutConfig): internalClientOption {
 }
 
 /** Sets the global default reconnect configuration for streams. */
-function withGlobalReconnectConfig(
-  conf: ReconnectConfig,
-): internalClientOption {
+function withGlobalReconnectConfig(conf: ReconnectConfig): internalClientOption {
   return (c) => c.setGlobalReconnectConfig(conf);
 }
 
@@ -1335,11 +1294,7 @@ class clientBuilder {
    * @param procDefs - Procedure definitions from the schema.
    * @param streamDefs - Stream definitions from the schema.
    */
-  constructor(
-    baseURL: string,
-    procDefs: OperationDefinition[],
-    streamDefs: OperationDefinition[],
-  ) {
+  constructor(baseURL: string, procDefs: OperationDefinition[], streamDefs: OperationDefinition[]) {
     this.baseURL = baseURL;
     this.procDefs = procDefs;
     this.streamDefs = streamDefs;
@@ -1395,12 +1350,7 @@ class clientBuilder {
 
   /** Builds and returns the configured client. */
   build(): internalClient {
-    return new internalClient(
-      this.baseURL,
-      this.procDefs,
-      this.streamDefs,
-      this.opts,
-    );
+    return new internalClient(this.baseURL, this.procDefs, this.streamDefs, this.opts);
   }
 }
 
@@ -1445,12 +1395,7 @@ class procCallBuilder {
   private timeoutConf?: TimeoutConfig;
   private signal?: AbortSignal;
 
-  constructor(
-    client: internalClient,
-    rpcName: string,
-    name: string,
-    input: unknown,
-  ) {
+  constructor(client: internalClient, rpcName: string, name: string, input: unknown) {
     this.client = client;
     this.rpcName = rpcName;
     this.name = name;
@@ -1566,12 +1511,7 @@ class streamCallBuilder {
   private onReconnectCb?: (attempt: number, delayMs: number) => void;
   private signal?: AbortSignal;
 
-  constructor(
-    client: internalClient,
-    rpcName: string,
-    name: string,
-    input: unknown,
-  ) {
+  constructor(client: internalClient, rpcName: string, name: string, input: unknown) {
     this.client = client;
     this.rpcName = rpcName;
     this.name = name;
@@ -1617,9 +1557,7 @@ class streamCallBuilder {
   }
 
   /** Sets a callback invoked before each reconnection attempt. */
-  withOnReconnect(
-    cb: (attempt: number, delayMs: number) => void,
-  ): streamCallBuilder {
+  withOnReconnect(cb: (attempt: number, delayMs: number) => void): streamCallBuilder {
     this.onReconnectCb = cb;
     return this;
   }

@@ -1,7 +1,8 @@
 // Verifies that the server properly validates enum values and rejects invalid ones.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient, VdlError } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server, VdlError } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -78,53 +79,30 @@ async function main() {
   try {
     // ========== Test 1: Valid enum values should work ==========
     console.log("Test 1: Valid enum values...");
-    const colorRes = await client.procs
-      .serviceEchoColor()
-      .execute({ color: "Red" });
-    if (colorRes.color !== "Red")
-      throw new Error(`Expected "Red", got ${colorRes.color}`);
+    const colorRes = await client.procs.serviceEchoColor().execute({ color: "Red" });
+    if (colorRes.color !== "Red") throw new Error(`Expected "Red", got ${colorRes.color}`);
 
-    const priorityRes = await client.procs
-      .serviceEchoPriority()
-      .execute({ priority: 2 });
-    if (priorityRes.priority !== 2)
-      throw new Error(`Expected 2, got ${priorityRes.priority}`);
+    const priorityRes = await client.procs.serviceEchoPriority().execute({ priority: 2 });
+    if (priorityRes.priority !== 2) throw new Error(`Expected 2, got ${priorityRes.priority}`);
 
-    const logLevelRes = await client.procs
-      .serviceEchoLogLevel()
-      .execute({ level: "DEBUG" });
+    const logLevelRes = await client.procs.serviceEchoLogLevel().execute({ level: "DEBUG" });
     if (logLevelRes.level !== "DEBUG")
       throw new Error(`Expected "DEBUG", got ${logLevelRes.level}`);
     console.log("  PASS: Valid enum values work");
 
     // ========== Test 2: Invalid string enum value should be rejected ==========
     console.log("Test 2: Invalid string enum value...");
-    await testRawInvalidRequest(
-      baseUrl,
-      "/Service/EchoColor",
-      { color: "Purple" },
-      "Color",
-    );
+    await testRawInvalidRequest(baseUrl, "/Service/EchoColor", { color: "Purple" }, "Color");
     console.log("  PASS: Invalid string enum rejected");
 
     // ========== Test 3: Invalid integer enum value should be rejected ==========
     console.log("Test 3: Invalid integer enum value...");
-    await testRawInvalidRequest(
-      baseUrl,
-      "/Service/EchoPriority",
-      { priority: 99 },
-      "Priority",
-    );
+    await testRawInvalidRequest(baseUrl, "/Service/EchoPriority", { priority: 99 }, "Priority");
     console.log("  PASS: Invalid integer enum rejected");
 
     // ========== Test 4: Invalid explicit-value enum should be rejected ==========
     console.log("Test 4: Invalid explicit-value enum...");
-    await testRawInvalidRequest(
-      baseUrl,
-      "/Service/EchoLogLevel",
-      { level: "TRACE" },
-      "LogLevel",
-    );
+    await testRawInvalidRequest(baseUrl, "/Service/EchoLogLevel", { level: "TRACE" }, "LogLevel");
     console.log("  PASS: Invalid explicit-value enum rejected");
 
     // ========== Test 5: Invalid enum in nested type should be rejected ==========
@@ -145,11 +123,8 @@ async function main() {
 
     // ========== Test 6: Valid optional enums (missing) should work ==========
     console.log("Test 6: Valid optional enums (missing)...");
-    const optRes = await client.procs
-      .serviceEchoOptional()
-      .execute({ settings: {} });
-    if (optRes.settings.color !== undefined)
-      throw new Error("Expected undefined color");
+    const optRes = await client.procs.serviceEchoOptional().execute({ settings: {} });
+    if (optRes.settings.color !== undefined) throw new Error("Expected undefined color");
     console.log("  PASS: Optional enums work when missing");
 
     // ========== Test 7: Invalid optional enum should be rejected ==========
@@ -170,8 +145,7 @@ async function main() {
         priorities: [1, 2, 3],
       },
     });
-    if (paletteRes.palette.colors.length !== 3)
-      throw new Error("Expected 3 colors");
+    if (paletteRes.palette.colors.length !== 3) throw new Error("Expected 3 colors");
     console.log("  PASS: Valid enum arrays work");
 
     // ========== Test 9: Invalid enum in array should be rejected ==========
@@ -197,8 +171,7 @@ async function main() {
         priorityByTask: { task1: 1, task2: 2 },
       },
     });
-    if (mapRes.colorMap.colorByName.primary !== "Red")
-      throw new Error("Expected Red");
+    if (mapRes.colorMap.colorByName.primary !== "Red") throw new Error("Expected Red");
     console.log("  PASS: Valid enum maps work");
 
     // ========== Test 11: Invalid enum in map should be rejected ==========
@@ -236,12 +209,7 @@ async function main() {
 
     // ========== Test 13: Invalid enum in stream should be rejected ==========
     console.log("Test 13: Invalid enum in stream...");
-    await testStreamInvalidRequest(
-      baseUrl,
-      "/Service/ColorStream",
-      { color: "Pink" },
-      "Color",
-    );
+    await testStreamInvalidRequest(baseUrl, "/Service/ColorStream", { color: "Pink" }, "Color");
     console.log("  PASS: Invalid enum in stream rejected");
 
     console.log("\nSuccess: All enum validation tests passed!");

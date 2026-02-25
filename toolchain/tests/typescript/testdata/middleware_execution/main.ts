@@ -1,9 +1,10 @@
 // Verifies middleware execution order and coverage across all levels:
 // Global middleware applies to all RPCs, RPC middleware applies to all procs in that RPC,
 // and Proc middleware applies only to specific procs.
+
+import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { NewClient, Server } from "./gen/index.ts";
 
 interface AppProps {
   trace: string[];
@@ -71,16 +72,14 @@ async function main() {
     prefix: "/rpc",
   });
 
-  const httpServer = createServer(
-    async (req: IncomingMessage, res: ServerResponse) => {
-      if (req.method !== "POST") {
-        res.writeHead(405);
-        res.end();
-        return;
-      }
-      await handler(req, res);
-    },
-  );
+  const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    if (req.method !== "POST") {
+      res.writeHead(405);
+      res.end();
+      return;
+    }
+    await handler(req, res);
+  });
 
   await new Promise<void>((resolve) => {
     httpServer.listen(0, resolve);
@@ -119,14 +118,10 @@ async function main() {
 
   for (const tc of testCases) {
     const trace = await tc.call();
-    const pass =
-      trace.length === tc.expected.length &&
-      trace.every((v, i) => v === tc.expected[i]);
+    const pass = trace.length === tc.expected.length && trace.every((v, i) => v === tc.expected[i]);
 
     if (!pass) {
-      console.error(
-        `${tc.name}: expected [${tc.expected.join(", ")}], got [${trace.join(", ")}]`,
-      );
+      console.error(`${tc.name}: expected [${tc.expected.join(", ")}], got [${trace.join(", ")}]`);
       process.exit(1);
     }
   }

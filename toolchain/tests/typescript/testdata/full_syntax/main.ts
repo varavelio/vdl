@@ -1,23 +1,22 @@
 // Verifies full VDL syntax: constants, enums, patterns, types, and RPCs.
+
+import type { Priority, Status } from "./gen/index.ts";
 import {
-  MAX_PAGE_SIZE,
   API_VERSION,
-  isStatus,
   isPriority,
+  isStatus,
+  MAX_PAGE_SIZE,
+  type User,
+  type UserServiceGetUserInput,
+  type UserServiceGetUserOutput,
+  type UserServiceUserActivityInput,
+  type UserServiceUserActivityOutput,
   UserTopic,
   VDLPaths,
-  User,
-  UserServiceGetUserInput,
-  UserServiceGetUserOutput,
-  UserServiceUserActivityInput,
-  UserServiceUserActivityOutput,
 } from "./gen/index.ts";
-import type { Status, Priority } from "./gen/index.ts";
 
 function fail(name: string, expected: unknown, actual: unknown): never {
-  console.error(
-    `Verification failed for ${name}: expected "${expected}", got "${actual}"`,
-  );
+  console.error(`Verification failed for ${name}: expected "${expected}", got "${actual}"`);
   process.exit(1);
 }
 

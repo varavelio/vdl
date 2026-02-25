@@ -1,33 +1,32 @@
 // Verifies header passing through context: client-level and request-level headers
 // are extracted by the HTTP handler and returned by the server.
+
+import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { NewClient } from "./gen/index.ts";
-import { createServer, IncomingMessage, ServerResponse } from "http";
 
 async function main() {
   // Create a custom server that returns headers from the request
-  const httpServer = createServer(
-    async (req: IncomingMessage, res: ServerResponse) => {
-      if (req.method !== "POST") {
-        res.writeHead(405);
-        res.end();
-        return;
-      }
+  const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    if (req.method !== "POST") {
+      res.writeHead(405);
+      res.end();
+      return;
+    }
 
-      // Extract specific headers and return them
-      const values: Record<string, string> = {
-        "X-Custom": (req.headers["x-custom"] as string) || "",
-        Authorization: (req.headers["authorization"] as string) || "",
-      };
+    // Extract specific headers and return them
+    const values: Record<string, string> = {
+      "X-Custom": (req.headers["x-custom"] as string) || "",
+      Authorization: (req.headers["authorization"] as string) || "",
+    };
 
-      const response = {
-        ok: true,
-        output: { values },
-      };
+    const response = {
+      ok: true,
+      output: { values },
+    };
 
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(response));
-    },
-  );
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(response));
+  });
 
   await new Promise<void>((resolve) => {
     httpServer.listen(0, resolve);
@@ -38,28 +37,19 @@ async function main() {
   const baseUrl = `http://localhost:${port}/rpc`;
 
   // Create client with global header (Authorization)
-  const client = NewClient(baseUrl)
-    .withGlobalHeader("Authorization", "Bearer secret")
-    .build();
+  const client = NewClient(baseUrl).withGlobalHeader("Authorization", "Bearer secret").build();
 
   try {
     // Execute with request-level header (X-Custom)
-    const result = await client.procs
-      .serviceGetHeaders()
-      .withHeader("X-Custom", "123")
-      .execute({});
+    const result = await client.procs.serviceGetHeaders().withHeader("X-Custom", "123").execute({});
 
     // Verify both headers were received
     if (result.values["Authorization"] !== "Bearer secret") {
-      console.error(
-        `missing Authorization header, got: ${result.values["Authorization"]}`,
-      );
+      console.error(`missing Authorization header, got: ${result.values["Authorization"]}`);
       process.exit(1);
     }
     if (result.values["X-Custom"] !== "123") {
-      console.error(
-        `missing X-Custom header, got: ${result.values["X-Custom"]}`,
-      );
+      console.error(`missing X-Custom header, got: ${result.values["X-Custom"]}`);
       process.exit(1);
     }
 

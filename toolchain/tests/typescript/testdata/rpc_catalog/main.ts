@@ -9,18 +9,10 @@ function fail(name: string, expected: string, actual: string): never {
 function main() {
   // Verify VDLPaths structure (only procs and streams, no service root path)
   if (VDLPaths.MyService.MyProc !== "/MyService/MyProc") {
-    fail(
-      "VDLPaths.MyService.MyProc",
-      "/MyService/MyProc",
-      VDLPaths.MyService.MyProc,
-    );
+    fail("VDLPaths.MyService.MyProc", "/MyService/MyProc", VDLPaths.MyService.MyProc);
   }
   if (VDLPaths.MyService.MyStream !== "/MyService/MyStream") {
-    fail(
-      "VDLPaths.MyService.MyStream",
-      "/MyService/MyStream",
-      VDLPaths.MyService.MyStream,
-    );
+    fail("VDLPaths.MyService.MyStream", "/MyService/MyStream", VDLPaths.MyService.MyStream);
   }
 
   // Verify VDLProcedures contains MyProc

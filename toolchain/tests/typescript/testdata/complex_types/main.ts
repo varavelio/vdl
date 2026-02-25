@@ -1,18 +1,19 @@
 // Verifies complex type serialization: deeply nested structures, maps of arrays,
 // arrays of maps, nested objects, and multi-dimensional arrays.
+
+import { createServer } from "http";
 import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
 import type {
-  Container,
-  User,
   Address,
+  Container,
   Level1,
   Level2,
   Level3,
   Point,
   Score,
+  User,
 } from "./gen/index.ts";
-import { createServer } from "http";
+import { NewClient, Server } from "./gen/index.ts";
 
 function deepEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -88,10 +89,7 @@ function buildComplexInput(): Container {
     deepNest: level1,
     points: points,
     scores: scores,
-    arrayOfMapOfArrays: [
-      { set1: [1, 2, 3], set2: [4, 5] },
-      { set3: [6, 7, 8, 9] },
-    ],
+    arrayOfMapOfArrays: [{ set1: [1, 2, 3], set2: [4, 5] }, { set3: [6, 7, 8, 9] }],
   };
 }
 
@@ -129,9 +127,7 @@ async function main() {
 
   try {
     const complexInput = buildComplexInput();
-    const response = await client.procs
-      .serviceEcho()
-      .execute({ data: complexInput });
+    const response = await client.procs.serviceEcho().execute({ data: complexInput });
 
     if (!deepEqual(response.data, complexInput)) {
       console.error("Complex types mismatch");

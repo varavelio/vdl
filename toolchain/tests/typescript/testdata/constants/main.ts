@@ -1,20 +1,18 @@
 // Verifies constants are generated correctly in a separate constants.ts file.
 // Import directly from constants.ts to verify the file exists
 import {
-  VERSION,
-  MAX_RETRIES,
-  TIMEOUT_SECONDS,
-  PI,
-  IS_ENABLED,
   GREETING,
+  IS_ENABLED,
+  MAX_RETRIES,
+  PI,
+  TIMEOUT_SECONDS,
+  VERSION,
 } from "./gen/constants.ts";
 // Also verify constants are exported via index.ts
 import * as gen from "./gen/index.ts";
 
 function fail(name: string, expected: unknown, actual: unknown): never {
-  console.error(
-    `Constant ${name} mismatch: expected ${expected}, got ${actual}`,
-  );
+  console.error(`Constant ${name} mismatch: expected ${expected}, got ${actual}`);
   process.exit(1);
 }
 

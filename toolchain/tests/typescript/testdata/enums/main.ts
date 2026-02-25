@@ -1,8 +1,9 @@
 // Verifies enum serialization: both string enums and int enums are echoed correctly.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
-import type { Color, Priority } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import type { Color, Priority } from "./gen/index.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -43,9 +44,7 @@ async function main() {
     ];
 
     for (const tc of testCases) {
-      const response = await client.procs
-        .serviceTest()
-        .execute({ c: tc.color, p: tc.priority });
+      const response = await client.procs.serviceTest().execute({ c: tc.color, p: tc.priority });
 
       if (response.c !== tc.color) {
         console.error(`Expected color ${tc.color}, got ${response.c}`);

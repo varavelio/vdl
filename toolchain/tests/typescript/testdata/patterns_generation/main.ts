@@ -1,17 +1,15 @@
 // Verifies pattern generation: pattern templates with placeholders should
 // generate functions that construct the correct strings.
 import {
-  UserEventSubject,
-  SessionCacheKey,
-  TopicChannel,
-  SimpleKey,
   DuplicatedSegment,
+  SessionCacheKey,
+  SimpleKey,
+  TopicChannel,
+  UserEventSubject,
 } from "./gen/patterns.ts";
 
 function fail(name: string, expected: string, actual: string): never {
-  console.error(
-    `${name}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`,
-  );
+  console.error(`${name}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
   process.exit(1);
 }
 

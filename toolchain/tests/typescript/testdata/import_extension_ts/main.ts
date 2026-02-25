@@ -1,8 +1,9 @@
 // Verifies that import_extension: ".ts" generates correct import paths
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { readFileSync } from "fs";
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   // =========================================================================
@@ -21,9 +22,7 @@ async function main() {
 
     for (const imp of importMatches) {
       if (!imp.includes(".ts")) {
-        throw new Error(
-          `${file}: expected .ts extension in import, got: ${imp}`,
-        );
+        throw new Error(`${file}: expected .ts extension in import, got: ${imp}`);
       }
       if (imp.includes(".js")) {
         throw new Error(`${file}: unexpected .js extension in import: ${imp}`);

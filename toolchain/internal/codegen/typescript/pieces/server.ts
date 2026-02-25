@@ -1,11 +1,11 @@
 // This imports are just to prevent errors in the IDE when developing, this imports
 // are handled in the generator for the generated code
 import {
-  Response,
-  VdlError,
   asError,
-  OperationDefinition,
-  OperationType,
+  type OperationDefinition,
+  type OperationType,
+  type Response,
+  VdlError,
 } from "./core";
 
 /** START FROM HERE **/
@@ -79,12 +79,7 @@ export class HandlerContext<T, I> {
   /** Details of the RPC operation. */
   public readonly operation: OperationDefinition;
 
-  constructor(
-    props: T,
-    input: I,
-    signal: AbortSignal,
-    operation: OperationDefinition,
-  ) {
+  constructor(props: T, input: I, signal: AbortSignal, operation: OperationDefinition) {
     this.props = props;
     this.input = input;
     this.signal = signal;
@@ -112,9 +107,7 @@ export class HandlerContext<T, I> {
  *
  * @typeParam T - The application context type (props).
  */
-export type GlobalHandlerFunc<T> = (
-  c: HandlerContext<T, unknown>,
-) => Promise<unknown>;
+export type GlobalHandlerFunc<T> = (c: HandlerContext<T, unknown>) => Promise<unknown>;
 
 /**
  * Middleware that applies to all requests (Procs and Streams).
@@ -122,9 +115,7 @@ export type GlobalHandlerFunc<T> = (
  *
  * @typeParam T - The application context type (props).
  */
-export type GlobalMiddlewareFunc<T> = (
-  next: GlobalHandlerFunc<T>,
-) => GlobalHandlerFunc<T>;
+export type GlobalMiddlewareFunc<T> = (next: GlobalHandlerFunc<T>) => GlobalHandlerFunc<T>;
 
 /**
  * The core logic for a Procedure.
@@ -155,10 +146,7 @@ export type ProcMiddlewareFunc<T, I, O> = (
  * @typeParam I - The input payload type of the stream.
  * @typeParam O - The output payload type of the emitted event.
  */
-export type EmitFunc<T, I, O> = (
-  c: HandlerContext<T, I>,
-  output: O,
-) => Promise<void>;
+export type EmitFunc<T, I, O> = (c: HandlerContext<T, I>, output: O) => Promise<void>;
 
 /**
  * Middleware that wraps the emit function of a stream.
@@ -168,9 +156,7 @@ export type EmitFunc<T, I, O> = (
  * @typeParam I - The input payload type of the stream.
  * @typeParam O - The output payload type of the emitted event.
  */
-export type EmitMiddlewareFunc<T, I, O> = (
-  next: EmitFunc<T, I, O>,
-) => EmitFunc<T, I, O>;
+export type EmitMiddlewareFunc<T, I, O> = (next: EmitFunc<T, I, O>) => EmitFunc<T, I, O>;
 
 /**
  * The core logic for a Stream.
@@ -207,10 +193,7 @@ export type DeserializerFunc = (raw: unknown) => Promise<unknown>;
  *
  * @typeParam T - The application context type (props).
  */
-export type ErrorHandlerFunc<T> = (
-  c: HandlerContext<T, unknown>,
-  error: unknown,
-) => VdlError;
+export type ErrorHandlerFunc<T> = (c: HandlerContext<T, unknown>, error: unknown) => VdlError;
 
 /**
  * Configuration for stream behavior (Server-Sent Events).
@@ -248,26 +231,14 @@ export class InternalServer<T> {
 
   // Handlers
   private procHandlers: Map<string, Map<string, ProcHandlerFunc<T, any, any>>>;
-  private streamHandlers: Map<
-    string,
-    Map<string, StreamHandlerFunc<T, any, any>>
-  >;
+  private streamHandlers: Map<string, Map<string, StreamHandlerFunc<T, any, any>>>;
 
   // Middlewares
   private globalMiddlewares: GlobalMiddlewareFunc<T>[];
   private rpcMiddlewares: Map<string, GlobalMiddlewareFunc<T>[]>;
-  private procMiddlewares: Map<
-    string,
-    Map<string, ProcMiddlewareFunc<T, any, any>[]>
-  >;
-  private streamMiddlewares: Map<
-    string,
-    Map<string, StreamMiddlewareFunc<T, any, any>[]>
-  >;
-  private streamEmitMiddlewares: Map<
-    string,
-    Map<string, EmitMiddlewareFunc<T, any, any>[]>
-  >;
+  private procMiddlewares: Map<string, Map<string, ProcMiddlewareFunc<T, any, any>[]>>;
+  private streamMiddlewares: Map<string, Map<string, StreamMiddlewareFunc<T, any, any>[]>>;
+  private streamEmitMiddlewares: Map<string, Map<string, EmitMiddlewareFunc<T, any, any>[]>>;
 
   // Configs & Helpers
   private procDeserializers: Map<string, Map<string, DeserializerFunc>>;
@@ -284,10 +255,7 @@ export class InternalServer<T> {
    * @param procDefs - Procedure definitions from the schema.
    * @param streamDefs - Stream definitions from the schema.
    */
-  constructor(
-    procDefs: OperationDefinition[],
-    streamDefs: OperationDefinition[],
-  ) {
+  constructor(procDefs: OperationDefinition[], streamDefs: OperationDefinition[]) {
     this.operationDefs = new Map();
     this.procHandlers = new Map();
     this.streamHandlers = new Map();
@@ -343,11 +311,7 @@ export class InternalServer<T> {
   }
 
   /** Registers a middleware for a specific procedure. */
-  addProcMiddleware(
-    rpcName: string,
-    procName: string,
-    mw: ProcMiddlewareFunc<T, any, any>,
-  ) {
+  addProcMiddleware(rpcName: string, procName: string, mw: ProcMiddlewareFunc<T, any, any>) {
     const rpcMap = this.procMiddlewares.get(rpcName);
     if (rpcMap) {
       if (!rpcMap.has(procName)) rpcMap.set(procName, []);
@@ -356,11 +320,7 @@ export class InternalServer<T> {
   }
 
   /** Registers a middleware for a specific stream handler. */
-  addStreamMiddleware(
-    rpcName: string,
-    streamName: string,
-    mw: StreamMiddlewareFunc<T, any, any>,
-  ) {
+  addStreamMiddleware(rpcName: string, streamName: string, mw: StreamMiddlewareFunc<T, any, any>) {
     const rpcMap = this.streamMiddlewares.get(rpcName);
     if (rpcMap) {
       if (!rpcMap.has(streamName)) rpcMap.set(streamName, []);
@@ -384,10 +344,7 @@ export class InternalServer<T> {
   /** Sets the global configuration for streams. */
   setGlobalStreamConfig(cfg: StreamConfig) {
     this.globalStreamConfig = { ...this.globalStreamConfig, ...cfg };
-    if (
-      !this.globalStreamConfig.pingIntervalMs ||
-      this.globalStreamConfig.pingIntervalMs <= 0
-    ) {
+    if (!this.globalStreamConfig.pingIntervalMs || this.globalStreamConfig.pingIntervalMs <= 0) {
       this.globalStreamConfig.pingIntervalMs = 30000;
     }
   }
@@ -426,9 +383,7 @@ export class InternalServer<T> {
     const rpcHandlers = this.procHandlers.get(rpcName);
     if (rpcHandlers) {
       if (rpcHandlers.has(procName)) {
-        throw new Error(
-          `Procedure handler for ${rpcName}.${procName} is already registered`,
-        );
+        throw new Error(`Procedure handler for ${rpcName}.${procName} is already registered`);
       }
       rpcHandlers.set(procName, handler);
     }
@@ -449,9 +404,7 @@ export class InternalServer<T> {
     const rpcHandlers = this.streamHandlers.get(rpcName);
     if (rpcHandlers) {
       if (rpcHandlers.has(streamName)) {
-        throw new Error(
-          `Stream handler for ${rpcName}.${streamName} is already registered`,
-        );
+        throw new Error(`Stream handler for ${rpcName}.${streamName} is already registered`);
       }
       rpcHandlers.set(streamName, handler);
     }
@@ -506,12 +459,11 @@ export class InternalServer<T> {
     const abortController = new AbortController();
     adapter.onClose(() => abortController.abort());
 
-    const ctx = new HandlerContext<T, unknown>(
-      props,
-      rawInput,
-      abortController.signal,
-      { rpcName, name: operationName, type: opType },
-    );
+    const ctx = new HandlerContext<T, unknown>(props, rawInput, abortController.signal, {
+      rpcName,
+      name: operationName,
+      type: opType,
+    });
 
     if (opType === "stream") {
       await this.handleStreamRequest(ctx, rpcName, operationName, adapter);
@@ -570,8 +522,7 @@ export class InternalServer<T> {
     // Order: Global MW runs first, calls next...
     // So we apply global MWs in reverse order to the inner chain.
 
-    let next: GlobalHandlerFunc<T> = (ctx) =>
-      baseHandler(ctx as HandlerContext<T, any>);
+    let next: GlobalHandlerFunc<T> = (ctx) => baseHandler(ctx as HandlerContext<T, any>);
 
     // Apply Proc MWs
     if (mws && mws.length > 0) {

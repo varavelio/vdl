@@ -1,12 +1,12 @@
+import { createServer } from "http";
 import { createNodeHandler } from "./gen/adapters/node.ts";
 import {
-  Server,
+  type FullyOptionalA,
   NewClient,
-  SelfReferencing,
-  NodeA,
-  FullyOptionalA,
+  type NodeA,
+  type SelfReferencing,
+  Server,
 } from "./gen/index.ts";
-import { createServer } from "http";
 
 async function main() {
   const server = new Server();

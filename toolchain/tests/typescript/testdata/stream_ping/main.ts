@@ -1,8 +1,9 @@
 // Verifies SSE ping handling: the server sends pings during a long-running stream.
 // Uses a raw HTTP client to verify pings are actually on the wire (the generated client filters them out).
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -130,10 +131,7 @@ async function testGeneratedClient() {
   const baseUrl = `http://localhost:${addr.port}/rpc`;
   const client = NewClient(baseUrl).build();
 
-  const { stream } = client.streams
-    .clockTicks()
-    .withReconnect({ maxAttempts: 0 })
-    .execute({});
+  const { stream } = client.streams.clockTicks().withReconnect({ maxAttempts: 0 }).execute({});
 
   const received: string[] = [];
   for await (const evt of stream) {
@@ -144,11 +142,7 @@ async function testGeneratedClient() {
     received.push(evt.output.iso);
   }
 
-  if (
-    received.length !== 2 ||
-    received[0] !== "event1" ||
-    received[1] !== "event2"
-  ) {
+  if (received.length !== 2 || received[0] !== "event1" || received[1] !== "event2") {
     console.error(`expected [event1, event2], got ${JSON.stringify(received)}`);
     process.exit(1);
   }

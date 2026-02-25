@@ -1,7 +1,8 @@
 // This imports are just to prevent errors in the IDE when developing, this imports
 // are handled in the generator for the generated code
-import type { HTTPAdapter } from "../server";
+
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { HTTPAdapter } from "../server";
 
 type Server<_> = any;
 
@@ -297,8 +298,7 @@ export function createNodeHandler<T = unknown>(
           ok: false,
           error: {
             code: "NOT_FOUND",
-            message:
-              "Invalid RPC path. Expected: /[prefix/]rpcName/operationName",
+            message: "Invalid RPC path. Expected: /[prefix/]rpcName/operationName",
           },
         }),
       );
@@ -318,9 +318,7 @@ export function createNodeHandler<T = unknown>(
     // Create context
     let props: T;
     try {
-      props = createContext
-        ? await createContext(req, res)
-        : (undefined as unknown as T);
+      props = createContext ? await createContext(req, res) : (undefined as unknown as T);
     } catch (err) {
       if (!res.headersSent) {
         res.writeHead(500, { "Content-Type": "application/json" });

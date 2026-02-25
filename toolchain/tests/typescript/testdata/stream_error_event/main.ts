@@ -1,8 +1,9 @@
 // Verifies stream error events: when a handler returns an error, the client
 // receives it as an error event with the expected message.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -40,10 +41,7 @@ async function main() {
   const client = NewClient(baseUrl).build();
 
   try {
-    const { stream } = client.streams
-      .serviceData()
-      .withReconnect({ maxAttempts: 0 })
-      .execute({});
+    const { stream } = client.streams.serviceData().withReconnect({ maxAttempts: 0 }).execute({});
 
     let gotError = false;
     const timeout = setTimeout(() => {
@@ -58,9 +56,7 @@ async function main() {
         process.exit(1);
       }
       if (event.error.message !== "something went wrong") {
-        console.error(
-          `expected 'something went wrong', got '${event.error.message}'`,
-        );
+        console.error(`expected 'something went wrong', got '${event.error.message}'`);
         process.exit(1);
       }
       gotError = true;

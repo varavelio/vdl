@@ -9,39 +9,39 @@ schema: "{{schema_path}}" # Schema for all targets
 
 # You can add as many targets as you want, including multiple for the same language.
 targets:
-  # - go:
-  #     output: ./gen/go
-  #     package: vdl
-  #     genServer: false
-  #     genClient: false
+# - go:
+#     output: ./gen/go
+#     package: vdl
+#     genServer: false
+#     genClient: false
 
-  # - typescript:
-  #     output: ./gen/ts
-  #     genServer: false
-  #     genClient: false
+# - typescript:
+#     output: ./gen/ts
+#     genServer: false
+#     genClient: false
 
-  # - dart:
-  #     output: ./gen/dart
+# - dart:
+#     output: ./gen/dart
 
-  # - python:
-  #     output: ./gen/python
+# - python:
+#     output: ./gen/python
 
-  # - jsonschema:
-  #     output: ./gen/jsonschema
-  #     filename: schema.json
-  #     id: https://example.com/schema.json
-  #     root: MyRpcBarProcInput
+# - jsonschema:
+#     output: ./gen/jsonschema
+#     filename: schema.json
+#     id: https://example.com/schema.json
+#     root: MyRpcBarProcInput
 
-  # - openapi:
-  #     output: ./gen/openapi
-  #     filename: openapi.yaml
-  #     title: VDL API
-  #     version: 1.0.0
+# - openapi:
+#     output: ./gen/openapi
+#     filename: openapi.yaml
+#     title: VDL API
+#     version: 1.0.0
 
-  # - playground:
-  #     output: ./gen/playground
-  #     defaultBaseUrl: http://localhost:8080/rpc
+# - playground:
+#     output: ./gen/playground
+#     defaultBaseUrl: http://localhost:8080/rpc
 
-  # - plugin:
-  #     output: ./gen/plugin
-  #     command: ["echo", "plugin_test"]
+# - plugin:
+#     output: ./gen/plugin
+#     command: ["echo", "plugin_test"]

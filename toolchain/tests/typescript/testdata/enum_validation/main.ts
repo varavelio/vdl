@@ -1,9 +1,10 @@
 // Verifies enum serialization and round-trip: both string enums and int enums
 // are echoed correctly through client/server communication.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient, Client } from "./gen/index.ts";
-import type { Color, Priority, LogLevel } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import type { Color, LogLevel, Priority } from "./gen/index.ts";
+import { type Client, NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -155,15 +156,11 @@ async function testExplicitValueRoundTrip(client: Client) {
     });
 
     if (res.level !== tc.level) {
-      throw new Error(
-        `round-trip failed: expected ${tc.level}, got ${res.level}`,
-      );
+      throw new Error(`round-trip failed: expected ${tc.level}, got ${res.level}`);
     }
     // Verify constant value matches expected wire format
     if (tc.level !== tc.expectedValue) {
-      throw new Error(
-        `value mismatch: expected ${tc.expectedValue}, got ${tc.level}`,
-      );
+      throw new Error(`value mismatch: expected ${tc.expectedValue}, got ${tc.level}`);
     }
   }
 }

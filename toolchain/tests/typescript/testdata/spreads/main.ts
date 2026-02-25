@@ -1,21 +1,22 @@
 // Verifies spread (type composition with ...) works correctly.
 // Tests simple spreads, chained spreads, multiple spreads, spreads with complex nested types,
 // and spreads directly in input/output blocks and nested anonymous objects.
+
+import { createServer } from "http";
 import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient, Client } from "./gen/index.ts";
 import type {
-  User,
-  UserWithTimestamps,
+  Address,
   AuditedEntity,
-  Person,
+  ContactInfo,
   Document,
-  ServiceConfig,
   Order,
   OrderItem,
-  Address,
-  ContactInfo,
+  Person,
+  ServiceConfig,
+  User,
+  UserWithTimestamps,
 } from "./gen/index.ts";
-import { createServer } from "http";
+import { type Client, NewClient, Server } from "./gen/index.ts";
 
 function deepEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -220,9 +221,7 @@ async function testSimpleSpread(client: Client) {
   const res = await client.procs.serviceEchoUser().execute({ user });
 
   if (!deepEqual(res.user, user)) {
-    throw new Error(
-      `User mismatch: got ${JSON.stringify(res.user)}, want ${JSON.stringify(user)}`,
-    );
+    throw new Error(`User mismatch: got ${JSON.stringify(res.user)}, want ${JSON.stringify(user)}`);
   }
 }
 
@@ -236,9 +235,7 @@ async function testMultipleSpreads(client: Client, now: Date) {
     deletedAt: new Date(now.getTime() + 24 * 3600000),
   };
 
-  const res = await client.procs
-    .serviceEchoUserWithTimestamps()
-    .execute({ user });
+  const res = await client.procs.serviceEchoUserWithTimestamps().execute({ user });
 
   if (!deepEqual(res.user, user)) {
     throw new Error(
@@ -384,9 +381,7 @@ async function testSpreadInInput(client: Client, now: Date) {
     throw new Error(`UpdatedAt mismatch`);
   }
   if (res.customField !== input.customField) {
-    throw new Error(
-      `CustomField mismatch: got ${res.customField}, want ${input.customField}`,
-    );
+    throw new Error(`CustomField mismatch: got ${res.customField}, want ${input.customField}`);
   }
 }
 
@@ -442,15 +437,11 @@ async function testSpreadInNestedAnonymous(client: Client, now: Date) {
     },
   };
 
-  const res = await client.procs
-    .serviceSpreadInNestedAnonymous()
-    .execute(input);
+  const res = await client.procs.serviceSpreadInNestedAnonymous().execute(input);
 
   // Verify wrapper.id from Identifiable spread
   if (res.wrapper.id !== input.wrapper.id) {
-    throw new Error(
-      `Wrapper.Id mismatch: got ${res.wrapper.id}, want ${input.wrapper.id}`,
-    );
+    throw new Error(`Wrapper.Id mismatch: got ${res.wrapper.id}, want ${input.wrapper.id}`);
   }
 
   // Verify wrapper.data fields
@@ -503,22 +494,13 @@ async function testDeepNestedSpreads(client: Client, now: Date) {
   }
 
   // Verify level3 (Taggable spread)
-  if (
-    !deepEqual(res.level1.level2.level3.tags, input.level1.level2.level3.tags)
-  ) {
+  if (!deepEqual(res.level1.level2.level3.tags, input.level1.level2.level3.tags)) {
     throw new Error("Level1.Level2.Level3.Tags mismatch");
   }
-  if (
-    !deepEqual(
-      res.level1.level2.level3.metadata,
-      input.level1.level2.level3.metadata,
-    )
-  ) {
+  if (!deepEqual(res.level1.level2.level3.metadata, input.level1.level2.level3.metadata)) {
     throw new Error("Level1.Level2.Level3.Metadata mismatch");
   }
-  if (
-    res.level1.level2.level3.deepValue !== input.level1.level2.level3.deepValue
-  ) {
+  if (res.level1.level2.level3.deepValue !== input.level1.level2.level3.deepValue) {
     throw new Error("Level1.Level2.Level3.DeepValue mismatch");
   }
 }

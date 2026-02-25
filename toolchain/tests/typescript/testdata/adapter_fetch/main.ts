@@ -7,11 +7,7 @@
  * Since we're running in Node.js and not a real edge runtime,
  * we simulate the Fetch API flow by directly invoking the handler.
  */
-import {
-  createFetchHandler,
-  FetchAdapter,
-  parseRpcPath,
-} from "./gen/adapters/fetch.ts";
+import { createFetchHandler, FetchAdapter, parseRpcPath } from "./gen/adapters/fetch.ts";
 import { Server } from "./gen/server.ts";
 
 async function main() {
@@ -52,44 +48,26 @@ async function main() {
   console.log("Test 1: parseRpcPath helper");
 
   const parsed1 = parseRpcPath("http://localhost/rpc/Greeter/Hello", "/rpc");
-  if (
-    !parsed1 ||
-    parsed1.rpcName !== "Greeter" ||
-    parsed1.operationName !== "Hello"
-  ) {
+  if (!parsed1 || parsed1.rpcName !== "Greeter" || parsed1.operationName !== "Hello") {
     console.error("Test 1a FAILED: Expected Greeter/Hello but got:", parsed1);
     process.exit(1);
   }
 
   const parsed2 = parseRpcPath("http://localhost/Greeter/Hello");
-  if (
-    !parsed2 ||
-    parsed2.rpcName !== "Greeter" ||
-    parsed2.operationName !== "Hello"
-  ) {
+  if (!parsed2 || parsed2.rpcName !== "Greeter" || parsed2.operationName !== "Hello") {
     console.error("Test 1b FAILED: Expected Greeter/Hello but got:", parsed2);
     process.exit(1);
   }
 
-  const parsed3 = parseRpcPath(
-    "http://localhost/api/v1/rpc/Calculator/Add",
-    "/api/v1/rpc",
-  );
-  if (
-    !parsed3 ||
-    parsed3.rpcName !== "Calculator" ||
-    parsed3.operationName !== "Add"
-  ) {
+  const parsed3 = parseRpcPath("http://localhost/api/v1/rpc/Calculator/Add", "/api/v1/rpc");
+  if (!parsed3 || parsed3.rpcName !== "Calculator" || parsed3.operationName !== "Add") {
     console.error("Test 1c FAILED: Expected Calculator/Add but got:", parsed3);
     process.exit(1);
   }
 
   const parsed4 = parseRpcPath("http://localhost/invalid");
   if (parsed4 !== null) {
-    console.error(
-      "Test 1d FAILED: Expected null for invalid path but got:",
-      parsed4,
-    );
+    console.error("Test 1d FAILED: Expected null for invalid path but got:", parsed4);
     process.exit(1);
   }
 
@@ -122,10 +100,7 @@ async function main() {
   const response = await handler(request);
 
   if (response.status !== 200) {
-    console.error(
-      "Test 2 FAILED: Expected status 200 but got:",
-      response.status,
-    );
+    console.error("Test 2 FAILED: Expected status 200 but got:", response.status);
     process.exit(1);
   }
 
@@ -188,19 +163,13 @@ async function main() {
   const invalidResponse = await handler(invalidRequest);
 
   if (invalidResponse.status !== 404) {
-    console.error(
-      "Test 4 FAILED: Expected 404 but got:",
-      invalidResponse.status,
-    );
+    console.error("Test 4 FAILED: Expected 404 but got:", invalidResponse.status);
     process.exit(1);
   }
 
   const invalidResult = (await invalidResponse.json()) as any;
   if (invalidResult.ok !== false) {
-    console.error(
-      "Test 4 FAILED: Expected error response but got:",
-      invalidResult,
-    );
+    console.error("Test 4 FAILED: Expected error response but got:", invalidResult);
     process.exit(1);
   }
 
@@ -221,20 +190,12 @@ async function main() {
   const adapter = new FetchAdapter(directRequest);
 
   // Process request
-  await server.handleRequest(
-    { requestId: "direct-test" },
-    "Greeter",
-    "Echo",
-    adapter,
-  );
+  await server.handleRequest({ requestId: "direct-test" }, "Greeter", "Echo", adapter);
 
   const directResponse = adapter.toResponse();
   const directResult = (await directResponse.json()) as any;
 
-  if (
-    !directResult.ok ||
-    directResult.output.message !== "Direct adapter test"
-  ) {
+  if (!directResult.ok || directResult.output.message !== "Direct adapter test") {
     console.error("Test 5 FAILED: Unexpected direct response:", directResult);
     process.exit(1);
   }
@@ -247,23 +208,17 @@ async function main() {
 
   console.log("Test 6: Invalid operation returns error");
 
-  const invalidOpRequest = new Request(
-    "http://localhost/rpc/Greeter/NonExistent",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    },
-  );
+  const invalidOpRequest = new Request("http://localhost/rpc/Greeter/NonExistent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
 
   const invalidOpResponse = await handler(invalidOpRequest);
   const invalidOpResult = (await invalidOpResponse.json()) as any;
 
   if (invalidOpResult.ok !== false) {
-    console.error(
-      "Test 6 FAILED: Expected error for non-existent operation:",
-      invalidOpResult,
-    );
+    console.error("Test 6 FAILED: Expected error for non-existent operation:", invalidOpResult);
     process.exit(1);
   }
 

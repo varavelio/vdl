@@ -1,34 +1,33 @@
 // Verifies client retry logic: the server fails with 500 on first 2 attempts,
 // then succeeds on the 3rd. The client should automatically retry and eventually succeed.
+
+import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { NewClient } from "./gen/index.ts";
-import { createServer, IncomingMessage, ServerResponse } from "http";
 
 async function main() {
   let attempts = 0;
 
   // Create a custom server that fails the first 2 requests with 500
-  const httpServer = createServer(
-    async (req: IncomingMessage, res: ServerResponse) => {
-      if (req.method !== "POST") {
-        res.writeHead(405);
-        res.end();
-        return;
-      }
+  const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    if (req.method !== "POST") {
+      res.writeHead(405);
+      res.end();
+      return;
+    }
 
-      attempts++;
-      if (attempts < 3) {
-        // Fail with 500 (retryable error)
-        res.writeHead(500);
-        res.end("Internal Server Error");
-        return;
-      }
+    attempts++;
+    if (attempts < 3) {
+      // Fail with 500 (retryable error)
+      res.writeHead(500);
+      res.end("Internal Server Error");
+      return;
+    }
 
-      // Success on 3rd attempt
-      const response = { ok: true, output: {} };
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(response));
-    },
-  );
+    // Success on 3rd attempt
+    const response = { ok: true, output: {} };
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(response));
+  });
 
   await new Promise<void>((resolve) => {
     httpServer.listen(0, resolve);

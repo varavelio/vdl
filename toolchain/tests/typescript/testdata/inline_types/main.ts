@@ -1,15 +1,15 @@
 import {
-  ComplexInlineTypes,
-  ComplexInlineTypesFiles,
-  ComplexInlineTypesMeta,
-  ComplexInlineTypesGroupedFiles,
-  ComplexInlineTypesConfigs,
-  ComplexInlineTypesGrid,
-  ComplexInlineTypesSimple,
-  ComplexInlineTypesDeepNest,
+  type ComplexInlineTypes,
+  type ComplexInlineTypesConfigs,
+  type ComplexInlineTypesDeepNest,
   ComplexInlineTypesDeepNestChild,
   ComplexInlineTypesDeepNestChildGrandChild,
   ComplexInlineTypesDeepNestChildGrandChildGreatGrandChild,
+  type ComplexInlineTypesFiles,
+  type ComplexInlineTypesGrid,
+  type ComplexInlineTypesGroupedFiles,
+  type ComplexInlineTypesMeta,
+  type ComplexInlineTypesSimple,
 } from "./gen/index.ts";
 
 function main() {
@@ -68,10 +68,8 @@ function main() {
   // Verify integrity
   if (output.files[0].path !== "a") throw new Error("files mismatch");
   if (output.meta["v1"].author !== "me") throw new Error("meta mismatch");
-  if (output.groupedFiles["group1"][0].size !== 10)
-    throw new Error("groupedFiles mismatch");
-  if (output.configs[0]["conf1"].value !== "v")
-    throw new Error("configs mismatch");
+  if (output.groupedFiles["group1"][0].size !== 10) throw new Error("groupedFiles mismatch");
+  if (output.configs[0]["conf1"].value !== "v") throw new Error("configs mismatch");
   if (output.grid[0][0].y !== 2) throw new Error("grid mismatch");
   if (output.simple.name !== "test") throw new Error("simple mismatch");
   if (output.deepNest.child.grandChild.greatGrandChild.data !== "end")

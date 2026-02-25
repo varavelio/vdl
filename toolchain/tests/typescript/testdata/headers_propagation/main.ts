@@ -1,8 +1,9 @@
 // Verifies custom header propagation: X-Trace-ID and other headers
 // should be correctly passed from client to server and accessible in handlers.
+
+import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { NewClient, Server } from "./gen/index.ts";
 
 interface AppProps {
   traceId: string;
@@ -32,16 +33,14 @@ async function main() {
     { prefix: "/rpc" },
   );
 
-  const httpServer = createServer(
-    async (req: IncomingMessage, res: ServerResponse) => {
-      if (req.method !== "POST") {
-        res.writeHead(405);
-        res.end();
-        return;
-      }
-      await handler(req, res);
-    },
-  );
+  const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    if (req.method !== "POST") {
+      res.writeHead(405);
+      res.end();
+      return;
+    }
+    await handler(req, res);
+  });
 
   await new Promise<void>((resolve) => {
     httpServer.listen(0, resolve);
@@ -72,16 +71,12 @@ async function main() {
 }
 
 async function testClientLevelHeader(baseUrl: string) {
-  const client = NewClient(baseUrl)
-    .withGlobalHeader("X-Trace-ID", "trace-123-abc")
-    .build();
+  const client = NewClient(baseUrl).withGlobalHeader("X-Trace-ID", "trace-123-abc").build();
 
   const result = await client.procs.serviceEcho().execute({ data: "hello" });
 
   if (result.receivedTraceId !== "trace-123-abc") {
-    throw new Error(
-      `expected receivedTraceId='trace-123-abc', got: ${result.receivedTraceId}`,
-    );
+    throw new Error(`expected receivedTraceId='trace-123-abc', got: ${result.receivedTraceId}`);
   }
 }
 
@@ -91,9 +86,7 @@ async function testWithoutTraceID(baseUrl: string) {
   const result = await client.procs.serviceEcho().execute({ data: "hello" });
 
   if (result.receivedTraceId !== "") {
-    throw new Error(
-      `expected receivedTraceId='', got: ${result.receivedTraceId}`,
-    );
+    throw new Error(`expected receivedTraceId='', got: ${result.receivedTraceId}`);
   }
 }
 
@@ -106,9 +99,7 @@ async function testRequestLevelHeader(baseUrl: string) {
     .execute({ data: "test" });
 
   if (result.receivedTraceId !== "trace-456-def") {
-    throw new Error(
-      `expected receivedTraceId='trace-456-def', got: ${result.receivedTraceId}`,
-    );
+    throw new Error(`expected receivedTraceId='trace-456-def', got: ${result.receivedTraceId}`);
   }
 }
 

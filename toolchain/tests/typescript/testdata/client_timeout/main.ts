@@ -1,8 +1,9 @@
 // Verifies client timeout configuration: the server handler sleeps for 500ms,
 // but the client is configured with a 100ms timeout, so it should fail with REQUEST_TIMEOUT.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient, VdlError } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server, VdlError } from "./gen/index.ts";
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -43,10 +44,7 @@ async function main() {
 
   const start = Date.now();
   try {
-    await client.procs
-      .serviceSlow()
-      .withTimeout({ timeoutMs: 100 })
-      .execute({});
+    await client.procs.serviceSlow().withTimeout({ timeoutMs: 100 }).execute({});
 
     console.error("expected timeout error, got success");
     process.exit(1);

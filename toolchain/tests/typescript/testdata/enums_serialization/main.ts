@@ -1,10 +1,11 @@
 // Verifies enum serialization: enums should be transmitted as strings on the wire,
 // and round-trip correctly through client->server->client.
 // Tests both implicit-value enums (name=value) and explicit-value enums (name!=value).
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient, Client } from "./gen/index.ts";
-import type { Color, Status, HttpStatus } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import type { Color, HttpStatus, Status } from "./gen/index.ts";
+import { type Client, NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -133,14 +134,10 @@ async function testAllEnumValues(client: Client) {
       });
 
       if (result.color !== color) {
-        throw new Error(
-          `color mismatch: expected ${color}, got ${result.color}`,
-        );
+        throw new Error(`color mismatch: expected ${color}, got ${result.color}`);
       }
       if (result.status !== status) {
-        throw new Error(
-          `status mismatch: expected ${status}, got ${result.status}`,
-        );
+        throw new Error(`status mismatch: expected ${status}, got ${result.status}`);
       }
     }
   }
@@ -162,16 +159,12 @@ async function testExplicitValueWireFormat(baseUrl: string) {
   };
 
   if (result.ok !== true) {
-    throw new Error(
-      `expected ok=true for BAD_REQUEST, got: ${JSON.stringify(result)}`,
-    );
+    throw new Error(`expected ok=true for BAD_REQUEST, got: ${JSON.stringify(result)}`);
   }
 
   // Wire format must use the VALUE, not the name
   if (result.output?.status !== "BAD_REQUEST") {
-    throw new Error(
-      `expected status='BAD_REQUEST' on wire, got: ${result.output?.status}`,
-    );
+    throw new Error(`expected status='BAD_REQUEST' on wire, got: ${result.output?.status}`);
   }
 }
 
@@ -195,15 +188,11 @@ async function testExplicitValueClient(client: Client) {
     });
 
     if (result.status !== tc.input) {
-      throw new Error(
-        `round-trip failed: expected ${tc.input}, got ${result.status}`,
-      );
+      throw new Error(`round-trip failed: expected ${tc.input}, got ${result.status}`);
     }
     // Verify the constant value matches expected wire format
     if (tc.input !== tc.expected) {
-      throw new Error(
-        `constant value mismatch: expected ${tc.expected}, got ${tc.input}`,
-      );
+      throw new Error(`constant value mismatch: expected ${tc.expected}, got ${tc.input}`);
     }
   }
 }
@@ -224,9 +213,7 @@ async function testExplicitValueAllMembers(client: Client) {
     });
 
     if (result.status !== status) {
-      throw new Error(
-        `status mismatch: expected ${status}, got ${result.status}`,
-      );
+      throw new Error(`status mismatch: expected ${status}, got ${result.status}`);
     }
   }
 }

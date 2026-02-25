@@ -1,8 +1,9 @@
 // Verifies SSE payload escaping: messages with newlines, unicode,
 // and special characters should be correctly transmitted through SSE.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 const testMessages = [
   "simple message",
@@ -62,9 +63,7 @@ async function main() {
     }
 
     if (received.length !== testMessages.length) {
-      console.error(
-        `expected ${testMessages.length} messages, got ${received.length}`,
-      );
+      console.error(`expected ${testMessages.length} messages, got ${received.length}`);
       process.exit(1);
     }
 

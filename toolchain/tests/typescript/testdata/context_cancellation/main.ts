@@ -1,8 +1,9 @@
 // Verifies context cancellation behavior: when the client cancels the AbortSignal
 // mid-stream, the server should stop sending events and clean up resources.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server } from "./gen/index.ts";
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -81,9 +82,7 @@ async function main() {
   await sleep(200);
 
   if (receivedCount < 3) {
-    console.error(
-      `expected at least 3 events before cancel, got ${receivedCount}`,
-    );
+    console.error(`expected at least 3 events before cancel, got ${receivedCount}`);
     process.exit(1);
   }
 

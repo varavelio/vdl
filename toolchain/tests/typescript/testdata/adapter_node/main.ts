@@ -4,10 +4,11 @@
  * This test verifies that the generated Node.js adapter (gen/adapters/node.ts)
  * works correctly with both native Node.js http and with pre-parsed body.
  */
+
+import { createServer } from "http";
 import { createNodeHandler, NodeAdapter } from "./gen/adapters/node.ts";
 import { NewClient } from "./gen/client.ts";
 import { Server } from "./gen/server.ts";
-import { createServer } from "http";
 
 async function main() {
   // =========================================================================
@@ -66,37 +67,25 @@ async function main() {
   try {
     // Test 1: Simple greeting
     console.log("Test 1: Greeter.Hello");
-    const greetResult = await client.procs
-      .greeterHello()
-      .execute({ name: "World" });
+    const greetResult = await client.procs.greeterHello().execute({ name: "World" });
     if (greetResult.greeting !== "Hello, World!") {
-      console.error(
-        "Test 1 FAILED: Expected 'Hello, World!' but got:",
-        greetResult.greeting,
-      );
+      console.error("Test 1 FAILED: Expected 'Hello, World!' but got:", greetResult.greeting);
       process.exit(1);
     }
     console.log("Test 1 PASSED");
 
     // Test 2: Echo
     console.log("Test 2: Greeter.Echo");
-    const echoResult = await client.procs
-      .greeterEcho()
-      .execute({ message: "Test message" });
+    const echoResult = await client.procs.greeterEcho().execute({ message: "Test message" });
     if (echoResult.message !== "Test message") {
-      console.error(
-        "Test 2 FAILED: Expected 'Test message' but got:",
-        echoResult.message,
-      );
+      console.error("Test 2 FAILED: Expected 'Test message' but got:", echoResult.message);
       process.exit(1);
     }
     console.log("Test 2 PASSED");
 
     // Test 3: Calculator.Add
     console.log("Test 3: Calculator.Add");
-    const addResult = await client.procs
-      .calculatorAdd()
-      .execute({ a: 5, b: 3 });
+    const addResult = await client.procs.calculatorAdd().execute({ a: 5, b: 3 });
     if (addResult.result !== 8) {
       console.error("Test 3 FAILED: Expected 8 but got:", addResult.result);
       process.exit(1);
@@ -111,10 +100,7 @@ async function main() {
       body: JSON.stringify({}),
     });
     if (invalidResponse.status !== 404) {
-      console.error(
-        "Test 4 FAILED: Expected 404 but got:",
-        invalidResponse.status,
-      );
+      console.error("Test 4 FAILED: Expected 404 but got:", invalidResponse.status);
       process.exit(1);
     }
     console.log("Test 4 PASSED");
@@ -164,14 +150,9 @@ async function main() {
   const client2 = NewClient(baseUrl2).build();
 
   try {
-    const result = await client2.procs
-      .greeterHello()
-      .execute({ name: "PreParsed" });
+    const result = await client2.procs.greeterHello().execute({ name: "PreParsed" });
     if (result.greeting !== "Hello, PreParsed!") {
-      console.error(
-        "Test 5 FAILED: Expected 'Hello, PreParsed!' but got:",
-        result.greeting,
-      );
+      console.error("Test 5 FAILED: Expected 'Hello, PreParsed!' but got:", result.greeting);
       process.exit(1);
     }
     console.log("Test 5 PASSED");

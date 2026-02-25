@@ -1,8 +1,9 @@
 // Verifies scalar edge cases: zero values (0, 0.0, false, "", zero datetime)
 // should be correctly transmitted and distinguishable from absent values.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { Server, NewClient, Client } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { type Client, NewClient, Server } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -169,16 +170,12 @@ async function testNonZeroValues(client: Client) {
     throw new Error(`expected boolVal=true, got: ${result.boolVal}`);
   }
   if (result.stringVal !== "hello world") {
-    throw new Error(
-      `expected stringVal='hello world', got: ${result.stringVal}`,
-    );
+    throw new Error(`expected stringVal='hello world', got: ${result.stringVal}`);
   }
 
   const resultDate = new Date(result.datetimeVal);
   if (resultDate.getTime() !== now.getTime()) {
-    throw new Error(
-      `expected datetimeVal=${now.toISOString()}, got: ${resultDate.toISOString()}`,
-    );
+    throw new Error(`expected datetimeVal=${now.toISOString()}, got: ${resultDate.toISOString()}`);
   }
 }
 

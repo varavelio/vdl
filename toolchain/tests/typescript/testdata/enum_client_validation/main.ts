@@ -1,9 +1,9 @@
 // Verifies that the client properly validates enum values BEFORE sending requests.
 // This tests client-side validation, which catches invalid enums without making network calls.
-import { createNodeHandler } from "./gen/adapters/node.ts";
-import { NewClient, VdlError } from "./gen/index.ts";
-import { Server } from "./gen/index.ts";
+
 import { createServer } from "http";
+import { createNodeHandler } from "./gen/adapters/node.ts";
+import { NewClient, Server, VdlError } from "./gen/index.ts";
 
 async function main() {
   const server = new Server();
@@ -76,17 +76,11 @@ async function main() {
   try {
     // ========== Test 1: Valid enum values should work ==========
     console.log("Test 1: Valid enum values...");
-    const colorRes = await client.procs
-      .serviceEchoColor()
-      .execute({ color: "Red" });
-    if (colorRes.color !== "Red")
-      throw new Error(`Expected "Red", got ${colorRes.color}`);
+    const colorRes = await client.procs.serviceEchoColor().execute({ color: "Red" });
+    if (colorRes.color !== "Red") throw new Error(`Expected "Red", got ${colorRes.color}`);
 
-    const priorityRes = await client.procs
-      .serviceEchoPriority()
-      .execute({ priority: 2 });
-    if (priorityRes.priority !== 2)
-      throw new Error(`Expected 2, got ${priorityRes.priority}`);
+    const priorityRes = await client.procs.serviceEchoPriority().execute({ priority: 2 });
+    if (priorityRes.priority !== 2) throw new Error(`Expected 2, got ${priorityRes.priority}`);
     console.log("  PASS: Valid enum values work");
 
     // ========== Test 2: Invalid string enum value should be rejected by client ==========
@@ -126,11 +120,8 @@ async function main() {
 
     // ========== Test 5: Valid optional enums (missing) should work ==========
     console.log("Test 5: Valid optional enums (missing)...");
-    const optRes = await client.procs
-      .serviceEchoOptional()
-      .execute({ settings: {} });
-    if (optRes.settings.color !== undefined)
-      throw new Error("Expected undefined color");
+    const optRes = await client.procs.serviceEchoOptional().execute({ settings: {} });
+    if (optRes.settings.color !== undefined) throw new Error("Expected undefined color");
     console.log("  PASS: Optional enums work when missing");
 
     // ========== Test 6: Invalid optional enum should be rejected by client ==========
@@ -153,8 +144,7 @@ async function main() {
         priorities: [1, 2, 3],
       },
     });
-    if (paletteRes.palette.colors.length !== 3)
-      throw new Error("Expected 3 colors");
+    if (paletteRes.palette.colors.length !== 3) throw new Error("Expected 3 colors");
     console.log("  PASS: Valid enum arrays work");
 
     // ========== Test 8: Invalid enum in array should be rejected by client ==========
@@ -180,8 +170,7 @@ async function main() {
         priorityByTask: { task1: 1, task2: 2 },
       },
     });
-    if (mapRes.colorMap.colorByName.primary !== "Red")
-      throw new Error("Expected Red");
+    if (mapRes.colorMap.colorByName.primary !== "Red") throw new Error("Expected Red");
     console.log("  PASS: Valid enum maps work");
 
     // ========== Test 10: Invalid enum in map should be rejected by client ==========
@@ -241,14 +230,10 @@ function assertClientValidationError(e: unknown, expectedEnumName: string) {
     throw new Error(`Expected VdlError, got: ${e}`);
   }
   if (e.code !== "INVALID_INPUT") {
-    throw new Error(
-      `Expected INVALID_INPUT error code, got: ${e.code} (message: ${e.message})`,
-    );
+    throw new Error(`Expected INVALID_INPUT error code, got: ${e.code} (message: ${e.message})`);
   }
   if (!e.message.includes(expectedEnumName)) {
-    throw new Error(
-      `Expected error message to mention "${expectedEnumName}", got: ${e.message}`,
-    );
+    throw new Error(`Expected error message to mention "${expectedEnumName}", got: ${e.message}`);
   }
 }
 

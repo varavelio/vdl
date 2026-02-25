@@ -3,18 +3,16 @@
 // Also verify patterns are exported via index.ts
 import * as gen from "./gen/index.ts";
 import {
-  UserTopic,
   CacheKey,
-  SimpleRoute,
-  PrefixedPath,
-  StaticPath,
   DuplicatedPlaceholder,
+  PrefixedPath,
+  SimpleRoute,
+  StaticPath,
+  UserTopic,
 } from "./gen/patterns.ts";
 
 function fail(name: string, expected: unknown, actual: unknown): never {
-  console.error(
-    `Pattern ${name} mismatch: expected ${expected}, got ${actual}`,
-  );
+  console.error(`Pattern ${name} mismatch: expected ${expected}, got ${actual}`);
   process.exit(1);
 }
 

@@ -248,8 +248,7 @@ export function createFetchHandler<T = unknown>(
           ok: false,
           error: {
             code: "NOT_FOUND",
-            message:
-              "Invalid RPC path. Expected: /[prefix/]rpcName/operationName",
+            message: "Invalid RPC path. Expected: /[prefix/]rpcName/operationName",
           },
         }),
         {
@@ -264,9 +263,7 @@ export function createFetchHandler<T = unknown>(
     // Create context
     let props: T;
     try {
-      props = createContext
-        ? await createContext(req)
-        : (undefined as unknown as T);
+      props = createContext ? await createContext(req) : (undefined as unknown as T);
     } catch (err) {
       return new Response(
         JSON.stringify({
