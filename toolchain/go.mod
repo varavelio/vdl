@@ -1,6 +1,6 @@
 module github.com/varavelio/vdl/toolchain
 
-go 1.25
+go 1.26
 
 replace github.com/varavelio/vdl/playground v0.0.0 => ../playground
 
