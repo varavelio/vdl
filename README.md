@@ -81,9 +81,9 @@ At its core, VDL is a system built on a **schema as the single source of truth**
 
 The ecosystem is comprised of three fundamental pillars:
 
-1.  **A Definition Language (DSL):** A simple and intuitive language (`.vdl`) for defining data types, procedures (request-response), and streams (real-time communication).
-2.  **First-Class Developer Tooling:** A suite of tools that makes working with the DSL a pleasure, including an **LSP** for autocompletion and validation in your editor, automatic formatters, and a **VSCode extension**.
-3.  **Multi-Language Code Generators:** A powerful engine that reads your schema and generates fully functional, strongly-typed, and resilient clients and servers, initially for **Go** and **TypeScript**.
+1. **A Definition Language (DSL):** A simple and intuitive language (`.vdl`) for defining data types, procedures (request-response), and streams (real-time communication).
+2. **First-Class Developer Tooling:** A suite of tools that makes working with the DSL a pleasure, including an **LSP** for autocompletion and validation in your editor, automatic formatters, and a **VSCode extension**.
+3. **Multi-Language Code Generators:** A powerful engine that reads your schema and generates fully functional, strongly-typed, and resilient clients and servers, initially for **Go** and **TypeScript**.
 
 The result is a workflow where you can design, implement, document, and consume APIs with unprecedented speed and confidence.
 
