@@ -1,26 +1,13 @@
 <script lang="ts">
-  import {
-    Info,
-    Loader,
-    MoveDownLeft,
-    MoveUpRight,
-    Trash,
-    Zap,
-  } from "@lucide/svelte";
+  import { Info, Loader, MoveDownLeft, MoveUpRight, Trash, Zap } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
-
-  import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
-  import { joinPath } from "$lib/helpers/joinPath";
-  import {
-    getHeadersObject,
-    type ProcedureDef,
-    storeSettings,
-  } from "$lib/storeSettings.svelte";
-  import { storeUi } from "$lib/storeUi.svelte";
-
   import H2 from "$lib/components/H2.svelte";
   import Menu from "$lib/components/Menu.svelte";
   import Tabs from "$lib/components/Tabs.svelte";
+  import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
+  import { joinPath } from "$lib/helpers/joinPath";
+  import { getHeadersObject, type ProcedureDef, storeSettings } from "$lib/storeSettings.svelte";
+  import { storeUi } from "$lib/storeUi.svelte";
 
   import type { StoreNodeInstance } from "../../storeNode.svelte";
 
@@ -55,11 +42,7 @@
         toast.info("Procedure call cancelled");
       };
 
-      const endpoint = joinPath([
-        storeSettings.store.baseUrl,
-        proc.rpcName,
-        proc.name,
-      ]);
+      const endpoint = joinPath([storeSettings.store.baseUrl, proc.rpcName, proc.name]);
       const response = await fetch(endpoint, {
         method: "POST",
         body: JSON.stringify(storeNode.store.input ?? {}),
@@ -129,12 +112,7 @@
     }}
   >
     {#if proc.input && proc.input.length > 0}
-      <div
-        class="space-y-4"
-        onkeydown={executeProcedureFromKbd}
-        role="button"
-        tabindex="0"
-      >
+      <div class="space-y-4" onkeydown={executeProcedureFromKbd} role="button" tabindex="0">
         <InputForm fields={proc.input} bind:input={storeNode.store.input} />
       </div>
     {:else}
@@ -162,11 +140,7 @@
       </button>
 
       <Menu content={kbd} placement="bottom" trigger="mouseenter">
-        <button
-          class="btn btn-primary"
-          disabled={isExecuting}
-          onclick={executeProcedure}
-        >
+        <button class="btn btn-primary" disabled={isExecuting} onclick={executeProcedure}>
           {#if isExecuting}
             <Loader class="animate size-4 animate-spin" />
           {:else}
@@ -190,7 +164,5 @@
 </div>
 
 {#if storeUi.store.isMobile}
-  <div class="mt-12">
-    <Snippets type="proc" name={proc.name} input={storeNode.store.input} />
-  </div>
+  <div class="mt-12"><Snippets type="proc" name={proc.name} input={storeNode.store.input} /></div>
 {/if}

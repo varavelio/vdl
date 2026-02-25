@@ -1,20 +1,14 @@
 <script lang="ts">
-  import { onNavigate } from "$app/navigation";
   import { CircleCheck, CircleDashed, CircleX, Loader } from "@lucide/svelte";
   import { onMount } from "svelte";
-  import { toast, Toaster } from "svelte-sonner";
   import { fade } from "svelte/transition";
-
+  import { Toaster, toast } from "svelte-sonner";
+  import { onNavigate } from "$app/navigation";
+  import Logo from "$lib/components/Logo.svelte";
   import { initializeShiki } from "$lib/shiki";
   import { loadVdlSchema, storeSettings } from "$lib/storeSettings.svelte";
-  import {
-    dimensionschangeAction,
-    initTheme,
-    storeUi,
-  } from "$lib/storeUi.svelte";
+  import { dimensionschangeAction, initTheme, storeUi } from "$lib/storeUi.svelte";
   import { wasmClient } from "$lib/wasm";
-
-  import Logo from "$lib/components/Logo.svelte";
 
   import "../app.css";
 
@@ -75,10 +69,7 @@
 
     updateStepStatus("config", "loading");
     try {
-      await Promise.all([
-        storeSettings.status.waitUntilReady(),
-        storeUi.status.waitUntilReady(),
-      ]);
+      await Promise.all([storeSettings.status.waitUntilReady(), storeUi.status.waitUntilReady()]);
       initTheme();
       updateStepStatus("config", "completed");
     } catch (error) {
@@ -114,16 +105,11 @@
 
   let mainWidth = $derived.by(() => {
     if (storeUi.store.isMobile) return storeUi.store.app.size.offsetWidth;
-    return (
-      storeUi.store.app.size.offsetWidth - storeUi.store.aside.size.offsetWidth
-    );
+    return storeUi.store.app.size.offsetWidth - storeUi.store.aside.size.offsetWidth;
   });
 
   let mainHeight = $derived.by(() => {
-    return (
-      storeUi.store.app.size.offsetHeight -
-      storeUi.store.header.size.offsetHeight
-    );
+    return storeUi.store.app.size.offsetHeight - storeUi.store.header.size.offsetHeight;
   });
 
   let mainStyle = $derived.by(() => {

@@ -7,18 +7,10 @@
 -->
 
 <script lang="ts">
-  import {
-    BrushCleaning,
-    Minus,
-    PackageOpen,
-    Plus,
-    Trash,
-  } from "@lucide/svelte";
+  import { BrushCleaning, Minus, PackageOpen, Plus, Trash } from "@lucide/svelte";
   import { get, set, unset } from "lodash-es";
-
-  import type { Field as FieldType } from "$lib/storeSettings.svelte";
-
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
 
   import CommonFieldDoc from "./CommonFieldDoc.svelte";
   import CommonFieldset from "./CommonFieldset.svelte";
@@ -61,42 +53,27 @@
 </script>
 
 <CommonFieldset>
-  <legend class="fieldset-legend">
-    <CommonLabel optional={field.optional} label={path} />
-  </legend>
+  <legend class="fieldset-legend"><CommonLabel optional={field.optional} label={path} /></legend>
 
   <CommonFieldDoc doc={field.doc} class="-mt-2" />
 
   {#if arrayLen == 0}
     <PackageOpen class="mx-auto size-6" />
-    <p class="text-center text-sm italic">
-      No items, add one using the button below
-    </p>
+    <p class="text-center text-sm italic">No items, add one using the button below</p>
   {/if}
 
   {#each arrayIndexes as index}
-    <Field
-      field={noArrayField}
-      path={`${path}[${index}]`}
-      disableDelete={true}
-      bind:input
-    />
+    <Field field={noArrayField} path={`${path}[${index}]`} disableDelete={true} bind:input />
   {/each}
 
   <div class="flex justify-end">
-    <Tooltip
-      content={`Clear and reset ${path} to an empty array`}
-      placement="left"
-    >
+    <Tooltip content={`Clear and reset ${path} to an empty array`} placement="left">
       <button class="btn btn-sm btn-ghost btn-square" onclick={clearArray}>
         <BrushCleaning class="size-4" />
       </button>
     </Tooltip>
 
-    <Tooltip
-      content={`Delete ${path} array from the JSON object`}
-      placement="left"
-    >
+    <Tooltip content={`Delete ${path} array from the JSON object`} placement="left">
       <button class="btn btn-sm btn-ghost btn-square" onclick={deleteArray}>
         <Trash class="size-4" />
       </button>

@@ -15,18 +15,12 @@
     Zap,
   } from "@lucide/svelte";
   import { onMount } from "svelte";
-
-  import {
-    getNodeName,
-    getNodeSlug,
-    storeSettings,
-  } from "$lib/storeSettings.svelte";
-  import { dimensionschangeAction, storeUi } from "$lib/storeUi.svelte";
-  import { getVersion } from "$lib/version";
-
   import Logo from "$lib/components/Logo.svelte";
   import Offcanvas from "$lib/components/Offcanvas.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import { getNodeName, getNodeSlug, storeSettings } from "$lib/storeSettings.svelte";
+  import { dimensionschangeAction, storeUi } from "$lib/storeUi.svelte";
+  import { getVersion } from "$lib/version";
 
   import LayoutAsideCollapse from "./LayoutAsideCollapse.svelte";
   import LayoutAsideLink from "./LayoutAsideLink.svelte";
@@ -344,7 +338,5 @@
 {/if}
 
 {#if storeUi.store.isMobile}
-  <Offcanvas bind:isOpen={storeUi.store.asideOpen}>
-    {@render aside()}
-  </Offcanvas>
+  <Offcanvas bind:isOpen={storeUi.store.asideOpen}> {@render aside()} </Offcanvas>
 {/if}

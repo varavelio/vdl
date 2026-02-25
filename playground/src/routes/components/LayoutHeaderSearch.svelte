@@ -13,7 +13,8 @@
     X,
     Zap,
   } from "@lucide/svelte";
-
+  import H2 from "$lib/components/H2.svelte";
+  import Modal from "$lib/components/Modal.svelte";
   import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
   import {
     markSearchHintsMinisearch,
@@ -21,9 +22,6 @@
   } from "$lib/helpers/markSearchHints";
   import { miniSearch } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-
-  import H2 from "$lib/components/H2.svelte";
-  import Modal from "$lib/components/Modal.svelte";
 
   let input: HTMLInputElement | null = null;
   let isOpen = $state(false);
@@ -53,10 +51,7 @@
   let searchResults = $derived(miniSearch.search(searchQuery));
 </script>
 
-<button
-  class="btn btn-ghost flex items-center justify-start space-x-1 text-sm"
-  onclick={openModal}
->
+<button class="btn btn-ghost flex items-center justify-start space-x-1 text-sm" onclick={openModal}>
   <Search class="size-4" />
   <span>Search...</span>
   {#if !storeUi.store.isMobile}
@@ -67,29 +62,17 @@
   {/if}
 </button>
 
-<Modal
-  bind:isOpen
-  class="flex size-[80%] max-h-125 max-w-125 flex-col justify-start space-y-2"
->
+<Modal bind:isOpen class="flex size-[80%] max-h-125 max-w-125 flex-col justify-start space-y-2">
   <div class="flex items-center justify-start space-x-2">
     <label class="input grow">
       <Search class="size-4" />
-      <input
-        bind:this={input}
-        bind:value={searchQuery}
-        type="search"
-        placeholder="Search..."
-      />
+      <input bind:this={input} bind:value={searchQuery} type="search" placeholder="Search...">
     </label>
-    <button class="btn btn-square" onclick={closeModal}>
-      <X class="size-4" />
-    </button>
+    <button class="btn btn-square" onclick={closeModal}><X class="size-4" /></button>
   </div>
 
   {#if searchResults.length === 0}
-    <div
-      class="flex grow flex-col items-center justify-center space-y-2 text-center"
-    >
+    <div class="flex grow flex-col items-center justify-center space-y-2 text-center">
       <FileX class="size-12" />
       <H2>No results found</H2>
     </div>
@@ -131,9 +114,7 @@
               {/if}
               {@html markSearchHintsMinisearch(result, result.name)}
             </span>
-            <p class="truncate text-sm">
-              {@html truncateWithMarkMinisearch(result, result.doc)}
-            </p>
+            <p class="truncate text-sm">{@html truncateWithMarkMinisearch(result, result.doc)}</p>
           </a>
         {/each}
       </ul>

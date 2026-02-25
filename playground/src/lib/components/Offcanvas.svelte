@@ -1,10 +1,9 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import Portal from "svelte-portal";
   import { fade } from "svelte/transition";
-
-  import { mergeClasses } from "$lib/helpers/mergeClasses";
+  import Portal from "svelte-portal";
   import type { ClassValue } from "$lib/helpers/mergeClasses";
+  import { mergeClasses } from "$lib/helpers/mergeClasses";
 
   interface Props {
     children?: Snippet;
@@ -57,8 +56,7 @@
         )}
         onclick={backdropClose ? closeOffcanvas : undefined}
         aria-label="Close modal"
-      >
-      </button>
+      ></button>
 
       <div
         class={mergeClasses(

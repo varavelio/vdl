@@ -1,13 +1,11 @@
 <script lang="ts">
   import { Expand, Minimize } from "@lucide/svelte";
-
-  import { type IrNode, storeSettings } from "$lib/storeSettings.svelte";
-  import { storeUi } from "$lib/storeUi.svelte";
-  import { wasmClient } from "$lib/wasm/index";
-
   import Code from "$lib/components/Code.svelte";
   import H2 from "$lib/components/H2.svelte";
   import Tabs from "$lib/components/Tabs.svelte";
+  import { type IrNode, storeSettings } from "$lib/storeSettings.svelte";
+  import { storeUi } from "$lib/storeUi.svelte";
+  import { wasmClient } from "$lib/wasm/index";
 
   interface Props {
     node: IrNode;
@@ -32,16 +30,10 @@
 
       if (node.kind === "type") {
         if (isCompact) {
-          extractedSchemaCompact = await wasmClient.extractType(
-            schemaCompact,
-            node.name,
-          );
+          extractedSchemaCompact = await wasmClient.extractType(schemaCompact, node.name);
         }
         if (isExtended) {
-          extractedSchemaExpanded = await wasmClient.extractType(
-            schemaExpanded,
-            node.name,
-          );
+          extractedSchemaExpanded = await wasmClient.extractType(schemaExpanded, node.name);
         }
       }
       if (node.kind === "proc") {

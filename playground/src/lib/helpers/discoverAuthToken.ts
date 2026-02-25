@@ -73,11 +73,7 @@ function isTokenKey(key: string, customPattern: RegExp | null): boolean {
  * Validates if a value appears to be a valid token
  */
 function isValidTokenValue(value: unknown, minLength: number): value is string {
-  return (
-    typeof value === "string" &&
-    value.trim().length >= minLength &&
-    value.trim().length > 0
-  );
+  return typeof value === "string" && value.trim().length >= minLength && value.trim().length > 0;
 }
 
 /**
@@ -109,9 +105,7 @@ function searchTokensRecursively(
 
     obj.forEach((item, index) => {
       const currentPath = path ? `${path}[${index}]` : `[${index}]`;
-      tokens.push(
-        ...searchTokensRecursively(item, options, currentPath, depth + 1),
-      );
+      tokens.push(...searchTokensRecursively(item, options, currentPath, depth + 1));
     });
     return tokens;
   }
@@ -137,9 +131,7 @@ function searchTokensRecursively(
 
       // Recursively search nested objects/arrays
       if (typeof value === "object" && value !== null) {
-        tokens.push(
-          ...searchTokensRecursively(value, options, currentPath, depth + 1),
-        );
+        tokens.push(...searchTokensRecursively(value, options, currentPath, depth + 1));
       }
     }
   }
@@ -170,10 +162,7 @@ function searchTokensRecursively(
  * // ]
  * ```
  */
-export function discoverAuthToken(
-  data: unknown,
-  options: DiscoverTokenOptions = {},
-): TokenInfo[] {
+export function discoverAuthToken(data: unknown, options: DiscoverTokenOptions = {}): TokenInfo[] {
   if (data === null || (typeof data !== "string" && typeof data !== "object")) {
     return [];
   }

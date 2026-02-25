@@ -1,12 +1,10 @@
 <script lang="ts">
   import { MoveDownLeft, MoveUpRight, X } from "@lucide/svelte";
-
-  import { formatISODate } from "$lib/helpers/formatISODate";
-  import { storeUi } from "$lib/storeUi.svelte";
-
   import Code from "$lib/components/Code.svelte";
   import Modal from "$lib/components/Modal.svelte";
   import Tabs from "$lib/components/Tabs.svelte";
+  import { formatISODate } from "$lib/helpers/formatISODate";
+  import { storeUi } from "$lib/storeUi.svelte";
 
   import type { HistoryItem } from "../../../storeNode.svelte";
 
@@ -22,9 +20,7 @@
   {#if historyItem}
     <div class="flex h-full flex-col space-y-4 overflow-hidden">
       <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold">
-          {formatISODate(historyItem.date)}
-        </h2>
+        <h2 class="text-lg font-semibold">{formatISODate(historyItem.date)}</h2>
         <button
           class="btn btn-ghost btn-sm btn-circle"
           onclick={() => (isOpen = false)}

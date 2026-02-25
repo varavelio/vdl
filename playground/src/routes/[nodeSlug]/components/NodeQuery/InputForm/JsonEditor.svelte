@@ -21,10 +21,7 @@
    * This deeply compares if the two objects have the same content
    * regardless of formatting or key order.
    */
-  function statesAreEqual(
-    input: Record<string, any>,
-    editorValue: string,
-  ): boolean {
+  function statesAreEqual(input: Record<string, any>, editorValue: string): boolean {
     try {
       const comparableInput = JSON.parse(JSON.stringify(input));
       const comparableEditorValue = JSON.parse(editorValue);

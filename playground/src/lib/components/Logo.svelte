@@ -16,10 +16,7 @@
   viewBox="0 0 940 275"
   {...rest}
 >
-  <path
-    fill="currentColor"
-    d="M680 275v-70h25V70h-25V0h145v70h-25v135h25l20-25h95v95z"
-  />
+  <path fill="currentColor" d="M680 275v-70h25V70h-25V0h145v70h-25v135h25l20-25h95v95z" />
   <path
     fill="currentColor"
     d="M360 0v70h25v135h-25v70l229.188.063L645 205V70L588.674 0Zm120 70h50l20 25v85l-20 25h-50z"

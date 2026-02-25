@@ -31,15 +31,7 @@ export type IrNode =
 
 export const primitiveTypes = ["string", "int", "float", "bool", "datetime"];
 
-type SearchItemKind =
-  | "constant"
-  | "pattern"
-  | "enum"
-  | "type"
-  | "rpc"
-  | "proc"
-  | "stream"
-  | "doc";
+type SearchItemKind = "constant" | "pattern" | "enum" | "type" | "rpc" | "proc" | "stream" | "doc";
 
 type SearchItem = {
   id: number;
@@ -295,8 +287,7 @@ const normalizeHeaders = (raw: unknown): Header[] => {
     const key = typeof item?.key === "string" ? item.key : "";
     const value = typeof item?.value === "string" ? item.value : "";
     const enabled = typeof item?.enabled === "boolean" ? item.enabled : true;
-    const description =
-      typeof item?.description === "string" ? item.description : "";
+    const description = typeof item?.description === "string" ? item.description : "";
     return { key, value, enabled, description } satisfies Header;
   });
 };

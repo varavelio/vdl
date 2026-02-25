@@ -1,10 +1,8 @@
 <script lang="ts">
   import * as curlconverter from "curlconverter";
   import { onMount } from "svelte";
-
-  import { storeUi } from "$lib/storeUi.svelte";
-
   import Code from "$lib/components/Code.svelte";
+  import { storeUi } from "$lib/storeUi.svelte";
 
   interface Props {
     curl: string;
@@ -311,25 +309,19 @@
   });
 
   let pickedLang = $derived.by(() => {
-    const lang = langs.find(
-      (lang) => lang.label === storeUi.store.codeSnippetsCurlLang,
-    );
+    const lang = langs.find((lang) => lang.label === storeUi.store.codeSnippetsCurlLang);
     if (!lang) return defaultLang.langCode;
     return lang.langCode;
   });
 
   let pickedCode = $derived.by(() => {
-    const lang = langs.find(
-      (lang) => lang.label === storeUi.store.codeSnippetsCurlLang,
-    );
+    const lang = langs.find((lang) => lang.label === storeUi.store.codeSnippetsCurlLang);
     if (!lang) return defaultLang.func(curl);
     return lang.func(curl);
   });
 
   onMount(() => {
-    const lang = langs.find(
-      (lang) => lang.label === storeUi.store.codeSnippetsCurlLang,
-    );
+    const lang = langs.find((lang) => lang.label === storeUi.store.codeSnippetsCurlLang);
     if (!lang) {
       storeUi.store.codeSnippetsCurlLang = defaultLang.label;
     }
@@ -338,10 +330,7 @@
 
 <label class="fieldset mb-4">
   <legend class="fieldset-legend">Language</legend>
-  <select
-    class="select w-full appearance-none"
-    bind:value={storeUi.store.codeSnippetsCurlLang}
-  >
+  <select class="select w-full appearance-none" bind:value={storeUi.store.codeSnippetsCurlLang}>
     {#each langGroups as langGroup}
       {#if langGroup.langs.length > 1}
         <optgroup label={langGroup.group}>
@@ -350,16 +339,13 @@
           {/each}
         </optgroup>
       {:else}
-        <option value={langGroup.langs[0].label}>
-          {langGroup.langs[0].label}
-        </option>
+        <option value={langGroup.langs[0].label}>{langGroup.langs[0].label}</option>
       {/if}
     {/each}
   </select>
   <div class="prose prose-sm text-base-content/50 max-w-none">
-    The easiest way to test this API is with the code snippets below. However,
-    if your language is supported, <b>using the SDK is recommended</b> for a smoother
-    integration experience.
+    The easiest way to test this API is with the code snippets below. However, if your language is
+    supported, <b>using the SDK is recommended</b> for a smoother integration experience.
   </div>
 </label>
 

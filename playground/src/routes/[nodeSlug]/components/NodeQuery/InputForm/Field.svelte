@@ -14,10 +14,7 @@
 -->
 
 <script lang="ts">
-  import {
-    type Field as FieldType,
-    storeSettings,
-  } from "$lib/storeSettings.svelte";
+  import { type Field as FieldType, storeSettings } from "$lib/storeSettings.svelte";
 
   import FieldInlineArray from "./FieldInlineArray.svelte";
   import FieldInlineSingle from "./FieldInlineSingle.svelte";
@@ -31,12 +28,7 @@
     disableDelete?: boolean;
   }
 
-  let {
-    field: originalField,
-    input = $bindable(),
-    path,
-    disableDelete,
-  }: Props = $props();
+  let { field: originalField, input = $bindable(), path, disableDelete }: Props = $props();
 
   function getTypeDefFields(typeName: string): FieldType[] {
     for (const typeDef of storeSettings.store.irSchema.types) {
@@ -90,13 +82,9 @@
   let isObject = $derived(field.typeRef.kind === "object");
   let isPrimitive = $derived(field.typeRef.kind === "primitive");
 
-  let isInlineArray = $derived(
-    isArray && field.typeRef.arrayType?.kind === "object",
-  );
+  let isInlineArray = $derived(isArray && field.typeRef.arrayType?.kind === "object");
   let isInlineSingle = $derived(isObject && !isArray);
-  let isNamedArray = $derived(
-    isArray && field.typeRef.arrayType?.kind === "primitive",
-  );
+  let isNamedArray = $derived(isArray && field.typeRef.arrayType?.kind === "primitive");
   let isNamedSingle = $derived(isPrimitive && !isArray);
 </script>
 

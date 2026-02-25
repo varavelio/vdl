@@ -81,11 +81,7 @@ export class WasmClient {
   /**
    * Extract a specific procedure declaration from the schema.
    */
-  async extractProc(
-    vdlSchema: string,
-    rpcName: string,
-    procName: string,
-  ): Promise<string> {
+  async extractProc(vdlSchema: string, rpcName: string, procName: string): Promise<string> {
     const res = await this.call({
       functionName: "ExtractProc",
       extractProc: { vdlSchema, rpcName, procName },
@@ -100,11 +96,7 @@ export class WasmClient {
   /**
    * Extract a specific stream declaration from the schema.
    */
-  async extractStream(
-    vdlSchema: string,
-    rpcName: string,
-    streamName: string,
-  ): Promise<string> {
+  async extractStream(vdlSchema: string, rpcName: string, streamName: string): Promise<string> {
     const res = await this.call({
       functionName: "ExtractStream",
       extractStream: { vdlSchema, rpcName, streamName },

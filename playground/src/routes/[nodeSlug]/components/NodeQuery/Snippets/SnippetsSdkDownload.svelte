@@ -6,10 +6,7 @@
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
   import { wasmClient } from "$lib/wasm/index";
-  import type {
-    CodegenOutput,
-    CodegenOutputFile,
-  } from "$lib/wasm/wasmtypes/types";
+  import type { CodegenOutput, CodegenOutputFile } from "$lib/wasm/wasmtypes/types";
 
   let isGenerating: boolean = $state(false);
 
@@ -67,8 +64,7 @@
           },
         });
       } else if (lang === "go") {
-        const packageName =
-          storeUi.store.codeSnippetsSdkGolangPackageName.trim() || "vdlclient";
+        const packageName = storeUi.store.codeSnippetsSdkGolangPackageName.trim() || "vdlclient";
         result = await wasmClient.codegen({
           vdlSchema,
           target: {
@@ -128,7 +124,7 @@
         class="input w-full"
         placeholder="Package name..."
         bind:value={storeUi.store.codeSnippetsSdkGolangPackageName}
-      />
+      >
       <div class="prose prose-sm text-base-content/50 max-w-none">
         The generated SDK and code examples will use this package name.
       </div>
@@ -143,7 +139,7 @@
         class="input w-full"
         placeholder="Package name..."
         bind:value={storeUi.store.codeSnippetsSdkDartPackageName}
-      />
+      >
       <div class="prose prose-sm text-base-content/50 max-w-none">
         The generated SDK and code examples will use this package name.
       </div>

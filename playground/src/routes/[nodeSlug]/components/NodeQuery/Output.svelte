@@ -1,19 +1,10 @@
 <script lang="ts">
-  import {
-    CircleX,
-    Clock,
-    CloudAlert,
-    Copy,
-    Loader,
-    Trash,
-  } from "@lucide/svelte";
-
-  import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
-  import { formatISODate } from "$lib/helpers/formatISODate";
-
+  import { CircleX, Clock, CloudAlert, Copy, Loader, Trash } from "@lucide/svelte";
   import Editor from "$lib/components/Editor.svelte";
   import H3 from "$lib/components/H3.svelte";
   import Tabs from "$lib/components/Tabs.svelte";
+  import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
+  import { formatISODate } from "$lib/helpers/formatISODate";
 
   import type { StoreNodeInstance } from "../../storeNode.svelte";
 
@@ -62,45 +53,36 @@
 
 <div class="w-full space-y-2">
   {#if !hasOutput && !isExecuting}
-    <div
-      class="mt-[100px] flex w-full flex-col items-center justify-center space-y-2"
-    >
+    <div class="mt-[100px] flex w-full flex-col items-center justify-center space-y-2">
       <CloudAlert class="size-10" />
       <H3 class="flex items-center justify-start space-x-2">No Output</H3>
     </div>
 
     <p class="mb-[100px] pt-4 text-center">
-      Please execute the {type === "proc" ? "procedure" : "stream"} from the input
-      tab to see the output.
+      Please execute the {type === "proc" ? "procedure" : "stream"} from the input tab to see the
+      output.
     </p>
   {/if}
 
   {#if !hasOutput && isExecuting}
-    <div
-      class="mt-12 mb-4 flex w-full flex-col items-center justify-center space-y-2"
-    >
+    <div class="mt-12 mb-4 flex w-full flex-col items-center justify-center space-y-2">
       <Loader class="animate size-10 animate-spin" />
       <H3 class="flex items-center justify-start space-x-2">
         {type === "proc" ? "Executing procedure" : "Starting data stream"}
       </H3>
     </div>
 
-    <div class="flex justify-center">
-      {@render CancelButton()}
-    </div>
+    <div class="flex justify-center">{@render CancelButton()}</div>
   {/if}
 
   {#if hasOutput}
     {#if type == "stream" && isExecuting}
       <p class="pb-2 text-sm">
-        The data stream is currently active using Server Sent Events (SSE). You
-        can stop it by clicking the button below. New messages will be added to
-        the top of the output.
+        The data stream is currently active using Server Sent Events (SSE). You can stop it by
+        clicking the button below. New messages will be added to the top of the output.
       </p>
 
-      <div class="pb-2">
-        {@render CancelButton()}
-      </div>
+      <div class="pb-2">{@render CancelButton()}</div>
     {/if}
 
     <div class="flex w-full flex-wrap items-start justify-between gap-2">

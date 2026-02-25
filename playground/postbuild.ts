@@ -91,9 +91,7 @@ const patchFiles = async () => {
 
       if (patched) {
         await fs.promises.writeFile(file, data, "utf8");
-        console.log(
-          `Patched relative assets in: ${path.relative(process.cwd(), file)}`,
-        );
+        console.log(`Patched relative assets in: ${path.relative(process.cwd(), file)}`);
       }
     }
   } catch (error) {

@@ -8,10 +8,8 @@
 <script lang="ts">
   import { BrushCleaning, Trash } from "@lucide/svelte";
   import { set, unset } from "lodash-es";
-
-  import type { Field as FieldType } from "$lib/storeSettings.svelte";
-
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
 
   import CommonFieldDoc from "./CommonFieldDoc.svelte";
   import CommonFieldset from "./CommonFieldset.svelte";
@@ -37,9 +35,7 @@
 </script>
 
 <CommonFieldset>
-  <legend class="fieldset-legend">
-    <CommonLabel label={path} optional={field.optional} />
-  </legend>
+  <legend class="fieldset-legend"><CommonLabel label={path} optional={field.optional} /></legend>
 
   <CommonFieldDoc doc={field.doc} class="-mt-2" />
 
@@ -48,10 +44,7 @@
   {/each}
 
   <div class="flex justify-end">
-    <Tooltip
-      content={`Clear and reset ${path} to an empty object`}
-      placement="left"
-    >
+    <Tooltip content={`Clear and reset ${path} to an empty object`} placement="left">
       <button class="btn btn-sm btn-ghost btn-square" onclick={clearObject}>
         <BrushCleaning class="size-4" />
       </button>

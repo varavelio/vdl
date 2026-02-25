@@ -5,9 +5,8 @@
   import SwaggerUI from "swagger-ui";
   import "swagger-ui/dist/swagger-ui.css";
 
-  import { storeSettings } from "$lib/storeSettings.svelte";
-
   import Logo from "$lib/components/Logo.svelte";
+  import { storeSettings } from "$lib/storeSettings.svelte";
 
   interface Props {
     onClose: () => void;
@@ -82,15 +81,12 @@
   <div class="grow"></div>
   <Logo class="h-8 grow" />
   <div class="flex grow justify-end">
-    <button class="btn btn-ghost btn-circle" onclick={onClose}>
-      <X class="size-6" />
-    </button>
+    <button class="btn btn-ghost btn-circle" onclick={onClose}><X class="size-6" /></button>
   </div>
 </header>
 
 <p class="text-base-content/50 mt-8 block px-4 text-center text-sm">
-  VDL is not affiliated with OpenAPI or Swagger. It just generates OpenAPI
-  schemas from VDL code.
+  VDL is not affiliated with OpenAPI or Swagger. It just generates OpenAPI schemas from VDL code.
 </p>
 
 <div class="mt-2 flex justify-center">

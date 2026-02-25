@@ -9,13 +9,10 @@ import type { SearchResult } from "minisearch";
  */
 export function markSearchHints(searchResult: string[], textToMark: string) {
   // Escape special regex characters in each search term to avoid regexp errors
-  const escapeRegExp = (str: string) =>
-    str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   // Filter out empty strings to avoid empty alternatives in the regexp
-  const sanitizedTerms = searchResult
-    .filter((term) => term && term.length > 0)
-    .map(escapeRegExp);
+  const sanitizedTerms = searchResult.filter((term) => term && term.length > 0).map(escapeRegExp);
 
   if (sanitizedTerms.length === 0) {
     return textToMark;
@@ -73,10 +70,7 @@ export function truncateWithMark(searchResult: string[], textToMark: string) {
  * @param textToMark - The text string where terms should be highlighted
  * @returns The text string with matching terms wrapped in <mark> tags
  */
-export function markSearchHintsMinisearch(
-  searchResult: SearchResult,
-  textToMark: string,
-) {
+export function markSearchHintsMinisearch(searchResult: SearchResult, textToMark: string) {
   return markSearchHints(searchResult.terms, textToMark);
 }
 
@@ -89,9 +83,6 @@ export function markSearchHintsMinisearch(
  *          the first 3 words, returns the full text. Otherwise, shows 3 words before
  *          the match and everything after, with an ellipsis prefix.
  */
-export function truncateWithMarkMinisearch(
-  searchResult: SearchResult,
-  textToMark: string,
-) {
+export function truncateWithMarkMinisearch(searchResult: SearchResult, textToMark: string) {
   return truncateWithMark(searchResult.terms, textToMark);
 }

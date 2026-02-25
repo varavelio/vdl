@@ -1,16 +1,10 @@
 <script lang="ts">
   import { Link, Plus, RefreshCcw, Settings, Trash, X } from "@lucide/svelte";
-
-  import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
-  import {
-    loadDefaultBaseURL,
-    loadDefaultHeaders,
-    storeSettings,
-  } from "$lib/storeSettings.svelte";
-  import { storeUi } from "$lib/storeUi.svelte";
-
   import Modal from "$lib/components/Modal.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import { ctrlSymbol } from "$lib/helpers/ctrlSymbol";
+  import { loadDefaultBaseURL, loadDefaultHeaders, storeSettings } from "$lib/storeSettings.svelte";
+  import { storeUi } from "$lib/storeUi.svelte";
 
   let isOpen = $state(false);
   const openModal = () => (isOpen = true);
@@ -38,9 +32,7 @@
   };
 
   const removeHeader = (index: number) => {
-    storeSettings.store.headers = storeSettings.store.headers.filter(
-      (_, i) => i !== index,
-    );
+    storeSettings.store.headers = storeSettings.store.headers.filter((_, i) => i !== index);
   };
 
   const loadDefaultBaseUrlWithConfirm = () => {
@@ -56,10 +48,7 @@
   };
 </script>
 
-<button
-  class="btn btn-ghost flex items-center justify-start space-x-1 text-sm"
-  onclick={openModal}
->
+<button class="btn btn-ghost flex items-center justify-start space-x-1 text-sm" onclick={openModal}>
   <Settings class="size-4" />
   <span>Settings</span>
   {#if !storeUi.store.isMobile}
@@ -73,9 +62,7 @@
 <Modal bind:isOpen class="size-[80%] max-h-200 max-w-200">
   <div class="flex w-full items-center justify-between">
     <h3 class="text-xl font-bold">Settings</h3>
-    <button class="btn btn-circle btn-ghost" onclick={closeModal}>
-      <X class="size-4" />
-    </button>
+    <button class="btn btn-circle btn-ghost" onclick={closeModal}><X class="size-4" /></button>
   </div>
 
   <p>Settings are saved in your browser's storage.</p>
@@ -92,20 +79,17 @@
             spellcheck="false"
             placeholder="https://api.example.com/rpc"
             bind:value={storeSettings.store.baseUrl}
-          />
+          >
         </label>
         <Tooltip content="Reset base URL to default">
-          <button
-            class="btn btn-ghost btn-square"
-            onclick={loadDefaultBaseUrlWithConfirm}
-          >
+          <button class="btn btn-ghost btn-square" onclick={loadDefaultBaseUrlWithConfirm}>
             <RefreshCcw class="size-4" />
           </button>
         </Tooltip>
       </div>
       <p class="label text-wrap">
-        This is the base URL where the VDL RPC server is running, all requests
-        will be sent to {`<base-url>/{rpcName}/{operationName}`}.
+        This is the base URL where the VDL RPC server is running, all requests will be sent to
+        {`<base-url>/{rpcName}/{operationName}`}.
       </p>
     </fieldset>
 
@@ -134,11 +118,7 @@
                         ? "Disable header"
                         : "Enable header"}
                     >
-                      <input
-                        type="checkbox"
-                        class="checkbox"
-                        bind:checked={header.enabled}
-                      />
+                      <input type="checkbox" class="checkbox" bind:checked={header.enabled}>
                     </Tooltip>
                   </td>
                   <td>
@@ -148,7 +128,7 @@
                       spellcheck="false"
                       placeholder="Key"
                       bind:value={header.key}
-                    />
+                    >
                   </td>
                   <td>
                     <input
@@ -157,7 +137,7 @@
                       spellcheck="false"
                       placeholder="Value"
                       bind:value={header.value}
-                    />
+                    >
                   </td>
                   <td>
                     <input
@@ -166,7 +146,7 @@
                       spellcheck="false"
                       placeholder="Description (optional)"
                       bind:value={header.description}
-                    />
+                    >
                   </td>
                   <td>
                     <Tooltip content="Remove header">

@@ -31,12 +31,7 @@ const storeNodeDefault: StoreNode = {
   history: [],
 };
 
-const storeNodeKeysToPersist: StoreNodeKey[] = [
-  "input",
-  "output",
-  "outputDate",
-  "history",
-];
+const storeNodeKeysToPersist: StoreNodeKey[] = ["input", "output", "outputDate", "history"];
 
 export const createStoreNode = (nodeSlug: string) => {
   return createStore({

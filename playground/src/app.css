@@ -7,9 +7,9 @@
 
 @plugin "daisyui/theme" {
   /*
-		Theme taken from here and then modified:
-		https://raw.githubusercontent.com/saadeghi/daisyui/refs/tags/v5.5.14/packages/daisyui/src/themes/light.css
-	*/
+  Theme taken from here and then modified:
+  https://raw.githubusercontent.com/saadeghi/daisyui/refs/tags/v5.5.14/packages/daisyui/src/themes/light.css
+  */
 
   name: "light";
   default: true;
@@ -59,10 +59,10 @@
 
 @plugin "daisyui/theme" {
   /*
-		Theme taken from here and then modified:
-		https://raw.githubusercontent.com/saadeghi/daisyui/refs/tags/v5.5.14/packages/daisyui/src/themes/dark.css
-		https://raw.githubusercontent.com/saadeghi/daisyui/refs/tags/v5.5.14/packages/daisyui/src/themes/dim.css
-	*/
+  Theme taken from here and then modified:
+  https://raw.githubusercontent.com/saadeghi/daisyui/refs/tags/v5.5.14/packages/daisyui/src/themes/dark.css
+  https://raw.githubusercontent.com/saadeghi/daisyui/refs/tags/v5.5.14/packages/daisyui/src/themes/dim.css
+  */
 
   name: "dark";
   default: false;

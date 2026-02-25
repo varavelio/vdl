@@ -1,11 +1,9 @@
 <script lang="ts">
   import { Ellipsis, EllipsisVertical, Menu, X } from "@lucide/svelte";
-
-  import { dimensionschangeAction, storeUi } from "$lib/storeUi.svelte";
-
   import Logo from "$lib/components/Logo.svelte";
   import MenuComponent from "$lib/components/Menu.svelte";
   import Offcanvas from "$lib/components/Offcanvas.svelte";
+  import { dimensionschangeAction, storeUi } from "$lib/storeUi.svelte";
 
   import LayoutHeaderDocsLink from "./LayoutHeaderDocsLink.svelte";
   import LayoutHeaderMoreOptions from "./LayoutHeaderMoreOptions.svelte";
@@ -39,14 +37,8 @@
         <LayoutHeaderMoreOptions />
       {/snippet}
 
-      <MenuComponent
-        content={menuContent}
-        trigger="mouseenter focus"
-        placement="bottom-start"
-      >
-        <button class="btn btn-ghost btn-square">
-          <EllipsisVertical class="size-4" />
-        </button>
+      <MenuComponent content={menuContent} trigger="mouseenter focus" placement="bottom-start">
+        <button class="btn btn-ghost btn-square"><EllipsisVertical class="size-4" /></button>
       </MenuComponent>
     </div>
   </header>
@@ -62,10 +54,7 @@
     ]}
   >
     <div class="flex items-center justify-start space-x-2">
-      <button
-        class="btn btn-ghost btn-square"
-        onclick={() => (storeUi.store.asideOpen = true)}
-      >
+      <button class="btn btn-ghost btn-square" onclick={() => (storeUi.store.asideOpen = true)}>
         <Menu class="size-6" />
       </button>
     </div>
@@ -73,10 +62,7 @@
     <Logo class="mx-auto h-[80%]" />
 
     <div class="flex items-center justify-end space-x-2">
-      <button
-        class="btn btn-ghost btn-square"
-        onclick={() => (isMobileOffcanvasOpen = true)}
-      >
+      <button class="btn btn-ghost btn-square" onclick={() => (isMobileOffcanvasOpen = true)}>
         <Ellipsis class="size-6" />
       </button>
     </div>
@@ -92,8 +78,6 @@
       </button>
       <h2 class="text-lg font-bold">More options</h2>
     </div>
-    <div class="p-4">
-      <LayoutHeaderMoreOptions />
-    </div>
+    <div class="p-4"><LayoutHeaderMoreOptions /></div>
   </Offcanvas>
 {/if}

@@ -1,16 +1,12 @@
 <script lang="ts">
   import { BookOpenText, Github } from "@lucide/svelte";
-
-  import { storeUi } from "$lib/storeUi.svelte";
-
   import BottomSpace from "$lib/components/BottomSpace.svelte";
   import Logo from "$lib/components/Logo.svelte";
   import VersionBadge from "$lib/components/VersionBadge.svelte";
+  import { storeUi } from "$lib/storeUi.svelte";
 </script>
 
-<svelte:head>
-  <title>About | VDL Playground</title>
-</svelte:head>
+<svelte:head> <title>About | VDL Playground</title> </svelte:head>
 
 <div
   class={{
@@ -49,9 +45,7 @@
       </a>
     </div>
 
-    <div class="flex justify-center">
-      <VersionBadge />
-    </div>
+    <div class="flex justify-center"><VersionBadge /></div>
 
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
@@ -62,10 +56,9 @@
           </p>
 
           <p class="text-base-content/80 leading-relaxed">
-            VDL is provided "AS IS" without warranty of any kind. The authors
-            assume no responsibility for damages or losses from using this
-            software. You are responsible for testing generated code before
-            production use.
+            VDL is provided "AS IS" without warranty of any kind. The authors assume no
+            responsibility for damages or losses from using this software. You are responsible for
+            testing generated code before production use.
           </p>
         </div>
       </div>

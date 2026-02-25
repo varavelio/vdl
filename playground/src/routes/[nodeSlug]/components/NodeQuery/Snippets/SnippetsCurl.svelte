@@ -1,8 +1,7 @@
 <script lang="ts">
+  import Code from "$lib/components/Code.svelte";
   import { joinPath } from "$lib/helpers/joinPath";
   import { getHeadersObject, storeSettings } from "$lib/storeSettings.svelte";
-
-  import Code from "$lib/components/Code.svelte";
 
   import SnippetsCode from "./SnippetsCurlCode.svelte";
 
@@ -46,13 +45,10 @@
 <div>
   {#if type === "stream"}
     <p class="pb-4 text-sm">
-      Streams use Server-Sent Events. Only curl examples are provided. Build a
-      client manually, or generate one with the vdl CLI if your language is
-      supported.
-      <br />
-      <a href="https://vdl.varavel.com/sse" target="_blank" class="link">
-        Learn more here
-      </a>
+      Streams use Server-Sent Events. Only curl examples are provided. Build a client manually, or
+      generate one with the vdl CLI if your language is supported.
+      <br>
+      <a href="https://vdl.varavel.com/sse" target="_blank" class="link"> Learn more here </a>
     </p>
 
     <Code code={curl} lang="bash" scrollY={false} />

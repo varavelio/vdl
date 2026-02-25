@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { pushState } from "$app/navigation";
   import { Expand, Link, Minimize, TriangleAlert } from "@lucide/svelte";
-
+  import { pushState } from "$app/navigation";
+  import Code from "$lib/components/Code.svelte";
+  import Tabs from "$lib/components/Tabs.svelte";
   import { markdownToHtml } from "$lib/helpers/markdownToHtml";
   import { slugify } from "$lib/helpers/slugify";
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
   import { wasmClient } from "$lib/wasm/index";
   import type { TypeDef } from "$lib/wasm/wasmtypes/types";
-
-  import Code from "$lib/components/Code.svelte";
-  import Tabs from "$lib/components/Tabs.svelte";
 
   interface Props {
     type: TypeDef;
@@ -27,9 +25,7 @@
   const href = `/#/${slug}`;
 
   function scrollTo(id: string) {
-    document
-      .getElementById(id)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function handleClick(e: MouseEvent) {
@@ -48,16 +44,10 @@
 
       try {
         if (isCompact) {
-          extractedSchemaCompact = await wasmClient.extractType(
-            schemaCompact,
-            type.name,
-          );
+          extractedSchemaCompact = await wasmClient.extractType(schemaCompact, type.name);
         }
         if (isExpanded) {
-          extractedSchemaExpanded = await wasmClient.extractType(
-            schemaExpanded,
-            type.name,
-          );
+          extractedSchemaExpanded = await wasmClient.extractType(schemaExpanded, type.name);
         }
       } catch (err) {
         console.error(`Failed to extract schema for ${type.name}`, err);
@@ -99,9 +89,7 @@
     {#if typeof type.deprecated === "string"}
       <div class="alert alert-warning">
         <TriangleAlert class="size-5" />
-        <span class="font-semibold">
-          {type.deprecated || "Deprecated"}
-        </span>
+        <span class="font-semibold"> {type.deprecated || "Deprecated"} </span>
       </div>
     {/if}
 
@@ -137,12 +125,7 @@
       </div>
 
       {#if schemaToShow}
-        <Code
-          code={schemaToShow}
-          lang="vdl"
-          withBorder={true}
-          class="max-h-125"
-        />
+        <Code code={schemaToShow} lang="vdl" withBorder={true} class="max-h-125" />
       {:else}
         <div class="skeleton h-32 w-full"></div>
       {/if}

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { storeUi } from "$lib/storeUi.svelte";
-
   import Code from "$lib/components/Code.svelte";
+  import { storeUi } from "$lib/storeUi.svelte";
 
   interface Props {
     type: "proc" | "stream";
@@ -107,28 +106,22 @@ for event in stream:
 
 <div class="prose prose-sm text-base-content max-w-none space-y-4">
   <p>
-    Here is a simple example of how to call this {isProc
+    Here is a simple example of how to call this
+    {isProc
       ? "procedure"
-      : "stream"} with the SDK.
+      : "stream"}
+    with the SDK.
   </p>
 
   <p>Use your editor/IDE to help you with the types, the SDK is fully typed.</p>
 
   {#if storeUi.store.codeSnippetsSdkLang === "typescript"}
-    <div class="not-prose">
-      <Code code={isProc ? tsProc : tsStream} lang="ts" />
-    </div>
+    <div class="not-prose"><Code code={isProc ? tsProc : tsStream} lang="ts" /></div>
   {:else if storeUi.store.codeSnippetsSdkLang === "go"}
-    <div class="not-prose">
-      <Code code={isProc ? goProc : goStream} lang="go" />
-    </div>
+    <div class="not-prose"><Code code={isProc ? goProc : goStream} lang="go" /></div>
   {:else if storeUi.store.codeSnippetsSdkLang === "dart"}
-    <div class="not-prose">
-      <Code code={isProc ? dartProc : dartStream} lang="dart" />
-    </div>
+    <div class="not-prose"><Code code={isProc ? dartProc : dartStream} lang="dart" /></div>
   {:else if storeUi.store.codeSnippetsSdkLang === "python"}
-    <div class="not-prose">
-      <Code code={isProc ? pythonProc : pythonStream} lang="python" />
-    </div>
+    <div class="not-prose"><Code code={isProc ? pythonProc : pythonStream} lang="python" /></div>
   {/if}
 </div>

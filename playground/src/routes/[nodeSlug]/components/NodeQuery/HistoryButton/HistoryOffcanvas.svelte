@@ -1,11 +1,9 @@
 <script lang="ts">
   import { History, Trash, X } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
-
-  import { formatISODate } from "$lib/helpers/formatISODate";
-
   import BottomSpace from "$lib/components/BottomSpace.svelte";
   import Offcanvas from "$lib/components/Offcanvas.svelte";
+  import { formatISODate } from "$lib/helpers/formatISODate";
 
   import type { StoreNodeInstance } from "../../../storeNode.svelte";
 
@@ -29,9 +27,7 @@
   }
 
   function isConfirmed() {
-    return confirm(
-      "Are you sure you want to continue? This action cannot be undone.",
-    );
+    return confirm("Are you sure you want to continue? This action cannot be undone.");
   }
 
   function deleteHistoryItem(index: number, event: Event) {
@@ -50,9 +46,7 @@
 
 <Offcanvas bind:isOpen direction="right" class="desk:w-[400px]">
   <div class="flex h-full flex-col">
-    <div
-      class="border-base-content/20 flex items-center justify-between border-b p-4"
-    >
+    <div class="border-base-content/20 flex items-center justify-between border-b p-4">
       <h2 class="text-lg font-semibold">Request History ({historyLength})</h2>
       <button
         class="btn btn-ghost btn-sm btn-circle"
@@ -96,12 +90,8 @@
                 onclick={() => viewHistoryItem(item)}
                 type="button"
               >
-                <p class="text-sm font-medium">
-                  {formatISODate(item.date)}
-                </p>
-                <p class="text-base-content/60 mt-1 truncate text-xs">
-                  Click to view details
-                </p>
+                <p class="text-sm font-medium">{formatISODate(item.date)}</p>
+                <p class="text-base-content/60 mt-1 truncate text-xs">Click to view details</p>
               </button>
               <button
                 class="btn btn-warning btn-square btn-xs mr-4 ml-2"

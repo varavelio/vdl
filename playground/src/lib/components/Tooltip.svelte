@@ -1,17 +1,14 @@
 <script lang="ts">
   import { onDestroy, onMount, type Snippet } from "svelte";
   import Portal from "svelte-portal";
-  import tippy from "tippy.js";
   import type { Instance, Props as TippyProps } from "tippy.js";
+  import tippy from "tippy.js";
   import "tippy.js/dist/svg-arrow.css";
   import "tippy.js/dist/tippy.css";
 
   // the following props are set by the component and should
   // not be passed in from the parent
-  type customTippyProps = Omit<
-    TippyProps,
-    "arrow" | "appendTo" | "triggerTarget" | "plugins"
-  >;
+  type customTippyProps = Omit<TippyProps, "arrow" | "appendTo" | "triggerTarget" | "plugins">;
 
   export interface Props extends Partial<customTippyProps> {
     children: Snippet;

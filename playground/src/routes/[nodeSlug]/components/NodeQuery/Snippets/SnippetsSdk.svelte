@@ -38,9 +38,9 @@
     <option value="python">Python</option>
   </select>
   <div class="prose prose-sm text-base-content/50 max-w-none">
-    <b>Can't find your language?</b> No problem. You can still use the HTTP
-    request snippets (Curl and others) to get started, or generate a client SDK
-    using the
+    <b>Can't find your language?</b>
+    No problem. You can still use the HTTP request snippets (Curl and others) to get started, or
+    generate a client SDK using the
     <a href="./openapi.yaml" target="_blank" class="text-base-content/50">
       OpenAPI specification.
     </a>
@@ -67,10 +67,7 @@
     </button>
 
     {#if isOpen}
-      <div
-        class="border-base-content/20 border-t p-4"
-        transition:slide={{ duration: 200 }}
-      >
+      <div class="border-base-content/20 border-t p-4" transition:slide={{ duration: 200 }}>
         {@render children()}
       </div>
     {/if}

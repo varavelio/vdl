@@ -1,15 +1,12 @@
 <script lang="ts">
+  import Code from "$lib/components/Code.svelte";
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-
-  import Code from "$lib/components/Code.svelte";
 
   const imp = "import";
 
   const dartPackageName = $derived.by(
-    () =>
-      storeUi.store.codeSnippetsSdkDartPackageName.trim() ||
-      "your_dart_package",
+    () => storeUi.store.codeSnippetsSdkDartPackageName.trim() || "your_dart_package",
   );
   const golangPackageName = $derived.by(
     () => storeUi.store.codeSnippetsSdkGolangPackageName.trim() || "yourpkg",
@@ -63,25 +60,23 @@ client = NewClient("${storeSettings.store.baseUrl}").build()`,
   {#if storeUi.store.codeSnippetsSdkLang === "typescript"}
     <h3>TypeScript setup</h3>
     <p>
-      The SDK is a single <code>.ts</code> file with no external dependencies.
-      Move it to your project and import <code>NewClient</code> from it.
+      The SDK is a single <code>.ts</code> file with no external dependencies. Move it to your
+      project and import <code>NewClient</code> from it.
     </p>
     <ol class="list-decimal pl-5">
       <li>
-        Move the generated file (for example, <code>vdl-client-sdk.ts</code>) to
-        a folder in your project.
+        Move the generated file (for example, <code>vdl-client-sdk.ts</code>) to a folder in your
+        project.
       </li>
       <li>Import and build the client:</li>
     </ol>
-    <div class="not-prose">
-      <Code code={tsSetup} lang="ts" />
-    </div>
+    <div class="not-prose"><Code code={tsSetup} lang="ts" /></div>
     <p>No additional configuration or dependencies are required.</p>
   {:else if storeUi.store.codeSnippetsSdkLang === "go"}
     <h3>Go setup</h3>
     <p>
-      The SDK is a single <code>.go</code> file with no external dependencies. Place
-      it inside the Go package where you will use it.
+      The SDK is a single <code>.go</code> file with no external dependencies. Place it inside the
+      Go package where you will use it.
     </p>
     <p>
       The package name you selected in the previous step is
@@ -91,49 +86,41 @@ client = NewClient("${storeSettings.store.baseUrl}").build()`,
       <li>Move the file into any go package inside your module.</li>
       <li>Import the package and build the client where you want to use it:</li>
     </ol>
-    <div class="not-prose">
-      <Code code={goSetup} lang="go" />
-    </div>
+    <div class="not-prose"><Code code={goSetup} lang="go" /></div>
     <p>
-      If you keep the generated client in a different package, import that
-      package and call <code>NewClient</code> through it.
+      If you keep the generated client in a different package, import that package and call
+      <code>NewClient</code>
+      through it.
     </p>
   {:else if storeUi.store.codeSnippetsSdkLang === "dart"}
     <h3>Dart setup</h3>
     <p>
-      The download is a zip containing a full Dart package. Unzip it and add it
-      to your project as a local dependency using the package name you chose
-      when you downloaded the SDK.
+      The download is a zip containing a full Dart package. Unzip it and add it to your project as a
+      local dependency using the package name you chose when you downloaded the SDK.
     </p>
     <ol class="list-decimal pl-5">
       <li>Unzip the archive to a local folder.</li>
       <li>
-        In your application's <code>pubspec.yaml</code>, add a local dependency
-        pointing to the unzipped folder:
+        In your application's <code>pubspec.yaml</code>, add a local dependency pointing to the
+        unzipped folder:
       </li>
     </ol>
-    <div class="not-prose">
-      <Code code={dartYaml} lang="yaml" />
-    </div>
+    <div class="not-prose"><Code code={dartYaml} lang="yaml" /></div>
     <ol class="list-decimal pl-5" start="3">
       <li>Run <code>dart pub get</code> or <code>flutter pub get</code>.</li>
       <li>Import the client package and build the client:</li>
     </ol>
-    <div class="not-prose">
-      <Code code={dartSetup} lang="dart" />
-    </div>
+    <div class="not-prose"><Code code={dartSetup} lang="dart" /></div>
   {:else if storeUi.store.codeSnippetsSdkLang === "python"}
     <h3>Python setup</h3>
     <p>
-      The SDK is a single <code>.py</code> file with no external dependencies.
-      Move it to your project and import <code>NewClient</code> from it.
+      The SDK is a single <code>.py</code> file with no external dependencies. Move it to your
+      project and import <code>NewClient</code> from it.
     </p>
     <ol class="list-decimal pl-5">
       <li>Move the generated file to your project.</li>
       <li>Import and build the client:</li>
     </ol>
-    <div class="not-prose">
-      <Code code={pythonSetup} lang="python" />
-    </div>
+    <div class="not-prose"><Code code={pythonSetup} lang="python" /></div>
   {/if}
 </div>

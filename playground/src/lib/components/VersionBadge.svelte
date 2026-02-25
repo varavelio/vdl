@@ -17,7 +17,5 @@
   class={mergeClasses("btn btn-ghost flex items-center", className)}
 >
   <ExternalLink class="size-4" />
-  <span>
-    VDL v{getVersion()}
-  </span>
+  <span> VDL v{getVersion()} </span>
 </a>

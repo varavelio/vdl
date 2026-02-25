@@ -11,11 +11,9 @@
   import flatpickr from "flatpickr";
   import { get, set, unset } from "lodash-es";
   import { onMount, untrack } from "svelte";
-
-  import type { Field as FieldType } from "$lib/storeSettings.svelte";
-
   import Menu from "$lib/components/Menu.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import type { Field as FieldType } from "$lib/storeSettings.svelte";
 
   import CommonFieldDoc from "./CommonFieldDoc.svelte";
   import CommonLabel from "./CommonLabel.svelte";
@@ -106,10 +104,7 @@
 
 {#snippet menuContent()}
   <div class="py-1">
-    <Tooltip
-      content={`Clear and reset ${path} to its default value`}
-      placement="left"
-    >
+    <Tooltip content={`Clear and reset ${path} to its default value`} placement="left">
       <button
         class="btn btn-ghost btn-block flex items-center justify-start space-x-2"
         onclick={clearValue}
@@ -135,9 +130,7 @@
 
 {#snippet menu()}
   <Menu content={menuContent} placement="bottom" trigger="mouseenter click">
-    <button class="btn btn-ghost btn-square">
-      <EllipsisVertical class="size-4" />
-    </button>
+    <button class="btn btn-ghost btn-square"><EllipsisVertical class="size-4" /></button>
   </Menu>
 {/snippet}
 
@@ -155,7 +148,7 @@
           bind:value={localValue}
           class="input group-hover/field:border-base-content/50 mr-1 flex-grow"
           placeholder={`Enter ${path} here...`}
-        />
+        >
 
         {@render menu()}
       </div>
@@ -170,7 +163,7 @@
           bind:value={localValue}
           class="input group-hover/field:border-base-content/50 mr-1 flex-grow"
           placeholder={`Enter ${path} here...`}
-        />
+        >
 
         {@render menu()}
       </div>
@@ -181,11 +174,7 @@
 
     {#if inputType === "checkbox"}
       <div class="flex items-center justify-start space-x-2">
-        <input
-          type="checkbox"
-          bind:checked={localValue}
-          class="toggle toggle-lg"
-        />
+        <input type="checkbox" bind:checked={localValue} class="toggle toggle-lg">
 
         {@render menu()}
       </div>

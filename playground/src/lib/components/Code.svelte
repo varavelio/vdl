@@ -5,14 +5,9 @@
 
   import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
   import { getLangExtension } from "$lib/helpers/getLangExtension";
-  import { mergeClasses } from "$lib/helpers/mergeClasses";
   import type { ClassValue } from "$lib/helpers/mergeClasses";
-  import {
-    darkTheme,
-    getHighlighter,
-    getOrFallbackLanguage,
-    lightTheme,
-  } from "$lib/shiki";
+  import { mergeClasses } from "$lib/helpers/mergeClasses";
+  import { darkTheme, getHighlighter, getOrFallbackLanguage, lightTheme } from "$lib/shiki";
   import { storeUi } from "$lib/storeUi.svelte";
 
   interface Props {
@@ -103,17 +98,11 @@
       }}
     >
       <div class="flex items-center justify-between space-x-1">
-        <button
-          class="btn btn-ghost btn-xs justify-end"
-          onclick={() => downloadCode()}
-        >
+        <button class="btn btn-ghost btn-xs justify-end" onclick={() => downloadCode()}>
           <Download class="size-3" />
           <span>Download</span>
         </button>
-        <button
-          class="btn btn-ghost btn-xs justify-start"
-          onclick={() => copyToClipboard()}
-        >
+        <button class="btn btn-ghost btn-xs justify-start" onclick={() => copyToClipboard()}>
           <Copy class="size-3" />
           <span>Copy to clipboard</span>
         </button>

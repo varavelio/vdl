@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { pushState } from "$app/navigation";
   import { Braces, Link } from "@lucide/svelte";
   import { onMount } from "svelte";
-
+  import { pushState } from "$app/navigation";
+  import BottomSpace from "$lib/components/BottomSpace.svelte";
+  import H1 from "$lib/components/H1.svelte";
   import { slugify } from "$lib/helpers/slugify";
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-
-  import BottomSpace from "$lib/components/BottomSpace.svelte";
-  import H1 from "$lib/components/H1.svelte";
 
   import TypeItem from "./TypeItem.svelte";
 
@@ -19,9 +17,7 @@
   const getHref = (name: string) => `/#/${getSlug(name)}`;
 
   function scrollTo(slug: string) {
-    document
-      .getElementById(slug)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(slug)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function handleClick(e: MouseEvent, name: string) {
@@ -39,22 +35,16 @@
   });
 </script>
 
-<svelte:head>
-  <title>Types | VDL Playground</title>
-</svelte:head>
+<svelte:head> <title>Types | VDL Playground</title> </svelte:head>
 
 <div class="h-full overflow-y-auto scroll-smooth">
   {#if types.length === 0}
-    <div
-      class="flex h-full flex-col items-center justify-center p-4 text-center"
-    >
+    <div class="flex h-full flex-col items-center justify-center p-4 text-center">
       <div class="card bg-base-200 w-full max-w-md shadow-lg">
         <div class="card-body items-center text-center">
           <Braces class="text-base-content/40 mb-4 size-16" />
           <H1 class="text-2xl">No Types Defined</H1>
-          <p class="text-base-content/60 mt-2">
-            Your schema doesn't have any types yet.
-          </p>
+          <p class="text-base-content/60 mt-2">Your schema doesn't have any types yet.</p>
         </div>
       </div>
     </div>
@@ -78,9 +68,7 @@
       </div>
 
       {#if !isMobile}
-        <aside
-          class="border-base-300 flex h-full w-64 shrink-0 flex-col border-l p-4"
-        >
+        <aside class="border-base-300 flex h-full w-64 shrink-0 flex-col border-l p-4">
           <h3
             class="text-base-content/60 mb-4 shrink-0 px-2 text-sm font-semibold tracking-wide uppercase"
           >
@@ -90,11 +78,7 @@
             <ul class="menu menu-sm w-full">
               {#each types as t (t.name)}
                 <li>
-                  <a
-                    href={getHref(t.name)}
-                    class="gap-2"
-                    onclick={(e) => handleClick(e, t.name)}
-                  >
+                  <a href={getHref(t.name)} class="gap-2" onclick={(e) => handleClick(e, t.name)}>
                     <Link class="size-3 shrink-0 opacity-50" />
                     <span class="truncate">{t.name}</span>
                   </a>

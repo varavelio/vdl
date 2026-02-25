@@ -81,9 +81,7 @@
   });
 </script>
 
-<svelte:head>
-  <title>{title}</title>
-</svelte:head>
+<svelte:head> <title>{title}</title> </svelte:head>
 
 {#if !nodeExists}
   <NotFound />

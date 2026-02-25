@@ -1,6 +1,6 @@
-import { browser } from "$app/environment";
 import { debounce } from "lodash-es";
 import type { Action } from "svelte/action";
+import { browser } from "$app/environment";
 
 import { createStore } from "./createStore.svelte";
 
@@ -58,13 +58,7 @@ export interface StoreUi {
   historyTab: "input" | "output";
   codeSnippetsTab: "sdk" | "curl";
   codeSnippetsCurlLang: string;
-  codeSnippetsSdkLang:
-    | "typescript"
-    | "go"
-    | "dart"
-    | "python"
-    | "openapi"
-    | "jsonschema";
+  codeSnippetsSdkLang: "typescript" | "go" | "dart" | "python" | "openapi" | "jsonschema";
   codeSnippetsSdkStep: "download" | "setup" | "usage" | "";
   codeSnippetsSdkDartPackageName: string;
   codeSnippetsSdkGolangPackageName: string;
@@ -246,11 +240,9 @@ function getScrollableAncestors(el: HTMLElement): (Window | HTMLElement)[] {
     const overflowY = style.overflowY;
     const overflowX = style.overflowX;
     const canScrollY =
-      (overflowY === "auto" || overflowY === "scroll") &&
-      parent.scrollHeight > parent.clientHeight;
+      (overflowY === "auto" || overflowY === "scroll") && parent.scrollHeight > parent.clientHeight;
     const canScrollX =
-      (overflowX === "auto" || overflowX === "scroll") &&
-      parent.scrollWidth > parent.clientWidth;
+      (overflowX === "auto" || overflowX === "scroll") && parent.scrollWidth > parent.clientWidth;
     if (canScrollY || canScrollX) hosts.push(parent);
     parent = parent.parentElement;
   }

@@ -1,13 +1,11 @@
 <script lang="ts">
   import { TriangleAlert } from "@lucide/svelte";
-
+  import BottomSpace from "$lib/components/BottomSpace.svelte";
   import { deleteMarkdownHeadings } from "$lib/helpers/deleteMarkdownHeadings";
   import { getMarkdownTitle } from "$lib/helpers/getMarkdownTitle";
   import { markdownToHtml } from "$lib/helpers/markdownToHtml";
-  import { type IrNode } from "$lib/storeSettings.svelte";
+  import type { IrNode } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-
-  import BottomSpace from "$lib/components/BottomSpace.svelte";
 
   import type { StoreNodeInstance } from "../storeNode.svelte";
 
@@ -45,14 +43,10 @@
   $effect(() => {
     (async () => {
       if (node.kind === "doc") {
-        documentation = await markdownToHtml(
-          deleteMarkdownHeadings(node.content),
-        );
+        documentation = await markdownToHtml(deleteMarkdownHeadings(node.content));
       }
       if (
-        (node.kind === "stream" ||
-          node.kind === "type" ||
-          node.kind === "proc") &&
+        (node.kind === "stream" || node.kind === "type" || node.kind === "proc") &&
         typeof node.doc === "string" &&
         node.doc !== ""
       ) {
@@ -87,10 +81,7 @@
       <h1 class="break-all">{name}</h1>
 
       {#if deprecatedMessage !== ""}
-        <div
-          role="alert"
-          class="alert alert-soft alert-error w-fit gap-2 font-bold italic"
-        >
+        <div role="alert" class="alert alert-soft alert-error w-fit gap-2 font-bold italic">
           <TriangleAlert class="size-4" />
           <span>Deprecated: {deprecatedMessage}</span>
         </div>
@@ -102,15 +93,11 @@
     </div>
 
     {#if node.kind === "proc"}
-      <div>
-        <NodeQueryProc proc={node} bind:storeNode />
-      </div>
+      <div><NodeQueryProc proc={node} bind:storeNode /></div>
     {/if}
 
     {#if node.kind === "stream"}
-      <div>
-        <NodeQueryStream stream={node} bind:storeNode />
-      </div>
+      <div><NodeQueryStream stream={node} bind:storeNode /></div>
     {/if}
 
     <Schema {node} />
@@ -122,11 +109,7 @@
 
   {#if !storeUi.store.isMobile && (node.kind == "proc" || node.kind == "stream")}
     <div class="col-span-4 overflow-y-auto p-4 pt-0">
-      <Snippets
-        type={node.kind}
-        name={node.name}
-        input={storeNode.store.input}
-      />
+      <Snippets type={node.kind} name={node.name} input={storeNode.store.input} />
       <BottomSpace />
     </div>
   {/if}

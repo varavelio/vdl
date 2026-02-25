@@ -26,13 +26,7 @@ import { build, files, prerendered, version } from "$service-worker";
 
 const swSelf = globalThis.self as unknown as ServiceWorkerGlobalScope;
 const KNOWN_ASSETS = [...build, ...files, ...prerendered];
-const NETWORK_FIRST_FILES = [
-  "/",
-  "index.html",
-  "version.json",
-  "config.json",
-  "schema.vdl",
-];
+const NETWORK_FIRST_FILES = ["/", "index.html", "version.json", "config.json", "schema.vdl"];
 
 /**
  * Generates the cache key prefix for the given scope.
@@ -128,10 +122,7 @@ swSelf.addEventListener("fetch", (event: FetchEvent) => {
     // Fallback to network (caches if successful)
     try {
       const networkResponse = await fetch(request);
-      if (
-        networkResponse &&
-        (networkResponse.status === 200 || networkResponse.status === 0)
-      ) {
+      if (networkResponse && (networkResponse.status === 200 || networkResponse.status === 0)) {
         await cache.put(request, networkResponse.clone());
       }
       return networkResponse;
@@ -146,9 +137,7 @@ swSelf.addEventListener("fetch", (event: FetchEvent) => {
 
   const url = new URL(request.url);
   const isNavigation = request.mode === "navigate";
-  const isCriticalFile = NETWORK_FIRST_FILES.some((file) =>
-    url.pathname.endsWith(file),
-  );
+  const isCriticalFile = NETWORK_FIRST_FILES.some((file) => url.pathname.endsWith(file));
 
   if (isNavigation || isCriticalFile) {
     event.respondWith(respondNetworkFirst());

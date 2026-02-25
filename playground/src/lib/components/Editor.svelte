@@ -31,10 +31,7 @@
   let isLoading = $state(true);
 
   onMount(async () => {
-    const [highlighter, monacoEditor] = await Promise.all([
-      getHighlighter(),
-      loader.init(),
-    ]);
+    const [highlighter, monacoEditor] = await Promise.all([getHighlighter(), loader.init()]);
 
     monaco = monacoEditor;
     monaco.languages.register({ id: "vdl" });

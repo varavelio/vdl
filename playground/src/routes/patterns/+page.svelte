@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { pushState } from "$app/navigation";
   import { Copy, Link, Regex, TriangleAlert } from "@lucide/svelte";
   import { onMount } from "svelte";
-
+  import { pushState } from "$app/navigation";
+  import BottomSpace from "$lib/components/BottomSpace.svelte";
+  import H1 from "$lib/components/H1.svelte";
   import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
   import { markdownToHtml } from "$lib/helpers/markdownToHtml";
   import { slugify } from "$lib/helpers/slugify";
   import { storeSettings } from "$lib/storeSettings.svelte";
   import { storeUi } from "$lib/storeUi.svelte";
-
-  import BottomSpace from "$lib/components/BottomSpace.svelte";
-  import H1 from "$lib/components/H1.svelte";
 
   let patterns = $derived(storeSettings.store.irSchema.patterns);
   let isMobile = $derived(storeUi.store.isMobile);
@@ -19,9 +17,7 @@
   const getHref = (name: string) => `/#/${getSlug(name)}`;
 
   function scrollTo(slug: string) {
-    document
-      .getElementById(slug)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(slug)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function handleClick(e: MouseEvent, name: string) {
@@ -39,22 +35,16 @@
   });
 </script>
 
-<svelte:head>
-  <title>Patterns | VDL Playground</title>
-</svelte:head>
+<svelte:head> <title>Patterns | VDL Playground</title> </svelte:head>
 
 <div class="h-full overflow-y-auto scroll-smooth">
   {#if patterns.length === 0}
-    <div
-      class="flex h-full flex-col items-center justify-center p-4 text-center"
-    >
+    <div class="flex h-full flex-col items-center justify-center p-4 text-center">
       <div class="card bg-base-200 w-full max-w-md shadow-lg">
         <div class="card-body items-center text-center">
           <Regex class="text-base-content/40 mb-4 size-16" />
           <H1 class="text-2xl">No Patterns Defined</H1>
-          <p class="text-base-content/60 mt-2">
-            Your schema doesn't have any patterns yet.
-          </p>
+          <p class="text-base-content/60 mt-2">Your schema doesn't have any patterns yet.</p>
         </div>
       </div>
     </div>
@@ -64,8 +54,7 @@
         <div class="mb-8">
           <H1>Schema Patterns</H1>
           <p class="text-base-content/60 mt-2">
-            Patterns are templates for generating dynamic strings with
-            placeholders.
+            Patterns are templates for generating dynamic strings with placeholders.
           </p>
         </div>
 
@@ -85,11 +74,7 @@
                     <Link class="size-4" />
                   </a>
 
-                  <a
-                    {href}
-                    class="group min-w-0 flex-1"
-                    onclick={(e) => handleClick(e, p.name)}
-                  >
+                  <a {href} class="group min-w-0 flex-1" onclick={(e) => handleClick(e, p.name)}>
                     <h2
                       id={slug}
                       class={{
@@ -106,9 +91,7 @@
                 {#if typeof p.deprecated === "string"}
                   <div class="alert alert-warning">
                     <TriangleAlert class="size-5" />
-                    <span class="font-semibold">
-                      {p.deprecated || "Deprecated"}
-                    </span>
+                    <span class="font-semibold"> {p.deprecated || "Deprecated"} </span>
                   </div>
                 {/if}
 
@@ -119,16 +102,14 @@
                 {/if}
 
                 <div>
-                  <span class="text-base-content/60 mb-2 block text-sm">
-                    Template
-                  </span>
+                  <span class="text-base-content/60 mb-2 block text-sm"> Template </span>
                   <div class="flex items-center gap-2">
                     <input
                       type="text"
                       readonly
                       value={p.template}
                       class="input input-bordered flex-1 font-mono"
-                    />
+                    >
                     <button
                       class="btn btn-square btn-ghost"
                       onclick={() => copyTextToClipboard(p.template)}
@@ -141,9 +122,7 @@
 
                 {#if p.placeholders.length > 0}
                   <div>
-                    <span class="text-base-content/60 mb-2 block text-sm">
-                      Placeholders
-                    </span>
+                    <span class="text-base-content/60 mb-2 block text-sm"> Placeholders </span>
                     <div class="flex flex-wrap gap-2">
                       {#each p.placeholders as placeholder}
                         <span class="badge badge-soft badge-neutral font-mono">
@@ -162,9 +141,7 @@
       </div>
 
       {#if !isMobile}
-        <aside
-          class="border-base-300 flex h-full w-64 shrink-0 flex-col border-l p-4"
-        >
+        <aside class="border-base-300 flex h-full w-64 shrink-0 flex-col border-l p-4">
           <h3
             class="text-base-content/60 mb-4 shrink-0 px-2 text-sm font-semibold tracking-wide uppercase"
           >
@@ -174,11 +151,7 @@
             <ul class="menu menu-sm w-full">
               {#each patterns as p (p.name)}
                 <li>
-                  <a
-                    href={getHref(p.name)}
-                    class="gap-2"
-                    onclick={(e) => handleClick(e, p.name)}
-                  >
+                  <a href={getHref(p.name)} class="gap-2" onclick={(e) => handleClick(e, p.name)}>
                     <Link class="size-3 shrink-0 opacity-50" />
                     <span class="truncate">{p.name}</span>
                   </a>

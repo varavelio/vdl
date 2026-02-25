@@ -1,7 +1,7 @@
-import { browser } from "$app/environment";
 import localforage from "localforage";
 import { debounce } from "lodash-es";
 import { toast } from "svelte-sonner";
+import { browser } from "$app/environment";
 
 /**
  * The type of function that can be used as an action in the store.
@@ -263,9 +263,7 @@ export function createStore<
 export function createGlobalDbNamePrefix(): string {
   if (!browser) return "";
 
-  const prefix = globalThis.location.pathname
-    .replace(/[^a-z0-9]/gi, "-")
-    .toLowerCase();
+  const prefix = globalThis.location.pathname.replace(/[^a-z0-9]/gi, "-").toLowerCase();
 
   return prefix;
 }

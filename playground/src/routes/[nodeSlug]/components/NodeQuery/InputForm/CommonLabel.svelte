@@ -1,10 +1,8 @@
 <script lang="ts">
   import { CircleHelp, SquareAsterisk } from "@lucide/svelte";
-
+  import Tooltip from "$lib/components/Tooltip.svelte";
   import type { ClassValue } from "$lib/helpers/mergeClasses";
   import { mergeClasses } from "$lib/helpers/mergeClasses";
-
-  import Tooltip from "$lib/components/Tooltip.svelte";
 
   interface Props {
     label: string;
@@ -14,9 +12,7 @@
 
   const { label, optional, class: className }: Props = $props();
 
-  let dataTip = $derived(
-    `${label} is marked as ${optional ? "optional" : "required"}`,
-  );
+  let dataTip = $derived(`${label} is marked as ${optional ? "optional" : "required"}`);
 </script>
 
 <Tooltip content={dataTip} placement="right">
@@ -26,9 +22,7 @@
       className,
     ])}
   >
-    <span>
-      {label}
-    </span>
+    <span> {label} </span>
 
     {#if optional}
       <CircleHelp class="text-info size-4" />

@@ -64,12 +64,10 @@
   {#each items as tab}
     {#snippet buttonContent()}
       {#if tab.icon}
-        <tab.icon class={mergeClasses("size-4", iconClass)} />
+        <tab .icon class={mergeClasses("size-4", iconClass)} />
       {/if}
       {#if tab.label}
-        <span class={mergeClasses(spanTextClass)}>
-          {tab.label}
-        </span>
+        <span class={mergeClasses(spanTextClass)}> {tab.label} </span>
       {/if}
     {/snippet}
 
@@ -90,9 +88,7 @@
     {/snippet}
 
     {#if tab.tooltipText}
-      <Tooltip content={tab.tooltipText} placement="top">
-        {@render button()}
-      </Tooltip>
+      <Tooltip content={tab.tooltipText} placement="top"> {@render button()} </Tooltip>
     {:else}
       {@render button()}
     {/if}

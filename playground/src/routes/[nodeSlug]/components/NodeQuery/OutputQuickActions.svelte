@@ -1,15 +1,10 @@
 <script lang="ts">
   import { Copy, EarthLock, Key, Sparkles } from "@lucide/svelte";
-
-  import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
-  import {
-    discoverAuthToken,
-    type TokenInfo,
-  } from "$lib/helpers/discoverAuthToken.ts";
-  import { setHeader } from "$lib/storeSettings.svelte";
-
   import Menu from "$lib/components/Menu.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import { copyTextToClipboard } from "$lib/helpers/copyTextToClipboard";
+  import { discoverAuthToken, type TokenInfo } from "$lib/helpers/discoverAuthToken.ts";
+  import { setHeader } from "$lib/storeSettings.svelte";
 
   interface Props {
     output: string | null;

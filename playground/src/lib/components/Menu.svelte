@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-
-  import Tooltip from "./Tooltip.svelte";
   import type { Props as TooltipProps } from "./Tooltip.svelte";
+  import Tooltip from "./Tooltip.svelte";
 
   interface Props extends Omit<TooltipProps, "content"> {
     content: Snippet;
@@ -19,15 +18,8 @@
   let contentWrapper: HTMLDivElement | undefined = $state(undefined);
 </script>
 
-<Tooltip
-  content={contentWrapper ?? ""}
-  {interactive}
-  {trigger}
-  {...tooltipProps}
->
+<Tooltip content={contentWrapper ?? ""} {interactive} {trigger} {...tooltipProps}>
   {@render children()}
 </Tooltip>
 
-<div bind:this={contentWrapper}>
-  {@render content()}
-</div>
+<div bind:this={contentWrapper}>{@render content()}</div>

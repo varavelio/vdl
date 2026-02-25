@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
   import { ChevronDown, ChevronRight, TriangleAlert } from "@lucide/svelte";
   import { onMount, type Snippet } from "svelte";
-
-  import { createGlobalDbNamePrefix } from "$lib/createStore.svelte";
-
+  import { browser } from "$app/environment";
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import { createGlobalDbNamePrefix } from "$lib/createStore.svelte";
 
   interface Props {
     icon: typeof ChevronDown;
@@ -14,13 +12,7 @@
     deprecated?: string;
     children?: Snippet;
   }
-  const {
-    icon: Icon,
-    label: rawLabel,
-    storageKey,
-    deprecated,
-    children,
-  }: Props = $props();
+  const { icon: Icon, label: rawLabel, storageKey, deprecated, children }: Props = $props();
 
   // safeStorageKey key avoids collisions across deployments on same domain
   let safeStorageKey = $derived.by(() => {
@@ -70,9 +62,7 @@
     </button>
 
     {#if isOpen && children}
-      <div
-        class="border-base-content/20 mt-1 ml-6 space-y-1 border-l-2 border-dashed pl-1"
-      >
+      <div class="border-base-content/20 mt-1 ml-6 space-y-1 border-l-2 border-dashed pl-1">
         {@render children()}
       </div>
     {/if}

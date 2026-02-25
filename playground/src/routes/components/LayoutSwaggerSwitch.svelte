@@ -1,11 +1,9 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-
-  import { storeSettings } from "$lib/storeSettings.svelte";
-
   import Logo from "$lib/components/Logo.svelte";
   import SwaggerLogo from "$lib/components/SwaggerLogo.svelte";
   import Tooltip from "$lib/components/Tooltip.svelte";
+  import { storeSettings } from "$lib/storeSettings.svelte";
 
   import LayoutSwaggerUi from "./LayoutSwaggerUi.svelte";
 
@@ -14,9 +12,7 @@
   let isOpen = $state(false);
   const toggle = () => (isOpen = !isOpen);
 
-  let tooltipContent = $derived(
-    isOpen ? "Switch to VDL" : "Switch to Swagger UI (OpenAPI)",
-  );
+  let tooltipContent = $derived(isOpen ? "Switch to VDL" : "Switch to Swagger UI (OpenAPI)");
 
   let shouldShow = $derived(storeSettings.store.irSchema.rpcs.length > 0);
 
@@ -43,14 +39,10 @@
       onclick={toggle}
     >
       {#if !isOpen}
-        <span in:fade={{ duration: animationDuration }}>
-          <SwaggerLogo class="w-full" />
-        </span>
+        <span in:fade={{ duration: animationDuration }}> <SwaggerLogo class="w-full" /> </span>
       {/if}
       {#if isOpen}
-        <span in:fade={{ duration: animationDuration }}>
-          <Logo class="size-10" />
-        </span>
+        <span in:fade={{ duration: animationDuration }}> <Logo class="size-10" /> </span>
       {/if}
     </button>
   </Tooltip>
