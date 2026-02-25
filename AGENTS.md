@@ -27,6 +27,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Code Style**:
   - Go: Idiomatic, `golangci-lint` strictness.
   - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4, DaisyUI v5.
+  - Formatting responsibilities are split by file type in Taskfile tasks: Go uses Go tooling (`gofmt` / `vdl format`), JavaScript/TypeScript/Svelte/Astro use Biome format checks, and other supported text formats (JSON/YAML/Markdown/CSS/HTML-like) use dprint.
   - Docs: Markdown/MDX with Starlight frontmatter.
 - **Terminology**: The core tool is referred to as `toolchain`. The binary is named `vdl`.
 
@@ -122,18 +123,18 @@ When updating this document, do so with the context of the entire document in mi
 
 The communication between the Playground (Svelte) and the Core (Go) relies on a strict **JSON-RPC style protocol** defined in VDL itself.
 
-1.  **The Contract (`schemas/wasm.vdl`)**:
-    - This is the source of truth. It defines the `WasmInput` and `WasmOutput` data structures and the `WasmFunctionName` enum.
+1. **The Contract (`schemas/wasm.vdl`)**:
+   - This is the source of truth. It defines the `WasmInput` and `WasmOutput` data structures and the `WasmFunctionName` enum.
 
-2.  **The Bridge**:
-    - **Frontend (`playground/src/lib/wasm/index.ts`)**: The `WasmClient` serializes requests to JSON and calls the global `window.wasmExecuteFunction`.
-    - **WASM Entry (`toolchain/cmd/vdlwasm/main.go`)**: This Go program runs in the browser. It attaches the `wasmExecuteFunction` to the Javascript `window` object. It wraps the execution in a Javascript Promise to handle async operations.
+2. **The Bridge**:
+   - **Frontend (`playground/src/lib/wasm/index.ts`)**: The `WasmClient` serializes requests to JSON and calls the global `window.wasmExecuteFunction`.
+   - **WASM Entry (`toolchain/cmd/vdlwasm/main.go`)**: This Go program runs in the browser. It attaches the `wasmExecuteFunction` to the Javascript `window` object. It wraps the execution in a Javascript Promise to handle async operations.
 
-3.  **The Execution (`toolchain/internal/wasm/run.go`)**:
-    - Receives the JSON string.
-    - Unmarshals it into Go structs (generated from `wasm.vdl`).
-    - Routes the request based on `FunctionName` (e.g., `Codegen`, `ExpandTypes`, etc) to the internal logic.
-    - Returns the response as a JSON string.
+3. **The Execution (`toolchain/internal/wasm/run.go`)**:
+   - Receives the JSON string.
+   - Unmarshals it into Go structs (generated from `wasm.vdl`).
+   - Routes the request based on `FunctionName` (e.g., `Codegen`, `ExpandTypes`, etc) to the internal logic.
+   - Returns the response as a JSON string.
 
 ## 4. Testing & Quality
 
@@ -143,22 +144,22 @@ The communication between the Playground (Svelte) and the Core (Go) relies on a 
 - **E2E Tests (`toolchain/tests/*`)**:
   - These are **integration tests** wrapped in Go test runners (`e2e_test.go`) located in each subdirectory.
   - **Mechanism**: The runner builds a temporary `vdl` binary from the current source, then for each case in `testdata/`:
-    1.  Runs the generation command via the test harness.
-    2.  **Verification**:
-        - For **Code Gen**: Executes the consumer program. The consumer code must **panic** or exit with non-zero status on failure.
-        - For **Schemas/Docs**: Compares the generated output against a "golden" expected file.
-        - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
+    1. Runs the generation command via the test harness.
+    2. **Verification**:
+       - For **Code Gen**: Executes the consumer program. The consumer code must **panic** or exit with non-zero status on failure.
+       - For **Schemas/Docs**: Compares the generated output against a "golden" expected file.
+       - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
 - **Frontend Tests**: Component/Logic tests in `playground/`.
 
 ### Adding a New E2E Test Case
 
-1.  Navigate to `toolchain/tests/<category>/testdata`.
-2.  Create a new directory for your case (e.g., `my_feature`).
-3.  Add the required files:
-    - `vdl.yaml`: Configuration for generation.
-    - `schema.vdl`: The schema to test.
-    - **For Code Gen**: `main.go`, `main.ts`, `main.dart`, or `main.py` (or equivalent) to import and verify generated code.
-    - **For Schemas**: `expected.json` or `expected.yaml` to match against.
+1. Navigate to `toolchain/tests/<category>/testdata`.
+2. Create a new directory for your case (e.g., `my_feature`).
+3. Add the required files:
+   - `vdl.yaml`: Configuration for generation.
+   - `schema.vdl`: The schema to test.
+   - **For Code Gen**: `main.go`, `main.ts`, `main.dart`, or `main.py` (or equivalent) to import and verify generated code.
+   - **For Schemas**: `expected.json` or `expected.yaml` to match against.
 
 ### Commands
 
@@ -199,13 +200,13 @@ Do NOT rely on memory. Run `task --list-all` to find the appropriate testing com
 
 **IMPORTANT**: All operational commands are centralized in `Taskfile.yml` and must be executed from the project root. There is no "npm scripts", "per subfolder Taskfile.yml" or other things, literally the source of truth is the `Taskfile.yml` in the repository root.
 
-1.  **Discover**: Run the following command to see all available tasks and their descriptions:
-    ```bash
-    task --list-all
-    ```
-2.  **Execute**: Run a specific task using:
-    ```bash
-    task <command_name>
-    ```
+1. **Discover**: Run the following command to see all available tasks and their descriptions:
+   ```bash
+   task --list-all
+   ```
+2. **Execute**: Run a specific task using:
+   ```bash
+   task <command_name>
+   ```
 
 **Do not guess commands.** The `Taskfile.yml` is the only source of truth for building, testing, linting, formatting, and releasing this project. You can list all the commands or read the file but don't guess random commands.

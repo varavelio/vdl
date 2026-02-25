@@ -20,7 +20,7 @@
     "parser": { "tailwindDirectives": true }
   },
   "formatter": {
-    "enabled": false
+    "enabled": true
   },
   "linter": {
     "enabled": true,
