@@ -1,17 +1,10 @@
 # This file will be copied to the devcontainer's .bashrc
 
 # Define command aliases
-alias t='task'
-alias td='task dev'
-alias tb='task build'
-alias tt='task test'
-alias tl='task lint'
-alias tf='task format'
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias ..='cd ..'
 alias c='clear'
+alias t='task'
+alias ll='ls -alh'
+alias ..='cd ..'
 
 # Set the user file-creation mode mask to 000, which allows all
 # users read, write, and execute permissions for newly created files.

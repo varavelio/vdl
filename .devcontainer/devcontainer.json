@@ -19,19 +19,27 @@
         "Chanzhaoyu.svelte-5-snippets",
         "astro-build.astro-vscode",
         "bradlc.vscode-tailwindcss",
-        "esbenp.prettier-vscode",
         "unifiedjs.vscode-mdx",
         "vitest.explorer",
-        "biomejs.biome",
-        "Dart-Code.dart-code"
+        "dprint.dprint",
+        "biomejs.biome"
       ],
       "settings": {
         "files.eol": "\n",
         "editor.formatOnSave": true,
         "editor.foldingStrategy": "indentation",
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "dprint.dprint",
         "css.validate": false,
         "svelte.enable-ts-plugin": true,
+        "[javascript]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
+        "[svelte]": {
+          "editor.defaultFormatter": "biomejs.biome"
+        },
         "[go]": {
           "editor.defaultFormatter": "golang.go"
         },
