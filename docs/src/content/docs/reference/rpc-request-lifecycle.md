@@ -38,9 +38,9 @@ The client sends an HTTP `POST` request to the server.
 
 The server receives the request and performs the following steps:
 
-1.  **Routing:** It maps the URL path (`/Users/CreateUser`) to the corresponding RPC service and procedure handler.
-2.  **Deserialization & Validation:** It decodes the JSON body and performs built-in validation (e.g., checking for required fields). If this fails, it immediately responds with a validation error.
-3.  **Handler Execution:** The server invokes the user-defined business logic for the procedure, passing the validated input.
+1. **Routing:** It maps the URL path (`/Users/CreateUser`) to the corresponding RPC service and procedure handler.
+2. **Deserialization & Validation:** It decodes the JSON body and performs built-in validation (e.g., checking for required fields). If this fails, it immediately responds with a validation error.
+3. **Handler Execution:** The server invokes the user-defined business logic for the procedure, passing the validated input.
 
 > **Note:** VDL provides a hook system (middlewares) that allows developers to run custom code at various points in the lifecycle for tasks like authentication, custom input validation, logging, metrics, etc.
 
@@ -94,11 +94,11 @@ The server sends a single HTTP response back to the client.
 
 The client library receives the HTTP response.
 
-1.  **Deserialization:** It decodes the JSON body.
-2.  **Result Unwrapping:**
-    - If `ok` is `true`, it returns the content of the `output` field to the application code.
-    - If `ok` is `false`, it returns the content of the `error` field.
-3.  **Resilience:** For transport-level failures or 5xx server errors, the client automatically handles retries with exponential backoff according to its configuration.
+1. **Deserialization:** It decodes the JSON body.
+2. **Result Unwrapping:**
+   - If `ok` is `true`, it returns the content of the `output` field to the application code.
+   - If `ok` is `false`, it returns the content of the `error` field.
+3. **Resilience:** For transport-level failures or 5xx server errors, the client automatically handles retries with exponential backoff according to its configuration.
 
 ---
 
@@ -131,14 +131,14 @@ The client initiates the connection with a single HTTP `POST` request.
 
 The server receives the request and establishes the persistent connection.
 
-1.  **Validation:** It validates the input just like a procedure. An error here terminates the connection attempt with a single JSON error response.
-2.  **Connection Upgrade:** If validation passes, the server sends back HTTP headers to establish the SSE stream. The connection is now open and long-lived.
-    - **Status Code:** `200 OK`
-    - **Headers:**
-      - `Content-Type: text/event-stream`
-      - `Cache-Control: no-cache`
-      - `Connection: keep-alive`
-3.  **Handler Execution:** The server invokes the user-defined stream handler, providing it with an `emit` function.
+1. **Validation:** It validates the input just like a procedure. An error here terminates the connection attempt with a single JSON error response.
+2. **Connection Upgrade:** If validation passes, the server sends back HTTP headers to establish the SSE stream. The connection is now open and long-lived.
+   - **Status Code:** `200 OK`
+   - **Headers:**
+     - `Content-Type: text/event-stream`
+     - `Cache-Control: no-cache`
+     - `Connection: keep-alive`
+3. **Handler Execution:** The server invokes the user-defined stream handler, providing it with an `emit` function.
 
 > **Note:** Just like with procedures, a hook system (middlewares) is available for streams to run custom code for authentication, validation, logging, and other cross-cutting concerns.
 
@@ -154,7 +154,6 @@ The server-side handler logic can now call the `emit` function at any time to pu
 
   ```
   data: {"ok":true,"output":{"messageId":"msg-abc","text":"Hello world!"}}
-
   ```
 
   _(Note the required blank line after the data line)_
@@ -163,7 +162,6 @@ The server-side handler logic can now call the `emit` function at any time to pu
 
   ```
   data: {"ok":false,"error":{"message":"You do not have permission to view this chat."}}
-
   ```
 
 ### 5. Keep-Alive (Ping Events)
@@ -176,17 +174,16 @@ To prevent the connection from being closed by proxies, load balancers, or netwo
 
 ```
 : ping
-
 ```
 
 ### 6. Client Handling (Event Loop)
 
 The client library maintains the open connection and listens for incoming events.
 
-1.  **Event Parsing:** As data arrives, the client parses the SSE `data:` payload.
-2.  **Ping Filtering:** SSE comment lines (starting with `:`) are automatically discarded.
-3.  **Deserialization:** It decodes the JSON from the data field.
-4.  **Delivery:** It delivers the content of the `output` or `error` field to the application code, typically through a channel or callback.
+1. **Event Parsing:** As data arrives, the client parses the SSE `data:` payload.
+2. **Ping Filtering:** SSE comment lines (starting with `:`) are automatically discarded.
+3. **Deserialization:** It decodes the JSON from the data field.
+4. **Delivery:** It delivers the content of the `output` or `error` field to the application code, typically through a channel or callback.
 
 ### 7. Stream Termination
 
