@@ -182,7 +182,6 @@ export function getIrNodes(): IrNode[] {
   ];
 }
 
-// prettier-ignore
 export function getNodeSlug(node: IrNode): string {
   const name = getNodeName(node);
   if (node.kind === "constant") return slugify(`constants#${name}`);

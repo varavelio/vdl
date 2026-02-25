@@ -66,7 +66,7 @@ tasks:
       - task: vs:format
       - task: in:format
       - task: dc:format
-      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' '!installers/npm/**' '!docs/**' --write --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+      - dprint fmt --config ./dprint.json --includes-override '**/*' --excludes 'toolchain/**' 'playground/**' 'editors/vscode/**' 'installers/npm/**' 'docs/**' --log-level warn
 
   test:
     desc: "Run all tests (Toolchain, Toolchain E2E and Playground)"
@@ -82,7 +82,7 @@ tasks:
       - task: vs:lint
       - task: in:lint
       - task: dc:lint
-      - npx --no prettier '**/*' '!toolchain/**' '!playground/**' '!editors/vscode/**' '!installers/npm/**' '!docs/**' --check --config ./.prettierrc --ignore-path ./.prettierignore --ignore-unknown --log-level warn
+      - dprint check --config ./dprint.json --includes-override '**/*' --excludes 'toolchain/**' 'playground/**' 'editors/vscode/**' 'installers/npm/**' 'docs/**' --log-level warn
 
   ###################
   # TOOLCHAIN TASKS #
@@ -120,7 +120,7 @@ tasks:
     desc: "Toolchain: Format Go code and run internal formatters"
     dir: ./toolchain
     cmds:
-      - npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - dprint fmt --config ../dprint.json --log-level warn
       - go fmt ./...
       - go run ./cmd/vdl/. format
 
@@ -152,7 +152,7 @@ tasks:
           echo "$UNFORMATTED"
           exit 1
         fi
-      - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - dprint check --config ../dprint.json --log-level warn
 
   ####################
   # PLAYGROUND TASKS #
@@ -177,7 +177,8 @@ tasks:
   pg:format:
     desc: "Playground: Format code"
     dir: ./playground
-    cmd: npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+    cmds:
+      - dprint fmt --config ../dprint.json --log-level warn
 
   pg:lint:
     desc: "Playground: Lint code"
@@ -186,7 +187,7 @@ tasks:
       - npx --no svelte-kit sync
       - npx --no svelte-check --tsconfig ./tsconfig.json
       - npx --no biome lint . --config-path ../biome.json
-      - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - dprint check --config ../dprint.json --log-level warn
 
   pg:test:
     desc: "Playground: Run Vitest unit tests"
@@ -227,12 +228,13 @@ tasks:
   vs:format:
     desc: "VSCode: Format code"
     dir: ./editors/vscode
-    cmd: npx --no prettier . --write --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+    cmds:
+      - dprint fmt --config ../dprint.json --log-level warn
 
   vs:lint:
     desc: "VSCode: Lint code"
     dir: ./editors/vscode
-    cmd: npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+    cmd: dprint check --config ../../dprint.json --log-level warn
 
   ####################
   # INSTALLERS TASKS #
@@ -241,14 +243,15 @@ tasks:
   in:format:
     desc: "Installers: Format code"
     dir: ./installers/npm
-    cmd: npx --no prettier . --write --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+    cmds:
+      - dprint fmt --config ../dprint.json --log-level warn
 
   in:lint:
     desc: "Installers: Lint code"
     dir: ./installers/npm
     cmds:
       - npx --no biome lint . --config-path ../../biome.json
-      - npx --no prettier . --check --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-unknown --log-level warn
+      - dprint check --config ../dprint.json --log-level warn
 
   ##############
   # DOCS TASKS #
@@ -271,11 +274,12 @@ tasks:
   dc:format:
     desc: "Docs: Format code"
     dir: ./docs
-    cmd: npx --no prettier . --write --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+    cmds:
+      - dprint fmt --config ../dprint.json --log-level warn
 
   dc:lint:
     desc: "Docs: Lint code"
     dir: ./docs
     cmds:
       - npx --no biome lint . --config-path ../biome.json
-      - npx --no prettier . --check --config ../.prettierrc --ignore-path ../.prettierignore --ignore-unknown --log-level warn
+      - dprint check --config ../dprint.json --log-level warn
