@@ -66,7 +66,7 @@ tasks:
       - task: vs:format
       - task: in:format
       - task: dc:format
-      - npx --no @biomejs/biome format --write --config-path ./biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --write --config-path ./biome.json --no-errors-on-unmatched .
       - dprint fmt --config ./dprint.json --includes-override '**/*' --excludes 'toolchain/**' 'playground/**' 'editors/vscode/**' 'installers/npm/**' 'docs/**' --log-level warn
 
   test:
@@ -83,7 +83,7 @@ tasks:
       - task: vs:lint
       - task: in:lint
       - task: dc:lint
-      - npx --no @biomejs/biome format --config-path ./biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --config-path ./biome.json --no-errors-on-unmatched .
       - dprint check --config ./dprint.json --includes-override '**/*' --excludes 'toolchain/**' 'playground/**' 'editors/vscode/**' 'installers/npm/**' 'docs/**' --log-level warn
 
   ###################
@@ -122,7 +122,7 @@ tasks:
     desc: "Toolchain: Format Go code and run internal formatters"
     dir: ./toolchain
     cmds:
-      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched .
       - dprint fmt --config ../dprint.json --log-level warn
       - go fmt ./...
       - go run ./cmd/vdl/. format
@@ -155,7 +155,7 @@ tasks:
           echo "$UNFORMATTED"
           exit 1
         fi
-      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched .
       - dprint check --config ../dprint.json --log-level warn
 
   ####################
@@ -182,7 +182,7 @@ tasks:
     desc: "Playground: Format code"
     dir: ./playground
     cmds:
-      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched .
       - dprint fmt --config ../dprint.json --log-level warn
 
   pg:lint:
@@ -192,7 +192,7 @@ tasks:
       - npx --no svelte-kit sync
       - npx --no svelte-check --tsconfig ./tsconfig.json
       - npx --no biome lint . --config-path ../biome.json
-      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched .
       - dprint check --config ../dprint.json --log-level warn
 
   pg:test:
@@ -235,14 +235,14 @@ tasks:
     desc: "VSCode: Format code"
     dir: ./editors/vscode
     cmds:
-      - npx --no @biomejs/biome format --write --config-path ../../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --write --config-path ../../biome.json --no-errors-on-unmatched .
       - dprint fmt --config ../../dprint.json --log-level warn
 
   vs:lint:
     desc: "VSCode: Lint code"
     dir: ./editors/vscode
     cmds:
-      - npx --no @biomejs/biome format --config-path ../../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --config-path ../../biome.json --no-errors-on-unmatched .
       - dprint check --config ../../dprint.json --log-level warn
 
   ####################
@@ -253,7 +253,7 @@ tasks:
     desc: "Installers: Format code"
     dir: ./installers/npm
     cmds:
-      - npx --no @biomejs/biome format --write --config-path ../../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --write --config-path ../../biome.json --no-errors-on-unmatched .
       - dprint fmt --config ../../dprint.json --log-level warn
 
   in:lint:
@@ -261,7 +261,7 @@ tasks:
     dir: ./installers/npm
     cmds:
       - npx --no biome lint . --config-path ../../biome.json
-      - npx --no @biomejs/biome format --config-path ../../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --config-path ../../biome.json --no-errors-on-unmatched .
       - dprint check --config ../../dprint.json --log-level warn
 
   ##############
@@ -286,7 +286,7 @@ tasks:
     desc: "Docs: Format code"
     dir: ./docs
     cmds:
-      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched .
       - dprint fmt --config ../dprint.json --log-level warn
 
   dc:lint:
@@ -294,5 +294,5 @@ tasks:
     dir: ./docs
     cmds:
       - npx --no biome lint . --config-path ../biome.json
-      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched '**/*.js' '**/*.jsx' '**/*.mjs' '**/*.cjs' '**/*.ts' '**/*.tsx' '**/*.mts' '**/*.cts' '**/*.svelte' '**/*.astro'
+      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched .
       - dprint check --config ../dprint.json --log-level warn

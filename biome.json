@@ -20,11 +20,26 @@
     "parser": { "tailwindDirectives": true }
   },
   "formatter": {
-    "enabled": true
+    "enabled": true,
+    "includes": [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.mts",
+      "**/*.cts",
+      "**/*.svelte",
+      "**/*.astro"
+    ]
   },
   "linter": {
     "enabled": true,
-    "includes": ["**", "!**/*.test.ts"],
+    "includes": [
+      "**",
+      "!**/*.test.ts"
+    ],
     "rules": {
       "recommended": true,
       "style": {
