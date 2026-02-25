@@ -23,7 +23,8 @@
       "!**/.svelte-kit",
       "!**/_app",
       "!**/.astro",
-      "!**/_astro"
+      "!**/_astro",
+      "!**/wasmtypes"
     ]
   },
   "html": {
