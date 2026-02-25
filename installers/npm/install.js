@@ -40,9 +40,7 @@ function getPlatform() {
 function getArch() {
   const arch = ARCH_MAP[process.arch];
   if (!arch) {
-    throw new Error(
-      `Unsupported architecture: ${process.arch}. VDL supports x64 and arm64.`,
-    );
+    throw new Error(`Unsupported architecture: ${process.arch}. VDL supports x64 and arm64.`);
   }
   return arch;
 }
@@ -103,9 +101,7 @@ function getChecksumsURL() {
  */
 function verifyChecksum(binaryBuffer, checksumsBuffer, filename) {
   const checksums = checksumsBuffer.toString("utf8");
-  const expectedLine = checksums
-    .split("\n")
-    .find((line) => line.trim().endsWith(filename));
+  const expectedLine = checksums.split("\n").find((line) => line.trim().endsWith(filename));
 
   if (!expectedLine) {
     throw new Error(`Checksum for ${filename} not found in checksums.txt`);
@@ -114,10 +110,7 @@ function verifyChecksum(binaryBuffer, checksumsBuffer, filename) {
   // Checksums file format is: <hash>  <filename>
   const expectedHash = expectedLine.split(/\s+/)[0].trim();
 
-  const calculatedHash = crypto
-    .createHash("sha256")
-    .update(binaryBuffer)
-    .digest("hex");
+  const calculatedHash = crypto.createHash("sha256").update(binaryBuffer).digest("hex");
 
   if (expectedHash !== calculatedHash) {
     throw new Error(
@@ -162,10 +155,7 @@ function extractTarGz(buffer, binDir, binaryName) {
       });
 
       let binaryFound = false;
-      const searchPaths = [
-        path.join(tempDir, binaryName),
-        path.join(tempDir, "vdl", binaryName),
-      ];
+      const searchPaths = [path.join(tempDir, binaryName), path.join(tempDir, "vdl", binaryName)];
 
       for (const searchPath of searchPaths) {
         if (fs.existsSync(searchPath)) {
@@ -181,11 +171,7 @@ function extractTarGz(buffer, binDir, binaryName) {
         const files = execSync(`find "${tempDir}" -type f`, {
           encoding: "utf8",
         });
-        reject(
-          new Error(
-            `Binary ${binaryName} not found in archive.\nFound files:\n${files}`,
-          ),
-        );
+        reject(new Error(`Binary ${binaryName} not found in archive.\nFound files:\n${files}`));
       } else {
         resolve();
       }
@@ -235,10 +221,7 @@ function extractZip(buffer, binDir, binaryName) {
       }
 
       let binaryFound = false;
-      const searchPaths = [
-        path.join(tempDir, binaryName),
-        path.join(tempDir, "vdl", binaryName),
-      ];
+      const searchPaths = [path.join(tempDir, binaryName), path.join(tempDir, "vdl", binaryName)];
 
       for (const searchPath of searchPaths) {
         if (fs.existsSync(searchPath)) {
@@ -288,9 +271,7 @@ function download(url) {
           response.statusCode === 307 ||
           response.statusCode === 308
         ) {
-          return download(response.headers.location)
-            .then(resolve)
-            .catch(reject);
+          return download(response.headers.location).then(resolve).catch(reject);
         }
 
         if (response.statusCode !== 200) {
