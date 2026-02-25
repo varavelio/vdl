@@ -3,7 +3,7 @@ FROM alpine:3.23.3 AS fetcher
 WORKDIR /fetcher
 
 RUN \
-  apk add -qq --no-cache curl unzip && \
+  apk add --quiet curl unzip && \
   # Fetch dprint
   curl -fsSL https://dprint.dev/install.sh | sh && \
   mv /root/.dprint/bin/dprint ./dprint && chmod +x ./dprint && \
