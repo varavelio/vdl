@@ -10,6 +10,17 @@
   "yaml": {
   },
   "excludes": [
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.mjs",
+    "**/*.cjs",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    "**/*.cts",
+    "**/*.svelte",
+    "**/*.astro",
+    "**/*.schema.json",
     "**/*-lock.json",
     "**/node_modules",
     "**/temp",
@@ -21,10 +32,7 @@
     "**/immutable",
     "**/_app",
     "**/.astro",
-    "**/_astro",
-    "**/*.svelte",
-    "**/*.astro",
-    "**/*.schema.json"
+    "**/_astro"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.21.1.wasm",
