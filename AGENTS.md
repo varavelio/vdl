@@ -165,6 +165,8 @@ The communication between the Playground (Svelte) and the Core (Go) relies on a 
 
 Do NOT rely on memory. Run `task --list-all` to find the appropriate testing command (e.g., for running all tests, specific toolchain tests, frontend tests, etc).
 
+For standard verification and formatting, use the root tasks (`task test`, `task lint`, `task format`). These tasks orchestrate checks across subprojects from the repository root.
+
 ## 5. Tech Stack & Conventions
 
 ### Go

@@ -61,30 +61,35 @@ tasks:
   format:
     desc: "Format all code"
     cmds:
-      - task: tc:format
-      - task: pg:format
-      - task: vs:format
-      - task: in:format
-      - task: dc:format
+      - cd ./toolchain && go fmt ./...
+      - cd ./toolchain && go run ./cmd/vdl/. format
       - npx --no @biomejs/biome format --write --config-path ./biome.json --no-errors-on-unmatched .
-      - dprint fmt --config ./dprint.json --includes-override '**/*' --excludes 'toolchain/**' 'playground/**' 'editors/vscode/**' 'installers/npm/**' 'docs/**' --log-level warn
+      - dprint fmt --config ./dprint.json --log-level warn
 
   test:
     desc: "Run all tests (Toolchain, Toolchain E2E and Playground)"
     cmds:
-      - task: tc:test
-      - task: pg:test
+      - cd ./toolchain && go test ./...
+      - cd ./toolchain && go test -race ./...
+      - cd ./playground && npx --no vitest run
 
   lint:
     desc: "Lint all code"
     cmds:
-      - task: tc:lint
-      - task: pg:lint
-      - task: vs:lint
-      - task: in:lint
-      - task: dc:lint
+      - cd ./toolchain && golangci-lint run ./...
+      - |
+        cd ./toolchain
+        UNFORMATTED=$(gofmt -l .)
+        if [ -n "$UNFORMATTED" ]; then
+          echo "The following files are not formatted correctly:"
+          echo "$UNFORMATTED"
+          exit 1
+        fi
+      - cd ./playground && npx --no svelte-kit sync
+      - cd ./playground && npx --no svelte-check --tsconfig ./tsconfig.json
+      - npx --no biome lint ./playground ./installers/npm ./docs --config-path ./biome.json
       - npx --no @biomejs/biome format --config-path ./biome.json --no-errors-on-unmatched .
-      - dprint check --config ./dprint.json --includes-override '**/*' --excludes 'toolchain/**' 'playground/**' 'editors/vscode/**' 'installers/npm/**' 'docs/**' --log-level warn
+      - dprint check --config ./dprint.json --log-level warn
 
   ###################
   # TOOLCHAIN TASKS #
@@ -118,46 +123,6 @@ tasks:
       - GOOS=darwin GOARCH=amd64 go build -o ./dist/vdl-darwin-amd64 ./cmd/vdl/.
       - GOOS=darwin GOARCH=arm64 go build -o ./dist/vdl-darwin-arm64 ./cmd/vdl/.
 
-  tc:format:
-    desc: "Toolchain: Format Go code and run internal formatters"
-    dir: ./toolchain
-    cmds:
-      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched .
-      - dprint fmt --config ../dprint.json --log-level warn
-      - go fmt ./...
-      - go run ./cmd/vdl/. format
-
-  tc:test:
-    desc: "Toolchain: Run unit and E2E tests"
-    dir: ./toolchain
-    cmds:
-      - go test ./...
-      - go test -race ./...
-
-  tc:lint:
-    desc: "Toolchain: Run GolangCI-Lint and format checks"
-    deps: [tc:lint:golang, tc:lint:format]
-    failfast: true
-
-  tc:lint:golang:
-    desc: "Toolchain: Run GolangCI-Lint"
-    dir: ./toolchain
-    cmd: golangci-lint run ./...
-
-  tc:lint:format:
-    desc: "Toolchain: Verify code formatting"
-    dir: ./toolchain
-    cmds:
-      - |
-        UNFORMATTED=$(gofmt -l .)
-        if [ -n "$UNFORMATTED" ]; then
-          echo "The following files are not formatted correctly:"
-          echo "$UNFORMATTED"
-          exit 1
-        fi
-      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched .
-      - dprint check --config ../dprint.json --log-level warn
-
   ####################
   # PLAYGROUND TASKS #
   ####################
@@ -177,28 +142,6 @@ tasks:
     cmds:
       - npx --no vite build
       - node ./postbuild.ts
-
-  pg:format:
-    desc: "Playground: Format code"
-    dir: ./playground
-    cmds:
-      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched .
-      - dprint fmt --config ../dprint.json --log-level warn
-
-  pg:lint:
-    desc: "Playground: Lint code"
-    dir: ./playground
-    cmds:
-      - npx --no svelte-kit sync
-      - npx --no svelte-check --tsconfig ./tsconfig.json
-      - npx --no biome lint . --config-path ../biome.json
-      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched .
-      - dprint check --config ../dprint.json --log-level warn
-
-  pg:test:
-    desc: "Playground: Run Vitest unit tests"
-    dir: ./playground
-    cmd: npx --no vitest run
 
   ##########################
   # VSCODE EXTENSION TASKS #
@@ -231,38 +174,9 @@ tasks:
     dir: ./editors/vscode
     cmd: npx --no vsce ls
 
-  vs:format:
-    desc: "VSCode: Format code"
-    dir: ./editors/vscode
-    cmds:
-      - npx --no @biomejs/biome format --write --config-path ../../biome.json --no-errors-on-unmatched .
-      - dprint fmt --config ../../dprint.json --log-level warn
-
-  vs:lint:
-    desc: "VSCode: Lint code"
-    dir: ./editors/vscode
-    cmds:
-      - npx --no @biomejs/biome format --config-path ../../biome.json --no-errors-on-unmatched .
-      - dprint check --config ../../dprint.json --log-level warn
-
   ####################
   # INSTALLERS TASKS #
   ####################
-
-  in:format:
-    desc: "Installers: Format code"
-    dir: ./installers/npm
-    cmds:
-      - npx --no @biomejs/biome format --write --config-path ../../biome.json --no-errors-on-unmatched .
-      - dprint fmt --config ../../dprint.json --log-level warn
-
-  in:lint:
-    desc: "Installers: Lint code"
-    dir: ./installers/npm
-    cmds:
-      - npx --no biome lint . --config-path ../../biome.json
-      - npx --no @biomejs/biome format --config-path ../../biome.json --no-errors-on-unmatched .
-      - dprint check --config ../../dprint.json --log-level warn
 
   ##############
   # DOCS TASKS #
@@ -281,18 +195,3 @@ tasks:
     deps:
       - tc:build:wasm
     cmd: npx --no astro build
-
-  dc:format:
-    desc: "Docs: Format code"
-    dir: ./docs
-    cmds:
-      - npx --no @biomejs/biome format --write --config-path ../biome.json --no-errors-on-unmatched .
-      - dprint fmt --config ../dprint.json --log-level warn
-
-  dc:lint:
-    desc: "Docs: Lint code"
-    dir: ./docs
-    cmds:
-      - npx --no biome lint . --config-path ../biome.json
-      - npx --no @biomejs/biome format --config-path ../biome.json --no-errors-on-unmatched .
-      - dprint check --config ../dprint.json --log-level warn
