@@ -1,12 +1,10 @@
 const vscode = require("vscode");
-const cp = require("child_process");
+const cp = require("node:child_process");
 
 async function openLogsCommand(binaryPath) {
   cp.execFile(binaryPath, ["lsp", "--log-path"], async (error, stdout, _) => {
     if (error) {
-      vscode.window.showErrorMessage(
-        `Failed to get VDL log path: ${error.message}`,
-      );
+      vscode.window.showErrorMessage(`Failed to get VDL log path: ${error.message}`);
       return;
     }
 
@@ -23,9 +21,7 @@ async function openLogsCommand(binaryPath) {
       const doc = await vscode.workspace.openTextDocument(uri);
       await vscode.window.showTextDocument(doc);
     } catch (err) {
-      vscode.window.showErrorMessage(
-        `Failed to open log file at ${logPath}: ${err.message}`,
-      );
+      vscode.window.showErrorMessage(`Failed to open log file at ${logPath}: ${err.message}`);
     }
   });
 }

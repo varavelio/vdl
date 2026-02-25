@@ -69,10 +69,7 @@ async function activate(context) {
   // Configuration Watcher (Reactivity)
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(async (e) => {
-      if (
-        e.affectsConfiguration("vdl.enable") ||
-        e.affectsConfiguration("vdl.binaryPath")
-      ) {
+      if (e.affectsConfiguration("vdl.enable") || e.affectsConfiguration("vdl.binaryPath")) {
         console.log("VDL: Configuration changed. Reloading services...");
         await stopLanguageServer();
         await bootstrap();

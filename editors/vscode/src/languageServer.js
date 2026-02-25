@@ -49,9 +49,7 @@ async function startLanguageServer(binaryPath) {
     console.log("VDL: Language Server started.");
   } catch (error) {
     console.error("VDL: Failed to start the language server:", error);
-    vscode.window.showErrorMessage(
-      `VDL: Failed to start Language Server: ${error}`,
-    );
+    vscode.window.showErrorMessage(`VDL: Failed to start Language Server: ${error}`);
   }
 }
 

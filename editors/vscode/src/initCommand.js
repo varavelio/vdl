@@ -1,14 +1,11 @@
 const vscode = require("vscode");
-const execProcess = require("child_process").exec;
+const execProcess = require("node:child_process").exec;
 
 async function initCommand(binaryPath) {
-  let defaultUri = undefined;
+  let defaultUri;
 
   // Open dialog in current project folder
-  if (
-    vscode.workspace.workspaceFolders &&
-    vscode.workspace.workspaceFolders.length > 0
-  ) {
+  if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
     defaultUri = vscode.workspace.workspaceFolders[0].uri;
   }
 
@@ -39,9 +36,7 @@ async function initCommand(binaryPath) {
 
     if (stdout) console.log(stdout);
 
-    vscode.window.showInformationMessage(
-      `VDL initialized successfully in: ${folderPath}`,
-    );
+    vscode.window.showInformationMessage(`VDL initialized successfully in: ${folderPath}`);
   });
 }
 
