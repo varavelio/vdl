@@ -16,8 +16,13 @@
       "!**/_astro"
     ]
   },
+  "html": {
+    "experimentalFullSupportEnabled": true
+  },
   "css": {
-    "parser": { "tailwindDirectives": true }
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "formatter": {
     "enabled": true,
@@ -49,13 +54,6 @@
       },
       "suspicious": {
         "noAssignInExpressions": "off"
-      }
-    }
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "off"
       }
     }
   }
