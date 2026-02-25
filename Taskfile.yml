@@ -50,7 +50,7 @@ tasks:
     cmds:
       - task: tc:build:wasm # <- Required by the playground
       - task: pg:build # <- Required by the final VDL binary
-      - task: tc:build:vdl
+      - task: tc:install
 
   codegen:
     desc: "Run all code generators"
@@ -63,7 +63,7 @@ tasks:
     cmds:
       - cd ./toolchain && go fmt ./...
       - cd ./toolchain && go run ./cmd/vdl/. format
-      - npx --no @biomejs/biome format --write --config-path ./biome.json --no-errors-on-unmatched .
+      - npx --no biome format --write --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - dprint fmt --config ./dprint.json --log-level warn
 
   test:
@@ -87,8 +87,7 @@ tasks:
         fi
       - cd ./playground && npx --no svelte-kit sync
       - cd ./playground && npx --no svelte-check --tsconfig ./tsconfig.json
-      - npx --no biome lint ./playground ./installers/npm ./docs --config-path ./biome.json
-      - npx --no @biomejs/biome format --config-path ./biome.json --no-errors-on-unmatched .
+      - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - dprint check --config ./dprint.json --log-level warn
 
   ###################
@@ -157,10 +156,6 @@ tasks:
     desc: "VSCode: List contents of packaged .vsix"
     dir: ./editors/vscode
     cmd: npx --no vsce ls
-
-  ####################
-  # INSTALLERS TASKS #
-  ####################
 
   ##############
   # DOCS TASKS #
