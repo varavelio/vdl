@@ -18,6 +18,7 @@
     "**/*.tsx",
     "**/*.mts",
     "**/*.cts",
+    "**/*.svg",
     "**/*.svelte",
     "**/*.astro",
     "**/*.schema.json",
