@@ -56,5 +56,8 @@
         "noAssignInExpressions": "off"
       }
     }
+  },
+  "assist": {
+    "enabled": true
   }
 }
