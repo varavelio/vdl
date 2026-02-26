@@ -11,7 +11,8 @@ import (
 // Keywords must come before Ident to have higher priority.
 var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	// Docstrings (triple quoted strings) - must come before StringLiteral
-	// Match """ followed by characters, allowing single/double quotes but not triple, until closing """
+	// Match """ followed by characters, allowing single/double quotes but
+	// not triple, until closing """
 	{Name: "Docstring", Pattern: `"""(?:[^"]+|"[^"]|""[^"])*"""`},
 
 	// Comments
@@ -30,11 +31,9 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{Name: "Datetime", Pattern: `\bdatetime\b`},
 	{Name: "Map", Pattern: `\bmap\b`},
 
-	// Boolean literals
+	// Literals
 	{Name: "True", Pattern: `\btrue\b`},
 	{Name: "False", Pattern: `\bfalse\b`},
-
-	// Literals
 	{Name: "FloatLiteral", Pattern: `[0-9]+\.[0-9]+`},
 	{Name: "IntLiteral", Pattern: `[0-9]+`},
 	{Name: "StringLiteral", Pattern: `"(?:\\"|\\\\|[^"])*"`},
@@ -42,7 +41,7 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	// Identifiers
 	{Name: "Ident", Pattern: `[a-zA-Z_][a-zA-Z0-9_]*`},
 
-	// Spread operator (must come before Illegal to catch it)
+	// Spread operator
 	{Name: "Spread", Pattern: `\.\.\.`},
 
 	// Delimiters and operators
@@ -56,8 +55,6 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{Name: "RBracket", Pattern: `\]`},
 	{Name: "Question", Pattern: `\?`},
 	{Name: "Equals", Pattern: `=`},
-	{Name: "LessThan", Pattern: `<`},
-	{Name: "GreaterThan", Pattern: `>`},
 
 	// Whitespace (excluding newlines)
 	{Name: "Whitespace", Pattern: `[ \t\r]+`},

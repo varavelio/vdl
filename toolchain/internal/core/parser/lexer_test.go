@@ -60,7 +60,7 @@ func filterTokens(tokens []tokenInfo) []tokenInfo {
 }
 
 func TestLexerDelimitersAndOperators(t *testing.T) {
-	tokens, err := lexString("@(){}[]?=<>")
+	tokens, err := lexString("@(){}[]?=")
 	require.NoError(t, err)
 
 	require.Equal(t, []tokenInfo{
@@ -73,8 +73,6 @@ func TestLexerDelimitersAndOperators(t *testing.T) {
 		{Type: "RBracket", Value: "]"},
 		{Type: "Question", Value: "?"},
 		{Type: "Equals", Value: "="},
-		{Type: "LessThan", Value: "<"},
-		{Type: "GreaterThan", Value: ">"},
 		{Type: "EOF", Value: ""},
 	}, tokens)
 }
@@ -200,8 +198,8 @@ func TestLexerFullSampleTypes(t *testing.T) {
 		@rpc type Chat {
 			@proc SendMessage {
 				input {
-					chatId string
-					message string
+					chatId string[]
+					message map[string]
 				}
 				output {
 					messageId string
@@ -230,7 +228,7 @@ func TestLexerFullSampleTypes(t *testing.T) {
 		"Include", "StringLiteral",
 		"At", "Ident", "Type", "Ident", "LBrace",
 		"At", "Ident", "Ident", "LBrace",
-		"Ident", "LBrace", "Ident", "String", "Ident", "String", "RBrace",
+		"Ident", "LBrace", "Ident", "String", "LBracket", "RBracket", "Ident", "LBracket", "String", "RBracket", "RBrace",
 		"Ident", "LBrace", "Ident", "String", "RBrace",
 		"RBrace", "RBrace",
 		"At", "Ident", "Const", "Ident", "Equals", "StringLiteral",
