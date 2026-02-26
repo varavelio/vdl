@@ -60,7 +60,7 @@ func filterTokens(tokens []tokenInfo) []tokenInfo {
 }
 
 func TestLexerDelimitersAndOperators(t *testing.T) {
-	tokens, err := lexString("@(){}[]?=")
+	tokens, err := lexString("@(){}[]?=.")
 	require.NoError(t, err)
 
 	require.Equal(t, []tokenInfo{
@@ -73,6 +73,7 @@ func TestLexerDelimitersAndOperators(t *testing.T) {
 		{Type: "RBracket", Value: "]"},
 		{Type: "Question", Value: "?"},
 		{Type: "Equals", Value: "="},
+		{Type: "Dot", Value: "."},
 		{Type: "EOF", Value: ""},
 	}, tokens)
 }
@@ -188,6 +189,168 @@ func TestLexerLiteralsAndComments(t *testing.T) {
 		}
 
 		require.Equal(t, []string{"CommentBlock", "Comment", "Docstring", "Spread", "Ident", "EOF"}, types)
+	})
+}
+
+func TestLexerDotToken(t *testing.T) {
+	t.Run("single dot lexes as Dot", func(t *testing.T) {
+		tokens, err := lexString(".")
+		require.NoError(t, err)
+		require.Equal(t, []tokenInfo{
+			{Type: "Dot", Value: "."},
+			{Type: "EOF", Value: ""},
+		}, tokens)
+	})
+
+	t.Run("spread takes priority over dot", func(t *testing.T) {
+		tokens, err := lexString("...Base")
+		require.NoError(t, err)
+		require.Equal(t, []tokenInfo{
+			{Type: "Spread", Value: "..."},
+			{Type: "Ident", Value: "Base"},
+			{Type: "EOF", Value: ""},
+		}, filterTokens(tokens))
+	})
+
+	t.Run("dot between identifiers", func(t *testing.T) {
+		tokens, err := lexString("Color.Red")
+		require.NoError(t, err)
+		require.Equal(t, []tokenInfo{
+			{Type: "Ident", Value: "Color"},
+			{Type: "Dot", Value: "."},
+			{Type: "Ident", Value: "Red"},
+			{Type: "EOF", Value: ""},
+		}, filterTokens(tokens))
+	})
+
+	t.Run("dot with spaces around it", func(t *testing.T) {
+		tokens, err := lexString("Foo . Bar")
+		require.NoError(t, err)
+		require.Equal(t, []tokenInfo{
+			{Type: "Ident", Value: "Foo"},
+			{Type: "Dot", Value: "."},
+			{Type: "Ident", Value: "Bar"},
+			{Type: "EOF", Value: ""},
+		}, filterTokens(tokens))
+	})
+
+	t.Run("multiple dots in sequence are separate tokens", func(t *testing.T) {
+		tokens, err := lexString("a.b.c")
+		require.NoError(t, err)
+		require.Equal(t, []tokenInfo{
+			{Type: "Ident", Value: "a"},
+			{Type: "Dot", Value: "."},
+			{Type: "Ident", Value: "b"},
+			{Type: "Dot", Value: "."},
+			{Type: "Ident", Value: "c"},
+			{Type: "EOF", Value: ""},
+		}, filterTokens(tokens))
+	})
+}
+
+func TestLexerReferencePatterns(t *testing.T) {
+	t.Run("enum member reference Color.Red", func(t *testing.T) {
+		tokens, err := lexString("Color.Red")
+		require.NoError(t, err)
+		filtered := filterTokens(tokens)
+		types := []string{}
+		for _, tok := range filtered {
+			types = append(types, tok.Type)
+		}
+		require.Equal(t, []string{"Ident", "Dot", "Ident", "EOF"}, types)
+		require.Equal(t, "Color", filtered[0].Value)
+		require.Equal(t, "Red", filtered[2].Value)
+	})
+
+	t.Run("reference in data literal context", func(t *testing.T) {
+		input := `{ color Color.Red count 42 }`
+		tokens, err := lexString(input)
+		require.NoError(t, err)
+		filtered := filterTokens(tokens)
+		types := []string{}
+		for _, tok := range filtered {
+			types = append(types, tok.Type)
+		}
+		require.Equal(t, []string{
+			"LBrace",
+			"Ident", "Ident", "Dot", "Ident",
+			"Ident", "IntLiteral",
+			"RBrace",
+			"EOF",
+		}, types)
+	})
+
+	t.Run("reference in annotation payload context", func(t *testing.T) {
+		input := `@default(Color.Red)`
+		tokens, err := lexString(input)
+		require.NoError(t, err)
+		filtered := filterTokens(tokens)
+		types := []string{}
+		for _, tok := range filtered {
+			types = append(types, tok.Type)
+		}
+		require.Equal(t, []string{
+			"At", "Ident", "LParen",
+			"Ident", "Dot", "Ident",
+			"RParen", "EOF",
+		}, types)
+	})
+
+	t.Run("const reference without dot is just Ident", func(t *testing.T) {
+		input := `{ config BASE_CONFIG }`
+		tokens, err := lexString(input)
+		require.NoError(t, err)
+		filtered := filterTokens(tokens)
+		types := []string{}
+		for _, tok := range filtered {
+			types = append(types, tok.Type)
+		}
+		require.Equal(t, []string{
+			"LBrace", "Ident", "Ident", "RBrace", "EOF",
+		}, types)
+	})
+}
+
+func TestLexerAtToken(t *testing.T) {
+	t.Run("at sign in various positions", func(t *testing.T) {
+		tokens, err := lexString("@entity @deprecated @rpc")
+		require.NoError(t, err)
+		filtered := filterTokens(tokens)
+		require.Equal(t, []tokenInfo{
+			{Type: "At", Value: "@"},
+			{Type: "Ident", Value: "entity"},
+			{Type: "At", Value: "@"},
+			{Type: "Ident", Value: "deprecated"},
+			{Type: "At", Value: "@"},
+			{Type: "Ident", Value: "rpc"},
+			{Type: "EOF", Value: ""},
+		}, filtered)
+	})
+
+	t.Run("at sign with payload", func(t *testing.T) {
+		tokens, err := lexString(`@name("value")`)
+		require.NoError(t, err)
+		filtered := filterTokens(tokens)
+		require.Equal(t, []tokenInfo{
+			{Type: "At", Value: "@"},
+			{Type: "Ident", Value: "name"},
+			{Type: "LParen", Value: "("},
+			{Type: "StringLiteral", Value: `"value"`},
+			{Type: "RParen", Value: ")"},
+			{Type: "EOF", Value: ""},
+		}, filtered)
+	})
+}
+
+func TestLexerNoCommaOrColon(t *testing.T) {
+	t.Run("comma is not a valid token", func(t *testing.T) {
+		_, err := lexString("a, b")
+		require.Error(t, err)
+	})
+
+	t.Run("colon is not a valid token", func(t *testing.T) {
+		_, err := lexString("name: string")
+		require.Error(t, err)
 	})
 }
 

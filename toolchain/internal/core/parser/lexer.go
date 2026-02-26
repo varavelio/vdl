@@ -44,6 +44,9 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	// Spread operator
 	{Name: "Spread", Pattern: `\.\.\.`},
 
+	// Dot (must come after Spread so "..." is matched first)
+	{Name: "Dot", Pattern: `\.`},
+
 	// Delimiters and operators
 	{Name: "Newline", Pattern: `\n`},
 	{Name: "At", Pattern: `@`},
