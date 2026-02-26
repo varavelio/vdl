@@ -228,7 +228,7 @@ func TestLexerFullSampleTypes(t *testing.T) {
 		"Include", "StringLiteral",
 		"At", "Ident", "Type", "Ident", "LBrace",
 		"At", "Ident", "Ident", "LBrace",
-		"Ident", "LBrace", "Ident", "String", "LBracket", "RBracket", "Ident", "LBracket", "String", "RBracket", "RBrace",
+		"Ident", "LBrace", "Ident", "String", "LBracket", "RBracket", "Ident", "Map", "LBracket", "String", "RBracket", "RBrace",
 		"Ident", "LBrace", "Ident", "String", "RBrace",
 		"RBrace", "RBrace",
 		"At", "Ident", "Const", "Ident", "Equals", "StringLiteral",
