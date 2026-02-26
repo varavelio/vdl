@@ -20,22 +20,15 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 
 	// Keywords (must come before Ident to have higher priority)
 	{Name: "Include", Pattern: `\binclude\b`},
-	{Name: "Rpc", Pattern: `\brpc\b`},
 	{Name: "Const", Pattern: `\bconst\b`},
 	{Name: "Enum", Pattern: `\benum\b`},
-	{Name: "Pattern", Pattern: `\bpattern\b`},
-	{Name: "Map", Pattern: `\bmap\b`},
-	{Name: "Deprecated", Pattern: `\bdeprecated\b`},
 	{Name: "Type", Pattern: `\btype\b`},
-	{Name: "Proc", Pattern: `\bproc\b`},
-	{Name: "Stream", Pattern: `\bstream\b`},
-	{Name: "Input", Pattern: `\binput\b`},
-	{Name: "Output", Pattern: `\boutput\b`},
 	{Name: "String", Pattern: `\bstring\b`},
 	{Name: "Int", Pattern: `\bint\b`},
 	{Name: "Float", Pattern: `\bfloat\b`},
 	{Name: "Bool", Pattern: `\bbool\b`},
 	{Name: "Datetime", Pattern: `\bdatetime\b`},
+	{Name: "Map", Pattern: `\bmap\b`},
 
 	// Boolean literals
 	{Name: "True", Pattern: `\btrue\b`},
@@ -54,8 +47,7 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 
 	// Delimiters and operators
 	{Name: "Newline", Pattern: `\n`},
-	{Name: "Colon", Pattern: `:`},
-	{Name: "Comma", Pattern: `,`},
+	{Name: "At", Pattern: `@`},
 	{Name: "LParen", Pattern: `\(`},
 	{Name: "RParen", Pattern: `\)`},
 	{Name: "LBrace", Pattern: `\{`},
