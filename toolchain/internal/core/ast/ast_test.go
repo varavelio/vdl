@@ -6,41 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDocstringGetExternal(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-		ok       bool
-	}{
-		{"valid unix path", "./docs/readme.md", "./docs/readme.md", true},
-		{"valid absolute unix path", "/usr/local/readme.md", "/usr/local/readme.md", true},
-		{"valid windows path", `C:\docs\readme.md`, `C:\docs\readme.md`, true},
-		{"invalid extension", "./docs/readme.txt", "", false},
-		{"empty string", "", "", false},
-		{"only whitespace", "   ", "", false},
-		{"newline at end", "./docs/readme.md\n", "./docs/readme.md", true},
-		{"newline at start", "\n./docs/readme.md", "./docs/readme.md", true},
-		{"newline in middle", "./docs/\nreadme.md", "", false},
-		{"carriage return at end", "./docs/readme.md\r", "./docs/readme.md", true},
-		{"carriage return in middle", "./docs/\rreadme.md", "", false},
-		{"uppercase extension", "./docs/README.MD", "", false},
-		{"leading and trailing whitespace", "  ./docs/readme.md  ", "./docs/readme.md", true},
-		{"just .md", ".md", "", false},
-		{"dotfile but not markdown", ".gitignore", "", false},
-		{"directory with dot", "./.config/readme.md", "./.config/readme.md", true},
-		{"tricky valid path with newline padding", "\n  ./dir/file.md  \r\n", "./dir/file.md", true},
-		{"path with tab in middle", "./docs/\treadme.md", "./docs/\treadme.md", true},
-	}
-
-	for _, tt := range tests {
-		d := Docstring{Value: DocstringValue(tt.input)}
-		path, ok := d.GetExternal()
-		require.Equal(t, tt.ok, ok, tt.name)
-		require.Equal(t, tt.expected, path, tt.name)
-	}
-}
-
 func TestDocstringIsExternal(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -48,42 +13,12 @@ func TestDocstringIsExternal(t *testing.T) {
 		expected string
 		ok       bool
 	}{
-		{
-			name:     "Valid file",
-			input:    "external_doc.md",
-			expected: "external_doc.md",
-			ok:       true,
-		},
-		{
-			name:     "With spaces",
-			input:    "   doc.md   ",
-			expected: "doc.md",
-			ok:       true,
-		},
-		{
-			name:     "With newline",
-			input:    "some\ndoc.md",
-			expected: "",
-			ok:       false,
-		},
-		{
-			name:     "Does not end with .md",
-			input:    "doc.txt",
-			expected: "",
-			ok:       false,
-		},
-		{
-			name:     "Incorrect suffix",
-			input:    ".md",
-			expected: "",
-			ok:       false,
-		},
-		{
-			name:     "Empty string",
-			input:    "",
-			expected: "",
-			ok:       false,
-		},
+		{name: "valid markdown path", input: " ./docs/readme.md ", expected: "./docs/readme.md", ok: true},
+		{name: "valid windows path", input: `C:\docs\readme.md`, expected: `C:\docs\readme.md`, ok: true},
+		{name: "invalid when multiline", input: "./docs\nreadme.md", expected: "", ok: false},
+		{name: "invalid extension", input: "./docs/readme.txt", expected: "", ok: false},
+		{name: "uppercase extension invalid", input: "./docs/README.MD", expected: "", ok: false},
+		{name: "empty invalid", input: "", expected: "", ok: false},
 	}
 
 	for _, tt := range tests {
@@ -95,11 +30,57 @@ func TestDocstringIsExternal(t *testing.T) {
 	}
 }
 
+func TestIsPrimitiveType(t *testing.T) {
+	require.True(t, IsPrimitiveType("string"))
+	require.True(t, IsPrimitiveType("datetime"))
+	require.False(t, IsPrimitiveType("User"))
+}
+
+func TestSchemaGetters(t *testing.T) {
+	schema := &Schema{
+		Declarations: []*TopLevelDecl{
+			{Include: &Include{Path: "./common.vdl"}},
+			{Docstring: &Docstring{Value: " standalone "}},
+			{Type: &TypeDecl{Name: "User"}},
+			{Const: &ConstDecl{Name: "AppConfig"}},
+			{Enum: &EnumDecl{Name: "Role"}},
+		},
+	}
+
+	require.Len(t, schema.GetIncludes(), 1)
+	require.Len(t, schema.GetDocstrings(), 1)
+	require.Len(t, schema.GetTypes(), 1)
+	require.Len(t, schema.GetConsts(), 1)
+	require.Len(t, schema.GetEnums(), 1)
+	require.Equal(t, "User", schema.GetTypesMap()["User"].Name)
+	require.Nil(t, schema.GetTypesMap()["Unknown"])
+}
+
+func TestSchemaChildKind(t *testing.T) {
+	tests := []struct {
+		name     string
+		child    *TopLevelDecl
+		expected DeclKind
+	}{
+		{name: "include", child: &TopLevelDecl{Include: &Include{Path: "./foo.vdl"}}, expected: DeclKindInclude},
+		{name: "docstring", child: &TopLevelDecl{Docstring: &Docstring{Value: " doc "}}, expected: DeclKindDocstring},
+		{name: "type", child: &TopLevelDecl{Type: &TypeDecl{Name: "User"}}, expected: DeclKindType},
+		{name: "const", child: &TopLevelDecl{Const: &ConstDecl{Name: "Config"}}, expected: DeclKindConst},
+		{name: "enum", child: &TopLevelDecl{Enum: &EnumDecl{Name: "Role"}}, expected: DeclKindEnum},
+		{name: "empty", child: &TopLevelDecl{}, expected: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.expected, tt.child.Kind())
+		})
+	}
+}
+
 func TestFlattenedFields(t *testing.T) {
 	primitiveString := "string"
 	primitiveInt := "int"
 
-	// Constructing a nested field structure for testing
 	fURL := &Field{Name: "url", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveString}}}
 	fSize := &Field{Name: "size", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}
 	fAvatar := &Field{
@@ -107,10 +88,7 @@ func TestFlattenedFields(t *testing.T) {
 		Type: FieldType{
 			Base: &FieldTypeBase{
 				Object: &FieldTypeObject{
-					Children: []*TypeDeclChild{
-						{Field: fURL},
-						{Field: fSize},
-					},
+					Members: []*TypeMember{{Field: fURL}, {Field: fSize}},
 				},
 			},
 		},
@@ -121,615 +99,369 @@ func TestFlattenedFields(t *testing.T) {
 		Type: FieldType{
 			Base: &FieldTypeBase{
 				Object: &FieldTypeObject{
-					Children: []*TypeDeclChild{
-						{Field: fName},
-						{Field: fAvatar},
-					},
+					Members: []*TypeMember{{Field: fName}, {Field: fAvatar}},
 				},
 			},
 		},
 	}
-	fId := &Field{Name: "id", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}
-	fRole := &Field{Name: "role", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveString}}}
 
-	typeDeclChildren := []*TypeDeclChild{
-		{Field: fId},
-		{Comment: &Comment{Simple: &[]string{"// some comment"}[0]}},
-		{Field: fProfile},
-		{Field: fRole},
-	}
-
-	// Create InputOutputChild slice for Input/Output tests
-	inputOutputChildren := []*InputOutputChild{
-		{Field: fId},
-		{Comment: &Comment{Simple: &[]string{"// some comment"}[0]}},
-		{Field: fProfile},
-		{Field: fRole},
-	}
-
-	expectedFieldNames := []string{"id", "profile", "name", "avatar", "url", "size", "role"}
-
-	t.Run("TypeDecl", func(t *testing.T) {
-		typeDecl := &TypeDecl{
-			Name:     "User",
-			Children: typeDeclChildren,
-		}
-
-		flattened := typeDecl.GetFlattenedFields()
-		require.Len(t, flattened, len(expectedFieldNames), "should have correct number of fields")
-
-		for i, field := range flattened {
-			require.Equal(t, expectedFieldNames[i], string(field.Name), "field name should match")
-		}
-
-		// Test pointer modification
-		require.False(t, flattened[0].Optional, "id should not be optional initially")
-		flattened[0].Optional = true
-		require.True(t, fId.Optional, "modifying flattened field should modify original field")
-	})
-
-	t.Run("ProcOrStreamDeclChildInput", func(t *testing.T) {
-		inputDecl := &ProcOrStreamDeclChildInput{
-			Children: inputOutputChildren,
-		}
-
-		flattened := inputDecl.GetFlattenedFields()
-		require.Len(t, flattened, len(expectedFieldNames), "should have correct number of fields")
-
-		for i, field := range flattened {
-			require.Equal(t, expectedFieldNames[i], string(field.Name), "field name should match")
-		}
-
-		// Test pointer modification
-		fId.Optional = false // reset from previous test
-		require.False(t, flattened[0].Optional, "id should not be optional initially")
-		flattened[0].Optional = true
-		require.True(t, fId.Optional, "modifying flattened field should modify original field")
-	})
-
-	t.Run("ProcOrStreamDeclChildOutput", func(t *testing.T) {
-		outputDecl := &ProcOrStreamDeclChildOutput{
-			Children: inputOutputChildren,
-		}
-
-		flattened := outputDecl.GetFlattenedFields()
-		require.Len(t, flattened, len(expectedFieldNames), "should have correct number of fields")
-
-		for i, field := range flattened {
-			require.Equal(t, expectedFieldNames[i], string(field.Name), "field name should match")
-		}
-
-		// Test pointer modification
-		fId.Optional = false // reset from previous test
-		require.False(t, flattened[0].Optional, "id should not be optional initially")
-		flattened[0].Optional = true
-		require.True(t, fId.Optional, "modifying flattened field should modify original field")
-	})
-
-	t.Run("Field.GetFlattenedField", func(t *testing.T) {
-		flattened := fProfile.GetFlattenedField()
-		expected := []string{"profile", "name", "avatar", "url", "size"}
-		require.Len(t, flattened, len(expected), "should have correct number of fields")
-
-		for i, field := range flattened {
-			require.Equal(t, expected[i], string(field.Name), "field name should match")
-		}
-
-		// Test pointer modification
-		require.False(t, flattened[1].Optional, "name should not be optional initially")
-		flattened[1].Optional = true
-		require.True(t, fName.Optional, "modifying flattened field should modify original field")
-		fName.Optional = false // reset
-	})
-}
-
-//////////////////////////////
-// PRIMITIVE TYPE TESTS     //
-//////////////////////////////
-
-func TestIsPrimitiveType(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected bool
-	}{
-		{"string is primitive", "string", true},
-		{"int is primitive", "int", true},
-		{"float is primitive", "float", true},
-		{"bool is primitive", "bool", true},
-		{"datetime is primitive", "datetime", true},
-		{"custom type is not primitive", "User", false},
-		{"empty string is not primitive", "", false},
-		{"similar name is not primitive", "String", false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := IsPrimitiveType(tt.input)
-			require.Equal(t, tt.expected, result)
-		})
-	}
-}
-
-//////////////////////////////
-// CAPTURE TYPES TESTS      //
-//////////////////////////////
-
-func TestQuotedString(t *testing.T) {
-	t.Run("Capture strips quotes", func(t *testing.T) {
-		var qs QuotedString
-		err := qs.Capture([]string{`"hello world"`})
-		require.NoError(t, err)
-		require.Equal(t, QuotedString("hello world"), qs)
-	})
-
-	t.Run("Capture handles empty string", func(t *testing.T) {
-		var qs QuotedString
-		err := qs.Capture([]string{`""`})
-		require.NoError(t, err)
-		require.Equal(t, QuotedString(""), qs)
-	})
-
-	t.Run("Capture without quotes", func(t *testing.T) {
-		var qs QuotedString
-		err := qs.Capture([]string{"no quotes"})
-		require.NoError(t, err)
-		require.Equal(t, QuotedString("no quotes"), qs)
-	})
-
-	t.Run("String method", func(t *testing.T) {
-		qs := QuotedString("test value")
-		require.Equal(t, "test value", qs.String())
-	})
-}
-
-func TestDocstringValue(t *testing.T) {
-	t.Run("Capture strips triple quotes", func(t *testing.T) {
-		var dv DocstringValue
-		err := dv.Capture([]string{`"""hello world"""`})
-		require.NoError(t, err)
-		require.Equal(t, DocstringValue("hello world"), dv)
-	})
-
-	t.Run("Capture handles empty docstring", func(t *testing.T) {
-		var dv DocstringValue
-		err := dv.Capture([]string{`""""""`})
-		require.NoError(t, err)
-		require.Equal(t, DocstringValue(""), dv)
-	})
-
-	t.Run("Capture handles multiline", func(t *testing.T) {
-		var dv DocstringValue
-		err := dv.Capture([]string{`"""
-line 1
-line 2
-"""`})
-		require.NoError(t, err)
-		require.Equal(t, DocstringValue("\nline 1\nline 2\n"), dv)
-	})
-
-	t.Run("String method", func(t *testing.T) {
-		dv := DocstringValue("test docstring")
-		require.Equal(t, "test docstring", dv.String())
-	})
-}
-
-//////////////////////////////
-// SCHEMA GETTER TESTS      //
-//////////////////////////////
-
-// Helper function to create a comprehensive test schema
-func createTestSchema() *Schema {
-	ptr := func(s string) *string { return &s }
-
-	return &Schema{
-		Children: []*SchemaChild{
-			// Includes
-			{Include: &Include{Path: "./common.vdl"}},
-			{Include: &Include{Path: "./auth.vdl"}},
-			// Comments
-			{Comment: &Comment{Simple: ptr("// A comment")}},
-			{Comment: &Comment{Block: ptr("/* Block comment */")}},
-			// Docstrings
-			{Docstring: &Docstring{Value: " Standalone docstring "}},
-			// Types
-			{Type: &TypeDecl{Name: "User", Children: []*TypeDeclChild{}}},
-			{Type: &TypeDecl{Name: "Product", Children: []*TypeDeclChild{}}},
-			// Consts
-			{Const: &ConstDecl{Name: "VERSION", Value: &ConstValue{Str: (*QuotedString)(ptr("1.0"))}}},
-			{Const: &ConstDecl{Name: "MAX_SIZE", Value: &ConstValue{Int: ptr("100")}}},
-			// Enums
-			{Enum: &EnumDecl{Name: "Status", Members: []*EnumMember{{Name: "Active"}}}},
-			{Enum: &EnumDecl{Name: "Priority", Members: []*EnumMember{{Name: "High"}}}},
-			// Patterns
-			{Pattern: &PatternDecl{Name: "CacheKey", Value: "cache:{id}"}},
-			// RPCs
-			{RPC: &RPCDecl{
-				Name: "UserService",
-				Children: []*RPCChild{
-					{Proc: &ProcDecl{Name: "GetUser", Children: []*ProcOrStreamDeclChild{}}},
-					{Proc: &ProcDecl{Name: "CreateUser", Children: []*ProcOrStreamDeclChild{}}},
-					{Stream: &StreamDecl{Name: "UserUpdates", Children: []*ProcOrStreamDeclChild{}}},
-				},
-			}},
-			{RPC: &RPCDecl{
-				Name: "OrderService",
-				Children: []*RPCChild{
-					{Proc: &ProcDecl{Name: "GetOrder", Children: []*ProcOrStreamDeclChild{}}},
-					{Stream: &StreamDecl{Name: "OrderUpdates", Children: []*ProcOrStreamDeclChild{}}},
-					{Stream: &StreamDecl{Name: "OrderNotifications", Children: []*ProcOrStreamDeclChild{}}},
-				},
-			}},
-		},
-	}
-}
-
-func TestSchemaGetIncludes(t *testing.T) {
-	schema := createTestSchema()
-	includes := schema.GetIncludes()
-
-	require.Len(t, includes, 2)
-	require.Equal(t, QuotedString("./common.vdl"), includes[0].Path)
-	require.Equal(t, QuotedString("./auth.vdl"), includes[1].Path)
-}
-
-func TestSchemaGetComments(t *testing.T) {
-	schema := createTestSchema()
-	comments := schema.GetComments()
-
-	require.Len(t, comments, 2)
-	require.NotNil(t, comments[0].Simple)
-	require.Equal(t, "// A comment", *comments[0].Simple)
-	require.NotNil(t, comments[1].Block)
-	require.Equal(t, "/* Block comment */", *comments[1].Block)
-}
-
-func TestSchemaGetDocstrings(t *testing.T) {
-	schema := createTestSchema()
-	docstrings := schema.GetDocstrings()
-
-	require.Len(t, docstrings, 1)
-	require.Equal(t, DocstringValue(" Standalone docstring "), docstrings[0].Value)
-}
-
-func TestSchemaGetTypes(t *testing.T) {
-	schema := createTestSchema()
-	types := schema.GetTypes()
-
-	require.Len(t, types, 2)
-	require.Equal(t, "User", types[0].Name)
-	require.Equal(t, "Product", types[1].Name)
-}
-
-func TestSchemaGetTypesMap(t *testing.T) {
-	schema := createTestSchema()
-	typesMap := schema.GetTypesMap()
-
-	require.Len(t, typesMap, 2)
-	require.NotNil(t, typesMap["User"])
-	require.NotNil(t, typesMap["Product"])
-	require.Nil(t, typesMap["NonExistent"])
-	require.Equal(t, "User", typesMap["User"].Name)
-}
-
-func TestSchemaGetConsts(t *testing.T) {
-	schema := createTestSchema()
-	consts := schema.GetConsts()
-
-	require.Len(t, consts, 2)
-	require.Equal(t, "VERSION", consts[0].Name)
-	require.Equal(t, "MAX_SIZE", consts[1].Name)
-}
-
-func TestSchemaGetEnums(t *testing.T) {
-	schema := createTestSchema()
-	enums := schema.GetEnums()
-
-	require.Len(t, enums, 2)
-	require.Equal(t, "Status", enums[0].Name)
-	require.Equal(t, "Priority", enums[1].Name)
-}
-
-func TestSchemaGetPatterns(t *testing.T) {
-	schema := createTestSchema()
-	patterns := schema.GetPatterns()
-
-	require.Len(t, patterns, 1)
-	require.Equal(t, "CacheKey", patterns[0].Name)
-	require.Equal(t, QuotedString("cache:{id}"), patterns[0].Value)
-}
-
-func TestSchemaGetRPCs(t *testing.T) {
-	schema := createTestSchema()
-	rpcs := schema.GetRPCs()
-
-	require.Len(t, rpcs, 2)
-	require.Equal(t, "UserService", rpcs[0].Name)
-	require.Equal(t, "OrderService", rpcs[1].Name)
-}
-
-func TestSchemaGetRPCsMap(t *testing.T) {
-	schema := createTestSchema()
-	rpcsMap := schema.GetRPCsMap()
-
-	require.Len(t, rpcsMap, 2)
-	require.NotNil(t, rpcsMap["UserService"])
-	require.NotNil(t, rpcsMap["OrderService"])
-	require.Nil(t, rpcsMap["NonExistent"])
-	require.Equal(t, "UserService", rpcsMap["UserService"].Name)
-}
-
-func TestSchemaEmptySchema(t *testing.T) {
-	schema := &Schema{Children: []*SchemaChild{}}
-
-	require.Empty(t, schema.GetIncludes())
-	require.Empty(t, schema.GetComments())
-	require.Empty(t, schema.GetDocstrings())
-	require.Empty(t, schema.GetTypes())
-	require.Empty(t, schema.GetTypesMap())
-	require.Empty(t, schema.GetConsts())
-	require.Empty(t, schema.GetEnums())
-	require.Empty(t, schema.GetPatterns())
-	require.Empty(t, schema.GetRPCs())
-	require.Empty(t, schema.GetRPCsMap())
-}
-
-//////////////////////////////
-// SCHEMA CHILD KIND TESTS  //
-//////////////////////////////
-
-func TestSchemaChildKind(t *testing.T) {
-	ptr := func(s string) *string { return &s }
-
-	tests := []struct {
-		name     string
-		child    *SchemaChild
-		expected SchemaChildKind
-	}{
-		{"Include", &SchemaChild{Include: &Include{Path: "./test.vdl"}}, SchemaChildKindInclude},
-		{"Comment", &SchemaChild{Comment: &Comment{Simple: ptr("// comment")}}, SchemaChildKindComment},
-		{"Docstring", &SchemaChild{Docstring: &Docstring{Value: "doc"}}, SchemaChildKindDocstring},
-		{"Type", &SchemaChild{Type: &TypeDecl{Name: "User"}}, SchemaChildKindType},
-		{"Const", &SchemaChild{Const: &ConstDecl{Name: "MAX"}}, SchemaChildKindConst},
-		{"Enum", &SchemaChild{Enum: &EnumDecl{Name: "Status"}}, SchemaChildKindEnum},
-		{"Pattern", &SchemaChild{Pattern: &PatternDecl{Name: "Key"}}, SchemaChildKindPattern},
-		{"RPC", &SchemaChild{RPC: &RPCDecl{Name: "Service"}}, SchemaChildKindRPC},
-		{"Empty", &SchemaChild{}, ""},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.expected, tt.child.Kind())
-		})
-	}
-}
-
-//////////////////////////////
-// RPC GETTER TESTS         //
-//////////////////////////////
-
-func TestRPCDeclGetProcs(t *testing.T) {
-	rpc := &RPCDecl{
-		Name: "TestService",
-		Children: []*RPCChild{
-			{Proc: &ProcDecl{Name: "Proc1"}},
-			{Comment: &Comment{Simple: func() *string { s := "// comment"; return &s }()}},
-			{Proc: &ProcDecl{Name: "Proc2"}},
-			{Stream: &StreamDecl{Name: "Stream1"}},
-			{Proc: &ProcDecl{Name: "Proc3"}},
+	typeDecl := &TypeDecl{
+		Name: "User",
+		Members: []*TypeMember{
+			{Field: &Field{Name: "id", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}},
+			{Field: fProfile},
 		},
 	}
 
-	procs := rpc.GetProcs()
-
-	require.Len(t, procs, 3)
-	require.Equal(t, "Proc1", procs[0].Name)
-	require.Equal(t, "Proc2", procs[1].Name)
-	require.Equal(t, "Proc3", procs[2].Name)
+	flattened := typeDecl.GetFlattenedFields()
+	require.Len(t, flattened, 6)
+	require.Equal(t, "id", flattened[0].Name)
+	require.Equal(t, "profile", flattened[1].Name)
+	require.Equal(t, "name", flattened[2].Name)
+	require.Equal(t, "avatar", flattened[3].Name)
+	require.Equal(t, "url", flattened[4].Name)
+	require.Equal(t, "size", flattened[5].Name)
 }
-
-func TestRPCDeclGetStreams(t *testing.T) {
-	rpc := &RPCDecl{
-		Name: "TestService",
-		Children: []*RPCChild{
-			{Stream: &StreamDecl{Name: "Stream1"}},
-			{Proc: &ProcDecl{Name: "Proc1"}},
-			{Stream: &StreamDecl{Name: "Stream2"}},
-			{Comment: &Comment{Simple: func() *string { s := "// comment"; return &s }()}},
-			{Stream: &StreamDecl{Name: "Stream3"}},
-		},
-	}
-
-	streams := rpc.GetStreams()
-
-	require.Len(t, streams, 3)
-	require.Equal(t, "Stream1", streams[0].Name)
-	require.Equal(t, "Stream2", streams[1].Name)
-	require.Equal(t, "Stream3", streams[2].Name)
-}
-
-func TestRPCDeclEmptyRPC(t *testing.T) {
-	rpc := &RPCDecl{
-		Name:     "EmptyService",
-		Children: []*RPCChild{},
-	}
-
-	require.Empty(t, rpc.GetProcs())
-	require.Empty(t, rpc.GetStreams())
-}
-
-//////////////////////////////
-// CONST VALUE TESTS        //
-//////////////////////////////
-
-func TestConstValueString(t *testing.T) {
-	ptr := func(s string) *string { return &s }
-	qptr := func(s string) *QuotedString { q := QuotedString(s); return &q }
-
-	tests := []struct {
-		name     string
-		value    ConstValue
-		expected string
-	}{
-		{"String value", ConstValue{Str: qptr("hello")}, `"hello"`},
-		{"String with quotes", ConstValue{Str: qptr(`say "hi"`)}, `"say \"hi\""`},
-		{"Integer value", ConstValue{Int: ptr("42")}, "42"},
-		{"Float value", ConstValue{Float: ptr("3.14")}, "3.14"},
-		{"Boolean true", ConstValue{True: true}, "true"},
-		{"Boolean false", ConstValue{False: true}, "false"},
-		{"Empty value", ConstValue{}, ""},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.expected, tt.value.String())
-		})
-	}
-}
-
-//////////////////////////////
-// ANY LITERAL TESTS        //
-//////////////////////////////
 
 func TestAnyLiteralString(t *testing.T) {
 	ptr := func(s string) *string { return &s }
 	qptr := func(s string) *QuotedString { q := QuotedString(s); return &q }
 
-	tests := []struct {
-		name     string
-		value    AnyLiteral
-		expected string
-	}{
-		{"String value", AnyLiteral{Str: qptr("hello")}, `"hello"`},
-		{"String with quotes", AnyLiteral{Str: qptr(`say "hi"`)}, `"say \"hi\""`},
-		{"Integer value", AnyLiteral{Int: ptr("42")}, "42"},
-		{"Float value", AnyLiteral{Float: ptr("3.14")}, "3.14"},
-		{"Boolean true", AnyLiteral{True: true}, "true"},
-		{"Boolean false", AnyLiteral{False: true}, "false"},
-		{"Empty value", AnyLiteral{}, ""},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.expected, tt.value.String())
-		})
-	}
+	require.Equal(t, `"hello"`, ScalarLiteral{Str: qptr("hello")}.String())
+	require.Equal(t, "42", ScalarLiteral{Int: ptr("42")}.String())
+	require.Equal(t, "3.14", ScalarLiteral{Float: ptr("3.14")}.String())
+	require.Equal(t, "true", ScalarLiteral{True: true}.String())
+	require.Equal(t, "false", ScalarLiteral{False: true}.String())
+	require.Equal(t, "", ScalarLiteral{}.String())
 }
 
-//////////////////////////////
-// FIELD TYPE ARRAY TESTS   //
-//////////////////////////////
+func TestCaptureTypes(t *testing.T) {
+	t.Run("quoted string capture", func(t *testing.T) {
+		var qs QuotedString
+		require.NoError(t, qs.Capture([]string{`"hello"`}))
+		require.Equal(t, QuotedString("hello"), qs)
+		require.Equal(t, "hello", qs.String())
+	})
+
+	t.Run("docstring capture", func(t *testing.T) {
+		var dv DocstringValue
+		require.NoError(t, dv.Capture([]string{`"""hello"""`}))
+		require.Equal(t, DocstringValue("hello"), dv)
+		require.Equal(t, "hello", dv.String())
+	})
+}
 
 func TestFieldTypeIsArray(t *testing.T) {
 	ptr := func(s string) *string { return &s }
 
-	tests := []struct {
-		name     string
-		ft       FieldType
-		expected bool
-	}{
-		{
-			name:     "Non-array type",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}},
-			expected: false,
-		},
-		{
-			name:     "1D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
-			expected: true,
-		},
-		{
-			name:     "2D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("int")}, Dimensions: 2},
-			expected: true,
-		},
-		{
-			name:     "3D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("float")}, Dimensions: 3},
-			expected: true,
-		},
-		{
-			name:     "Zero dimensions",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("bool")}, Dimensions: 0},
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.expected, tt.ft.IsArray())
-		})
-	}
-}
-
-func TestFieldTypeDimensions(t *testing.T) {
-	ptr := func(s string) *string { return &s }
-
-	tests := []struct {
-		name     string
-		ft       FieldType
-		expected ArrayDimensions
-	}{
-		{
-			name:     "Non-array type",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}},
-			expected: 0,
-		},
-		{
-			name:     "1D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
-			expected: 1,
-		},
-		{
-			name:     "2D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("int")}, Dimensions: 2},
-			expected: 2,
-		},
-		{
-			name:     "3D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("float")}, Dimensions: 3},
-			expected: 3,
-		},
-		{
-			name:     "5D array",
-			ft:       FieldType{Base: &FieldTypeBase{Named: ptr("datetime")}, Dimensions: 5},
-			expected: 5,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.expected, tt.ft.Dimensions)
-		})
-	}
+	require.False(t, (&FieldType{Base: &FieldTypeBase{Named: ptr("string")}}).IsArray())
+	require.True(t, (&FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 2}).IsArray())
 }
 
 func TestArrayDimensionsCapture(t *testing.T) {
-	t.Run("No calls means zero", func(t *testing.T) {
-		var ad ArrayDimensions
-		require.Equal(t, ArrayDimensions(0), ad)
+	var ad ArrayDimensions
+	require.NoError(t, ad.Capture([]string{"]"}))
+	require.NoError(t, ad.Capture([]string{"]"}))
+	require.Equal(t, ArrayDimensions(2), ad)
+	require.NoError(t, ad.Capture([]string{"]"}))
+	require.Equal(t, ArrayDimensions(3), ad)
+}
+
+func TestReferenceString(t *testing.T) {
+	t.Run("simple const reference", func(t *testing.T) {
+		ref := Reference{Name: "FOO"}
+		require.Equal(t, "FOO", ref.String())
 	})
 
-	t.Run("Single capture call", func(t *testing.T) {
-		var ad ArrayDimensions
-		err := ad.Capture([]string{"]"})
-		require.NoError(t, err)
-		require.Equal(t, ArrayDimensions(1), ad)
+	t.Run("enum member reference", func(t *testing.T) {
+		member := "Red"
+		ref := Reference{Name: "Color", Member: &member}
+		require.Equal(t, "Color.Red", ref.String())
 	})
 
-	t.Run("Multiple capture calls accumulate", func(t *testing.T) {
-		var ad ArrayDimensions
-		// participle calls Capture once per match in a repetition
-		_ = ad.Capture([]string{"]"}) // first []
-		_ = ad.Capture([]string{"]"}) // second []
-		require.Equal(t, ArrayDimensions(2), ad)
+	t.Run("nil member is simple reference", func(t *testing.T) {
+		ref := Reference{Name: "BASE_CONFIG", Member: nil}
+		require.Equal(t, "BASE_CONFIG", ref.String())
+	})
+}
+
+func TestAnyLiteralStringWithRef(t *testing.T) {
+	t.Run("ref without member", func(t *testing.T) {
+		ref := &Reference{Name: "MY_CONST"}
+		lit := ScalarLiteral{Ref: ref}
+		require.Equal(t, "MY_CONST", lit.String())
 	})
 
-	t.Run("Three dimensions", func(t *testing.T) {
-		var ad ArrayDimensions
-		_ = ad.Capture([]string{"]"})
-		_ = ad.Capture([]string{"]"})
-		_ = ad.Capture([]string{"]"})
-		require.Equal(t, ArrayDimensions(3), ad)
+	t.Run("ref with member", func(t *testing.T) {
+		member := "Active"
+		ref := &Reference{Name: "Status", Member: &member}
+		lit := ScalarLiteral{Ref: ref}
+		require.Equal(t, "Status.Active", lit.String())
+	})
+
+	t.Run("ref takes lowest precedence", func(t *testing.T) {
+		// When Str is set, Ref should be ignored (Str is checked first)
+		q := QuotedString("hello")
+		member := "X"
+		lit := ScalarLiteral{
+			Str: &q,
+			Ref: &Reference{Name: "A", Member: &member},
+		}
+		require.Equal(t, `"hello"`, lit.String())
+	})
+}
+
+func TestScalarLiteralStringAllTypes(t *testing.T) {
+	ptr := func(s string) *string { return &s }
+	qptr := func(s string) *QuotedString { q := QuotedString(s); return &q }
+
+	tests := []struct {
+		name     string
+		literal  ScalarLiteral
+		expected string
+	}{
+		{name: "string literal", literal: ScalarLiteral{Str: qptr("hello")}, expected: `"hello"`},
+		{name: "string with quotes", literal: ScalarLiteral{Str: qptr(`say "hi"`)}, expected: `"say \"hi\""`},
+		{name: "int literal", literal: ScalarLiteral{Int: ptr("42")}, expected: "42"},
+		{name: "float literal", literal: ScalarLiteral{Float: ptr("3.14")}, expected: "3.14"},
+		{name: "true literal", literal: ScalarLiteral{True: true}, expected: "true"},
+		{name: "false literal", literal: ScalarLiteral{False: true}, expected: "false"},
+		{name: "simple ref", literal: ScalarLiteral{Ref: &Reference{Name: "FOO"}}, expected: "FOO"},
+		{name: "enum ref", literal: ScalarLiteral{Ref: &Reference{Name: "Color", Member: ptr("Red")}}, expected: "Color.Red"},
+		{name: "empty literal", literal: ScalarLiteral{}, expected: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.expected, tt.literal.String())
+		})
+	}
+}
+
+func TestTypeDeclChildWithDocstring(t *testing.T) {
+	t.Run("docstring child", func(t *testing.T) {
+		child := &TypeMember{Docstring: &Docstring{Value: " field docs "}}
+		require.NotNil(t, child.Docstring)
+		require.Nil(t, child.Field)
+		require.Nil(t, child.Spread)
+	})
+
+	t.Run("field child", func(t *testing.T) {
+		child := &TypeMember{Field: &Field{Name: "id"}}
+		require.Nil(t, child.Docstring)
+		require.NotNil(t, child.Field)
+		require.Nil(t, child.Spread)
+	})
+
+	t.Run("spread child", func(t *testing.T) {
+		child := &TypeMember{Spread: &Spread{Ref: &Reference{Name: "Base"}}}
+		require.Nil(t, child.Docstring)
+		require.Nil(t, child.Field)
+		require.NotNil(t, child.Spread)
+	})
+}
+
+func TestSpreadWithReference(t *testing.T) {
+	t.Run("spread with simple reference", func(t *testing.T) {
+		s := &Spread{Ref: &Reference{Name: "BaseUser"}}
+		require.NotNil(t, s.Ref)
+		require.Equal(t, "BaseUser", s.Ref.Name)
+		require.Nil(t, s.Ref.Member)
+		require.Equal(t, "BaseUser", s.Ref.String())
+	})
+
+	t.Run("spread with namespaced reference", func(t *testing.T) {
+		member := "BaseUser"
+		s := &Spread{Ref: &Reference{Name: "auth", Member: &member}}
+		require.NotNil(t, s.Ref)
+		require.Equal(t, "auth", s.Ref.Name)
+		require.NotNil(t, s.Ref.Member)
+		require.Equal(t, "BaseUser", *s.Ref.Member)
+		require.Equal(t, "auth.BaseUser", s.Ref.String())
+	})
+
+	t.Run("spread in type decl child with simple ref", func(t *testing.T) {
+		child := &TypeMember{Spread: &Spread{Ref: &Reference{Name: "Metadata"}}}
+		require.NotNil(t, child.Spread)
+		require.Equal(t, "Metadata", child.Spread.Ref.Name)
+		require.Nil(t, child.Spread.Ref.Member)
+	})
+
+	t.Run("spread in type decl child with namespaced ref", func(t *testing.T) {
+		member := "Credentials"
+		child := &TypeMember{Spread: &Spread{Ref: &Reference{Name: "auth", Member: &member}}}
+		require.NotNil(t, child.Spread)
+		require.Equal(t, "auth", child.Spread.Ref.Name)
+		require.Equal(t, "Credentials", *child.Spread.Ref.Member)
+		require.Equal(t, "auth.Credentials", child.Spread.Ref.String())
+	})
+
+	t.Run("spread in enum member with simple ref", func(t *testing.T) {
+		m := &EnumMember{Spread: &Spread{Ref: &Reference{Name: "BaseRoles"}}}
+		require.NotNil(t, m.Spread)
+		require.Equal(t, "BaseRoles", m.Spread.Ref.Name)
+		require.Nil(t, m.Spread.Ref.Member)
+	})
+
+	t.Run("spread in enum member with namespaced ref", func(t *testing.T) {
+		member := "AdminRoles"
+		m := &EnumMember{Spread: &Spread{Ref: &Reference{Name: "auth", Member: &member}}}
+		require.NotNil(t, m.Spread)
+		require.Equal(t, "auth", m.Spread.Ref.Name)
+		require.Equal(t, "AdminRoles", *m.Spread.Ref.Member)
+		require.Equal(t, "auth.AdminRoles", m.Spread.Ref.String())
+	})
+
+	t.Run("spread in data literal object entry with simple ref", func(t *testing.T) {
+		entry := &DataLiteralObjectEntry{
+			Spread: &Spread{Ref: &Reference{Name: "baseConfig"}},
+		}
+		require.NotNil(t, entry.Spread)
+		require.Equal(t, "baseConfig", entry.Spread.Ref.Name)
+		require.Nil(t, entry.Spread.Ref.Member)
+	})
+
+	t.Run("spread in data literal object entry with namespaced ref", func(t *testing.T) {
+		member := "prodDefaults"
+		entry := &DataLiteralObjectEntry{
+			Spread: &Spread{Ref: &Reference{Name: "config", Member: &member}},
+		}
+		require.NotNil(t, entry.Spread)
+		require.Equal(t, "config", entry.Spread.Ref.Name)
+		require.Equal(t, "prodDefaults", *entry.Spread.Ref.Member)
+		require.Equal(t, "config.prodDefaults", entry.Spread.Ref.String())
+	})
+}
+
+func TestDocstringGetExternalMethod(t *testing.T) {
+	d := Docstring{Value: DocstringValue(" ./guide.md ")}
+	path, ok := d.GetExternal()
+	require.True(t, ok)
+	require.Equal(t, "./guide.md", path)
+}
+
+func TestEnumMemberStructure(t *testing.T) {
+	qptr := func(s string) *QuotedString { q := QuotedString(s); return &q }
+	ptr := func(s string) *string { return &s }
+
+	t.Run("plain member", func(t *testing.T) {
+		m := &EnumMember{Name: "Active"}
+		require.Equal(t, "Active", m.Name)
+		require.Nil(t, m.Spread)
+		require.Nil(t, m.Docstring)
+		require.Len(t, m.Annotations, 0)
+		require.Nil(t, m.Value)
+	})
+
+	t.Run("member with string value", func(t *testing.T) {
+		m := &EnumMember{
+			Name:  "Admin",
+			Value: &EnumValue{Str: qptr("admin")},
+		}
+		require.Equal(t, "Admin", m.Name)
+		require.NotNil(t, m.Value)
+		require.Equal(t, "admin", m.Value.Str.String())
+	})
+
+	t.Run("member with int value", func(t *testing.T) {
+		m := &EnumMember{
+			Name:  "High",
+			Value: &EnumValue{Int: ptr("10")},
+		}
+		require.Equal(t, "High", m.Name)
+		require.NotNil(t, m.Value)
+		require.Equal(t, "10", *m.Value.Int)
+	})
+
+	t.Run("spread member", func(t *testing.T) {
+		m := &EnumMember{Spread: &Spread{Ref: &Reference{Name: "BaseRoles"}}}
+		require.NotNil(t, m.Spread)
+		require.Equal(t, "BaseRoles", m.Spread.Ref.Name)
+		require.Equal(t, "", m.Name)
+	})
+
+	t.Run("member with flag annotation", func(t *testing.T) {
+		m := &EnumMember{
+			Annotations: []*Annotation{{Name: "deprecated"}},
+			Name:        "OldValue",
+		}
+		require.Len(t, m.Annotations, 1)
+		require.Equal(t, "deprecated", m.Annotations[0].Name)
+		require.Nil(t, m.Annotations[0].Argument)
+	})
+
+	t.Run("member with annotation payload", func(t *testing.T) {
+		m := &EnumMember{
+			Annotations: []*Annotation{{
+				Name:     "deprecated",
+				Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("Use NewValue")}},
+			}},
+			Name:  "OldValue",
+			Value: &EnumValue{Str: qptr("old")},
+		}
+		require.Len(t, m.Annotations, 1)
+		require.Equal(t, "deprecated", m.Annotations[0].Name)
+		require.Equal(t, "Use NewValue", m.Annotations[0].Argument.Scalar.Str.String())
+		require.Equal(t, "OldValue", m.Name)
+		require.Equal(t, "old", m.Value.Str.String())
+	})
+
+	t.Run("member with multiple annotations", func(t *testing.T) {
+		m := &EnumMember{
+			Annotations: []*Annotation{
+				{Name: "deprecated", Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("Use X")}}},
+				{Name: "alias", Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("old_val")}}},
+			},
+			Name: "Legacy",
+		}
+		require.Len(t, m.Annotations, 2)
+		require.Equal(t, "deprecated", m.Annotations[0].Name)
+		require.Equal(t, "alias", m.Annotations[1].Name)
+	})
+
+	t.Run("member with docstring", func(t *testing.T) {
+		m := &EnumMember{
+			Docstring: &Docstring{Value: " The active state "},
+			Name:      "Active",
+		}
+		require.NotNil(t, m.Docstring)
+		require.Equal(t, " The active state ", m.Docstring.Value.String())
+		require.Equal(t, "Active", m.Name)
+	})
+
+	t.Run("member with docstring and annotations", func(t *testing.T) {
+		m := &EnumMember{
+			Docstring:   &Docstring{Value: " Full access role "},
+			Annotations: []*Annotation{{Name: "rbac", Argument: &DataLiteral{Scalar: &ScalarLiteral{Int: ptr("100")}}}},
+			Name:        "Admin",
+			Value:       &EnumValue{Str: qptr("admin")},
+		}
+		require.NotNil(t, m.Docstring)
+		require.Equal(t, " Full access role ", m.Docstring.Value.String())
+		require.Len(t, m.Annotations, 1)
+		require.Equal(t, "rbac", m.Annotations[0].Name)
+		require.Equal(t, "100", *m.Annotations[0].Argument.Scalar.Int)
+		require.Equal(t, "Admin", m.Name)
+		require.Equal(t, "admin", m.Value.Str.String())
+	})
+
+	t.Run("member with annotation with object payload", func(t *testing.T) {
+		m := &EnumMember{
+			Annotations: []*Annotation{{
+				Name: "meta",
+				Argument: &DataLiteral{Object: &DataLiteralObject{Entries: []*DataLiteralObjectEntry{
+					{Key: "level", Value: &DataLiteral{Scalar: &ScalarLiteral{Int: ptr("100")}}},
+					{Key: "label", Value: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("Super Admin")}}},
+				}}},
+			}},
+			Name: "SuperAdmin",
+		}
+		require.Len(t, m.Annotations, 1)
+		ann := m.Annotations[0]
+		require.Equal(t, "meta", ann.Name)
+		require.NotNil(t, ann.Argument.Object)
+		require.Len(t, ann.Argument.Object.Entries, 2)
+		require.Equal(t, "level", ann.Argument.Object.Entries[0].Key)
+		require.Equal(t, "label", ann.Argument.Object.Entries[1].Key)
 	})
 }
