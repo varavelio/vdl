@@ -14,7 +14,7 @@ type Parser = participle.Parser[ast.Schema]
 // ParserInstance is a pre-built parser instance for VDL schemas.
 var ParserInstance = participle.MustBuild[ast.Schema](
 	participle.Lexer(VDLLexer),
-	participle.Elide("Whitespace", "Newline"),
-	// We need to look some tokens ahead to distinguish between associated and standalone docstrings
-	participle.UseLookahead(5),
+	participle.Elide("Newline", "Whitespace", "Comment", "CommentBlock"),
+	// We need lookahead to distinguish associated docstrings/annotations and declaration starts.
+	participle.UseLookahead(8),
 )

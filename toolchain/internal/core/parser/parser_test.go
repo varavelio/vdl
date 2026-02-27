@@ -8,20 +8,10 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/testutil"
 )
 
-// Helper function to create a pointer to a string
-func ptr(s string) *string {
-	return &s
-}
-
-// Helper function to create a pointer to a QuotedString
 func qptr(s string) *ast.QuotedString {
 	q := ast.QuotedString(s)
 	return &q
 }
-
-//////////////
-// INCLUDES //
-//////////////
 
 func TestParserInclude(t *testing.T) {
 	t.Run("Basic include", func(t *testing.T) {
@@ -29,15 +19,7 @@ func TestParserInclude(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Include: &ast.Include{
-						Path: "./foo.vdl",
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Include: &ast.Include{Path: "./foo.vdl"}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -50,20 +32,14 @@ func TestParserInclude(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Include: &ast.Include{Path: "./foo.vdl"}},
-				{Include: &ast.Include{Path: "./bar.vdl"}},
-				{Include: &ast.Include{Path: "../common/types.vdl"}},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
+			{Include: &ast.Include{Path: "./foo.vdl"}},
+			{Include: &ast.Include{Path: "./bar.vdl"}},
+			{Include: &ast.Include{Path: "../common/types.vdl"}},
+		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 }
-
-////////////////
-// CONSTANTS  //
-////////////////
 
 func TestParserConstDecl(t *testing.T) {
 	t.Run("String constant", func(t *testing.T) {
@@ -71,18 +47,10 @@ func TestParserConstDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Name: "API_VERSION",
-						Value: &ast.ConstValue{
-							Str: qptr("1.0.0"),
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:  "API_VERSION",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Str: qptr("1.0.0")}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -91,18 +59,10 @@ func TestParserConstDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Name: "MAX_PAGE_SIZE",
-						Value: &ast.ConstValue{
-							Int: ptr("100"),
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:  "MAX_PAGE_SIZE",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("100")}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -111,58 +71,40 @@ func TestParserConstDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Name: "DEFAULT_TAX_RATE",
-						Value: &ast.ConstValue{
-							Float: ptr("0.21"),
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:  "DEFAULT_TAX_RATE",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Float: new("0.21")}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Boolean true constant", func(t *testing.T) {
-		input := `const FEATURE_FLAG_ENABLED = true`
+	t.Run("Boolean constants", func(t *testing.T) {
+		input := `
+			const FEATURE_FLAG_ENABLED = true
+			const DEBUG_MODE = false
+		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Name: "FEATURE_FLAG_ENABLED",
-						Value: &ast.ConstValue{
-							True: true,
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
+			{Const: &ast.ConstDecl{Name: "FEATURE_FLAG_ENABLED", Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{True: true}}}},
+			{Const: &ast.ConstDecl{Name: "DEBUG_MODE", Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{False: true}}}},
+		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Boolean false constant", func(t *testing.T) {
-		input := `const DEBUG_MODE = false`
+	t.Run("Constant with optional explicit type", func(t *testing.T) {
+		input := `const appConfig AppConfigType = { port 8080 }`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Name: "DEBUG_MODE",
-						Value: &ast.ConstValue{
-							False: true,
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:     "appConfig",
+			TypeName: new("AppConfigType"),
+			Value: &ast.DataLiteral{Object: &ast.DataLiteralObject{Entries: []*ast.DataLiteralObjectEntry{
+				{Key: "port", Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("8080")}}},
+			}}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -174,72 +116,58 @@ func TestParserConstDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Docstring: &ast.Docstring{
-							Value: " The maximum number of items allowed per request. ",
-						},
-						Name: "MAX_ITEMS",
-						Value: &ast.ConstValue{
-							Int: ptr("50"),
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Docstring: &ast.Docstring{Value: " The maximum number of items allowed per request. "},
+			Name:      "MAX_ITEMS",
+			Value:     &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("50")}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Deprecated constant", func(t *testing.T) {
-		input := `deprecated const OLD_LIMIT = 100`
+	t.Run("Constant annotations with primitive payload", func(t *testing.T) {
+		input := `@deprecated("Use NEW_LIMIT instead") const OLD_LIMIT = 100`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Deprecated: &ast.Deprecated{},
-						Name:       "OLD_LIMIT",
-						Value: &ast.ConstValue{
-							Int: ptr("100"),
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Annotations: []*ast.Annotation{{
+				Name:     "deprecated",
+				Argument: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Str: qptr("Use NEW_LIMIT instead")}},
+			}},
+			Name:  "OLD_LIMIT",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("100")}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Deprecated constant with message", func(t *testing.T) {
-		input := `deprecated("Use NEW_LIMIT instead") const OLD_LIMIT = 100`
+	t.Run("Constant with object spread and arrays without commas", func(t *testing.T) {
+		input := `
+			const appConfig = {
+				...baseConfig
+				port 8080
+				targets [
+					{ go { output "./gen/go" } }
+				]
+			}
+		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Const: &ast.ConstDecl{
-						Deprecated: &ast.Deprecated{
-							Message: qptr("Use NEW_LIMIT instead"),
-						},
-						Name: "OLD_LIMIT",
-						Value: &ast.ConstValue{
-							Int: ptr("100"),
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		decl := parsed.Declarations[0].Const
+		require.NotNil(t, decl)
+		require.Nil(t, decl.TypeName)
+		require.NotNil(t, decl.Value)
+		require.NotNil(t, decl.Value.Object)
+		require.Len(t, decl.Value.Object.Entries, 3)
+		require.Equal(t, "baseConfig", decl.Value.Object.Entries[0].Spread.Ref.Name)
+		require.Equal(t, "port", decl.Value.Object.Entries[1].Key)
+		require.Equal(t, "8080", *decl.Value.Object.Entries[1].Value.Scalar.Int)
+		require.Equal(t, "targets", decl.Value.Object.Entries[2].Key)
+		require.NotNil(t, decl.Value.Object.Entries[2].Value.Array)
+		require.Len(t, decl.Value.Object.Entries[2].Value.Array.Elements, 1)
 	})
 }
-
-////////////////
-// ENUMS      //
-////////////////
 
 func TestParserEnumDecl(t *testing.T) {
 	t.Run("String enum with implicit values", func(t *testing.T) {
@@ -253,52 +181,43 @@ func TestParserEnumDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Enum: &ast.EnumDecl{
-						Name: "OrderStatus",
-						Members: []*ast.EnumMember{
-							{Name: "Pending"},
-							{Name: "Processing"},
-							{Name: "Shipped"},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Enum: &ast.EnumDecl{
+			Name: "OrderStatus",
+			Members: []*ast.EnumMember{
+				{Name: "Pending"},
+				{Name: "Processing"},
+				{Name: "Shipped"},
 			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("String enum with explicit values", func(t *testing.T) {
+	t.Run("Enum with explicit values and spread", func(t *testing.T) {
 		input := `
-			enum HttpMethod {
-				Get = "GET"
-				Post = "POST"
+			@roleSet
+			enum AllRoles {
+				SuperAdmin = "super"
+				...StandardRoles
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Enum: &ast.EnumDecl{
-						Name: "HttpMethod",
-						Members: []*ast.EnumMember{
-							{Name: "Get", Value: &ast.EnumValue{Str: qptr("GET")}},
-							{Name: "Post", Value: &ast.EnumValue{Str: qptr("POST")}},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Enum: &ast.EnumDecl{
+			Annotations: []*ast.Annotation{{Name: "roleSet"}},
+			Name:        "AllRoles",
+			Members: []*ast.EnumMember{
+				{Name: "SuperAdmin", Value: &ast.EnumValue{Str: qptr("super")}},
+				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "StandardRoles"}}},
 			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
 	t.Run("Integer enum", func(t *testing.T) {
 		input := `
 			enum Priority {
+				// low level
 				Low = 1
 				High = 10
 			}
@@ -306,579 +225,522 @@ func TestParserEnumDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Enum: &ast.EnumDecl{
-						Name: "Priority",
-						Members: []*ast.EnumMember{
-							{Name: "Low", Value: &ast.EnumValue{Int: ptr("1")}},
-							{Name: "High", Value: &ast.EnumValue{Int: ptr("10")}},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Enum: &ast.EnumDecl{
+			Name: "Priority",
+			Members: []*ast.EnumMember{
+				{Name: "Low", Value: &ast.EnumValue{Int: new("1")}},
+				{Name: "High", Value: &ast.EnumValue{Int: new("10")}},
 			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
+}
 
-	t.Run("Enum with docstring", func(t *testing.T) {
+func TestParserEnumMemberAnnotations(t *testing.T) {
+	t.Run("Single flag annotation on enum member", func(t *testing.T) {
 		input := `
-			""" Order status enum """
-			enum OrderStatus {
-				Pending
+			enum Status {
+				@deprecated
+				Active
+				Inactive
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Enum: &ast.EnumDecl{
-						Docstring: &ast.Docstring{Value: " Order status enum "},
-						Name:      "OrderStatus",
-						Members: []*ast.EnumMember{
-							{Name: "Pending"},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Enum: &ast.EnumDecl{
+			Name: "Status",
+			Members: []*ast.EnumMember{
+				{Annotations: []*ast.Annotation{{Name: "deprecated"}}, Name: "Active"},
+				{Name: "Inactive"},
 			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Deprecated enum", func(t *testing.T) {
+	t.Run("Annotation with string payload on enum member", func(t *testing.T) {
 		input := `
-			deprecated enum OldStatus {
+			enum Color {
+				@deprecated("Use Crimson instead")
+				Red = "red"
+				Blue = "blue"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 1)
+		require.Equal(t, "deprecated", members[0].Annotations[0].Name)
+		require.NotNil(t, members[0].Annotations[0].Argument)
+		require.Equal(t, "Use Crimson instead", members[0].Annotations[0].Argument.Scalar.Str.String())
+		require.Equal(t, "Red", members[0].Name)
+		require.Equal(t, "red", members[0].Value.Str.String())
+		require.Len(t, members[1].Annotations, 0)
+	})
+
+	t.Run("Multiple annotations on enum member", func(t *testing.T) {
+		input := `
+			enum Permission {
+				@deprecated("Use ReadWrite")
+				@alias("r")
+				Read = "read"
+				Write = "write"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 2)
+		require.Equal(t, "deprecated", members[0].Annotations[0].Name)
+		require.Equal(t, "alias", members[0].Annotations[1].Name)
+		require.Equal(t, "r", members[0].Annotations[1].Argument.Scalar.Str.String())
+		require.Equal(t, "Read", members[0].Name)
+	})
+
+	t.Run("Annotation with integer payload on enum member", func(t *testing.T) {
+		input := `
+			enum Priority {
+				@weight(10)
+				High = 3
+				@weight(1)
+				Low = 1
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 1)
+		require.Equal(t, "10", *members[0].Annotations[0].Argument.Scalar.Int)
+		require.Equal(t, "High", members[0].Name)
+		require.Len(t, members[1].Annotations, 1)
+		require.Equal(t, "1", *members[1].Annotations[0].Argument.Scalar.Int)
+		require.Equal(t, "Low", members[1].Name)
+	})
+
+	t.Run("Annotation with object payload on enum member", func(t *testing.T) {
+		input := `
+			enum Role {
+				@meta({
+					description "Full access"
+					level 100
+				})
+				Admin = "admin"
+				User = "user"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 1)
+		ann := members[0].Annotations[0]
+		require.Equal(t, "meta", ann.Name)
+		require.NotNil(t, ann.Argument.Object)
+		require.Len(t, ann.Argument.Object.Entries, 2)
+		require.Equal(t, "description", ann.Argument.Object.Entries[0].Key)
+		require.Equal(t, "Full access", ann.Argument.Object.Entries[0].Value.Scalar.Str.String())
+		require.Equal(t, "level", ann.Argument.Object.Entries[1].Key)
+		require.Equal(t, "100", *ann.Argument.Object.Entries[1].Value.Scalar.Int)
+	})
+
+	t.Run("Annotation with array payload on enum member", func(t *testing.T) {
+		input := `
+			enum Feature {
+				@tags(["core" "stable"])
+				Auth
+				@tags(["beta"])
+				Experimental
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 1)
+		require.NotNil(t, members[0].Annotations[0].Argument.Array)
+		require.Len(t, members[0].Annotations[0].Argument.Array.Elements, 2)
+		require.Equal(t, "core", members[0].Annotations[0].Argument.Array.Elements[0].Scalar.Str.String())
+		require.Equal(t, "stable", members[0].Annotations[0].Argument.Array.Elements[1].Scalar.Str.String())
+		require.Len(t, members[1].Annotations, 1)
+		require.Len(t, members[1].Annotations[0].Argument.Array.Elements, 1)
+	})
+
+	t.Run("Annotation with boolean payload on enum member", func(t *testing.T) {
+		input := `
+			enum Mode {
+				@hidden(true)
+				Debug
+				@hidden(false)
+				Release
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.True(t, members[0].Annotations[0].Argument.Scalar.True)
+		require.True(t, members[1].Annotations[0].Argument.Scalar.False)
+	})
+
+	t.Run("Docstring on enum member", func(t *testing.T) {
+		input := `
+			enum Status {
+				""" Active means the user is live """
+				Active
+				""" Banned means the user is blocked """
+				Banned
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.NotNil(t, members[0].Docstring)
+		require.Equal(t, " Active means the user is live ", members[0].Docstring.Value.String())
+		require.Equal(t, "Active", members[0].Name)
+		require.NotNil(t, members[1].Docstring)
+		require.Equal(t, " Banned means the user is blocked ", members[1].Docstring.Value.String())
+		require.Equal(t, "Banned", members[1].Name)
+	})
+
+	t.Run("Docstring with blank line inside enum fails", func(t *testing.T) {
+		// Unlike type bodies which support standalone docstrings as TypeMember,
+		// enum bodies do not have a standalone docstring alternative.
+		// A docstring separated by a blank line from the next member is invalid.
+		input := `
+			enum Status {
+				""" Section header """
+
 				Active
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Enum: &ast.EnumDecl{
-						Deprecated: &ast.Deprecated{},
-						Name:       "OldStatus",
-						Members: []*ast.EnumMember{
-							{Name: "Active"},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-}
-
-////////////////
-// PATTERNS   //
-////////////////
-
-func TestParserPatternDecl(t *testing.T) {
-	t.Run("Basic pattern", func(t *testing.T) {
-		input := `pattern UserEventSubject = "events.users.{userId}"`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Pattern: &ast.PatternDecl{
-						Name:  "UserEventSubject",
-						Value: "events.users.{userId}",
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err)
 	})
 
-	t.Run("Pattern with docstring", func(t *testing.T) {
+	t.Run("Docstring and annotation on enum member", func(t *testing.T) {
 		input := `
-			""" Redis cache key pattern """
-			pattern SessionCacheKey = "cache:session:{sessionId}"
+			enum Status {
+				""" The active state """
+				@live
+				Active
+				Inactive
+			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Pattern: &ast.PatternDecl{
-						Docstring: &ast.Docstring{Value: " Redis cache key pattern "},
-						Name:      "SessionCacheKey",
-						Value:     "cache:session:{sessionId}",
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.NotNil(t, members[0].Docstring)
+		require.Equal(t, " The active state ", members[0].Docstring.Value.String())
+		require.Len(t, members[0].Annotations, 1)
+		require.Equal(t, "live", members[0].Annotations[0].Name)
+		require.Equal(t, "Active", members[0].Name)
+		require.Nil(t, members[1].Docstring)
+		require.Len(t, members[1].Annotations, 0)
+		require.Equal(t, "Inactive", members[1].Name)
 	})
 
-	t.Run("Deprecated pattern", func(t *testing.T) {
-		input := `deprecated pattern OldQueueName = "legacy.{id}"`
+	t.Run("Docstring and annotation on enum member with value", func(t *testing.T) {
+		input := `
+			enum HttpCode {
+				""" Success """
+				@standard
+				OK = 200
+				""" Not found """
+				@standard
+				NotFound = 404
+			}
+		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Pattern: &ast.PatternDecl{
-						Deprecated: &ast.Deprecated{},
-						Name:       "OldQueueName",
-						Value:      "legacy.{id}",
-					},
-				},
-			},
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+
+		require.NotNil(t, members[0].Docstring)
+		require.Equal(t, " Success ", members[0].Docstring.Value.String())
+		require.Len(t, members[0].Annotations, 1)
+		require.Equal(t, "standard", members[0].Annotations[0].Name)
+		require.Equal(t, "OK", members[0].Name)
+		require.Equal(t, "200", *members[0].Value.Int)
+
+		require.NotNil(t, members[1].Docstring)
+		require.Equal(t, " Not found ", members[1].Docstring.Value.String())
+		require.Len(t, members[1].Annotations, 1)
+		require.Equal(t, "NotFound", members[1].Name)
+		require.Equal(t, "404", *members[1].Value.Int)
+	})
+
+	t.Run("Enum with both type-level and member-level annotations", func(t *testing.T) {
+		input := `
+			""" Role definitions """
+			@rbac
+			enum Role {
+				@meta({ level 100 })
+				Admin = "admin"
+				@meta({ level 10 })
+				User = "user"
+				Guest = "guest"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		enumDecl := parsed.Declarations[0].Enum
+		require.NotNil(t, enumDecl.Docstring)
+		require.Equal(t, " Role definitions ", enumDecl.Docstring.Value.String())
+		require.Len(t, enumDecl.Annotations, 1)
+		require.Equal(t, "rbac", enumDecl.Annotations[0].Name)
+
+		members := enumDecl.Members
+		require.Len(t, members, 3)
+		require.Len(t, members[0].Annotations, 1)
+		require.Equal(t, "meta", members[0].Annotations[0].Name)
+		require.Equal(t, "Admin", members[0].Name)
+		require.Len(t, members[1].Annotations, 1)
+		require.Equal(t, "User", members[1].Name)
+		require.Len(t, members[2].Annotations, 0)
+		require.Equal(t, "Guest", members[2].Name)
+	})
+
+	t.Run("Annotation on spread in enum", func(t *testing.T) {
+		input := `
+			enum AllRoles {
+				@deprecated
+				SuperAdmin = "super"
+				...StandardRoles
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 1)
+		require.Equal(t, "deprecated", members[0].Annotations[0].Name)
+		require.Equal(t, "SuperAdmin", members[0].Name)
+		require.NotNil(t, members[1].Spread)
+		require.Equal(t, "StandardRoles", members[1].Spread.Ref.Name)
+	})
+
+	t.Run("Every member annotated", func(t *testing.T) {
+		input := `
+			enum Direction {
+				@axis("x")
+				Left
+				@axis("x")
+				Right
+				@axis("y")
+				Up
+				@axis("y")
+				Down
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 4)
+		for _, m := range members {
+			require.Len(t, m.Annotations, 1)
+			require.Equal(t, "axis", m.Annotations[0].Name)
 		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Equal(t, "x", members[0].Annotations[0].Argument.Scalar.Str.String())
+		require.Equal(t, "x", members[1].Annotations[0].Argument.Scalar.Str.String())
+		require.Equal(t, "y", members[2].Annotations[0].Argument.Scalar.Str.String())
+		require.Equal(t, "y", members[3].Annotations[0].Argument.Scalar.Str.String())
+	})
+
+	t.Run("Annotation with reference payload on enum member", func(t *testing.T) {
+		input := `
+			enum Theme {
+				@fallback(DEFAULT_THEME)
+				Dark
+				Light
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.Len(t, members[0].Annotations, 1)
+		ann := members[0].Annotations[0]
+		require.Equal(t, "fallback", ann.Name)
+		require.NotNil(t, ann.Argument.Scalar.Ref)
+		require.Equal(t, "DEFAULT_THEME", ann.Argument.Scalar.Ref.Name)
+		require.Nil(t, ann.Argument.Scalar.Ref.Member)
 	})
 }
-
-////////////////
-// TYPES      //
-////////////////
 
 func TestParserTypeDecl(t *testing.T) {
 	t.Run("Minimum type declaration", func(t *testing.T) {
 		input := `
 			type MyType {
-				field: string
+				field string
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "field",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{Named: ptr("string")},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
+			Name: "MyType",
+			Members: []*ast.TypeMember{{
+				Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}},
+			}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Type with docstring", func(t *testing.T) {
+	t.Run("Type with docstring and annotation", func(t *testing.T) {
 		input := `
 			""" My type description """
+			@entity
 			type MyType {
-				field: string
+				field string
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Docstring: &ast.Docstring{Value: " My type description "},
-						Name:      "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "field",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{Named: ptr("string")},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
+			Docstring:   &ast.Docstring{Value: " My type description "},
+			Annotations: []*ast.Annotation{{Name: "entity"}},
+			Name:        "MyType",
+			Members: []*ast.TypeMember{{
+				Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}},
+			}},
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Deprecated type", func(t *testing.T) {
-		input := `
-			deprecated type MyType {
-				field: string
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Deprecated: &ast.Deprecated{},
-						Name:       "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "field",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{Named: ptr("string")},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Deprecated type with message", func(t *testing.T) {
-		input := `
-			deprecated("Use NewType instead")
-			type MyType {
-				field: string
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Deprecated: &ast.Deprecated{
-							Message: qptr("Use NewType instead"),
-						},
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "field",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{Named: ptr("string")},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Type with all primitive types", func(t *testing.T) {
+	t.Run("Type with all primitive fields and optional field", func(t *testing.T) {
 		input := `
 			type MyType {
-				f1: string
-				f2: int
-				f3: float
-				f4: bool
-				f5: datetime
+				f1 string
+				f2 int
+				f3 float
+				f4 bool
+				f5 datetime
+				optional? string
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "f1", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "f2", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-							{Field: &ast.Field{Name: "f3", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
-							{Field: &ast.Field{Name: "f4", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-							{Field: &ast.Field{Name: "f5", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "MyType", typeDecl.Name)
+		require.Len(t, typeDecl.Members, 6)
+		require.True(t, typeDecl.Members[5].Field.Optional)
 	})
 
-	t.Run("Type with optional fields", func(t *testing.T) {
+	t.Run("Type with arrays and multidimensional arrays", func(t *testing.T) {
 		input := `
 			type MyType {
-				required: string
-				optional?: string
+				tags string[]
+				scores int[][]
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "required", Optional: false, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "optional", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
+			Name: "MyType",
+			Members: []*ast.TypeMember{
+				{Field: &ast.Field{Name: "tags", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}, Dimensions: 1}}},
+				{Field: &ast.Field{Name: "scores", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("int")}, Dimensions: 2}}},
 			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Type with array fields", func(t *testing.T) {
-		input := `
-			type MyType {
-				tags: string[]
-				scores: int[]
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "tags", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1}}},
-							{Field: &ast.Field{Name: "scores", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 1}}},
-						},
-					},
-				},
-			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
 	t.Run("Type with nested inline object", func(t *testing.T) {
 		input := `
 			type MyType {
-				location: {
-					lat: float
-					lng: float
+				location {
+					lat float
+					lng float
 				}
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "location",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Object: &ast.FieldTypeObject{
-												Children: []*ast.TypeDeclChild{
-													{Field: &ast.Field{Name: "lat", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
-													{Field: &ast.Field{Name: "lng", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Members, 1)
+		location := typeDecl.Members[0].Field
+		require.Equal(t, "location", location.Name)
+		require.NotNil(t, location.Type.Base.Object)
+		require.Len(t, location.Type.Base.Object.Members, 2)
 	})
 
 	t.Run("Type with map fields", func(t *testing.T) {
 		input := `
 			type MyType {
-				counts: map<int>
-				users: map<User>
+				counts map[int]
+				users map[User]
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "counts",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Map: &ast.FieldTypeMap{
-												ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}},
-											},
-										},
-									},
-								},
-							},
-							{
-								Field: &ast.Field{
-									Name: "users",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Map: &ast.FieldTypeMap{
-												ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("User")}},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
+			Name: "MyType",
+			Members: []*ast.TypeMember{
+				{Field: &ast.Field{Name: "counts", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: new("int")}}}}}}},
+				{Field: &ast.Field{Name: "users", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: new("User")}}}}}}},
 			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Type with spread operator", func(t *testing.T) {
+	t.Run("Type with spread operator and field annotation", func(t *testing.T) {
 		input := `
 			type Article {
 				...AuditMetadata
-				title: string
+				@title
+				heading string
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Article",
-						Children: []*ast.TypeDeclChild{
-							{Spread: &ast.Spread{TypeName: "AuditMetadata"}},
-							{Field: &ast.Field{Name: "title", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						},
-					},
-				},
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
+			Name: "Article",
+			Members: []*ast.TypeMember{
+				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "AuditMetadata"}}},
+				{Field: &ast.Field{Annotations: []*ast.Annotation{{Name: "title"}}, Name: "heading", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}},
 			},
-		}
+		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Type with field docstrings", func(t *testing.T) {
+	t.Run("Nested type model for rpc-style shapes", func(t *testing.T) {
 		input := `
-			type Product {
-				""" The SKU identifier """
-				sku: string
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Product",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Docstring: &ast.Docstring{Value: " The SKU identifier "},
-									Name:      "sku",
-									Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-}
-
-////////////////
-// RPC BLOCKS //
-////////////////
-
-func TestParserRPCDecl(t *testing.T) {
-	t.Run("Empty RPC block", func(t *testing.T) {
-		input := `rpc MyService {}`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name:     "MyService",
-						Children: nil,
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("RPC with docstring", func(t *testing.T) {
-		input := `
-			""" My service description """
-			rpc MyService {}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Docstring: &ast.Docstring{Value: " My service description "},
-						Name:      "MyService",
-						Children:  nil,
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Deprecated RPC", func(t *testing.T) {
-		input := `deprecated rpc OldService {}`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Deprecated: &ast.Deprecated{},
-						Name:       "OldService",
-						Children:   nil,
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("RPC with procedure", func(t *testing.T) {
-		input := `
-			rpc MyService {
-				proc GetUser {
+			@rpc
+			type Chat {
+				@proc
+				SendMessage {
 					input {
-						userId: string
+						chatId string
+						message string
 					}
 					output {
-						user: User
+						messageId string
 					}
 				}
 			}
@@ -886,265 +748,20 @@ func TestParserRPCDecl(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "MyService",
-						Children: []*ast.RPCChild{
-							{
-								Proc: &ast.ProcDecl{
-									Name: "GetUser",
-									Children: []*ast.ProcOrStreamDeclChild{
-										{
-											Input: &ast.ProcOrStreamDeclChildInput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "userId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												},
-											},
-										},
-										{
-											Output: &ast.ProcOrStreamDeclChildOutput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "user", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("User")}}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("RPC with stream", func(t *testing.T) {
-		input := `
-			rpc MyService {
-				stream NewMessages {
-					input {
-						channelId: string
-					}
-					output {
-						message: string
-					}
-				}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "MyService",
-						Children: []*ast.RPCChild{
-							{
-								Stream: &ast.StreamDecl{
-									Name: "NewMessages",
-									Children: []*ast.ProcOrStreamDeclChild{
-										{
-											Input: &ast.ProcOrStreamDeclChildInput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "channelId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												},
-											},
-										},
-										{
-											Output: &ast.ProcOrStreamDeclChildOutput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "message", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Deprecated proc inside RPC", func(t *testing.T) {
-		input := `
-			rpc MyService {
-				deprecated proc OldProc {}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "MyService",
-						Children: []*ast.RPCChild{
-							{
-								Proc: &ast.ProcDecl{
-									Deprecated: &ast.Deprecated{},
-									Name:       "OldProc",
-									Children:   nil,
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Proc with spread in input/output", func(t *testing.T) {
-		input := `
-			rpc Articles {
-				proc ListArticles {
-					input {
-						...PaginationParams
-						filter?: string
-					}
-					output {
-						items: Article[]
-					}
-				}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "Articles",
-						Children: []*ast.RPCChild{
-							{
-								Proc: &ast.ProcDecl{
-									Name: "ListArticles",
-									Children: []*ast.ProcOrStreamDeclChild{
-										{
-											Input: &ast.ProcOrStreamDeclChildInput{
-												Children: []*ast.InputOutputChild{
-													{Spread: &ast.Spread{TypeName: "PaginationParams"}},
-													{Field: &ast.Field{Name: "filter", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												},
-											},
-										},
-										{
-											Output: &ast.ProcOrStreamDeclChildOutput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "items", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("Article")}, Dimensions: 1}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		rpcType := parsed.Declarations[0].Type
+		require.Equal(t, "Chat", rpcType.Name)
+		require.Len(t, rpcType.Annotations, 1)
+		require.Equal(t, "rpc", rpcType.Annotations[0].Name)
+		require.Len(t, rpcType.Members, 1)
+		sendMessage := rpcType.Members[0].Field
+		require.Equal(t, "SendMessage", sendMessage.Name)
+		require.Len(t, sendMessage.Annotations, 1)
+		require.Equal(t, "proc", sendMessage.Annotations[0].Name)
+		require.NotNil(t, sendMessage.Type.Base.Object)
+		require.Len(t, sendMessage.Type.Base.Object.Members, 2)
 	})
 }
-
-////////////////
-// COMMENTS   //
-////////////////
-
-func TestParserComments(t *testing.T) {
-	t.Run("Top-level comments", func(t *testing.T) {
-		input := `
-			// This is a comment
-			type MyType {
-				field: string
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Comment: &ast.Comment{Simple: ptr("// This is a comment")}},
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Block comments", func(t *testing.T) {
-		input := `
-			/* This is a block comment */
-			type MyType {
-				field: string
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Comment: &ast.Comment{Block: ptr("/* This is a block comment */")}},
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Comments inside type", func(t *testing.T) {
-		input := `
-			type MyType {
-				// Before field
-				field: string
-				/* After field */
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Comment: &ast.Comment{Simple: ptr("// Before field")}},
-							{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Comment: &ast.Comment{Block: ptr("/* After field */")}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-}
-
-////////////////
-// DOCSTRINGS //
-////////////////
 
 func TestParserDocstrings(t *testing.T) {
 	t.Run("Standalone docstring", func(t *testing.T) {
@@ -1152,11 +769,7 @@ func TestParserDocstrings(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Docstring: &ast.Docstring{Value: " This is a standalone docstring. "}},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Docstring: &ast.Docstring{Value: " This is a standalone docstring. "}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -1168,12 +781,10 @@ func TestParserDocstrings(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Docstring: &ast.Docstring{Value: " First docstring "}},
-				{Docstring: &ast.Docstring{Value: " Second docstring "}},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
+			{Docstring: &ast.Docstring{Value: " First docstring "}},
+			{Docstring: &ast.Docstring{Value: " Second docstring "}},
+		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -1182,117 +793,54 @@ func TestParserDocstrings(t *testing.T) {
 			""" This is standalone """
 
 			type MyType {
-				field: string
+				field string
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Docstring: &ast.Docstring{Value: " This is standalone "}},
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Docstring in RPC becomes standalone", func(t *testing.T) {
-		input := `
-			rpc MyService {
-				""" Standalone doc inside RPC """
-
-				proc DoSomething {}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "MyService",
-						Children: []*ast.RPCChild{
-							{Docstring: &ast.Docstring{Value: " Standalone doc inside RPC "}},
-							{Proc: &ast.ProcDecl{Name: "DoSomething", Children: nil}},
-						},
-					},
-				},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
+			{Docstring: &ast.Docstring{Value: " This is standalone "}},
+			{Type: &ast.TypeDecl{Name: "MyType", Members: []*ast.TypeMember{{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}}}}},
+		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 }
 
-////////////////
-// EDGE CASES //
-////////////////
-
 func TestParserEdgeCases(t *testing.T) {
 	t.Run("Empty schema", func(t *testing.T) {
-		input := ``
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		parsed, err := ParserInstance.ParseString("schema.vdl", ``)
 		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: nil,
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		testutil.ASTEqualNoPos(t, &ast.Schema{Declarations: nil}, parsed)
 	})
 
 	t.Run("Whitespace only", func(t *testing.T) {
-		input := `   
-		
+		parsed, err := ParserInstance.ParseString("schema.vdl", "   \n\t\n")
+		require.NoError(t, err)
+		testutil.ASTEqualNoPos(t, &ast.Schema{Declarations: nil}, parsed)
+	})
+
+	t.Run("Empty type and enum", func(t *testing.T) {
+		input := `
+			type EmptyType {}
+			enum EmptyEnum {}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: nil,
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Empty type", func(t *testing.T) {
-		input := `type EmptyType {}`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Type: &ast.TypeDecl{Name: "EmptyType", Children: nil}},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Empty enum", func(t *testing.T) {
-		input := `enum EmptyEnum {}`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{Enum: &ast.EnumDecl{Name: "EmptyEnum", Members: nil}},
-			},
-		}
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
+			{Type: &ast.TypeDecl{Name: "EmptyType", Members: nil}},
+			{Enum: &ast.EnumDecl{Name: "EmptyEnum", Members: nil}},
+		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
 	t.Run("Deeply nested inline objects", func(t *testing.T) {
 		input := `
 			type Deep {
-				level1: {
-					level2: {
-						value: string
+				level1 {
+					level2 {
+						value string
 					}
 				}
 			}
@@ -1300,2013 +848,954 @@ func TestParserEdgeCases(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Deep",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "level1",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Object: &ast.FieldTypeObject{
-												Children: []*ast.TypeDeclChild{
-													{
-														Field: &ast.Field{
-															Name: "level2",
-															Type: ast.FieldType{
-																Base: &ast.FieldTypeBase{
-																	Object: &ast.FieldTypeObject{
-																		Children: []*ast.TypeDeclChild{
-																			{Field: &ast.Field{Name: "value", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		require.Equal(t, "Deep", parsed.Declarations[0].Type.Name)
+		require.NotNil(t, parsed.Declarations[0].Type.Members[0].Field.Type.Base.Object)
 	})
 
 	t.Run("Array of inline objects", func(t *testing.T) {
 		input := `
 			type MyType {
-				items: {
-					name: string
+				items {
+					name string
 				}[]
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "items",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Object: &ast.FieldTypeObject{
-												Children: []*ast.TypeDeclChild{
-													{Field: &ast.Field{Name: "name", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												},
-											},
-										},
-										Dimensions: 1,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		items := parsed.Declarations[0].Type.Members[0].Field
+		require.Equal(t, ast.ArrayDimensions(1), items.Type.Dimensions)
+		require.NotNil(t, items.Type.Base.Object)
 	})
 
 	t.Run("Map of arrays", func(t *testing.T) {
 		input := `
 			type MyType {
-				data: map<string[]>
+				data map[string[]]
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "MyType",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "data",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Map: &ast.FieldTypeMap{
-												ValueType: &ast.FieldType{
-													Base:       &ast.FieldTypeBase{Named: ptr("string")},
-													Dimensions: 1,
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		field := parsed.Declarations[0].Type.Members[0].Field
+		require.NotNil(t, field.Type.Base.Map)
+		require.Equal(t, ast.ArrayDimensions(1), field.Type.Base.Map.ValueType.Dimensions)
 	})
 
 	t.Run("Custom type reference", func(t *testing.T) {
 		input := `
 			type Profile {
-				user: User
+				user User
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Profile",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "user", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("User")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Equal(t, "User", *parsed.Declarations[0].Type.Members[0].Field.Type.Base.Named)
 	})
 }
 
-////////////////
-// MULTI-DIMENSIONAL ARRAYS //
-////////////////
-
 func TestParserMultiDimensionalArrays(t *testing.T) {
-	t.Run("2D array of primitives", func(t *testing.T) {
-		input := `
-			type Matrix {
-				data: int[][]
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Matrix",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "data",
-									Type: ast.FieldType{
-										Base:       &ast.FieldTypeBase{Named: ptr("int")},
-										Dimensions: 2,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("3D array of strings", func(t *testing.T) {
-		input := `
-			type Tensor {
-				values: string[][][]
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Tensor",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "values",
-									Type: ast.FieldType{
-										Base:       &ast.FieldTypeBase{Named: ptr("string")},
-										Dimensions: 3,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("2D array of custom types", func(t *testing.T) {
-		input := `
-			type Grid {
-				cells: Cell[][]
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Grid",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "cells",
-									Type: ast.FieldType{
-										Base:       &ast.FieldTypeBase{Named: ptr("Cell")},
-										Dimensions: 2,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Mixed array dimensions in same type", func(t *testing.T) {
+	t.Run("2D and 3D arrays", func(t *testing.T) {
 		input := `
 			type Container {
-				single: int
-				oneDim: int[]
-				twoDim: int[][]
-				threeDim: int[][][]
+				single int
+				oneDim int[]
+				twoDim int[][]
+				threeDim int[][][]
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Container",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "single", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-							{Field: &ast.Field{Name: "oneDim", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 1}}},
-							{Field: &ast.Field{Name: "twoDim", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
-							{Field: &ast.Field{Name: "threeDim", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 3}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("2D array of inline objects", func(t *testing.T) {
-		input := `
-			type Board {
-				squares: {
-					value: int
-					color: string
-				}[][]
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Board",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "squares",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Object: &ast.FieldTypeObject{
-												Children: []*ast.TypeDeclChild{
-													{Field: &ast.Field{Name: "value", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-													{Field: &ast.Field{Name: "color", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												},
-											},
-										},
-										Dimensions: 2,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, ast.ArrayDimensions(0), typeDecl.Members[0].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Members[1].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(2), typeDecl.Members[2].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(3), typeDecl.Members[3].Field.Type.Dimensions)
 	})
 
 	t.Run("Map with multi-dimensional array value", func(t *testing.T) {
 		input := `
 			type Cache {
-				matrices: map<int[][]>[][][]
+				matrices map[int[][]][][][]
 			}
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "Cache",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "matrices",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Map: &ast.FieldTypeMap{
-												ValueType: &ast.FieldType{
-													Base:       &ast.FieldTypeBase{Named: ptr("int")},
-													Dimensions: 2,
-												},
-											},
-										},
-										Dimensions: 3,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Optional multi-dimensional array", func(t *testing.T) {
-		input := `
-			type OptionalMatrix {
-				data?: float[][]
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "OptionalMatrix",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name:     "data",
-									Optional: true,
-									Type: ast.FieldType{
-										Base:       &ast.FieldTypeBase{Named: ptr("float")},
-										Dimensions: 2,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("RPC proc with multi-dimensional arrays", func(t *testing.T) {
-		input := `
-			rpc MatrixService {
-				proc Multiply {
-					input {
-						a: int[][]
-						b: int[][]
-					}
-					output {
-						result: int[][]
-					}
-				}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "MatrixService",
-						Children: []*ast.RPCChild{
-							{
-								Proc: &ast.ProcDecl{
-									Name: "Multiply",
-									Children: []*ast.ProcOrStreamDeclChild{
-										{
-											Input: &ast.ProcOrStreamDeclChildInput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "a", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
-													{Field: &ast.Field{Name: "b", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
-												},
-											},
-										},
-										{
-											Output: &ast.ProcOrStreamDeclChildOutput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "result", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		field := parsed.Declarations[0].Type.Members[0].Field
+		require.Equal(t, ast.ArrayDimensions(3), field.Type.Dimensions)
+		require.NotNil(t, field.Type.Base.Map)
+		require.Equal(t, ast.ArrayDimensions(2), field.Type.Base.Map.ValueType.Dimensions)
 	})
 }
 
-////////////////////////////
-// KEYWORDS AS FIELD NAMES //
-////////////////////////////
-
-// TestParserKeywordsAsFieldNames tests that all language keywords can be used
-// as field names in types and RPC input/output blocks.
 func TestParserKeywordsAsFieldNames(t *testing.T) {
-	t.Run("All keywords as field names in type", func(t *testing.T) {
+	t.Run("Current and old keywords as field names in type", func(t *testing.T) {
 		input := `
 			type KeywordFields {
-				type: string
-				rpc: string
-				proc: string
-				stream: string
-				enum: string
-				const: string
-				pattern: string
-				input: string
-				output: string
-				include: string
-				deprecated: string
-				map: string
-				string: string
-				int: string
-				float: string
-				bool: string
-				datetime: string
-				true: string
-				false: string
+				type string
+				enum string
+				const string
+				include string
+				map string
+				string string
+				int string
+				float string
+				bool string
+				datetime string
+				true string
+				false string
+				rpc string
+				proc string
+				stream string
+				input string
+				output string
+				pattern string
+				deprecated string
 			}
 		`
+
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "KeywordFields",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "rpc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "proc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "stream", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "enum", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "const", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "pattern", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "include", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "deprecated", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "map", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "string", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "int", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "float", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "bool", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "datetime", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "true", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "false", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Keywords as field names in RPC input/output", func(t *testing.T) {
-		input := `
-			rpc TestService {
-				proc TestProc {
-					input {
-						input: int
-						output: string
-						type: bool
-						rpc: float
-					}
-					output {
-						proc: datetime
-						stream: int
-						enum: string
-						const: bool
-					}
-				}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "TestService",
-						Children: []*ast.RPCChild{
-							{
-								Proc: &ast.ProcDecl{
-									Name: "TestProc",
-									Children: []*ast.ProcOrStreamDeclChild{
-										{
-											Input: &ast.ProcOrStreamDeclChildInput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-													{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-													{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-													{Field: &ast.Field{Name: "rpc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
-												},
-											},
-										},
-										{
-											Output: &ast.ProcOrStreamDeclChildOutput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "proc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-													{Field: &ast.Field{Name: "stream", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-													{Field: &ast.Field{Name: "enum", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-													{Field: &ast.Field{Name: "const", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		require.Len(t, parsed.Declarations, 1)
+		require.Len(t, parsed.Declarations[0].Type.Members, 19)
 	})
 
 	t.Run("Keywords as optional field names", func(t *testing.T) {
 		input := `
 			type OptionalKeywords {
-				input?: string
-				output?: int
-				type?: bool
+				input? string
+				output? int
+				type? bool
 			}
 		`
+
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "OptionalKeywords",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "input", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-							{Field: &ast.Field{Name: "output", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-							{Field: &ast.Field{Name: "type", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Keywords as field names with arrays and maps", func(t *testing.T) {
-		input := `
-			type ArraysAndMaps {
-				input: string[]
-				output: int[][]
-				type: map<bool>
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "ArraysAndMaps",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1}}},
-							{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2}}},
-							{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}}}}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Keywords as field names with inline objects", func(t *testing.T) {
-		input := `
-			type InlineKeywords {
-				input: {
-					output: string
-					type: int
-				}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "InlineKeywords",
-						Children: []*ast.TypeDeclChild{
-							{
-								Field: &ast.Field{
-									Name: "input",
-									Type: ast.FieldType{
-										Base: &ast.FieldTypeBase{
-											Object: &ast.FieldTypeObject{
-												Children: []*ast.TypeDeclChild{
-													{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-													{Field: &ast.Field{Name: "type", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Keywords as field names with docstrings", func(t *testing.T) {
-		input := `
-			type DocstringKeywords {
-				""" The input field """
-				input: string
-				""" The output field """
-				output: int
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					Type: &ast.TypeDecl{
-						Name: "DocstringKeywords",
-						Children: []*ast.TypeDeclChild{
-							{Field: &ast.Field{
-								Docstring: &ast.Docstring{Value: " The input field "},
-								Name:      "input",
-								Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-							}},
-							{Field: &ast.Field{
-								Docstring: &ast.Docstring{Value: " The output field "},
-								Name:      "output",
-								Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}},
-							}},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
-	t.Run("Keywords as field names in stream input/output", func(t *testing.T) {
-		input := `
-			rpc TestService {
-				stream TestStream {
-					input {
-						input: string
-						stream: int
-					}
-					output {
-						output: bool
-						rpc: datetime
-					}
-				}
-			}
-		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{
-			Children: []*ast.SchemaChild{
-				{
-					RPC: &ast.RPCDecl{
-						Name: "TestService",
-						Children: []*ast.RPCChild{
-							{
-								Stream: &ast.StreamDecl{
-									Name: "TestStream",
-									Children: []*ast.ProcOrStreamDeclChild{
-										{
-											Input: &ast.ProcOrStreamDeclChildInput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "input", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-													{Field: &ast.Field{Name: "stream", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-												},
-											},
-										},
-										{
-											Output: &ast.ProcOrStreamDeclChildOutput{
-												Children: []*ast.InputOutputChild{
-													{Field: &ast.Field{Name: "output", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-													{Field: &ast.Field{Name: "rpc", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		testutil.ASTEqualNoPos(t, expected, parsed)
+		typeDecl := parsed.Declarations[0].Type
+		require.True(t, typeDecl.Members[0].Field.Optional)
+		require.True(t, typeDecl.Members[1].Field.Optional)
+		require.True(t, typeDecl.Members[2].Field.Optional)
 	})
 }
 
-//////////////////////
-// COMPLETE SCHEMA  //
-//////////////////////
+func TestParserAnnotations(t *testing.T) {
+	t.Run("Flags and primitive payloads", func(t *testing.T) {
+		input := `
+			@entity
+			@deprecated("Use UserV2")
+			type User {
+				@id
+				id string
+			}
+		`
 
-// TestParserCompleteSchema is a comprehensive test that covers ALL syntax features
-// of the VDL IDL specification. It tests:
-// - Includes (multiple)
-// - Comments (simple and block)
-// - Standalone docstrings (at schema level and inside RPC)
-// - Constants (string, int, float, bool true/false, with docstrings, deprecated, deprecated with message)
-// - Enums (string implicit, string explicit, integer, with docstrings, deprecated)
-// - Patterns (with docstrings, deprecated)
-// - Types (all primitives: string/int/float/bool/datetime, arrays, maps, inline objects, spreads, optional fields, field docstrings, deprecated)
-// - RPC (with docstrings, deprecated)
-// - Proc (with input/output, field docstrings, spreads in input/output, deprecated)
-// - Stream (with input/output, field docstrings, deprecated)
-func TestParserCompleteSchema(t *testing.T) {
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Annotations, 2)
+		require.Equal(t, "entity", typeDecl.Annotations[0].Name)
+		require.Equal(t, "deprecated", typeDecl.Annotations[1].Name)
+		require.NotNil(t, typeDecl.Annotations[1].Argument)
+		require.Equal(t, "Use UserV2", typeDecl.Annotations[1].Argument.Scalar.Str.String())
+		require.Len(t, typeDecl.Members[0].Field.Annotations, 1)
+		require.Equal(t, "id", typeDecl.Members[0].Field.Annotations[0].Name)
+	})
+
+	t.Run("Complex annotation payload", func(t *testing.T) {
+		input := `
+			@auth({
+				roles ["admin" "user"]
+				rules {
+					strict true
+				}
+			})
+			type Secured {
+				id string
+			}
+		`
+
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		annotation := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "auth", annotation.Name)
+		require.NotNil(t, annotation.Argument)
+		require.NotNil(t, annotation.Argument.Object)
+		require.Len(t, annotation.Argument.Object.Entries, 2)
+		require.Equal(t, "roles", annotation.Argument.Object.Entries[0].Key)
+		require.NotNil(t, annotation.Argument.Object.Entries[0].Value.Array)
+		require.Equal(t, "rules", annotation.Argument.Object.Entries[1].Key)
+		require.NotNil(t, annotation.Argument.Object.Entries[1].Value.Object)
+	})
+
+	t.Run("Multiple annotations in same line", func(t *testing.T) {
+		input := `@a @b("x") type T { f string }`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Annotations, 2)
+		require.Equal(t, "a", typeDecl.Annotations[0].Name)
+		require.Equal(t, "b", typeDecl.Annotations[1].Name)
+		require.Equal(t, "x", typeDecl.Annotations[1].Argument.Scalar.Str.String())
+	})
+
+	t.Run("Field annotation with complex payload", func(t *testing.T) {
+		input := `
+			type User {
+				@db({
+					index true
+					tags ["a" "b"]
+				})
+				email string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		field := parsed.Declarations[0].Type.Members[0].Field
+		require.Len(t, field.Annotations, 1)
+		ann := field.Annotations[0]
+		require.Equal(t, "db", ann.Name)
+		require.NotNil(t, ann.Argument)
+		require.NotNil(t, ann.Argument.Object)
+		require.Len(t, ann.Argument.Object.Entries, 2)
+	})
+}
+
+func TestParserConstWithReferences(t *testing.T) {
+	t.Run("const with enum member reference value", func(t *testing.T) {
+		input := `const DEFAULT_COLOR = Color.Red`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name: "DEFAULT_COLOR",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Ref: &ast.Reference{
+				Name:   "Color",
+				Member: new("Red"),
+			}}},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("const with const reference value", func(t *testing.T) {
+		input := `const MY_CONFIG = BASE_CONFIG`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name: "MY_CONFIG",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Ref: &ast.Reference{
+				Name: "BASE_CONFIG",
+			}}},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("const with typed enum member reference value", func(t *testing.T) {
+		input := `const DEFAULT_STATUS StatusEnum = Status.Active`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:     "DEFAULT_STATUS",
+			TypeName: new("StatusEnum"),
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Ref: &ast.Reference{
+				Name:   "Status",
+				Member: new("Active"),
+			}}},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("const object with enum member reference in value", func(t *testing.T) {
+		input := `
+			const appConfig = {
+				color Color.Red
+				status Status.Active
+				name "test"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		require.Len(t, parsed.Declarations, 1)
+		decl := parsed.Declarations[0].Const
+		require.NotNil(t, decl.Value.Object)
+		entries := decl.Value.Object.Entries
+		require.Len(t, entries, 3)
+
+		// First entry: color Color.Red
+		require.Equal(t, "color", entries[0].Key)
+		require.NotNil(t, entries[0].Value.Scalar.Ref)
+		require.Equal(t, "Color", entries[0].Value.Scalar.Ref.Name)
+		require.Equal(t, "Red", *entries[0].Value.Scalar.Ref.Member)
+
+		// Second entry: status Status.Active
+		require.Equal(t, "status", entries[1].Key)
+		require.NotNil(t, entries[1].Value.Scalar.Ref)
+		require.Equal(t, "Status", entries[1].Value.Scalar.Ref.Name)
+		require.Equal(t, "Active", *entries[1].Value.Scalar.Ref.Member)
+
+		// Third entry: name "test"
+		require.Equal(t, "name", entries[2].Key)
+		require.NotNil(t, entries[2].Value.Scalar.Str)
+		require.Equal(t, "test", entries[2].Value.Scalar.Str.String())
+	})
+
+	t.Run("const object with const reference in value", func(t *testing.T) {
+		input := `
+			const derived = {
+				base BASE_CONFIG
+				extra "stuff"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		entries := parsed.Declarations[0].Const.Value.Object.Entries
+		require.Len(t, entries, 2)
+		require.NotNil(t, entries[0].Value.Scalar.Ref)
+		require.Equal(t, "BASE_CONFIG", entries[0].Value.Scalar.Ref.Name)
+		require.Nil(t, entries[0].Value.Scalar.Ref.Member)
+	})
+
+	t.Run("const array with mixed references and literals", func(t *testing.T) {
+		input := `
+			const items = [
+				Color.Red
+				"hello"
+				42
+				BASE
+			]
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		arr := parsed.Declarations[0].Const.Value.Array
+		require.NotNil(t, arr)
+		require.Len(t, arr.Elements, 4)
+
+		// Color.Red
+		require.NotNil(t, arr.Elements[0].Scalar.Ref)
+		require.Equal(t, "Color", arr.Elements[0].Scalar.Ref.Name)
+		require.Equal(t, "Red", *arr.Elements[0].Scalar.Ref.Member)
+
+		// "hello"
+		require.NotNil(t, arr.Elements[1].Scalar.Str)
+
+		// 42
+		require.NotNil(t, arr.Elements[2].Scalar.Int)
+
+		// BASE (const ref)
+		require.NotNil(t, arr.Elements[3].Scalar.Ref)
+		require.Equal(t, "BASE", arr.Elements[3].Scalar.Ref.Name)
+		require.Nil(t, arr.Elements[3].Scalar.Ref.Member)
+	})
+}
+
+func TestParserAnnotationPayloadVariants(t *testing.T) {
+	t.Run("annotation with array payload", func(t *testing.T) {
+		input := `
+			@tags(["admin" "user" "guest"])
+			type User {
+				id string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "tags", ann.Name)
+		require.NotNil(t, ann.Argument.Array)
+		require.Len(t, ann.Argument.Array.Elements, 3)
+		require.Equal(t, "admin", ann.Argument.Array.Elements[0].Scalar.Str.String())
+		require.Equal(t, "user", ann.Argument.Array.Elements[1].Scalar.Str.String())
+		require.Equal(t, "guest", ann.Argument.Array.Elements[2].Scalar.Str.String())
+	})
+
+	t.Run("annotation with enum member reference payload", func(t *testing.T) {
+		input := `
+			@default(Color.Red)
+			type Themed {
+				color string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "default", ann.Name)
+		require.NotNil(t, ann.Argument.Scalar)
+		require.NotNil(t, ann.Argument.Scalar.Ref)
+		require.Equal(t, "Color", ann.Argument.Scalar.Ref.Name)
+		require.Equal(t, "Red", *ann.Argument.Scalar.Ref.Member)
+	})
+
+	t.Run("annotation with const reference payload", func(t *testing.T) {
+		input := `
+			@fallback(DEFAULT_CONFIG)
+			type Settings {
+				value string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "fallback", ann.Name)
+		require.NotNil(t, ann.Argument.Scalar.Ref)
+		require.Equal(t, "DEFAULT_CONFIG", ann.Argument.Scalar.Ref.Name)
+		require.Nil(t, ann.Argument.Scalar.Ref.Member)
+	})
+
+	t.Run("annotation with integer payload", func(t *testing.T) {
+		input := `
+			@maxItems(100)
+			type List {
+				items string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "maxItems", ann.Name)
+		require.NotNil(t, ann.Argument.Scalar.Int)
+		require.Equal(t, "100", *ann.Argument.Scalar.Int)
+	})
+
+	t.Run("annotation with boolean payload", func(t *testing.T) {
+		input := `
+			@strict(true)
+			type Validated {
+				value string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "strict", ann.Name)
+		require.NotNil(t, ann.Argument.Scalar)
+		require.True(t, ann.Argument.Scalar.True)
+	})
+
+	t.Run("field annotation with reference payload", func(t *testing.T) {
+		input := `
+			type User {
+				@default(Status.Active)
+				status string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		field := parsed.Declarations[0].Type.Members[0].Field
+		require.Len(t, field.Annotations, 1)
+		ann := field.Annotations[0]
+		require.Equal(t, "default", ann.Name)
+		require.NotNil(t, ann.Argument.Scalar.Ref)
+		require.Equal(t, "Status", ann.Argument.Scalar.Ref.Name)
+		require.Equal(t, "Active", *ann.Argument.Scalar.Ref.Member)
+	})
+
+	t.Run("annotation with nested object containing references", func(t *testing.T) {
+		input := `
+			@config({
+				defaultColor Color.Red
+				fallback BASE_CONFIG
+				enabled true
+			})
+			type App {
+				id string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "config", ann.Name)
+		require.NotNil(t, ann.Argument.Object)
+		entries := ann.Argument.Object.Entries
+		require.Len(t, entries, 3)
+
+		// defaultColor Color.Red
+		require.NotNil(t, entries[0].Value.Scalar.Ref)
+		require.Equal(t, "Color", entries[0].Value.Scalar.Ref.Name)
+		require.Equal(t, "Red", *entries[0].Value.Scalar.Ref.Member)
+
+		// fallback BASE_CONFIG
+		require.NotNil(t, entries[1].Value.Scalar.Ref)
+		require.Equal(t, "BASE_CONFIG", entries[1].Value.Scalar.Ref.Name)
+		require.Nil(t, entries[1].Value.Scalar.Ref.Member)
+
+		// enabled true
+		require.True(t, entries[2].Value.Scalar.True)
+	})
+}
+
+func TestParserDocstringInsideTypeBody(t *testing.T) {
+	t.Run("docstring without blank line attaches to next field", func(t *testing.T) {
+		input := `
+			type User {
+				""" This docstring attaches to id """
+				id string
+				name string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		// Without a blank line, the docstring attaches to the field (same as top-level behavior)
+		require.Len(t, typeDecl.Members, 2)
+		require.NotNil(t, typeDecl.Members[0].Field)
+		require.NotNil(t, typeDecl.Members[0].Field.Docstring)
+		require.Equal(t, " This docstring attaches to id ", typeDecl.Members[0].Field.Docstring.Value.String())
+		require.Equal(t, "id", typeDecl.Members[0].Field.Name)
+		require.NotNil(t, typeDecl.Members[1].Field)
+		require.Equal(t, "name", typeDecl.Members[1].Field.Name)
+	})
+
+	t.Run("docstring attached to field inside type body", func(t *testing.T) {
+		input := `
+			type User {
+				""" The user ID """
+				id string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Members, 1)
+		field := typeDecl.Members[0].Field
+		require.NotNil(t, field)
+		require.NotNil(t, field.Docstring)
+		require.Equal(t, " The user ID ", field.Docstring.Value.String())
+		require.Equal(t, "id", field.Name)
+	})
+
+	t.Run("docstring with blank line becomes standalone in type body", func(t *testing.T) {
+		input := `
+			type User {
+				""" Section header """
+
+				id string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Members, 2)
+		require.NotNil(t, typeDecl.Members[0].Docstring)
+		require.Equal(t, " Section header ", typeDecl.Members[0].Docstring.Value.String())
+		require.NotNil(t, typeDecl.Members[1].Field)
+		require.Equal(t, "id", typeDecl.Members[1].Field.Name)
+	})
+
+	t.Run("multiple docstrings in type body", func(t *testing.T) {
+		input := `
+			type User {
+				""" Identity fields """
+
+				id string
+				name string
+
+				""" Contact info """
+
+				email string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Members, 5)
+		require.NotNil(t, typeDecl.Members[0].Docstring)
+		require.Equal(t, " Identity fields ", typeDecl.Members[0].Docstring.Value.String())
+		require.NotNil(t, typeDecl.Members[1].Field)
+		require.Equal(t, "id", typeDecl.Members[1].Field.Name)
+		require.NotNil(t, typeDecl.Members[2].Field)
+		require.Equal(t, "name", typeDecl.Members[2].Field.Name)
+		require.NotNil(t, typeDecl.Members[3].Docstring)
+		require.Equal(t, " Contact info ", typeDecl.Members[3].Docstring.Value.String())
+		require.NotNil(t, typeDecl.Members[4].Field)
+		require.Equal(t, "email", typeDecl.Members[4].Field.Name)
+	})
+
+	t.Run("docstring attached to annotated field in type body", func(t *testing.T) {
+		input := `
+			type User {
+				""" The email address """
+				@unique
+				email string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Members, 1)
+		field := typeDecl.Members[0].Field
+		require.NotNil(t, field.Docstring)
+		require.Equal(t, " The email address ", field.Docstring.Value.String())
+		require.Len(t, field.Annotations, 1)
+		require.Equal(t, "unique", field.Annotations[0].Name)
+		require.Equal(t, "email", field.Name)
+	})
+}
+
+func TestParserInvalidSyntax(t *testing.T) {
+	t.Run("Field with colon fails", func(t *testing.T) {
+		input := `type Bad { name: string }`
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err)
+	})
+
+	t.Run("Top-level legacy rpc fails", func(t *testing.T) {
+		input := `rpc Service {}`
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err)
+	})
+
+	t.Run("Array with commas fails", func(t *testing.T) {
+		input := `const bad = [1, 2]`
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err)
+	})
+}
+
+func TestParserLargeSchema(t *testing.T) {
 	input := `
 		include "./common.vdl"
-		include "./auth.vdl"
 
-		/*
-		  This is a block comment at the schema level.
-		  It can span multiple lines.
-		*/
-
-		""" This is a standalone docstring at schema level. """
-
-		"""
-		This is a multi-line standalone docstring.
-		It can contain markdown formatting.
-		"""
-
-		""" String constant documentation. """
-		const API_VERSION = "1.0.0"
-
-		""" Integer constant documentation. """
-		const MAX_PAGE_SIZE = 100
-
-		""" Float constant documentation. """
-		const DEFAULT_TAX_RATE = 0.21
-
-		""" Boolean true constant. """
-		const FEATURE_ENABLED = true
-
-		""" Boolean false constant. """
-		const MAINTENANCE_MODE = false
-
-		deprecated
-		const OLD_LIMIT = 50
-
-		deprecated("Use NEW_TIMEOUT instead")
-		const OLD_TIMEOUT = 30
-
-		""" String enum with implicit values. """
-		enum OrderStatus {
-			Pending
-			Processing
-			Shipped // inline comment
-			Delivered
-			Cancelled
-		}
-
-		""" String enum with explicit values. """
-		enum HttpMethod {
-			Get = "GET"
-			Post = "POST"
-			Put = "PUT"
-			Delete = "DELETE"
-		}
-
-		""" Integer enum. """
-		enum Priority {
-			Low = 1
-			Medium = 2
-			High = 3
-			Critical = 10
-		}
-
-		deprecated
-		enum OldStatus {
-			Active
-			Inactive
-		}
-
-		deprecated("Use NewCategory instead")
-		enum LegacyCategory {
-			TypeA = "A"
-			TypeB = "B"
-		}
-
-		""" NATS subject for product events. """
-		pattern ProductEventSubject = "events.products.{productId}.{eventType}"
-
-		""" Redis cache key for sessions. """
-		pattern SessionCacheKey = "cache:session:{sessionId}"
-
-		deprecated
-		pattern OldQueueName = "legacy.{id}"
-
-		deprecated("Use NewPattern instead")
-		pattern DeprecatedPattern = "old.{value}"
-
-		""" Base audit metadata for all entities. """
-		type AuditMetadata {
-			id: string
-			createdAt: datetime
-			updatedAt: datetime
-		}
-
-		""" Pagination parameters for list requests. """
-		type PaginationParams {
-			page: int
-			limit: int
-		}
-
-		""" Pagination response metadata. """
-		type PaginatedResponse {
-			totalItems: int
-			totalPages: int
-			currentPage: int
-		}
-
-		"""
-		Comprehensive type demonstrating all field types.
-		"""
-		type CompleteExample {
-			// Spread at the beginning
-			...AuditMetadata
-
-			""" String field documentation. """
-			name: string
-
-			""" Integer field. """
-			count: int
-
-			""" Float field. """
-			price: float
-
-			""" Boolean field. """
-			isActive: bool
-
-			""" Datetime field. """
-			scheduledAt: datetime
-
-			""" Optional string field. """
-			nickname?: string
-
-			""" Array of strings. """
-			tags: string[]
-
-			""" Optional array. """
-			categories?: string[]
-
-			""" Array of custom types. """
-			items: OrderStatus[]
-
-			""" Map with string values. """
-			metadata: map<string>
-
-			""" Map with integer values. """
-			scores: map<int>
-
-			""" Map with custom type values. """
-			priorities: map<Priority>
-
-			""" Inline object field. """
-			location: {
-				latitude: float
-				longitude: float
-			}
-
-			""" Optional inline object. """
-			address?: {
-				street: string
-				city: string
-				country: string
-			}
-
-			""" Array of inline objects. """
-			coordinates: {
-				x: int
-				y: int
-			}[]
-
-			""" 2D Matrix of integers. """
-			matrix: int[][]
-
-			""" 3D Tensor of floats. """
-			tensor: float[][][]
-
-			""" 2D array of inline objects. """
-			grid: {
-				row: int
-				col: int
-			}[][]
-
-			""" Deeply nested inline object. """
-			config: {
-				display: {
-					theme: string
-					fontSize: int
-				}
-				notifications: {
-					email: bool
-					push: bool
-				}
-			}
-		}
-
-		deprecated
-		type LegacyUser {
-			username: string
-		}
-
-		deprecated("Use UserV2 instead")
-		type OldUser {
-			name: string
-			email: string
-		}
-
-		"""
-		Catalog Service
-
-		Provides operations for managing products and browsing the catalog.
-		This is a multi-line docstring for the RPC.
-		"""
-		rpc Catalog {
-			"""
-			# Product Lifecycle
-			This is a standalone docstring inside RPC.
-			It documents a section of related procedures.
-			"""
-
-			""" Creates a new product in the system. """
-			proc CreateProduct {
+		""" service description """
+		@rpc
+		type Chat {
+			@proc
+			SendMessage {
 				input {
-					""" The product to create. """
-					product: CompleteExample
-				}
-
-				output {
-					""" Whether the operation succeeded. """
-					success: bool
-					""" The ID of the created product. """
-					productId: string
-				}
-			}
-
-			""" Retrieves a product by ID with its reviews. """
-			proc GetProduct {
-				input {
-					productId: string
-				}
-
-				output {
-					product: CompleteExample
-					reviews: {
-						rating: int
-						comment: string
-						userId: string
-					}[]
-				}
-			}
-
-			""" Lists products with pagination and filtering. """
-			proc ListProducts {
-				input {
-					// Spread in input block
-					...PaginationParams
-					filterByStatus?: OrderStatus
-				}
-
-				output {
-					// Spread in output block
-					...PaginatedResponse
-					items: CompleteExample[]
-				}
-			}
-
-			deprecated
-			proc OldGetProduct {
-				input {
-					id: string
+					chatId string
+					message string
 				}
 				output {
-					name: string
+					messageId string
 				}
 			}
-
-			deprecated("Use GetProductV2 instead")
-			proc DeprecatedGetProduct {
-				input {
-					legacyId: string
-				}
-				output {
-					data: string
-				}
-			}
-
-			// A comment between proc and stream
-
-			""" Subscribes to product updates. """
-			stream ProductUpdates {
-				input {
-					""" The product ID to watch. """
-					productId: string
-					""" Optional filter by event type. """
-					eventType?: string
-				}
-
-				output {
-					""" The type of update. """
-					updateType: string
-					""" The updated product data. """
-					product: CompleteExample
-					""" Server timestamp. """
-					timestamp: datetime
-				}
-			}
-
-			deprecated
-			stream OldStream {
-				input {
-					id: string
-				}
-				output {
-					data: string
-				}
-			}
-
-			deprecated("Use NewStream instead")
-			stream LegacyStream {
-				input {
-					legacyId: string
-				}
-				output {
-					result: bool
-				}
-			}
+			...BaseChat
 		}
 
-		"""
-		Chat Service
+		@pattern
+		const UserTopic = "events.users.{userId}"
 
-		Real-time messaging capabilities with procedures and streams.
-		"""
-		rpc Chat {
-			""" Sends a message to a chat room. """
-			proc SendMessage {
-				input {
-					chatId: string
-					message: string
-					attachments?: {
-						url: string
-						mimeType: string
-					}[]
-				}
-
-				output {
-					messageId: string
-					timestamp: datetime
-				}
-			}
-
-			""" Subscribes to new messages in a chat room. """
-			stream NewMessage {
-				input {
-					chatId: string
-					sinceTimestamp?: datetime
-				}
-
-				output {
-					id: string
-					senderId: string
-					message: string
-					timestamp: datetime
-				}
-			}
+		const compilerConfig = {
+			version 1
+			targets [
+				{ go { output "./gen/go" } }
+				{ ts { output "./gen/ts" } }
+			]
 		}
 
-		deprecated
-		rpc OldService {
-			proc DoSomething {
-				input {
-					value: string
-				}
-				output {
-					result: bool
-				}
-			}
-		}
-
-		deprecated("Use NewAPI instead")
-		rpc LegacyAPI {
-			proc LegacyCall {
-				input {
-					param: string
-				}
-				output {
-					response: string
-				}
-			}
+		enum Roles {
+			Admin = "admin"
+			User = "user"
+			...DefaultRoles
 		}
 	`
+
+	parsed, err := ParserInstance.ParseString("schema.vdl", input)
+	require.NoError(t, err)
+	require.Len(t, parsed.Declarations, 5)
+
+	require.NotNil(t, parsed.Declarations[0].Include)
+	require.NotNil(t, parsed.Declarations[1].Type)
+	require.NotNil(t, parsed.Declarations[2].Const)
+	require.NotNil(t, parsed.Declarations[3].Const)
+	require.NotNil(t, parsed.Declarations[4].Enum)
+
+	chat := parsed.Declarations[1].Type
+	require.Equal(t, "Chat", chat.Name)
+	require.Len(t, chat.Annotations, 1)
+	require.Equal(t, "rpc", chat.Annotations[0].Name)
+	require.Len(t, chat.Members, 2)
+	require.NotNil(t, chat.Members[1].Spread)
+
+	cfg := parsed.Declarations[3].Const
+	require.Equal(t, "compilerConfig", cfg.Name)
+	require.NotNil(t, cfg.Value.Object)
+	require.Len(t, cfg.Value.Object.Entries, 2)
+
+	roles := parsed.Declarations[4].Enum
+	require.Equal(t, "Roles", roles.Name)
+	require.Len(t, roles.Members, 3)
+	require.NotNil(t, roles.Members[2].Spread)
+}
+
+func TestParserDocstringAttachmentWithAnnotations(t *testing.T) {
+	t.Run("docstring attaches across annotation lines", func(t *testing.T) {
+		input := `
+			""" type docs """
+			@entity
+			type User {
+				id string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.NotNil(t, typeDecl.Docstring)
+		require.Equal(t, " type docs ", typeDecl.Docstring.Value.String())
+		require.Len(t, typeDecl.Annotations, 1)
+	})
+
+	t.Run("blank line keeps docstring standalone", func(t *testing.T) {
+		input := `
+			""" docs """
+
+			@entity
+			type User {
+				id string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		require.NotNil(t, parsed.Declarations[0].Docstring)
+		require.NotNil(t, parsed.Declarations[1].Type)
+	})
+}
+
+func TestParserNamespacedSpread(t *testing.T) {
+	t.Run("Namespaced spread in type body", func(t *testing.T) {
+		input := `
+			type User {
+				...auth.BaseUser
+				name string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
+			Name: "User",
+			Members: []*ast.TypeMember{
+				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "auth", Member: new("BaseUser")}}},
+				{Field: &ast.Field{Name: "name", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}},
+			},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Namespaced spread in enum body", func(t *testing.T) {
+		input := `
+			enum AllRoles {
+				Admin = "admin"
+				...auth.StandardRoles
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Enum: &ast.EnumDecl{
+			Name: "AllRoles",
+			Members: []*ast.EnumMember{
+				{Name: "Admin", Value: &ast.EnumValue{Str: qptr("admin")}},
+				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "auth", Member: new("StandardRoles")}}},
+			},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Namespaced spread in const object literal", func(t *testing.T) {
+		input := `
+			const config = {
+				...shared.baseConfig
+				port 8080
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		decl := parsed.Declarations[0].Const
+		require.NotNil(t, decl.Value.Object)
+		entries := decl.Value.Object.Entries
+		require.Len(t, entries, 2)
+		require.NotNil(t, entries[0].Spread)
+		require.Equal(t, "shared", entries[0].Spread.Ref.Name)
+		require.Equal(t, "baseConfig", *entries[0].Spread.Ref.Member)
+		require.Equal(t, "port", entries[1].Key)
+	})
+
+	t.Run("Mixed local and namespaced spreads in type body", func(t *testing.T) {
+		input := `
+			type FullUser {
+				...BaseUser
+				...auth.Credentials
+				...billing.PaymentInfo
+				name string
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "FullUser", typeDecl.Name)
+		require.Len(t, typeDecl.Members, 4)
+
+		// Local spread
+		require.NotNil(t, typeDecl.Members[0].Spread)
+		require.Equal(t, "BaseUser", typeDecl.Members[0].Spread.Ref.Name)
+		require.Nil(t, typeDecl.Members[0].Spread.Ref.Member)
+
+		// Namespaced spread 1
+		require.NotNil(t, typeDecl.Members[1].Spread)
+		require.Equal(t, "auth", typeDecl.Members[1].Spread.Ref.Name)
+		require.Equal(t, "Credentials", *typeDecl.Members[1].Spread.Ref.Member)
+
+		// Namespaced spread 2
+		require.NotNil(t, typeDecl.Members[2].Spread)
+		require.Equal(t, "billing", typeDecl.Members[2].Spread.Ref.Name)
+		require.Equal(t, "PaymentInfo", *typeDecl.Members[2].Spread.Ref.Member)
+
+		// Regular field
+		require.NotNil(t, typeDecl.Members[3].Field)
+		require.Equal(t, "name", typeDecl.Members[3].Field.Name)
+	})
+
+	t.Run("Mixed local and namespaced spreads in enum body", func(t *testing.T) {
+		input := `
+			enum AllPermissions {
+				...BasePermissions
+				...auth.AdminPermissions
+				Custom = "custom"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 3)
+
+		require.NotNil(t, members[0].Spread)
+		require.Equal(t, "BasePermissions", members[0].Spread.Ref.Name)
+		require.Nil(t, members[0].Spread.Ref.Member)
+
+		require.NotNil(t, members[1].Spread)
+		require.Equal(t, "auth", members[1].Spread.Ref.Name)
+		require.Equal(t, "AdminPermissions", *members[1].Spread.Ref.Member)
+
+		require.Equal(t, "Custom", members[2].Name)
+		require.Equal(t, "custom", members[2].Value.Str.String())
+	})
+
+	t.Run("Multiple namespaced spreads in const object", func(t *testing.T) {
+		input := `
+			const merged = {
+				...defaults.base
+				...overrides.prod
+				name "final"
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		entries := parsed.Declarations[0].Const.Value.Object.Entries
+		require.Len(t, entries, 3)
+
+		require.NotNil(t, entries[0].Spread)
+		require.Equal(t, "defaults", entries[0].Spread.Ref.Name)
+		require.Equal(t, "base", *entries[0].Spread.Ref.Member)
+
+		require.NotNil(t, entries[1].Spread)
+		require.Equal(t, "overrides", entries[1].Spread.Ref.Name)
+		require.Equal(t, "prod", *entries[1].Spread.Ref.Member)
+
+		require.Equal(t, "name", entries[2].Key)
+		require.Equal(t, "final", entries[2].Value.Scalar.Str.String())
+	})
+
+	t.Run("Namespaced spread in large schema with rpc-style type", func(t *testing.T) {
+		input := `
+			@rpc
+			type UserService {
+				...common.BaseService
+				@proc
+				GetUser {
+					input {
+						id string
+					}
+					output {
+						...models.UserProfile
+						active bool
+					}
+				}
+			}
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "UserService", typeDecl.Name)
+		require.Len(t, typeDecl.Annotations, 1)
+		require.Equal(t, "rpc", typeDecl.Annotations[0].Name)
+		require.Len(t, typeDecl.Members, 2)
+
+		// First child: namespaced spread
+		require.NotNil(t, typeDecl.Members[0].Spread)
+		require.Equal(t, "common", typeDecl.Members[0].Spread.Ref.Name)
+		require.Equal(t, "BaseService", *typeDecl.Members[0].Spread.Ref.Member)
+
+		// Second child: proc field with nested objects
+		proc := typeDecl.Members[1].Field
+		require.Equal(t, "GetUser", proc.Name)
+		require.NotNil(t, proc.Type.Base.Object)
+		require.Len(t, proc.Type.Base.Object.Members, 2)
+
+		// output has a namespaced spread inside
+		outputField := proc.Type.Base.Object.Members[1].Field
+		require.Equal(t, "output", outputField.Name)
+		require.NotNil(t, outputField.Type.Base.Object)
+		outputChildren := outputField.Type.Base.Object.Members
+		require.Len(t, outputChildren, 2)
+		require.NotNil(t, outputChildren[0].Spread)
+		require.Equal(t, "models", outputChildren[0].Spread.Ref.Name)
+		require.Equal(t, "UserProfile", *outputChildren[0].Spread.Ref.Member)
+		require.NotNil(t, outputChildren[1].Field)
+		require.Equal(t, "active", outputChildren[1].Field.Name)
+	})
+}
+
+func TestParserDataLiteralKeys(t *testing.T) {
+	input := `
+		const c = {
+			type "a"
+			enum "b"
+			const "c"
+			map "d"
+			true "e"
+			false "f"
+		}
+	`
+
 	parsed, err := ParserInstance.ParseString("schema.vdl", input)
 	require.NoError(t, err)
 
-	// Note: EnumValue.Int is stored as *string (the lexer returns the token value as string)
-	// So we just use ptr("1") for integer enum values
-
-	expected := &ast.Schema{
-		Children: []*ast.SchemaChild{
-			// ==================== INCLUDES ====================
-			{Include: &ast.Include{Path: "./common.vdl"}},
-			{Include: &ast.Include{Path: "./auth.vdl"}},
-
-			// ==================== BLOCK COMMENT ====================
-			{Comment: &ast.Comment{Block: ptr(`/*
-		  This is a block comment at the schema level.
-		  It can span multiple lines.
-		*/`)}},
-
-			// ==================== STANDALONE DOCSTRINGS ====================
-			{Docstring: &ast.Docstring{Value: " This is a standalone docstring at schema level. "}},
-			{Docstring: &ast.Docstring{Value: `
-		This is a multi-line standalone docstring.
-		It can contain markdown formatting.
-		`}},
-
-			// ==================== CONSTANTS ====================
-			// String constant
-			{
-				Const: &ast.ConstDecl{
-					Docstring: &ast.Docstring{Value: " String constant documentation. "},
-					Name:      "API_VERSION",
-					Value:     &ast.ConstValue{Str: qptr("1.0.0")},
-				},
-			},
-			// Integer constant
-			{
-				Const: &ast.ConstDecl{
-					Docstring: &ast.Docstring{Value: " Integer constant documentation. "},
-					Name:      "MAX_PAGE_SIZE",
-					Value:     &ast.ConstValue{Int: ptr("100")},
-				},
-			},
-			// Float constant
-			{
-				Const: &ast.ConstDecl{
-					Docstring: &ast.Docstring{Value: " Float constant documentation. "},
-					Name:      "DEFAULT_TAX_RATE",
-					Value:     &ast.ConstValue{Float: ptr("0.21")},
-				},
-			},
-			// Boolean true constant
-			{
-				Const: &ast.ConstDecl{
-					Docstring: &ast.Docstring{Value: " Boolean true constant. "},
-					Name:      "FEATURE_ENABLED",
-					Value:     &ast.ConstValue{True: true},
-				},
-			},
-			// Boolean false constant
-			{
-				Const: &ast.ConstDecl{
-					Docstring: &ast.Docstring{Value: " Boolean false constant. "},
-					Name:      "MAINTENANCE_MODE",
-					Value:     &ast.ConstValue{False: true},
-				},
-			},
-			// Deprecated constant (no message)
-			{
-				Const: &ast.ConstDecl{
-					Deprecated: &ast.Deprecated{},
-					Name:       "OLD_LIMIT",
-					Value:      &ast.ConstValue{Int: ptr("50")},
-				},
-			},
-			// Deprecated constant (with message)
-			{
-				Const: &ast.ConstDecl{
-					Deprecated: &ast.Deprecated{Message: qptr("Use NEW_TIMEOUT instead")},
-					Name:       "OLD_TIMEOUT",
-					Value:      &ast.ConstValue{Int: ptr("30")},
-				},
-			},
-
-			// ==================== ENUMERATIONS ====================
-			// String enum with implicit values
-			{
-				Enum: &ast.EnumDecl{
-					Docstring: &ast.Docstring{Value: " String enum with implicit values. "},
-					Name:      "OrderStatus",
-					Members: []*ast.EnumMember{
-						{Name: "Pending"},
-						{Name: "Processing"},
-						{Name: "Shipped"},
-						{Comment: &ast.Comment{Simple: ptr("// inline comment")}},
-						{Name: "Delivered"},
-						{Name: "Cancelled"},
-					},
-				},
-			},
-			// String enum with explicit values
-			{
-				Enum: &ast.EnumDecl{
-					Docstring: &ast.Docstring{Value: " String enum with explicit values. "},
-					Name:      "HttpMethod",
-					Members: []*ast.EnumMember{
-						{Name: "Get", Value: &ast.EnumValue{Str: qptr("GET")}},
-						{Name: "Post", Value: &ast.EnumValue{Str: qptr("POST")}},
-						{Name: "Put", Value: &ast.EnumValue{Str: qptr("PUT")}},
-						{Name: "Delete", Value: &ast.EnumValue{Str: qptr("DELETE")}},
-					},
-				},
-			},
-			// Integer enum
-			{
-				Enum: &ast.EnumDecl{
-					Docstring: &ast.Docstring{Value: " Integer enum. "},
-					Name:      "Priority",
-					Members: []*ast.EnumMember{
-						{Name: "Low", Value: &ast.EnumValue{Int: ptr("1")}},
-						{Name: "Medium", Value: &ast.EnumValue{Int: ptr("2")}},
-						{Name: "High", Value: &ast.EnumValue{Int: ptr("3")}},
-						{Name: "Critical", Value: &ast.EnumValue{Int: ptr("10")}},
-					},
-				},
-			},
-			// Deprecated enum (no message)
-			{
-				Enum: &ast.EnumDecl{
-					Deprecated: &ast.Deprecated{},
-					Name:       "OldStatus",
-					Members: []*ast.EnumMember{
-						{Name: "Active"},
-						{Name: "Inactive"},
-					},
-				},
-			},
-			// Deprecated enum (with message)
-			{
-				Enum: &ast.EnumDecl{
-					Deprecated: &ast.Deprecated{Message: qptr("Use NewCategory instead")},
-					Name:       "LegacyCategory",
-					Members: []*ast.EnumMember{
-						{Name: "TypeA", Value: &ast.EnumValue{Str: qptr("A")}},
-						{Name: "TypeB", Value: &ast.EnumValue{Str: qptr("B")}},
-					},
-				},
-			},
-
-			// ==================== PATTERNS ====================
-			// Pattern with docstring
-			{
-				Pattern: &ast.PatternDecl{
-					Docstring: &ast.Docstring{Value: " NATS subject for product events. "},
-					Name:      "ProductEventSubject",
-					Value:     "events.products.{productId}.{eventType}",
-				},
-			},
-			// Another pattern with docstring
-			{
-				Pattern: &ast.PatternDecl{
-					Docstring: &ast.Docstring{Value: " Redis cache key for sessions. "},
-					Name:      "SessionCacheKey",
-					Value:     "cache:session:{sessionId}",
-				},
-			},
-			// Deprecated pattern (no message)
-			{
-				Pattern: &ast.PatternDecl{
-					Deprecated: &ast.Deprecated{},
-					Name:       "OldQueueName",
-					Value:      "legacy.{id}",
-				},
-			},
-			// Deprecated pattern (with message)
-			{
-				Pattern: &ast.PatternDecl{
-					Deprecated: &ast.Deprecated{Message: qptr("Use NewPattern instead")},
-					Name:       "DeprecatedPattern",
-					Value:      "old.{value}",
-				},
-			},
-
-			// ==================== TYPES ====================
-			// AuditMetadata type
-			{
-				Type: &ast.TypeDecl{
-					Docstring: &ast.Docstring{Value: " Base audit metadata for all entities. "},
-					Name:      "AuditMetadata",
-					Children: []*ast.TypeDeclChild{
-						{Field: &ast.Field{Name: "id", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						{Field: &ast.Field{Name: "createdAt", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-						{Field: &ast.Field{Name: "updatedAt", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-					},
-				},
-			},
-			// PaginationParams type
-			{
-				Type: &ast.TypeDecl{
-					Docstring: &ast.Docstring{Value: " Pagination parameters for list requests. "},
-					Name:      "PaginationParams",
-					Children: []*ast.TypeDeclChild{
-						{Field: &ast.Field{Name: "page", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-						{Field: &ast.Field{Name: "limit", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-					},
-				},
-			},
-			// PaginatedResponse type
-			{
-				Type: &ast.TypeDecl{
-					Docstring: &ast.Docstring{Value: " Pagination response metadata. "},
-					Name:      "PaginatedResponse",
-					Children: []*ast.TypeDeclChild{
-						{Field: &ast.Field{Name: "totalItems", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-						{Field: &ast.Field{Name: "totalPages", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-						{Field: &ast.Field{Name: "currentPage", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-					},
-				},
-			},
-			// CompleteExample type - demonstrating all field types
-			{
-				Type: &ast.TypeDecl{
-					Docstring: &ast.Docstring{Value: `
-		Comprehensive type demonstrating all field types.
-		`},
-					Name: "CompleteExample",
-					Children: []*ast.TypeDeclChild{
-						// Comment
-						{Comment: &ast.Comment{Simple: ptr("// Spread at the beginning")}},
-						// Spread
-						{Spread: &ast.Spread{TypeName: "AuditMetadata"}},
-						// String field with docstring
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " String field documentation. "},
-							Name:      "name",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-						}},
-						// Integer field
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Integer field. "},
-							Name:      "count",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}},
-						}},
-						// Float field
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Float field. "},
-							Name:      "price",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}},
-						}},
-						// Boolean field
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Boolean field. "},
-							Name:      "isActive",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}},
-						}},
-						// Datetime field
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Datetime field. "},
-							Name:      "scheduledAt",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}},
-						}},
-						// Optional string field
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Optional string field. "},
-							Name:      "nickname",
-							Optional:  true,
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-						}},
-						// Array of strings
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Array of strings. "},
-							Name:      "tags",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
-						}},
-						// Optional array
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Optional array. "},
-							Name:      "categories",
-							Optional:  true,
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}, Dimensions: 1},
-						}},
-						// Array of custom types
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Array of custom types. "},
-							Name:      "items",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("OrderStatus")}, Dimensions: 1},
-						}},
-						// Map with string values
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Map with string values. "},
-							Name:      "metadata",
-							Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{
-								ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-							}}},
-						}},
-						// Map with integer values
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Map with integer values. "},
-							Name:      "scores",
-							Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{
-								ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}},
-							}}},
-						}},
-						// Map with custom type values
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Map with custom type values. "},
-							Name:      "priorities",
-							Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{
-								ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("Priority")}},
-							}}},
-						}},
-						// Inline object field
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Inline object field. "},
-							Name:      "location",
-							Type: ast.FieldType{Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-								Children: []*ast.TypeDeclChild{
-									{Field: &ast.Field{Name: "latitude", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
-									{Field: &ast.Field{Name: "longitude", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}}}},
-								},
-							}}},
-						}},
-						// Optional inline object
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Optional inline object. "},
-							Name:      "address",
-							Optional:  true,
-							Type: ast.FieldType{Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-								Children: []*ast.TypeDeclChild{
-									{Field: &ast.Field{Name: "street", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-									{Field: &ast.Field{Name: "city", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-									{Field: &ast.Field{Name: "country", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-								},
-							}}},
-						}},
-						// Array of inline objects
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Array of inline objects. "},
-							Name:      "coordinates",
-							Type: ast.FieldType{
-								Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-									Children: []*ast.TypeDeclChild{
-										{Field: &ast.Field{Name: "x", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-										{Field: &ast.Field{Name: "y", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-									},
-								}},
-								Dimensions: 1,
-							},
-						}},
-						// 2D matrix
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " 2D Matrix of integers. "},
-							Name:      "matrix",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}, Dimensions: 2},
-						}},
-						// 3D tensor
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " 3D Tensor of floats. "},
-							Name:      "tensor",
-							Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("float")}, Dimensions: 3},
-						}},
-						// 2D array of inline objects
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " 2D array of inline objects. "},
-							Name:      "grid",
-							Type: ast.FieldType{
-								Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-									Children: []*ast.TypeDeclChild{
-										{Field: &ast.Field{Name: "row", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-										{Field: &ast.Field{Name: "col", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-									},
-								}},
-								Dimensions: 2,
-							},
-						}},
-						// Deeply nested inline object
-						{Field: &ast.Field{
-							Docstring: &ast.Docstring{Value: " Deeply nested inline object. "},
-							Name:      "config",
-							Type: ast.FieldType{Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-								Children: []*ast.TypeDeclChild{
-									{Field: &ast.Field{
-										Name: "display",
-										Type: ast.FieldType{Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-											Children: []*ast.TypeDeclChild{
-												{Field: &ast.Field{Name: "theme", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "fontSize", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-											},
-										}}},
-									}},
-									{Field: &ast.Field{
-										Name: "notifications",
-										Type: ast.FieldType{Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-											Children: []*ast.TypeDeclChild{
-												{Field: &ast.Field{Name: "email", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-												{Field: &ast.Field{Name: "push", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-											},
-										}}},
-									}},
-								},
-							}}},
-						}},
-					},
-				},
-			},
-			// Deprecated type (no message)
-			{
-				Type: &ast.TypeDecl{
-					Deprecated: &ast.Deprecated{},
-					Name:       "LegacyUser",
-					Children: []*ast.TypeDeclChild{
-						{Field: &ast.Field{Name: "username", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-					},
-				},
-			},
-			// Deprecated type (with message)
-			{
-				Type: &ast.TypeDecl{
-					Deprecated: &ast.Deprecated{Message: qptr("Use UserV2 instead")},
-					Name:       "OldUser",
-					Children: []*ast.TypeDeclChild{
-						{Field: &ast.Field{Name: "name", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-						{Field: &ast.Field{Name: "email", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-					},
-				},
-			},
-
-			// ==================== RPC SERVICES ====================
-			// Catalog RPC
-			{
-				RPC: &ast.RPCDecl{
-					Docstring: &ast.Docstring{Value: `
-		Catalog Service
-
-		Provides operations for managing products and browsing the catalog.
-		This is a multi-line docstring for the RPC.
-		`},
-					Name: "Catalog",
-					Children: []*ast.RPCChild{
-						// Standalone docstring inside RPC
-						{Docstring: &ast.Docstring{Value: `
-			# Product Lifecycle
-			This is a standalone docstring inside RPC.
-			It documents a section of related procedures.
-			`}},
-						// CreateProduct proc
-						{
-							Proc: &ast.ProcDecl{
-								Docstring: &ast.Docstring{Value: " Creates a new product in the system. "},
-								Name:      "CreateProduct",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " The product to create. "},
-													Name:      "product",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("CompleteExample")}},
-												}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " Whether the operation succeeded. "},
-													Name:      "success",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}},
-												}},
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " The ID of the created product. "},
-													Name:      "productId",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-												}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// GetProduct proc
-						{
-							Proc: &ast.ProcDecl{
-								Docstring: &ast.Docstring{Value: " Retrieves a product by ID with its reviews. "},
-								Name:      "GetProduct",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{
-													Name: "productId",
-													Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-												}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{
-													Name: "product",
-													Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("CompleteExample")}},
-												}},
-												{Field: &ast.Field{
-													Name: "reviews",
-													Type: ast.FieldType{
-														Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-															Children: []*ast.TypeDeclChild{
-																{Field: &ast.Field{Name: "rating", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("int")}}}},
-																{Field: &ast.Field{Name: "comment", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-																{Field: &ast.Field{Name: "userId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-															},
-														}},
-														Dimensions: 1,
-													},
-												}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// ListProducts proc with spreads
-						{
-							Proc: &ast.ProcDecl{
-								Docstring: &ast.Docstring{Value: " Lists products with pagination and filtering. "},
-								Name:      "ListProducts",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Comment: &ast.Comment{Simple: ptr("// Spread in input block")}},
-												{Spread: &ast.Spread{TypeName: "PaginationParams"}},
-												{Field: &ast.Field{
-													Name:     "filterByStatus",
-													Optional: true,
-													Type:     ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("OrderStatus")}},
-												}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Comment: &ast.Comment{Simple: ptr("// Spread in output block")}},
-												{Spread: &ast.Spread{TypeName: "PaginatedResponse"}},
-												{Field: &ast.Field{
-													Name: "items",
-													Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("CompleteExample")}, Dimensions: 1},
-												}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// Deprecated proc (no message)
-						{
-							Proc: &ast.ProcDecl{
-								Deprecated: &ast.Deprecated{},
-								Name:       "OldGetProduct",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "id", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "name", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// Deprecated proc (with message)
-						{
-							Proc: &ast.ProcDecl{
-								Deprecated: &ast.Deprecated{Message: qptr("Use GetProductV2 instead")},
-								Name:       "DeprecatedGetProduct",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "legacyId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "data", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// Comment between proc and stream
-						{Comment: &ast.Comment{Simple: ptr("// A comment between proc and stream")}},
-						// ProductUpdates stream
-						{
-							Stream: &ast.StreamDecl{
-								Docstring: &ast.Docstring{Value: " Subscribes to product updates. "},
-								Name:      "ProductUpdates",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " The product ID to watch. "},
-													Name:      "productId",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-												}},
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " Optional filter by event type. "},
-													Name:      "eventType",
-													Optional:  true,
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-												}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " The type of update. "},
-													Name:      "updateType",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}},
-												}},
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " The updated product data. "},
-													Name:      "product",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("CompleteExample")}},
-												}},
-												{Field: &ast.Field{
-													Docstring: &ast.Docstring{Value: " Server timestamp. "},
-													Name:      "timestamp",
-													Type:      ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}},
-												}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// Deprecated stream (no message)
-						{
-							Stream: &ast.StreamDecl{
-								Deprecated: &ast.Deprecated{},
-								Name:       "OldStream",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "id", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "data", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// Deprecated stream (with message)
-						{
-							Stream: &ast.StreamDecl{
-								Deprecated: &ast.Deprecated{Message: qptr("Use NewStream instead")},
-								Name:       "LegacyStream",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "legacyId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "result", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			// Chat RPC
-			{
-				RPC: &ast.RPCDecl{
-					Docstring: &ast.Docstring{Value: `
-		Chat Service
-
-		Real-time messaging capabilities with procedures and streams.
-		`},
-					Name: "Chat",
-					Children: []*ast.RPCChild{
-						// SendMessage proc
-						{
-							Proc: &ast.ProcDecl{
-								Docstring: &ast.Docstring{Value: " Sends a message to a chat room. "},
-								Name:      "SendMessage",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "chatId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "message", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{
-													Name:     "attachments",
-													Optional: true,
-													Type: ast.FieldType{
-														Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{
-															Children: []*ast.TypeDeclChild{
-																{Field: &ast.Field{Name: "url", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-																{Field: &ast.Field{Name: "mimeType", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-															},
-														}},
-														Dimensions: 1,
-													},
-												}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "messageId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "timestamp", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-						// NewMessage stream
-						{
-							Stream: &ast.StreamDecl{
-								Docstring: &ast.Docstring{Value: " Subscribes to new messages in a chat room. "},
-								Name:      "NewMessage",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "chatId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "sinceTimestamp", Optional: true, Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "id", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "senderId", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "message", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-												{Field: &ast.Field{Name: "timestamp", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("datetime")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			// Deprecated RPC (no message)
-			{
-				RPC: &ast.RPCDecl{
-					Deprecated: &ast.Deprecated{},
-					Name:       "OldService",
-					Children: []*ast.RPCChild{
-						{
-							Proc: &ast.ProcDecl{
-								Name: "DoSomething",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "value", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "result", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("bool")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			// Deprecated RPC (with message)
-			{
-				RPC: &ast.RPCDecl{
-					Deprecated: &ast.Deprecated{Message: qptr("Use NewAPI instead")},
-					Name:       "LegacyAPI",
-					Children: []*ast.RPCChild{
-						{
-							Proc: &ast.ProcDecl{
-								Name: "LegacyCall",
-								Children: []*ast.ProcOrStreamDeclChild{
-									{
-										Input: &ast.ProcOrStreamDeclChildInput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "param", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-									{
-										Output: &ast.ProcOrStreamDeclChildOutput{
-											Children: []*ast.InputOutputChild{
-												{Field: &ast.Field{Name: "response", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: ptr("string")}}}},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	testutil.ASTEqualNoPos(t, expected, parsed)
+	entries := parsed.Declarations[0].Const.Value.Object.Entries
+	require.Len(t, entries, 6)
+	require.Equal(t, "type", entries[0].Key)
+	require.Equal(t, "enum", entries[1].Key)
+	require.Equal(t, "const", entries[2].Key)
+	require.Equal(t, "map", entries[3].Key)
+	require.Equal(t, "true", entries[4].Key)
+	require.Equal(t, "false", entries[5].Key)
 }
