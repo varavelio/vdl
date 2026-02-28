@@ -1,0 +1,5 @@
+// @expect: E201
+
+type User {
+  metadata map[MissingType]
+}

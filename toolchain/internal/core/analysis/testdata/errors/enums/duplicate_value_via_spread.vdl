@@ -1,0 +1,10 @@
+// @expect: E303
+
+enum BaseRole {
+  Admin = "admin"
+}
+
+enum AllRoles {
+  ...BaseRole
+  SuperAdmin = "admin"
+}

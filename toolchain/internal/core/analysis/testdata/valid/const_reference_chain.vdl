@@ -1,0 +1,8 @@
+// @expect-no-errors
+// @assert: has-const baseTimeout
+// @assert: has-const timeout
+// @assert: const-kind timeout int
+
+const baseTimeout = 1500
+const timeout = baseTimeout
+const timeoutAlias = timeout

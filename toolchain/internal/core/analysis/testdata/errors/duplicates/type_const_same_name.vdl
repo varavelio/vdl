@@ -1,0 +1,7 @@
+// @expect: E804
+
+type Limits {
+  max int
+}
+
+const Limits = 10

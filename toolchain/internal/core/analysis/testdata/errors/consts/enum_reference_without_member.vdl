@@ -1,0 +1,7 @@
+// @expect: E205
+
+enum Status {
+  Active
+}
+
+const bad = Status

@@ -1,0 +1,27 @@
+// @expect-no-errors
+// @assert: has-const nestedConfig
+// @assert: const-kind nestedConfig object
+// @assert: has-const points
+// @assert: const-kind points array
+
+const baseHeaders = {
+  xTrace "trace-id"
+  xEnv "test"
+}
+
+const nestedConfig = {
+  service {
+    name "billing"
+    retries 3
+  }
+  headers {
+    ...baseHeaders
+    xRegion "us-east-1"
+  }
+  enabled true
+}
+
+const points = [
+  { x 1 y 2 }
+  { x 3 y 4 }
+]

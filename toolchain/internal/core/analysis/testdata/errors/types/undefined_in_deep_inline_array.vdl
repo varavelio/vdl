@@ -1,0 +1,9 @@
+// @expect: E201
+
+type Event {
+  payload {
+    entries {
+      item MissingType
+    }[]
+  }
+}

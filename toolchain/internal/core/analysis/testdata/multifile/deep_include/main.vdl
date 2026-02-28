@@ -1,10 +1,10 @@
 // @expect-no-errors
 // @assert: has-type User
+// @assert: has-type Profile
 // @assert: field-resolved-type User profile Profile
+// @assert: file-count 3
 
-type Profile {
-  id string
-}
+include "./level1.vdl"
 
 type User {
   profile Profile

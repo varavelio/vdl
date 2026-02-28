@@ -1,0 +1,9 @@
+// @expect: E206
+
+const baseConfig = {
+  host "localhost"
+}
+
+const cfg = {
+  ...env.baseConfig
+}

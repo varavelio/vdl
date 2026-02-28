@@ -1,0 +1,12 @@
+// @expect-no-errors
+// @assert: has-enum Priority
+// @assert: has-const defaultPriority
+// @assert: const-kind defaultPriority int
+
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}
+
+const defaultPriority = Priority.Medium

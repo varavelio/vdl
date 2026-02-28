@@ -1,0 +1,5 @@
+include "./level2.vdl"
+
+type Wrapper {
+  profile Profile
+}

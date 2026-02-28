@@ -1,0 +1,12 @@
+// @expect: E305
+
+enum Region {
+  UsEast1
+  EuWest1
+}
+
+const cfg = {
+  routing {
+    region Region.ApSouth1
+  }
+}

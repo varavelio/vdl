@@ -1,0 +1,6 @@
+// @expect: E205
+
+const cfg = {
+  ...missingConfig
+  port 8080
+}

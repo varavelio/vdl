@@ -1,5 +1,9 @@
 // @expect: E201
 // @expect: E102
+// @assert: has-type ValidType
+// @assert: has-type InvalidType
+// @assert: has-const validConst
+// @assert: has-const BAD_CONST
 
 type ValidType {
   id string

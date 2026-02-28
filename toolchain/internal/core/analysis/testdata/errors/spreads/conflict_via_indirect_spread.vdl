@@ -1,0 +1,14 @@
+// @expect: E203
+
+type Base {
+  id string
+}
+
+type Mid {
+  ...Base
+}
+
+type User {
+  ...Mid
+  id int
+}

@@ -1,0 +1,16 @@
+// @expect: E203
+
+type BasePayload {
+  value string
+}
+
+type MidPayload {
+  ...BasePayload
+}
+
+type Envelope {
+  payload {
+    ...MidPayload
+    value bool
+  }
+}

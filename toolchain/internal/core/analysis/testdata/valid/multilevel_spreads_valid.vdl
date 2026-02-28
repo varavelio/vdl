@@ -1,0 +1,22 @@
+// @expect-no-errors
+// @assert: has-type Final
+// @assert: type-spread Final BaseC
+
+type BaseA {
+  a string
+}
+
+type BaseB {
+  ...BaseA
+  b string
+}
+
+type BaseC {
+  ...BaseB
+  c string
+}
+
+type Final {
+  ...BaseC
+  d string
+}

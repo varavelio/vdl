@@ -1,0 +1,13 @@
+// @expect-no-errors
+// @assert: has-type Envelope
+
+type Audit {
+  createdAt datetime
+}
+
+type Envelope {
+  payload {
+    ...Audit
+    data string
+  }
+}

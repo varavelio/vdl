@@ -1,0 +1,7 @@
+// @expect: E001
+
+include "./does_not_exist.vdl"
+
+type User {
+  id string
+}

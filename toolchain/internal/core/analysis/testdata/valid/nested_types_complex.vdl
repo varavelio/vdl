@@ -1,0 +1,11 @@
+// @expect-no-errors
+// @assert: has-type Project
+
+type Project {
+  id string
+  members {
+    name string
+    role string
+  }[]
+  labels map[string]
+}

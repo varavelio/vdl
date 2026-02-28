@@ -1,0 +1,8 @@
+// @expect: E202
+
+type Envelope {
+  payload {
+    ...MissingBase
+    value string
+  }
+}

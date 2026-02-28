@@ -1,3 +1,6 @@
+// @expect: E003
+// @assert: diagnostic-message-contains E003 nonexistent.md
+
 """ ./docs/nonexistent.md """
 
 type User {

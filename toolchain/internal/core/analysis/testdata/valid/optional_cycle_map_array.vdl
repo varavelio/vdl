@@ -1,0 +1,9 @@
+// @expect-no-errors
+// @assert: has-type Node
+
+type Node {
+  id string
+  parent? Node
+  children? Node[]
+  metadata? map[Node]
+}

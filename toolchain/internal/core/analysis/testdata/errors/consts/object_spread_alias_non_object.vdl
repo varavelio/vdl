@@ -1,0 +1,9 @@
+// @expect: E206
+
+const base = 1
+const alias = base
+
+const cfg = {
+  ...alias
+  host "localhost"
+}

@@ -1,0 +1,20 @@
+// @expect-no-errors
+// @assert: has-const pointRows
+// @assert: const-kind pointRows array
+// @assert: has-const payload
+// @assert: const-kind payload object
+
+const pointRows = [
+  [
+    { x 1 y 2 tags ["a" "b"] }
+    { x 3 y 4 tags ["c" "d"] }
+  ]
+  [
+    { x 5 y 6 tags ["e" "f"] }
+    { x 7 y 8 tags ["g" "h"] }
+  ]
+]
+
+const payload = {
+  points pointRows
+}

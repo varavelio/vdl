@@ -1,0 +1,9 @@
+// @expect: E201
+
+enum Status {
+  Active
+}
+
+const bad Status = {
+  value "active"
+}

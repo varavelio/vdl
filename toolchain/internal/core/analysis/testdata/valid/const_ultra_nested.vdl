@@ -1,0 +1,55 @@
+// @expect-no-errors
+// @assert: has-const megaConfig
+// @assert: const-kind megaConfig object
+// @assert: has-const releaseSnapshots
+// @assert: const-kind releaseSnapshots array
+
+enum Region {
+  UsEast1
+  EuWest1
+  ApSouth1
+}
+
+const baseHeaders = {
+  xTrace "trace-id"
+  xEnv "prod"
+}
+
+const baseTimeouts = [250 500 1000 2000]
+
+const releaseSnapshots = [
+  {
+    name "r1"
+    enabled true
+    rollout {
+      percent 10
+      regions [Region.UsEast1 Region.EuWest1]
+    }
+  }
+  {
+    name "r2"
+    enabled false
+    rollout {
+      percent 100
+      regions [Region.UsEast1 Region.EuWest1 Region.ApSouth1]
+    }
+  }
+]
+
+const megaConfig = {
+  api {
+    version "v3"
+    headers {
+      ...baseHeaders
+      xService "gateway"
+    }
+    retries [1 2 3 4]
+    timeouts baseTimeouts
+  }
+  features {
+    auth true
+    billing true
+    ranking false
+  }
+  releases releaseSnapshots
+}

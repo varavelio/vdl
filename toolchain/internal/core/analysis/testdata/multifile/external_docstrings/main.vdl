@@ -1,3 +1,10 @@
+// @expect-no-errors
+// @assert: has-type User
+// @assert: standalone-docs 1
+// @assert: standalone-doc-contains General documentation
+// @assert: type-doc-contains User Represents a user in the system
+// @assert: field-doc-contains User id unique identifier for the user
+
 """ ./docs/api_intro.md """
 
 """ ./docs/user_type.md """

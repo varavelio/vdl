@@ -1,3 +1,9 @@
+// @expect-no-errors
+// @assert: has-type BaseEntity
+// @assert: has-type User
+// @assert: type-spread User BaseEntity
+// @assert: file-count 2
+
 include "./common.vdl"
 
 type User {

@@ -1,0 +1,8 @@
+// @expect: E002
+// @assert: has-type A
+
+include "./a.vdl"
+
+type Root {
+  id string
+}

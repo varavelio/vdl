@@ -1,6 +1,6 @@
 // @expect: E102
 
 @BadAnn
-type User {
-  id string
+enum Status {
+  Active
 }

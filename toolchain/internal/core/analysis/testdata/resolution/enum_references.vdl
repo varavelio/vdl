@@ -1,3 +1,7 @@
+// @expect-no-errors
+// @assert: has-type User
+// @assert: field-resolved-enum User status Status
+
 enum Status {
   Active
   Disabled

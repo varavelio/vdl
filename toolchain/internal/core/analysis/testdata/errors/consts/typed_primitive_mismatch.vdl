@@ -1,0 +1,7 @@
+// @expect: E201
+
+enum Flag {
+  On
+}
+
+const retries Flag = true

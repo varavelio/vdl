@@ -1,0 +1,12 @@
+// @expect: E203
+
+type BasePayload {
+  value string
+}
+
+type Envelope {
+  payload {
+    ...BasePayload
+    value int
+  }
+}

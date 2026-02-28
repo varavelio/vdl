@@ -1,0 +1,6 @@
+// @expect: E102
+
+enum Status {
+  @BadAnn
+  Active
+}

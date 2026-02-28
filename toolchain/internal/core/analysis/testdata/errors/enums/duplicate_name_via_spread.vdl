@@ -1,0 +1,10 @@
+// @expect: E304
+
+enum BaseStatus {
+  Active
+}
+
+enum Status {
+  ...BaseStatus
+  Active = "active_2"
+}
