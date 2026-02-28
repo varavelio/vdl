@@ -11,7 +11,7 @@ import (
 func TestAnalyzeWithContext(t *testing.T) {
 	t.Run("returns nil when context is already cancelled", func(t *testing.T) {
 		fs := vfs.New()
-		fs.WriteFileCache("/test.vdl", []byte(`type User { name: string }`))
+		fs.WriteFileCache("/test.vdl", []byte(`type User { name string }`))
 
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel() // Cancel immediately
@@ -23,7 +23,7 @@ func TestAnalyzeWithContext(t *testing.T) {
 
 	t.Run("completes normally with valid context", func(t *testing.T) {
 		fs := vfs.New()
-		fs.WriteFileCache("/test.vdl", []byte(`type User { name: string }`))
+		fs.WriteFileCache("/test.vdl", []byte(`type User { name string }`))
 
 		ctx := context.Background()
 		program, diagnostics := AnalyzeWithContext(ctx, fs, "/test.vdl")
@@ -35,7 +35,7 @@ func TestAnalyzeWithContext(t *testing.T) {
 
 	t.Run("Analyze uses background context internally", func(t *testing.T) {
 		fs := vfs.New()
-		fs.WriteFileCache("/test.vdl", []byte(`type User { name: string }`))
+		fs.WriteFileCache("/test.vdl", []byte(`type User { name string }`))
 
 		program, diagnostics := Analyze(fs, "/test.vdl")
 
@@ -50,7 +50,7 @@ func TestResolverWithContext(t *testing.T) {
 		fs := vfs.New()
 		fs.WriteFileCache("/main.vdl", []byte(`include "a.vdl"`))
 		fs.WriteFileCache("/a.vdl", []byte(`include "b.vdl"`))
-		fs.WriteFileCache("/b.vdl", []byte(`type B { name: string }`))
+		fs.WriteFileCache("/b.vdl", []byte(`type B { name string }`))
 
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel() // Cancel immediately
@@ -65,7 +65,7 @@ func TestResolverWithContext(t *testing.T) {
 	t.Run("resolves all files with valid context", func(t *testing.T) {
 		fs := vfs.New()
 		fs.WriteFileCache("/main.vdl", []byte(`include "a.vdl"`))
-		fs.WriteFileCache("/a.vdl", []byte(`type A { name: string }`))
+		fs.WriteFileCache("/a.vdl", []byte(`type A { name string }`))
 
 		ctx := context.Background()
 		resolver := newResolverWithContext(ctx, fs)

@@ -154,12 +154,12 @@ func (r *resolver) resolveDocstrings(schema *ast.Schema, filePath string) {
 		r.resolveDocstring(doc, filePath)
 	}
 
-	// Type docstrings and field docstrings
+	// Type docstrings and type-member docstrings
 	for _, typeDecl := range schema.GetTypes() {
 		if typeDecl.Docstring != nil {
 			r.resolveDocstring(typeDecl.Docstring, filePath)
 		}
-		r.resolveFieldDocstrings(typeDecl.Children, filePath)
+		r.resolveTypeMemberDocstrings(typeDecl.Members, filePath)
 	}
 
 	// Const docstrings
@@ -176,95 +176,25 @@ func (r *resolver) resolveDocstrings(schema *ast.Schema, filePath string) {
 		}
 	}
 
-	// Pattern docstrings
-	for _, patternDecl := range schema.GetPatterns() {
-		if patternDecl.Docstring != nil {
-			r.resolveDocstring(patternDecl.Docstring, filePath)
+	// Enum member docstrings
+	for _, enumDecl := range schema.GetEnums() {
+		for _, member := range enumDecl.Members {
+			if member.Docstring != nil {
+				r.resolveDocstring(member.Docstring, filePath)
+			}
 		}
-	}
-
-	// RPC docstrings
-	for _, rpc := range schema.GetRPCs() {
-		if rpc.Docstring != nil {
-			r.resolveDocstring(rpc.Docstring, filePath)
-		}
-		r.resolveRPCDocstrings(rpc, filePath)
 	}
 }
 
-// resolveFieldDocstrings resolves docstrings in type children (fields, comments, spreads).
-func (r *resolver) resolveFieldDocstrings(children []*ast.TypeDeclChild, filePath string) {
+// resolveTypeMemberDocstrings resolves docstrings in type members and nested inline objects.
+func (r *resolver) resolveTypeMemberDocstrings(children []*ast.TypeMember, filePath string) {
 	for _, child := range children {
 		if child.Field != nil && child.Field.Docstring != nil {
 			r.resolveDocstring(child.Field.Docstring, filePath)
 		}
 		// Recursively handle inline objects
 		if child.Field != nil && child.Field.Type.Base != nil && child.Field.Type.Base.Object != nil {
-			r.resolveFieldDocstrings(child.Field.Type.Base.Object.Children, filePath)
-		}
-	}
-}
-
-// resolveRPCDocstrings resolves docstrings within an RPC declaration.
-func (r *resolver) resolveRPCDocstrings(rpc *ast.RPCDecl, filePath string) {
-	for _, child := range rpc.Children {
-		// Standalone docstrings in RPC
-		if child.Docstring != nil {
-			r.resolveDocstring(child.Docstring, filePath)
-		}
-
-		// Proc docstrings
-		if child.Proc != nil {
-			if child.Proc.Docstring != nil {
-				r.resolveDocstring(child.Proc.Docstring, filePath)
-			}
-			r.resolveProcOrStreamDocstrings(child.Proc.Children, filePath)
-		}
-
-		// Stream docstrings
-		if child.Stream != nil {
-			if child.Stream.Docstring != nil {
-				r.resolveDocstring(child.Stream.Docstring, filePath)
-			}
-			r.resolveProcOrStreamDocstrings(child.Stream.Children, filePath)
-		}
-	}
-}
-
-// resolveProcOrStreamDocstrings resolves docstrings in proc/stream children.
-func (r *resolver) resolveProcOrStreamDocstrings(children []*ast.ProcOrStreamDeclChild, filePath string) {
-	for _, child := range children {
-		if child.Input != nil {
-			r.resolveInputOutputDocstrings(child.Input.Children, filePath)
-		}
-		if child.Output != nil {
-			r.resolveInputOutputDocstrings(child.Output.Children, filePath)
-		}
-	}
-}
-
-// resolveInputOutputDocstrings resolves docstrings in input/output block children.
-func (r *resolver) resolveInputOutputDocstrings(children []*ast.InputOutputChild, filePath string) {
-	for _, child := range children {
-		if child.Field != nil && child.Field.Docstring != nil {
-			r.resolveDocstring(child.Field.Docstring, filePath)
-		}
-		// Recursively handle inline objects in fields
-		if child.Field != nil && child.Field.Type.Base != nil && child.Field.Type.Base.Object != nil {
-			r.resolveInlineObjectDocstrings(child.Field.Type.Base.Object.Children, filePath)
-		}
-	}
-}
-
-// resolveInlineObjectDocstrings resolves docstrings in inline object children.
-func (r *resolver) resolveInlineObjectDocstrings(children []*ast.TypeDeclChild, filePath string) {
-	for _, child := range children {
-		if child.Field != nil && child.Field.Docstring != nil {
-			r.resolveDocstring(child.Field.Docstring, filePath)
-		}
-		// Recursively handle nested inline objects
-		if child.Field != nil && child.Field.Type.Base != nil && child.Field.Type.Base.Object != nil {
-			r.resolveInlineObjectDocstrings(child.Field.Type.Base.Object.Children, filePath)
+			r.resolveTypeMemberDocstrings(child.Field.Type.Base.Object.Members, filePath)
 		}
 	}
 }

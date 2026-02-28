@@ -1,39 +1,13 @@
-// Inline object types
-
-type WithInlineObject {
-  name: string
-  address: {
-    street: string
-    city: string
-    country: string
+type User {
+  id string
+  contact {
+    email string
+    phone? string
   }
-}
-
-type NestedInlineObjects {
-  data: {
-    user: {
-      profile: {
-        bio: string
-        avatar: string
-      }
-      settings: {
-        theme: string
-        notifications: bool
-      }
+  preferences {
+    notifications {
+      email bool
+      sms bool
     }
   }
-}
-
-type InlineWithOptional {
-  metadata?: {
-    createdAt: datetime
-    updatedAt?: datetime
-  }
-}
-
-type InlineArray {
-  items: {
-    id: string
-    name: string
-  }[]
 }

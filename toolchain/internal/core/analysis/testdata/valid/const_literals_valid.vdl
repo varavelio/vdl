@@ -1,0 +1,12 @@
+const baseConfig = {
+  host "localhost"
+  port 8080
+}
+
+const appConfig = {
+  ...baseConfig
+  secure true
+}
+
+const labels = ["a" "b" "c"]
+const timeoutMs = 1000

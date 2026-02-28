@@ -1,0 +1,9 @@
+enum BaseRole {
+  User
+  Editor
+}
+
+enum AllRole {
+  ...BaseRole
+  Admin
+}

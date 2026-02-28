@@ -8,37 +8,13 @@ import (
 )
 
 // validateTypes checks that all type references point to existing types.
-// This includes:
-// - Field types in type declarations
-// - Field types in inline objects
-// - Field types in input/output blocks
-// - Map value types
+// This includes field types in type declarations, inline objects, and map values.
 func validateTypes(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
 	// Check type fields
 	for _, typ := range symbols.types {
 		diagnostics = append(diagnostics, validateFieldTypes(symbols, typ.Fields, "type", typ.Name)...)
-	}
-
-	// Check RPC proc/stream fields
-	for _, rpc := range symbols.rpcs {
-		for _, proc := range rpc.Procs {
-			if proc.Input != nil {
-				diagnostics = append(diagnostics, validateFieldTypes(symbols, proc.Input.Fields, "procedure input", proc.Name)...)
-			}
-			if proc.Output != nil {
-				diagnostics = append(diagnostics, validateFieldTypes(symbols, proc.Output.Fields, "procedure output", proc.Name)...)
-			}
-		}
-		for _, stream := range rpc.Streams {
-			if stream.Input != nil {
-				diagnostics = append(diagnostics, validateFieldTypes(symbols, stream.Input.Fields, "stream input", stream.Name)...)
-			}
-			if stream.Output != nil {
-				diagnostics = append(diagnostics, validateFieldTypes(symbols, stream.Output.Fields, "stream output", stream.Name)...)
-			}
-		}
 	}
 
 	return diagnostics
@@ -157,15 +133,16 @@ func buildInlineObject(obj *ast.FieldTypeObject) *InlineObject {
 		Spreads: []*SpreadRef{},
 	}
 
-	for _, child := range obj.Children {
+	for _, child := range obj.Members {
 		if child.Field != nil {
 			inline.Fields = append(inline.Fields, buildFieldSymbol(child.Field, ""))
 		}
 		if child.Spread != nil {
 			inline.Spreads = append(inline.Spreads, &SpreadRef{
-				TypeName: child.Spread.TypeName,
-				Pos:      child.Spread.Pos,
-				EndPos:   child.Spread.EndPos,
+				Name:   child.Spread.Ref.Name,
+				Member: child.Spread.Ref.Member,
+				Pos:    child.Spread.Pos,
+				EndPos: child.Spread.EndPos,
 			})
 		}
 	}
@@ -183,11 +160,12 @@ func buildFieldSymbol(field *ast.Field, file string) *FieldSymbol {
 
 	return &FieldSymbol{
 		Symbol: Symbol{
-			Name:      string(field.Name),
-			File:      file,
-			Pos:       field.Pos,
-			EndPos:    field.EndPos,
-			Docstring: docstring,
+			Name:        string(field.Name),
+			File:        file,
+			Pos:         field.Pos,
+			EndPos:      field.EndPos,
+			Docstring:   docstring,
+			Annotations: buildAnnotationRefs(field.Annotations),
 		},
 		AST:      field,
 		Optional: field.Optional,

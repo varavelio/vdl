@@ -1,4 +1,0 @@
-// @expect: E804
-
-pattern UserEvent = "users.{id}"
-pattern UserEvent = "events.{id}"

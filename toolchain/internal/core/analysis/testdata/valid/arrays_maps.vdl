@@ -1,36 +1,10 @@
-// Arrays and maps of various depths
-
-type SimpleArrays {
-  strings: string[]
-  ints: int[]
-  floats: float[]
-  bools: bool[]
-  dates: datetime[]
+type Profile {
+  id string
 }
 
-type NestedArrays {
-  matrix: int[][]
-  cube: string[][][]
-}
-
-type SimpleMaps {
-  stringMap: map<string>
-  intMap: map<int>
-  floatMap: map<float>
-  boolMap: map<bool>
-}
-
-type NestedMaps {
-  mapOfMaps: map<map<string>>
-  mapOfArrays: map<string[]>
-}
-
-type CustomTypeMaps {
-  users: map<User>
-  userLists: map<User[]>
-}
-
-type User {
-  id: string
-  name: string
+type Metrics {
+  ids string[]
+  matrix int[][]
+  flags map[bool]
+  usersById map[Profile]
 }

@@ -1,6 +1,5 @@
 // @expect: E202
 
 type User {
-  ...UndefinedBase
-  name: string
+  ...BaseUser
 }

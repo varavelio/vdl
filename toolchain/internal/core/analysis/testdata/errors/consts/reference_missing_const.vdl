@@ -1,0 +1,3 @@
+// @expect: E205
+
+const timeout = baseTimeout

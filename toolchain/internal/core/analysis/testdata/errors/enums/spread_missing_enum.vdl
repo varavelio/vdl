@@ -1,0 +1,6 @@
+// @expect: E202
+
+enum Role {
+  ...BaseRole
+  Admin
+}

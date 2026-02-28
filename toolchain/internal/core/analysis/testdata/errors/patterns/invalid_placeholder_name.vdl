@@ -1,3 +1,0 @@
-// @expect: E402
-
-pattern Invalid = "events.{123invalid}"

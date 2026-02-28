@@ -1,0 +1,6 @@
+// @expect: E102
+
+@Bad_Annotation
+type User {
+  id string
+}

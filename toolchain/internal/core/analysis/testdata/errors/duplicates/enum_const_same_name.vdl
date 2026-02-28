@@ -1,0 +1,7 @@
+// @expect: E804
+
+enum Limit {
+  Low
+}
+
+const Limit = 10

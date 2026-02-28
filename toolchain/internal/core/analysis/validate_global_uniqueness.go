@@ -8,15 +8,13 @@ import (
 
 // symbolOrigin tracks where a name was first declared for collision detection.
 type symbolOrigin struct {
-	kind   string       // "type", "enum", "pattern", "rpc"
+	kind   string
 	file   string       // File where declared
 	pos    ast.Position // Position of declaration
 	endPos ast.Position
 }
 
-// validateGlobalUniqueness checks that names are unique across all PascalCase categories.
-// Types, Enums, Patterns, and RPCs all share the same namespace since they use PascalCase.
-// Constants use UPPER_SNAKE_CASE and are excluded from this check.
+// validateGlobalUniqueness checks that names are unique across declarations.
 func validateGlobalUniqueness(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
@@ -63,39 +61,19 @@ func validateGlobalUniqueness(symbols *symbolTable) []Diagnostic {
 		}
 	}
 
-	// Register all patterns
-	for name, sym := range symbols.patterns {
+	// Register all constants
+	for name, sym := range symbols.consts {
 		if orig, exists := seen[name]; exists {
 			diagnostics = append(diagnostics, newDiagnostic(
 				sym.File,
 				sym.Pos,
 				sym.EndPos,
 				CodeDuplicateName,
-				formatNameCollision("pattern", name, orig.kind, orig.file, orig.pos),
+				formatNameCollision("constant", name, orig.kind, orig.file, orig.pos),
 			))
 		} else {
 			seen[name] = symbolOrigin{
-				kind:   "pattern",
-				file:   sym.File,
-				pos:    sym.Pos,
-				endPos: sym.EndPos,
-			}
-		}
-	}
-
-	// Register all RPCs
-	for name, sym := range symbols.rpcs {
-		if orig, exists := seen[name]; exists {
-			diagnostics = append(diagnostics, newDiagnostic(
-				sym.File,
-				sym.Pos,
-				sym.EndPos,
-				CodeDuplicateName,
-				formatNameCollision("rpc", name, orig.kind, orig.file, orig.pos),
-			))
-		} else {
-			seen[name] = symbolOrigin{
-				kind:   "rpc",
+				kind:   "constant",
 				file:   sym.File,
 				pos:    sym.Pos,
 				endPos: sym.EndPos,

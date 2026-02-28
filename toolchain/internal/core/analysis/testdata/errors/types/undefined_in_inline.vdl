@@ -1,7 +1,7 @@
 // @expect: E201
 
-type User {
-  data: {
-    profile: Profile
+type Envelope {
+  payload {
+    item MissingType
   }
 }

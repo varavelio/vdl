@@ -1,11 +1,10 @@
 // @expect: E203
 
 type Base {
-  id: string
-  name: string
+  id string
 }
 
 type User {
   ...Base
-  name: string
+  id string
 }

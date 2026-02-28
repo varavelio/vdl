@@ -1,8 +1,0 @@
-// @expect: E601
-// Arrays do NOT break type cycles - circular references are always forbidden
-// (unless the field is optional)
-
-type TreeNode {
-  value: string
-  children: TreeNode[]
-}

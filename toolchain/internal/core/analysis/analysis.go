@@ -22,8 +22,8 @@
 // The analysis process consists of four phases:
 //
 //  1. Resolution: Parse entry point, resolve includes recursively, resolve external docstrings
-//  2. Symbol Collection: Collect all types, enums, constants, patterns, RPCs into a symbol table
-//  3. Validation: Run all semantic validators (naming, types, spreads, enums, patterns, etc.)
+//  2. Symbol Collection: Collect all declarations into a symbol table
+//  3. Validation: Run semantic validators (naming, types, spreads, enums, const literals, etc.)
 //  4. Result: Return Program (best-effort) along with all diagnostics
 //
 // # Error Handling (Best-Effort Strategy)

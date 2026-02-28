@@ -1,0 +1,7 @@
+// @expect: E305
+
+enum Status {
+  Active
+}
+
+const defaultStatus = Status.Disabled

@@ -1,7 +1,5 @@
-// fmt:off
-// @expect: E104
+// @expect: E103
 
 enum Status {
-	active
-	inactive
+  active
 }

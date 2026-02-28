@@ -1,6 +1,5 @@
-// fmt:off
 // @expect: E101
 
-type lowercase {
-	id: string
+type user {
+  id string
 }

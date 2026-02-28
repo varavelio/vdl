@@ -1,6 +1,6 @@
 // @expect: E303
 
-enum Status {
-  Active = "active"
-  Pending = "active"
+enum HttpMethod {
+  Get = "GET"
+  Read = "GET"
 }

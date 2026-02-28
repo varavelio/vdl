@@ -1,17 +1,9 @@
-// All primitive types
-
-type AllPrimitives {
-  stringField: string
-  intField: int
-  floatField: float
-  boolField: bool
-  datetimeField: datetime
+type PrimitiveSet {
+  name string
+  count int
+  ratio float
+  active bool
+  createdAt datetime
 }
 
-type OptionalPrimitives {
-  stringField?: string
-  intField?: int
-  floatField?: float
-  boolField?: bool
-  datetimeField?: datetime
-}
+const maxRetries = 3

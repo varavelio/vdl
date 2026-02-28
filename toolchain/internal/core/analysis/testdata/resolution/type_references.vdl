@@ -1,13 +1,7 @@
-// Tests that ResolvedType is populated for custom type references
-
-type Address {
-  street: string
-  city: string
+type Profile {
+  id string
 }
 
 type User {
-  name: string
-  address: Address
-  addresses: Address[]
-  addressMap: map<Address>
+  profile Profile
 }

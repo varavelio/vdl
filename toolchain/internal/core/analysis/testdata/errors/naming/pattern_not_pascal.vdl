@@ -1,4 +1,0 @@
-// fmt:off
-// @expect: E101
-
-pattern lowercase = "events.{id}"

@@ -1,0 +1,6 @@
+const envs = ["dev" "staging" "prod"]
+const config = {
+  enabled true
+  retries 3
+  environments envs
+}

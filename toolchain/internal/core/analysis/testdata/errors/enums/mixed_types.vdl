@@ -1,0 +1,6 @@
+// @expect: E301
+
+enum Priority {
+  Low = 1
+  High = "HIGH"
+}

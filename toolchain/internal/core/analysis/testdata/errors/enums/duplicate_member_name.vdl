@@ -3,5 +3,4 @@
 enum Status {
   Active
   Active
-  Pending
 }

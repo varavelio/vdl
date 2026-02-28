@@ -1,7 +1,0 @@
-// @expect: E703
-
-type User {
-  id: string
-  name: string
-  id: int
-}

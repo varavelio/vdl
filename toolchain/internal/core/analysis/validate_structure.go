@@ -7,90 +7,22 @@ import (
 )
 
 // validateStructure validates structural requirements:
-// - Procedures and streams have at most one input block
-// - Procedures and streams have at most one output block
 // - Field names are unique within a type/block
-func validateStructure(symbols *symbolTable, files map[string]*File) []Diagnostic {
+// - Object literal keys are unique within each object literal
+func validateStructure(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
 	// Validate type field uniqueness
 	for _, typ := range symbols.types {
 		diagnostics = append(diagnostics, validateFieldUniqueness(typ.Fields, "type", typ.Name, typ.File)...)
-	}
-
-	// Validate proc/stream structure from AST (to check for multiple input/output blocks)
-	for _, file := range files {
-		for _, rpc := range file.AST.GetRPCs() {
-			for _, proc := range rpc.GetProcs() {
-				diagnostics = append(diagnostics, validateProcStreamStructure(proc.Children, "procedure", proc.Name, file.Path)...)
-			}
-			for _, stream := range rpc.GetStreams() {
-				diagnostics = append(diagnostics, validateProcStreamStructure(stream.Children, "stream", stream.Name, file.Path)...)
-			}
+		for _, field := range typ.Fields {
+			diagnostics = append(diagnostics, validateInlineFieldUniqueness(field.Type, typ.File, field.Name)...)
 		}
 	}
 
-	// Validate proc/stream field uniqueness from symbols
-	for _, rpc := range symbols.rpcs {
-		for _, proc := range rpc.Procs {
-			if proc.Input != nil {
-				diagnostics = append(diagnostics, validateFieldUniqueness(proc.Input.Fields, "input of procedure", proc.Name, proc.File)...)
-			}
-			if proc.Output != nil {
-				diagnostics = append(diagnostics, validateFieldUniqueness(proc.Output.Fields, "output of procedure", proc.Name, proc.File)...)
-			}
-		}
-		for _, stream := range rpc.Streams {
-			if stream.Input != nil {
-				diagnostics = append(diagnostics, validateFieldUniqueness(stream.Input.Fields, "input of stream", stream.Name, stream.File)...)
-			}
-			if stream.Output != nil {
-				diagnostics = append(diagnostics, validateFieldUniqueness(stream.Output.Fields, "output of stream", stream.Name, stream.File)...)
-			}
-		}
-	}
-
-	return diagnostics
-}
-
-// validateProcStreamStructure validates that a proc/stream has at most one input and one output block.
-func validateProcStreamStructure(children []*ast.ProcOrStreamDeclChild, kind, name, file string) []Diagnostic {
-	var diagnostics []Diagnostic
-
-	inputCount := 0
-	outputCount := 0
-	var firstInputPos, firstOutputPos ast.Position
-
-	for _, child := range children {
-		if child.Input != nil {
-			inputCount++
-			if inputCount == 1 {
-				firstInputPos = child.Input.Pos
-			} else {
-				diagnostics = append(diagnostics, newDiagnostic(
-					file,
-					child.Input.Pos,
-					child.Input.EndPos,
-					CodeMultipleInputBlocks,
-					fmt.Sprintf("%s %q cannot have more than one input block (first at line %d)",
-						kind, name, firstInputPos.Line),
-				))
-			}
-		}
-		if child.Output != nil {
-			outputCount++
-			if outputCount == 1 {
-				firstOutputPos = child.Output.Pos
-			} else {
-				diagnostics = append(diagnostics, newDiagnostic(
-					file,
-					child.Output.Pos,
-					child.Output.EndPos,
-					CodeMultipleOutputBlocks,
-					fmt.Sprintf("%s %q cannot have more than one output block (first at line %d)",
-						kind, name, firstOutputPos.Line),
-				))
-			}
+	for _, cnst := range symbols.consts {
+		if cnst.AST != nil && cnst.AST.Value != nil {
+			diagnostics = append(diagnostics, validateObjectLiteralUniqueness(cnst.AST.Value, cnst.File)...)
 		}
 	}
 
@@ -124,6 +56,65 @@ func validateFieldUniqueness(fields []*FieldSymbol, context, parentName, file st
 				field.Name,
 				file,
 			)...)
+		}
+	}
+
+	return diagnostics
+}
+
+func validateInlineFieldUniqueness(typeInfo *FieldTypeInfo, file, owner string) []Diagnostic {
+	if typeInfo == nil {
+		return nil
+	}
+
+	var diagnostics []Diagnostic
+	switch typeInfo.Kind {
+	case FieldTypeKindMap:
+		return validateInlineFieldUniqueness(typeInfo.MapValue, file, owner)
+	case FieldTypeKindObject:
+		if typeInfo.ObjectDef == nil {
+			return nil
+		}
+		diagnostics = append(diagnostics, validateFieldUniqueness(typeInfo.ObjectDef.Fields, "inline object in", owner, file)...)
+		for _, f := range typeInfo.ObjectDef.Fields {
+			diagnostics = append(diagnostics, validateInlineFieldUniqueness(f.Type, file, f.Name)...)
+		}
+	}
+
+	return diagnostics
+}
+
+func validateObjectLiteralUniqueness(lit *ast.DataLiteral, file string) []Diagnostic {
+	if lit == nil {
+		return nil
+	}
+
+	var diagnostics []Diagnostic
+	if lit.Object != nil {
+		seen := map[string]ast.Position{}
+		for _, entry := range lit.Object.Entries {
+			if entry.Spread != nil {
+				diagnostics = append(diagnostics, validateObjectLiteralUniqueness(entry.Value, file)...)
+				continue
+			}
+			if existing, ok := seen[entry.Key]; ok {
+				diagnostics = append(diagnostics, newDiagnostic(
+					file,
+					entry.Pos,
+					entry.EndPos,
+					CodeDuplicateField,
+					fmt.Sprintf("object key %q is already declared at line %d", entry.Key, existing.Line),
+				))
+			} else {
+				seen[entry.Key] = entry.Pos
+			}
+			diagnostics = append(diagnostics, validateObjectLiteralUniqueness(entry.Value, file)...)
+		}
+	}
+
+	if lit.Array != nil {
+		for _, elem := range lit.Array.Elements {
+			diagnostics = append(diagnostics, validateObjectLiteralUniqueness(elem, file)...)
 		}
 	}
 

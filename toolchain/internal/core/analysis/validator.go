@@ -78,21 +78,6 @@ func (v *validator) collectFromSchema(schema *ast.Schema, file string) {
 			v.diagnostics = append(v.diagnostics, *diag)
 		}
 	}
-
-	// Collect patterns
-	for _, patternDecl := range schema.GetPatterns() {
-		sym := buildPatternSymbol(patternDecl, file)
-		if diag := v.symbols.registerPattern(sym); diag != nil {
-			v.diagnostics = append(v.diagnostics, *diag)
-		}
-	}
-
-	// Collect RPCs (these are merged, not duplicate-checked at schema level)
-	for _, rpcDecl := range schema.GetRPCs() {
-		sym, rpcDiags := buildRPCSymbol(rpcDecl, file)
-		v.diagnostics = append(v.diagnostics, rpcDiags...)
-		v.symbols.registerRPC(sym)
-	}
 }
 
 // buildTypeSymbol creates a TypeSymbol from an AST TypeDecl.
@@ -103,39 +88,31 @@ func (v *validator) buildTypeSymbol(decl *ast.TypeDecl, file string) *TypeSymbol
 		docstring = &s
 	}
 
-	var deprecated *DeprecationInfo
-	if decl.Deprecated != nil {
-		msg := ""
-		if decl.Deprecated.Message != nil {
-			msg = string(*decl.Deprecated.Message)
-		}
-		deprecated = &DeprecationInfo{Message: msg}
-	}
-
 	typ := &TypeSymbol{
 		Symbol: Symbol{
-			Name:       decl.Name,
-			File:       file,
-			Pos:        decl.Pos,
-			EndPos:     decl.EndPos,
-			Docstring:  docstring,
-			Deprecated: deprecated,
+			Name:        decl.Name,
+			File:        file,
+			Pos:         decl.Pos,
+			EndPos:      decl.EndPos,
+			Docstring:   docstring,
+			Annotations: buildAnnotationRefs(decl.Annotations),
 		},
 		AST:     decl,
 		Fields:  []*FieldSymbol{},
 		Spreads: []*SpreadRef{},
 	}
 
-	// Process children
-	for _, child := range decl.Children {
+	// Process members
+	for _, child := range decl.Members {
 		if child.Field != nil {
 			typ.Fields = append(typ.Fields, buildFieldSymbol(child.Field, file))
 		}
 		if child.Spread != nil {
 			typ.Spreads = append(typ.Spreads, &SpreadRef{
-				TypeName: child.Spread.TypeName,
-				Pos:      child.Spread.Pos,
-				EndPos:   child.Spread.EndPos,
+				Name:   child.Spread.Ref.Name,
+				Member: child.Spread.Ref.Member,
+				Pos:    child.Spread.Pos,
+				EndPos: child.Spread.EndPos,
 			})
 		}
 	}
@@ -151,45 +128,47 @@ func (v *validator) buildConstSymbol(decl *ast.ConstDecl, file string) *ConstSym
 		docstring = &s
 	}
 
-	var deprecated *DeprecationInfo
-	if decl.Deprecated != nil {
-		msg := ""
-		if decl.Deprecated.Message != nil {
-			msg = string(*decl.Deprecated.Message)
-		}
-		deprecated = &DeprecationInfo{Message: msg}
-	}
-
 	cnst := &ConstSymbol{
 		Symbol: Symbol{
-			Name:       decl.Name,
-			File:       file,
-			Pos:        decl.Pos,
-			EndPos:     decl.EndPos,
-			Docstring:  docstring,
-			Deprecated: deprecated,
+			Name:        decl.Name,
+			File:        file,
+			Pos:         decl.Pos,
+			EndPos:      decl.EndPos,
+			Docstring:   docstring,
+			Annotations: buildAnnotationRefs(decl.Annotations),
 		},
-		AST: decl,
+		AST:              decl,
+		ExplicitTypeName: decl.TypeName,
+		ValueType:        ConstValueTypeUnknown,
 	}
 
-	// Determine value type and value
-	if decl.Value != nil {
-		if decl.Value.Str != nil {
+	if decl.Value != nil && decl.Value.Scalar != nil {
+		s := decl.Value.Scalar
+		switch {
+		case s.Str != nil:
 			cnst.ValueType = ConstValueTypeString
-			cnst.Value = string(*decl.Value.Str)
-		} else if decl.Value.Int != nil {
+			cnst.Value = string(*s.Str)
+		case s.Int != nil:
 			cnst.ValueType = ConstValueTypeInt
-			cnst.Value = *decl.Value.Int
-		} else if decl.Value.Float != nil {
+			cnst.Value = *s.Int
+		case s.Float != nil:
 			cnst.ValueType = ConstValueTypeFloat
-			cnst.Value = *decl.Value.Float
-		} else if decl.Value.True {
+			cnst.Value = *s.Float
+		case s.True || s.False:
 			cnst.ValueType = ConstValueTypeBool
-			cnst.Value = "true"
-		} else if decl.Value.False {
-			cnst.ValueType = ConstValueTypeBool
-			cnst.Value = "false"
+			if s.True {
+				cnst.Value = "true"
+			} else {
+				cnst.Value = "false"
+			}
+		case s.Ref != nil:
+			cnst.ValueType = ConstValueTypeReference
+			cnst.Value = s.Ref.String()
 		}
+	} else if decl.Value != nil && decl.Value.Object != nil {
+		cnst.ValueType = ConstValueTypeObject
+	} else if decl.Value != nil && decl.Value.Array != nil {
+		cnst.ValueType = ConstValueTypeArray
 	}
 
 	return cnst
@@ -204,14 +183,12 @@ func (v *validator) validate() []Diagnostic {
 	validators := []func(*symbolTable) []Diagnostic{
 		validateNaming,
 		validateTypes,
+		validateConsts,
 		validateSpreads,
 		validateEnums,
-		validatePatterns,
-		validateRPCs,
 		validateCycles,
-		func(s *symbolTable) []Diagnostic { return validateStructure(s, v.files) },
+		validateStructure,
 		validateGlobalUniqueness,
-		validateCollisions,
 	}
 
 	// Run validators with cancellation checks between each
@@ -223,6 +200,22 @@ func (v *validator) validate() []Diagnostic {
 	}
 
 	return diagnostics
+}
+
+func buildAnnotationRefs(annotations []*ast.Annotation) []*AnnotationRef {
+	if len(annotations) == 0 {
+		return nil
+	}
+	refs := make([]*AnnotationRef, 0, len(annotations))
+	for _, ann := range annotations {
+		refs = append(refs, &AnnotationRef{
+			Name:     ann.Name,
+			Argument: ann.Argument,
+			Pos:      ann.Pos,
+			EndPos:   ann.EndPos,
+		})
+	}
+	return refs
 }
 
 // buildProgram creates the final Program from collected symbols.

@@ -1,49 +1,8 @@
-// Optional fields break circular type dependencies.
-// When at least one field in the cycle is optional, the cycle is valid.
-
-// Self-referencing type with optional field
 type Node {
-  value: string
-  child?: Node
+  id string
+  parent? Node
 }
 
-// Self-referencing with optional array
-type TreeNode {
-  value: string
-  children?: TreeNode[]
-}
-
-// Indirect cycle with optional field
-type A {
-  b: B
-}
-
-type B {
-  c: C
-}
-
-type C {
-  a?: A
-}
-
-// Cycle through map with optional
-type GraphNode {
-  name: string
-  edges?: map<GraphNode>
-}
-
-// Double optional cycle
-type Parent {
-  children?: Child[]
-}
-
-type Child {
-  parent?: Parent
-}
-
-// Cycle in inline object with optional
-type Container {
-  item?: {
-    nested?: Container
-  }
+type Tree {
+  roots? Node[]
 }

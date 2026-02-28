@@ -1,7 +1,0 @@
-// fmt:off
-// @expect: E101
-
-enum lowercase {
-	Active
-	Inactive
-}

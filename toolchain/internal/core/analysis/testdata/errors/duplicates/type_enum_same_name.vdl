@@ -1,11 +1,9 @@
-// @expect: E805
-// Type and enum share the same name
+// @expect: E804
 
-type User {
-  id: string
+type Status {
+  id string
 }
 
-enum User {
+enum Status {
   Active
-  Inactive
 }

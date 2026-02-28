@@ -1,1 +1,1 @@
-The unique identifier for the user (UUID format).
+The unique identifier for the user.

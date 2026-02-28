@@ -18,8 +18,6 @@ type Program struct {
 	Types          map[string]*TypeSymbol
 	Enums          map[string]*EnumSymbol
 	Consts         map[string]*ConstSymbol
-	Patterns       map[string]*PatternSymbol
-	RPCs           map[string]*RPCSymbol
 	StandaloneDocs []*DocSymbol
 }
 
@@ -33,17 +31,20 @@ type File struct {
 // Symbol contains common metadata for all symbol types.
 // It provides origin information for LSP features.
 type Symbol struct {
-	Name       string           // The symbol's identifier
-	File       string           // File where the symbol was declared
-	Pos        ast.Position     // Start position of the declaration
-	EndPos     ast.Position     // End position of the declaration
-	Docstring  *string          // Resolved docstring content (nil if none)
-	Deprecated *DeprecationInfo // Deprecation info (nil if not deprecated)
+	Name        string       // The symbol's identifier
+	File        string       // File where the symbol was declared
+	Pos         ast.Position // Start position of the declaration
+	EndPos      ast.Position // End position of the declaration
+	Docstring   *string      // Resolved docstring content (nil if none)
+	Annotations []*AnnotationRef
 }
 
-// DeprecationInfo contains information about a deprecated symbol.
-type DeprecationInfo struct {
-	Message string // Optional deprecation message
+// AnnotationRef represents an annotation attached to a symbol.
+type AnnotationRef struct {
+	Name     string
+	Argument *ast.DataLiteral
+	Pos      ast.Position
+	EndPos   ast.Position
 }
 
 // TypeSymbol represents a type declaration in the global namespace.
@@ -89,9 +90,10 @@ const (
 
 // SpreadRef represents a reference to a type via the spread operator.
 type SpreadRef struct {
-	TypeName string       // The name of the type being spread
-	Pos      ast.Position // Position of the spread in source
-	EndPos   ast.Position
+	Name   string       // Name part of the spread reference
+	Member *string      // Optional member part (invalid for spread semantics)
+	Pos    ast.Position // Position of the spread in source
+	EndPos ast.Position
 }
 
 // InlineObject represents an inline object type definition.
@@ -106,6 +108,7 @@ type EnumSymbol struct {
 	AST       *ast.EnumDecl       // Original AST node
 	ValueType EnumValueType       // Whether this is a string or int enum
 	Members   []*EnumMemberSymbol // Enum members
+	Spreads   []*SpreadRef        // Enum spreads
 }
 
 // EnumValueType indicates whether an enum uses string or integer values.
@@ -118,9 +121,7 @@ const (
 
 // EnumMemberSymbol represents a member of an enum.
 type EnumMemberSymbol struct {
-	Name        string       // Member name
-	Pos         ast.Position // Position in source
-	EndPos      ast.Position
+	Symbol
 	Value       string // String representation of the value
 	HasExplicit bool   // Whether value was explicitly set
 }
@@ -128,9 +129,10 @@ type EnumMemberSymbol struct {
 // ConstSymbol represents a constant declaration in the global namespace.
 type ConstSymbol struct {
 	Symbol
-	AST       *ast.ConstDecl // Original AST node
-	ValueType ConstValueType // The type of the constant value
-	Value     string         // String representation of the value
+	AST              *ast.ConstDecl // Original AST node
+	ExplicitTypeName *string
+	ValueType        ConstValueType // Inferred top-level value type
+	Value            string         // String representation for scalar values
 }
 
 // ConstValueType indicates the type of a constant's value.
@@ -141,49 +143,11 @@ const (
 	ConstValueTypeInt
 	ConstValueTypeFloat
 	ConstValueTypeBool
+	ConstValueTypeObject
+	ConstValueTypeArray
+	ConstValueTypeReference
+	ConstValueTypeUnknown
 )
-
-// PatternSymbol represents a pattern declaration in the global namespace.
-type PatternSymbol struct {
-	Symbol
-	AST          *ast.PatternDecl // Original AST node
-	Template     string           // The template string
-	Placeholders []string         // Extracted placeholder names
-}
-
-// RPCSymbol represents an RPC service in the global namespace.
-// Multiple RPC declarations with the same name are merged into one.
-type RPCSymbol struct {
-	Symbol
-	Procs          map[string]*ProcSymbol   // Procedures in this RPC
-	Streams        map[string]*StreamSymbol // Streams in this RPC
-	DeclaredIn     []string                 // Files where this RPC was declared
-	StandaloneDocs []*DocSymbol             // Standalone docs within the RPC
-}
-
-// ProcSymbol represents a procedure within an RPC service.
-type ProcSymbol struct {
-	Symbol
-	AST    *ast.ProcDecl // Original AST node
-	Input  *BlockSymbol  // Input block (nil if not defined)
-	Output *BlockSymbol  // Output block (nil if not defined)
-}
-
-// StreamSymbol represents a stream within an RPC service.
-type StreamSymbol struct {
-	Symbol
-	AST    *ast.StreamDecl // Original AST node
-	Input  *BlockSymbol    // Input block (nil if not defined)
-	Output *BlockSymbol    // Output block (nil if not defined)
-}
-
-// BlockSymbol represents an input or output block.
-type BlockSymbol struct {
-	Pos     ast.Position // Position of the block
-	EndPos  ast.Position
-	Fields  []*FieldSymbol // Fields in the block
-	Spreads []*SpreadRef   // Spreads in the block
-}
 
 // DocSymbol represents a standalone docstring.
 type DocSymbol struct {
@@ -201,8 +165,6 @@ func newProgram(entryPoint string) *Program {
 		Types:          make(map[string]*TypeSymbol),
 		Enums:          make(map[string]*EnumSymbol),
 		Consts:         make(map[string]*ConstSymbol),
-		Patterns:       make(map[string]*PatternSymbol),
-		RPCs:           make(map[string]*RPCSymbol),
 		StandaloneDocs: []*DocSymbol{},
 	}
 }

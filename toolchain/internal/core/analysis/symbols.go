@@ -10,20 +10,17 @@ import (
 // It tracks all declarations and their origins for building the final Program.
 type symbolTable struct {
 	// All collected symbols
-	types    map[string]*TypeSymbol
-	enums    map[string]*EnumSymbol
-	consts   map[string]*ConstSymbol
-	patterns map[string]*PatternSymbol
-	rpcs     map[string]*RPCSymbol
+	types  map[string]*TypeSymbol
+	enums  map[string]*EnumSymbol
+	consts map[string]*ConstSymbol
 
 	// Standalone docstrings at the schema level
 	standaloneDocs []*DocSymbol
 
 	// Track where each symbol was first declared (for duplicate detection)
-	typeOrigins    map[string]ast.Position
-	enumOrigins    map[string]ast.Position
-	constOrigins   map[string]ast.Position
-	patternOrigins map[string]ast.Position
+	typeOrigins  map[string]ast.Position
+	enumOrigins  map[string]ast.Position
+	constOrigins map[string]ast.Position
 }
 
 // newSymbolTable creates a new empty symbol table.
@@ -32,13 +29,10 @@ func newSymbolTable() *symbolTable {
 		types:          make(map[string]*TypeSymbol),
 		enums:          make(map[string]*EnumSymbol),
 		consts:         make(map[string]*ConstSymbol),
-		patterns:       make(map[string]*PatternSymbol),
-		rpcs:           make(map[string]*RPCSymbol),
 		standaloneDocs: []*DocSymbol{},
 		typeOrigins:    make(map[string]ast.Position),
 		enumOrigins:    make(map[string]ast.Position),
 		constOrigins:   make(map[string]ast.Position),
-		patternOrigins: make(map[string]ast.Position),
 	}
 }
 
@@ -96,45 +90,6 @@ func (st *symbolTable) registerConst(sym *ConstSymbol) *Diagnostic {
 	return nil
 }
 
-// registerPattern attempts to register a pattern symbol.
-// Returns a Diagnostic if the pattern name is already declared.
-func (st *symbolTable) registerPattern(sym *PatternSymbol) *Diagnostic {
-	if existing, ok := st.patternOrigins[sym.Name]; ok {
-		diag := newDiagnostic(
-			sym.File,
-			sym.Pos,
-			sym.EndPos,
-			CodeDuplicatePattern,
-			formatDuplicateError("pattern", sym.Name, existing),
-		)
-		return &diag
-	}
-	st.patterns[sym.Name] = sym
-	st.patternOrigins[sym.Name] = sym.Pos
-	return nil
-}
-
-// registerRPC registers or merges an RPC symbol.
-// RPCs with the same name are merged together.
-func (st *symbolTable) registerRPC(sym *RPCSymbol) {
-	if existing, ok := st.rpcs[sym.Name]; ok {
-		// Merge: add the new file to DeclaredIn
-		existing.DeclaredIn = append(existing.DeclaredIn, sym.DeclaredIn...)
-		// Merge procs (individual duplicates are checked later)
-		for name, proc := range sym.Procs {
-			existing.Procs[name] = proc
-		}
-		// Merge streams
-		for name, stream := range sym.Streams {
-			existing.Streams[name] = stream
-		}
-		// Merge standalone docs
-		existing.StandaloneDocs = append(existing.StandaloneDocs, sym.StandaloneDocs...)
-	} else {
-		st.rpcs[sym.Name] = sym
-	}
-}
-
 // addStandaloneDoc adds a standalone docstring to the symbol table.
 func (st *symbolTable) addStandaloneDoc(doc *DocSymbol) {
 	st.standaloneDocs = append(st.standaloneDocs, doc)
@@ -180,6 +135,20 @@ func (st *symbolTable) allFieldTypeNames() []string {
 	return names
 }
 
+// allConstNames returns a slice of all registered const names.
+func (st *symbolTable) allConstNames() []string {
+	names := make([]string, 0, len(st.consts))
+	for name := range st.consts {
+		names = append(names, name)
+	}
+	return names
+}
+
+// lookupConst returns the const symbol with the given name, or nil if not found.
+func (st *symbolTable) lookupConst(name string) *ConstSymbol {
+	return st.consts[name]
+}
+
 // buildProgram creates a Program from the collected symbols.
 func (st *symbolTable) buildProgram(entryPoint string, files map[string]*File) *Program {
 	return &Program{
@@ -188,8 +157,6 @@ func (st *symbolTable) buildProgram(entryPoint string, files map[string]*File) *
 		Types:          st.types,
 		Enums:          st.enums,
 		Consts:         st.consts,
-		Patterns:       st.patterns,
-		RPCs:           st.rpcs,
 		StandaloneDocs: st.standaloneDocs,
 	}
 }

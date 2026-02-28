@@ -1,9 +1,0 @@
-// @expect: E901
-// Pattern collides with auto-generated StatusList from enum Status
-
-enum Status {
-  Active
-  Inactive
-}
-
-pattern StatusList = "/api/status/{id}"

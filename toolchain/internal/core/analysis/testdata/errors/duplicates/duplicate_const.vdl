@@ -1,4 +1,4 @@
 // @expect: E803
 
-const MAX_SIZE = 100
-const MAX_SIZE = 200
+const maxRetries = 3
+const maxRetries = 5

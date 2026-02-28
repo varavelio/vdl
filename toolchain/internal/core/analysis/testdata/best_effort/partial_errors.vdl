@@ -1,21 +1,13 @@
-// fmt:off
 // @expect: E201
-// @expect: E103
-// Tests that valid symbols are collected even when some have errors
+// @expect: E102
 
 type ValidType {
-	id: string
-	name: string
+  id string
 }
 
 type InvalidType {
-	profile: NonExistentType
+  missing MissingType
 }
 
-const VALID_CONST = 100
-const invalidConst = 200
-
-enum ValidEnum {
-	Active
-	Inactive
-}
+const validConst = 100
+const BAD_CONST = 200

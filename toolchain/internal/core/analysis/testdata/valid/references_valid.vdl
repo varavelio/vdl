@@ -1,0 +1,7 @@
+enum Status {
+  Active
+  Disabled = "disabled"
+}
+
+const defaultStatus = Status.Active
+const fallbackStatus = defaultStatus

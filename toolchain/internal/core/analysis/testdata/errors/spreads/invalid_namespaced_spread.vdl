@@ -1,0 +1,9 @@
+// @expect: E202
+
+type Base {
+  id string
+}
+
+type User {
+  ...auth.Base
+}

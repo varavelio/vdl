@@ -1,0 +1,8 @@
+// @expect: E701
+
+type Envelope {
+  payload {
+    value string
+    value string
+  }
+}

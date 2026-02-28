@@ -1,1 +1,1 @@
-Represents a user in the system with authentication capabilities.
+Represents a user in the system.

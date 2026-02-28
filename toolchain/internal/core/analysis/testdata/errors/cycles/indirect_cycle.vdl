@@ -1,13 +1,13 @@
 // @expect: E601
 
 type A {
-  b: B
+  b B
 }
 
 type B {
-  c: C
+  c C
 }
 
 type C {
-  a: A
+  a A
 }

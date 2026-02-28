@@ -5,5 +5,5 @@ enum Status {
 }
 
 enum Status {
-  Pending
+  Disabled
 }

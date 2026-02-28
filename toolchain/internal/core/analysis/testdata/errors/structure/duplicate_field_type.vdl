@@ -1,0 +1,6 @@
+// @expect: E701
+
+type User {
+  id string
+  id string
+}

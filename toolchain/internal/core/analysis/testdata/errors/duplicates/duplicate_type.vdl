@@ -1,9 +1,9 @@
 // @expect: E801
 
 type User {
-  id: string
+  id string
 }
 
 type User {
-  name: string
+  email string
 }

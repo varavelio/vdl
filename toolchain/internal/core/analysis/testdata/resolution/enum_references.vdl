@@ -1,12 +1,8 @@
-// Tests that ResolvedEnum is populated for enum references
-
 enum Status {
   Active
-  Inactive
+  Disabled
 }
 
 type User {
-  name: string
-  status: Status
-  statuses: Status[]
+  status Status
 }

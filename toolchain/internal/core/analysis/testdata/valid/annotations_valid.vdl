@@ -1,0 +1,15 @@
+@entity
+@meta({ owner "core" })
+type User {
+  @id
+  id string
+}
+
+@config
+const maxPageSize = 100
+
+enum Status {
+  @deprecated("Use Disabled")
+  Inactive
+  Active
+}

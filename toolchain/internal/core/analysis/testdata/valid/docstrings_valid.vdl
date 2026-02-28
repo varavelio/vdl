@@ -1,0 +1,7 @@
+""" General documentation block """
+
+""" Represents account model """
+type Account {
+  """ unique id """
+  id string
+}

@@ -24,16 +24,18 @@ const (
 const (
 	CodeNotPascalCase       = "E101"
 	CodeNotCamelCase        = "E102"
-	CodeNotUpperSnakeCase   = "E103"
-	CodeEnumMemberNotPascal = "E104"
+	CodeEnumMemberNotPascal = "E103"
 )
 
 // Type reference errors (E20x)
 const (
-	CodeTypeNotDeclared     = "E201"
-	CodeSpreadTypeNotFound  = "E202"
-	CodeSpreadFieldConflict = "E203"
-	CodeSpreadCycle         = "E204"
+	CodeTypeNotDeclared      = "E201"
+	CodeSpreadTypeNotFound   = "E202"
+	CodeSpreadFieldConflict  = "E203"
+	CodeSpreadCycle          = "E204"
+	CodeInvalidReference     = "E205"
+	CodeConstSpreadNotObject = "E206"
+	CodeConstArrayMixedTypes = "E207"
 )
 
 // Enum errors (E30x)
@@ -42,19 +44,7 @@ const (
 	CodeEnumIntNeedsValues = "E302"
 	CodeEnumDuplicateValue = "E303"
 	CodeEnumDuplicateName  = "E304"
-)
-
-// Pattern errors (E40x)
-const (
-	CodePatternInvalidSyntax      = "E401"
-	CodePatternInvalidPlaceholder = "E402"
-)
-
-// RPC errors (E50x)
-const (
-	CodeDuplicateProc      = "E501"
-	CodeDuplicateStream    = "E502"
-	CodeProcStreamSameName = "E503"
+	CodeEnumMemberNotFound = "E305"
 )
 
 // Cycle errors (E60x)
@@ -64,23 +54,15 @@ const (
 
 // Structure errors (E70x)
 const (
-	CodeMultipleInputBlocks  = "E701"
-	CodeMultipleOutputBlocks = "E702"
-	CodeDuplicateField       = "E703"
+	CodeDuplicateField = "E701"
 )
 
 // Global uniqueness errors (E80x)
 const (
-	CodeDuplicateType    = "E801"
-	CodeDuplicateEnum    = "E802"
-	CodeDuplicateConst   = "E803"
-	CodeDuplicatePattern = "E804"
-	CodeDuplicateName    = "E805" // Cross-category name collision
-)
-
-// Synthetic name collision errors (E90x)
-const (
-	CodeSyntheticNameCollision = "E901" // User-defined name collides with auto-generated synthetic name
+	CodeDuplicateType  = "E801"
+	CodeDuplicateEnum  = "E802"
+	CodeDuplicateConst = "E803"
+	CodeDuplicateName  = "E804" // Cross-category name collision
 )
 
 // Diagnostic represents an error found during semantic analysis.

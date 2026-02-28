@@ -1,7 +1,5 @@
-// fmt:off
 // @expect: E102
 
 type User {
-	UserId: string
-	Name: string
+  UserId string
 }

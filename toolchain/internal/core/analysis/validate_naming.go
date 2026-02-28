@@ -2,14 +2,16 @@ package analysis
 
 import (
 	"fmt"
+	"slices"
 	"unicode"
 )
 
 // validateNaming checks that all identifiers follow the naming conventions:
-// - Types, Enums, RPCs, Procs, Streams, Patterns: PascalCase
+// - Types and Enums: PascalCase
 // - Fields: camelCase
-// - Constants: UPPER_SNAKE_CASE
+// - Constants: camelCase
 // - Enum members: PascalCase
+// - Annotations: camelCase
 func validateNaming(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
@@ -25,6 +27,7 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 			))
 		}
 		diagnostics = append(diagnostics, validateFieldNaming(typ.Fields, "type", typ.Name)...)
+		diagnostics = append(diagnostics, validateAnnotationNaming(typ.Annotations, typ.File, "type", typ.Name)...)
 	}
 
 	// Validate enum names and member names
@@ -48,84 +51,23 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 					fmt.Sprintf("enum member %q in enum %q must be in PascalCase", member.Name, enum.Name),
 				))
 			}
+			diagnostics = append(diagnostics, validateAnnotationNaming(member.Annotations, enum.File, "enum member", member.Name)...)
 		}
+		diagnostics = append(diagnostics, validateAnnotationNaming(enum.Annotations, enum.File, "enum", enum.Name)...)
 	}
 
 	// Validate constant names
 	for _, cnst := range symbols.consts {
-		if !isUpperSnakeCase(cnst.Name) {
+		if !isCamelCase(cnst.Name) {
 			diagnostics = append(diagnostics, newDiagnostic(
 				cnst.File,
 				cnst.Pos,
 				cnst.EndPos,
-				CodeNotUpperSnakeCase,
-				fmt.Sprintf("constant name %q must be in UPPER_SNAKE_CASE", cnst.Name),
+				CodeNotCamelCase,
+				fmt.Sprintf("constant name %q must be in camelCase", cnst.Name),
 			))
 		}
-	}
-
-	// Validate pattern names
-	for _, pattern := range symbols.patterns {
-		if !isPascalCase(pattern.Name) {
-			diagnostics = append(diagnostics, newDiagnostic(
-				pattern.File,
-				pattern.Pos,
-				pattern.EndPos,
-				CodeNotPascalCase,
-				fmt.Sprintf("pattern name %q must be in PascalCase", pattern.Name),
-			))
-		}
-	}
-
-	// Validate RPC, proc, and stream names
-	for _, rpc := range symbols.rpcs {
-		if !isPascalCase(rpc.Name) {
-			diagnostics = append(diagnostics, newDiagnostic(
-				rpc.File,
-				rpc.Pos,
-				rpc.EndPos,
-				CodeNotPascalCase,
-				fmt.Sprintf("RPC name %q must be in PascalCase", rpc.Name),
-			))
-		}
-
-		for _, proc := range rpc.Procs {
-			if !isPascalCase(proc.Name) {
-				diagnostics = append(diagnostics, newDiagnostic(
-					proc.File,
-					proc.Pos,
-					proc.EndPos,
-					CodeNotPascalCase,
-					fmt.Sprintf("procedure name %q in RPC %q must be in PascalCase", proc.Name, rpc.Name),
-				))
-			}
-			// Validate input/output fields
-			if proc.Input != nil {
-				diagnostics = append(diagnostics, validateFieldNaming(proc.Input.Fields, "procedure input", proc.Name)...)
-			}
-			if proc.Output != nil {
-				diagnostics = append(diagnostics, validateFieldNaming(proc.Output.Fields, "procedure output", proc.Name)...)
-			}
-		}
-
-		for _, stream := range rpc.Streams {
-			if !isPascalCase(stream.Name) {
-				diagnostics = append(diagnostics, newDiagnostic(
-					stream.File,
-					stream.Pos,
-					stream.EndPos,
-					CodeNotPascalCase,
-					fmt.Sprintf("stream name %q in RPC %q must be in PascalCase", stream.Name, rpc.Name),
-				))
-			}
-			// Validate input/output fields
-			if stream.Input != nil {
-				diagnostics = append(diagnostics, validateFieldNaming(stream.Input.Fields, "stream input", stream.Name)...)
-			}
-			if stream.Output != nil {
-				diagnostics = append(diagnostics, validateFieldNaming(stream.Output.Fields, "stream output", stream.Name)...)
-			}
-		}
+		diagnostics = append(diagnostics, validateAnnotationNaming(cnst.Annotations, cnst.File, "constant", cnst.Name)...)
 	}
 
 	return diagnostics
@@ -148,6 +90,23 @@ func validateFieldNaming(fields []*FieldSymbol, context, parentName string) []Di
 		if field.Type != nil && field.Type.Kind == FieldTypeKindObject && field.Type.ObjectDef != nil {
 			diagnostics = append(diagnostics, validateFieldNaming(field.Type.ObjectDef.Fields, "inline object in", field.Name)...)
 		}
+		diagnostics = append(diagnostics, validateAnnotationNaming(field.Annotations, field.File, "field", field.Name)...)
+	}
+	return diagnostics
+}
+
+func validateAnnotationNaming(annotations []*AnnotationRef, file, context, parentName string) []Diagnostic {
+	var diagnostics []Diagnostic
+	for _, ann := range annotations {
+		if !isCamelCase(ann.Name) {
+			diagnostics = append(diagnostics, newDiagnostic(
+				file,
+				ann.Pos,
+				ann.EndPos,
+				CodeNotCamelCase,
+				fmt.Sprintf("annotation %q in %s %q must be in camelCase", ann.Name, context, parentName),
+			))
+		}
 	}
 	return diagnostics
 }
@@ -166,13 +125,7 @@ func isPascalCase(s string) bool {
 	}
 
 	// No underscores allowed
-	for _, r := range runes {
-		if r == '_' {
-			return false
-		}
-	}
-
-	return true
+	return !slices.Contains(runes, '_')
 }
 
 // isCamelCase checks if a string follows camelCase convention.
@@ -189,46 +142,5 @@ func isCamelCase(s string) bool {
 	}
 
 	// No underscores allowed
-	for _, r := range runes {
-		if r == '_' {
-			return false
-		}
-	}
-
-	return true
-}
-
-// isUpperSnakeCase checks if a string follows UPPER_SNAKE_CASE convention.
-// All letters must be uppercase, words separated by underscores.
-func isUpperSnakeCase(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	runes := []rune(s)
-
-	// First character must be uppercase letter
-	if !unicode.IsUpper(runes[0]) {
-		return false
-	}
-
-	// All letters must be uppercase, only underscores and digits allowed otherwise
-	for i, r := range runes {
-		if unicode.IsLetter(r) {
-			if !unicode.IsUpper(r) {
-				return false
-			}
-		} else if r == '_' {
-			// Underscore cannot be first, last, or consecutive
-			if i == 0 || i == len(runes)-1 {
-				return false
-			}
-			if runes[i-1] == '_' {
-				return false
-			}
-		} else if !unicode.IsDigit(r) {
-			return false
-		}
-	}
-
-	return true
+	return !slices.Contains(runes, '_')
 }
