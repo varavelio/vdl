@@ -53,7 +53,7 @@ When updating this document, do so with the context of the entire document in mi
     - `vdlwasm/`: Entry point for WASM compilation (browser target).
   - `internal/`: Private library code.
     - `core/`: The Compiler Core Pipeline.
-      - `ast/`: Abstract Syntax Tree definitions. **Crucial**: The AST structure groups `proc` and `stream` definitions inside `rpc` blocks.
+      - `ast/`: Abstract Syntax Tree definitions. **Crucial**: The AST frozen core is declaration-centric (`type`, `enum`, `const`) and uses annotations (`@...`) to express domain semantics.
       - `parser/`: Lexical analysis and parsing.
       - `analysis/`: Semantic analysis and symbol resolution.
       - `ir/`: Intermediate Representation for generators.
@@ -175,7 +175,8 @@ For standard verification and formatting, use the root tasks (`task test`, `task
 - **Key Libs**: `go-arg`, `participle` (parser), `testify`, `jsonschema`.
 - **Patterns**: Standard Go project layout (`cmd`, `internal`).
 - **AST Handling**:
-  - When working with the AST, remember that `Proc` and `Stream` are children of `RPC`.
+  - The VDL core parser model is declaration-centric (`type`, `enum`, `const`) with metadata expressed via annotations (`@...`).
+  - RPC-like semantics are modeled as annotated data structures in the AST (for example `@rpc` on `type` and `@proc` on fields), not dedicated grammar keywords.
   - Use `transform` package for AST manipulations intended for display or refactoring.
 
 ### Playground
