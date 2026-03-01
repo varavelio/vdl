@@ -1,16 +1,21 @@
+type Item {
+  id string
+}
+
 type WithArrays {
-  tags: string[]
-  scores: int[]
-  matrix: float[][]
+  tags string[]
+  scores int[]
+  matrix float[][]
+  items Item[]
 }
 
 type WithMaps {
-  metadata: map<string>
-  counts: map<int>
-  nested: map<map<bool>>
+  metadata map[string]
+  counts map[int]
+  nested map[map[bool]]
 }
 
 type Combined {
-  items: map<string[]>
-  lookup: map<int>[]
+  items map[string[]]
+  lookup map[int][]
 }

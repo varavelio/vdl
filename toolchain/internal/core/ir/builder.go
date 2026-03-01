@@ -2,110 +2,109 @@ package ir
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
+	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// FromProgram builds an IR Schema from a validated analysis.Program.
-// It assumes the Program has passed through analysis.Analyze() without errors.
-// All spreads are expanded, docs are normalized, and collections are sorted.
+// FromProgram builds a flat IR schema from a validated analysis program.
 func FromProgram(program *analysis.Program) *irtypes.IrSchema {
+	resolver := newValueResolver(program)
+
 	schema := &irtypes.IrSchema{
-		Types:      make([]irtypes.TypeDef, 0, len(program.Types)),
-		Enums:      make([]irtypes.EnumDef, 0, len(program.Enums)),
-		Constants:  make([]irtypes.ConstantDef, 0, len(program.Consts)),
-		Patterns:   make([]irtypes.PatternDef, 0, len(program.Patterns)),
-		Rpcs:       make([]irtypes.RpcDef, 0, len(program.RPCs)),
-		Procedures: make([]irtypes.ProcedureDef, 0),
-		Streams:    make([]irtypes.StreamDef, 0),
-		Docs:       make([]irtypes.DocDef, 0, len(program.StandaloneDocs)),
+		Types:     make([]irtypes.TypeDef, 0, len(program.Types)),
+		Enums:     make([]irtypes.EnumDef, 0, len(program.Enums)),
+		Constants: make([]irtypes.ConstantDef, 0, len(program.Consts)),
+		Docs:      make([]irtypes.DocDef, 0, len(program.StandaloneDocs)),
 	}
 
-	// Convert types
 	for _, typ := range program.Types {
-		schema.Types = append(schema.Types, convertType(typ, program.Types, program.Enums))
+		schema.Types = append(schema.Types, convertType(typ, program.Types, program.Enums, resolver))
 	}
-	sortTypes(schema.Types)
-
-	// Convert enums
 	for _, enum := range program.Enums {
-		schema.Enums = append(schema.Enums, convertEnum(enum))
+		schema.Enums = append(schema.Enums, convertEnum(enum, program.Enums, resolver))
 	}
-	sortEnums(schema.Enums)
-
-	// Convert constants
 	for _, cnst := range program.Consts {
-		schema.Constants = append(schema.Constants, convertConstant(cnst))
+		schema.Constants = append(schema.Constants, convertConstant(cnst, program, resolver))
 	}
-	sortConstants(schema.Constants)
-
-	// Convert patterns
-	for _, pattern := range program.Patterns {
-		schema.Patterns = append(schema.Patterns, convertPattern(pattern))
-	}
-	sortPatterns(schema.Patterns)
-
-	// Convert services (RPCs) - now we flatten procs/streams separately
-	for _, rpc := range program.RPCs {
-		// Add RPC definition
-		schema.Rpcs = append(schema.Rpcs, convertRPCDef(rpc))
-
-		// Add procedures
-		for _, proc := range rpc.Procs {
-			schema.Procedures = append(schema.Procedures, convertProcedure(proc, program.Types, program.Enums, rpc.Name))
-		}
-
-		// Add streams
-		for _, stream := range rpc.Streams {
-			schema.Streams = append(schema.Streams, convertStream(stream, program.Types, program.Enums, rpc.Name))
-		}
-
-		// Add RPC-level docs
-		for _, doc := range rpc.StandaloneDocs {
-			normalized := normalizeDoc(&doc.Content)
-			if normalized != "" {
-				rpcName := rpc.Name
-				schema.Docs = append(schema.Docs, irtypes.DocDef{
-					RpcName: &rpcName,
-					Content: normalized,
-				})
-			}
-		}
-	}
-	sortRPCs(schema.Rpcs)
-	sortProcedures(schema.Procedures)
-	sortStreams(schema.Streams)
-
-	// Convert standalone docs
 	for _, doc := range program.StandaloneDocs {
 		normalized := normalizeDoc(&doc.Content)
-		if normalized != "" {
-			schema.Docs = append(schema.Docs, irtypes.DocDef{
-				Content: normalized,
-			})
+		if normalized == "" {
+			continue
 		}
+		schema.Docs = append(schema.Docs, irtypes.DocDef{Content: normalized})
 	}
+
+	sort.Slice(schema.Types, func(i, j int) bool { return schema.Types[i].Name < schema.Types[j].Name })
+	sort.Slice(schema.Enums, func(i, j int) bool { return schema.Enums[i].Name < schema.Enums[j].Name })
+	sort.Slice(schema.Constants, func(i, j int) bool { return schema.Constants[i].Name < schema.Constants[j].Name })
 
 	return schema
 }
-
-// ============================================================================
-// TYPE CONVERSION
-// ============================================================================
 
 func convertType(
 	typ *analysis.TypeSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
+	resolver *valueResolver,
 ) irtypes.TypeDef {
 	return irtypes.TypeDef{
-		Name:       typ.Name,
-		Doc:        normalizeDocPtr(typ.Docstring),
-		Deprecated: convertDeprecation(typ.Deprecated),
-		Fields:     flattenFields(typ.Fields, typ.Spreads, types, enums),
+		Name:        typ.Name,
+		Doc:         normalizeDocPtr(typ.Docstring),
+		Annotations: convertAnnotations(typ.Annotations, resolver),
+		Fields:      flattenTypeFields(typ, types, enums, resolver),
+	}
+}
+
+func convertEnum(
+	enum *analysis.EnumSymbol,
+	enums map[string]*analysis.EnumSymbol,
+	resolver *valueResolver,
+) irtypes.EnumDef {
+	members := expandEnumMembers(enum, enums, map[string]bool{})
+	irMembers := make([]irtypes.EnumDefMember, 0, len(members))
+
+	for _, member := range members {
+		irMembers = append(irMembers, irtypes.EnumDefMember{
+			Name:        member.Name,
+			Value:       member.Value,
+			Doc:         normalizeDocPtr(member.Docstring),
+			Annotations: convertAnnotations(member.Annotations, resolver),
+		})
+	}
+
+	return irtypes.EnumDef{
+		Name:        enum.Name,
+		Doc:         normalizeDocPtr(enum.Docstring),
+		Annotations: convertAnnotations(enum.Annotations, resolver),
+		EnumType:    convertEnumType(enum.ValueType),
+		Members:     irMembers,
+	}
+}
+
+func convertConstant(
+	cnst *analysis.ConstSymbol,
+	program *analysis.Program,
+	resolver *valueResolver,
+) irtypes.ConstantDef {
+	value, ok := resolver.resolveConstValue(cnst.Name)
+	if !ok {
+		value = irtypes.Value{
+			Kind:        irtypes.ValueKindString,
+			StringValue: irtypes.Ptr(""),
+		}
+	}
+
+	return irtypes.ConstantDef{
+		Name:        cnst.Name,
+		Doc:         normalizeDocPtr(cnst.Docstring),
+		Annotations: convertAnnotations(cnst.Annotations, resolver),
+		TypeRef:     inferConstTypeRef(cnst, value, program.Types, program.Enums),
+		Value:       value,
 	}
 }
 
@@ -113,12 +112,14 @@ func convertField(
 	field *analysis.FieldSymbol,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
+	resolver *valueResolver,
 ) irtypes.Field {
 	return irtypes.Field{
-		Name:     field.Name,
-		Doc:      normalizeDocPtr(field.Docstring),
-		Optional: field.Optional,
-		TypeRef:  convertFieldType(field.Type, types, enums),
+		Name:        field.Name,
+		Doc:         normalizeDocPtr(field.Docstring),
+		Optional:    field.Optional,
+		Annotations: convertAnnotations(field.Annotations, resolver),
+		TypeRef:     convertFieldType(field.Type, types, enums, resolver),
 	}
 }
 
@@ -126,42 +127,36 @@ func convertFieldType(
 	info *analysis.FieldTypeInfo,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
+	resolver *valueResolver,
 ) irtypes.TypeRef {
 	if info == nil {
-		return irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString)}
+		return primitiveTypeRef(irtypes.PrimitiveTypeString)
 	}
 
-	// Get the base type first
-	baseRef := convertBaseFieldType(info, types, enums)
-
-	// If there are array dimensions, wrap the base type with array info
-	if info.ArrayDims > 0 {
-		dims := int64(info.ArrayDims)
-		return irtypes.TypeRef{
-			Kind:      irtypes.TypeKindArray,
-			ArrayType: &baseRef,
-			ArrayDims: &dims,
-		}
+	baseRef := convertBaseFieldType(info, types, enums, resolver)
+	if info.ArrayDims <= 0 {
+		return baseRef
 	}
 
-	return baseRef
+	dims := int64(info.ArrayDims)
+	return irtypes.TypeRef{
+		Kind:      irtypes.TypeKindArray,
+		ArrayType: &baseRef,
+		ArrayDims: &dims,
+	}
 }
 
 func convertBaseFieldType(
 	info *analysis.FieldTypeInfo,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
+	resolver *valueResolver,
 ) irtypes.TypeRef {
 	switch info.Kind {
 	case analysis.FieldTypeKindPrimitive:
-		primType := convertPrimitiveType(info.Name)
-		return irtypes.TypeRef{
-			Kind:          irtypes.TypeKindPrimitive,
-			PrimitiveName: &primType,
-		}
+		return primitiveTypeRef(convertPrimitiveType(info.Name))
 
 	case analysis.FieldTypeKindCustom:
-		// Check if this is an enum or a type
 		if enum, ok := enums[info.Name]; ok {
 			enumType := convertEnumType(enum.ValueType)
 			return irtypes.TypeRef{
@@ -170,27 +165,23 @@ func convertBaseFieldType(
 				EnumType: &enumType,
 			}
 		}
-		// It's a custom type
-		return irtypes.TypeRef{
-			Kind:     irtypes.TypeKindType,
-			TypeName: &info.Name,
+		if _, ok := types[info.Name]; ok {
+			return irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &info.Name}
 		}
+		return irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &info.Name}
 
 	case analysis.FieldTypeKindMap:
-		mapType := convertFieldType(info.MapValue, types, enums)
-		return irtypes.TypeRef{
-			Kind:    irtypes.TypeKindMap,
-			MapType: &mapType,
-		}
+		mapValue := convertFieldType(info.MapValue, types, enums, resolver)
+		return irtypes.TypeRef{Kind: irtypes.TypeKindMap, MapType: &mapValue}
 
 	case analysis.FieldTypeKindObject:
 		return irtypes.TypeRef{
 			Kind:         irtypes.TypeKindObject,
-			ObjectFields: flattenInlineObjectFields(info.ObjectDef, types, enums),
+			ObjectFields: flattenInlineObjectFields(info.ObjectDef, types, enums, resolver),
 		}
 
 	default:
-		return irtypes.TypeRef{Kind: irtypes.TypeKindPrimitive, PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString)}
+		return primitiveTypeRef(irtypes.PrimitiveTypeString)
 	}
 }
 
@@ -211,28 +202,6 @@ func convertPrimitiveType(name string) irtypes.PrimitiveType {
 	}
 }
 
-// ============================================================================
-// ENUM CONVERSION
-// ============================================================================
-
-func convertEnum(enum *analysis.EnumSymbol) irtypes.EnumDef {
-	members := make([]irtypes.EnumDefMember, 0, len(enum.Members))
-	for _, m := range enum.Members {
-		members = append(members, irtypes.EnumDefMember{
-			Name:  m.Name,
-			Value: m.Value,
-		})
-	}
-
-	return irtypes.EnumDef{
-		Name:       enum.Name,
-		Doc:        normalizeDocPtr(enum.Docstring),
-		Deprecated: convertDeprecation(enum.Deprecated),
-		EnumType:   convertEnumType(enum.ValueType),
-		Members:    members,
-	}
-}
-
 func convertEnumType(vt analysis.EnumValueType) irtypes.EnumType {
 	if vt == analysis.EnumValueTypeInt {
 		return irtypes.EnumTypeInt
@@ -240,158 +209,246 @@ func convertEnumType(vt analysis.EnumValueType) irtypes.EnumType {
 	return irtypes.EnumTypeString
 }
 
-// ============================================================================
-// CONSTANT CONVERSION
-// ============================================================================
-
-func convertConstant(cnst *analysis.ConstSymbol) irtypes.ConstantDef {
-	return irtypes.ConstantDef{
-		Name:       cnst.Name,
-		Doc:        normalizeDocPtr(cnst.Docstring),
-		Deprecated: convertDeprecation(cnst.Deprecated),
-		ConstType:  convertConstType(cnst.ValueType),
-		Value:      cnst.Value,
+func primitiveTypeRef(primitive irtypes.PrimitiveType) irtypes.TypeRef {
+	return irtypes.TypeRef{
+		Kind:          irtypes.TypeKindPrimitive,
+		PrimitiveName: &primitive,
 	}
 }
 
-func convertConstType(vt analysis.ConstValueType) irtypes.ConstType {
-	switch vt {
-	case analysis.ConstValueTypeString:
-		return irtypes.ConstTypeString
-	case analysis.ConstValueTypeInt:
-		return irtypes.ConstTypeInt
-	case analysis.ConstValueTypeFloat:
-		return irtypes.ConstTypeFloat
-	case analysis.ConstValueTypeBool:
-		return irtypes.ConstTypeBool
-	default:
-		return irtypes.ConstTypeString
+func convertAnnotations(annotations []*analysis.AnnotationRef, resolver *valueResolver) []irtypes.Annotation {
+	if len(annotations) == 0 {
+		return []irtypes.Annotation{}
 	}
+
+	result := make([]irtypes.Annotation, 0, len(annotations))
+	for _, ann := range annotations {
+		if ann == nil {
+			continue
+		}
+
+		converted := irtypes.Annotation{Name: ann.Name}
+		if ann.Argument != nil {
+			if value, ok := resolver.resolveDataLiteral(ann.Argument); ok {
+				converted.Argument = &value
+			}
+		}
+
+		result = append(result, converted)
+	}
+
+	if len(result) == 0 {
+		return []irtypes.Annotation{}
+	}
+	return result
 }
 
-// ============================================================================
-// PATTERN CONVERSION
-// ============================================================================
-
-func convertPattern(pattern *analysis.PatternSymbol) irtypes.PatternDef {
-	placeholders := pattern.Placeholders
-	if placeholders == nil {
-		placeholders = []string{}
-	}
-	return irtypes.PatternDef{
-		Name:         pattern.Name,
-		Doc:          normalizeDocPtr(pattern.Docstring),
-		Deprecated:   convertDeprecation(pattern.Deprecated),
-		Template:     pattern.Template,
-		Placeholders: placeholders,
-	}
-}
-
-// ============================================================================
-// RPC CONVERSION
-// ============================================================================
-
-func convertRPCDef(rpc *analysis.RPCSymbol) irtypes.RpcDef {
-	return irtypes.RpcDef{
-		Name:       rpc.Name,
-		Doc:        normalizeDocPtr(rpc.Docstring),
-		Deprecated: convertDeprecation(rpc.Deprecated),
-	}
-}
-
-func convertProcedure(
-	proc *analysis.ProcSymbol,
+func inferConstTypeRef(
+	cnst *analysis.ConstSymbol,
+	value irtypes.Value,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
-	rpcName string,
-) irtypes.ProcedureDef {
-	return irtypes.ProcedureDef{
-		RpcName:    rpcName,
-		Name:       proc.Name,
-		Doc:        normalizeDocPtr(proc.Docstring),
-		Deprecated: convertDeprecation(proc.Deprecated),
-		Input:      flattenBlockFields(proc.Input, types, enums),
-		Output:     flattenBlockFields(proc.Output, types, enums),
-	}
-}
-
-func convertStream(
-	stream *analysis.StreamSymbol,
-	types map[string]*analysis.TypeSymbol,
-	enums map[string]*analysis.EnumSymbol,
-	rpcName string,
-) irtypes.StreamDef {
-	return irtypes.StreamDef{
-		RpcName:    rpcName,
-		Name:       stream.Name,
-		Doc:        normalizeDocPtr(stream.Docstring),
-		Deprecated: convertDeprecation(stream.Deprecated),
-		Input:      flattenBlockFields(stream.Input, types, enums),
-		Output:     flattenBlockFields(stream.Output, types, enums),
-	}
-}
-
-// ============================================================================
-// DEPRECATION CONVERSION
-// ============================================================================
-
-func convertDeprecation(dep *analysis.DeprecationInfo) *string {
-	if dep == nil {
-		return nil
-	}
-	return &dep.Message
-}
-
-// ============================================================================
-// SORTING FUNCTIONS
-// ============================================================================
-
-func sortTypes(types []irtypes.TypeDef) {
-	sort.Slice(types, func(i, j int) bool {
-		return types[i].Name < types[j].Name
-	})
-}
-
-func sortEnums(enums []irtypes.EnumDef) {
-	sort.Slice(enums, func(i, j int) bool {
-		return enums[i].Name < enums[j].Name
-	})
-}
-
-func sortConstants(constants []irtypes.ConstantDef) {
-	sort.Slice(constants, func(i, j int) bool {
-		return constants[i].Name < constants[j].Name
-	})
-}
-
-func sortPatterns(patterns []irtypes.PatternDef) {
-	sort.Slice(patterns, func(i, j int) bool {
-		return patterns[i].Name < patterns[j].Name
-	})
-}
-
-func sortRPCs(rpcs []irtypes.RpcDef) {
-	sort.Slice(rpcs, func(i, j int) bool {
-		return rpcs[i].Name < rpcs[j].Name
-	})
-}
-
-func sortProcedures(procs []irtypes.ProcedureDef) {
-	sort.Slice(procs, func(i, j int) bool {
-		if procs[i].RpcName != procs[j].RpcName {
-			return procs[i].RpcName < procs[j].RpcName
+) irtypes.TypeRef {
+	if cnst.ExplicitTypeName != nil {
+		typeName := *cnst.ExplicitTypeName
+		if ast.IsPrimitiveType(typeName) {
+			return primitiveTypeRef(convertPrimitiveType(typeName))
 		}
-		return procs[i].Name < procs[j].Name
-	})
+		if enum, ok := enums[typeName]; ok {
+			enumType := convertEnumType(enum.ValueType)
+			return irtypes.TypeRef{
+				Kind:     irtypes.TypeKindEnum,
+				EnumName: &typeName,
+				EnumType: &enumType,
+			}
+		}
+		if _, ok := types[typeName]; ok {
+			return irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &typeName}
+		}
+	}
+
+	return inferTypeRefFromValue(value)
 }
 
-func sortStreams(streams []irtypes.StreamDef) {
-	sort.Slice(streams, func(i, j int) bool {
-		if streams[i].RpcName != streams[j].RpcName {
-			return streams[i].RpcName < streams[j].RpcName
+func inferTypeRefFromValue(value irtypes.Value) irtypes.TypeRef {
+	switch value.Kind {
+	case irtypes.ValueKindString:
+		return primitiveTypeRef(irtypes.PrimitiveTypeString)
+	case irtypes.ValueKindInt:
+		return primitiveTypeRef(irtypes.PrimitiveTypeInt)
+	case irtypes.ValueKindFloat:
+		return primitiveTypeRef(irtypes.PrimitiveTypeFloat)
+	case irtypes.ValueKindBool:
+		return primitiveTypeRef(irtypes.PrimitiveTypeBool)
+
+	case irtypes.ValueKindObject:
+		entries := value.GetObjectEntries()
+		fields := make([]irtypes.Field, 0, len(entries))
+		for _, entry := range entries {
+			fields = append(fields, irtypes.Field{
+				Name:        entry.Key,
+				Optional:    false,
+				Annotations: []irtypes.Annotation{},
+				TypeRef:     inferTypeRefFromValue(entry.Value),
+			})
 		}
-		return streams[i].Name < streams[j].Name
-	})
+		return irtypes.TypeRef{Kind: irtypes.TypeKindObject, ObjectFields: &fields}
+
+	case irtypes.ValueKindArray:
+		items := value.GetArrayItems()
+		if len(items) == 0 {
+			dims := int64(1)
+			base := primitiveTypeRef(irtypes.PrimitiveTypeString)
+			return irtypes.TypeRef{Kind: irtypes.TypeKindArray, ArrayType: &base, ArrayDims: &dims}
+		}
+
+		elemType := inferTypeRefFromValue(items[0])
+		if elemType.Kind == irtypes.TypeKindArray && elemType.ArrayDims != nil && elemType.ArrayType != nil {
+			dims := *elemType.ArrayDims + 1
+			return irtypes.TypeRef{Kind: irtypes.TypeKindArray, ArrayType: elemType.ArrayType, ArrayDims: &dims}
+		}
+
+		dims := int64(1)
+		return irtypes.TypeRef{Kind: irtypes.TypeKindArray, ArrayType: &elemType, ArrayDims: &dims}
+	}
+
+	return primitiveTypeRef(irtypes.PrimitiveTypeString)
+}
+
+type valueResolver struct {
+	consts      map[string]*analysis.ConstSymbol
+	enums       map[string]*analysis.EnumSymbol
+	constValues map[string]irtypes.Value
+	resolving   map[string]bool
+}
+
+func newValueResolver(program *analysis.Program) *valueResolver {
+	return &valueResolver{
+		consts:      program.Consts,
+		enums:       program.Enums,
+		constValues: make(map[string]irtypes.Value, len(program.Consts)),
+		resolving:   make(map[string]bool, len(program.Consts)),
+	}
+}
+
+func (r *valueResolver) resolveConstValue(name string) (irtypes.Value, bool) {
+	if v, ok := r.constValues[name]; ok {
+		return v, true
+	}
+	if r.resolving[name] {
+		return irtypes.Value{}, false
+	}
+
+	cnst := r.consts[name]
+	if cnst == nil || cnst.AST == nil || cnst.AST.Value == nil {
+		return irtypes.Value{}, false
+	}
+
+	r.resolving[name] = true
+	defer delete(r.resolving, name)
+
+	v, ok := r.resolveDataLiteral(cnst.AST.Value)
+	if ok {
+		r.constValues[name] = v
+	}
+	return v, ok
+}
+
+func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Value, bool) {
+	if lit == nil {
+		return irtypes.Value{}, false
+	}
+
+	if lit.Scalar != nil {
+		return r.resolveScalarLiteral(lit.Scalar)
+	}
+
+	if lit.Object != nil {
+		entries := make([]irtypes.ObjectEntry, 0, len(lit.Object.Entries))
+		for _, entry := range lit.Object.Entries {
+			if entry == nil {
+				continue
+			}
+
+			if entry.Spread != nil {
+				if entry.Spread.Ref.Member != nil {
+					continue
+				}
+				spreadValue, ok := r.resolveConstValue(entry.Spread.Ref.Name)
+				if !ok || spreadValue.Kind != irtypes.ValueKindObject {
+					continue
+				}
+				entries = append(entries, spreadValue.GetObjectEntries()...)
+				continue
+			}
+
+			value, ok := r.resolveDataLiteral(entry.Value)
+			if !ok {
+				continue
+			}
+			entries = append(entries, irtypes.ObjectEntry{Key: entry.Key, Value: value})
+		}
+
+		return irtypes.Value{
+			Kind:          irtypes.ValueKindObject,
+			ObjectEntries: &entries,
+		}, true
+	}
+
+	if lit.Array != nil {
+		items := make([]irtypes.Value, 0, len(lit.Array.Elements))
+		for _, element := range lit.Array.Elements {
+			value, ok := r.resolveDataLiteral(element)
+			if !ok {
+				continue
+			}
+			items = append(items, value)
+		}
+
+		return irtypes.Value{
+			Kind:       irtypes.ValueKindArray,
+			ArrayItems: &items,
+		}, true
+	}
+
+	return irtypes.Value{}, false
+}
+
+func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral) (irtypes.Value, bool) {
+	if s.Str != nil {
+		value := string(*s.Str)
+		return irtypes.Value{Kind: irtypes.ValueKindString, StringValue: &value}, true
+	}
+	if s.Int != nil {
+		n, err := strconv.ParseInt(*s.Int, 10, 64)
+		if err != nil {
+			return irtypes.Value{}, false
+		}
+		return irtypes.Value{Kind: irtypes.ValueKindInt, IntValue: &n}, true
+	}
+	if s.Float != nil {
+		f, err := strconv.ParseFloat(*s.Float, 64)
+		if err != nil {
+			return irtypes.Value{}, false
+		}
+		return irtypes.Value{Kind: irtypes.ValueKindFloat, FloatValue: &f}, true
+	}
+	if s.True {
+		b := true
+		return irtypes.Value{Kind: irtypes.ValueKindBool, BoolValue: &b}, true
+	}
+	if s.False {
+		b := false
+		return irtypes.Value{Kind: irtypes.ValueKindBool, BoolValue: &b}, true
+	}
+	if s.Ref != nil {
+		if s.Ref.Member == nil {
+			return r.resolveConstValue(s.Ref.Name)
+		}
+		return lookupEnumMemberValue(r.enums, s.Ref.Name, *s.Ref.Member)
+	}
+
+	return irtypes.Value{}, false
 }
 
 func normalizeDoc(raw *string) string {

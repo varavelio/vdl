@@ -24,7 +24,7 @@ enum HttpMethod {
 }
 
 type Order {
-  id: string
-  status: OrderStatus
-  priority: Priority
+  id string
+  status OrderStatus
+  priority Priority
 }

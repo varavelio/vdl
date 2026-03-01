@@ -1,77 +1,92 @@
 {
   "constants": [],
-  "patterns": [],
   "enums": [
     {
       "name": "HttpMethod",
       "doc": "HTTP methods with explicit string values.",
+      "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "Get",
-          "value": "GET"
+          "value": "GET",
+          "annotations": []
         },
         {
           "name": "Post",
-          "value": "POST"
+          "value": "POST",
+          "annotations": []
         },
         {
           "name": "Put",
-          "value": "PUT"
+          "value": "PUT",
+          "annotations": []
         },
         {
           "name": "Delete",
-          "value": "DELETE"
+          "value": "DELETE",
+          "annotations": []
         }
       ]
     },
     {
       "name": "OrderStatus",
       "doc": "Order status enum with implicit string values.",
+      "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "Pending",
-          "value": "Pending"
+          "value": "Pending",
+          "annotations": []
         },
         {
           "name": "Processing",
-          "value": "Processing"
+          "value": "Processing",
+          "annotations": []
         },
         {
           "name": "Shipped",
-          "value": "Shipped"
+          "value": "Shipped",
+          "annotations": []
         },
         {
           "name": "Delivered",
-          "value": "Delivered"
+          "value": "Delivered",
+          "annotations": []
         },
         {
           "name": "Cancelled",
-          "value": "Cancelled"
+          "value": "Cancelled",
+          "annotations": []
         }
       ]
     },
     {
       "name": "Priority",
       "doc": "Priority levels with explicit int values.",
+      "annotations": [],
       "enumType": "int",
       "members": [
         {
           "name": "Low",
-          "value": "1"
+          "value": "1",
+          "annotations": []
         },
         {
           "name": "Medium",
-          "value": "2"
+          "value": "2",
+          "annotations": []
         },
         {
           "name": "High",
-          "value": "3"
+          "value": "3",
+          "annotations": []
         },
         {
           "name": "Critical",
-          "value": "10"
+          "value": "10",
+          "annotations": []
         }
       ]
     }
@@ -79,10 +94,12 @@
   "types": [
     {
       "name": "Order",
+      "annotations": [],
       "fields": [
         {
           "name": "id",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -91,6 +108,7 @@
         {
           "name": "status",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "enum",
             "enumName": "OrderStatus",
@@ -100,6 +118,7 @@
         {
           "name": "priority",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "enum",
             "enumName": "Priority",
@@ -109,8 +128,5 @@
       ]
     }
   ],
-  "rpcs": [],
-  "procedures": [],
-  "streams": [],
   "docs": []
 }

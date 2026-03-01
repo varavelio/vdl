@@ -1,29 +1,54 @@
 {
-  "constants": [],
-  "patterns": [
+  "constants": [
     {
-      "name": "SessionCacheKey",
-      "doc": "Redis cache key for sessions.",
-      "template": "cache:session:{sessionId}",
-      "placeholders": ["sessionId"]
+      "name": "sessionCacheKey",
+      "doc": "Cache key template for sessions.",
+      "annotations": [
+        {
+          "name": "cacheTemplate"
+        }
+      ],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      },
+      "value": {
+        "kind": "string",
+        "stringValue": "cache:session:{sessionId}"
+      }
     },
     {
-      "name": "SimpleKey",
-      "doc": "Simple pattern with one placeholder.",
-      "template": "key:{id}",
-      "placeholders": ["id"]
+      "name": "simpleKey",
+      "doc": "Simple key template.",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      },
+      "value": {
+        "kind": "string",
+        "stringValue": "key:{id}"
+      }
     },
     {
-      "name": "UserEventSubject",
-      "doc": "NATS subject for user events.",
-      "template": "events.users.{userId}.{eventType}",
-      "placeholders": ["userId", "eventType"]
+      "name": "userEventSubject",
+      "doc": "Subject template for user events.",
+      "annotations": [
+        {
+          "name": "topicTemplate"
+        }
+      ],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      },
+      "value": {
+        "kind": "string",
+        "stringValue": "events.users.{userId}.{eventType}"
+      }
     }
   ],
   "enums": [],
   "types": [],
-  "rpcs": [],
-  "procedures": [],
-  "streams": [],
   "docs": []
 }

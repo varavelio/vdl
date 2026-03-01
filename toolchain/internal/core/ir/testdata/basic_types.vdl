@@ -1,15 +1,15 @@
 """ Basic types test schema. """
 
 type SimpleType {
-  name: string
-  age: int
-  score: float
-  active: bool
-  createdAt: datetime
+  name string
+  age int
+  score float
+  active bool
+  createdAt datetime
 }
 
 type OptionalFields {
-  required: string
-  optional?: string
-  optionalInt?: int
+  required string
+  optional? string
+  optionalInt? int
 }

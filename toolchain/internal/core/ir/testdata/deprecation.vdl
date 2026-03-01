@@ -1,42 +1,31 @@
-deprecated type LegacyUser {
-  id: string
-  name: string
+@deprecated
+type LegacyUser {
+  id string
+  name string
 }
 
-deprecated("Use UserV2 instead")
+@deprecated("Use UserV2 instead")
 type OldUser {
-  id: string
+  id string
 }
 
-deprecated enum OldStatus {
+@deprecated
+enum OldStatus {
   Active
   Inactive
 }
 
-deprecated("Will be removed in v3.0")
-const OLD_LIMIT = 50
+@deprecated("Will be removed in v3.0")
+const oldLimit = 50
 
-deprecated pattern OldPattern = "old:{id}"
+enum AccountState {
+  @deprecated("Use Active")
+  Legacy
+  Active
+}
 
-rpc Legacy {
-  deprecated proc OldMethod {
-    input {
-      id: string
-    }
-
-    output {
-      result: string
-    }
-  }
-
-  deprecated("Use NewStream instead")
-  stream OldStream {
-    input {
-      id: string
-    }
-
-    output {
-      data: string
-    }
-  }
+type Account {
+  @deprecated("Use accountId")
+  id string
+  accountId string
 }

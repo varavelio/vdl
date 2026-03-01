@@ -1,41 +1,196 @@
 {
   "constants": [
     {
-      "name": "API_VERSION",
+      "name": "apiVersion",
       "doc": "API version string.",
-      "constType": "string",
-      "value": "1.0.0"
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      },
+      "value": {
+        "kind": "string",
+        "stringValue": "1.0.0"
+      }
     },
     {
-      "name": "DEFAULT_TAX_RATE",
+      "name": "baseConfig",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "host",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "port",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          }
+        ]
+      },
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "host",
+            "value": {
+              "kind": "string",
+              "stringValue": "localhost"
+            }
+          },
+          {
+            "key": "port",
+            "value": {
+              "kind": "int",
+              "intValue": 8080
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "defaultLimit",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "int"
+      },
+      "value": {
+        "kind": "int",
+        "intValue": 100
+      }
+    },
+    {
+      "name": "defaultTaxRate",
       "doc": "Default tax rate.",
-      "constType": "float",
-      "value": "0.21"
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "float"
+      },
+      "value": {
+        "kind": "float",
+        "floatValue": 0.21
+      }
     },
     {
-      "name": "FEATURE_NEW_UI",
+      "name": "featureNewUi",
       "doc": "Feature flag for new UI.",
-      "constType": "bool",
-      "value": "true"
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "bool"
+      },
+      "value": {
+        "kind": "bool",
+        "boolValue": true
+      }
     },
     {
-      "name": "LEGACY_MODE",
+      "name": "legacyMode",
       "doc": "Legacy mode disabled.",
-      "constType": "bool",
-      "value": "false"
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "bool"
+      },
+      "value": {
+        "kind": "bool",
+        "boolValue": false
+      }
     },
     {
-      "name": "MAX_PAGE_SIZE",
+      "name": "maxPageSize",
       "doc": "Maximum items per page.",
-      "constType": "int",
-      "value": "100"
+      "annotations": [
+        {
+          "name": "config"
+        }
+      ],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "int"
+      },
+      "value": {
+        "kind": "int",
+        "intValue": 100
+      }
+    },
+    {
+      "name": "prodConfig",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "host",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "port",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "secure",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "bool"
+            }
+          }
+        ]
+      },
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "host",
+            "value": {
+              "kind": "string",
+              "stringValue": "localhost"
+            }
+          },
+          {
+            "key": "port",
+            "value": {
+              "kind": "int",
+              "intValue": 8080
+            }
+          },
+          {
+            "key": "secure",
+            "value": {
+              "kind": "bool",
+              "boolValue": true
+            }
+          }
+        ]
+      }
     }
   ],
-  "patterns": [],
   "enums": [],
   "types": [],
-  "rpcs": [],
-  "procedures": [],
-  "streams": [],
   "docs": []
 }

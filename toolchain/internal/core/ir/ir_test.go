@@ -17,13 +17,7 @@ import (
 
 var update = flag.Bool("update", false, "update golden files")
 
-// TestFromProgram_Golden runs golden file tests for the IR builder.
-// Each .vdl file in testdata is parsed, analyzed, converted to IR,
-// and compared against its corresponding .json file.
-//
-// Run with -update flag to regenerate golden files:
-//
-//	go test -run TestFromProgram_Golden -update
+// TestFromProgram_Golden validates IR output against golden JSON fixtures.
 func TestFromProgram_Golden(t *testing.T) {
 	inputs, err := filepath.Glob("testdata/*.vdl")
 	require.NoError(t, err)
@@ -32,26 +26,18 @@ func TestFromProgram_Golden(t *testing.T) {
 	for _, input := range inputs {
 		name := strings.TrimSuffix(filepath.Base(input), ".vdl")
 		t.Run(name, func(t *testing.T) {
-			// Get absolute path for analysis
 			absInput, err := filepath.Abs(input)
 			require.NoError(t, err)
 
-			// 1. Parse + Analyze
 			fs := vfs.New()
 			program, diags := analysis.Analyze(fs, absInput)
 			require.Empty(t, diags, "analysis errors: %v", diags)
 
-			// 2. Build IR
 			schema := FromProgram(program)
-
-			// 3. Serialize to JSON
 			got, err := json.MarshalIndent(schema, "", "  ")
 			require.NoError(t, err)
 
-			// Golden file path (same name, .json extension)
 			goldenPath := strings.TrimSuffix(input, ".vdl") + ".json"
-
-			// 4. Update or compare
 			if *update {
 				err := os.WriteFile(goldenPath, got, 0644)
 				require.NoError(t, err)
@@ -59,7 +45,6 @@ func TestFromProgram_Golden(t *testing.T) {
 				return
 			}
 
-			// 5. Read and compare with golden
 			want, err := os.ReadFile(goldenPath)
 			if os.IsNotExist(err) {
 				t.Fatalf("golden file not found: %s (run with -update to create)", goldenPath)
@@ -71,95 +56,48 @@ func TestFromProgram_Golden(t *testing.T) {
 	}
 }
 
-// TestNormalizeDoc tests the docstring normalization function.
 func TestNormalizeDoc(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    *string
 		expected string
 	}{
-		{
-			name:     "nil input",
-			input:    nil,
-			expected: "",
-		},
-		{
-			name:     "empty string",
-			input:    ptr(""),
-			expected: "",
-		},
-		{
-			name:     "single line",
-			input:    ptr("Hello World"),
-			expected: "Hello World",
-		},
-		{
-			name:     "single line with whitespace",
-			input:    ptr("  Hello World  "),
-			expected: "Hello World",
-		},
-		{
-			name:     "multi-line no indent",
-			input:    ptr("Line 1\nLine 2\nLine 3"),
-			expected: "Line 1\nLine 2\nLine 3",
-		},
-		{
-			name:     "multi-line with common indent",
-			input:    ptr("    Line 1\n    Line 2\n    Line 3"),
-			expected: "Line 1\nLine 2\nLine 3",
-		},
-		{
-			name:     "multi-line with varying indent",
-			input:    ptr("    Line 1\n      Line 2\n    Line 3"),
-			expected: "Line 1\n  Line 2\nLine 3",
-		},
-		{
-			name:     "multi-line with empty lines",
-			input:    ptr("    Line 1\n\n    Line 2"),
-			expected: "Line 1\n\nLine 2",
-		},
-		{
-			name:     "leading and trailing newlines",
-			input:    ptr("\n\n    Content\n\n"),
-			expected: "Content",
-		},
+		{name: "nil input", input: nil, expected: ""},
+		{name: "empty string", input: ptr(""), expected: ""},
+		{name: "single line", input: ptr("Hello World"), expected: "Hello World"},
+		{name: "single line with whitespace", input: ptr("  Hello World  "), expected: "Hello World"},
+		{name: "multi-line with indent", input: ptr("    Line 1\n    Line 2\n    Line 3"), expected: "Line 1\nLine 2\nLine 3"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := normalizeDoc(tt.input)
-			assert.Equal(t, tt.expected, result)
+			assert.Equal(t, tt.expected, normalizeDoc(tt.input))
 		})
 	}
 }
 
-// TestSorting verifies that all collections are sorted alphabetically.
 func TestSorting(t *testing.T) {
 	fs := vfs.New()
-
-	// Parse a schema with multiple types in non-alphabetical order
 	content := `
-		type Zebra { name: string }
-		type Alpha { name: string }
-		type Middle { name: string }
+type Zebra {
+  name string
+}
 
-		enum ZEnum { A }
-		enum AEnum { B }
+type Alpha {
+  name string
+}
 
-		const Z_CONST = 1
-		const A_CONST = 2
+enum ZEnum {
+  A
+}
 
-		pattern ZPattern = "z:{id}"
-		pattern APattern = "a:{id}"
+enum AEnum {
+  B
+}
 
-		rpc ZService {
-				proc ZProc { input {} output {} }
-				proc AProc { input {} output {} }
-		}
-		rpc AService {
-				proc Only { input {} output {} }
-		}
-	`
+const zConst = 1
+const aConst = 2
+`
 	absPath := "/test/sorting.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
@@ -168,58 +106,33 @@ func TestSorting(t *testing.T) {
 
 	schema := FromProgram(program)
 
-	// Check types are sorted
-	require.Len(t, schema.Types, 3)
+	require.Len(t, schema.Types, 2)
 	assert.Equal(t, "Alpha", schema.Types[0].Name)
-	assert.Equal(t, "Middle", schema.Types[1].Name)
-	assert.Equal(t, "Zebra", schema.Types[2].Name)
+	assert.Equal(t, "Zebra", schema.Types[1].Name)
 
-	// Check enums are sorted
 	require.Len(t, schema.Enums, 2)
 	assert.Equal(t, "AEnum", schema.Enums[0].Name)
 	assert.Equal(t, "ZEnum", schema.Enums[1].Name)
 
-	// Check constants are sorted
 	require.Len(t, schema.Constants, 2)
-	assert.Equal(t, "A_CONST", schema.Constants[0].Name)
-	assert.Equal(t, "Z_CONST", schema.Constants[1].Name)
-
-	// Check patterns are sorted
-	require.Len(t, schema.Patterns, 2)
-	assert.Equal(t, "APattern", schema.Patterns[0].Name)
-	assert.Equal(t, "ZPattern", schema.Patterns[1].Name)
-
-	// Check RPCs are sorted
-	require.Len(t, schema.Rpcs, 2)
-	assert.Equal(t, "AService", schema.Rpcs[0].Name)
-	assert.Equal(t, "ZService", schema.Rpcs[1].Name)
-
-	// Check procedures are sorted (by RpcName, then Name)
-	require.Len(t, schema.Procedures, 3)
-	assert.Equal(t, "AService", schema.Procedures[0].RpcName)
-	assert.Equal(t, "Only", schema.Procedures[0].Name)
-	assert.Equal(t, "ZService", schema.Procedures[1].RpcName)
-	assert.Equal(t, "AProc", schema.Procedures[1].Name)
-	assert.Equal(t, "ZService", schema.Procedures[2].RpcName)
-	assert.Equal(t, "ZProc", schema.Procedures[2].Name)
+	assert.Equal(t, "aConst", schema.Constants[0].Name)
+	assert.Equal(t, "zConst", schema.Constants[1].Name)
 }
 
-// TestSpreadFlattening verifies that spreads are properly expanded.
 func TestSpreadFlattening(t *testing.T) {
 	fs := vfs.New()
-
 	content := `
-		type Base {
-				id: string
-				createdAt: datetime
-		}
+type Base {
+  id string
+  createdAt datetime
+}
 
-		type Extended {
-				...Base
-				name: string
-				active: bool
-		}
-	`
+type Extended {
+  ...Base
+  name string
+  active bool
+}
+`
 	absPath := "/test/spreads.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
@@ -228,7 +141,6 @@ func TestSpreadFlattening(t *testing.T) {
 
 	schema := FromProgram(program)
 
-	// Find Extended type
 	var extended *irtypes.TypeDef
 	for i := range schema.Types {
 		if schema.Types[i].Name == "Extended" {
@@ -237,39 +149,36 @@ func TestSpreadFlattening(t *testing.T) {
 		}
 	}
 	require.NotNil(t, extended)
-
-	// Extended should have 4 fields: id, createdAt (from Base), name, active
 	require.Len(t, extended.Fields, 4)
 
-	// Fields from spread should come first
 	assert.Equal(t, "id", extended.Fields[0].Name)
 	assert.Equal(t, "createdAt", extended.Fields[1].Name)
 	assert.Equal(t, "name", extended.Fields[2].Name)
 	assert.Equal(t, "active", extended.Fields[3].Name)
 }
 
-// TestEnumTypeInfo verifies that enum references include EnumType.
-func TestEnumTypeInfo(t *testing.T) {
+func TestConstantResolution(t *testing.T) {
 	fs := vfs.New()
-
 	content := `
-		enum Status {
-				Active
-				Inactive
-		}
+enum Status {
+  Active
+  Inactive = "inactive"
+}
 
-		enum Priority {
-				Low = 1
-				High = 2
-		}
+const base = {
+  host "localhost"
+  port 8080
+}
 
-		type Item {
-				status: Status
-				priority: Priority
-				name: string
-		}
-	`
-	absPath := "/test/enuminfo.vdl"
+const cfg = {
+  ...base
+  secure true
+  status Status.Active
+}
+
+const cfgAlias = cfg
+`
+	absPath := "/test/constants.vdl"
 	fs.WriteFileCache(absPath, []byte(content))
 
 	program, diags := analysis.Analyze(fs, absPath)
@@ -277,111 +186,92 @@ func TestEnumTypeInfo(t *testing.T) {
 
 	schema := FromProgram(program)
 
-	// Find Item type
-	var item *irtypes.TypeDef
-	for i := range schema.Types {
-		if schema.Types[i].Name == "Item" {
-			item = &schema.Types[i]
+	constants := map[string]irtypes.ConstantDef{}
+	for _, c := range schema.Constants {
+		constants[c.Name] = c
+	}
+
+	cfg, ok := constants["cfg"]
+	require.True(t, ok)
+	assert.Equal(t, irtypes.TypeKindObject, cfg.TypeRef.Kind)
+	assert.Equal(t, irtypes.ValueKindObject, cfg.Value.Kind)
+
+	entries := cfg.Value.GetObjectEntries()
+	require.Len(t, entries, 4)
+	assert.Equal(t, "host", entries[0].Key)
+	assert.Equal(t, "localhost", entries[0].Value.GetStringValue())
+	assert.Equal(t, "status", entries[3].Key)
+	assert.Equal(t, "Active", entries[3].Value.GetStringValue())
+
+	alias, ok := constants["cfgAlias"]
+	require.True(t, ok)
+	assert.Equal(t, cfg.Value, alias.Value)
+}
+
+func TestAnnotationsPreserved(t *testing.T) {
+	fs := vfs.New()
+	content := `
+@entity
+@meta({ owner "core" retries 2 })
+type User {
+  @id
+  id string
+}
+
+@featureFlag
+const maxRetries = 3
+
+enum Status {
+  @deprecated("Use Inactive")
+  Legacy
+  Active
+}
+`
+	absPath := "/test/annotations.vdl"
+	fs.WriteFileCache(absPath, []byte(content))
+
+	program, diags := analysis.Analyze(fs, absPath)
+	require.Empty(t, diags)
+
+	schema := FromProgram(program)
+
+	var user irtypes.TypeDef
+	for _, typ := range schema.Types {
+		if typ.Name == "User" {
+			user = typ
 			break
 		}
 	}
-	require.NotNil(t, item)
-	require.Len(t, item.Fields, 3)
+	require.Equal(t, "User", user.Name)
+	require.Len(t, user.Annotations, 2)
+	assert.Equal(t, "entity", user.Annotations[0].Name)
+	assert.Equal(t, "meta", user.Annotations[1].Name)
+	assert.Equal(t, irtypes.ValueKindObject, user.Annotations[1].Argument.GetKind())
 
-	// Find fields by name (they're in original order: status, priority, name)
-	fieldsByName := make(map[string]*irtypes.Field)
-	for i := range item.Fields {
-		fieldsByName[item.Fields[i].Name] = &item.Fields[i]
-	}
-
-	// status field should have EnumType with string type
-	statusField := fieldsByName["status"]
-	require.NotNil(t, statusField)
-	assert.Equal(t, irtypes.TypeKindEnum, statusField.TypeRef.Kind)
-	require.NotNil(t, statusField.TypeRef.EnumName)
-	assert.Equal(t, "Status", *statusField.TypeRef.EnumName)
-	require.NotNil(t, statusField.TypeRef.EnumType)
-	assert.Equal(t, irtypes.EnumTypeString, *statusField.TypeRef.EnumType)
-
-	// priority field should have EnumType with int type
-	priorityField := fieldsByName["priority"]
-	require.NotNil(t, priorityField)
-	assert.Equal(t, irtypes.TypeKindEnum, priorityField.TypeRef.Kind)
-	require.NotNil(t, priorityField.TypeRef.EnumName)
-	assert.Equal(t, "Priority", *priorityField.TypeRef.EnumName)
-	require.NotNil(t, priorityField.TypeRef.EnumType)
-	assert.Equal(t, irtypes.EnumTypeInt, *priorityField.TypeRef.EnumType)
-
-	// name field should NOT have EnumType (it's a primitive)
-	nameField := fieldsByName["name"]
-	require.NotNil(t, nameField)
-	assert.Nil(t, nameField.TypeRef.EnumType)
-}
-
-// TestArrayTypes verifies array type handling.
-func TestArrayTypes(t *testing.T) {
-	fs := vfs.New()
-
-	content := `
-		type WithArrays {
-				simple: string[]
-				nested: int[][]
-		}
-	`
-	absPath := "/test/arrays.vdl"
-	fs.WriteFileCache(absPath, []byte(content))
-
-	program, diags := analysis.Analyze(fs, absPath)
-	require.Empty(t, diags)
-
-	schema := FromProgram(program)
-
-	require.Len(t, schema.Types, 1)
-	typ := schema.Types[0]
-	require.Len(t, typ.Fields, 2)
-
-	// Find simple field
-	var simple, nested *irtypes.Field
-	for i := range typ.Fields {
-		if typ.Fields[i].Name == "simple" {
-			simple = &typ.Fields[i]
-		}
-		if typ.Fields[i].Name == "nested" {
-			nested = &typ.Fields[i]
+	var status irtypes.EnumDef
+	for _, enum := range schema.Enums {
+		if enum.Name == "Status" {
+			status = enum
+			break
 		}
 	}
-
-	// simple: string[] -> array with 1 dimension of string
-	require.NotNil(t, simple)
-	assert.Equal(t, irtypes.TypeKindArray, simple.TypeRef.Kind)
-	require.NotNil(t, simple.TypeRef.ArrayDims)
-	assert.Equal(t, int64(1), *simple.TypeRef.ArrayDims)
-	require.NotNil(t, simple.TypeRef.ArrayType)
-	assert.Equal(t, irtypes.TypeKindPrimitive, simple.TypeRef.ArrayType.Kind)
-	require.NotNil(t, simple.TypeRef.ArrayType.PrimitiveName)
-	assert.Equal(t, irtypes.PrimitiveTypeString, *simple.TypeRef.ArrayType.PrimitiveName)
-
-	// nested: int[][] -> array with 2 dimensions of int
-	require.NotNil(t, nested)
-	assert.Equal(t, irtypes.TypeKindArray, nested.TypeRef.Kind)
-	require.NotNil(t, nested.TypeRef.ArrayDims)
-	assert.Equal(t, int64(2), *nested.TypeRef.ArrayDims)
-	require.NotNil(t, nested.TypeRef.ArrayType)
-	assert.Equal(t, irtypes.TypeKindPrimitive, nested.TypeRef.ArrayType.Kind)
-	require.NotNil(t, nested.TypeRef.ArrayType.PrimitiveName)
-	assert.Equal(t, irtypes.PrimitiveTypeInt, *nested.TypeRef.ArrayType.PrimitiveName)
+	require.Equal(t, "Status", status.Name)
+	require.Len(t, status.Members, 2)
+	require.Len(t, status.Members[0].Annotations, 1)
+	assert.Equal(t, "deprecated", status.Members[0].Annotations[0].Name)
 }
 
-// TestIrSchemaJSONSerialization tests that IrSchema can be serialized to JSON.
 func TestIrSchemaJSONSerialization(t *testing.T) {
 	schema := &irtypes.IrSchema{
 		Types: []irtypes.TypeDef{
 			{
-				Name: "User",
+				Name:        "User",
+				Annotations: []irtypes.Annotation{},
 				Fields: []irtypes.Field{
 					{
-						Name:     "id",
-						Optional: false,
+						Name:        "id",
+						Optional:    false,
+						Annotations: []irtypes.Annotation{},
 						TypeRef: irtypes.TypeRef{
 							Kind:          irtypes.TypeKindPrimitive,
 							PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString),
@@ -390,28 +280,37 @@ func TestIrSchemaJSONSerialization(t *testing.T) {
 				},
 			},
 		},
-		Enums:      []irtypes.EnumDef{},
-		Constants:  []irtypes.ConstantDef{},
-		Patterns:   []irtypes.PatternDef{},
-		Rpcs:       []irtypes.RpcDef{},
-		Procedures: []irtypes.ProcedureDef{},
-		Streams:    []irtypes.StreamDef{},
-		Docs:       []irtypes.DocDef{},
+		Enums: []irtypes.EnumDef{},
+		Constants: []irtypes.ConstantDef{
+			{
+				Name:        "maxRetries",
+				Annotations: []irtypes.Annotation{},
+				TypeRef: irtypes.TypeRef{
+					Kind:          irtypes.TypeKindPrimitive,
+					PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeInt),
+				},
+				Value: irtypes.Value{
+					Kind:     irtypes.ValueKindInt,
+					IntValue: irtypes.Ptr(int64(3)),
+				},
+			},
+		},
+		Docs: []irtypes.DocDef{},
 	}
 
 	jsonBytes, err := json.MarshalIndent(schema, "", "  ")
 	require.NoError(t, err)
 
-	// Parse back to verify it's valid JSON
 	var parsed irtypes.IrSchema
 	err = json.Unmarshal(jsonBytes, &parsed)
 	require.NoError(t, err)
 
 	assert.Equal(t, "User", parsed.Types[0].Name)
 	assert.Equal(t, "id", parsed.Types[0].Fields[0].Name)
+	assert.Equal(t, "maxRetries", parsed.Constants[0].Name)
+	assert.Equal(t, int64(3), parsed.Constants[0].Value.GetIntValue())
 }
 
-// Helper function
 func ptr(s string) *string {
 	return &s
 }

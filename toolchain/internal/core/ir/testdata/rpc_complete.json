@@ -1,14 +1,92 @@
 {
-  "constants": [],
-  "patterns": [],
-  "enums": [],
+  "constants": [
+    {
+      "name": "maxPageSize",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "int"
+      },
+      "value": {
+        "kind": "int",
+        "intValue": 100
+      }
+    },
+    {
+      "name": "queryDefaults",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "page",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "limit",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          }
+        ]
+      },
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "page",
+            "value": {
+              "kind": "int",
+              "intValue": 1
+            }
+          },
+          {
+            "key": "limit",
+            "value": {
+              "kind": "int",
+              "intValue": 100
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "enums": [
+    {
+      "name": "UserEventAction",
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Created",
+          "value": "created",
+          "annotations": []
+        },
+        {
+          "name": "Updated",
+          "value": "updated",
+          "annotations": []
+        }
+      ]
+    }
+  ],
   "types": [
     {
       "name": "PaginatedResponse",
+      "annotations": [],
       "fields": [
         {
           "name": "totalItems",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "int"
@@ -17,6 +95,7 @@
         {
           "name": "totalPages",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "int"
@@ -26,10 +105,12 @@
     },
     {
       "name": "PaginationParams",
+      "annotations": [],
       "fields": [
         {
           "name": "page",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "int"
@@ -38,6 +119,7 @@
         {
           "name": "limit",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "int"
@@ -47,10 +129,12 @@
     },
     {
       "name": "User",
+      "annotations": [],
       "fields": [
         {
           "name": "id",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -59,6 +143,7 @@
         {
           "name": "name",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -67,157 +152,22 @@
         {
           "name": "email",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
           }
         }
       ]
-    }
-  ],
-  "rpcs": [
-    {
-      "name": "Notifications",
-      "doc": "Notification service."
     },
     {
-      "name": "Users",
-      "doc": "User management service."
-    }
-  ],
-  "procedures": [
-    {
-      "rpcName": "Notifications",
-      "name": "SendNotification",
-      "input": [
-        {
-          "name": "userId",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "message",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
-        {
-          "name": "sent",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "bool"
-          }
-        }
-      ]
-    },
-    {
-      "rpcName": "Users",
-      "name": "CreateUser",
-      "doc": "Creates a new user in the system.",
-      "input": [
-        {
-          "name": "name",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "email",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
-        {
-          "name": "user",
-          "optional": false,
-          "typeRef": {
-            "kind": "type",
-            "typeName": "User"
-          }
-        },
-        {
-          "name": "success",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "bool"
-          }
-        }
-      ]
-    },
-    {
-      "rpcName": "Users",
-      "name": "GetUser",
-      "doc": "Retrieves a user by ID.",
-      "input": [
-        {
-          "name": "id",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
-        {
-          "name": "user",
-          "optional": false,
-          "typeRef": {
-            "kind": "type",
-            "typeName": "User"
-          }
-        }
-      ]
-    },
-    {
-      "rpcName": "Users",
-      "name": "ListUsers",
-      "doc": "Lists users with pagination.",
-      "input": [
-        {
-          "name": "page",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        },
-        {
-          "name": "limit",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        },
-        {
-          "name": "filterByName",
-          "optional": true,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
+      "name": "UserListResult",
+      "annotations": [],
+      "fields": [
         {
           "name": "totalItems",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "int"
@@ -226,6 +176,7 @@
         {
           "name": "totalPages",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "int"
@@ -234,6 +185,7 @@
         {
           "name": "users",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "array",
             "arrayType": {
@@ -244,47 +196,40 @@
           }
         }
       ]
-    }
-  ],
-  "streams": [
+    },
     {
-      "rpcName": "Users",
-      "name": "UserStatusUpdates",
-      "doc": "Stream of user status updates.",
-      "input": [
+      "name": "UserQuery",
+      "annotations": [],
+      "fields": [
         {
-          "name": "userId",
+          "name": "page",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
-        {
-          "name": "status",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+            "primitiveName": "int"
           }
         },
         {
-          "name": "timestamp",
+          "name": "limit",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
-            "primitiveName": "datetime"
+            "primitiveName": "int"
+          }
+        },
+        {
+          "name": "filterByName",
+          "optional": true,
+          "annotations": [],
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
           }
         }
       ]
     }
   ],
-  "docs": [
-    {
-      "rpcName": "Users",
-      "content": "# User Operations\nThe following procedures handle user lifecycle."
-    }
-  ]
+  "docs": []
 }

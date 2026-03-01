@@ -1,19 +1,21 @@
 {
   "constants": [],
-  "patterns": [],
   "enums": [
     {
       "name": "DocumentedEnum",
       "doc": "Enum with documented members.",
+      "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "First",
-          "value": "First"
+          "value": "First",
+          "annotations": []
         },
         {
           "name": "Second",
-          "value": "Second"
+          "value": "Second",
+          "annotations": []
         }
       ]
     }
@@ -22,11 +24,13 @@
     {
       "name": "DocumentedType",
       "doc": "This docstring has leading indentation\nthat should be stripped.\n\n- Indented list\n  - Nested item",
+      "annotations": [],
       "fields": [
         {
           "name": "id",
           "doc": "The unique identifier.",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -36,6 +40,7 @@
           "name": "description",
           "doc": "A longer field description\nspanning multiple lines.",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -44,9 +49,6 @@
       ]
     }
   ],
-  "rpcs": [],
-  "procedures": [],
-  "streams": [],
   "docs": [
     {
       "content": "This is a multi-line docstring.\n\nIt has multiple paragraphs and should be normalized.\n\n- Item 1\n- Item 2"

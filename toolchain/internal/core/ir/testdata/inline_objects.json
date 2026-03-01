@@ -1,14 +1,15 @@
 {
   "constants": [],
-  "patterns": [],
   "enums": [],
   "types": [
     {
       "name": "Address",
+      "annotations": [],
       "fields": [
         {
           "name": "street",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -17,6 +18,7 @@
         {
           "name": "city",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -25,12 +27,14 @@
         {
           "name": "location",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "object",
             "objectFields": [
               {
                 "name": "lat",
                 "optional": false,
+                "annotations": [],
                 "typeRef": {
                   "kind": "primitive",
                   "primitiveName": "float"
@@ -39,6 +43,7 @@
               {
                 "name": "lng",
                 "optional": false,
+                "annotations": [],
                 "typeRef": {
                   "kind": "primitive",
                   "primitiveName": "float"
@@ -51,10 +56,12 @@
     },
     {
       "name": "Company",
+      "annotations": [],
       "fields": [
         {
           "name": "name",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -63,12 +70,14 @@
         {
           "name": "headquarters",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "object",
             "objectFields": [
               {
                 "name": "address",
                 "optional": false,
+                "annotations": [],
                 "typeRef": {
                   "kind": "primitive",
                   "primitiveName": "string"
@@ -77,6 +86,7 @@
               {
                 "name": "floors",
                 "optional": false,
+                "annotations": [],
                 "typeRef": {
                   "kind": "primitive",
                   "primitiveName": "int"
@@ -85,12 +95,14 @@
               {
                 "name": "amenities",
                 "optional": false,
+                "annotations": [],
                 "typeRef": {
                   "kind": "object",
                   "objectFields": [
                     {
                       "name": "hasGym",
                       "optional": false,
+                      "annotations": [],
                       "typeRef": {
                         "kind": "primitive",
                         "primitiveName": "bool"
@@ -99,6 +111,7 @@
                     {
                       "name": "hasCafeteria",
                       "optional": false,
+                      "annotations": [],
                       "typeRef": {
                         "kind": "primitive",
                         "primitiveName": "bool"
@@ -114,10 +127,12 @@
     },
     {
       "name": "Location",
+      "annotations": [],
       "fields": [
         {
           "name": "latitude",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "float"
@@ -126,6 +141,7 @@
         {
           "name": "longitude",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "float"
@@ -134,8 +150,5 @@
       ]
     }
   ],
-  "rpcs": [],
-  "procedures": [],
-  "streams": [],
   "docs": []
 }

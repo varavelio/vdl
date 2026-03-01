@@ -1,45 +1,119 @@
 {
   "constants": [
     {
-      "name": "OLD_LIMIT",
-      "deprecated": "Will be removed in v3.0",
-      "constType": "int",
-      "value": "50"
-    }
-  ],
-  "patterns": [
-    {
-      "name": "OldPattern",
-      "deprecated": "",
-      "template": "old:{id}",
-      "placeholders": ["id"]
+      "name": "oldLimit",
+      "annotations": [
+        {
+          "name": "deprecated",
+          "argument": {
+            "kind": "string",
+            "stringValue": "Will be removed in v3.0"
+          }
+        }
+      ],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "int"
+      },
+      "value": {
+        "kind": "int",
+        "intValue": 50
+      }
     }
   ],
   "enums": [
     {
+      "name": "AccountState",
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "name": "Legacy",
+          "value": "Legacy",
+          "annotations": [
+            {
+              "name": "deprecated",
+              "argument": {
+                "kind": "string",
+                "stringValue": "Use Active"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Active",
+          "value": "Active",
+          "annotations": []
+        }
+      ]
+    },
+    {
       "name": "OldStatus",
-      "deprecated": "",
+      "annotations": [
+        {
+          "name": "deprecated"
+        }
+      ],
       "enumType": "string",
       "members": [
         {
           "name": "Active",
-          "value": "Active"
+          "value": "Active",
+          "annotations": []
         },
         {
           "name": "Inactive",
-          "value": "Inactive"
+          "value": "Inactive",
+          "annotations": []
         }
       ]
     }
   ],
   "types": [
     {
-      "name": "LegacyUser",
-      "deprecated": "",
+      "name": "Account",
+      "annotations": [],
       "fields": [
         {
           "name": "id",
           "optional": false,
+          "annotations": [
+            {
+              "name": "deprecated",
+              "argument": {
+                "kind": "string",
+                "stringValue": "Use accountId"
+              }
+            }
+          ],
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        },
+        {
+          "name": "accountId",
+          "optional": false,
+          "annotations": [],
+          "typeRef": {
+            "kind": "primitive",
+            "primitiveName": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "LegacyUser",
+      "annotations": [
+        {
+          "name": "deprecated"
+        }
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -48,6 +122,7 @@
         {
           "name": "name",
           "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"
@@ -57,70 +132,20 @@
     },
     {
       "name": "OldUser",
-      "deprecated": "Use UserV2 instead",
+      "annotations": [
+        {
+          "name": "deprecated",
+          "argument": {
+            "kind": "string",
+            "stringValue": "Use UserV2 instead"
+          }
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
-    }
-  ],
-  "rpcs": [
-    {
-      "name": "Legacy"
-    }
-  ],
-  "procedures": [
-    {
-      "rpcName": "Legacy",
-      "name": "OldMethod",
-      "deprecated": "",
-      "input": [
-        {
-          "name": "id",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
-        {
-          "name": "result",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
-    }
-  ],
-  "streams": [
-    {
-      "rpcName": "Legacy",
-      "name": "OldStream",
-      "deprecated": "Use NewStream instead",
-      "input": [
-        {
-          "name": "id",
-          "optional": false,
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ],
-      "output": [
-        {
-          "name": "data",
-          "optional": false,
+          "annotations": [],
           "typeRef": {
             "kind": "primitive",
             "primitiveName": "string"

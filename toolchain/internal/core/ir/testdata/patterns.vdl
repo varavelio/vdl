@@ -1,8 +1,10 @@
-""" NATS subject for user events. """
-pattern UserEventSubject = "events.users.{userId}.{eventType}"
+""" Subject template for user events. """
+@topicTemplate
+const userEventSubject = "events.users.{userId}.{eventType}"
 
-""" Redis cache key for sessions. """
-pattern SessionCacheKey = "cache:session:{sessionId}"
+""" Cache key template for sessions. """
+@cacheTemplate
+const sessionCacheKey = "cache:session:{sessionId}"
 
-""" Simple pattern with one placeholder. """
-pattern SimpleKey = "key:{id}"
+""" Simple key template. """
+const simpleKey = "key:{id}"

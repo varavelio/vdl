@@ -16,13 +16,13 @@ that should be stripped.
 """
 type DocumentedType {
   """ The unique identifier. """
-  id: string
+  id string
 
   """
   A longer field description
   spanning multiple lines.
   """
-  description: string
+  description string
 }
 
 """

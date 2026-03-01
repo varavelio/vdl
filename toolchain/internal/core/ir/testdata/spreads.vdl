@@ -1,25 +1,25 @@
 type AuditFields {
-  createdAt: datetime
-  updatedAt: datetime
+  createdAt datetime
+  updatedAt datetime
 }
 
 type User {
   ...AuditFields
-  id: string
-  name: string
+  id string
+  name string
 }
 
 type Timestamps {
-  timestamp: datetime
+  timestamp datetime
 }
 
 type BaseEntity {
   ...Timestamps
-  id: string
+  id string
 }
 
 type NestedSpread {
   ...BaseEntity
-  name: string
-  active: bool
+  name string
+  active bool
 }
