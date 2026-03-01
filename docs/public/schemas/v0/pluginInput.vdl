@@ -1,41 +1,25 @@
 """
-IrSchema represents the root of the VDL Intermediate Representation (IR).
+IrSchema is the generator-facing representation of a VDL program.
 
-It acts as the canonical, simplified view of the domain model, abstracting away
-the complexity of parsing, file structures, and syntactic sugar.
+This model is intentionally "flat" and "resolved":
+- spreads are already expanded
+- references are already resolved
+- collections are in deterministic order
 
-This structure is the "Golden Platter" for code generators, plugins, and analysis tools:
-a flattened, fully resolved, and read-only data structure ready for consumption.
-
-To ensure reproducible builds and consistent outputs across different environments,
-all collections within the IRSchema are strictly sorted alphabetically.
-
-This is the structure on which code generators and plugins are executed, as it is the
-purest and simplest form of representation of the entire IDL.
+A code generator should be able to consume IrSchema directly, without needing
+to re-run parser or semantic-analysis logic.
 """
 type IrSchema {
-  """ List of all constant definitions in the schema """
+  """ Constant definitions, sorted by name """
   constants: ConstantDef[]
 
-  """ List of all pattern definitions in the schema """
-  patterns: PatternDef[]
-
-  """ List of all enum definitions in the schema """
+  """ Enum definitions, sorted by name """
   enums: EnumDef[]
 
-  """ List of all type definitions in the schema """
+  """ Type definitions, sorted by name """
   types: TypeDef[]
 
-  """ List of all RPC definitions in the schema """
-  rpcs: RpcDef[]
-
-  """ Flattened list of all procedures from all RPCs """
-  procedures: ProcedureDef[]
-
-  """ Flattened list of all streams from all RPCs """
-  streams: StreamDef[]
-
-  """ List of all standalone documentation blocks (even from all RPCs) """
+  """ Standalone documentation blocks in source traversal order """
   docs: DocDef[]
 }
 
@@ -43,7 +27,7 @@ type IrSchema {
 * ENUMS *
 ********/
 
-""" Categories for a type """
+""" Kind discriminator for TypeRef """
 enum TypeKind {
   Primitive = "primitive"
   Type = "type"
@@ -53,7 +37,7 @@ enum TypeKind {
   Object = "object"
 }
 
-""" Field primitive types """
+""" Primitive scalar type names """
 enum PrimitiveType {
   String = "string"
   Int = "int"
@@ -62,213 +46,236 @@ enum PrimitiveType {
   Datetime = "datetime"
 }
 
-""" The underlying value type of an enum """
+""" Underlying storage kind used by an enum """
 enum EnumType {
   String = "string"
   Int = "int"
 }
 
-""" The type of a constant value """
-enum ConstType {
+"""
+Kind discriminator for Value.
+
+Value is used for fully resolved literal data in:
+- constant values
+- annotation arguments
+"""
+enum ValueKind {
   String = "string"
   Int = "int"
   Float = "float"
   Bool = "bool"
+  Object = "object"
+  Array = "array"
 }
 
 /*******************
 * TYPE SYSTEM CORE *
 *******************/
 
-""" Represents any referenced type in a unified way """
+"""
+Normalized type reference used by fields and constants.
+
+`kind` selects which payload fields are meaningful. Generators should inspect
+`kind` first, then read the related payload fields.
+"""
 type TypeRef {
-  """ The category of the type """
+  """ Type category discriminator """
   kind: TypeKind
 
-  """ The name of the primitive type if Kind is primitive """
+  """ Primitive type name when `kind` is `primitive` """
   primitiveName?: PrimitiveType
 
-  """ The name of the type if Kind is type """
+  """ Referenced type name when `kind` is `type` """
   typeName?: string
 
-  """ The name of the enum if Kind is enum """
+  """ Referenced enum name when `kind` is `enum` """
   enumName?: string
 
-  """ The type of the enum if Kind is enum """
+  """ Referenced enum underlying kind when `kind` is `enum` """
   enumType?: EnumType
 
-  """ The type of elements in the array if Kind is array """
+  """ Element type when `kind` is `array` """
   arrayType?: TypeRef
 
-  """ Number of array dimensions (e.g. 2 for int[][]) if Kind is array """
+  """ Array rank when `kind` is `array` (for example, 2 for `T[][]`) """
   arrayDims?: int
 
-  """ The type of values in the map if Kind is map """
+  """ Map value type when `kind` is `map` """
   mapType?: TypeRef
 
-  """ Fields of the inline object if Kind is object, in the same order in which they were written """
+  """ Inline object fields when `kind` is `object` """
   objectFields?: Field[]
 }
 
-""" Represents a field with its type fully resolved """
-type Field {
-  """ The name of the field """
+"""
+Annotation metadata preserved in IR.
+
+`name` is the annotation identifier without the `@` prefix.
+`argument`, when present, is fully resolved as a Value.
+"""
+type Annotation {
+  """ Annotation name without `@` """
   name: string
 
-  """ Documentation for the field """
+  """ Optional resolved argument payload """
+  argument?: Value
+}
+
+""" Flattened object/type field definition """
+type Field {
+  """ Field name """
+  name: string
+
+  """ Optional field documentation """
   doc?: string
 
-  """ Whether the field is optional """
+  """ True when the field is optional (`?`) """
   optional: bool
 
-  """ The type definition of the field """
+  """ Field annotations in source order """
+  annotations: Annotation[]
+
+  """ Normalized field type reference """
   typeRef: TypeRef
+}
+
+/*****************
+* RESOLVED VALUE *
+*****************/
+
+"""
+Fully resolved literal value.
+
+The selected payload is determined by `kind`:
+- `string` -> `stringValue`
+- `int` -> `intValue`
+- `float` -> `floatValue`
+- `bool` -> `boolValue`
+- `object` -> `objectEntries`
+- `array` -> `arrayItems`
+"""
+type Value {
+  """ Value category discriminator """
+  kind: ValueKind
+
+  """ Payload for `kind = string` """
+  stringValue?: string
+
+  """ Payload for `kind = int` """
+  intValue?: int
+
+  """ Payload for `kind = float` """
+  floatValue?: float
+
+  """ Payload for `kind = bool` """
+  boolValue?: bool
+
+  """ Payload for `kind = object` """
+  objectEntries?: ObjectEntry[]
+
+  """ Payload for `kind = array` """
+  arrayItems?: Value[]
+}
+
+""" Key/value pair inside an object Value payload """
+type ObjectEntry {
+  """ Object key """
+  key: string
+
+  """ Fully resolved value for this key """
+  value: Value
 }
 
 /************************
 * TOP LEVEL DEFINITIONS *
 ************************/
 
-""" Represents a type definition """
+"""
+Flattened type definition.
+
+All spreads are already expanded into `fields`.
+"""
 type TypeDef {
-  """ The name of the type """
+  """ Type name """
   name: string
 
-  """ Documentation for the type """
+  """ Optional type documentation """
   doc?: string
 
-  """ Deprecation status if deprecated """
-  deprecated?: string
+  """ Type annotations in source order """
+  annotations: Annotation[]
 
-  """ List of fields in the type in the same order in which they were written """
+  """ Type fields in source order """
   fields: Field[]
 }
 
-""" Represents an enum definition """
+"""
+Flattened enum definition.
+
+All enum spreads are already expanded into `members`.
+"""
 type EnumDef {
-  """ The name of the enum """
+  """ Enum name """
   name: string
 
-  """ Documentation for the enum """
+  """ Optional enum documentation """
   doc?: string
 
-  """ Deprecation status if deprecated """
-  deprecated?: string
+  """ Enum annotations in source order """
+  annotations: Annotation[]
 
-  """ The type of this enum """
+  """ Enum underlying storage kind """
   enumType: EnumType
 
-  """ List of enum members """
+  """ Enum members in source order after spread expansion """
   members: EnumDefMember[]
 }
 
-""" A member of an enum """
+""" Enum member definition """
 type EnumDefMember {
-  """ The name of the enum member """
+  """ Member name """
   name: string
 
-  """ The value of the enum member as a string """
+  """ Canonical string representation of the member value """
   value: string
+
+  """ Optional member documentation """
+  doc?: string
+
+  """ Member annotations in source order """
+  annotations: Annotation[]
 }
 
-""" Represents a constant definition """
+"""
+Fully resolved constant definition.
+
+`typeRef` is explicit or inferred by analysis.
+`value` contains the fully resolved literal payload.
+"""
 type ConstantDef {
-  """ The name of the constant """
+  """ Constant name """
   name: string
 
-  """ Documentation for the constant """
+  """ Optional constant documentation """
   doc?: string
 
-  """ Deprecation status if deprecated """
-  deprecated?: string
+  """ Constant annotations in source order """
+  annotations: Annotation[]
 
-  """ The type of the constant value """
-  constType: ConstType
+  """ Normalized constant type reference (explicit or inferred) """
+  typeRef: TypeRef
 
-  """ The value of the constant as a string """
-  value: string
+  """ Fully resolved constant value """
+  value: Value
 }
 
-""" Represents a pattern template for generating dynamic strings """
-type PatternDef {
-  """ The name of the pattern """
-  name: string
+"""
+Standalone documentation block.
 
-  """ Documentation for the pattern """
-  doc?: string
-
-  """ Deprecation status if deprecated """
-  deprecated?: string
-
-  """ The template string containing placeholders """
-  template: string
-
-  """ List of placeholder names extracted from the template """
-  placeholders: string[]
-}
-
-""" Represents an RPC definition """
-type RpcDef {
-  """ The name of the RPC """
-  name: string
-
-  """ Documentation for the RPC """
-  doc?: string
-
-  """ Deprecation status if deprecated """
-  deprecated?: string
-}
-
-""" Represents an RPC procedure """
-type ProcedureDef {
-  """ The name of the parent RPC """
-  rpcName: string
-
-  """ The name of the procedure """
-  name: string
-
-  """ Documentation for the procedure """
-  doc?: string
-
-  """ Deprecation status if deprecated """
-  deprecated?: string
-
-  """ List of input fields in the same order in which they were written """
-  input: Field[]
-
-  """ List of output fields in the same order in which they were written """
-  output: Field[]
-}
-
-""" Represents an RPC stream """
-type StreamDef {
-  """ The name of the parent RPC """
-  rpcName: string
-
-  """ The name of the stream """
-  name: string
-
-  """ Documentation for the stream """
-  doc?: string
-
-  """ Deprecation status if deprecated """
-  deprecated?: string
-
-  """ List of input fields in the same order in which they were written """
-  input: Field[]
-
-  """ List of output fields in the same order in which they were written """
-  output: Field[]
-}
-
-""" Represents a standalone documentation block """
+Used for top-level docstrings that are not attached to a type/enum/constant.
+"""
 type DocDef {
-  """
-  The name of the RPC this doc belongs to. If empty this is a global standalone documentation block.
-  """
-  rpcName?: string
-
-  """ The content of the documentation """
+  """ Resolved documentation content """
   content: string
 }
 

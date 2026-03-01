@@ -1,61 +1,80 @@
 {
   "$defs": {
-    "ConstType": {
-      "description": "The type of a constant value",
-      "enum": [
-        "string",
-        "int",
-        "float",
-        "bool"
-      ],
-      "type": "string"
-    },
-    "ConstantDef": {
-      "description": "Represents a constant definition",
+    "Annotation": {
+      "description": "Annotation metadata preserved in IR.\n\n`name` is the annotation identifier without the `@` prefix.\n`argument`, when present, is fully resolved as a Value.",
       "properties": {
-        "constType": {
+        "argument": {
           "allOf": [
             {
-              "$ref": "#/$defs/ConstType"
+              "$ref": "#/$defs/Value"
             },
             {
-              "description": "The type of the constant value"
+              "description": "Optional resolved argument payload"
             }
           ]
         },
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
-          "type": "string"
-        },
-        "doc": {
-          "description": "Documentation for the constant",
-          "type": "string"
-        },
         "name": {
-          "description": "The name of the constant",
-          "type": "string"
-        },
-        "value": {
-          "description": "The value of the constant as a string",
+          "description": "Annotation name without `@`",
           "type": "string"
         }
       },
       "required": [
-        "constType",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ConstantDef": {
+      "description": "Fully resolved constant definition.\n\n`typeRef` is explicit or inferred by analysis.\n`value` contains the fully resolved literal payload.",
+      "properties": {
+        "annotations": {
+          "description": "Constant annotations in source order",
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
+        },
+        "doc": {
+          "description": "Optional constant documentation",
+          "type": "string"
+        },
+        "name": {
+          "description": "Constant name",
+          "type": "string"
+        },
+        "typeRef": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeRef"
+            },
+            {
+              "description": "Normalized constant type reference (explicit or inferred)"
+            }
+          ]
+        },
+        "value": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Value"
+            },
+            {
+              "description": "Fully resolved constant value"
+            }
+          ]
+        }
+      },
+      "required": [
+        "annotations",
         "name",
+        "typeRef",
         "value"
       ],
       "type": "object"
     },
     "DocDef": {
-      "description": "Represents a standalone documentation block",
+      "description": "Standalone documentation block.\n\nUsed for top-level docstrings that are not attached to a type/enum/constant.",
       "properties": {
         "content": {
-          "description": "The content of the documentation",
-          "type": "string"
-        },
-        "rpcName": {
-          "description": "The name of the RPC this doc belongs to. If empty this is a global standalone documentation block.",
+          "description": "Resolved documentation content",
           "type": "string"
         }
       },
@@ -65,14 +84,17 @@
       "type": "object"
     },
     "EnumDef": {
-      "description": "Represents an enum definition",
+      "description": "Flattened enum definition.\n\nAll enum spreads are already expanded into `members`.",
       "properties": {
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
-          "type": "string"
+        "annotations": {
+          "description": "Enum annotations in source order",
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
         },
         "doc": {
-          "description": "Documentation for the enum",
+          "description": "Optional enum documentation",
           "type": "string"
         },
         "enumType": {
@@ -81,23 +103,24 @@
               "$ref": "#/$defs/EnumType"
             },
             {
-              "description": "The type of this enum"
+              "description": "Enum underlying storage kind"
             }
           ]
         },
         "members": {
-          "description": "List of enum members",
+          "description": "Enum members in source order after spread expansion",
           "items": {
             "$ref": "#/$defs/EnumDefMember"
           },
           "type": "array"
         },
         "name": {
-          "description": "The name of the enum",
+          "description": "Enum name",
           "type": "string"
         }
       },
       "required": [
+        "annotations",
         "enumType",
         "members",
         "name"
@@ -105,25 +128,37 @@
       "type": "object"
     },
     "EnumDefMember": {
-      "description": "A member of an enum",
+      "description": "Enum member definition",
       "properties": {
+        "annotations": {
+          "description": "Member annotations in source order",
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
+        },
+        "doc": {
+          "description": "Optional member documentation",
+          "type": "string"
+        },
         "name": {
-          "description": "The name of the enum member",
+          "description": "Member name",
           "type": "string"
         },
         "value": {
-          "description": "The value of the enum member as a string",
+          "description": "Canonical string representation of the member value",
           "type": "string"
         }
       },
       "required": [
+        "annotations",
         "name",
         "value"
       ],
       "type": "object"
     },
     "EnumType": {
-      "description": "The underlying value type of an enum",
+      "description": "Underlying storage kind used by an enum",
       "enum": [
         "string",
         "int"
@@ -131,18 +166,25 @@
       "type": "string"
     },
     "Field": {
-      "description": "Represents a field with its type fully resolved",
+      "description": "Flattened object/type field definition",
       "properties": {
+        "annotations": {
+          "description": "Field annotations in source order",
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
+        },
         "doc": {
-          "description": "Documentation for the field",
+          "description": "Optional field documentation",
           "type": "string"
         },
         "name": {
-          "description": "The name of the field",
+          "description": "Field name",
           "type": "string"
         },
         "optional": {
-          "description": "Whether the field is optional",
+          "description": "True when the field is optional (`?`)",
           "type": "boolean"
         },
         "typeRef": {
@@ -151,12 +193,13 @@
               "$ref": "#/$defs/TypeRef"
             },
             {
-              "description": "The type definition of the field"
+              "description": "Normalized field type reference"
             }
           ]
         }
       },
       "required": [
+        "annotations",
         "name",
         "optional",
         "typeRef"
@@ -164,59 +207,31 @@
       "type": "object"
     },
     "IrSchema": {
-      "description": "IrSchema represents the root of the VDL Intermediate Representation (IR).\n\nIt acts as the canonical, simplified view of the domain model, abstracting away\nthe complexity of parsing, file structures, and syntactic sugar.\n\nThis structure is the \"Golden Platter\" for code generators, plugins, and analysis tools:\na flattened, fully resolved, and read-only data structure ready for consumption.\n\nTo ensure reproducible builds and consistent outputs across different environments,\nall collections within the IRSchema are strictly sorted alphabetically.\n\nThis is the structure on which code generators and plugins are executed, as it is the\npurest and simplest form of representation of the entire IDL.",
+      "description": "IrSchema is the generator-facing representation of a VDL program.\n\nThis model is intentionally \"flat\" and \"resolved\":\n- spreads are already expanded\n- references are already resolved\n- collections are in deterministic order\n\nA code generator should be able to consume IrSchema directly, without needing\nto re-run parser or semantic-analysis logic.",
       "properties": {
         "constants": {
-          "description": "List of all constant definitions in the schema",
+          "description": "Constant definitions, sorted by name",
           "items": {
             "$ref": "#/$defs/ConstantDef"
           },
           "type": "array"
         },
         "docs": {
-          "description": "List of all standalone documentation blocks (even from all RPCs)",
+          "description": "Standalone documentation blocks in source traversal order",
           "items": {
             "$ref": "#/$defs/DocDef"
           },
           "type": "array"
         },
         "enums": {
-          "description": "List of all enum definitions in the schema",
+          "description": "Enum definitions, sorted by name",
           "items": {
             "$ref": "#/$defs/EnumDef"
           },
           "type": "array"
         },
-        "patterns": {
-          "description": "List of all pattern definitions in the schema",
-          "items": {
-            "$ref": "#/$defs/PatternDef"
-          },
-          "type": "array"
-        },
-        "procedures": {
-          "description": "Flattened list of all procedures from all RPCs",
-          "items": {
-            "$ref": "#/$defs/ProcedureDef"
-          },
-          "type": "array"
-        },
-        "rpcs": {
-          "description": "List of all RPC definitions in the schema",
-          "items": {
-            "$ref": "#/$defs/RpcDef"
-          },
-          "type": "array"
-        },
-        "streams": {
-          "description": "Flattened list of all streams from all RPCs",
-          "items": {
-            "$ref": "#/$defs/StreamDef"
-          },
-          "type": "array"
-        },
         "types": {
-          "description": "List of all type definitions in the schema",
+          "description": "Type definitions, sorted by name",
           "items": {
             "$ref": "#/$defs/TypeDef"
           },
@@ -227,50 +242,36 @@
         "constants",
         "docs",
         "enums",
-        "patterns",
-        "procedures",
-        "rpcs",
-        "streams",
         "types"
       ],
       "type": "object"
     },
-    "PatternDef": {
-      "description": "Represents a pattern template for generating dynamic strings",
+    "ObjectEntry": {
+      "description": "Key/value pair inside an object Value payload",
       "properties": {
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
+        "key": {
+          "description": "Object key",
           "type": "string"
         },
-        "doc": {
-          "description": "Documentation for the pattern",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the pattern",
-          "type": "string"
-        },
-        "placeholders": {
-          "description": "List of placeholder names extracted from the template",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "template": {
-          "description": "The template string containing placeholders",
-          "type": "string"
+        "value": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Value"
+            },
+            {
+              "description": "Fully resolved value for this key"
+            }
+          ]
         }
       },
       "required": [
-        "name",
-        "placeholders",
-        "template"
+        "key",
+        "value"
       ],
       "type": "object"
     },
     "PrimitiveType": {
-      "description": "Field primitive types",
+      "description": "Primitive scalar type names",
       "enum": [
         "string",
         "int",
@@ -280,142 +281,41 @@
       ],
       "type": "string"
     },
-    "ProcedureDef": {
-      "description": "Represents an RPC procedure",
-      "properties": {
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
-          "type": "string"
-        },
-        "doc": {
-          "description": "Documentation for the procedure",
-          "type": "string"
-        },
-        "input": {
-          "description": "List of input fields in the same order in which they were written",
-          "items": {
-            "$ref": "#/$defs/Field"
-          },
-          "type": "array"
-        },
-        "name": {
-          "description": "The name of the procedure",
-          "type": "string"
-        },
-        "output": {
-          "description": "List of output fields in the same order in which they were written",
-          "items": {
-            "$ref": "#/$defs/Field"
-          },
-          "type": "array"
-        },
-        "rpcName": {
-          "description": "The name of the parent RPC",
-          "type": "string"
-        }
-      },
-      "required": [
-        "input",
-        "name",
-        "output",
-        "rpcName"
-      ],
-      "type": "object"
-    },
-    "RpcDef": {
-      "description": "Represents an RPC definition",
-      "properties": {
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
-          "type": "string"
-        },
-        "doc": {
-          "description": "Documentation for the RPC",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the RPC",
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "type": "object"
-    },
-    "StreamDef": {
-      "description": "Represents an RPC stream",
-      "properties": {
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
-          "type": "string"
-        },
-        "doc": {
-          "description": "Documentation for the stream",
-          "type": "string"
-        },
-        "input": {
-          "description": "List of input fields in the same order in which they were written",
-          "items": {
-            "$ref": "#/$defs/Field"
-          },
-          "type": "array"
-        },
-        "name": {
-          "description": "The name of the stream",
-          "type": "string"
-        },
-        "output": {
-          "description": "List of output fields in the same order in which they were written",
-          "items": {
-            "$ref": "#/$defs/Field"
-          },
-          "type": "array"
-        },
-        "rpcName": {
-          "description": "The name of the parent RPC",
-          "type": "string"
-        }
-      },
-      "required": [
-        "input",
-        "name",
-        "output",
-        "rpcName"
-      ],
-      "type": "object"
-    },
     "TypeDef": {
-      "description": "Represents a type definition",
+      "description": "Flattened type definition.\n\nAll spreads are already expanded into `fields`.",
       "properties": {
-        "deprecated": {
-          "description": "Deprecation status if deprecated",
-          "type": "string"
+        "annotations": {
+          "description": "Type annotations in source order",
+          "items": {
+            "$ref": "#/$defs/Annotation"
+          },
+          "type": "array"
         },
         "doc": {
-          "description": "Documentation for the type",
+          "description": "Optional type documentation",
           "type": "string"
         },
         "fields": {
-          "description": "List of fields in the type in the same order in which they were written",
+          "description": "Type fields in source order",
           "items": {
             "$ref": "#/$defs/Field"
           },
           "type": "array"
         },
         "name": {
-          "description": "The name of the type",
+          "description": "Type name",
           "type": "string"
         }
       },
       "required": [
+        "annotations",
         "fields",
         "name"
       ],
       "type": "object"
     },
     "TypeKind": {
-      "description": "Categories for a type",
+      "description": "Kind discriminator for TypeRef",
       "enum": [
         "primitive",
         "type",
@@ -427,10 +327,10 @@
       "type": "string"
     },
     "TypeRef": {
-      "description": "Represents any referenced type in a unified way",
+      "description": "Normalized type reference used by fields and constants.\n\n`kind` selects which payload fields are meaningful. Generators should inspect\n`kind` first, then read the related payload fields.",
       "properties": {
         "arrayDims": {
-          "description": "Number of array dimensions (e.g. 2 for int[][]) if Kind is array",
+          "description": "Array rank when `kind` is `array` (for example, 2 for `T[][]`)",
           "type": "integer"
         },
         "arrayType": {
@@ -439,12 +339,12 @@
               "$ref": "#/$defs/TypeRef"
             },
             {
-              "description": "The type of elements in the array if Kind is array"
+              "description": "Element type when `kind` is `array`"
             }
           ]
         },
         "enumName": {
-          "description": "The name of the enum if Kind is enum",
+          "description": "Referenced enum name when `kind` is `enum`",
           "type": "string"
         },
         "enumType": {
@@ -453,7 +353,7 @@
               "$ref": "#/$defs/EnumType"
             },
             {
-              "description": "The type of the enum if Kind is enum"
+              "description": "Referenced enum underlying kind when `kind` is `enum`"
             }
           ]
         },
@@ -463,7 +363,7 @@
               "$ref": "#/$defs/TypeKind"
             },
             {
-              "description": "The category of the type"
+              "description": "Type category discriminator"
             }
           ]
         },
@@ -473,12 +373,12 @@
               "$ref": "#/$defs/TypeRef"
             },
             {
-              "description": "The type of values in the map if Kind is map"
+              "description": "Map value type when `kind` is `map`"
             }
           ]
         },
         "objectFields": {
-          "description": "Fields of the inline object if Kind is object, in the same order in which they were written",
+          "description": "Inline object fields when `kind` is `object`",
           "items": {
             "$ref": "#/$defs/Field"
           },
@@ -490,12 +390,12 @@
               "$ref": "#/$defs/PrimitiveType"
             },
             {
-              "description": "The name of the primitive type if Kind is primitive"
+              "description": "Primitive type name when `kind` is `primitive`"
             }
           ]
         },
         "typeName": {
-          "description": "The name of the type if Kind is type",
+          "description": "Referenced type name when `kind` is `type`",
           "type": "string"
         }
       },
@@ -503,6 +403,67 @@
         "kind"
       ],
       "type": "object"
+    },
+    "Value": {
+      "description": "Fully resolved literal value.\n\nThe selected payload is determined by `kind`:\n- `string` -\u003e `stringValue`\n- `int` -\u003e `intValue`\n- `float` -\u003e `floatValue`\n- `bool` -\u003e `boolValue`\n- `object` -\u003e `objectEntries`\n- `array` -\u003e `arrayItems`",
+      "properties": {
+        "arrayItems": {
+          "description": "Payload for `kind = array`",
+          "items": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "array"
+        },
+        "boolValue": {
+          "description": "Payload for `kind = bool`",
+          "type": "boolean"
+        },
+        "floatValue": {
+          "description": "Payload for `kind = float`",
+          "type": "number"
+        },
+        "intValue": {
+          "description": "Payload for `kind = int`",
+          "type": "integer"
+        },
+        "kind": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/ValueKind"
+            },
+            {
+              "description": "Value category discriminator"
+            }
+          ]
+        },
+        "objectEntries": {
+          "description": "Payload for `kind = object`",
+          "items": {
+            "$ref": "#/$defs/ObjectEntry"
+          },
+          "type": "array"
+        },
+        "stringValue": {
+          "description": "Payload for `kind = string`",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ValueKind": {
+      "description": "Kind discriminator for Value.\n\nValue is used for fully resolved literal data in:\n- constant values\n- annotation arguments",
+      "enum": [
+        "string",
+        "int",
+        "float",
+        "bool",
+        "object",
+        "array"
+      ],
+      "type": "string"
     }
   },
   "$id": "https://vdl.varavel.com/schemas/v0/ir.schema.json",
