@@ -48,17 +48,19 @@ If the binary is not in your operating system PATH, you can set a custom path in
 
 The following snippets are available for `.vdl` files:
 
-- `type`: Define a new custom data type
-- `field`: Add a field to a type
-- `enum`: Define an enumeration (String or Integer)
-- `const`: Define a global constant
-- `pattern`: Define a string interpolation pattern
-- `map`: Define a map type (keys are always strings)
-- `rpc`: Define a new RPC service block
-- `proc`: Define a request-response procedure inside an RPC
-- `stream`: Define a unidirectional stream inside an RPC
+- `type`: Define a new named type
+- `field`: Add a required field to a type
+- `field?`: Add an optional field to a type
+- `enum`: Define an enumeration with implicit string values
+- `enums`: Define an enumeration with explicit string values
+- `enumi`: Define an enumeration with explicit integer values
+- `const`: Define a constant with an inferred type
+- `constt`: Define a constant with an explicit type
+- `ann`: Add a flag annotation (`@name`)
+- `annarg`: Add an annotation with a scalar argument (`@name("value")`)
+- `annobj`: Add an annotation with an object argument
+- `map`: Use a map type (`map[ValueType]`)
 - `include`: Include another VDL file
-- `deprecated`: Mark the next element as deprecated
 - `doc`: Insert a standalone documentation block
 - `docfile`: Reference an external markdown documentation file
 

@@ -9,14 +9,13 @@
   "patterns": [
     { "include": "#comments" },
     { "include": "#docstrings" },
-    { "include": "#strings" },
+    { "include": "#annotations" },
     { "include": "#declarations" },
-    { "include": "#properties" },
     { "include": "#keywords" },
-    { "include": "#functions-macros" },
     { "include": "#constants-language" },
     { "include": "#constants-numeric" },
-    { "include": "#constants-usage" },
+    { "include": "#spreads" },
+    { "include": "#strings" },
     { "include": "#types-primitive" },
     { "include": "#types-container" },
     { "include": "#types-usage" },
@@ -59,14 +58,49 @@
           "match": "\\\\."
         },
         {
-          "name": "variable.other.pattern.placeholder.vdl",
+          "name": "meta.template.expression.vdl",
           "match": "\\{[a-zA-Z0-9_]+\\}"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "comment": "Annotation with argument: @name(...)",
+          "name": "meta.annotation.vdl",
+          "begin": "@([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()",
+          "beginCaptures": {
+            "1": { "name": "entity.other.attribute-name.vdl" },
+            "2": { "name": "punctuation.definition.parameters.begin.vdl" }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.parameters.end.vdl" }
+          },
+          "patterns": [
+            { "include": "#docstrings" },
+            { "include": "#strings" },
+            { "include": "#constants-language" },
+            { "include": "#constants-numeric" },
+            { "include": "#spreads" },
+            { "include": "#types-usage" },
+            { "include": "#operators" }
+          ]
+        },
+        {
+          "comment": "Annotation flag: @name",
+          "name": "meta.annotation.vdl",
+          "match": "@([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.vdl" }
+          }
         }
       ]
     },
     "declarations": {
       "patterns": [
         {
+          "comment": "Type or enum declaration: type Foo { / enum Bar {",
           "name": "meta.declaration.type.vdl",
           "match": "\\b(type|enum)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
@@ -75,22 +109,7 @@
           }
         },
         {
-          "name": "meta.declaration.rpc.vdl",
-          "match": "\\b(rpc)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
-          "captures": {
-            "1": { "name": "keyword.control.vdl" },
-            "2": { "name": "entity.name.type.class.vdl" }
-          }
-        },
-        {
-          "name": "meta.declaration.function.vdl",
-          "match": "\\b(proc|stream|pattern)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
-          "captures": {
-            "1": { "name": "keyword.control.vdl" },
-            "2": { "name": "entity.name.function.vdl" }
-          }
-        },
-        {
+          "comment": "Const declaration: const name ...",
           "name": "meta.declaration.constant.vdl",
           "match": "\\b(const)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
@@ -104,27 +123,7 @@
       "patterns": [
         {
           "name": "keyword.control.vdl",
-          "match": "\\b(include|input|output)\\b"
-        }
-      ]
-    },
-    "functions-macros": {
-      "patterns": [
-        {
-          "name": "keyword.other.deprecated.vdl",
-          "match": "\\bdeprecated\\b"
-        },
-        {
-          "begin": "\\b(deprecated)\\s*(\\()",
-          "beginCaptures": {
-            "1": { "name": "keyword.other.deprecated.vdl" },
-            "2": { "name": "punctuation.definition.parameters.begin.vdl" }
-          },
-          "end": "\\)",
-          "endCaptures": {
-            "0": { "name": "punctuation.definition.parameters.end.vdl" }
-          },
-          "patterns": [{ "include": "#strings" }]
+          "match": "\\b(include)\\b"
         }
       ]
     },
@@ -148,12 +147,15 @@
         }
       ]
     },
-    "constants-usage": {
+    "spreads": {
       "patterns": [
         {
-          "comment": "Matches UPPER_CASE identifiers as constants references",
-          "name": "variable.other.constant.vdl",
-          "match": "\\b[A-Z][A-Z0-9_]*_\\w+\\b|\\b[A-Z]{2,}\\b"
+          "comment": "Spread member: ...TypeName",
+          "match": "(\\.\\.\\.)(([a-zA-Z_][a-zA-Z0-9_]*))",
+          "captures": {
+            "1": { "name": "keyword.operator.spread.vdl" },
+            "2": { "name": "entity.name.type.class.vdl" }
+          }
         }
       ]
     },
@@ -168,6 +170,7 @@
     "types-container": {
       "patterns": [
         {
+          "comment": "Map type: map[ValueType]",
           "name": "storage.type.container.vdl",
           "match": "\\b(map)\\b"
         }
@@ -176,7 +179,15 @@
     "types-usage": {
       "patterns": [
         {
-          "comment": "Matches PascalCase identifiers as Types/Enums references",
+          "comment": "Enum member reference: EnumName.MemberName",
+          "match": "\\b([A-Z][a-zA-Z0-9]*)\\.(([A-Z][a-zA-Z0-9]*))",
+          "captures": {
+            "1": { "name": "entity.name.type.class.vdl" },
+            "2": { "name": "variable.other.enummember.vdl" }
+          }
+        },
+        {
+          "comment": "PascalCase type/enum reference",
           "name": "entity.name.type.class.vdl",
           "match": "\\b[A-Z][a-zA-Z0-9]*\\b"
         }
@@ -185,32 +196,12 @@
     "operators": {
       "patterns": [
         {
-          "name": "keyword.operator.spread.vdl",
-          "match": "\\.\\.\\."
-        },
-        {
           "name": "keyword.operator.optional.vdl",
           "match": "\\?"
         },
         {
           "name": "keyword.operator.assignment.vdl",
           "match": "="
-        },
-        {
-          "name": "punctuation.separator.key-value.vdl",
-          "match": ":"
-        },
-        {
-          "name": "punctuation.terminator.vdl",
-          "match": ","
-        },
-        {
-          "name": "punctuation.definition.type.begin.vdl",
-          "match": "<"
-        },
-        {
-          "name": "punctuation.definition.type.end.vdl",
-          "match": ">"
         },
         {
           "name": "punctuation.section.braces.begin.vdl",
@@ -235,15 +226,6 @@
         {
           "name": "punctuation.definition.parameters.end.vdl",
           "match": "\\)"
-        }
-      ]
-    },
-    "properties": {
-      "patterns": [
-        {
-          "comment": "Matches field names (including keywords) when used as properties: field: Type or field?: Type",
-          "name": "variable.object.property.vdl",
-          "match": "\\b(type|rpc|proc|stream|enum|const|pattern|input|output|include|deprecated|map|string|int|float|bool|datetime|true|false|[a-z][a-zA-Z0-9_]*)\\b(?=\\s*\\??\\s*:)"
         }
       ]
     }

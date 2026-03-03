@@ -1,92 +1,89 @@
 {
   "VDL Type Definition": {
     "prefix": "type",
-    "body": ["type ${1:TypeName} {", "\t${2:field}: ${3:string}", "}"],
+    "body": ["type ${1:TypeName} {", "\t${2:fieldName} ${3:string}", "}"],
     "description": "Define a new custom data type",
   },
   "VDL Field": {
     "prefix": "field",
-    "body": ["${1:fieldName}: ${2:string}"],
+    "body": ["${1:fieldName} ${2:string}"],
     "description": "Add a field to a type",
   },
   "VDL Optional Field": {
     "prefix": "field?",
-    "body": ["${1:fieldName}?: ${2:string}"],
+    "body": ["${1:fieldName}? ${2:string}"],
     "description": "Add an optional field to a type",
   },
-  "VDL Enum": {
+  "VDL Enum (implicit)": {
     "prefix": "enum",
     "body": ["enum ${1:EnumName} {", "\t${2:Member}", "}"],
-    "description": "Define an enumeration (String or Integer)",
+    "description": "Define an enumeration with implicit string values",
   },
-  "VDL Constant": {
+  "VDL Enum (explicit strings)": {
+    "prefix": "enums",
+    "body": [
+      "enum ${1:EnumName} {",
+      "\t${2:Member} = \"${3:value}\"",
+      "}",
+    ],
+    "description": "Define an enumeration with explicit string values",
+  },
+  "VDL Enum (explicit integers)": {
+    "prefix": "enumi",
+    "body": [
+      "enum ${1:EnumName} {",
+      "\t${2:Member} = ${3:1}",
+      "}",
+    ],
+    "description": "Define an enumeration with explicit integer values",
+  },
+  "VDL Const (inferred type)": {
     "prefix": "const",
-    "body": ["const ${1:CONSTANT_NAME} = ${2:Value}"],
-    "description": "Define a global constant",
+    "body": ["const ${1:name} = ${2:value}"],
+    "description": "Define a constant with inferred type",
   },
-  "VDL Pattern": {
-    "prefix": "pattern",
-    "body": ["pattern ${1:PatternName} = \"${2:prefix.{placeholder}}\""],
-    "description": "Define a string interpolation pattern",
+  "VDL Const (explicit type)": {
+    "prefix": "constt",
+    "body": ["const ${1:name} ${2:int} = ${3:0}"],
+    "description": "Define a constant with explicit type",
+  },
+  "VDL Annotation (flag)": {
+    "prefix": "ann",
+    "body": ["@${1:annotationName}"],
+    "description": "Add a flag annotation",
+  },
+  "VDL Annotation (with argument)": {
+    "prefix": "annarg",
+    "body": ["@${1:annotationName}(${2:argument})"],
+    "description": "Add an annotation with an argument",
+  },
+  "VDL Annotation (object argument)": {
+    "prefix": "annobj",
+    "body": [
+      "@${1:annotationName}({",
+      "\t${2:key} ${3:value}",
+      "})",
+    ],
+    "description": "Add an annotation with an object argument",
   },
   "VDL Map": {
     "prefix": "map",
-    "body": ["map<${1:string}>"],
-    "description": "Define a map type (keys are always strings)",
-  },
-  "VDL RPC Service": {
-    "prefix": "rpc",
-    "body": ["rpc ${1:ServiceName} {", "\t$0", "}"],
-    "description": "Define a new RPC service block",
-  },
-  "VDL Procedure": {
-    "prefix": "proc",
-    "body": [
-      "proc ${1:ProcedureName} {",
-      "\tinput {",
-      "\t\t${2:field}: ${3:string}",
-      "\t}",
-      "",
-      "\toutput {",
-      "\t\t${4:field}: ${5:string}",
-      "\t}",
-      "}",
-    ],
-    "description": "Define a request-response procedure inside an RPC",
-  },
-  "VDL Stream": {
-    "prefix": "stream",
-    "body": [
-      "stream ${1:StreamName} {",
-      "\tinput {",
-      "\t\t${2:field}: ${3:string}",
-      "\t}",
-      "",
-      "\toutput {",
-      "\t\t${4:field}: ${5:string}",
-      "\t}",
-      "}",
-    ],
-    "description": "Define a unidirectional stream inside an RPC",
+    "body": ["map[${1:string}]"],
+    "description": "Define a map type",
   },
   "VDL Include": {
     "prefix": "include",
     "body": ["include \"./${1:file}.vdl\""],
     "description": "Include another VDL file",
   },
-  "VDL Deprecated": {
-    "prefix": "deprecated",
-    "body": ["deprecated(\"Use ${1:NewElement} instead\")"],
-    "description": "Mark the next element as deprecated",
-  },
-  "VDL Docstring (Standalone)": {
+  "VDL Docstring": {
     "prefix": "doc",
     "body": ["\"\"\" ${1:Description...} \"\"\""],
-    "description": "Insert a standalone documentation block",
+    "description": "Insert a documentation string",
   },
-  "VDL Docstring (External)": {
+  "VDL Docstring (external file)": {
     "prefix": "docfile",
     "body": ["\"\"\" ./${1:docs/file.md} \"\"\""],
     "description": "Reference an external markdown documentation file",
-  },
+  }
 }
