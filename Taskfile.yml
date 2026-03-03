@@ -37,7 +37,6 @@ tasks:
     cmds:
       - npm install
       - cd ./toolchain && go mod download
-      - cd ./docs && npm install
 
   codegen:
     desc: "Run all code generators"
@@ -125,21 +124,3 @@ tasks:
     desc: "VSCode: List contents of packaged .vsix"
     dir: ./editors/vscode
     cmd: npx --no vsce ls
-
-  ##############
-  # DOCS TASKS #
-  ##############
-
-  dc:dev:
-    desc: "Docs: Start development server"
-    dir: ./docs
-    deps:
-      - tc:build:wasm
-    cmd: npx --no astro dev --host 0.0.0.0
-
-  dc:build:
-    desc: "Docs: Build the production docs site"
-    dir: ./docs
-    deps:
-      - tc:build:wasm
-    cmd: npx --no astro build
