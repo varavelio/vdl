@@ -161,10 +161,6 @@ func buildEnumSymbol(decl *ast.EnumDecl, file string) *EnumSymbol {
 }
 
 func expandEnumMembers(symbols *symbolTable, enum *EnumSymbol) ([]*EnumMemberSymbol, EnumValueType, []Diagnostic) {
-	type frame struct {
-		enum *EnumSymbol
-	}
-
 	var diagnostics []Diagnostic
 	stack := []string{}
 	seen := map[string]bool{}
@@ -254,7 +250,6 @@ func expandEnumMembers(symbols *symbolTable, enum *EnumSymbol) ([]*EnumMemberSym
 		}
 	}
 
-	_ = frame{}
 	return effectiveMembers, valueType, diagnostics
 }
 
