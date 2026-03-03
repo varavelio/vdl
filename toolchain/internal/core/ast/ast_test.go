@@ -107,9 +107,13 @@ func TestFlattenedFields(t *testing.T) {
 
 	typeDecl := &TypeDecl{
 		Name: "User",
-		Members: []*TypeMember{
-			{Field: &Field{Name: "id", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}},
-			{Field: fProfile},
+		Base: &FieldTypeBase{
+			Object: &FieldTypeObject{
+				Members: []*TypeMember{
+					{Field: &Field{Name: "id", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}},
+					{Field: fProfile},
+				},
+			},
 		},
 	}
 
@@ -238,26 +242,54 @@ func TestScalarLiteralStringAllTypes(t *testing.T) {
 	}
 }
 
-func TestTypeDeclChildWithDocstring(t *testing.T) {
-	t.Run("docstring child", func(t *testing.T) {
-		child := &TypeMember{Docstring: &Docstring{Value: " field docs "}}
-		require.NotNil(t, child.Docstring)
-		require.Nil(t, child.Field)
-		require.Nil(t, child.Spread)
-	})
-
-	t.Run("field child", func(t *testing.T) {
+func TestTypeMemberVariants(t *testing.T) {
+	t.Run("field member", func(t *testing.T) {
 		child := &TypeMember{Field: &Field{Name: "id"}}
-		require.Nil(t, child.Docstring)
 		require.NotNil(t, child.Field)
 		require.Nil(t, child.Spread)
 	})
 
-	t.Run("spread child", func(t *testing.T) {
+	t.Run("spread member", func(t *testing.T) {
 		child := &TypeMember{Spread: &Spread{Ref: &Reference{Name: "Base"}}}
-		require.Nil(t, child.Docstring)
 		require.Nil(t, child.Field)
 		require.NotNil(t, child.Spread)
+	})
+}
+
+func TestTypeDeclKinds(t *testing.T) {
+	t.Run("object type", func(t *testing.T) {
+		decl := &TypeDecl{
+			Name: "Foo",
+			Base: &FieldTypeBase{
+				Object: &FieldTypeObject{
+					Members: []*TypeMember{{Field: &Field{Name: "id"}}},
+				},
+			},
+		}
+		require.True(t, decl.IsObject())
+		require.NotNil(t, decl.Members())
+	})
+
+	t.Run("named type", func(t *testing.T) {
+		named := "string"
+		decl := &TypeDecl{
+			Name: "Bar",
+			Base: &FieldTypeBase{Named: &named},
+		}
+		require.NotNil(t, decl.Base.Named)
+		require.False(t, decl.IsObject())
+	})
+
+	t.Run("array type", func(t *testing.T) {
+		named := "int"
+		decl := &TypeDecl{
+			Name:       "Ids",
+			Base:       &FieldTypeBase{Named: &named},
+			Dimensions: 1,
+		}
+		require.NotNil(t, decl.Base.Named)
+		ft := decl.Type()
+		require.True(t, ft.IsArray())
 	})
 }
 

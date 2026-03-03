@@ -207,27 +207,49 @@ type Annotation struct {
 }
 
 // TypeDecl represents a custom type declaration.
+// A type IS its type reference, it can be a primitive, custom type, map, object, or array of any.
+// Examples: type Foo string, type Bar int[], type Config map[string], type User { name string }
 type TypeDecl struct {
 	Positions
-	Docstring   *Docstring    `parser:"(@@ (?! Newline Newline))?"`
-	Annotations []*Annotation `parser:"@@*"`
-	Name        string        `parser:"Type @Ident"`
-	Members     []*TypeMember `parser:"LBrace @@* RBrace"`
+	Docstring   *Docstring      `parser:"(@@ (?! Newline Newline))?"`
+	Annotations []*Annotation   `parser:"@@*"`
+	Name        string          `parser:"Type @Ident"`
+	Base        *FieldTypeBase  `parser:"@@"`
+	Dimensions  ArrayDimensions `parser:"(LBracket @RBracket)*"`
+}
+
+// IsObject returns true if this type is an object type (e.g., type Foo { ... }).
+func (t *TypeDecl) IsObject() bool { return t.Base != nil && t.Base.Object != nil }
+
+// Type returns the FieldType that this type declaration defines.
+func (t *TypeDecl) Type() FieldType {
+	return FieldType{
+		Positions:  t.Positions,
+		Base:       t.Base,
+		Dimensions: t.Dimensions,
+	}
+}
+
+// Members returns the type members if this is an object type, or nil otherwise.
+func (t *TypeDecl) Members() []*TypeMember {
+	if t.Base != nil && t.Base.Object != nil {
+		return t.Base.Object.Members
+	}
+	return nil
 }
 
 // TypeMember represents a member within a type declaration block.
-// Can be a Field, a Spread, or a standalone Docstring.
+// Can be a Field or a Spread.
 type TypeMember struct {
 	Positions
-	Field     *Field     `parser:"  @@"`
-	Spread    *Spread    `parser:"| @@"`
-	Docstring *Docstring `parser:"| @@"`
+	Field  *Field  `parser:"  @@"`
+	Spread *Spread `parser:"| @@"`
 }
 
 // GetFlattenedFields returns a recursive flattened list of all fields in the type declaration.
 func (t *TypeDecl) GetFlattenedFields() []*Field {
 	fields := []*Field{}
-	for _, child := range t.Members {
+	for _, child := range t.Members() {
 		if child.Field == nil {
 			continue
 		}
