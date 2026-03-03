@@ -1,11 +1,10 @@
 package version
 
 import (
-	"fmt"
 	"strings"
 	"unicode/utf8"
 
-	"github.com/varavelio/vdl/toolchain/internal/util/cliutil"
+	"github.com/varavelio/tinta"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
@@ -40,8 +39,8 @@ var basicInfoRaw = strings.Join([]string{
 var AsciiArt = func() string {
 	maxWidth := 0
 	for line := range strings.SplitSeq(basicInfoRaw, "\n") {
-		if utf8.RuneCountInString(line) > maxWidth {
-			maxWidth = utf8.RuneCountInString(line)
+		if w := utf8.RuneCountInString(line); w > maxWidth {
+			maxWidth = w
 		}
 	}
 
@@ -49,59 +48,46 @@ var AsciiArt = func() string {
 	versionSection := strutil.CenterText("v"+Version, maxWidth)
 	combined := strings.Join([]string{logoSection, versionSection, "", basicInfoRaw}, "\n")
 
-	// Main box (bold)
-	horizontal := cliutil.ColorizeBlueBold(strings.Repeat("━", maxWidth))
-	borderLeft := cliutil.ColorizeBlueBold("┃")
-	borderRight := cliutil.ColorizeBlueBold("┃")
-	cornerTL := cliutil.ColorizeBlueBold("┏━")
-	cornerTR := cliutil.ColorizeBlueBold("━┓")
-	cornerBL := cliutil.ColorizeBlueBold("┗━")
-	cornerBR := cliutil.ColorizeBlueBold("━┛")
-
-	// Shadow box (non-bold for depth effect)
-	doubleTopRight := cliutil.ColorizeBlue("╗")
-	doubleRight := cliutil.ColorizeBlue("║")
-	doubleBottom := cliutil.ColorizeBlue("╚" + strings.Repeat("═", maxWidth+2) + "╝")
-
 	githubURL := "https://github.com/varavelio/vdl"
-
-	var contentLines strings.Builder
-	lineIndex := 0
 	logoLineCount := strings.Count(logoSection, "\n") + 1
 	versionLineIndex := logoLineCount
 
-	for line := range strings.SplitSeq(combined, "\n") {
-		spaces := maxWidth - utf8.RuneCountInString(line)
-		padding := strings.Repeat(" ", spaces)
-
+	var contentLines strings.Builder
+	for lineIndex, line := range strings.Split(combined, "\n") {
 		var coloredLine string
-		if lineIndex < logoLineCount {
-			coloredLine = cliutil.ColorizeBlueBold(line)
-		} else if lineIndex == versionLineIndex {
-			coloredLine = cliutil.ColorizeGreenBold(line)
-		} else if strings.Contains(line, githubURL) {
-			coloredLine = strings.Replace(line, "Star the repo:", cliutil.ColorizeWhiteBold("Star the repo:"), 1)
-			coloredLine = strings.Replace(coloredLine, githubURL, cliutil.ColorizeCyanBoldUnderline(githubURL), 1)
-		} else if strings.HasPrefix(line, "Show usage:") {
-			coloredLine = strings.Replace(line, "Show usage:", cliutil.ColorizeWhiteBold("Show usage:"), 1)
-		} else if strings.HasPrefix(line, "Show version:") {
-			coloredLine = strings.Replace(line, "Show version:", cliutil.ColorizeWhiteBold("Show version:"), 1)
-		} else {
+		switch {
+		case lineIndex < logoLineCount:
+			coloredLine = tinta.Text().Blue().Bold().String(line)
+		case lineIndex == versionLineIndex:
+			coloredLine = tinta.Text().Green().Bold().String(line)
+		case strings.Contains(line, githubURL):
+			coloredLine = strings.Replace(line, "Star the repo:", tinta.Text().White().Bold().String("Star the repo:"), 1)
+			coloredLine = strings.Replace(coloredLine, githubURL, tinta.Text().Cyan().Bold().Underline().String(githubURL), 1)
+		case strings.HasPrefix(line, "Show usage:"):
+			coloredLine = strings.Replace(line, "Show usage:", tinta.Text().White().Bold().String("Show usage:"), 1)
+		case strings.HasPrefix(line, "Show version:"):
+			coloredLine = strings.Replace(line, "Show version:", tinta.Text().White().Bold().String("Show version:"), 1)
+		default:
 			coloredLine = line
 		}
 
-		if lineIndex == 0 {
-			fmt.Fprintf(&contentLines, "%s %s%s %s%s\n", borderLeft, coloredLine, padding, borderRight, doubleTopRight)
-		} else {
-			fmt.Fprintf(&contentLines, "%s %s%s %s%s\n", borderLeft, coloredLine, padding, borderRight, doubleRight)
+		if contentLines.Len() > 0 {
+			contentLines.WriteByte('\n')
 		}
-		lineIndex++
+		contentLines.WriteString(coloredLine)
 	}
 
-	return strings.Join([]string{
-		cornerTL + horizontal + cornerTR,
-		strings.TrimSuffix(contentLines.String(), "\n"),
-		cornerBL + horizontal + cornerBR + doubleRight,
-		" " + doubleBottom,
-	}, "\n")
+	return tinta.Box().
+		BorderHeavy().
+		Blue().Bold().
+		Shadow(tinta.ShadowBottomRight, tinta.ShadowStyle{
+			TopRight:    tinta.BorderDouble.TopRight,
+			TopLeft:     tinta.BorderDouble.TopLeft,
+			BottomRight: tinta.BorderDouble.BottomRight,
+			BottomLeft:  tinta.BorderDouble.BottomLeft,
+			Vertical:    tinta.BorderDouble.Vertical,
+			Horizontal:  tinta.BorderDouble.Horizontal,
+		}).
+		PaddingX(1).
+		String(contentLines.String())
 }()
