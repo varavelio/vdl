@@ -132,6 +132,9 @@ Annotation metadata preserved in IR.
 `argument`, when present, is fully resolved as a LiteralValue.
 """
 type Annotation {
+  """ Source position of this annotation """
+  position: Position
+
   """ Annotation name without `@` """
   name: string
 
@@ -141,6 +144,9 @@ type Annotation {
 
 """ Flattened object/type field definition """
 type Field {
+  """ Source position of this field """
+  position: Position
+
   """ Field name """
   name: string
 
@@ -259,6 +265,9 @@ type EnumDef {
 
 """ Enum member definition """
 type EnumMember {
+  """ Source position of this member """
+  position: Position
+
   """ Member name """
   name: string
 

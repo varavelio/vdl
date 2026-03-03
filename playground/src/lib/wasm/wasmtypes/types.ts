@@ -127,14 +127,17 @@ export function isWasmFunctionName(value: unknown): value is WasmFunctionName {
  * `argument`, when present, is fully resolved as a LiteralValue.
  */
 export type Annotation = {
+  position: Position
   name: string
   argument?: LiteralValue
 }
 
 export function hydrateAnnotation(input: Annotation): Annotation {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedName = input.name
   const hydratedArgument = input.argument ? hydrateLiteralValue(input.argument) : input.argument
   return {
+    position: hydratedPosition,
     name: hydratedName,
     argument: hydratedArgument,
   }
@@ -146,6 +149,13 @@ export function validateAnnotation(input: unknown, path = "Annotation"): string 
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.argument !== undefined && obj.argument !== null) {
     {
       const err = validateLiteralValue(obj.argument, `${path}.argument`);
@@ -499,6 +509,7 @@ export function validateEnumDef(input: unknown, path = "EnumDef"): string | null
  * EnumMember Enum member definition
  */
 export type EnumMember = {
+  position: Position
   name: string
   value: LiteralValue
   doc?: string
@@ -506,11 +517,13 @@ export type EnumMember = {
 }
 
 export function hydrateEnumMember(input: EnumMember): EnumMember {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedName = input.name
   const hydratedValue = hydrateLiteralValue(input.value)
   const hydratedDoc = input.doc ? input.doc : input.doc
   const hydratedAnnotations = input.annotations.map(el => hydrateAnnotation(el))
   return {
+    position: hydratedPosition,
     name: hydratedName,
     value: hydratedValue,
     doc: hydratedDoc,
@@ -524,6 +537,13 @@ export function validateEnumMember(input: unknown, path = "EnumMember"): string 
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.value === undefined || obj.value === null) {
     return `${path}.value: required field is missing`;
   }
@@ -711,6 +731,7 @@ export function validateExtractTypeOutput(_input: unknown, _path = "ExtractTypeO
  * Field Flattened object/type field definition
  */
 export type Field = {
+  position: Position
   name: string
   doc?: string
   optional: boolean
@@ -719,12 +740,14 @@ export type Field = {
 }
 
 export function hydrateField(input: Field): Field {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedName = input.name
   const hydratedDoc = input.doc ? input.doc : input.doc
   const hydratedOptional = input.optional
   const hydratedAnnotations = input.annotations.map(el => hydrateAnnotation(el))
   const hydratedTypeRef = hydrateTypeRef(input.typeRef)
   return {
+    position: hydratedPosition,
     name: hydratedName,
     doc: hydratedDoc,
     optional: hydratedOptional,
@@ -739,6 +762,13 @@ export function validateField(input: unknown, path = "Field"): string | null {
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.annotations === undefined || obj.annotations === null) {
     return `${path}.annotations: required field is missing`;
   }

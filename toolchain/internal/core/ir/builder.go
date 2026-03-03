@@ -96,6 +96,7 @@ func convertEnum(
 
 	for _, member := range members {
 		irMembers = append(irMembers, irtypes.EnumMember{
+			Position:    convertPosition(member.File, member.Pos),
 			Name:        member.Name,
 			Value:       resolveEnumMemberValue(enum.ValueType, member.Value),
 			Doc:         normalizeDocPtr(member.Docstring),
@@ -157,6 +158,7 @@ func convertField(
 	resolver *valueResolver,
 ) irtypes.Field {
 	return irtypes.Field{
+		Position:    convertPosition(field.File, field.Pos),
 		Name:        field.Name,
 		Doc:         normalizeDocPtr(field.Docstring),
 		Optional:    field.Optional,
@@ -269,7 +271,10 @@ func convertAnnotations(annotations []*analysis.AnnotationRef, resolver *valueRe
 			continue
 		}
 
-		converted := irtypes.Annotation{Name: ann.Name}
+		converted := irtypes.Annotation{
+			Position: convertPosition(ann.Pos.Filename, ann.Pos),
+			Name:     ann.Name,
+		}
 		if ann.Argument != nil {
 			if value, ok := resolver.resolveDataLiteral(ann.Argument); ok {
 				converted.Argument = &value

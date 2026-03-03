@@ -1,17 +1,22 @@
 {
   "constants": [
     {
-      "name": "baseConfig",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 57,
         "column": 1
       },
+      "name": "baseConfig",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "retries",
             "optional": false,
             "annotations": [],
@@ -21,6 +26,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "timeoutMs",
             "optional": false,
             "annotations": [],
@@ -52,12 +62,12 @@
       }
     },
     {
-      "name": "baseTags",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 54,
         "column": 1
       },
+      "name": "baseTags",
       "annotations": [],
       "typeRef": {
         "kind": "array",
@@ -82,12 +92,12 @@
       }
     },
     {
-      "name": "defaultPriority",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 56,
         "column": 1
       },
+      "name": "defaultPriority",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -99,12 +109,12 @@
       }
     },
     {
-      "name": "defaultStatus",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 55,
         "column": 1
       },
+      "name": "defaultStatus",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -116,14 +126,19 @@
       }
     },
     {
-      "name": "maxPageSize",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 52,
         "column": 1
       },
+      "name": "maxPageSize",
       "annotations": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 52,
+            "column": 1
+          },
           "name": "featureFlag"
         }
       ],
@@ -137,17 +152,22 @@
       }
     },
     {
-      "name": "serviceConfig",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 61,
         "column": 1
       },
+      "name": "serviceConfig",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "retries",
             "optional": false,
             "annotations": [],
@@ -157,6 +177,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "timeoutMs",
             "optional": false,
             "annotations": [],
@@ -166,6 +191,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "name",
             "optional": false,
             "annotations": [],
@@ -175,6 +205,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "tags",
             "optional": false,
             "annotations": [],
@@ -235,16 +270,21 @@
   ],
   "enums": [
     {
-      "name": "Priority",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 46,
         "column": 1
       },
+      "name": "Priority",
       "annotations": [],
       "enumType": "int",
       "members": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 47,
+            "column": 3
+          },
           "name": "Low",
           "value": {
             "kind": "int",
@@ -253,6 +293,11 @@
           "annotations": []
         },
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 48,
+            "column": 3
+          },
           "name": "Medium",
           "value": {
             "kind": "int",
@@ -261,6 +306,11 @@
           "annotations": []
         },
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 49,
+            "column": 3
+          },
           "name": "High",
           "value": {
             "kind": "int",
@@ -271,16 +321,21 @@
       ]
     },
     {
-      "name": "UserStatus",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 40,
         "column": 1
       },
+      "name": "UserStatus",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 41,
+            "column": 3
+          },
           "name": "Active",
           "value": {
             "kind": "string",
@@ -289,6 +344,11 @@
           "annotations": []
         },
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 42,
+            "column": 3
+          },
           "name": "Inactive",
           "value": {
             "kind": "string",
@@ -297,6 +357,11 @@
           "annotations": []
         },
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 43,
+            "column": 3
+          },
           "name": "Suspended",
           "value": {
             "kind": "string",
@@ -309,17 +374,22 @@
   ],
   "types": [
     {
-      "name": "Address",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 20,
         "column": 1
       },
+      "name": "Address",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 21,
+              "column": 3
+            },
             "name": "street",
             "optional": false,
             "annotations": [],
@@ -329,6 +399,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 22,
+              "column": 3
+            },
             "name": "city",
             "optional": false,
             "annotations": [],
@@ -338,6 +413,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 23,
+              "column": 3
+            },
             "name": "location",
             "optional": false,
             "annotations": [],
@@ -350,14 +430,19 @@
       }
     },
     {
-      "name": "AuditFields",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 9,
         "column": 1
       },
+      "name": "AuditFields",
       "annotations": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+            "line": 9,
+            "column": 1
+          },
           "name": "entity"
         }
       ],
@@ -365,6 +450,11 @@
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 11,
+              "column": 3
+            },
             "name": "createdAt",
             "optional": false,
             "annotations": [],
@@ -374,6 +464,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 12,
+              "column": 3
+            },
             "name": "updatedAt",
             "optional": false,
             "annotations": [],
@@ -386,17 +481,22 @@
       }
     },
     {
-      "name": "Coordinates",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 15,
         "column": 1
       },
+      "name": "Coordinates",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 16,
+              "column": 3
+            },
             "name": "lat",
             "optional": false,
             "annotations": [],
@@ -406,6 +506,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 17,
+              "column": 3
+            },
             "name": "lng",
             "optional": false,
             "annotations": [],
@@ -418,17 +523,22 @@
       }
     },
     {
-      "name": "User",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 26,
         "column": 1
       },
+      "name": "User",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 11,
+              "column": 3
+            },
             "name": "createdAt",
             "optional": false,
             "annotations": [],
@@ -438,6 +548,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 12,
+              "column": 3
+            },
             "name": "updatedAt",
             "optional": false,
             "annotations": [],
@@ -447,10 +562,20 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 28,
+              "column": 3
+            },
             "name": "id",
             "optional": false,
             "annotations": [
               {
+                "position": {
+                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                  "line": 28,
+                  "column": 3
+                },
                 "name": "id"
               }
             ],
@@ -460,6 +585,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 30,
+              "column": 3
+            },
             "name": "email",
             "optional": false,
             "annotations": [],
@@ -469,6 +599,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 31,
+              "column": 3
+            },
             "name": "address",
             "optional": false,
             "annotations": [],
@@ -478,6 +613,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 32,
+              "column": 3
+            },
             "name": "tags",
             "optional": false,
             "annotations": [],
@@ -491,6 +631,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 33,
+              "column": 3
+            },
             "name": "metadata",
             "optional": false,
             "annotations": [],
@@ -503,6 +648,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 34,
+              "column": 3
+            },
             "name": "preferences",
             "optional": false,
             "annotations": [],
@@ -510,6 +660,11 @@
               "kind": "object",
               "objectFields": [
                 {
+                  "position": {
+                    "file": "",
+                    "line": 35,
+                    "column": 5
+                  },
                   "name": "locale",
                   "optional": false,
                   "annotations": [],
@@ -519,6 +674,11 @@
                   }
                 },
                 {
+                  "position": {
+                    "file": "",
+                    "line": 36,
+                    "column": 5
+                  },
                   "name": "notifications",
                   "optional": false,
                   "annotations": [],
@@ -536,20 +696,20 @@
   ],
   "docs": [
     {
-      "content": "Comprehensive schema to validate IR flattening and value resolution.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 1,
         "column": 1
-      }
+      },
+      "content": "Comprehensive schema to validate IR flattening and value resolution."
     },
     {
-      "content": "Standalone documentation block.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
         "line": 5,
         "column": 1
-      }
+      },
+      "content": "Standalone documentation block."
     }
   ]
 }

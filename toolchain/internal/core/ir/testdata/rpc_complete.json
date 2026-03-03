@@ -1,12 +1,12 @@
 {
   "constants": [
     {
-      "name": "maxPageSize",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 32,
         "column": 1
       },
+      "name": "maxPageSize",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -18,17 +18,22 @@
       }
     },
     {
-      "name": "queryDefaults",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 34,
         "column": 1
       },
+      "name": "queryDefaults",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "page",
             "optional": false,
             "annotations": [],
@@ -38,6 +43,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "limit",
             "optional": false,
             "annotations": [],
@@ -71,16 +81,21 @@
   ],
   "enums": [
     {
-      "name": "UserEventAction",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 27,
         "column": 1
       },
+      "name": "UserEventAction",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+            "line": 28,
+            "column": 3
+          },
           "name": "Created",
           "value": {
             "kind": "string",
@@ -89,6 +104,11 @@
           "annotations": []
         },
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+            "line": 29,
+            "column": 3
+          },
           "name": "Updated",
           "value": {
             "kind": "string",
@@ -101,17 +121,22 @@
   ],
   "types": [
     {
-      "name": "PaginatedResponse",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 6,
         "column": 1
       },
+      "name": "PaginatedResponse",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 7,
+              "column": 3
+            },
             "name": "totalItems",
             "optional": false,
             "annotations": [],
@@ -121,6 +146,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 8,
+              "column": 3
+            },
             "name": "totalPages",
             "optional": false,
             "annotations": [],
@@ -133,17 +163,22 @@
       }
     },
     {
-      "name": "PaginationParams",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 1,
         "column": 1
       },
+      "name": "PaginationParams",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 2,
+              "column": 3
+            },
             "name": "page",
             "optional": false,
             "annotations": [],
@@ -153,6 +188,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 3,
+              "column": 3
+            },
             "name": "limit",
             "optional": false,
             "annotations": [],
@@ -165,17 +205,22 @@
       }
     },
     {
-      "name": "User",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 11,
         "column": 1
       },
+      "name": "User",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 12,
+              "column": 3
+            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -185,6 +230,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 13,
+              "column": 3
+            },
             "name": "name",
             "optional": false,
             "annotations": [],
@@ -194,6 +244,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 14,
+              "column": 3
+            },
             "name": "email",
             "optional": false,
             "annotations": [],
@@ -206,17 +261,22 @@
       }
     },
     {
-      "name": "UserListResult",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 22,
         "column": 1
       },
+      "name": "UserListResult",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 7,
+              "column": 3
+            },
             "name": "totalItems",
             "optional": false,
             "annotations": [],
@@ -226,6 +286,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 8,
+              "column": 3
+            },
             "name": "totalPages",
             "optional": false,
             "annotations": [],
@@ -235,6 +300,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 24,
+              "column": 3
+            },
             "name": "users",
             "optional": false,
             "annotations": [],
@@ -251,17 +321,22 @@
       }
     },
     {
-      "name": "UserQuery",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
         "line": 17,
         "column": 1
       },
+      "name": "UserQuery",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 2,
+              "column": 3
+            },
             "name": "page",
             "optional": false,
             "annotations": [],
@@ -271,6 +346,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 3,
+              "column": 3
+            },
             "name": "limit",
             "optional": false,
             "annotations": [],
@@ -280,6 +360,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 19,
+              "column": 3
+            },
             "name": "filterByName",
             "optional": true,
             "annotations": [],

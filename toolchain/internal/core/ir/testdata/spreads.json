@@ -3,17 +3,22 @@
   "enums": [],
   "types": [
     {
-      "name": "AuditFields",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
         "line": 1,
         "column": 1
       },
+      "name": "AuditFields",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 2,
+              "column": 3
+            },
             "name": "createdAt",
             "optional": false,
             "annotations": [],
@@ -23,6 +28,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 3,
+              "column": 3
+            },
             "name": "updatedAt",
             "optional": false,
             "annotations": [],
@@ -35,17 +45,22 @@
       }
     },
     {
-      "name": "BaseEntity",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
         "line": 16,
         "column": 1
       },
+      "name": "BaseEntity",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 13,
+              "column": 3
+            },
             "name": "timestamp",
             "optional": false,
             "annotations": [],
@@ -55,6 +70,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 18,
+              "column": 3
+            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -67,17 +87,22 @@
       }
     },
     {
-      "name": "NestedSpread",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
         "line": 21,
         "column": 1
       },
+      "name": "NestedSpread",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 13,
+              "column": 3
+            },
             "name": "timestamp",
             "optional": false,
             "annotations": [],
@@ -87,6 +112,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 18,
+              "column": 3
+            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -96,6 +126,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 23,
+              "column": 3
+            },
             "name": "name",
             "optional": false,
             "annotations": [],
@@ -105,6 +140,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 24,
+              "column": 3
+            },
             "name": "active",
             "optional": false,
             "annotations": [],
@@ -117,17 +157,22 @@
       }
     },
     {
-      "name": "Timestamps",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
         "line": 12,
         "column": 1
       },
+      "name": "Timestamps",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 13,
+              "column": 3
+            },
             "name": "timestamp",
             "optional": false,
             "annotations": [],
@@ -140,17 +185,22 @@
       }
     },
     {
-      "name": "User",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
         "line": 6,
         "column": 1
       },
+      "name": "User",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 2,
+              "column": 3
+            },
             "name": "createdAt",
             "optional": false,
             "annotations": [],
@@ -160,6 +210,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 3,
+              "column": 3
+            },
             "name": "updatedAt",
             "optional": false,
             "annotations": [],
@@ -169,6 +224,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 8,
+              "column": 3
+            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -178,6 +238,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+              "line": 9,
+              "column": 3
+            },
             "name": "name",
             "optional": false,
             "annotations": [],

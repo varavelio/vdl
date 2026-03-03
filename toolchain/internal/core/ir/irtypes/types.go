@@ -271,10 +271,29 @@ func (e *TypeKind) UnmarshalJSON(data []byte) error {
 // `name` is the annotation identifier without the `@` prefix.
 // `argument`, when present, is fully resolved as a LiteralValue.
 type Annotation struct {
+	// Source position of this annotation
+	Position Position `json:"position"`
 	// Annotation name without `@`
 	Name string `json:"name"`
 	// Optional resolved argument payload
 	Argument *LiteralValue `json:"argument,omitempty"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *Annotation) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *Annotation) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -313,6 +332,7 @@ func (x *Annotation) GetArgumentOr(defaultValue LiteralValue) LiteralValue {
 
 // preAnnotation is the version of Annotation previous to the required field validation
 type preAnnotation struct {
+	Position *prePosition     `json:"position,omitempty"`
 	Name     *string          `json:"name,omitempty"`
 	Argument *preLiteralValue `json:"argument,omitempty"`
 }
@@ -321,6 +341,16 @@ type preAnnotation struct {
 func (p *preAnnotation) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preAnnotation is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "name"
@@ -341,6 +371,8 @@ func (p *preAnnotation) validate() error {
 // transform transforms the preAnnotation type to the final Annotation type
 func (p *preAnnotation) transform() Annotation {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transName := *p.Name
 	var transArgument *LiteralValue
 	if p.Argument != nil {
@@ -351,6 +383,7 @@ func (p *preAnnotation) transform() Annotation {
 
 	// Assignments
 	return Annotation{
+		Position: transPosition,
 		Name:     transName,
 		Argument: transArgument,
 	}
@@ -796,6 +829,8 @@ func (p *preEnumDef) transform() EnumDef {
 
 // Enum member definition
 type EnumMember struct {
+	// Source position of this member
+	Position Position `json:"position"`
 	// Member name
 	Name string `json:"name"`
 	// Fully resolved member value
@@ -804,6 +839,23 @@ type EnumMember struct {
 	Doc *string `json:"doc,omitempty"`
 	// Member annotations in source order
 	Annotations []Annotation `json:"annotations"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *EnumMember) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *EnumMember) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -876,6 +928,7 @@ func (x *EnumMember) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
 
 // preEnumMember is the version of EnumMember previous to the required field validation
 type preEnumMember struct {
+	Position    *prePosition     `json:"position,omitempty"`
 	Name        *string          `json:"name,omitempty"`
 	Value       *preLiteralValue `json:"value,omitempty"`
 	Doc         *string          `json:"doc,omitempty"`
@@ -886,6 +939,16 @@ type preEnumMember struct {
 func (p *preEnumMember) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preEnumMember is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "name"
@@ -923,6 +986,8 @@ func (p *preEnumMember) validate() error {
 // transform transforms the preEnumMember type to the final EnumMember type
 func (p *preEnumMember) transform() EnumMember {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transName := *p.Name
 	var transValue LiteralValue
 	transValue = p.Value.transform()
@@ -937,6 +1002,7 @@ func (p *preEnumMember) transform() EnumMember {
 
 	// Assignments
 	return EnumMember{
+		Position:    transPosition,
 		Name:        transName,
 		Value:       transValue,
 		Doc:         transDoc,
@@ -946,6 +1012,8 @@ func (p *preEnumMember) transform() EnumMember {
 
 // Flattened object/type field definition
 type Field struct {
+	// Source position of this field
+	Position Position `json:"position"`
 	// Field name
 	Name string `json:"name"`
 	// Optional field documentation
@@ -956,6 +1024,23 @@ type Field struct {
 	Annotations []Annotation `json:"annotations"`
 	// Normalized field type reference
 	TypeRef TypeRef `json:"typeRef"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *Field) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *Field) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -1045,6 +1130,7 @@ func (x *Field) GetTypeRefOr(defaultValue TypeRef) TypeRef {
 
 // preField is the version of Field previous to the required field validation
 type preField struct {
+	Position    *prePosition     `json:"position,omitempty"`
 	Name        *string          `json:"name,omitempty"`
 	Doc         *string          `json:"doc,omitempty"`
 	Optional    *bool            `json:"optional,omitempty"`
@@ -1056,6 +1142,16 @@ type preField struct {
 func (p *preField) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preField is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "name"
@@ -1098,6 +1194,8 @@ func (p *preField) validate() error {
 // transform transforms the preField type to the final Field type
 func (p *preField) transform() Field {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transName := *p.Name
 	transDoc := p.Doc
 	transOptional := *p.Optional
@@ -1113,6 +1211,7 @@ func (p *preField) transform() Field {
 
 	// Assignments
 	return Field{
+		Position:    transPosition,
 		Name:        transName,
 		Doc:         transDoc,
 		Optional:    transOptional,

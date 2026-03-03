@@ -1,13 +1,13 @@
 {
   "constants": [
     {
-      "name": "apiVersion",
-      "doc": "API version string.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 5,
         "column": 1
       },
+      "name": "apiVersion",
+      "doc": "API version string.",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -19,17 +19,22 @@
       }
     },
     {
-      "name": "baseConfig",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 19,
         "column": 1
       },
+      "name": "baseConfig",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "host",
             "optional": false,
             "annotations": [],
@@ -39,6 +44,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "port",
             "optional": false,
             "annotations": [],
@@ -70,12 +80,12 @@
       }
     },
     {
-      "name": "defaultLimit",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 17,
         "column": 1
       },
+      "name": "defaultLimit",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -87,13 +97,13 @@
       }
     },
     {
-      "name": "defaultTaxRate",
-      "doc": "Default tax rate.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 8,
         "column": 1
       },
+      "name": "defaultTaxRate",
+      "doc": "Default tax rate.",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -105,13 +115,13 @@
       }
     },
     {
-      "name": "featureNewUi",
-      "doc": "Feature flag for new UI.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 11,
         "column": 1
       },
+      "name": "featureNewUi",
+      "doc": "Feature flag for new UI.",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -123,13 +133,13 @@
       }
     },
     {
-      "name": "legacyMode",
-      "doc": "Legacy mode disabled.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 14,
         "column": 1
       },
+      "name": "legacyMode",
+      "doc": "Legacy mode disabled.",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -141,15 +151,20 @@
       }
     },
     {
-      "name": "maxPageSize",
-      "doc": "Maximum items per page.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 1,
         "column": 1
       },
+      "name": "maxPageSize",
+      "doc": "Maximum items per page.",
       "annotations": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+            "line": 2,
+            "column": 1
+          },
           "name": "config"
         }
       ],
@@ -163,17 +178,22 @@
       }
     },
     {
-      "name": "prodConfig",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
         "line": 24,
         "column": 1
       },
+      "name": "prodConfig",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "host",
             "optional": false,
             "annotations": [],
@@ -183,6 +203,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "port",
             "optional": false,
             "annotations": [],
@@ -192,6 +217,11 @@
             }
           },
           {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "name": "secure",
             "optional": false,
             "annotations": [],

@@ -16,10 +16,21 @@
         "name": {
           "description": "Annotation name without `@`",
           "type": "string"
+        },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this annotation"
+            }
+          ]
         }
       },
       "required": [
-        "name"
+        "name",
+        "position"
       ],
       "type": "object"
     },
@@ -154,6 +165,16 @@
           "description": "Member name",
           "type": "string"
         },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this member"
+            }
+          ]
+        },
         "value": {
           "allOf": [
             {
@@ -168,6 +189,7 @@
       "required": [
         "annotations",
         "name",
+        "position",
         "value"
       ],
       "type": "object"
@@ -202,6 +224,16 @@
           "description": "True when the field is optional (`?`)",
           "type": "boolean"
         },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this field"
+            }
+          ]
+        },
         "typeRef": {
           "allOf": [
             {
@@ -217,6 +249,7 @@
         "annotations",
         "name",
         "optional",
+        "position",
         "typeRef"
       ],
       "type": "object"

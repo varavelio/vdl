@@ -3,12 +3,12 @@
   "enums": [],
   "types": [
     {
-      "name": "Active",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 9,
         "column": 1
       },
+      "name": "Active",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -16,12 +16,12 @@
       }
     },
     {
-      "name": "Age",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 5,
         "column": 1
       },
+      "name": "Age",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -29,12 +29,12 @@
       }
     },
     {
-      "name": "Matrix",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 15,
         "column": 1
       },
+      "name": "Matrix",
       "annotations": [],
       "typeRef": {
         "kind": "array",
@@ -46,12 +46,12 @@
       }
     },
     {
-      "name": "Name",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 3,
         "column": 1
       },
+      "name": "Name",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -59,12 +59,12 @@
       }
     },
     {
-      "name": "Names",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 13,
         "column": 1
       },
+      "name": "Names",
       "annotations": [],
       "typeRef": {
         "kind": "array",
@@ -76,12 +76,12 @@
       }
     },
     {
-      "name": "Score",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 7,
         "column": 1
       },
+      "name": "Score",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -89,12 +89,12 @@
       }
     },
     {
-      "name": "Timestamp",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 11,
         "column": 1
       },
+      "name": "Timestamp",
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -102,17 +102,22 @@
       }
     },
     {
-      "name": "User",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 27,
         "column": 1
       },
+      "name": "User",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
+              "line": 28,
+              "column": 3
+            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -122,6 +127,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
+              "line": 29,
+              "column": 3
+            },
             "name": "name",
             "optional": false,
             "annotations": [],
@@ -131,6 +141,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
+              "line": 30,
+              "column": 3
+            },
             "name": "age",
             "optional": false,
             "annotations": [],
@@ -140,6 +155,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
+              "line": 31,
+              "column": 3
+            },
             "name": "scores",
             "optional": false,
             "annotations": [],
@@ -153,6 +173,11 @@
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
+              "line": 32,
+              "column": 3
+            },
             "name": "config",
             "optional": false,
             "annotations": [],
@@ -165,12 +190,12 @@
       }
     },
     {
-      "name": "UserConfig",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 17,
         "column": 1
       },
+      "name": "UserConfig",
       "annotations": [],
       "typeRef": {
         "kind": "map",
@@ -181,15 +206,20 @@
       }
     },
     {
-      "name": "UserID",
-      "doc": "A documented alias type.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 23,
         "column": 1
       },
+      "name": "UserID",
+      "doc": "A documented alias type.",
       "annotations": [
         {
+          "position": {
+            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
+            "line": 24,
+            "column": 1
+          },
           "name": "entity"
         }
       ],
@@ -199,12 +229,12 @@
       }
     },
     {
-      "name": "UserList",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 21,
         "column": 1
       },
+      "name": "UserList",
       "annotations": [],
       "typeRef": {
         "kind": "array",
@@ -216,12 +246,12 @@
       }
     },
     {
-      "name": "UserMap",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 19,
         "column": 1
       },
+      "name": "UserMap",
       "annotations": [],
       "typeRef": {
         "kind": "map",
@@ -234,12 +264,12 @@
   ],
   "docs": [
     {
-      "content": "Type alias test schema.",
       "position": {
         "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/type_aliases.vdl",
         "line": 1,
         "column": 1
-      }
+      },
+      "content": "Type alias test schema."
     }
   ]
 }
