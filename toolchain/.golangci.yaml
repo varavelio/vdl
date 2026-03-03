@@ -8,6 +8,9 @@ linters:
     - ineffassign
     - staticcheck
     - unused
+    - bodyclose
+    - godoclint
+    - godot
   exclusions:
     generated: lax
     presets:
