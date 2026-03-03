@@ -93,7 +93,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Role**: Contains the VDL definitions for the tool's internal structures. VDL eats its own dog food.
 - **Key Files**:
   - `config.vdl`: Defines the structure of `vdl.yaml` configuration files.
-  - `ir.vdl`: Defines the Intermediate Representation (IR) passed to generators.
+  - `ir.vdl`: Defines the Intermediate Representation (IR) passed to generators. The IR is intentionally flattened and generator-friendly: spreads and references are pre-resolved, constants carry inferred/resolved value shapes, and annotation metadata is preserved.
   - `plugin.vdl`: Defines the protocol for External Plugins.
   - `wasm.vdl`: Defines the JSON-RPC protocol between the Playground (JS) and Core (WASM).
 - **Usage**: These schemas are compiled into Go/TS structs to ensure type safety across boundaries.
