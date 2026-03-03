@@ -1,8 +1,8 @@
-# AGENTS.md
+# Agent Context for VDL
 
-## 1. Summary
+## Summary
 
-**VDL (Varavel Definition Language)** is a Universal RPC schema and generator tool located in a monorepo. It combines a Go-based core (`toolchain`) with a Svelte 5-based web playground. The Go core compiles to both a native CLI and a WebAssembly (WASM) binary. The WASM binary is consumed by the playground to provide client-side schema generation, validation, formatting, and transformation directly in the browser. The final build embeds the static playground assets back into the Go binary.
+VDL (Varavel Definition Language) is a monorepo centered on a Go toolchain (`toolchain/`) that provides the CLI, parser, analyzer, formatter, and LSP for `.vdl` schemas. The repository also contains docs, editor integrations, and installers.
 
 ## Maintaining this Document
 
@@ -10,206 +10,105 @@ After completing any task, review this file and update it if you made structural
 
 When updating this document, do so with the context of the entire document in mind; do not simply add new sections at the end, but place them where they make the most sense within the context of the document.
 
-## 2. General Instructions (The Constitution)
-
-- **Context Awareness**: Always respect the monorepo structure. There are distinct environments for Go (`toolchain/`), Node/Svelte (`playground/`), Editor Extensions (`editors/`), and Documentation (`docs/`).
-- **Command Authority**: The root `Taskfile.yml` is the **single source of truth** for orchestration.
-  - **Do NOT** run `npm`, `go`, `vite`, or `vsce` commands manually.
-  - **ALWAYS** run `task --list-all` from the project root to discover the available commands before starting any task.
-  - **Execution**: All commands are run via `task <command>`.
-- **Verification**:
-  - Always check available verification tasks (lint, test, format) via `task --list-all`.
-  - Ensure standard checks pass before finishing work.
-- **Dependency Management**:
-  - Go: Manage in `toolchain/go.mod`.
-  - Node: Manage in `playground/package.json` or root `package.json` for dev tools.
-  - Docs: Manage in `docs/package.json`.
-- **Code Style**:
-  - Go: Idiomatic, `golangci-lint` strictness.
-  - Svelte: Functional components, Svelte 5 runes syntax, Tailwind CSS v4, DaisyUI v5.
-  - Formatting responsibilities are split by file type in Taskfile tasks: Go uses Go tooling (`gofmt` / `vdl format`), JavaScript/TypeScript/Svelte/Astro use Biome format checks, and other supported text formats (JSON/YAML/Markdown/CSS/HTML-like) use dprint.
-  - Docs: Markdown/MDX with Starlight frontmatter.
-- **Terminology**: The core tool is referred to as `toolchain`. The binary is named `vdl`.
-
-## 3. Architecture & Organization
+## Architecture & Organization
 
 ### Root Layout
 
-- `Taskfile.yml`: Orchestrates the entire build pipeline across languages.
-- `toolchain/`: The Go backend/core (Compiler, CLI, WASM).
-- `playground/`: The Svelte 5 frontend.
-- `editors/`: Editor plugins (VS Code, Neovim).
-- `docs/`: Documentation site (Astro/Starlight).
-- `schemas/`: VDL self-definitions (Internal structures defined in VDL).
-- `scripts/`: Build and maintenance scripts.
-- `assets/`: Static assets.
+- `Taskfile.yml`: Central command orchestration for CI, test, lint, format, release, docs, and VS Code extension tasks.
+- `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
+- `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `pluginInput.vdl`, `pluginOutput.vdl`).
+- `docs/`: Astro/Starlight documentation site.
+- `editors/`: Editor integrations (`vscode/`, `neovim/`).
+- `installers/`: Distribution installers (`brew/`, `npm/`, `unix/`, `windows/`).
+- `scripts/`: Release automation (`scripts/release/main.go`).
+- `assets/`: Branding/static assets used by docs and packaging.
+- `.github/workflows/`: CI, docs deployment, and release workflows.
+- `temp/`: Local scratch/output area; treat as non-source, disposable workspace.
 
-### `toolchain/` (Go Core)
+### `toolchain/` (Core Go Project)
 
-- **Role**: Contains the business logic for parsing, analyzing, transforming, and generating RPC schemas.
-- **Key Directories**:
-  - `cmd/`: Entry points.
-    - `vdl/`: Main CLI entry point (native).
-    - `vdlwasm/`: Entry point for WASM compilation (browser target).
-  - `internal/`: Private library code.
-    - `core/`: The Compiler Core Pipeline.
-      - `ast/`: Abstract Syntax Tree definitions. **Crucial**: The AST frozen core is declaration-centric (`type`, `enum`, `const`) and uses annotations (`@...`) to express domain semantics.
-      - `parser/`: Lexical analysis and parsing.
-      - `analysis/`: Semantic analysis and symbol resolution.
-      - `ir/`: Intermediate Representation for generators.
-      - `vfs/`: Virtual File System.
-    - `transform/`: AST Transformations (Used by Playground/LSP).
-      - `expand.go`: Handles type flattening (spreads) and circular reference protection.
-      - `extract.go`: Logic to extract specific AST nodes (Types, RPCs, Procs, Streams) as standalone strings.
-    - `formatter/`: Source code formatting logic (`vdl format`).
-    - `lsp/`: Language Server Protocol implementation.
-    - `codegen/`: Code Generators (Go, TS, Dart, etc.).
-    - `cmd/schemagen/`: Internal tool to generate JSON schemas for IR and Config.
-    - `util/`: Shared Utilities (strings, paths, debug).
-  - `tests/`: End-to-End (E2E) test suite, organized by target language/format.
-    - `golang/`: E2E tests for Go code generation (verifies client/server behavior via `go run`).
-    - `typescript/`: E2E tests for TypeScript code generation (verifies client/server behavior via `tsx`).
-    - `dart/`: E2E tests for Dart code generation (verifies client/server behavior via `dart run`).
-    - `python/`: E2E tests for Python code generation (verifies client/server behavior via `python3`).
-    - `jsonschema/`: E2E tests for JSON Schema generation (verifies output against expected JSON).
-    - `openapi/`: E2E tests for OpenAPI generation (verifies output against expected YAML/JSON).
-    - `playground/`: E2E tests for Playground assets generation.
-    - `plugin/`: E2E tests for the Plugin system (verifies Python plugin integration).
-    - Each test case in `testdata` contains a schema, config, and verification assets (consumer program or expected output).
-  - `dist/`: Build artifacts (e.g., `vdl.wasm`).
-- **Integration**: Compiles to `dist/vdl.wasm` which is copied to the playground.
+- **Role**: Implements language tooling and project analysis for VDL.
+- **Entry points**:
+  - `cmd/vdl/main.go`: CLI entry point (`vdl init`, `vdl format`, `vdl generate`, `vdl lsp`, `vdl version`).
+- **Key directories**:
+  - `internal/core/`: Compiler pipeline (`vfs`, `parser`, `ast`, `analysis`, `ir`).
+  - `internal/formatter/`: Lexer-based formatter implementation and golden tests.
+  - `internal/lsp/`: Language Server handlers (definition/hover/references/rename/completion/document symbols/links).
+  - `internal/codegen/`: Generation entrypoint currently under migration; plugin-oriented direction.
+  - `internal/util/`: Shared helpers (`cliutil`, `strutil`, `filepathutil`, etc.).
+  - `tests/`: Currently only repository notes (`README.md`); legacy E2E suite has been removed.
 
-### `playground/` (Frontend)
+### `schemas/` (Contracts)
 
-- **Role**: A visual editor/playground for VDL.
-- **Tech**: Svelte 5 (Runes), Vite, TailwindCSS 4, DaisyUI 5, Biome.
-- **Integration**:
-  - Consumes `vdl.wasm` (via `wasm_exec.js`).
-  - Generates Typescript definitions from Go schemas.
-  - Builds to static files that are eventually embedded into the Go binary.
+- **Role**: Source-of-truth schema contracts consumed by generation and docs artifacts.
+- **Key files**:
+  - `ir.vdl`: Flattened/resolved IR contract for generators.
+  - `plugin.vdl`: Plugin protocol umbrella schema.
+  - `pluginInput.vdl`: Input payload sent to plugins over stdin.
+  - `pluginOutput.vdl`: Output payload returned by plugins over stdout.
+- **Important direction**: New generator behavior should align with plugin contracts instead of hardcoded language generators.
 
-### `schemas/` (Self-Definition)
+### `docs/` (Documentation Site)
 
-- **Role**: Contains the VDL definitions for the tool's internal structures. VDL eats its own dog food.
-- **Key Files**:
-  - `config.vdl`: Defines the structure of `vdl.yaml` configuration files.
-  - `ir.vdl`: Defines the Intermediate Representation (IR) passed to generators. The IR is intentionally flattened and generator-friendly: spreads and references are pre-resolved, constants carry inferred/resolved value shapes, and annotation metadata is preserved.
-  - `plugin.vdl`: Defines the protocol for External Plugins.
-  - `wasm.vdl`: Defines the JSON-RPC protocol between the Playground (JS) and Core (WASM).
-- **Usage**: These schemas are compiled into Go/TS structs to ensure type safety across boundaries.
-
-### `docs/` (Documentation)
-
-- **Role**: The official documentation site.
-- **Tech**: Astro, Starlight, Tailwind CSS.
-- **Key Directories**:
-  - `src/content/docs/`: Markdown/MDX files containing the actual documentation content.
-  - `public/`: Static assets for the docs site.
+- **Role**: Public documentation and schema artifact publishing.
+- **Key paths**:
+  - `src/content/docs/`: Markdown/MDX documentation source.
+  - `public/schemas/v0/`: Published schema artifacts.
 
 ### `editors/` (IDE Integrations)
 
-- **Role**: Provides syntax highlighting and LSP support for VDL.
-- **Key Directories**:
-  - `vscode/`: Visual Studio Code extension (Node.js/TS).
-  - `neovim/`: Neovim plugin (Markdown instructions).
+- `editors/vscode/`: VS Code extension (`src/extension.js` is runtime entry).
+- `editors/neovim/`: Neovim integration instructions.
 
-### Build Pipeline
+### `installers/` (Distribution)
 
-1. **WASM Build**: Go code compiles to WASM.
-2. **Frontend Build**: Playground consumes WASM and builds static assets.
-3. **CLI Build**: Go CLI embeds the static assets and compiles the final binary.
+- `installers/brew/`: Formula generator for Homebrew tap updates.
+- `installers/npm/`: npm package wrapper/installer for `vdl`.
+- `installers/unix/`, `installers/windows/`: shell and PowerShell installers.
 
-### WASM Communication Protocol
+## General Instructions (Constitution)
 
-The communication between the Playground (Svelte) and the Core (Go) relies on a strict **JSON-RPC style protocol** defined in VDL itself.
+- **Always re-scan structure first**: run `task --list-all` and inspect relevant directories before changing behavior.
+- **Trust current tree, not historical assumptions**: `playground/` and legacy E2E layout are removed; do not reintroduce WASM/playground coupling unless explicitly requested.
+- **VDL model alignment**: keep parser/analysis/lsp changes declaration-centric (`include`, docstrings, `type`, `enum`, `const`, annotations, spreads). Avoid legacy RPC/pattern/proc/stream assumptions.
+- **Plugin-first generation**: treat `schemas/plugin*.vdl` as the contract for generator integrations; prefer extending plugin flows rather than adding fixed built-in generators.
+- **Command policy**: prefer root Taskfile tasks; use direct subproject commands only when a focused Taskfile task does not exist.
+- **Formatting/linting split**: Go uses `go fmt` + `vdl format`; JS/TS/Astro/Svelte use Biome; JSON/YAML/Markdown/CSS/HTML-like formats use dprint.
 
-1. **The Contract (`schemas/wasm.vdl`)**:
-   - This is the source of truth. It defines the `WasmInput` and `WasmOutput` data structures and the `WasmFunctionName` enum.
+## Testing & Quality
 
-2. **The Bridge**:
-   - **Frontend (`playground/src/lib/wasm/index.ts`)**: The `WasmClient` serializes requests to JSON and calls the global `window.wasmExecuteFunction`.
-   - **WASM Entry (`toolchain/cmd/vdlwasm/main.go`)**: This Go program runs in the browser. It attaches the `wasmExecuteFunction` to the Javascript `window` object. It wraps the execution in a Javascript Promise to handle async operations.
+- **Primary test strategy**: package-level Go unit tests (`*_test.go`) in `toolchain/internal/**`.
+- **Formatter quality**: relies on golden-style fixtures in `toolchain/internal/formatter/tests/`.
+- **LSP quality**: behavior tests live in `toolchain/internal/lsp/*_test.go` and should stay aligned with the current declaration-centric AST/program model.
+- **E2E note**: `toolchain/tests/` no longer contains the old multi-language E2E harness; do not assume legacy `testdata`-driven E2E structure exists.
+- **Verification commands**:
+  - `task test`
+  - `task lint`
+  - `task format`
 
-3. **The Execution (`toolchain/internal/wasm/run.go`)**:
-   - Receives the JSON string.
-   - Unmarshals it into Go structs (generated from `wasm.vdl`).
-   - Routes the request based on `FunctionName` (e.g., `Codegen`, `ExpandTypes`, etc) to the internal logic.
-   - Returns the response as a JSON string.
+## Tech Stack & Conventions
 
-## 4. Testing & Quality
+- **Go**: 1.26 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
+- **Docs**: Astro 5 + Starlight + Tailwind CSS 4 (`docs/`).
+- **Editor extension**: VS Code extension in Node/JS with `vscode-languageclient`.
+- **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools.
+- **Code style goals**:
+  - Idiomatic Go with clear, small functions and explicit error handling.
+  - Keep LSP logic robust under partial/invalid code (best-effort behavior is expected).
+  - Keep architecture docs and contracts synchronized when changing schema-level behavior.
 
-### Strategy
+## Operational Commands
 
-- **Unit Tests**: Standard Go tests for internal logic.
-- **E2E Tests (`toolchain/tests/*`)**:
-  - These are **integration tests** wrapped in Go test runners (`e2e_test.go`) located in each subdirectory.
-  - **Mechanism**: The runner builds a temporary `vdl` binary from the current source, then for each case in `testdata/`:
-    1. Runs the generation command via the test harness.
-    2. **Verification**:
-       - For **Code Gen**: Executes the consumer program. The consumer code must **panic** or exit with non-zero status on failure.
-       - For **Schemas/Docs**: Compares the generated output against a "golden" expected file.
-       - For **Plugins**: Executes the plugin and verifies the JSON output or error handling.
-- **Frontend Tests**: Component/Logic tests in `playground/`.
+- **Discover commands**: `task --list-all`
+- **Core verification**: `task test`, `task lint`, `task format`
+- **Dependencies**: `task deps`
+- **Codegen workflow**: `task codegen`
+- **Install local CLI**: `task tc:install`
+- **Docs**: `task dc:dev`, `task dc:build`
+- **VS Code extension**: `task vs:dev`, `task vs:build`, `task vs:package`, `task vs:package:ls`
+- **Release pipeline**: `task release`
 
-### Adding a New E2E Test Case
+### Current Caveats
 
-1. Navigate to `toolchain/tests/<category>/testdata`.
-2. Create a new directory for your case (e.g., `my_feature`).
-3. Add the required files:
-   - `vdl.yaml`: Configuration for generation.
-   - `schema.vdl`: The schema to test.
-   - **For Code Gen**: `main.go`, `main.ts`, `main.dart`, or `main.py` (or equivalent) to import and verify generated code.
-   - **For Schemas**: `expected.json` or `expected.yaml` to match against.
-
-### Commands
-
-Do NOT rely on memory. Run `task --list-all` to find the appropriate testing command (e.g., for running all tests, specific toolchain tests, frontend tests, etc).
-
-For standard verification and formatting, use the root tasks (`task test`, `task lint`, `task format`). These tasks orchestrate checks across subprojects from the repository root.
-
-## 5. Tech Stack & Conventions
-
-### Go
-
-- **Version**: 1.25+
-- **Key Libs**: `go-arg`, `participle` (parser), `testify`, `jsonschema`.
-- **Patterns**: Standard Go project layout (`cmd`, `internal`).
-- **AST Handling**:
-  - The VDL core parser model is declaration-centric (`type`, `enum`, `const`) with metadata expressed via annotations (`@...`).
-  - RPC-like semantics are modeled as annotated data structures in the AST (for example `@rpc` on `type` and `@proc` on fields), not dedicated grammar keywords.
-  - Use `transform` package for AST manipulations intended for display or refactoring.
-
-### Playground
-
-- **Framework**: Svelte 5 (SvelteKit static).
-  - **Syntax**: MUST use **Runes** (`$state`, `$derived`, etc) and TypeScript.
-  - **Styles**: Do NOT use `<style>` blocks. Use Tailwind/DaisyUI classes exclusively.
-- **UI System**:
-  - **DaisyUI v5**: Prefer component classes (e.g., `btn`, `card`) over raw utility classes. Always prefer DaisyUI classes, you can read the documentation here: https://daisyui.com/llms.txt
-  - **Tailwind CSS v4**:
-    - **Breakpoints**: Custom setup. Use **mobile-first** (no prefix) by default. Use `desk:` prefix for desktop. **Ignore standard breakpoints** (`sm`, `md`, `lg`, etc).
-- **Icons**: Use `@lucide/svelte`.
-  - Import: `import { Zap } from "@lucide/svelte";`
-  - Usage: `<Zap class="size-4" />`
-- **Linter/Formatter**: Biome.
-
-### Documentation
-
-- **Framework**: Astro 5 (Starlight).
-- **Content**: Markdown/MDX in `docs/src/content/docs`.
-- **Styles**: Tailwind CSS 4.
-
-## 6. Operational Commands
-
-**IMPORTANT**: All operational commands are centralized in `Taskfile.yml` and must be executed from the project root. There is no "npm scripts", "per subfolder Taskfile.yml" or other things, literally the source of truth is the `Taskfile.yml` in the repository root.
-
-1. **Discover**: Run the following command to see all available tasks and their descriptions:
-   ```bash
-   task --list-all
-   ```
-2. **Execute**: Run a specific task using:
-   ```bash
-   task <command_name>
-   ```
-
-**Do not guess commands.** The `Taskfile.yml` is the only source of truth for building, testing, linting, formatting, and releasing this project. You can list all the commands or read the file but don't guess random commands.
+- `task ci` references a `build` task not currently defined in the root `Taskfile.yml`; verify CI task wiring before relying on it locally.
+- `task tc:build:wasm` exists in `Taskfile.yml`, but the corresponding `toolchain/cmd/vdlwasm` entrypoint is currently absent.
