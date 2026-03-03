@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/varavelio/tinta"
 	"github.com/varavelio/vdl/toolchain/internal/codegen"
-	"github.com/varavelio/vdl/toolchain/internal/util/cliutil"
 )
 
 type cmdGenerateArgs struct {
@@ -38,9 +38,9 @@ func cmdGenerate(args *cmdGenerateArgs) {
 
 		// Make the first line red bold
 		if idx := strings.Index(errStr, "\n"); idx != -1 {
-			errStr = cliutil.ColorizeRedBold(errStr[:idx]) + errStr[idx:]
+			errStr = tinta.Text().Red().Bold().String(errStr[:idx]) + errStr[idx:]
 		} else {
-			errStr = cliutil.ColorizeRedBold(errStr)
+			errStr = tinta.Text().Red().Bold().String(errStr)
 		}
 
 		// Add 2 spaces after each newline for better indentation
@@ -48,11 +48,15 @@ func cmdGenerate(args *cmdGenerateArgs) {
 
 		// Paint error[XXXX] patterns in red
 		errorCodePattern := regexp.MustCompile(`error\[[^\]]+\]`)
-		errStr = errorCodePattern.ReplaceAllStringFunc(errStr, cliutil.ColorizeRed)
+		errStr = errorCodePattern.ReplaceAllStringFunc(errStr, func(s string) string {
+			return tinta.Text().Red().String(s)
+		})
 
-		// Make "did you mean ... ?" patterns bold
+		// Make "did you mean ... ?" patterns cyan
 		didYouMeanPattern := regexp.MustCompile(`did you mean[^?]+\?`)
-		errStr = didYouMeanPattern.ReplaceAllStringFunc(errStr, cliutil.ColorizeCyan)
+		errStr = didYouMeanPattern.ReplaceAllStringFunc(errStr, func(s string) string {
+			return tinta.Text().Cyan().String(s)
+		})
 
 		fmt.Fprintf(os.Stderr, "%s\n", errStr)
 		os.Exit(1)

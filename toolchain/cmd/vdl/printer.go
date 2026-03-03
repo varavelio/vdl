@@ -1,22 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/varavelio/vdl/toolchain/internal/util/cliutil"
+	"github.com/varavelio/tinta"
+)
+
+var (
+	styleSuccess = tinta.Text().Green().Bold()
+	styleError   = tinta.Text().Red().Bold()
+	styleWarn    = tinta.Text().Yellow().Bold()
 )
 
 // printSuccess prints a success message in green bold to stdout.
 func printSuccess(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	fmt.Println(cliutil.ColorizeGreenBold(msg))
+	styleSuccess.Fprintf(os.Stdout, format+"\n", args...)
 }
 
 // printError prints an error message in red bold to stderr.
 func printError(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	fmt.Fprintln(os.Stderr, cliutil.ColorizeRedBold(msg))
+	styleError.Fprintf(os.Stderr, format+"\n", args...)
 }
 
 // printFatal prints an error message in red bold to stderr and exits with code 1.
@@ -27,6 +30,5 @@ func printFatal(format string, args ...any) {
 
 // printWarn prints a warning message in yellow bold to stderr.
 func printWarn(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	fmt.Fprintln(os.Stderr, cliutil.ColorizeYellowBold(msg))
+	styleWarn.Fprintf(os.Stderr, format+"\n", args...)
 }
