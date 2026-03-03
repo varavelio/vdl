@@ -1,18 +1,18 @@
 ---
 title: Formatting Guide
-description: Standard formatting conventions for the VDL IDL
+description: Standard formatting conventions for VDL
 ---
 
-This document specifies the standard formatting rules for the VDL IDL. Consistent formatting enhances code readability, maintainability, and collaboration.
+This guide defines how to keep VDL files easy to read, stable in diffs, and predictable across teams.
 
-> **Note:** All style conventions are automatically enforced by the official VDL formatter. Run it manually with `vdl format ./schema.vdl`, or let the built-in LSP formatter (bundled with the VS Code extension) format files on save.
+> **Note:** These conventions are enforced by the official formatter. Run `vdl format ./schema.vdl` or use editor format-on-save through the VDL LSP.
 
 ## 1. General Principles
 
-- **Encoding:** UTF-8.
-- **Line Endings:** Use newline characters (`\n`).
-- **Trailing Whitespace:** None.
-- **Final Newline:** End non-empty files with one newline.
+- Format for consistency, not personal style.
+- Prefer the smallest readable layout.
+- Keep related items close; separate unrelated items with one blank line.
+- Use UTF-8, LF (`\n`), no trailing whitespace, and a final newline.
 
 ## 2. Indentation
 
@@ -21,31 +21,32 @@ This document specifies the standard formatting rules for the VDL IDL. Consisten
 
 ```vdl
 type Example {
-  field: string
+  field string
 }
 ```
 
 ## 3. Top-Level Elements
 
-Top-level elements include `include`, `type`, `enum`, `const`, `pattern`, `rpc`, and standalone docstrings or comments.
+Top-level elements are `include`, `type`, `const`, `enum`, comments, and standalone docstrings.
 
-- **Includes:** Group consecutive `include` statements together without blank lines between them.
-- **Separation:** Separate each top-level element with one blank line.
-- **Preservation:** Intentionally placed blank lines in the source are respected.
+- Group `include` statements at the top with no blank lines inside the group.
+- Use one blank line between top-level declarations.
+- Avoid multiple consecutive blank lines.
 
 ```vdl
 include "./common.vdl"
 include "./auth.vdl"
 
-const MAX_PAGE_SIZE = 100
+const maxPageSize = 100
 
 type Order {
-  id: string
-  total: float
+  id string
+  total float
 }
 
-rpc Orders {
-  proc GetOrder { ... }
+enum OrderStatus {
+  Pending
+  Paid
 }
 ```
 
@@ -53,103 +54,110 @@ rpc Orders {
 
 ### 4.1 Block Structure
 
-- Opening braces (`{`) are on the same line as the declaration, preceded by one space.
-- Contents inside non-empty blocks start on a new, indented line.
-- The closing brace (`}`) is placed on its own line, aligned with the declaration.
+- Put `{` on the same line as the declaration, with one space before it.
+- Put block members on their own lines.
+- Align `}` with the declaration start.
 
 ```vdl
 type User {
-  id: string
-  name: string
+  id string
+  name string
 }
 ```
 
-### 4.2 RPC Blocks
+### 4.2 Field Members
 
-Procedures (`proc`) and streams (`stream`) must be defined inside an `rpc` block. Separate each endpoint with one blank line.
-
-```vdl
-rpc Service {
-  proc Get {
-    input {
-      id: string
-    }
-    output {
-      data: string
-    }
-  }
-
-  stream Watch {
-    input {
-      filter: string
-    }
-    output {
-      event: string
-    }
-  }
-}
-```
-
-### 4.3 Fields
-
-- Each field is placed on its own line.
-- Fields without docstrings can be placed consecutively without blank lines.
-- When a field has a docstring, separate it from the preceding field with one blank line.
-- The spread operator (`...`) should be placed at the beginning of the block.
+- Keep one member per line.
+- Prefer no blank lines between plain fields.
+- Add one blank line around field docstrings when it improves scanning.
+- Place spreads before regular fields when possible.
 
 ```vdl
 type User {
   ...AuditMetadata
 
   """ The user's display name. """
-  name: string
+  name string
 
   """ The user's email address. """
-  email: string
+  email string
 
-  age?: int
+  age? int
 }
 ```
 
-### 4.4 Input and Output Blocks
+### 4.3 Annotation Placement
 
-In procedures and streams, separate the `input` and `output` blocks with one blank line.
+Annotations carry domain semantics. Keep placement strict and vertical for readability.
+
+- Put annotations directly above the declaration or member they target.
+- Use one annotation per line.
+- Keep docstring above annotations when both are present.
+- Keep a single blank line between logical groups of annotated members.
 
 ```vdl
-proc CreateUser {
-  input {
-    name: string
-    email: string
+"""
+User operations.
+"""
+@rpc
+type Users {
+  @proc
+  GetUser {
+    input {
+      userId string
+    }
+
+    output {
+      id string
+      email string
+    }
   }
 
-  output {
-    userId: string
-    createdAt: datetime
+  @stream
+  UserEvents {
+    input {
+      userId string
+    }
+    output {
+      event string
+      at datetime
+    }
   }
 }
 ```
 
 ## 5. Spacing
 
-| Context               | Rule                               | Example          |
-| :-------------------- | :--------------------------------- | :--------------- |
-| Colons (`:`)          | No space before, one space after   | `field: string`  |
-| Braces (`{`)          | One space before in declarations   | `type User {`    |
-| Brackets (`[]`)       | No spaces for array types          | `string[]`       |
-| Optional marker (`?`) | Immediately follows the field name | `email?: string` |
-| Map syntax            | No extra spaces                    | `map<User>`      |
+| Context                | Rule                              | Example                   |
+| :--------------------- | :-------------------------------- | :------------------------ |
+| Field syntax           | `<name>[?] <type>`                | `email? string`           |
+| Assignment             | One space around `=`              | `const retries = 3`       |
+| Braces (`{}`)          | One space before `{`              | `type User {`             |
+| Arrays (`[]`)          | No spaces inside or before suffix | `string[]`, `int[][]`     |
+| Maps (`map[...]`)      | No spaces inside brackets         | `map[int]`, `map[User]`   |
+| Annotation call        | No space before `(`               | `@meta({ owner "core" })` |
+| Object literal entries | Space-separated key/value         | `{ host "localhost" }`    |
+| Array literal entries  | Space-separated elements          | `["a" "b" "c"]`           |
+| Enum member assignment | One space around `=`              | `Archived = "archived"`   |
 
 ## 6. Comments
 
-Comment content is preserved exactly, including internal whitespace.
+VDL supports two comment styles, and formatter preserves comment content exactly as written.
 
-- **Standalone Comments:** Use `//` or `/* ... */` on their own lines, indented to the current block level.
-- **End-of-Line Comments:** Place after code on the same line, with at least one space separating them.
+- **Single-line:** `// ...`
+- **Multi-line:** `/* ... */`
+- Comments can appear at top level or inside blocks.
 
 ```vdl
-// This is a standalone comment
+// Top-level single-line comment
+
+/*
+  Top-level multi-line comment
+*/
+
 type Example {
-  field: string  // End-of-line comment
+  // Inside block
+  field string
 }
 ```
 
@@ -157,7 +165,8 @@ type Example {
 
 - Place docstrings immediately above the element they document.
 - Enclose in triple quotes (`"""`), preserving internal newlines and formatting.
-- For fields, prefer concise, single-line docstrings.
+- Prefer concise, purpose-first text.
+- Use a blank line after a standalone docstring node.
 
 ```vdl
 """
@@ -165,52 +174,24 @@ Represents a user in the system.
 """
 type User {
   """ The unique identifier. """
-  id: string
+  id string
 
   """ The user's full name. """
-  name: string
+  name string
 }
 ```
 
-## 8. Deprecation
-
-The `deprecated` keyword marks elements as deprecated. Place it on its own line immediately before the element definition. If a docstring exists, place `deprecated` between the docstring and the element.
-
-```vdl
-deprecated type LegacyUser {
-  // ...
-}
-
-"""
-Documentation for this service.
-"""
-deprecated rpc OldService {
-  deprecated proc FetchData {
-    // ...
-  }
-}
-
-deprecated("Use NewType instead")
-type OldType {
-  // ...
-}
-```
-
-## 9. Naming Conventions
+## 8. Naming Conventions
 
 The formatter automatically enforces the following naming conventions:
 
-| Element      | Convention         | Example                 |
-| :----------- | :----------------- | :---------------------- |
-| Types        | `PascalCase`       | `UserProfile`           |
-| Enums        | `PascalCase`       | `OrderStatus`           |
-| Enum Members | `PascalCase`       | `Pending`, `InProgress` |
-| RPC Services | `PascalCase`       | `UserService`           |
-| Procedures   | `PascalCase`       | `GetUser`               |
-| Streams      | `PascalCase`       | `NewMessages`           |
-| Patterns     | `PascalCase`       | `UserEventSubject`      |
-| Fields       | `camelCase`        | `userId`, `createdAt`   |
-| Constants    | `UPPER_SNAKE_CASE` | `MAX_PAGE_SIZE`         |
+| Element         | Convention   | Example                      |
+| :-------------- | :----------- | :--------------------------- |
+| Types and Enums | `PascalCase` | `UserProfile`, `OrderStatus` |
+| Enum Members    | `PascalCase` | `Pending`, `InProgress`      |
+| Type Members    | `camelCase`  | `userId`, `createdAt`        |
+| Constants       | `camelCase`  | `maxPageSize`, `apiVersion`  |
+| Annotations     | `camelCase`  | `rpc`, `proc`, `deprecated`  |
 
 ### Acronym Handling
 
