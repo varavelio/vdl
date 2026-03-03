@@ -1,8 +1,8 @@
 const vscode = require("vscode");
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const { execSync } = require("child_process");
+const fs = require("node:fs");
+const path = require("node:path");
+const os = require("node:os");
+const { execSync } = require("node:child_process");
 
 function getBinaryPath() {
   const config = vscode.workspace.getConfiguration("vdl");
@@ -54,7 +54,7 @@ function getBinaryPath() {
         return line;
       }
     }
-  } catch (e) {
+  } catch (_e) {
     // Ignore error if not found in PATH
   }
 

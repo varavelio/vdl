@@ -1,8 +1,5 @@
 const vscode = require("vscode");
-const { LanguageClient } = require("vscode-languageclient/node");
-const { TransportKind } = require("vscode-languageclient/node");
-const { Executable } = require("vscode-languageclient/node");
-const { LanguageClientOptions } = require("vscode-languageclient/node");
+const { LanguageClient, TransportKind } = require("vscode-languageclient/node");
 
 /**
  * The language server client instance.
