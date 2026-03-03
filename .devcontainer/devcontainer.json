@@ -17,9 +17,7 @@
         "golang.go",
         "svelte.svelte-vscode",
         "Chanzhaoyu.svelte-5-snippets",
-        "astro-build.astro-vscode",
         "bradlc.vscode-tailwindcss",
-        "unifiedjs.vscode-mdx",
         "vitest.explorer",
         "dprint.dprint",
         "biomejs.biome"
