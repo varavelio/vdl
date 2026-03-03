@@ -1,7 +1,0 @@
-version: 1
-schema: main.vdl
-targets:
-  - typescript:
-      output: gen
-      genServer: true
-      genClient: true

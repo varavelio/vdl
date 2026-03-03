@@ -1,4 +1,0 @@
-// Minimal schema for command args test
-type Item {
-  name: string
-}

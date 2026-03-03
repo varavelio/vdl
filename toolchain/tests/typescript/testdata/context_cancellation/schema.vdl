@@ -1,9 +1,0 @@
-rpc Service {
-  stream Counter {
-    input {}
-
-    output {
-      count: int
-    }
-  }
-}

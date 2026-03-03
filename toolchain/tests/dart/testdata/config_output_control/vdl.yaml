@@ -1,7 +1,0 @@
-version: 1
-schema: schema.vdl
-targets:
-  - dart:
-      output: gen
-      genConsts: false
-      genPatterns: false

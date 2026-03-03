@@ -1,7 +1,0 @@
-rpc Service {
-  proc Slow {
-    input {}
-
-    output {}
-  }
-}

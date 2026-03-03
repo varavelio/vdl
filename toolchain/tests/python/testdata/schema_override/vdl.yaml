@@ -1,5 +1,0 @@
-version: 1
-targets:
-  - python:
-      output: "./gen"
-      schema: "override.vdl"

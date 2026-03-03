@@ -1,5 +1,0 @@
-type Reserved {
-  class: string
-  def: int
-  from: bool
-}

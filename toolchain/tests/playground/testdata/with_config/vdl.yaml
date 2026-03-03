@@ -1,9 +1,0 @@
-version: 1
-schema: schema.vdl
-targets:
-  - playground:
-      output: gen
-      defaultBaseUrl: https://api.example.com
-      defaultHeaders:
-        Authorization: Bearer token123
-        X-API-Version: v2

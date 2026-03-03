@@ -1,8 +1,0 @@
-version: 1
-schema: main.vdl
-targets:
-  - go:
-      output: gen
-      package: gen
-      genServer: true
-      genClient: true

@@ -1,9 +1,0 @@
-version: 1
-schema: ./schema.vdl
-targets:
-  - typescript:
-      output: ./gen/ts
-      genClient: true
-      genServer: true
-      genPatterns: true
-      genConsts: true

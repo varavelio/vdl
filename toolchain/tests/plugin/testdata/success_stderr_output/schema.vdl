@@ -1,4 +1,0 @@
-// Minimal schema for stderr test
-type Message {
-  content: string
-}

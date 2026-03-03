@@ -1,9 +1,0 @@
-version: 1
-schema: ./schema.vdl
-targets:
-  - openapi:
-      output: ./gen/openapi
-      title: My API
-      version: "1.0.0"
-      description: A sample API
-      baseUrl: https://api.example.com

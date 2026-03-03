@@ -1,2 +1,0 @@
-// Empty schema - tests edge case where no types, rpcs, etc. are defined.
-// The plugin should still receive a valid IR with empty arrays.

@@ -1,9 +1,0 @@
-rpc Service {
-  proc GetHeaders {
-    input {}
-
-    output {
-      values: map<string>
-    }
-  }
-}

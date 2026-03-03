@@ -1,6 +1,0 @@
-version: 1
-targets:
-  - plugin:
-      output: "./gen"
-      schema: "override.vdl"
-      command: ["python3", "plugin.py"]

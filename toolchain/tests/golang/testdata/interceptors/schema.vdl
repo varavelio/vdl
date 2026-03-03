@@ -1,9 +1,0 @@
-rpc Service {
-  proc Test {
-    input {}
-
-    output {
-      intercepted: bool
-    }
-  }
-}

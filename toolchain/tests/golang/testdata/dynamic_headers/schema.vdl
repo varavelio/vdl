@@ -1,9 +1,0 @@
-rpc Service {
-  proc Get {
-    input {}
-
-    output {
-      val: string
-    }
-  }
-}

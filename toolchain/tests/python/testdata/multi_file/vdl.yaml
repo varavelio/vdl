@@ -1,7 +1,0 @@
-version: 1
-schema: main.vdl
-targets:
-  - python:
-      output: gen
-      genConsts: true
-      genPatterns: true

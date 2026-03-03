@@ -1,5 +1,0 @@
-version: 1
-schema: schema.vdl
-targets:
-  - playground:
-      output: gen

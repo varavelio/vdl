@@ -1,3 +1,0 @@
-# Test external
-
-External documentation
