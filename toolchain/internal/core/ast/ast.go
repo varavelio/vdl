@@ -208,7 +208,7 @@ type Annotation struct {
 
 // TypeDecl represents a custom type declaration.
 // A type IS its type reference, it can be a primitive, custom type, map, object, or array of any.
-// Examples: type Foo string, type Bar int[], type Config map[string], type User { name string }
+// Examples: type Foo string, type Bar int[], type Config map[string], type User { name string }.
 type TypeDecl struct {
 	Positions
 	Docstring   *Docstring      `parser:"(@@ (?! Newline Newline))?"`

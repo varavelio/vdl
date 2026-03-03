@@ -1,6 +1,3 @@
-// Package analysis provides semantic analysis for VDL schemas.
-// It validates the meaning of the code, resolves imports, checks types,
-// and produces a unified Program with all symbols merged.
 package analysis
 
 import (
@@ -11,7 +8,7 @@ import (
 )
 
 // Error codes for diagnostics.
-// Resolution errors (E00x)
+// Resolution errors (E00x).
 const (
 	CodeFileNotFound          = "E001"
 	CodeCircularInclude       = "E002"
@@ -20,14 +17,14 @@ const (
 	CodeParseError            = "E005"
 )
 
-// Naming errors (E10x)
+// Naming errors (E10x).
 const (
 	CodeNotPascalCase       = "E101"
 	CodeNotCamelCase        = "E102"
 	CodeEnumMemberNotPascal = "E103"
 )
 
-// Type reference errors (E20x)
+// Type reference errors (E20x).
 const (
 	CodeTypeNotDeclared      = "E201"
 	CodeSpreadTypeNotFound   = "E202"
@@ -38,7 +35,7 @@ const (
 	CodeConstArrayMixedTypes = "E207"
 )
 
-// Enum errors (E30x)
+// Enum errors (E30x).
 const (
 	CodeEnumMixedTypes     = "E301"
 	CodeEnumIntNeedsValues = "E302"
@@ -47,17 +44,17 @@ const (
 	CodeEnumMemberNotFound = "E305"
 )
 
-// Cycle errors (E60x)
+// Cycle errors (E60x).
 const (
 	CodeCircularTypeDependency = "E601"
 )
 
-// Structure errors (E70x)
+// Structure errors (E70x).
 const (
 	CodeDuplicateField = "E701"
 )
 
-// Global uniqueness errors (E80x)
+// Global uniqueness errors (E80x).
 const (
 	CodeDuplicateType  = "E801"
 	CodeDuplicateEnum  = "E802"
@@ -76,7 +73,7 @@ type Diagnostic struct {
 }
 
 // String returns a formatted string representation of the diagnostic.
-// Format: "file:line:column: error[CODE]: message"
+// Format: "file:line:column: error[CODE]: message".
 func (d Diagnostic) String() string {
 	return fmt.Sprintf(
 		"%s:%d:%d: error[%s]: %s",
@@ -112,7 +109,7 @@ func newDiagnosticFromPositions(positions ast.Positions, code, message string) D
 }
 
 // formatSuggestions formats a slice of suggestions for display in error messages.
-// Returns strings like: "Foo", "Foo or Bar", "Foo, Bar, or Baz"
+// Returns strings like: "Foo", "Foo or Bar", "Foo, Bar, or Baz".
 func formatSuggestions(suggestions []string) string {
 	switch len(suggestions) {
 	case 0:

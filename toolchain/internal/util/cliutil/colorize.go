@@ -2,7 +2,7 @@ package cliutil
 
 import "fmt"
 
-// ANSI color codes
+// ANSI color codes.
 const (
 	reset     = "\033[0m"
 	bold      = "\033[1m"

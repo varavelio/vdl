@@ -7,11 +7,12 @@ import (
 )
 
 // validateNaming checks that all identifiers follow the naming conventions:
-// - Types and Enums: PascalCase
-// - Fields: camelCase
-// - Constants: camelCase
-// - Enum members: PascalCase
-// - Annotations: camelCase
+//
+// - Types and Enums: PascalCase.
+// - Fields: camelCase.
+// - Constants: camelCase.
+// - Enum members: PascalCase.
+// - Annotations: camelCase.
 func validateNaming(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 

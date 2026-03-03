@@ -10,10 +10,11 @@ import (
 )
 
 // validateEnums validates all enum declarations:
-// - All members must have consistent types (all string or all int)
-// - For int enums, all members must have explicit values
-// - All member names must be unique
-// - All member values must be unique
+//
+// - All members must have consistent types (all string or all int).
+// - For int enums, all members must have explicit values.
+// - All member names must be unique.
+// - All member values must be unique.
 func validateEnums(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 

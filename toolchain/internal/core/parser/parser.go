@@ -5,10 +5,10 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
-// Error is an alias for participle.Error
+// Error is an alias for participle.Error.
 type Error = participle.Error
 
-// Parser is an alias for participle.Parser with ast.Schema as the root node
+// Parser is an alias for participle.Parser with ast.Schema as the root node.
 type Parser = participle.Parser[ast.Schema]
 
 // ParserInstance is a pre-built parser instance for VDL schemas.

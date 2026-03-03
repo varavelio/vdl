@@ -241,7 +241,7 @@ func getCompletionContext(content string, pos TextDocumentPosition) (string, Com
 	return "", 0, false
 }
 
-// Regex for fallback extraction
+// Regex for fallback extraction.
 var typeDefRegex = regexp.MustCompile(`\btype\s+([a-zA-Z_]\w*)`)
 var enumDefRegex = regexp.MustCompile(`\benum\s+([a-zA-Z_]\w*)`)
 

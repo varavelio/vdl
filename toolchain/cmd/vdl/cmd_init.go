@@ -53,10 +53,10 @@ func cmdInit(args *cmdInitArgs) {
 // generateUniqueFilenames generates unique filenames for the schema and config files
 //
 // Returns:
-// - schemaName: The name of the schema file
-// - schemaPath: The path to the schema file
-// - configName: The name of the config file
-// - configPath: The path to the config file
+// - schemaName: The name of the schema file.
+// - schemaPath: The path to the schema file.
+// - configName: The name of the config file.
+// - configPath: The path to the config file.
 func generateUniqueFilenames(dir string) (string, string, string, string) {
 	schemaName := "schema.vdl"
 	configName := "vdl.yaml"

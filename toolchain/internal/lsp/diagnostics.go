@@ -13,13 +13,13 @@ import (
 type DiagnosticSeverity int
 
 const (
-	// Error severity level.
+	// DiagnosticSeverityError is the error severity level.
 	DiagnosticSeverityError DiagnosticSeverity = 1
-	// Warning severity level.
+	// DiagnosticSeverityWarning is the warning severity level.
 	DiagnosticSeverityWarning DiagnosticSeverity = 2
-	// Information severity level.
+	// DiagnosticSeverityInformation is the information severity level.
 	DiagnosticSeverityInformation DiagnosticSeverity = 3
-	// Hint severity level.
+	// DiagnosticSeverityHint is the hint severity level.
 	DiagnosticSeverityHint DiagnosticSeverity = 4
 )
 

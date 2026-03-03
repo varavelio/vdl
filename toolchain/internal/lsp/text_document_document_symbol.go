@@ -8,7 +8,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 )
 
-// SymbolKind values (subset of LSP specification)
+// SymbolKind values (subset of LSP specification).
 const (
 	SymbolKindFile          = 1
 	SymbolKindModule        = 2

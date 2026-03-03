@@ -7,8 +7,9 @@ import (
 )
 
 // validateStructure validates structural requirements:
-// - Field names are unique within a type/block
-// - Object literal keys are unique within each object literal
+//
+// - Field names are unique within a type/block.
+// - Object literal keys are unique within each object literal.
 func validateStructure(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 

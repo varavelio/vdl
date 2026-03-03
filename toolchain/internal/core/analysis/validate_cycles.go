@@ -11,7 +11,7 @@ import (
 // (either directly or through a chain of other types).
 //
 // Circular references are allowed if at least one field in the cycle is optional.
-// This allows recursive types like: type Node { children?: []Node }
+// This allows recursive types like: type Node { children?: []Node }.
 func validateCycles(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 

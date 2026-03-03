@@ -460,7 +460,7 @@ func TestPathToUri_CrossPlatform(t *testing.T) {
 	})
 }
 
-// TestEdgeCases tests additional edge cases that might occur in practice
+// TestEdgeCases tests additional edge cases that might occur in practice.
 func TestEdgeCases(t *testing.T) {
 	t.Run("UriToPath with percent in filename", func(t *testing.T) {
 		// A literal percent sign that's not part of encoding

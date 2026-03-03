@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// tokenInfo is a helper struct for testing
+// tokenInfo is a helper struct for testing.
 type tokenInfo struct {
 	Type  string
 	Value string
 }
 
-// lexString is a helper function that lexes a string and returns tokens
+// lexString is a helper function that lexes a string and returns tokens.
 func lexString(input string) ([]tokenInfo, error) {
 	lex, err := VDLLexer.LexString("test.vdl", input)
 	if err != nil {
@@ -48,7 +48,7 @@ func lexString(input string) ([]tokenInfo, error) {
 	return tokens, nil
 }
 
-// filterTokens removes whitespace and newline tokens for cleaner test assertions
+// filterTokens removes whitespace and newline tokens for cleaner test assertions.
 func filterTokens(tokens []tokenInfo) []tokenInfo {
 	var filtered []tokenInfo
 	for _, tok := range tokens {

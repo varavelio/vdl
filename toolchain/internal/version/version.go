@@ -9,7 +9,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-// These variables are set at build time using ldflags
+// These variables are set at build time using ldflags.
 var (
 	// Version is the vdl version, set at build time using ldflags. This string does not contain the "v" prefix.
 	Version = "0.0.0-dev"
@@ -19,7 +19,7 @@ var (
 	Date = "unknown"
 )
 
-// asciiArtRaw is used to generate AsciiArt
+// asciiArtRaw is used to generate AsciiArt.
 var asciiArtRaw = strings.TrimSpace(`
 ██╗  ██╗█████╗ ██╗
 ██║  ██║██╔═██╗██║
@@ -28,7 +28,7 @@ var asciiArtRaw = strings.TrimSpace(`
   ╚══╝  ╚════╝ ╚════╝
 `)
 
-// basicInfoRaw is used to generate AsciiArt
+// basicInfoRaw is used to generate AsciiArt.
 var basicInfoRaw = strings.Join([]string{
 	"Star the repo: https://github.com/varavelio/vdl",
 	"Show usage:    vdl --help",
