@@ -5,7 +5,10 @@
       "name": "Run VDL Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}/editors/vscode"]
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/editors/vscode",
+        "${workspaceFolder}"
+      ]
     }
   ]
 }
