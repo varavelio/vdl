@@ -10,11 +10,8 @@ import (
 func TestHandleTextDocumentReferences(t *testing.T) {
 	schema := `type Foo {}
 
-rpc Test {
-  proc Bar {
-    input { foo: Foo }
-    output { ok: bool }
-  }
+type Bar {
+  foo Foo
 }
 `
 	uri := "file:///refs.vdl"
@@ -24,7 +21,7 @@ rpc Test {
 		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/references", ID: "1"}},
 		Params: RequestMessageTextDocumentReferencesParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
-			Position:     TextDocumentPosition{Line: 4, Character: 17}, // Foo reference
+			Position:     TextDocumentPosition{Line: 3, Character: 7}, // Foo reference
 		},
 	}
 	b, _ := json.Marshal(req)

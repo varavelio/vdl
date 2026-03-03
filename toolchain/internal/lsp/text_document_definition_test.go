@@ -11,20 +11,12 @@ import (
 
 func TestFindIdentifierAtPosition(t *testing.T) {
 	content := `type FooType {
-  firstField: string
-  secondField: int[]
+  firstField string
+  secondField int[]
 }
 
-rpc Test {
-  proc BarProc {
-    input {
-      foo: FooType
-    }
-
-    output {
-      baz: bool
-    }
-  }
+type Wrapper {
+  foo FooType
 }`
 
 	tests := []struct {
@@ -38,13 +30,13 @@ rpc Test {
 			want:     "FooType",
 		},
 		{
-			name:     "Find proc name",
-			position: TextDocumentPosition{Line: 6, Character: 9},
-			want:     "BarProc",
+			name:     "Find wrapper type name",
+			position: TextDocumentPosition{Line: 5, Character: 7},
+			want:     "Wrapper",
 		},
 		{
 			name:     "Find type reference",
-			position: TextDocumentPosition{Line: 8, Character: 12},
+			position: TextDocumentPosition{Line: 6, Character: 8},
 			want:     "FooType",
 		},
 		{
@@ -72,27 +64,19 @@ func TestHandleTextDocumentDefinition(t *testing.T) {
 
 	// Create a test schema using new VDL syntax
 	schemaContent := `type FooType {
-  firstField: string
-  secondField: int[]
+  firstField string
+  secondField int[]
 }
 
-rpc Test {
-  proc BarProc {
-    input {
-      foo: FooType
-    }
-
-    output {
-      baz: bool
-    }
-  }
+type Wrapper {
+  foo FooType
 }`
 
 	// Add the schema to the vfs
 	filePath := "/test.vdl"
 	lsp.fs.WriteFileCache(filePath, []byte(schemaContent))
 
-	// Create a definition request - position is on "FooType" in the input block
+	// Create a definition request - position is on "FooType" in Wrapper
 	request := RequestMessageTextDocumentDefinition{
 		RequestMessage: RequestMessage{
 			Message: Message{
@@ -106,8 +90,8 @@ rpc Test {
 				URI: "file://" + filePath,
 			},
 			Position: TextDocumentPosition{
-				Line:      8, // 0-based, line with "foo: FooType"
-				Character: 12,
+				Line:      6, // 0-based, line with "foo FooType"
+				Character: 8,
 			},
 		},
 	}

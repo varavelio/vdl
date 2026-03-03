@@ -81,7 +81,7 @@ func TestHandleTextDocumentDocumentLinkRanges(t *testing.T) {
 		schema := `""" ./doc.md """
 include "foo.vdl"
 type User {
-	name: string
+	name string
 }`
 		uri := "file:///links.vdl"
 		l := newTestLSP(t, schema, uri)

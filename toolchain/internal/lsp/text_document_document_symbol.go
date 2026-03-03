@@ -157,95 +157,21 @@ func buildDocumentSymbols(program *analysis.Program, filePath string) []Document
 		symbols = append(symbols, sym)
 	}
 
-	// Patterns defined in this file
-	for _, p := range program.Patterns {
-		if p.File != filePath {
+	for _, e := range program.Enums {
+		if e.File != filePath {
 			continue
 		}
-		sym := DocumentSymbol{
-			Name:           p.Name,
-			Kind:           SymbolKindVariable,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(p.Pos), End: convertASTPositionToLSPPosition(p.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(p.Pos), End: convertASTPositionToLSPPosition(p.Pos)},
-		}
-		symbols = append(symbols, sym)
-	}
 
-	// RPCs defined in this file (with procs and streams as children)
-	for _, r := range program.RPCs {
-		if r.File != filePath {
-			continue
-		}
-		rpcSym := DocumentSymbol{
-			Name:           r.Name,
-			Kind:           SymbolKindModule,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(r.Pos), End: convertASTPositionToLSPPosition(r.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(r.Pos), End: convertASTPositionToLSPPosition(r.Pos)},
-		}
-
-		// Add procs as children
-		for _, proc := range r.Procs {
-			if proc.File != filePath {
-				continue
+		for _, m := range e.Members {
+			sym := DocumentSymbol{
+				Name:           m.Name,
+				Kind:           SymbolKindEnumMember,
+				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(m.Pos), End: convertASTPositionToLSPPosition(m.EndPos)},
+				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(m.Pos), End: convertASTPositionToLSPPosition(m.Pos)},
 			}
-			procSym := DocumentSymbol{
-				Name:           proc.Name,
-				Kind:           SymbolKindFunction,
-				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(proc.Pos), End: convertASTPositionToLSPPosition(proc.EndPos)},
-				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(proc.Pos), End: convertASTPositionToLSPPosition(proc.Pos)},
-			}
-
-			// Add input/output as children of proc
-			procSym.Children = buildInputOutputSymbols(proc.Input, proc.Output)
-			rpcSym.Children = append(rpcSym.Children, procSym)
+			symbols = append(symbols, sym)
 		}
-
-		// Add streams as children
-		for _, stream := range r.Streams {
-			if stream.File != filePath {
-				continue
-			}
-			streamSym := DocumentSymbol{
-				Name:           stream.Name,
-				Kind:           SymbolKindEvent,
-				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(stream.Pos), End: convertASTPositionToLSPPosition(stream.EndPos)},
-				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(stream.Pos), End: convertASTPositionToLSPPosition(stream.Pos)},
-			}
-
-			// Add input/output as children of stream
-			streamSym.Children = buildInputOutputSymbols(stream.Input, stream.Output)
-			rpcSym.Children = append(rpcSym.Children, streamSym)
-		}
-
-		symbols = append(symbols, rpcSym)
 	}
 
 	return symbols
-}
-
-// buildInputOutputSymbols builds document symbols for input and output blocks.
-func buildInputOutputSymbols(input, output *analysis.BlockSymbol) []DocumentSymbol {
-	var children []DocumentSymbol
-
-	if input != nil {
-		inputSym := DocumentSymbol{
-			Name:           "input",
-			Kind:           SymbolKindObject,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(input.Pos), End: convertASTPositionToLSPPosition(input.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(input.Pos), End: convertASTPositionToLSPPosition(input.Pos)},
-		}
-		children = append(children, inputSym)
-	}
-
-	if output != nil {
-		outputSym := DocumentSymbol{
-			Name:           "output",
-			Kind:           SymbolKindObject,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(output.Pos), End: convertASTPositionToLSPPosition(output.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(output.Pos), End: convertASTPositionToLSPPosition(output.Pos)},
-		}
-		children = append(children, outputSym)
-	}
-
-	return children
 }

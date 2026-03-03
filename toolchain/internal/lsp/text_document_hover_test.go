@@ -11,20 +11,12 @@ import (
 
 func TestExtractCodeFromContent(t *testing.T) {
 	content := `type FooType {
-  firstField: string
-  secondField: int[]
+  firstField string
+  secondField int[]
 }
 
-rpc Test {
-  proc BarProc {
-    input {
-      foo: FooType
-    }
-
-    output {
-      baz: bool
-    }
-  }
+type Wrapper {
+  foo FooType
 }`
 
 	tests := []struct {
@@ -38,14 +30,14 @@ rpc Test {
 			name:      "Extract type definition",
 			startLine: 1,
 			endLine:   4,
-			want:      "type FooType {\n  firstField: string\n  secondField: int[]\n}",
+			want:      "type FooType {\n  firstField string\n  secondField int[]\n}",
 			wantErr:   false,
 		},
 		{
 			name:      "Extract single line",
 			startLine: 2,
 			endLine:   2,
-			want:      "firstField: string",
+			want:      "firstField string",
 			wantErr:   false,
 		},
 		{
@@ -59,7 +51,7 @@ rpc Test {
 			name:      "End line out of range",
 			startLine: 1,
 			endLine:   100,
-			want:      "type FooType {\n  firstField: string\n  secondField: int[]\n}\n\nrpc Test {\n  proc BarProc {\n    input {\n      foo: FooType\n    }\n\n    output {\n      baz: bool\n    }\n  }\n}",
+			want:      "type FooType {\n  firstField string\n  secondField int[]\n}\n\ntype Wrapper {\n  foo FooType\n}",
 			wantErr:   false,
 		},
 	}
@@ -87,27 +79,19 @@ func TestHandleTextDocumentHover(t *testing.T) {
 
 	// Create a test schema using the new VDL syntax
 	schemaContent := `type FooType {
-  firstField: string
-  secondField: int[]
+  firstField string
+  secondField int[]
 }
 
-rpc Test {
-  proc BarProc {
-    input {
-      foo: FooType
-    }
-
-    output {
-      baz: bool
-    }
-  }
+type Wrapper {
+  foo FooType
 }`
 
 	// Add the schema to the vfs
 	filePath := "/test.vdl"
 	lsp.fs.WriteFileCache(filePath, []byte(schemaContent))
 
-	// Create a hover request for a type reference (line 9 is "foo: FooType")
+	// Create a hover request for a type reference (line 7 is "foo FooType")
 	request := RequestMessageTextDocumentHover{
 		RequestMessage: RequestMessage{
 			Message: Message{
@@ -121,8 +105,8 @@ rpc Test {
 				URI: "file://" + filePath,
 			},
 			Position: TextDocumentPosition{
-				Line:      8, // 0-based, line with "foo: FooType"
-				Character: 11,
+				Line:      6, // 0-based, line with "foo FooType"
+				Character: 8,
 			},
 		},
 	}

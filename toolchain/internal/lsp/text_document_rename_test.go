@@ -10,11 +10,8 @@ import (
 func TestHandleTextDocumentRename(t *testing.T) {
 	schema := `type Foo {}
 
-rpc Test {
-  proc Bar {
-    input { foo: Foo }
-    output { ok: bool }
-  }
+type Bar {
+  foo Foo
 }
 `
 	uri := "file:///rename.vdl"
@@ -24,7 +21,7 @@ rpc Test {
 		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"}},
 		Params: RequestMessageTextDocumentRenameParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
-			Position:     TextDocumentPosition{Line: 4, Character: 17}, // Foo reference
+			Position:     TextDocumentPosition{Line: 3, Character: 7}, // Foo reference
 			NewName:      "BarType",
 		},
 	}
@@ -48,7 +45,9 @@ func TestHandleTextDocumentRename_CrossFile(t *testing.T) {
 	// a.vdl defines Foo
 	schemaA := `type Foo {}`
 	// b.vdl uses Foo
-	schemaB := `type Bar { f: Foo }`
+	schemaB := `type Bar {
+  f Foo
+}`
 
 	uriA := "file:///a.vdl"
 	uriB := "file:///b.vdl"
@@ -96,7 +95,9 @@ func TestHandleTextDocumentRename_TransitiveDependency(t *testing.T) {
 	// middle.vdl imports shared.vdl
 	schemaMiddle := `
 include "shared.vdl"
-type Middle { t: MyType }
+type Middle {
+  t MyType
+}
 `
 	// main.vdl imports middle.vdl and uses MyType (implicitly available?)
 	// Assuming VDL allows using transitive types if they are in scope or if they are exported.
@@ -105,7 +106,9 @@ type Middle { t: MyType }
 	// If it's valid syntax, `findReferencesInSchema` will find `MyType`.
 	schemaMain := `
 include "middle.vdl"
-type Main { t: MyType }
+type Main {
+  t MyType
+}
 `
 
 	uriShared := "file:///shared.vdl"

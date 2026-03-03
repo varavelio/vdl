@@ -73,70 +73,58 @@ func collectDocumentLinks(content string, docPath string) []DocumentLink {
 
 	baseDir := filepath.Dir(docPath)
 
-	// Find all docstrings that reference external files
-	for _, child := range schema.Children {
-		if child.Docstring != nil {
-			if path, isExternal := child.Docstring.GetExternal(); isExternal {
-				normPath := filepath.Join(baseDir, path)
-				normPath = filepath.Clean(normPath)
-
-				links = append(links, DocumentLink{
-					Range:   calculateDocstringPathRange(child.Docstring, path),
-					Target:  PathToUri(normPath),
-					Tooltip: "Open markdown file",
-				})
-			}
-		}
-
-		// Check docstrings in types, enums, etc.
-		if child.Type != nil && child.Type.Docstring != nil {
-			addExternalDocstringLink(&links, child.Type.Docstring, baseDir)
-		}
-		if child.Enum != nil && child.Enum.Docstring != nil {
-			addExternalDocstringLink(&links, child.Enum.Docstring, baseDir)
-		}
-		if child.Const != nil && child.Const.Docstring != nil {
-			addExternalDocstringLink(&links, child.Const.Docstring, baseDir)
-		}
-		if child.Pattern != nil && child.Pattern.Docstring != nil {
-			addExternalDocstringLink(&links, child.Pattern.Docstring, baseDir)
-		}
-		if child.RPC != nil {
-			if child.RPC.Docstring != nil {
-				addExternalDocstringLink(&links, child.RPC.Docstring, baseDir)
-			}
-			// Check procs and streams within RPC
-			for _, rpcChild := range child.RPC.Children {
-				if rpcChild.Docstring != nil {
-					addExternalDocstringLink(&links, rpcChild.Docstring, baseDir)
-				}
-				if rpcChild.Proc != nil && rpcChild.Proc.Docstring != nil {
-					addExternalDocstringLink(&links, rpcChild.Proc.Docstring, baseDir)
-				}
-				if rpcChild.Stream != nil && rpcChild.Stream.Docstring != nil {
-					addExternalDocstringLink(&links, rpcChild.Stream.Docstring, baseDir)
-				}
-			}
-		}
-
-		// Include statements also become links
-		if child.Include != nil {
-			normPath := filepath.Join(baseDir, string(child.Include.Path))
+	for _, decl := range schema.Declarations {
+		switch decl.Kind() {
+		case ast.DeclKindInclude:
+			normPath := filepath.Join(baseDir, string(decl.Include.Path))
 			normPath = filepath.Clean(normPath)
 
 			links = append(links, DocumentLink{
-				Range:   calculateIncludePathRange(child.Include),
+				Range:   calculateIncludePathRange(decl.Include),
 				Target:  PathToUri(normPath),
 				Tooltip: "Open included file",
 			})
+		case ast.DeclKindDocstring:
+			addExternalDocstringLink(&links, decl.Docstring, baseDir)
+		case ast.DeclKindType:
+			addExternalDocstringLink(&links, decl.Type.Docstring, baseDir)
+			collectTypeMemberDocstringLinks(&links, decl.Type.Members(), baseDir)
+		case ast.DeclKindConst:
+			addExternalDocstringLink(&links, decl.Const.Docstring, baseDir)
+		case ast.DeclKindEnum:
+			addExternalDocstringLink(&links, decl.Enum.Docstring, baseDir)
+			for _, member := range decl.Enum.Members {
+				if member == nil {
+					continue
+				}
+				addExternalDocstringLink(&links, member.Docstring, baseDir)
+			}
 		}
 	}
 
 	return links
 }
 
+func collectTypeMemberDocstringLinks(links *[]DocumentLink, members []*ast.TypeMember, baseDir string) {
+	for _, member := range members {
+		if member == nil || member.Field == nil {
+			continue
+		}
+
+		addExternalDocstringLink(links, member.Field.Docstring, baseDir)
+
+		if member.Field.Type.Base != nil && member.Field.Type.Base.Object != nil {
+			collectTypeMemberDocstringLinks(links, member.Field.Type.Base.Object.Members, baseDir)
+		}
+	}
+}
+
 // addExternalDocstringLink adds a document link for an external docstring if applicable.
 func addExternalDocstringLink(links *[]DocumentLink, docstring *ast.Docstring, baseDir string) {
+	if docstring == nil {
+		return
+	}
+
 	path, isExternal := docstring.GetExternal()
 	if !isExternal {
 		return

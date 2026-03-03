@@ -15,7 +15,6 @@ type IdentifierInfo struct {
 }
 
 // findIdentifierAtPosition finds the identifier at the given LSP position in the content.
-// Returns the identifier name, or empty string if not found.
 func findIdentifierAtPosition(content string, lspPosition TextDocumentPosition) string {
 	lines := strings.Split(content, "\n")
 	if lspPosition.Line >= len(lines) {
@@ -27,13 +26,11 @@ func findIdentifierAtPosition(content string, lspPosition TextDocumentPosition) 
 		return ""
 	}
 
-	// Find the start of the identifier
 	start := lspPosition.Character
 	for start > 0 && isIdentifierChar(line[start-1]) {
 		start--
 	}
 
-	// Find the end of the identifier
 	end := lspPosition.Character
 	for end < len(line) && isIdentifierChar(line[end]) {
 		end++
@@ -46,13 +43,12 @@ func findIdentifierAtPosition(content string, lspPosition TextDocumentPosition) 
 	return line[start:end]
 }
 
-// isIdentifierChar returns true if the character is valid in an identifier.
 func isIdentifierChar(c byte) bool {
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_'
 }
 
-// findDocstringPathAtPosition finds if the position is inside a docstring that references an external file.
-// Returns the path and true if found, empty string and false otherwise.
+// findDocstringPathAtPosition finds if the position is inside a single-line docstring
+// that references an external .md file.
 func findDocstringPathAtPosition(content string, lspPosition TextDocumentPosition) (string, bool) {
 	lines := strings.Split(content, "\n")
 	if lspPosition.Line >= len(lines) {
@@ -60,30 +56,22 @@ func findDocstringPathAtPosition(content string, lspPosition TextDocumentPositio
 	}
 
 	line := lines[lspPosition.Line]
-
-	// Check if we're inside a docstring that contains a .md path
-	// Look for """ markers
 	docStart := strings.Index(line, `"""`)
 	if docStart == -1 {
 		return "", false
 	}
 
-	// Find the closing """
 	docEnd := strings.Index(line[docStart+3:], `"""`)
 	if docEnd == -1 {
 		return "", false
 	}
 	docEnd += docStart + 3
 
-	// Check if cursor is within the docstring
 	if lspPosition.Character < docStart || lspPosition.Character > docEnd+3 {
 		return "", false
 	}
 
-	// Extract content between the quotes
 	docContent := strings.TrimSpace(line[docStart+3 : docEnd])
-
-	// Check if it's an external file reference
 	if strings.HasSuffix(docContent, ".md") && !strings.ContainsAny(docContent, "\r\n") {
 		return docContent, true
 	}
@@ -91,288 +79,183 @@ func findDocstringPathAtPosition(content string, lspPosition TextDocumentPositio
 	return "", false
 }
 
-// collectAllIdentifiersFromSchema collects all identifier occurrences from the parsed schema.
-// This walks the AST and collects all identifiers with their positions.
 func collectAllIdentifiersFromSchema(schema *ast.Schema, content string) []IdentifierInfo {
-	// Pre-allocate a reasonable capacity to avoid frequent re-allocations
-	// Most files have < 1000 identifiers
-	identifiers := make([]IdentifierInfo, 0, 100)
+	ids := make([]IdentifierInfo, 0, 128)
 
-	for _, child := range schema.Children {
-		switch child.Kind() {
-		case ast.SchemaChildKindType:
-			collectIdentifiersFromType(child.Type, content, &identifiers)
-		case ast.SchemaChildKindEnum:
-			collectIdentifiersFromEnum(child.Enum, content, &identifiers)
-		case ast.SchemaChildKindConst:
-			collectIdentifiersFromConst(child.Const, content, &identifiers)
-		case ast.SchemaChildKindPattern:
-			collectIdentifiersFromPattern(child.Pattern, content, &identifiers)
-		case ast.SchemaChildKindRPC:
-			collectIdentifiersFromRPC(child.RPC, content, &identifiers)
+	for _, decl := range schema.Declarations {
+		switch decl.Kind() {
+		case ast.DeclKindType:
+			collectIdentifiersFromType(decl.Type, content, &ids)
+		case ast.DeclKindEnum:
+			collectIdentifiersFromEnum(decl.Enum, content, &ids)
+		case ast.DeclKindConst:
+			collectIdentifiersFromConst(decl.Const, content, &ids)
 		}
 	}
 
-	return identifiers
+	return ids
 }
 
-func collectIdentifiersFromType(t *ast.TypeDecl, content string, identifiers *[]IdentifierInfo) {
-	// Type name
-	// Find the position of the name
-	startPos := t.Pos
-	if t.Docstring != nil {
-		startPos = t.Docstring.EndPos
-	}
-	if t.Deprecated != nil {
-		startPos = t.Deprecated.EndPos
-	}
-
-	namePos, nameEndPos := findIdentifierRange(content, startPos, t.Name)
-
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   t.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-
-	// Fields and spreads
-	for _, child := range t.Children {
-		if child.Field != nil {
-			collectIdentifiersFromField(child.Field, content, identifiers)
-		}
-		if child.Spread != nil {
-			namePos, nameEndPos := findIdentifierRange(content, child.Spread.Pos, child.Spread.TypeName)
-			*identifiers = append(*identifiers, IdentifierInfo{
-				Name:   child.Spread.TypeName,
-				Pos:    namePos,
-				EndPos: nameEndPos,
-			})
-		}
-	}
-}
-
-func collectIdentifiersFromField(f *ast.Field, content string, identifiers *[]IdentifierInfo) {
-	// Field name
-	startPos := f.Pos
-	if f.Docstring != nil {
-		startPos = f.Docstring.EndPos
-	}
-
-	namePos, nameEndPos := findIdentifierRange(content, startPos, string(f.Name))
-
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   string(f.Name),
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-
-	// Field type references
-	collectIdentifiersFromFieldType(&f.Type, content, identifiers)
-}
-
-func collectIdentifiersFromFieldType(ft *ast.FieldType, content string, identifiers *[]IdentifierInfo) {
-	if ft.Base == nil {
+func collectIdentifiersFromType(t *ast.TypeDecl, content string, ids *[]IdentifierInfo) {
+	if t == nil {
 		return
 	}
 
-	// Named type reference
+	namePos, nameEndPos := findIdentifierRange(content, t.Pos, t.Name)
+	*ids = append(*ids, IdentifierInfo{Name: t.Name, Pos: namePos, EndPos: nameEndPos})
+
+	collectIdentifiersFromAnnotations(t.Annotations, content, ids)
+	if !t.IsObject() {
+		typeRef := t.Type()
+		collectIdentifiersFromFieldType(&typeRef, content, ids)
+	}
+
+	for _, m := range t.Members() {
+		collectIdentifiersFromTypeMember(m, content, ids)
+	}
+}
+
+func collectIdentifiersFromTypeMember(m *ast.TypeMember, content string, ids *[]IdentifierInfo) {
+	if m == nil {
+		return
+	}
+	if m.Field != nil {
+		collectIdentifiersFromField(m.Field, content, ids)
+	}
+	if m.Spread != nil {
+		collectIdentifiersFromSpread(m.Spread, content, ids)
+	}
+}
+
+func collectIdentifiersFromField(f *ast.Field, content string, ids *[]IdentifierInfo) {
+	if f == nil {
+		return
+	}
+
+	namePos, nameEndPos := findIdentifierRange(content, f.Pos, f.Name)
+	*ids = append(*ids, IdentifierInfo{Name: f.Name, Pos: namePos, EndPos: nameEndPos})
+
+	collectIdentifiersFromAnnotations(f.Annotations, content, ids)
+	collectIdentifiersFromFieldType(&f.Type, content, ids)
+}
+
+func collectIdentifiersFromFieldType(ft *ast.FieldType, content string, ids *[]IdentifierInfo) {
+	if ft == nil || ft.Base == nil {
+		return
+	}
+
 	if ft.Base.Named != nil {
 		name := *ft.Base.Named
-		// Only add if it's not a primitive
 		if !ast.IsPrimitiveType(name) {
-			// ft.Base.Pos covers the name
 			namePos, nameEndPos := findIdentifierRange(content, ft.Base.Pos, name)
-			*identifiers = append(*identifiers, IdentifierInfo{
-				Name:   name,
-				Pos:    namePos,
-				EndPos: nameEndPos,
-			})
+			*ids = append(*ids, IdentifierInfo{Name: name, Pos: namePos, EndPos: nameEndPos})
 		}
 	}
 
-	// Map value type
-	if ft.Base.Map != nil && ft.Base.Map.ValueType != nil {
-		collectIdentifiersFromFieldType(ft.Base.Map.ValueType, content, identifiers)
+	if ft.Base.Map != nil {
+		collectIdentifiersFromFieldType(ft.Base.Map.ValueType, content, ids)
 	}
 
-	// Inline object
 	if ft.Base.Object != nil {
-		for _, child := range ft.Base.Object.Children {
-			if child.Field != nil {
-				collectIdentifiersFromField(child.Field, content, identifiers)
+		for _, m := range ft.Base.Object.Members {
+			collectIdentifiersFromTypeMember(m, content, ids)
+		}
+	}
+}
+
+func collectIdentifiersFromEnum(e *ast.EnumDecl, content string, ids *[]IdentifierInfo) {
+	if e == nil {
+		return
+	}
+
+	namePos, nameEndPos := findIdentifierRange(content, e.Pos, e.Name)
+	*ids = append(*ids, IdentifierInfo{Name: e.Name, Pos: namePos, EndPos: nameEndPos})
+
+	collectIdentifiersFromAnnotations(e.Annotations, content, ids)
+
+	for _, m := range e.Members {
+		if m == nil {
+			continue
+		}
+		if m.Spread != nil {
+			collectIdentifiersFromSpread(m.Spread, content, ids)
+			continue
+		}
+		if m.Name != "" {
+			memberPos, memberEndPos := findIdentifierRange(content, m.Pos, m.Name)
+			*ids = append(*ids, IdentifierInfo{Name: m.Name, Pos: memberPos, EndPos: memberEndPos})
+		}
+		collectIdentifiersFromAnnotations(m.Annotations, content, ids)
+	}
+}
+
+func collectIdentifiersFromConst(c *ast.ConstDecl, content string, ids *[]IdentifierInfo) {
+	if c == nil {
+		return
+	}
+
+	namePos, nameEndPos := findIdentifierRange(content, c.Pos, c.Name)
+	*ids = append(*ids, IdentifierInfo{Name: c.Name, Pos: namePos, EndPos: nameEndPos})
+
+	collectIdentifiersFromAnnotations(c.Annotations, content, ids)
+	collectIdentifiersFromDataLiteral(c.Value, content, ids)
+}
+
+func collectIdentifiersFromAnnotations(annotations []*ast.Annotation, content string, ids *[]IdentifierInfo) {
+	for _, ann := range annotations {
+		if ann == nil || ann.Argument == nil {
+			continue
+		}
+		collectIdentifiersFromDataLiteral(ann.Argument, content, ids)
+	}
+}
+
+func collectIdentifiersFromDataLiteral(lit *ast.DataLiteral, content string, ids *[]IdentifierInfo) {
+	if lit == nil {
+		return
+	}
+
+	if lit.Scalar != nil && lit.Scalar.Ref != nil {
+		collectIdentifiersFromReference(lit.Scalar.Ref, content, ids)
+	}
+
+	if lit.Object != nil {
+		for _, e := range lit.Object.Entries {
+			if e == nil {
+				continue
 			}
-			if child.Spread != nil {
-				namePos, nameEndPos := findIdentifierRange(content, child.Spread.Pos, child.Spread.TypeName)
-				*identifiers = append(*identifiers, IdentifierInfo{
-					Name:   child.Spread.TypeName,
-					Pos:    namePos,
-					EndPos: nameEndPos,
-				})
+			if e.Spread != nil {
+				collectIdentifiersFromSpread(e.Spread, content, ids)
 			}
+			collectIdentifiersFromDataLiteral(e.Value, content, ids)
+		}
+	}
+
+	if lit.Array != nil {
+		for _, el := range lit.Array.Elements {
+			collectIdentifiersFromDataLiteral(el, content, ids)
 		}
 	}
 }
 
-func collectIdentifiersFromEnum(e *ast.EnumDecl, content string, identifiers *[]IdentifierInfo) {
-	// Enum name
-	startPos := e.Pos
-	if e.Docstring != nil {
-		startPos = e.Docstring.EndPos
+func collectIdentifiersFromSpread(s *ast.Spread, content string, ids *[]IdentifierInfo) {
+	if s == nil || s.Ref == nil {
+		return
 	}
-	if e.Deprecated != nil {
-		startPos = e.Deprecated.EndPos
-	}
-	namePos, nameEndPos := findIdentifierRange(content, startPos, e.Name)
-
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   e.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-
-	// Enum members
-	for _, member := range e.Members {
-		if member.Name != "" {
-			namePos, nameEndPos := findIdentifierRange(content, member.Pos, member.Name)
-			*identifiers = append(*identifiers, IdentifierInfo{
-				Name:   member.Name,
-				Pos:    namePos,
-				EndPos: nameEndPos,
-			})
-		}
-	}
+	collectIdentifiersFromReference(s.Ref, content, ids)
 }
 
-func collectIdentifiersFromConst(c *ast.ConstDecl, content string, identifiers *[]IdentifierInfo) {
-	startPos := c.Pos
-	if c.Docstring != nil {
-		startPos = c.Docstring.EndPos
+func collectIdentifiersFromReference(ref *ast.Reference, content string, ids *[]IdentifierInfo) {
+	if ref == nil {
+		return
 	}
-	if c.Deprecated != nil {
-		startPos = c.Deprecated.EndPos
-	}
-	namePos, nameEndPos := findIdentifierRange(content, startPos, c.Name)
 
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   c.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-}
+	namePos, nameEndPos := findIdentifierRange(content, ref.Pos, ref.Name)
+	*ids = append(*ids, IdentifierInfo{Name: ref.Name, Pos: namePos, EndPos: nameEndPos})
 
-func collectIdentifiersFromPattern(p *ast.PatternDecl, content string, identifiers *[]IdentifierInfo) {
-	startPos := p.Pos
-	if p.Docstring != nil {
-		startPos = p.Docstring.EndPos
-	}
-	if p.Deprecated != nil {
-		startPos = p.Deprecated.EndPos
-	}
-	namePos, nameEndPos := findIdentifierRange(content, startPos, p.Name)
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   p.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-}
-
-func collectIdentifiersFromRPC(r *ast.RPCDecl, content string, identifiers *[]IdentifierInfo) {
-	// RPC name
-	startPos := r.Pos
-	if r.Docstring != nil {
-		startPos = r.Docstring.EndPos
-	}
-	if r.Deprecated != nil {
-		startPos = r.Deprecated.EndPos
-	}
-	namePos, nameEndPos := findIdentifierRange(content, startPos, r.Name)
-
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   r.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-
-	// Procs and Streams
-	for _, child := range r.Children {
-		if child.Proc != nil {
-			collectIdentifiersFromProc(child.Proc, content, identifiers)
-		}
-		if child.Stream != nil {
-			collectIdentifiersFromStream(child.Stream, content, identifiers)
-		}
-	}
-}
-
-func collectIdentifiersFromProc(p *ast.ProcDecl, content string, identifiers *[]IdentifierInfo) {
-	// Proc name
-	startPos := p.Pos
-	if p.Docstring != nil {
-		startPos = p.Docstring.EndPos
-	}
-	if p.Deprecated != nil {
-		startPos = p.Deprecated.EndPos
-	}
-	namePos, nameEndPos := findIdentifierRange(content, startPos, p.Name)
-
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   p.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-
-	// Input/Output
-	for _, child := range p.Children {
-		if child.Input != nil {
-			collectIdentifiersFromInputOutput(child.Input.Children, content, identifiers)
-		}
-		if child.Output != nil {
-			collectIdentifiersFromInputOutput(child.Output.Children, content, identifiers)
-		}
-	}
-}
-
-func collectIdentifiersFromStream(s *ast.StreamDecl, content string, identifiers *[]IdentifierInfo) {
-	// Stream name
-	startPos := s.Pos
-	if s.Docstring != nil {
-		startPos = s.Docstring.EndPos
-	}
-	if s.Deprecated != nil {
-		startPos = s.Deprecated.EndPos
-	}
-	namePos, nameEndPos := findIdentifierRange(content, startPos, s.Name)
-
-	*identifiers = append(*identifiers, IdentifierInfo{
-		Name:   s.Name,
-		Pos:    namePos,
-		EndPos: nameEndPos,
-	})
-
-	// Input/Output
-	for _, child := range s.Children {
-		if child.Input != nil {
-			collectIdentifiersFromInputOutput(child.Input.Children, content, identifiers)
-		}
-		if child.Output != nil {
-			collectIdentifiersFromInputOutput(child.Output.Children, content, identifiers)
-		}
-	}
-}
-
-func collectIdentifiersFromInputOutput(children []*ast.InputOutputChild, content string, identifiers *[]IdentifierInfo) {
-	for _, child := range children {
-		if child.Field != nil {
-			collectIdentifiersFromField(child.Field, content, identifiers)
-		}
-		if child.Spread != nil {
-			namePos, nameEndPos := findIdentifierRange(content, child.Spread.Pos, child.Spread.TypeName)
-			*identifiers = append(*identifiers, IdentifierInfo{
-				Name:   child.Spread.TypeName,
-				Pos:    namePos,
-				EndPos: nameEndPos,
-			})
-		}
+	if ref.Member != nil {
+		memberPos, memberEndPos := findIdentifierRange(content, nameEndPos, *ref.Member)
+		*ids = append(*ids, IdentifierInfo{Name: *ref.Member, Pos: memberPos, EndPos: memberEndPos})
 	}
 }
 
@@ -380,7 +263,7 @@ func collectIdentifiersFromInputOutput(children []*ast.InputOutputChild, content
 func findReferencesInSchema(schema *ast.Schema, symbolName, content string) []IdentifierInfo {
 	allIdentifiers := collectAllIdentifiersFromSchema(schema, content)
 
-	var references []IdentifierInfo
+	references := make([]IdentifierInfo, 0, len(allIdentifiers))
 	for _, id := range allIdentifiers {
 		if id.Name == symbolName {
 			references = append(references, id)
@@ -398,7 +281,6 @@ func findIdentifierRange(content string, startSearchPos ast.Position, name strin
 		return startSearchPos, startSearchPos
 	}
 
-	// Search for the name starting from startOffset
 	idx := strings.Index(content[startOffset:], name)
 	if idx == -1 {
 		return startSearchPos, startSearchPos
@@ -406,7 +288,6 @@ func findIdentifierRange(content string, startSearchPos ast.Position, name strin
 
 	matchOffset := startOffset + idx
 
-	// Calculate new position
 	newPos := startSearchPos
 	segment := content[startOffset:matchOffset]
 	newlines := strings.Count(segment, "\n")
@@ -427,84 +308,39 @@ func findIdentifierRange(content string, startSearchPos ast.Position, name strin
 }
 
 // resolveSymbolDefinition finds the definition of a symbol in the program.
-// Returns the location of the definition, or nil if not found.
 func resolveSymbolDefinition(program *analysis.Program, symbolName string) *Location {
-	// Check types
+	if program == nil {
+		return nil
+	}
+
 	if t, ok := program.Types[symbolName]; ok {
-		return &Location{
-			URI: PathToUri(t.File),
-			Range: TextDocumentRange{
-				Start: convertASTPositionToLSPPosition(t.Pos),
-				End:   convertASTPositionToLSPPosition(t.EndPos),
-			},
-		}
+		return symbolToLocation(t.File, t.Pos, t.EndPos)
 	}
-
-	// Check enums
 	if e, ok := program.Enums[symbolName]; ok {
-		return &Location{
-			URI: PathToUri(e.File),
-			Range: TextDocumentRange{
-				Start: convertASTPositionToLSPPosition(e.Pos),
-				End:   convertASTPositionToLSPPosition(e.EndPos),
-			},
-		}
+		return symbolToLocation(e.File, e.Pos, e.EndPos)
 	}
-
-	// Check constants
 	if c, ok := program.Consts[symbolName]; ok {
-		return &Location{
-			URI: PathToUri(c.File),
-			Range: TextDocumentRange{
-				Start: convertASTPositionToLSPPosition(c.Pos),
-				End:   convertASTPositionToLSPPosition(c.EndPos),
-			},
-		}
+		return symbolToLocation(c.File, c.Pos, c.EndPos)
 	}
 
-	// Check patterns
-	if p, ok := program.Patterns[symbolName]; ok {
-		return &Location{
-			URI: PathToUri(p.File),
-			Range: TextDocumentRange{
-				Start: convertASTPositionToLSPPosition(p.Pos),
-				End:   convertASTPositionToLSPPosition(p.EndPos),
-			},
-		}
-	}
-
-	// Check RPCs
-	if r, ok := program.RPCs[symbolName]; ok {
-		return &Location{
-			URI: PathToUri(r.File),
-			Range: TextDocumentRange{
-				Start: convertASTPositionToLSPPosition(r.Pos),
-				End:   convertASTPositionToLSPPosition(r.EndPos),
-			},
-		}
-	}
-
-	// Check procs and streams within RPCs
-	for _, rpc := range program.RPCs {
-		if proc, ok := rpc.Procs[symbolName]; ok {
-			return &Location{
-				URI: PathToUri(proc.File),
-				Range: TextDocumentRange{
-					Start: convertASTPositionToLSPPosition(proc.Pos),
-					End:   convertASTPositionToLSPPosition(proc.EndPos),
-				},
-			}
-		}
-		if stream, ok := rpc.Streams[symbolName]; ok {
-			return &Location{
-				URI: PathToUri(stream.File),
-				Range: TextDocumentRange{
-					Start: convertASTPositionToLSPPosition(stream.Pos),
-					End:   convertASTPositionToLSPPosition(stream.EndPos),
-				},
+	// Allow go-to-definition on enum member names.
+	for _, e := range program.Enums {
+		for _, m := range e.Members {
+			if m.Name == symbolName {
+				return symbolToLocation(m.File, m.Pos, m.EndPos)
 			}
 		}
 	}
 
 	return nil
+}
+
+func symbolToLocation(file string, pos, endPos ast.Position) *Location {
+	return &Location{
+		URI: PathToUri(file),
+		Range: TextDocumentRange{
+			Start: convertASTPositionToLSPPosition(pos),
+			End:   convertASTPositionToLSPPosition(endPos),
+		},
+	}
 }

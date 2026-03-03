@@ -134,53 +134,17 @@ func findHoverInfo(fs interface{ ReadFile(string) ([]byte, error) }, identifier 
 		}
 	}
 
-	// Check if the identifier is a pattern
-	if p, ok := program.Patterns[identifier]; ok {
-		sourceCode, err := extractSourceCode(fs, p.File, p.Pos.Line, p.EndPos.Line)
-		if err != nil {
-			return nil
-		}
-		return &HoverResult{
-			Contents: MarkupContent{
-				Kind:  "markdown",
-				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
-			},
-		}
-	}
+	for _, e := range program.Enums {
+		for _, m := range e.Members {
+			if m.Name != identifier {
+				continue
+			}
 
-	// Check if the identifier is an RPC
-	if r, ok := program.RPCs[identifier]; ok {
-		sourceCode, err := extractSourceCode(fs, r.File, r.Pos.Line, r.EndPos.Line)
-		if err != nil {
-			return nil
-		}
-		return &HoverResult{
-			Contents: MarkupContent{
-				Kind:  "markdown",
-				Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
-			},
-		}
-	}
-
-	// Check procs and streams within RPCs
-	for _, rpc := range program.RPCs {
-		if proc, ok := rpc.Procs[identifier]; ok {
-			sourceCode, err := extractSourceCode(fs, proc.File, proc.Pos.Line, proc.EndPos.Line)
+			sourceCode, err := extractSourceCode(fs, m.File, m.Pos.Line, m.EndPos.Line)
 			if err != nil {
 				return nil
 			}
-			return &HoverResult{
-				Contents: MarkupContent{
-					Kind:  "markdown",
-					Value: fmt.Sprintf("```vdl\n%s\n```", sourceCode),
-				},
-			}
-		}
-		if stream, ok := rpc.Streams[identifier]; ok {
-			sourceCode, err := extractSourceCode(fs, stream.File, stream.Pos.Line, stream.EndPos.Line)
-			if err != nil {
-				return nil
-			}
+
 			return &HoverResult{
 				Contents: MarkupContent{
 					Kind:  "markdown",

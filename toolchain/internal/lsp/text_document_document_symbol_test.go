@@ -12,8 +12,8 @@ func TestHandleTextDocumentDocumentSymbol(t *testing.T) {
 
 type Person {}
 
-rpc Test {
-  proc Hello {}
+enum Status {
+  ONLINE
 }
 `
 	uri := "file:///symbols.vdl"
@@ -27,7 +27,6 @@ rpc Test {
 	anyResp, err := l.handleTextDocumentDocumentSymbol(b)
 	require.NoError(t, err)
 	resp := anyResp.(ResponseMessageTextDocumentDocumentSymbol)
-	// We expect: 1 docstring, 1 type (Person), 1 RPC (Test) which contains 1 proc (Hello)
-	// The RPC should have Hello as a child
-	require.GreaterOrEqual(t, len(resp.Result), 2) // At minimum: docstring + type + rpc
+	// We expect at least: top-level docstring, type, enum, and enum member symbols.
+	require.GreaterOrEqual(t, len(resp.Result), 3)
 }
