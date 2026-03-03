@@ -1,12 +1,12 @@
 {
   "$defs": {
     "Annotation": {
-      "description": "Annotation metadata preserved in IR.\n\n`name` is the annotation identifier without the `@` prefix.\n`argument`, when present, is fully resolved as a Value.",
+      "description": "Annotation metadata preserved in IR.\n\n`name` is the annotation identifier without the `@` prefix.\n`argument`, when present, is fully resolved as a LiteralValue.",
       "properties": {
         "argument": {
           "allOf": [
             {
-              "$ref": "#/$defs/Value"
+              "$ref": "#/$defs/LiteralValue"
             },
             {
               "description": "Optional resolved argument payload"
@@ -41,6 +41,16 @@
           "description": "Constant name",
           "type": "string"
         },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this definition"
+            }
+          ]
+        },
         "typeRef": {
           "allOf": [
             {
@@ -54,7 +64,7 @@
         "value": {
           "allOf": [
             {
-              "$ref": "#/$defs/Value"
+              "$ref": "#/$defs/LiteralValue"
             },
             {
               "description": "Fully resolved constant value"
@@ -65,21 +75,9 @@
       "required": [
         "annotations",
         "name",
+        "position",
         "typeRef",
         "value"
-      ],
-      "type": "object"
-    },
-    "DocDef": {
-      "description": "Standalone documentation block.\n\nUsed for top-level docstrings that are not attached to a type/enum/constant.",
-      "properties": {
-        "content": {
-          "description": "Resolved documentation content",
-          "type": "string"
-        }
-      },
-      "required": [
-        "content"
       ],
       "type": "object"
     },
@@ -100,7 +98,7 @@
         "enumType": {
           "allOf": [
             {
-              "$ref": "#/$defs/EnumType"
+              "$ref": "#/$defs/EnumValueType"
             },
             {
               "description": "Enum underlying storage kind"
@@ -110,24 +108,35 @@
         "members": {
           "description": "Enum members in source order after spread expansion",
           "items": {
-            "$ref": "#/$defs/EnumDefMember"
+            "$ref": "#/$defs/EnumMember"
           },
           "type": "array"
         },
         "name": {
           "description": "Enum name",
           "type": "string"
+        },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this definition"
+            }
+          ]
         }
       },
       "required": [
         "annotations",
         "enumType",
         "members",
-        "name"
+        "name",
+        "position"
       ],
       "type": "object"
     },
-    "EnumDefMember": {
+    "EnumMember": {
       "description": "Enum member definition",
       "properties": {
         "annotations": {
@@ -146,8 +155,14 @@
           "type": "string"
         },
         "value": {
-          "description": "Canonical string representation of the member value",
-          "type": "string"
+          "allOf": [
+            {
+              "$ref": "#/$defs/LiteralValue"
+            },
+            {
+              "description": "Fully resolved member value"
+            }
+          ]
         }
       },
       "required": [
@@ -157,7 +172,7 @@
       ],
       "type": "object"
     },
-    "EnumType": {
+    "EnumValueType": {
       "description": "Underlying storage kind used by an enum",
       "enum": [
         "string",
@@ -207,7 +222,7 @@
       "type": "object"
     },
     "IrSchema": {
-      "description": "IrSchema is the generator-facing representation of a VDL program.\n\nThis model is intentionally \"flat\" and \"resolved\":\n- spreads are already expanded\n- references are already resolved\n- collections are in deterministic order\n\nA code generator should be able to consume IrSchema directly, without needing\nto re-run parser or semantic-analysis logic.",
+      "description": "IrSchema is the generator-facing representation of a VDL program.\n\nThis model is intentionally \"flat\" and \"resolved\":\n\n- spreads are already expanded\n- references are already resolved\n- collections are in deterministic order\n\nA code generator should be able to consume IrSchema directly, without needing\nto re-run parser or semantic-analysis logic.",
       "properties": {
         "constants": {
           "description": "Constant definitions, sorted by name",
@@ -219,7 +234,7 @@
         "docs": {
           "description": "Standalone documentation blocks in source traversal order",
           "items": {
-            "$ref": "#/$defs/DocDef"
+            "$ref": "#/$defs/TopLevelDoc"
           },
           "type": "array"
         },
@@ -246,8 +261,69 @@
       ],
       "type": "object"
     },
+    "LiteralKind": {
+      "description": "Kind discriminator for LiteralValue.\n\nLiteralValue is used for fully resolved literal data in:\n\n- constant values\n- annotation arguments",
+      "enum": [
+        "string",
+        "int",
+        "float",
+        "bool",
+        "object",
+        "array"
+      ],
+      "type": "string"
+    },
+    "LiteralValue": {
+      "description": "Fully resolved literal value.\n\nThe selected payload is determined by `kind`:\n\n- `string` -\u003e `stringValue`\n- `int` -\u003e `intValue`\n- `float` -\u003e `floatValue`\n- `bool` -\u003e `boolValue`\n- `object` -\u003e `objectEntries`\n- `array` -\u003e `arrayItems`",
+      "properties": {
+        "arrayItems": {
+          "description": "Payload for `kind = array`",
+          "items": {
+            "$ref": "#/$defs/LiteralValue"
+          },
+          "type": "array"
+        },
+        "boolValue": {
+          "description": "Payload for `kind = bool`",
+          "type": "boolean"
+        },
+        "floatValue": {
+          "description": "Payload for `kind = float`",
+          "type": "number"
+        },
+        "intValue": {
+          "description": "Payload for `kind = int`",
+          "type": "integer"
+        },
+        "kind": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/LiteralKind"
+            },
+            {
+              "description": "Value category discriminator"
+            }
+          ]
+        },
+        "objectEntries": {
+          "description": "Payload for `kind = object`",
+          "items": {
+            "$ref": "#/$defs/ObjectEntry"
+          },
+          "type": "array"
+        },
+        "stringValue": {
+          "description": "Payload for `kind = string`",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
     "ObjectEntry": {
-      "description": "Key/value pair inside an object Value payload",
+      "description": "Key/value pair inside an object LiteralValue payload",
       "properties": {
         "key": {
           "description": "Object key",
@@ -256,7 +332,7 @@
         "value": {
           "allOf": [
             {
-              "$ref": "#/$defs/Value"
+              "$ref": "#/$defs/LiteralValue"
             },
             {
               "description": "Fully resolved value for this key"
@@ -267,6 +343,29 @@
       "required": [
         "key",
         "value"
+      ],
+      "type": "object"
+    },
+    "Position": {
+      "description": "Source position where a declaration was defined",
+      "properties": {
+        "column": {
+          "description": "Column number (1-indexed)",
+          "type": "integer"
+        },
+        "file": {
+          "description": "Absolute file path",
+          "type": "string"
+        },
+        "line": {
+          "description": "Line number (1-indexed)",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "column",
+        "file",
+        "line"
       ],
       "type": "object"
     },
@@ -281,8 +380,32 @@
       ],
       "type": "string"
     },
+    "TopLevelDoc": {
+      "description": "Standalone documentation block.\n\nUsed for top-level docstrings that are not attached to a type/enum/constant.",
+      "properties": {
+        "content": {
+          "description": "Resolved documentation content",
+          "type": "string"
+        },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this documentation block"
+            }
+          ]
+        }
+      },
+      "required": [
+        "content",
+        "position"
+      ],
+      "type": "object"
+    },
     "TypeDef": {
-      "description": "Flattened type definition.\n\nAll spreads are already expanded into `fields`.",
+      "description": "Flattened type definition.\n\nAll spreads are already expanded. The unified `typeRef` describes what this\ntype IS, a primitive, custom reference, map, array, or object with fields.",
       "properties": {
         "annotations": {
           "description": "Type annotations in source order",
@@ -295,22 +418,36 @@
           "description": "Optional type documentation",
           "type": "string"
         },
-        "fields": {
-          "description": "Type fields in source order",
-          "items": {
-            "$ref": "#/$defs/Field"
-          },
-          "type": "array"
-        },
         "name": {
           "description": "Type name",
           "type": "string"
+        },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this definition"
+            }
+          ]
+        },
+        "typeRef": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TypeRef"
+            },
+            {
+              "description": "Unified type reference describing what this type IS"
+            }
+          ]
         }
       },
       "required": [
         "annotations",
-        "fields",
-        "name"
+        "name",
+        "position",
+        "typeRef"
       ],
       "type": "object"
     },
@@ -350,7 +487,7 @@
         "enumType": {
           "allOf": [
             {
-              "$ref": "#/$defs/EnumType"
+              "$ref": "#/$defs/EnumValueType"
             },
             {
               "description": "Referenced enum underlying kind when `kind` is `enum`"
@@ -403,67 +540,6 @@
         "kind"
       ],
       "type": "object"
-    },
-    "Value": {
-      "description": "Fully resolved literal value.\n\nThe selected payload is determined by `kind`:\n- `string` -\u003e `stringValue`\n- `int` -\u003e `intValue`\n- `float` -\u003e `floatValue`\n- `bool` -\u003e `boolValue`\n- `object` -\u003e `objectEntries`\n- `array` -\u003e `arrayItems`",
-      "properties": {
-        "arrayItems": {
-          "description": "Payload for `kind = array`",
-          "items": {
-            "$ref": "#/$defs/Value"
-          },
-          "type": "array"
-        },
-        "boolValue": {
-          "description": "Payload for `kind = bool`",
-          "type": "boolean"
-        },
-        "floatValue": {
-          "description": "Payload for `kind = float`",
-          "type": "number"
-        },
-        "intValue": {
-          "description": "Payload for `kind = int`",
-          "type": "integer"
-        },
-        "kind": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/ValueKind"
-            },
-            {
-              "description": "Value category discriminator"
-            }
-          ]
-        },
-        "objectEntries": {
-          "description": "Payload for `kind = object`",
-          "items": {
-            "$ref": "#/$defs/ObjectEntry"
-          },
-          "type": "array"
-        },
-        "stringValue": {
-          "description": "Payload for `kind = string`",
-          "type": "string"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "type": "object"
-    },
-    "ValueKind": {
-      "description": "Kind discriminator for Value.\n\nValue is used for fully resolved literal data in:\n- constant values\n- annotation arguments",
-      "enum": [
-        "string",
-        "int",
-        "float",
-        "bool",
-        "object",
-        "array"
-      ],
-      "type": "string"
     }
   },
   "$id": "https://vdl.varavel.com/schemas/v0/ir.schema.json",

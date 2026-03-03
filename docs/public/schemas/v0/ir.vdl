@@ -2,6 +2,7 @@
 IrSchema is the generator-facing representation of a VDL program.
 
 This model is intentionally "flat" and "resolved":
+
 - spreads are already expanded
 - references are already resolved
 - collections are in deterministic order
@@ -20,7 +21,7 @@ type IrSchema {
   types: TypeDef[]
 
   """ Standalone documentation blocks in source traversal order """
-  docs: DocDef[]
+  docs: TopLevelDoc[]
 }
 
 /********
@@ -47,25 +48,42 @@ enum PrimitiveType {
 }
 
 """ Underlying storage kind used by an enum """
-enum EnumType {
+enum EnumValueType {
   String = "string"
   Int = "int"
 }
 
 """
-Kind discriminator for Value.
+Kind discriminator for LiteralValue.
 
-Value is used for fully resolved literal data in:
+LiteralValue is used for fully resolved literal data in:
+
 - constant values
 - annotation arguments
 """
-enum ValueKind {
+enum LiteralKind {
   String = "string"
   Int = "int"
   Float = "float"
   Bool = "bool"
   Object = "object"
   Array = "array"
+}
+
+/***********
+* POSITION *
+***********/
+
+""" Source position where a declaration was defined """
+type Position {
+  """ Absolute file path """
+  file: string
+
+  """ Line number (1-indexed) """
+  line: int
+
+  """ Column number (1-indexed) """
+  column: int
 }
 
 /*******************
@@ -92,7 +110,7 @@ type TypeRef {
   enumName?: string
 
   """ Referenced enum underlying kind when `kind` is `enum` """
-  enumType?: EnumType
+  enumType?: EnumValueType
 
   """ Element type when `kind` is `array` """
   arrayType?: TypeRef
@@ -111,14 +129,14 @@ type TypeRef {
 Annotation metadata preserved in IR.
 
 `name` is the annotation identifier without the `@` prefix.
-`argument`, when present, is fully resolved as a Value.
+`argument`, when present, is fully resolved as a LiteralValue.
 """
 type Annotation {
   """ Annotation name without `@` """
   name: string
 
   """ Optional resolved argument payload """
-  argument?: Value
+  argument?: LiteralValue
 }
 
 """ Flattened object/type field definition """
@@ -147,6 +165,7 @@ type Field {
 Fully resolved literal value.
 
 The selected payload is determined by `kind`:
+
 - `string` -> `stringValue`
 - `int` -> `intValue`
 - `float` -> `floatValue`
@@ -154,9 +173,9 @@ The selected payload is determined by `kind`:
 - `object` -> `objectEntries`
 - `array` -> `arrayItems`
 """
-type Value {
+type LiteralValue {
   """ Value category discriminator """
-  kind: ValueKind
+  kind: LiteralKind
 
   """ Payload for `kind = string` """
   stringValue?: string
@@ -174,16 +193,16 @@ type Value {
   objectEntries?: ObjectEntry[]
 
   """ Payload for `kind = array` """
-  arrayItems?: Value[]
+  arrayItems?: LiteralValue[]
 }
 
-""" Key/value pair inside an object Value payload """
+""" Key/value pair inside an object LiteralValue payload """
 type ObjectEntry {
   """ Object key """
   key: string
 
   """ Fully resolved value for this key """
-  value: Value
+  value: LiteralValue
 }
 
 /************************
@@ -193,9 +212,13 @@ type ObjectEntry {
 """
 Flattened type definition.
 
-All spreads are already expanded into `fields`.
+All spreads are already expanded. The unified `typeRef` describes what this
+type IS, a primitive, custom reference, map, array, or object with fields.
 """
 type TypeDef {
+  """ Source position of this definition """
+  position: Position
+
   """ Type name """
   name: string
 
@@ -205,8 +228,8 @@ type TypeDef {
   """ Type annotations in source order """
   annotations: Annotation[]
 
-  """ Type fields in source order """
-  fields: Field[]
+  """ Unified type reference describing what this type IS """
+  typeRef: TypeRef
 }
 
 """
@@ -215,6 +238,9 @@ Flattened enum definition.
 All enum spreads are already expanded into `members`.
 """
 type EnumDef {
+  """ Source position of this definition """
+  position: Position
+
   """ Enum name """
   name: string
 
@@ -225,19 +251,19 @@ type EnumDef {
   annotations: Annotation[]
 
   """ Enum underlying storage kind """
-  enumType: EnumType
+  enumType: EnumValueType
 
   """ Enum members in source order after spread expansion """
-  members: EnumDefMember[]
+  members: EnumMember[]
 }
 
 """ Enum member definition """
-type EnumDefMember {
+type EnumMember {
   """ Member name """
   name: string
 
-  """ Canonical string representation of the member value """
-  value: string
+  """ Fully resolved member value """
+  value: LiteralValue
 
   """ Optional member documentation """
   doc?: string
@@ -253,6 +279,9 @@ Fully resolved constant definition.
 `value` contains the fully resolved literal payload.
 """
 type ConstantDef {
+  """ Source position of this definition """
+  position: Position
+
   """ Constant name """
   name: string
 
@@ -266,7 +295,7 @@ type ConstantDef {
   typeRef: TypeRef
 
   """ Fully resolved constant value """
-  value: Value
+  value: LiteralValue
 }
 
 """
@@ -274,7 +303,10 @@ Standalone documentation block.
 
 Used for top-level docstrings that are not attached to a type/enum/constant.
 """
-type DocDef {
+type TopLevelDoc {
+  """ Source position of this documentation block """
+  position: Position
+
   """ Resolved documentation content """
   content: string
 }

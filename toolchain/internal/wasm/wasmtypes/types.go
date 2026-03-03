@@ -16,54 +16,122 @@ import (
 // -----------------------------------------------------------------------------
 
 // Underlying storage kind used by an enum
-type EnumType string
+type EnumValueType string
 
-// EnumType enum values
+// EnumValueType enum values
 const (
-	EnumTypeString EnumType = "string"
-	EnumTypeInt    EnumType = "int"
+	EnumValueTypeString EnumValueType = "string"
+	EnumValueTypeInt    EnumValueType = "int"
 )
 
-// EnumTypeList contains all valid EnumType values.
-var EnumTypeList = []EnumType{
-	EnumTypeString,
-	EnumTypeInt,
+// EnumValueTypeList contains all valid EnumValueType values.
+var EnumValueTypeList = []EnumValueType{
+	EnumValueTypeString,
+	EnumValueTypeInt,
 }
 
-// String returns the string representation of EnumType.
-func (e EnumType) String() string {
+// String returns the string representation of EnumValueType.
+func (e EnumValueType) String() string {
 	return string(e)
 }
 
-// IsValid returns true if the value is a valid EnumType.
-func (e EnumType) IsValid() bool {
+// IsValid returns true if the value is a valid EnumValueType.
+func (e EnumValueType) IsValid() bool {
 	switch e {
-	case EnumTypeString, EnumTypeInt:
+	case EnumValueTypeString, EnumValueTypeInt:
 		return true
 	}
 	return false
 }
 
 // MarshalJSON implements json.Marshaler.
-// Returns an error if the value is not a valid EnumType member.
-func (e EnumType) MarshalJSON() ([]byte, error) {
+// Returns an error if the value is not a valid EnumValueType member.
+func (e EnumValueType) MarshalJSON() ([]byte, error) {
 	if !e.IsValid() {
-		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum EnumType", string(e))
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum EnumValueType", string(e))
 	}
 	return json.Marshal(string(e))
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-// Returns an error if the value is not a valid EnumType member.
-func (e *EnumType) UnmarshalJSON(data []byte) error {
+// Returns an error if the value is not a valid EnumValueType member.
+func (e *EnumValueType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
 
-	v := EnumType(s)
+	v := EnumValueType(s)
 	if !v.IsValid() {
-		return fmt.Errorf("invalid value '%s' for enum EnumType", s)
+		return fmt.Errorf("invalid value '%s' for enum EnumValueType", s)
+	}
+
+	*e = v
+	return nil
+}
+
+// Kind discriminator for LiteralValue.
+//
+// LiteralValue is used for fully resolved literal data in:
+//
+// - constant values
+// - annotation arguments
+type LiteralKind string
+
+// LiteralKind enum values
+const (
+	LiteralKindString LiteralKind = "string"
+	LiteralKindInt    LiteralKind = "int"
+	LiteralKindFloat  LiteralKind = "float"
+	LiteralKindBool   LiteralKind = "bool"
+	LiteralKindObject LiteralKind = "object"
+	LiteralKindArray  LiteralKind = "array"
+)
+
+// LiteralKindList contains all valid LiteralKind values.
+var LiteralKindList = []LiteralKind{
+	LiteralKindString,
+	LiteralKindInt,
+	LiteralKindFloat,
+	LiteralKindBool,
+	LiteralKindObject,
+	LiteralKindArray,
+}
+
+// String returns the string representation of LiteralKind.
+func (e LiteralKind) String() string {
+	return string(e)
+}
+
+// IsValid returns true if the value is a valid LiteralKind.
+func (e LiteralKind) IsValid() bool {
+	switch e {
+	case LiteralKindString, LiteralKindInt, LiteralKindFloat, LiteralKindBool, LiteralKindObject, LiteralKindArray:
+		return true
+	}
+	return false
+}
+
+// MarshalJSON implements json.Marshaler.
+// Returns an error if the value is not a valid LiteralKind member.
+func (e LiteralKind) MarshalJSON() ([]byte, error) {
+	if !e.IsValid() {
+		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum LiteralKind", string(e))
+	}
+	return json.Marshal(string(e))
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+// Returns an error if the value is not a valid LiteralKind member.
+func (e *LiteralKind) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	v := LiteralKind(s)
+	if !v.IsValid() {
+		return fmt.Errorf("invalid value '%s' for enum LiteralKind", s)
 	}
 
 	*e = v
@@ -251,73 +319,6 @@ func (e *TypescriptTargetImportExtension) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Kind discriminator for Value.
-//
-// Value is used for fully resolved literal data in:
-// - constant values
-// - annotation arguments
-type ValueKind string
-
-// ValueKind enum values
-const (
-	ValueKindString ValueKind = "string"
-	ValueKindInt    ValueKind = "int"
-	ValueKindFloat  ValueKind = "float"
-	ValueKindBool   ValueKind = "bool"
-	ValueKindObject ValueKind = "object"
-	ValueKindArray  ValueKind = "array"
-)
-
-// ValueKindList contains all valid ValueKind values.
-var ValueKindList = []ValueKind{
-	ValueKindString,
-	ValueKindInt,
-	ValueKindFloat,
-	ValueKindBool,
-	ValueKindObject,
-	ValueKindArray,
-}
-
-// String returns the string representation of ValueKind.
-func (e ValueKind) String() string {
-	return string(e)
-}
-
-// IsValid returns true if the value is a valid ValueKind.
-func (e ValueKind) IsValid() bool {
-	switch e {
-	case ValueKindString, ValueKindInt, ValueKindFloat, ValueKindBool, ValueKindObject, ValueKindArray:
-		return true
-	}
-	return false
-}
-
-// MarshalJSON implements json.Marshaler.
-// Returns an error if the value is not a valid ValueKind member.
-func (e ValueKind) MarshalJSON() ([]byte, error) {
-	if !e.IsValid() {
-		return nil, fmt.Errorf("cannot marshal invalid value '%s' for enum ValueKind", string(e))
-	}
-	return json.Marshal(string(e))
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-// Returns an error if the value is not a valid ValueKind member.
-func (e *ValueKind) UnmarshalJSON(data []byte) error {
-	var s string
-	if err := json.Unmarshal(data, &s); err != nil {
-		return err
-	}
-
-	v := ValueKind(s)
-	if !v.IsValid() {
-		return fmt.Errorf("invalid value '%s' for enum ValueKind", s)
-	}
-
-	*e = v
-	return nil
-}
-
 // Represents a function to be called via WASM
 type WasmFunctionName string
 
@@ -388,12 +389,12 @@ func (e *WasmFunctionName) UnmarshalJSON(data []byte) error {
 // Annotation metadata preserved in IR.
 //
 // `name` is the annotation identifier without the `@` prefix.
-// `argument`, when present, is fully resolved as a Value.
+// `argument`, when present, is fully resolved as a LiteralValue.
 type Annotation struct {
 	// Annotation name without `@`
 	Name string `json:"name"`
 	// Optional resolved argument payload
-	Argument *Value `json:"argument,omitempty"`
+	Argument *LiteralValue `json:"argument,omitempty"`
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -414,16 +415,16 @@ func (x *Annotation) GetNameOr(defaultValue string) string {
 }
 
 // GetArgument returns the value of Argument or the zero value if the receiver or field is nil.
-func (x *Annotation) GetArgument() Value {
+func (x *Annotation) GetArgument() LiteralValue {
 	if x != nil && x.Argument != nil {
 		return *x.Argument
 	}
-	var zero Value
+	var zero LiteralValue
 	return zero
 }
 
 // GetArgumentOr returns the value of Argument or the provided default if the receiver or field is nil.
-func (x *Annotation) GetArgumentOr(defaultValue Value) Value {
+func (x *Annotation) GetArgumentOr(defaultValue LiteralValue) LiteralValue {
 	if x != nil && x.Argument != nil {
 		return *x.Argument
 	}
@@ -432,8 +433,8 @@ func (x *Annotation) GetArgumentOr(defaultValue Value) Value {
 
 // preAnnotation is the version of Annotation previous to the required field validation
 type preAnnotation struct {
-	Name     *string   `json:"name,omitempty"`
-	Argument *preValue `json:"argument,omitempty"`
+	Name     *string          `json:"name,omitempty"`
+	Argument *preLiteralValue `json:"argument,omitempty"`
 }
 
 // validate validates the required fields of Annotation
@@ -461,9 +462,9 @@ func (p *preAnnotation) validate() error {
 func (p *preAnnotation) transform() Annotation {
 	// Transformations
 	transName := *p.Name
-	var transArgument *Value
+	var transArgument *LiteralValue
 	if p.Argument != nil {
-		var valArgument Value
+		var valArgument LiteralValue
 		valArgument = p.Argument.transform()
 		transArgument = &valArgument
 	}
@@ -861,6 +862,8 @@ func (p *preCommonTargetConfig) transform() CommonTargetConfig {
 // `typeRef` is explicit or inferred by analysis.
 // `value` contains the fully resolved literal payload.
 type ConstantDef struct {
+	// Source position of this definition
+	Position Position `json:"position"`
 	// Constant name
 	Name string `json:"name"`
 	// Optional constant documentation
@@ -870,7 +873,24 @@ type ConstantDef struct {
 	// Normalized constant type reference (explicit or inferred)
 	TypeRef TypeRef `json:"typeRef"`
 	// Fully resolved constant value
-	Value Value `json:"value"`
+	Value LiteralValue `json:"value"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *ConstantDef) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *ConstantDef) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -942,16 +962,16 @@ func (x *ConstantDef) GetTypeRefOr(defaultValue TypeRef) TypeRef {
 }
 
 // GetValue returns the value of Value or the zero value if the receiver or field is nil.
-func (x *ConstantDef) GetValue() Value {
+func (x *ConstantDef) GetValue() LiteralValue {
 	if x != nil {
 		return x.Value
 	}
-	var zero Value
+	var zero LiteralValue
 	return zero
 }
 
 // GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
-func (x *ConstantDef) GetValueOr(defaultValue Value) Value {
+func (x *ConstantDef) GetValueOr(defaultValue LiteralValue) LiteralValue {
 	if x != nil {
 		return x.Value
 	}
@@ -960,17 +980,28 @@ func (x *ConstantDef) GetValueOr(defaultValue Value) Value {
 
 // preConstantDef is the version of ConstantDef previous to the required field validation
 type preConstantDef struct {
+	Position    *prePosition     `json:"position,omitempty"`
 	Name        *string          `json:"name,omitempty"`
 	Doc         *string          `json:"doc,omitempty"`
 	Annotations *[]preAnnotation `json:"annotations,omitempty"`
 	TypeRef     *preTypeRef      `json:"typeRef,omitempty"`
-	Value       *preValue        `json:"value,omitempty"`
+	Value       *preLiteralValue `json:"value,omitempty"`
 }
 
 // validate validates the required fields of ConstantDef
 func (p *preConstantDef) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preConstantDef is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "name"
@@ -1018,6 +1049,8 @@ func (p *preConstantDef) validate() error {
 // transform transforms the preConstantDef type to the final ConstantDef type
 func (p *preConstantDef) transform() ConstantDef {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transName := *p.Name
 	transDoc := p.Doc
 	var transAnnotations []Annotation
@@ -1029,11 +1062,12 @@ func (p *preConstantDef) transform() ConstantDef {
 	}
 	var transTypeRef TypeRef
 	transTypeRef = p.TypeRef.transform()
-	var transValue Value
+	var transValue LiteralValue
 	transValue = p.Value.transform()
 
 	// Assignments
 	return ConstantDef{
+		Position:    transPosition,
 		Name:        transName,
 		Doc:         transDoc,
 		Annotations: transAnnotations,
@@ -1241,65 +1275,12 @@ func (p *preDartTargetConfig) transform() DartTargetConfig {
 	}
 }
 
-// Standalone documentation block.
-//
-// Used for top-level docstrings that are not attached to a type/enum/constant.
-type DocDef struct {
-	// Resolved documentation content
-	Content string `json:"content"`
-}
-
-// GetContent returns the value of Content or the zero value if the receiver or field is nil.
-func (x *DocDef) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	var zero string
-	return zero
-}
-
-// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
-func (x *DocDef) GetContentOr(defaultValue string) string {
-	if x != nil {
-		return x.Content
-	}
-	return defaultValue
-}
-
-// preDocDef is the version of DocDef previous to the required field validation
-type preDocDef struct {
-	Content *string `json:"content,omitempty"`
-}
-
-// validate validates the required fields of DocDef
-func (p *preDocDef) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preDocDef is nil")
-	}
-
-	// Validation for field "content"
-	if p.Content == nil {
-		return errorMissingRequiredField("field content is required")
-	}
-
-	return nil
-}
-
-// transform transforms the preDocDef type to the final DocDef type
-func (p *preDocDef) transform() DocDef {
-	// Transformations
-	transContent := *p.Content
-
-	// Assignments
-	return DocDef{
-		Content: transContent,
-	}
-}
-
 // Flattened enum definition.
 //
 // All enum spreads are already expanded into `members`.
 type EnumDef struct {
+	// Source position of this definition
+	Position Position `json:"position"`
 	// Enum name
 	Name string `json:"name"`
 	// Optional enum documentation
@@ -1307,9 +1288,26 @@ type EnumDef struct {
 	// Enum annotations in source order
 	Annotations []Annotation `json:"annotations"`
 	// Enum underlying storage kind
-	EnumType EnumType `json:"enumType"`
+	EnumType EnumValueType `json:"enumType"`
 	// Enum members in source order after spread expansion
-	Members []EnumDefMember `json:"members"`
+	Members []EnumMember `json:"members"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *EnumDef) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *EnumDef) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -1364,16 +1362,16 @@ func (x *EnumDef) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
 }
 
 // GetEnumType returns the value of EnumType or the zero value if the receiver or field is nil.
-func (x *EnumDef) GetEnumType() EnumType {
+func (x *EnumDef) GetEnumType() EnumValueType {
 	if x != nil {
 		return x.EnumType
 	}
-	var zero EnumType
+	var zero EnumValueType
 	return zero
 }
 
 // GetEnumTypeOr returns the value of EnumType or the provided default if the receiver or field is nil.
-func (x *EnumDef) GetEnumTypeOr(defaultValue EnumType) EnumType {
+func (x *EnumDef) GetEnumTypeOr(defaultValue EnumValueType) EnumValueType {
 	if x != nil {
 		return x.EnumType
 	}
@@ -1381,16 +1379,16 @@ func (x *EnumDef) GetEnumTypeOr(defaultValue EnumType) EnumType {
 }
 
 // GetMembers returns the value of Members or the zero value if the receiver or field is nil.
-func (x *EnumDef) GetMembers() []EnumDefMember {
+func (x *EnumDef) GetMembers() []EnumMember {
 	if x != nil {
 		return x.Members
 	}
-	var zero []EnumDefMember
+	var zero []EnumMember
 	return zero
 }
 
 // GetMembersOr returns the value of Members or the provided default if the receiver or field is nil.
-func (x *EnumDef) GetMembersOr(defaultValue []EnumDefMember) []EnumDefMember {
+func (x *EnumDef) GetMembersOr(defaultValue []EnumMember) []EnumMember {
 	if x != nil {
 		return x.Members
 	}
@@ -1399,17 +1397,28 @@ func (x *EnumDef) GetMembersOr(defaultValue []EnumDefMember) []EnumDefMember {
 
 // preEnumDef is the version of EnumDef previous to the required field validation
 type preEnumDef struct {
-	Name        *string             `json:"name,omitempty"`
-	Doc         *string             `json:"doc,omitempty"`
-	Annotations *[]preAnnotation    `json:"annotations,omitempty"`
-	EnumType    *EnumType           `json:"enumType,omitempty"`
-	Members     *[]preEnumDefMember `json:"members,omitempty"`
+	Position    *prePosition     `json:"position,omitempty"`
+	Name        *string          `json:"name,omitempty"`
+	Doc         *string          `json:"doc,omitempty"`
+	Annotations *[]preAnnotation `json:"annotations,omitempty"`
+	EnumType    *EnumValueType   `json:"enumType,omitempty"`
+	Members     *[]preEnumMember `json:"members,omitempty"`
 }
 
 // validate validates the required fields of EnumDef
 func (p *preEnumDef) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preEnumDef is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "name"
@@ -1454,6 +1463,8 @@ func (p *preEnumDef) validate() error {
 // transform transforms the preEnumDef type to the final EnumDef type
 func (p *preEnumDef) transform() EnumDef {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transName := *p.Name
 	transDoc := p.Doc
 	var transAnnotations []Annotation
@@ -1464,16 +1475,17 @@ func (p *preEnumDef) transform() EnumDef {
 		transAnnotations[i] = tmp_
 	}
 	transEnumType := *p.EnumType
-	var transMembers []EnumDefMember
-	transMembers = make([]EnumDefMember, len(*p.Members))
+	var transMembers []EnumMember
+	transMembers = make([]EnumMember, len(*p.Members))
 	for i, v := range *p.Members {
-		var tmp_ EnumDefMember
+		var tmp_ EnumMember
 		tmp_ = v.transform()
 		transMembers[i] = tmp_
 	}
 
 	// Assignments
 	return EnumDef{
+		Position:    transPosition,
 		Name:        transName,
 		Doc:         transDoc,
 		Annotations: transAnnotations,
@@ -1483,11 +1495,11 @@ func (p *preEnumDef) transform() EnumDef {
 }
 
 // Enum member definition
-type EnumDefMember struct {
+type EnumMember struct {
 	// Member name
 	Name string `json:"name"`
-	// Canonical string representation of the member value
-	Value string `json:"value"`
+	// Fully resolved member value
+	Value LiteralValue `json:"value"`
 	// Optional member documentation
 	Doc *string `json:"doc,omitempty"`
 	// Member annotations in source order
@@ -1495,7 +1507,7 @@ type EnumDefMember struct {
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
-func (x *EnumDefMember) GetName() string {
+func (x *EnumMember) GetName() string {
 	if x != nil {
 		return x.Name
 	}
@@ -1504,7 +1516,7 @@ func (x *EnumDefMember) GetName() string {
 }
 
 // GetNameOr returns the value of Name or the provided default if the receiver or field is nil.
-func (x *EnumDefMember) GetNameOr(defaultValue string) string {
+func (x *EnumMember) GetNameOr(defaultValue string) string {
 	if x != nil {
 		return x.Name
 	}
@@ -1512,16 +1524,16 @@ func (x *EnumDefMember) GetNameOr(defaultValue string) string {
 }
 
 // GetValue returns the value of Value or the zero value if the receiver or field is nil.
-func (x *EnumDefMember) GetValue() string {
+func (x *EnumMember) GetValue() LiteralValue {
 	if x != nil {
 		return x.Value
 	}
-	var zero string
+	var zero LiteralValue
 	return zero
 }
 
 // GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
-func (x *EnumDefMember) GetValueOr(defaultValue string) string {
+func (x *EnumMember) GetValueOr(defaultValue LiteralValue) LiteralValue {
 	if x != nil {
 		return x.Value
 	}
@@ -1529,7 +1541,7 @@ func (x *EnumDefMember) GetValueOr(defaultValue string) string {
 }
 
 // GetDoc returns the value of Doc or the zero value if the receiver or field is nil.
-func (x *EnumDefMember) GetDoc() string {
+func (x *EnumMember) GetDoc() string {
 	if x != nil && x.Doc != nil {
 		return *x.Doc
 	}
@@ -1538,7 +1550,7 @@ func (x *EnumDefMember) GetDoc() string {
 }
 
 // GetDocOr returns the value of Doc or the provided default if the receiver or field is nil.
-func (x *EnumDefMember) GetDocOr(defaultValue string) string {
+func (x *EnumMember) GetDocOr(defaultValue string) string {
 	if x != nil && x.Doc != nil {
 		return *x.Doc
 	}
@@ -1546,7 +1558,7 @@ func (x *EnumDefMember) GetDocOr(defaultValue string) string {
 }
 
 // GetAnnotations returns the value of Annotations or the zero value if the receiver or field is nil.
-func (x *EnumDefMember) GetAnnotations() []Annotation {
+func (x *EnumMember) GetAnnotations() []Annotation {
 	if x != nil {
 		return x.Annotations
 	}
@@ -1555,25 +1567,25 @@ func (x *EnumDefMember) GetAnnotations() []Annotation {
 }
 
 // GetAnnotationsOr returns the value of Annotations or the provided default if the receiver or field is nil.
-func (x *EnumDefMember) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
+func (x *EnumMember) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
 	if x != nil {
 		return x.Annotations
 	}
 	return defaultValue
 }
 
-// preEnumDefMember is the version of EnumDefMember previous to the required field validation
-type preEnumDefMember struct {
+// preEnumMember is the version of EnumMember previous to the required field validation
+type preEnumMember struct {
 	Name        *string          `json:"name,omitempty"`
-	Value       *string          `json:"value,omitempty"`
+	Value       *preLiteralValue `json:"value,omitempty"`
 	Doc         *string          `json:"doc,omitempty"`
 	Annotations *[]preAnnotation `json:"annotations,omitempty"`
 }
 
-// validate validates the required fields of EnumDefMember
-func (p *preEnumDefMember) validate() error {
+// validate validates the required fields of EnumMember
+func (p *preEnumMember) validate() error {
 	if p == nil {
-		return errorMissingRequiredField("preEnumDefMember is nil")
+		return errorMissingRequiredField("preEnumMember is nil")
 	}
 
 	// Validation for field "name"
@@ -1584,6 +1596,11 @@ func (p *preEnumDefMember) validate() error {
 	// Validation for field "value"
 	if p.Value == nil {
 		return errorMissingRequiredField("field value is required")
+	}
+	if p.Value != nil {
+		if err := p.Value.validate(); err != nil {
+			return errorMissingRequiredField("field value: " + err.Error())
+		}
 	}
 
 	// Validation for field "doc"
@@ -1603,11 +1620,12 @@ func (p *preEnumDefMember) validate() error {
 	return nil
 }
 
-// transform transforms the preEnumDefMember type to the final EnumDefMember type
-func (p *preEnumDefMember) transform() EnumDefMember {
+// transform transforms the preEnumMember type to the final EnumMember type
+func (p *preEnumMember) transform() EnumMember {
 	// Transformations
 	transName := *p.Name
-	transValue := *p.Value
+	var transValue LiteralValue
+	transValue = p.Value.transform()
 	transDoc := p.Doc
 	var transAnnotations []Annotation
 	transAnnotations = make([]Annotation, len(*p.Annotations))
@@ -1618,7 +1636,7 @@ func (p *preEnumDefMember) transform() EnumDefMember {
 	}
 
 	// Assignments
-	return EnumDefMember{
+	return EnumMember{
 		Name:        transName,
 		Value:       transValue,
 		Doc:         transDoc,
@@ -2576,6 +2594,7 @@ func (p *preGoTargetConfig) transform() GoTargetConfig {
 // IrSchema is the generator-facing representation of a VDL program.
 //
 // This model is intentionally "flat" and "resolved":
+//
 // - spreads are already expanded
 // - references are already resolved
 // - collections are in deterministic order
@@ -2590,7 +2609,7 @@ type IrSchema struct {
 	// Type definitions, sorted by name
 	Types []TypeDef `json:"types"`
 	// Standalone documentation blocks in source traversal order
-	Docs []DocDef `json:"docs"`
+	Docs []TopLevelDoc `json:"docs"`
 }
 
 // GetConstants returns the value of Constants or the zero value if the receiver or field is nil.
@@ -2645,16 +2664,16 @@ func (x *IrSchema) GetTypesOr(defaultValue []TypeDef) []TypeDef {
 }
 
 // GetDocs returns the value of Docs or the zero value if the receiver or field is nil.
-func (x *IrSchema) GetDocs() []DocDef {
+func (x *IrSchema) GetDocs() []TopLevelDoc {
 	if x != nil {
 		return x.Docs
 	}
-	var zero []DocDef
+	var zero []TopLevelDoc
 	return zero
 }
 
 // GetDocsOr returns the value of Docs or the provided default if the receiver or field is nil.
-func (x *IrSchema) GetDocsOr(defaultValue []DocDef) []DocDef {
+func (x *IrSchema) GetDocsOr(defaultValue []TopLevelDoc) []TopLevelDoc {
 	if x != nil {
 		return x.Docs
 	}
@@ -2666,7 +2685,7 @@ type preIrSchema struct {
 	Constants *[]preConstantDef `json:"constants,omitempty"`
 	Enums     *[]preEnumDef     `json:"enums,omitempty"`
 	Types     *[]preTypeDef     `json:"types,omitempty"`
-	Docs      *[]preDocDef      `json:"docs,omitempty"`
+	Docs      *[]preTopLevelDoc `json:"docs,omitempty"`
 }
 
 // validate validates the required fields of IrSchema
@@ -2750,10 +2769,10 @@ func (p *preIrSchema) transform() IrSchema {
 		tmp_ = v.transform()
 		transTypes[i] = tmp_
 	}
-	var transDocs []DocDef
-	transDocs = make([]DocDef, len(*p.Docs))
+	var transDocs []TopLevelDoc
+	transDocs = make([]TopLevelDoc, len(*p.Docs))
 	for i, v := range *p.Docs {
-		var tmp_ DocDef
+		var tmp_ TopLevelDoc
 		tmp_ = v.transform()
 		transDocs[i] = tmp_
 	}
@@ -3090,12 +3109,252 @@ func (p *preJsonSchemaTargetConfig) transform() JsonSchemaTargetConfig {
 	}
 }
 
-// Key/value pair inside an object Value payload
+// Fully resolved literal value.
+//
+// The selected payload is determined by `kind`:
+//
+// - `string` -> `stringValue`
+// - `int` -> `intValue`
+// - `float` -> `floatValue`
+// - `bool` -> `boolValue`
+// - `object` -> `objectEntries`
+// - `array` -> `arrayItems`
+type LiteralValue struct {
+	// Value category discriminator
+	Kind LiteralKind `json:"kind"`
+	// Payload for `kind = string`
+	StringValue *string `json:"stringValue,omitempty"`
+	// Payload for `kind = int`
+	IntValue *int64 `json:"intValue,omitempty"`
+	// Payload for `kind = float`
+	FloatValue *float64 `json:"floatValue,omitempty"`
+	// Payload for `kind = bool`
+	BoolValue *bool `json:"boolValue,omitempty"`
+	// Payload for `kind = object`
+	ObjectEntries *[]ObjectEntry `json:"objectEntries,omitempty"`
+	// Payload for `kind = array`
+	ArrayItems *[]LiteralValue `json:"arrayItems,omitempty"`
+}
+
+// GetKind returns the value of Kind or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetKind() LiteralKind {
+	if x != nil {
+		return x.Kind
+	}
+	var zero LiteralKind
+	return zero
+}
+
+// GetKindOr returns the value of Kind or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetKindOr(defaultValue LiteralKind) LiteralKind {
+	if x != nil {
+		return x.Kind
+	}
+	return defaultValue
+}
+
+// GetStringValue returns the value of StringValue or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetStringValue() string {
+	if x != nil && x.StringValue != nil {
+		return *x.StringValue
+	}
+	var zero string
+	return zero
+}
+
+// GetStringValueOr returns the value of StringValue or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetStringValueOr(defaultValue string) string {
+	if x != nil && x.StringValue != nil {
+		return *x.StringValue
+	}
+	return defaultValue
+}
+
+// GetIntValue returns the value of IntValue or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetIntValue() int64 {
+	if x != nil && x.IntValue != nil {
+		return *x.IntValue
+	}
+	var zero int64
+	return zero
+}
+
+// GetIntValueOr returns the value of IntValue or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetIntValueOr(defaultValue int64) int64 {
+	if x != nil && x.IntValue != nil {
+		return *x.IntValue
+	}
+	return defaultValue
+}
+
+// GetFloatValue returns the value of FloatValue or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetFloatValue() float64 {
+	if x != nil && x.FloatValue != nil {
+		return *x.FloatValue
+	}
+	var zero float64
+	return zero
+}
+
+// GetFloatValueOr returns the value of FloatValue or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetFloatValueOr(defaultValue float64) float64 {
+	if x != nil && x.FloatValue != nil {
+		return *x.FloatValue
+	}
+	return defaultValue
+}
+
+// GetBoolValue returns the value of BoolValue or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetBoolValue() bool {
+	if x != nil && x.BoolValue != nil {
+		return *x.BoolValue
+	}
+	var zero bool
+	return zero
+}
+
+// GetBoolValueOr returns the value of BoolValue or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetBoolValueOr(defaultValue bool) bool {
+	if x != nil && x.BoolValue != nil {
+		return *x.BoolValue
+	}
+	return defaultValue
+}
+
+// GetObjectEntries returns the value of ObjectEntries or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetObjectEntries() []ObjectEntry {
+	if x != nil && x.ObjectEntries != nil {
+		return *x.ObjectEntries
+	}
+	var zero []ObjectEntry
+	return zero
+}
+
+// GetObjectEntriesOr returns the value of ObjectEntries or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetObjectEntriesOr(defaultValue []ObjectEntry) []ObjectEntry {
+	if x != nil && x.ObjectEntries != nil {
+		return *x.ObjectEntries
+	}
+	return defaultValue
+}
+
+// GetArrayItems returns the value of ArrayItems or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetArrayItems() []LiteralValue {
+	if x != nil && x.ArrayItems != nil {
+		return *x.ArrayItems
+	}
+	var zero []LiteralValue
+	return zero
+}
+
+// GetArrayItemsOr returns the value of ArrayItems or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetArrayItemsOr(defaultValue []LiteralValue) []LiteralValue {
+	if x != nil && x.ArrayItems != nil {
+		return *x.ArrayItems
+	}
+	return defaultValue
+}
+
+// preLiteralValue is the version of LiteralValue previous to the required field validation
+type preLiteralValue struct {
+	Kind          *LiteralKind       `json:"kind,omitempty"`
+	StringValue   *string            `json:"stringValue,omitempty"`
+	IntValue      *int64             `json:"intValue,omitempty"`
+	FloatValue    *float64           `json:"floatValue,omitempty"`
+	BoolValue     *bool              `json:"boolValue,omitempty"`
+	ObjectEntries *[]preObjectEntry  `json:"objectEntries,omitempty"`
+	ArrayItems    *[]preLiteralValue `json:"arrayItems,omitempty"`
+}
+
+// validate validates the required fields of LiteralValue
+func (p *preLiteralValue) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preLiteralValue is nil")
+	}
+
+	// Validation for field "kind"
+	if p.Kind == nil {
+		return errorMissingRequiredField("field kind is required")
+	}
+
+	// Validation for field "stringValue"
+
+	// Validation for field "intValue"
+
+	// Validation for field "floatValue"
+
+	// Validation for field "boolValue"
+
+	// Validation for field "objectEntries"
+	if p.ObjectEntries != nil {
+		for _, item := range *p.ObjectEntries {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field objectEntries: " + err.Error())
+			}
+		}
+	}
+
+	// Validation for field "arrayItems"
+	if p.ArrayItems != nil {
+		for _, item := range *p.ArrayItems {
+			if err := item.validate(); err != nil {
+				return errorMissingRequiredField("field arrayItems: " + err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+// transform transforms the preLiteralValue type to the final LiteralValue type
+func (p *preLiteralValue) transform() LiteralValue {
+	// Transformations
+	transKind := *p.Kind
+	transStringValue := p.StringValue
+	transIntValue := p.IntValue
+	transFloatValue := p.FloatValue
+	transBoolValue := p.BoolValue
+	var transObjectEntries *[]ObjectEntry
+	if p.ObjectEntries != nil {
+		var valObjectEntries []ObjectEntry
+		valObjectEntries = make([]ObjectEntry, len(*p.ObjectEntries))
+		for i, v := range *p.ObjectEntries {
+			var tmp_ ObjectEntry
+			tmp_ = v.transform()
+			valObjectEntries[i] = tmp_
+		}
+		transObjectEntries = &valObjectEntries
+	}
+	var transArrayItems *[]LiteralValue
+	if p.ArrayItems != nil {
+		var valArrayItems []LiteralValue
+		valArrayItems = make([]LiteralValue, len(*p.ArrayItems))
+		for i, v := range *p.ArrayItems {
+			var tmp_ LiteralValue
+			tmp_ = v.transform()
+			valArrayItems[i] = tmp_
+		}
+		transArrayItems = &valArrayItems
+	}
+
+	// Assignments
+	return LiteralValue{
+		Kind:          transKind,
+		StringValue:   transStringValue,
+		IntValue:      transIntValue,
+		FloatValue:    transFloatValue,
+		BoolValue:     transBoolValue,
+		ObjectEntries: transObjectEntries,
+		ArrayItems:    transArrayItems,
+	}
+}
+
+// Key/value pair inside an object LiteralValue payload
 type ObjectEntry struct {
 	// Object key
 	Key string `json:"key"`
 	// Fully resolved value for this key
-	Value Value `json:"value"`
+	Value LiteralValue `json:"value"`
 }
 
 // GetKey returns the value of Key or the zero value if the receiver or field is nil.
@@ -3116,16 +3375,16 @@ func (x *ObjectEntry) GetKeyOr(defaultValue string) string {
 }
 
 // GetValue returns the value of Value or the zero value if the receiver or field is nil.
-func (x *ObjectEntry) GetValue() Value {
+func (x *ObjectEntry) GetValue() LiteralValue {
 	if x != nil {
 		return x.Value
 	}
-	var zero Value
+	var zero LiteralValue
 	return zero
 }
 
 // GetValueOr returns the value of Value or the provided default if the receiver or field is nil.
-func (x *ObjectEntry) GetValueOr(defaultValue Value) Value {
+func (x *ObjectEntry) GetValueOr(defaultValue LiteralValue) LiteralValue {
 	if x != nil {
 		return x.Value
 	}
@@ -3134,8 +3393,8 @@ func (x *ObjectEntry) GetValueOr(defaultValue Value) Value {
 
 // preObjectEntry is the version of ObjectEntry previous to the required field validation
 type preObjectEntry struct {
-	Key   *string   `json:"key,omitempty"`
-	Value *preValue `json:"value,omitempty"`
+	Key   *string          `json:"key,omitempty"`
+	Value *preLiteralValue `json:"value,omitempty"`
 }
 
 // validate validates the required fields of ObjectEntry
@@ -3166,7 +3425,7 @@ func (p *preObjectEntry) validate() error {
 func (p *preObjectEntry) transform() ObjectEntry {
 	// Transformations
 	transKey := *p.Key
-	var transValue Value
+	var transValue LiteralValue
 	transValue = p.Value.transform()
 
 	// Assignments
@@ -3826,6 +4085,113 @@ func (p *prePluginTargetConfig) transform() PluginTargetConfig {
 	}
 }
 
+// Source position where a declaration was defined
+type Position struct {
+	// Absolute file path
+	File string `json:"file"`
+	// Line number (1-indexed)
+	Line int64 `json:"line"`
+	// Column number (1-indexed)
+	Column int64 `json:"column"`
+}
+
+// GetFile returns the value of File or the zero value if the receiver or field is nil.
+func (x *Position) GetFile() string {
+	if x != nil {
+		return x.File
+	}
+	var zero string
+	return zero
+}
+
+// GetFileOr returns the value of File or the provided default if the receiver or field is nil.
+func (x *Position) GetFileOr(defaultValue string) string {
+	if x != nil {
+		return x.File
+	}
+	return defaultValue
+}
+
+// GetLine returns the value of Line or the zero value if the receiver or field is nil.
+func (x *Position) GetLine() int64 {
+	if x != nil {
+		return x.Line
+	}
+	var zero int64
+	return zero
+}
+
+// GetLineOr returns the value of Line or the provided default if the receiver or field is nil.
+func (x *Position) GetLineOr(defaultValue int64) int64 {
+	if x != nil {
+		return x.Line
+	}
+	return defaultValue
+}
+
+// GetColumn returns the value of Column or the zero value if the receiver or field is nil.
+func (x *Position) GetColumn() int64 {
+	if x != nil {
+		return x.Column
+	}
+	var zero int64
+	return zero
+}
+
+// GetColumnOr returns the value of Column or the provided default if the receiver or field is nil.
+func (x *Position) GetColumnOr(defaultValue int64) int64 {
+	if x != nil {
+		return x.Column
+	}
+	return defaultValue
+}
+
+// prePosition is the version of Position previous to the required field validation
+type prePosition struct {
+	File   *string `json:"file,omitempty"`
+	Line   *int64  `json:"line,omitempty"`
+	Column *int64  `json:"column,omitempty"`
+}
+
+// validate validates the required fields of Position
+func (p *prePosition) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("prePosition is nil")
+	}
+
+	// Validation for field "file"
+	if p.File == nil {
+		return errorMissingRequiredField("field file is required")
+	}
+
+	// Validation for field "line"
+	if p.Line == nil {
+		return errorMissingRequiredField("field line is required")
+	}
+
+	// Validation for field "column"
+	if p.Column == nil {
+		return errorMissingRequiredField("field column is required")
+	}
+
+	return nil
+}
+
+// transform transforms the prePosition type to the final Position type
+func (p *prePosition) transform() Position {
+	// Transformations
+	transFile := *p.File
+	transLine := *p.Line
+	transColumn := *p.Column
+
+	// Assignments
+	return Position{
+		File:   transFile,
+		Line:   transLine,
+		Column: transColumn,
+	}
+}
+
 // Configuration for Python code generation
 type PythonTargetConfig struct {
 	// The output directory where generated files will be placed
@@ -4391,18 +4757,126 @@ func (p *preTargetConfig) transform() TargetConfig {
 	}
 }
 
+// Standalone documentation block.
+//
+// Used for top-level docstrings that are not attached to a type/enum/constant.
+type TopLevelDoc struct {
+	// Source position of this documentation block
+	Position Position `json:"position"`
+	// Resolved documentation content
+	Content string `json:"content"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *TopLevelDoc) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *TopLevelDoc) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
+}
+
+// GetContent returns the value of Content or the zero value if the receiver or field is nil.
+func (x *TopLevelDoc) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	var zero string
+	return zero
+}
+
+// GetContentOr returns the value of Content or the provided default if the receiver or field is nil.
+func (x *TopLevelDoc) GetContentOr(defaultValue string) string {
+	if x != nil {
+		return x.Content
+	}
+	return defaultValue
+}
+
+// preTopLevelDoc is the version of TopLevelDoc previous to the required field validation
+type preTopLevelDoc struct {
+	Position *prePosition `json:"position,omitempty"`
+	Content  *string      `json:"content,omitempty"`
+}
+
+// validate validates the required fields of TopLevelDoc
+func (p *preTopLevelDoc) validate() error {
+	if p == nil {
+		return errorMissingRequiredField("preTopLevelDoc is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
+	}
+
+	// Validation for field "content"
+	if p.Content == nil {
+		return errorMissingRequiredField("field content is required")
+	}
+
+	return nil
+}
+
+// transform transforms the preTopLevelDoc type to the final TopLevelDoc type
+func (p *preTopLevelDoc) transform() TopLevelDoc {
+	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
+	transContent := *p.Content
+
+	// Assignments
+	return TopLevelDoc{
+		Position: transPosition,
+		Content:  transContent,
+	}
+}
+
 // Flattened type definition.
 //
-// All spreads are already expanded into `fields`.
+// All spreads are already expanded. The unified `typeRef` describes what this
+// type IS, a primitive, custom reference, map, array, or object with fields.
 type TypeDef struct {
+	// Source position of this definition
+	Position Position `json:"position"`
 	// Type name
 	Name string `json:"name"`
 	// Optional type documentation
 	Doc *string `json:"doc,omitempty"`
 	// Type annotations in source order
 	Annotations []Annotation `json:"annotations"`
-	// Type fields in source order
-	Fields []Field `json:"fields"`
+	// Unified type reference describing what this type IS
+	TypeRef TypeRef `json:"typeRef"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -4456,35 +4930,46 @@ func (x *TypeDef) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
 	return defaultValue
 }
 
-// GetFields returns the value of Fields or the zero value if the receiver or field is nil.
-func (x *TypeDef) GetFields() []Field {
+// GetTypeRef returns the value of TypeRef or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetTypeRef() TypeRef {
 	if x != nil {
-		return x.Fields
+		return x.TypeRef
 	}
-	var zero []Field
+	var zero TypeRef
 	return zero
 }
 
-// GetFieldsOr returns the value of Fields or the provided default if the receiver or field is nil.
-func (x *TypeDef) GetFieldsOr(defaultValue []Field) []Field {
+// GetTypeRefOr returns the value of TypeRef or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetTypeRefOr(defaultValue TypeRef) TypeRef {
 	if x != nil {
-		return x.Fields
+		return x.TypeRef
 	}
 	return defaultValue
 }
 
 // preTypeDef is the version of TypeDef previous to the required field validation
 type preTypeDef struct {
+	Position    *prePosition     `json:"position,omitempty"`
 	Name        *string          `json:"name,omitempty"`
 	Doc         *string          `json:"doc,omitempty"`
 	Annotations *[]preAnnotation `json:"annotations,omitempty"`
-	Fields      *[]preField      `json:"fields,omitempty"`
+	TypeRef     *preTypeRef      `json:"typeRef,omitempty"`
 }
 
 // validate validates the required fields of TypeDef
 func (p *preTypeDef) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preTypeDef is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "name"
@@ -4506,15 +4991,13 @@ func (p *preTypeDef) validate() error {
 		}
 	}
 
-	// Validation for field "fields"
-	if p.Fields == nil {
-		return errorMissingRequiredField("field fields is required")
+	// Validation for field "typeRef"
+	if p.TypeRef == nil {
+		return errorMissingRequiredField("field typeRef is required")
 	}
-	if p.Fields != nil {
-		for _, item := range *p.Fields {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field fields: " + err.Error())
-			}
+	if p.TypeRef != nil {
+		if err := p.TypeRef.validate(); err != nil {
+			return errorMissingRequiredField("field typeRef: " + err.Error())
 		}
 	}
 
@@ -4524,6 +5007,8 @@ func (p *preTypeDef) validate() error {
 // transform transforms the preTypeDef type to the final TypeDef type
 func (p *preTypeDef) transform() TypeDef {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transName := *p.Name
 	transDoc := p.Doc
 	var transAnnotations []Annotation
@@ -4533,20 +5018,16 @@ func (p *preTypeDef) transform() TypeDef {
 		tmp_ = v.transform()
 		transAnnotations[i] = tmp_
 	}
-	var transFields []Field
-	transFields = make([]Field, len(*p.Fields))
-	for i, v := range *p.Fields {
-		var tmp_ Field
-		tmp_ = v.transform()
-		transFields[i] = tmp_
-	}
+	var transTypeRef TypeRef
+	transTypeRef = p.TypeRef.transform()
 
 	// Assignments
 	return TypeDef{
+		Position:    transPosition,
 		Name:        transName,
 		Doc:         transDoc,
 		Annotations: transAnnotations,
-		Fields:      transFields,
+		TypeRef:     transTypeRef,
 	}
 }
 
@@ -4564,7 +5045,7 @@ type TypeRef struct {
 	// Referenced enum name when `kind` is `enum`
 	EnumName *string `json:"enumName,omitempty"`
 	// Referenced enum underlying kind when `kind` is `enum`
-	EnumType *EnumType `json:"enumType,omitempty"`
+	EnumType *EnumValueType `json:"enumType,omitempty"`
 	// Element type when `kind` is `array`
 	ArrayType *TypeRef `json:"arrayType,omitempty"`
 	// Array rank when `kind` is `array` (for example, 2 for `T[][]`)
@@ -4644,16 +5125,16 @@ func (x *TypeRef) GetEnumNameOr(defaultValue string) string {
 }
 
 // GetEnumType returns the value of EnumType or the zero value if the receiver or field is nil.
-func (x *TypeRef) GetEnumType() EnumType {
+func (x *TypeRef) GetEnumType() EnumValueType {
 	if x != nil && x.EnumType != nil {
 		return *x.EnumType
 	}
-	var zero EnumType
+	var zero EnumValueType
 	return zero
 }
 
 // GetEnumTypeOr returns the value of EnumType or the provided default if the receiver or field is nil.
-func (x *TypeRef) GetEnumTypeOr(defaultValue EnumType) EnumType {
+func (x *TypeRef) GetEnumTypeOr(defaultValue EnumValueType) EnumValueType {
 	if x != nil && x.EnumType != nil {
 		return *x.EnumType
 	}
@@ -4734,7 +5215,7 @@ type preTypeRef struct {
 	PrimitiveName *PrimitiveType `json:"primitiveName,omitempty"`
 	TypeName      *string        `json:"typeName,omitempty"`
 	EnumName      *string        `json:"enumName,omitempty"`
-	EnumType      *EnumType      `json:"enumType,omitempty"`
+	EnumType      *EnumValueType `json:"enumType,omitempty"`
 	ArrayType     *preTypeRef    `json:"arrayType,omitempty"`
 	ArrayDims     *int64         `json:"arrayDims,omitempty"`
 	MapType       *preTypeRef    `json:"mapType,omitempty"`
@@ -5053,245 +5534,6 @@ func (p *preTypeScriptTargetConfig) transform() TypeScriptTargetConfig {
 		GenClient:       transGenClient,
 		GenServer:       transGenServer,
 		ImportExtension: transImportExtension,
-	}
-}
-
-// Fully resolved literal value.
-//
-// The selected payload is determined by `kind`:
-// - `string` -> `stringValue`
-// - `int` -> `intValue`
-// - `float` -> `floatValue`
-// - `bool` -> `boolValue`
-// - `object` -> `objectEntries`
-// - `array` -> `arrayItems`
-type Value struct {
-	// Value category discriminator
-	Kind ValueKind `json:"kind"`
-	// Payload for `kind = string`
-	StringValue *string `json:"stringValue,omitempty"`
-	// Payload for `kind = int`
-	IntValue *int64 `json:"intValue,omitempty"`
-	// Payload for `kind = float`
-	FloatValue *float64 `json:"floatValue,omitempty"`
-	// Payload for `kind = bool`
-	BoolValue *bool `json:"boolValue,omitempty"`
-	// Payload for `kind = object`
-	ObjectEntries *[]ObjectEntry `json:"objectEntries,omitempty"`
-	// Payload for `kind = array`
-	ArrayItems *[]Value `json:"arrayItems,omitempty"`
-}
-
-// GetKind returns the value of Kind or the zero value if the receiver or field is nil.
-func (x *Value) GetKind() ValueKind {
-	if x != nil {
-		return x.Kind
-	}
-	var zero ValueKind
-	return zero
-}
-
-// GetKindOr returns the value of Kind or the provided default if the receiver or field is nil.
-func (x *Value) GetKindOr(defaultValue ValueKind) ValueKind {
-	if x != nil {
-		return x.Kind
-	}
-	return defaultValue
-}
-
-// GetStringValue returns the value of StringValue or the zero value if the receiver or field is nil.
-func (x *Value) GetStringValue() string {
-	if x != nil && x.StringValue != nil {
-		return *x.StringValue
-	}
-	var zero string
-	return zero
-}
-
-// GetStringValueOr returns the value of StringValue or the provided default if the receiver or field is nil.
-func (x *Value) GetStringValueOr(defaultValue string) string {
-	if x != nil && x.StringValue != nil {
-		return *x.StringValue
-	}
-	return defaultValue
-}
-
-// GetIntValue returns the value of IntValue or the zero value if the receiver or field is nil.
-func (x *Value) GetIntValue() int64 {
-	if x != nil && x.IntValue != nil {
-		return *x.IntValue
-	}
-	var zero int64
-	return zero
-}
-
-// GetIntValueOr returns the value of IntValue or the provided default if the receiver or field is nil.
-func (x *Value) GetIntValueOr(defaultValue int64) int64 {
-	if x != nil && x.IntValue != nil {
-		return *x.IntValue
-	}
-	return defaultValue
-}
-
-// GetFloatValue returns the value of FloatValue or the zero value if the receiver or field is nil.
-func (x *Value) GetFloatValue() float64 {
-	if x != nil && x.FloatValue != nil {
-		return *x.FloatValue
-	}
-	var zero float64
-	return zero
-}
-
-// GetFloatValueOr returns the value of FloatValue or the provided default if the receiver or field is nil.
-func (x *Value) GetFloatValueOr(defaultValue float64) float64 {
-	if x != nil && x.FloatValue != nil {
-		return *x.FloatValue
-	}
-	return defaultValue
-}
-
-// GetBoolValue returns the value of BoolValue or the zero value if the receiver or field is nil.
-func (x *Value) GetBoolValue() bool {
-	if x != nil && x.BoolValue != nil {
-		return *x.BoolValue
-	}
-	var zero bool
-	return zero
-}
-
-// GetBoolValueOr returns the value of BoolValue or the provided default if the receiver or field is nil.
-func (x *Value) GetBoolValueOr(defaultValue bool) bool {
-	if x != nil && x.BoolValue != nil {
-		return *x.BoolValue
-	}
-	return defaultValue
-}
-
-// GetObjectEntries returns the value of ObjectEntries or the zero value if the receiver or field is nil.
-func (x *Value) GetObjectEntries() []ObjectEntry {
-	if x != nil && x.ObjectEntries != nil {
-		return *x.ObjectEntries
-	}
-	var zero []ObjectEntry
-	return zero
-}
-
-// GetObjectEntriesOr returns the value of ObjectEntries or the provided default if the receiver or field is nil.
-func (x *Value) GetObjectEntriesOr(defaultValue []ObjectEntry) []ObjectEntry {
-	if x != nil && x.ObjectEntries != nil {
-		return *x.ObjectEntries
-	}
-	return defaultValue
-}
-
-// GetArrayItems returns the value of ArrayItems or the zero value if the receiver or field is nil.
-func (x *Value) GetArrayItems() []Value {
-	if x != nil && x.ArrayItems != nil {
-		return *x.ArrayItems
-	}
-	var zero []Value
-	return zero
-}
-
-// GetArrayItemsOr returns the value of ArrayItems or the provided default if the receiver or field is nil.
-func (x *Value) GetArrayItemsOr(defaultValue []Value) []Value {
-	if x != nil && x.ArrayItems != nil {
-		return *x.ArrayItems
-	}
-	return defaultValue
-}
-
-// preValue is the version of Value previous to the required field validation
-type preValue struct {
-	Kind          *ValueKind        `json:"kind,omitempty"`
-	StringValue   *string           `json:"stringValue,omitempty"`
-	IntValue      *int64            `json:"intValue,omitempty"`
-	FloatValue    *float64          `json:"floatValue,omitempty"`
-	BoolValue     *bool             `json:"boolValue,omitempty"`
-	ObjectEntries *[]preObjectEntry `json:"objectEntries,omitempty"`
-	ArrayItems    *[]preValue       `json:"arrayItems,omitempty"`
-}
-
-// validate validates the required fields of Value
-func (p *preValue) validate() error {
-	if p == nil {
-		return errorMissingRequiredField("preValue is nil")
-	}
-
-	// Validation for field "kind"
-	if p.Kind == nil {
-		return errorMissingRequiredField("field kind is required")
-	}
-
-	// Validation for field "stringValue"
-
-	// Validation for field "intValue"
-
-	// Validation for field "floatValue"
-
-	// Validation for field "boolValue"
-
-	// Validation for field "objectEntries"
-	if p.ObjectEntries != nil {
-		for _, item := range *p.ObjectEntries {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field objectEntries: " + err.Error())
-			}
-		}
-	}
-
-	// Validation for field "arrayItems"
-	if p.ArrayItems != nil {
-		for _, item := range *p.ArrayItems {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field arrayItems: " + err.Error())
-			}
-		}
-	}
-
-	return nil
-}
-
-// transform transforms the preValue type to the final Value type
-func (p *preValue) transform() Value {
-	// Transformations
-	transKind := *p.Kind
-	transStringValue := p.StringValue
-	transIntValue := p.IntValue
-	transFloatValue := p.FloatValue
-	transBoolValue := p.BoolValue
-	var transObjectEntries *[]ObjectEntry
-	if p.ObjectEntries != nil {
-		var valObjectEntries []ObjectEntry
-		valObjectEntries = make([]ObjectEntry, len(*p.ObjectEntries))
-		for i, v := range *p.ObjectEntries {
-			var tmp_ ObjectEntry
-			tmp_ = v.transform()
-			valObjectEntries[i] = tmp_
-		}
-		transObjectEntries = &valObjectEntries
-	}
-	var transArrayItems *[]Value
-	if p.ArrayItems != nil {
-		var valArrayItems []Value
-		valArrayItems = make([]Value, len(*p.ArrayItems))
-		for i, v := range *p.ArrayItems {
-			var tmp_ Value
-			tmp_ = v.transform()
-			valArrayItems[i] = tmp_
-		}
-		transArrayItems = &valArrayItems
-	}
-
-	// Assignments
-	return Value{
-		Kind:          transKind,
-		StringValue:   transStringValue,
-		IntValue:      transIntValue,
-		FloatValue:    transFloatValue,
-		BoolValue:     transBoolValue,
-		ObjectEntries: transObjectEntries,
-		ArrayItems:    transArrayItems,
 	}
 }
 

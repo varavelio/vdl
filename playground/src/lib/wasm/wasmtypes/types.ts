@@ -14,15 +14,38 @@
 /**
  * Underlying storage kind used by an enum
  */
-export type EnumType = "string" | "int";
+export type EnumValueType = "string" | "int";
 
-export const EnumTypeList: EnumType[] = [
+export const EnumValueTypeList: EnumValueType[] = [
   "string",
   "int",
 ];
 
-export function isEnumType(value: unknown): value is EnumType {
-  return EnumTypeList.includes(value as EnumType);
+export function isEnumValueType(value: unknown): value is EnumValueType {
+  return EnumValueTypeList.includes(value as EnumValueType);
+}
+
+/**
+ * Kind discriminator for LiteralValue.
+ * 
+ * LiteralValue is used for fully resolved literal data in:
+ * 
+ * - constant values
+ * - annotation arguments
+ */
+export type LiteralKind = "string" | "int" | "float" | "bool" | "object" | "array";
+
+export const LiteralKindList: LiteralKind[] = [
+  "string",
+  "int",
+  "float",
+  "bool",
+  "object",
+  "array",
+];
+
+export function isLiteralKind(value: unknown): value is LiteralKind {
+  return LiteralKindList.includes(value as LiteralKind);
 }
 
 /**
@@ -76,28 +99,6 @@ export function isTypescriptTargetImportExtension(value: unknown): value is Type
 }
 
 /**
- * Kind discriminator for Value.
- * 
- * Value is used for fully resolved literal data in:
- * - constant values
- * - annotation arguments
- */
-export type ValueKind = "string" | "int" | "float" | "bool" | "object" | "array";
-
-export const ValueKindList: ValueKind[] = [
-  "string",
-  "int",
-  "float",
-  "bool",
-  "object",
-  "array",
-];
-
-export function isValueKind(value: unknown): value is ValueKind {
-  return ValueKindList.includes(value as ValueKind);
-}
-
-/**
  * Represents a function to be called via WASM
  */
 export type WasmFunctionName = "ExpandTypes" | "ExtractType" | "ExtractProc" | "ExtractStream" | "Irgen" | "Codegen";
@@ -123,16 +124,16 @@ export function isWasmFunctionName(value: unknown): value is WasmFunctionName {
  * Annotation Annotation metadata preserved in IR.
  * 
  * `name` is the annotation identifier without the `@` prefix.
- * `argument`, when present, is fully resolved as a Value.
+ * `argument`, when present, is fully resolved as a LiteralValue.
  */
 export type Annotation = {
   name: string
-  argument?: Value
+  argument?: LiteralValue
 }
 
 export function hydrateAnnotation(input: Annotation): Annotation {
   const hydratedName = input.name
-  const hydratedArgument = input.argument ? hydrateValue(input.argument) : input.argument
+  const hydratedArgument = input.argument ? hydrateLiteralValue(input.argument) : input.argument
   return {
     name: hydratedName,
     argument: hydratedArgument,
@@ -147,7 +148,7 @@ export function validateAnnotation(input: unknown, path = "Annotation"): string 
 
   if (obj.argument !== undefined && obj.argument !== null) {
     {
-      const err = validateValue(obj.argument, `${path}.argument`);
+      const err = validateLiteralValue(obj.argument, `${path}.argument`);
       if (err !== null) return err;
     }
   }
@@ -294,20 +295,23 @@ export function validateCommonTargetConfig(_input: unknown, _path = "CommonTarge
  * `value` contains the fully resolved literal payload.
  */
 export type ConstantDef = {
+  position: Position
   name: string
   doc?: string
   annotations: Annotation[]
   typeRef: TypeRef
-  value: Value
+  value: LiteralValue
 }
 
 export function hydrateConstantDef(input: ConstantDef): ConstantDef {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedName = input.name
   const hydratedDoc = input.doc ? input.doc : input.doc
   const hydratedAnnotations = input.annotations.map(el => hydrateAnnotation(el))
   const hydratedTypeRef = hydrateTypeRef(input.typeRef)
-  const hydratedValue = hydrateValue(input.value)
+  const hydratedValue = hydrateLiteralValue(input.value)
   return {
+    position: hydratedPosition,
     name: hydratedName,
     doc: hydratedDoc,
     annotations: hydratedAnnotations,
@@ -322,6 +326,13 @@ export function validateConstantDef(input: unknown, path = "ConstantDef"): strin
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.annotations === undefined || obj.annotations === null) {
     return `${path}.annotations: required field is missing`;
   }
@@ -347,7 +358,7 @@ export function validateConstantDef(input: unknown, path = "ConstantDef"): strin
     return `${path}.value: required field is missing`;
   }
   {
-    const err = validateValue(obj.value, `${path}.value`);
+    const err = validateLiteralValue(obj.value, `${path}.value`);
     if (err !== null) return err;
   }
   return null;
@@ -402,45 +413,28 @@ export function validateDartTargetConfig(_input: unknown, _path = "DartTargetCon
 }
 
 /**
- * DocDef Standalone documentation block.
- * 
- * Used for top-level docstrings that are not attached to a type/enum/constant.
- */
-export type DocDef = {
-  content: string
-}
-
-export function hydrateDocDef(input: DocDef): DocDef {
-  const hydratedContent = input.content
-  return {
-    content: hydratedContent,
-  }
-}
-
-export function validateDocDef(_input: unknown, _path = "DocDef"): string | null {
-  return null;
-}
-
-/**
  * EnumDef Flattened enum definition.
  * 
  * All enum spreads are already expanded into `members`.
  */
 export type EnumDef = {
+  position: Position
   name: string
   doc?: string
   annotations: Annotation[]
-  enumType: EnumType
-  members: EnumDefMember[]
+  enumType: EnumValueType
+  members: EnumMember[]
 }
 
 export function hydrateEnumDef(input: EnumDef): EnumDef {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedName = input.name
   const hydratedDoc = input.doc ? input.doc : input.doc
   const hydratedAnnotations = input.annotations.map(el => hydrateAnnotation(el))
   const hydratedEnumType = input.enumType
-  const hydratedMembers = input.members.map(el => hydrateEnumDefMember(el))
+  const hydratedMembers = input.members.map(el => hydrateEnumMember(el))
   return {
+    position: hydratedPosition,
     name: hydratedName,
     doc: hydratedDoc,
     annotations: hydratedAnnotations,
@@ -455,6 +449,13 @@ export function validateEnumDef(input: unknown, path = "EnumDef"): string | null
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.annotations === undefined || obj.annotations === null) {
     return `${path}.annotations: required field is missing`;
   }
@@ -473,8 +474,8 @@ export function validateEnumDef(input: unknown, path = "EnumDef"): string | null
     return `${path}.enumType: required field is missing`;
   }
   {
-    if (!isEnumType(obj.enumType)) {
-      return `${path}.enumType: invalid enum value '${obj.enumType}' for EnumType`;
+    if (!isEnumValueType(obj.enumType)) {
+      return `${path}.enumType: invalid enum value '${obj.enumType}' for EnumValueType`;
     }
   }
   if (obj.members === undefined || obj.members === null) {
@@ -486,7 +487,7 @@ export function validateEnumDef(input: unknown, path = "EnumDef"): string | null
     }
     for (let i = 0; i < obj.members.length; i++) {
       {
-        const err = validateEnumDefMember(obj.members[i], `${path}.members[${i}]`);
+        const err = validateEnumMember(obj.members[i], `${path}.members[${i}]`);
         if (err !== null) return err;
       }
     }
@@ -495,18 +496,18 @@ export function validateEnumDef(input: unknown, path = "EnumDef"): string | null
 }
 
 /**
- * EnumDefMember Enum member definition
+ * EnumMember Enum member definition
  */
-export type EnumDefMember = {
+export type EnumMember = {
   name: string
-  value: string
+  value: LiteralValue
   doc?: string
   annotations: Annotation[]
 }
 
-export function hydrateEnumDefMember(input: EnumDefMember): EnumDefMember {
+export function hydrateEnumMember(input: EnumMember): EnumMember {
   const hydratedName = input.name
-  const hydratedValue = input.value
+  const hydratedValue = hydrateLiteralValue(input.value)
   const hydratedDoc = input.doc ? input.doc : input.doc
   const hydratedAnnotations = input.annotations.map(el => hydrateAnnotation(el))
   return {
@@ -517,12 +518,19 @@ export function hydrateEnumDefMember(input: EnumDefMember): EnumDefMember {
   }
 }
 
-export function validateEnumDefMember(input: unknown, path = "EnumDefMember"): string | null {
+export function validateEnumMember(input: unknown, path = "EnumMember"): string | null {
   if (input === null || input === undefined || typeof input !== "object") {
     return `${path}: expected object, got ${typeof input}`;
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.value === undefined || obj.value === null) {
+    return `${path}.value: required field is missing`;
+  }
+  {
+    const err = validateLiteralValue(obj.value, `${path}.value`);
+    if (err !== null) return err;
+  }
   if (obj.annotations === undefined || obj.annotations === null) {
     return `${path}.annotations: required field is missing`;
   }
@@ -798,6 +806,7 @@ export function validateGoTargetConfig(_input: unknown, _path = "GoTargetConfig"
  * IrSchema IrSchema is the generator-facing representation of a VDL program.
  * 
  * This model is intentionally "flat" and "resolved":
+ * 
  * - spreads are already expanded
  * - references are already resolved
  * - collections are in deterministic order
@@ -809,14 +818,14 @@ export type IrSchema = {
   constants: ConstantDef[]
   enums: EnumDef[]
   types: TypeDef[]
-  docs: DocDef[]
+  docs: TopLevelDoc[]
 }
 
 export function hydrateIrSchema(input: IrSchema): IrSchema {
   const hydratedConstants = input.constants.map(el => hydrateConstantDef(el))
   const hydratedEnums = input.enums.map(el => hydrateEnumDef(el))
   const hydratedTypes = input.types.map(el => hydrateTypeDef(el))
-  const hydratedDocs = input.docs.map(el => hydrateDocDef(el))
+  const hydratedDocs = input.docs.map(el => hydrateTopLevelDoc(el))
   return {
     constants: hydratedConstants,
     enums: hydratedEnums,
@@ -882,7 +891,7 @@ export function validateIrSchema(input: unknown, path = "IrSchema"): string | nu
     }
     for (let i = 0; i < obj.docs.length; i++) {
       {
-        const err = validateDocDef(obj.docs[i], `${path}.docs[${i}]`);
+        const err = validateTopLevelDoc(obj.docs[i], `${path}.docs[${i}]`);
         if (err !== null) return err;
       }
     }
@@ -954,16 +963,100 @@ export function validateJsonSchemaTargetConfig(_input: unknown, _path = "JsonSch
 }
 
 /**
- * ObjectEntry Key/value pair inside an object Value payload
+ * LiteralValue Fully resolved literal value.
+ * 
+ * The selected payload is determined by `kind`:
+ * 
+ * - `string` -> `stringValue`
+ * - `int` -> `intValue`
+ * - `float` -> `floatValue`
+ * - `bool` -> `boolValue`
+ * - `object` -> `objectEntries`
+ * - `array` -> `arrayItems`
+ */
+export type LiteralValue = {
+  kind: LiteralKind
+  stringValue?: string
+  intValue?: number
+  floatValue?: number
+  boolValue?: boolean
+  objectEntries?: ObjectEntry[]
+  arrayItems?: LiteralValue[]
+}
+
+export function hydrateLiteralValue(input: LiteralValue): LiteralValue {
+  const hydratedKind = input.kind
+  const hydratedStringValue = input.stringValue ? input.stringValue : input.stringValue
+  const hydratedIntValue = input.intValue ? input.intValue : input.intValue
+  const hydratedFloatValue = input.floatValue ? input.floatValue : input.floatValue
+  const hydratedBoolValue = input.boolValue ? input.boolValue : input.boolValue
+  const hydratedObjectEntries = input.objectEntries ? input.objectEntries.map(el => hydrateObjectEntry(el)) : input.objectEntries
+  const hydratedArrayItems = input.arrayItems ? input.arrayItems.map(el => hydrateLiteralValue(el)) : input.arrayItems
+  return {
+    kind: hydratedKind,
+    stringValue: hydratedStringValue,
+    intValue: hydratedIntValue,
+    floatValue: hydratedFloatValue,
+    boolValue: hydratedBoolValue,
+    objectEntries: hydratedObjectEntries,
+    arrayItems: hydratedArrayItems,
+  }
+}
+
+export function validateLiteralValue(input: unknown, path = "LiteralValue"): string | null {
+  if (input === null || input === undefined || typeof input !== "object") {
+    return `${path}: expected object, got ${typeof input}`;
+  }
+  const obj = input as Record<string, unknown>;
+
+  if (obj.kind === undefined || obj.kind === null) {
+    return `${path}.kind: required field is missing`;
+  }
+  {
+    if (!isLiteralKind(obj.kind)) {
+      return `${path}.kind: invalid enum value '${obj.kind}' for LiteralKind`;
+    }
+  }
+  if (obj.objectEntries !== undefined && obj.objectEntries !== null) {
+    {
+      if (!Array.isArray(obj.objectEntries)) {
+        return `${path}.objectEntries: expected array, got ${typeof obj.objectEntries}`;
+      }
+      for (let i = 0; i < obj.objectEntries.length; i++) {
+        {
+          const err = validateObjectEntry(obj.objectEntries[i], `${path}.objectEntries[${i}]`);
+          if (err !== null) return err;
+        }
+      }
+    }
+  }
+  if (obj.arrayItems !== undefined && obj.arrayItems !== null) {
+    {
+      if (!Array.isArray(obj.arrayItems)) {
+        return `${path}.arrayItems: expected array, got ${typeof obj.arrayItems}`;
+      }
+      for (let i = 0; i < obj.arrayItems.length; i++) {
+        {
+          const err = validateLiteralValue(obj.arrayItems[i], `${path}.arrayItems[${i}]`);
+          if (err !== null) return err;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * ObjectEntry Key/value pair inside an object LiteralValue payload
  */
 export type ObjectEntry = {
   key: string
-  value: Value
+  value: LiteralValue
 }
 
 export function hydrateObjectEntry(input: ObjectEntry): ObjectEntry {
   const hydratedKey = input.key
-  const hydratedValue = hydrateValue(input.value)
+  const hydratedValue = hydrateLiteralValue(input.value)
   return {
     key: hydratedKey,
     value: hydratedValue,
@@ -980,7 +1073,7 @@ export function validateObjectEntry(input: unknown, path = "ObjectEntry"): strin
     return `${path}.value: required field is missing`;
   }
   {
-    const err = validateValue(obj.value, `${path}.value`);
+    const err = validateLiteralValue(obj.value, `${path}.value`);
     if (err !== null) return err;
   }
   return null;
@@ -1109,6 +1202,30 @@ export function hydratePluginTargetConfig(input: PluginTargetConfig): PluginTarg
 }
 
 export function validatePluginTargetConfig(_input: unknown, _path = "PluginTargetConfig"): string | null {
+  return null;
+}
+
+/**
+ * Position Source position where a declaration was defined
+ */
+export type Position = {
+  file: string
+  line: number
+  column: number
+}
+
+export function hydratePosition(input: Position): Position {
+  const hydratedFile = input.file
+  const hydratedLine = input.line
+  const hydratedColumn = input.column
+  return {
+    file: hydratedFile,
+    line: hydratedLine,
+    column: hydratedColumn,
+  }
+}
+
+export function validatePosition(_input: unknown, _path = "Position"): string | null {
   return null;
 }
 
@@ -1271,27 +1388,66 @@ export function validateTargetConfig(input: unknown, path = "TargetConfig"): str
 }
 
 /**
+ * TopLevelDoc Standalone documentation block.
+ * 
+ * Used for top-level docstrings that are not attached to a type/enum/constant.
+ */
+export type TopLevelDoc = {
+  position: Position
+  content: string
+}
+
+export function hydrateTopLevelDoc(input: TopLevelDoc): TopLevelDoc {
+  const hydratedPosition = hydratePosition(input.position)
+  const hydratedContent = input.content
+  return {
+    position: hydratedPosition,
+    content: hydratedContent,
+  }
+}
+
+export function validateTopLevelDoc(input: unknown, path = "TopLevelDoc"): string | null {
+  if (input === null || input === undefined || typeof input !== "object") {
+    return `${path}: expected object, got ${typeof input}`;
+  }
+  const obj = input as Record<string, unknown>;
+
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
+  return null;
+}
+
+/**
  * TypeDef Flattened type definition.
  * 
- * All spreads are already expanded into `fields`.
+ * All spreads are already expanded. The unified `typeRef` describes what this
+ * type IS, a primitive, custom reference, map, array, or object with fields.
  */
 export type TypeDef = {
+  position: Position
   name: string
   doc?: string
   annotations: Annotation[]
-  fields: Field[]
+  typeRef: TypeRef
 }
 
 export function hydrateTypeDef(input: TypeDef): TypeDef {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedName = input.name
   const hydratedDoc = input.doc ? input.doc : input.doc
   const hydratedAnnotations = input.annotations.map(el => hydrateAnnotation(el))
-  const hydratedFields = input.fields.map(el => hydrateField(el))
+  const hydratedTypeRef = hydrateTypeRef(input.typeRef)
   return {
+    position: hydratedPosition,
     name: hydratedName,
     doc: hydratedDoc,
     annotations: hydratedAnnotations,
-    fields: hydratedFields,
+    typeRef: hydratedTypeRef,
   }
 }
 
@@ -1301,6 +1457,13 @@ export function validateTypeDef(input: unknown, path = "TypeDef"): string | null
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.annotations === undefined || obj.annotations === null) {
     return `${path}.annotations: required field is missing`;
   }
@@ -1315,19 +1478,12 @@ export function validateTypeDef(input: unknown, path = "TypeDef"): string | null
       }
     }
   }
-  if (obj.fields === undefined || obj.fields === null) {
-    return `${path}.fields: required field is missing`;
+  if (obj.typeRef === undefined || obj.typeRef === null) {
+    return `${path}.typeRef: required field is missing`;
   }
   {
-    if (!Array.isArray(obj.fields)) {
-      return `${path}.fields: expected array, got ${typeof obj.fields}`;
-    }
-    for (let i = 0; i < obj.fields.length; i++) {
-      {
-        const err = validateField(obj.fields[i], `${path}.fields[${i}]`);
-        if (err !== null) return err;
-      }
-    }
+    const err = validateTypeRef(obj.typeRef, `${path}.typeRef`);
+    if (err !== null) return err;
   }
   return null;
 }
@@ -1343,7 +1499,7 @@ export type TypeRef = {
   primitiveName?: PrimitiveType
   typeName?: string
   enumName?: string
-  enumType?: EnumType
+  enumType?: EnumValueType
   arrayType?: TypeRef
   arrayDims?: number
   mapType?: TypeRef
@@ -1396,8 +1552,8 @@ export function validateTypeRef(input: unknown, path = "TypeRef"): string | null
   }
   if (obj.enumType !== undefined && obj.enumType !== null) {
     {
-      if (!isEnumType(obj.enumType)) {
-        return `${path}.enumType: invalid enum value '${obj.enumType}' for EnumType`;
+      if (!isEnumValueType(obj.enumType)) {
+        return `${path}.enumType: invalid enum value '${obj.enumType}' for EnumValueType`;
       }
     }
   }
@@ -1474,89 +1630,6 @@ export function validateTypeScriptTargetConfig(input: unknown, path = "TypeScrip
     {
       if (!isTypescriptTargetImportExtension(obj.importExtension)) {
         return `${path}.importExtension: invalid enum value '${obj.importExtension}' for TypescriptTargetImportExtension`;
-      }
-    }
-  }
-  return null;
-}
-
-/**
- * Value Fully resolved literal value.
- * 
- * The selected payload is determined by `kind`:
- * - `string` -> `stringValue`
- * - `int` -> `intValue`
- * - `float` -> `floatValue`
- * - `bool` -> `boolValue`
- * - `object` -> `objectEntries`
- * - `array` -> `arrayItems`
- */
-export type Value = {
-  kind: ValueKind
-  stringValue?: string
-  intValue?: number
-  floatValue?: number
-  boolValue?: boolean
-  objectEntries?: ObjectEntry[]
-  arrayItems?: Value[]
-}
-
-export function hydrateValue(input: Value): Value {
-  const hydratedKind = input.kind
-  const hydratedStringValue = input.stringValue ? input.stringValue : input.stringValue
-  const hydratedIntValue = input.intValue ? input.intValue : input.intValue
-  const hydratedFloatValue = input.floatValue ? input.floatValue : input.floatValue
-  const hydratedBoolValue = input.boolValue ? input.boolValue : input.boolValue
-  const hydratedObjectEntries = input.objectEntries ? input.objectEntries.map(el => hydrateObjectEntry(el)) : input.objectEntries
-  const hydratedArrayItems = input.arrayItems ? input.arrayItems.map(el => hydrateValue(el)) : input.arrayItems
-  return {
-    kind: hydratedKind,
-    stringValue: hydratedStringValue,
-    intValue: hydratedIntValue,
-    floatValue: hydratedFloatValue,
-    boolValue: hydratedBoolValue,
-    objectEntries: hydratedObjectEntries,
-    arrayItems: hydratedArrayItems,
-  }
-}
-
-export function validateValue(input: unknown, path = "Value"): string | null {
-  if (input === null || input === undefined || typeof input !== "object") {
-    return `${path}: expected object, got ${typeof input}`;
-  }
-  const obj = input as Record<string, unknown>;
-
-  if (obj.kind === undefined || obj.kind === null) {
-    return `${path}.kind: required field is missing`;
-  }
-  {
-    if (!isValueKind(obj.kind)) {
-      return `${path}.kind: invalid enum value '${obj.kind}' for ValueKind`;
-    }
-  }
-  if (obj.objectEntries !== undefined && obj.objectEntries !== null) {
-    {
-      if (!Array.isArray(obj.objectEntries)) {
-        return `${path}.objectEntries: expected array, got ${typeof obj.objectEntries}`;
-      }
-      for (let i = 0; i < obj.objectEntries.length; i++) {
-        {
-          const err = validateObjectEntry(obj.objectEntries[i], `${path}.objectEntries[${i}]`);
-          if (err !== null) return err;
-        }
-      }
-    }
-  }
-  if (obj.arrayItems !== undefined && obj.arrayItems !== null) {
-    {
-      if (!Array.isArray(obj.arrayItems)) {
-        return `${path}.arrayItems: expected array, got ${typeof obj.arrayItems}`;
-      }
-      for (let i = 0; i < obj.arrayItems.length; i++) {
-        {
-          const err = validateValue(obj.arrayItems[i], `${path}.arrayItems[${i}]`);
-          if (err !== null) return err;
-        }
       }
     }
   }
