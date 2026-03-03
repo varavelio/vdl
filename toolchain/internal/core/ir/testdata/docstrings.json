@@ -4,17 +4,28 @@
     {
       "name": "DocumentedEnum",
       "doc": "Enum with documented members.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
+        "line": 28,
+        "column": 1
+      },
       "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "First",
-          "value": "First",
+          "value": {
+            "kind": "string",
+            "stringValue": "First"
+          },
           "annotations": []
         },
         {
           "name": "Second",
-          "value": "Second",
+          "value": {
+            "kind": "string",
+            "stringValue": "Second"
+          },
           "annotations": []
         }
       ]
@@ -24,6 +35,11 @@
     {
       "name": "DocumentedType",
       "doc": "This docstring has leading indentation\nthat should be stripped.\n\n- Indented list\n  - Nested item",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
+        "line": 10,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -54,7 +70,12 @@
   ],
   "docs": [
     {
-      "content": "This is a multi-line docstring.\n\nIt has multiple paragraphs and should be normalized.\n\n- Item 1\n- Item 2"
+      "content": "This is a multi-line docstring.\n\nIt has multiple paragraphs and should be normalized.\n\n- Item 1\n- Item 2",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
+        "line": 1,
+        "column": 1
+      }
     }
   ]
 }

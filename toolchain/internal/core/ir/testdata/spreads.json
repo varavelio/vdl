@@ -4,6 +4,11 @@
   "types": [
     {
       "name": "AuditFields",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -31,6 +36,11 @@
     },
     {
       "name": "BaseEntity",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+        "line": 16,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -58,6 +68,11 @@
     },
     {
       "name": "NestedSpread",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+        "line": 21,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -103,6 +118,11 @@
     },
     {
       "name": "Timestamps",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+        "line": 12,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -121,6 +141,11 @@
     },
     {
       "name": "User",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
+        "line": 6,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",

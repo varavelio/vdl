@@ -4,6 +4,11 @@
   "types": [
     {
       "name": "Address",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
+        "line": 6,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -59,6 +64,11 @@
     },
     {
       "name": "Company",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
+        "line": 15,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -133,6 +143,11 @@
     },
     {
       "name": "Location",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",

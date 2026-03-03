@@ -197,7 +197,7 @@ const cfgAlias = cfg
 	cfg, ok := constants["cfg"]
 	require.True(t, ok)
 	assert.Equal(t, irtypes.TypeKindObject, cfg.TypeRef.Kind)
-	assert.Equal(t, irtypes.ValueKindObject, cfg.Value.Kind)
+	assert.Equal(t, irtypes.LiteralKindObject, cfg.Value.Kind)
 
 	entries := cfg.Value.GetObjectEntries()
 	require.Len(t, entries, 4)
@@ -249,7 +249,7 @@ enum Status {
 	require.Len(t, user.Annotations, 2)
 	assert.Equal(t, "entity", user.Annotations[0].Name)
 	assert.Equal(t, "meta", user.Annotations[1].Name)
-	assert.Equal(t, irtypes.ValueKindObject, user.Annotations[1].Argument.GetKind())
+	assert.Equal(t, irtypes.LiteralKindObject, user.Annotations[1].Argument.GetKind())
 
 	var status irtypes.EnumDef
 	for _, enum := range schema.Enums {
@@ -269,6 +269,7 @@ func TestIrSchemaJSONSerialization(t *testing.T) {
 		Types: []irtypes.TypeDef{
 			{
 				Name:        "User",
+				Position:    irtypes.Position{},
 				Annotations: []irtypes.Annotation{},
 				TypeRef: irtypes.TypeRef{
 					Kind: irtypes.TypeKindObject,
@@ -290,18 +291,19 @@ func TestIrSchemaJSONSerialization(t *testing.T) {
 		Constants: []irtypes.ConstantDef{
 			{
 				Name:        "maxRetries",
+				Position:    irtypes.Position{},
 				Annotations: []irtypes.Annotation{},
 				TypeRef: irtypes.TypeRef{
 					Kind:          irtypes.TypeKindPrimitive,
 					PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeInt),
 				},
-				Value: irtypes.Value{
-					Kind:     irtypes.ValueKindInt,
+				Value: irtypes.LiteralValue{
+					Kind:     irtypes.LiteralKindInt,
 					IntValue: irtypes.Ptr(int64(3)),
 				},
 			},
 		},
-		Docs: []irtypes.DocDef{},
+		Docs: []irtypes.TopLevelDoc{},
 	}
 
 	jsonBytes, err := json.MarshalIndent(schema, "", "  ")

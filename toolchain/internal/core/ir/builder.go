@@ -19,7 +19,7 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 		Types:     make([]irtypes.TypeDef, 0, len(program.Types)),
 		Enums:     make([]irtypes.EnumDef, 0, len(program.Enums)),
 		Constants: make([]irtypes.ConstantDef, 0, len(program.Consts)),
-		Docs:      make([]irtypes.DocDef, 0, len(program.StandaloneDocs)),
+		Docs:      make([]irtypes.TopLevelDoc, 0, len(program.StandaloneDocs)),
 	}
 
 	for _, typ := range program.Types {
@@ -36,7 +36,10 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 		if normalized == "" {
 			continue
 		}
-		schema.Docs = append(schema.Docs, irtypes.DocDef{Content: normalized})
+		schema.Docs = append(schema.Docs, irtypes.TopLevelDoc{
+			Content:  normalized,
+			Position: convertPosition(doc.File, doc.Pos),
+		})
 	}
 
 	sort.Slice(schema.Types, func(i, j int) bool { return schema.Types[i].Name < schema.Types[j].Name })
@@ -44,6 +47,14 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 	sort.Slice(schema.Constants, func(i, j int) bool { return schema.Constants[i].Name < schema.Constants[j].Name })
 
 	return schema
+}
+
+func convertPosition(file string, pos ast.Position) irtypes.Position {
+	return irtypes.Position{
+		File:   file,
+		Line:   int64(pos.Line),
+		Column: int64(pos.Column),
+	}
 }
 
 func convertType(
@@ -55,6 +66,7 @@ func convertType(
 	def := irtypes.TypeDef{
 		Name:        typ.Name,
 		Doc:         normalizeDocPtr(typ.Docstring),
+		Position:    convertPosition(typ.File, typ.Pos),
 		Annotations: convertAnnotations(typ.Annotations, resolver),
 	}
 
@@ -80,12 +92,12 @@ func convertEnum(
 	resolver *valueResolver,
 ) irtypes.EnumDef {
 	members := expandEnumMembers(enum, enums, map[string]bool{})
-	irMembers := make([]irtypes.EnumDefMember, 0, len(members))
+	irMembers := make([]irtypes.EnumMember, 0, len(members))
 
 	for _, member := range members {
-		irMembers = append(irMembers, irtypes.EnumDefMember{
+		irMembers = append(irMembers, irtypes.EnumMember{
 			Name:        member.Name,
-			Value:       member.Value,
+			Value:       resolveEnumMemberValue(enum.ValueType, member.Value),
 			Doc:         normalizeDocPtr(member.Docstring),
 			Annotations: convertAnnotations(member.Annotations, resolver),
 		})
@@ -94,10 +106,25 @@ func convertEnum(
 	return irtypes.EnumDef{
 		Name:        enum.Name,
 		Doc:         normalizeDocPtr(enum.Docstring),
+		Position:    convertPosition(enum.File, enum.Pos),
 		Annotations: convertAnnotations(enum.Annotations, resolver),
 		EnumType:    convertEnumType(enum.ValueType),
 		Members:     irMembers,
 	}
+}
+
+// resolveEnumMemberValue converts a raw enum member value string into a
+// properly typed LiteralValue based on the enum's underlying storage kind.
+func resolveEnumMemberValue(valueType analysis.EnumValueType, rawValue string) irtypes.LiteralValue {
+	if valueType == analysis.EnumValueTypeInt {
+		n, err := strconv.ParseInt(rawValue, 10, 64)
+		if err != nil {
+			// Fallback to string if parsing fails
+			return irtypes.LiteralValue{Kind: irtypes.LiteralKindString, StringValue: &rawValue}
+		}
+		return irtypes.LiteralValue{Kind: irtypes.LiteralKindInt, IntValue: &n}
+	}
+	return irtypes.LiteralValue{Kind: irtypes.LiteralKindString, StringValue: &rawValue}
 }
 
 func convertConstant(
@@ -107,8 +134,8 @@ func convertConstant(
 ) irtypes.ConstantDef {
 	value, ok := resolver.resolveConstValue(cnst.Name)
 	if !ok {
-		value = irtypes.Value{
-			Kind:        irtypes.ValueKindString,
+		value = irtypes.LiteralValue{
+			Kind:        irtypes.LiteralKindString,
 			StringValue: irtypes.Ptr(""),
 		}
 	}
@@ -116,6 +143,7 @@ func convertConstant(
 	return irtypes.ConstantDef{
 		Name:        cnst.Name,
 		Doc:         normalizeDocPtr(cnst.Docstring),
+		Position:    convertPosition(cnst.File, cnst.Pos),
 		Annotations: convertAnnotations(cnst.Annotations, resolver),
 		TypeRef:     inferConstTypeRef(cnst, value, program.Types, program.Enums),
 		Value:       value,
@@ -216,11 +244,11 @@ func convertPrimitiveType(name string) irtypes.PrimitiveType {
 	}
 }
 
-func convertEnumType(vt analysis.EnumValueType) irtypes.EnumType {
+func convertEnumType(vt analysis.EnumValueType) irtypes.EnumValueType {
 	if vt == analysis.EnumValueTypeInt {
-		return irtypes.EnumTypeInt
+		return irtypes.EnumValueTypeInt
 	}
-	return irtypes.EnumTypeString
+	return irtypes.EnumValueTypeString
 }
 
 func primitiveTypeRef(primitive irtypes.PrimitiveType) irtypes.TypeRef {
@@ -259,7 +287,7 @@ func convertAnnotations(annotations []*analysis.AnnotationRef, resolver *valueRe
 
 func inferConstTypeRef(
 	cnst *analysis.ConstSymbol,
-	value irtypes.Value,
+	value irtypes.LiteralValue,
 	types map[string]*analysis.TypeSymbol,
 	enums map[string]*analysis.EnumSymbol,
 ) irtypes.TypeRef {
@@ -284,18 +312,18 @@ func inferConstTypeRef(
 	return inferTypeRefFromValue(value)
 }
 
-func inferTypeRefFromValue(value irtypes.Value) irtypes.TypeRef {
+func inferTypeRefFromValue(value irtypes.LiteralValue) irtypes.TypeRef {
 	switch value.Kind {
-	case irtypes.ValueKindString:
+	case irtypes.LiteralKindString:
 		return primitiveTypeRef(irtypes.PrimitiveTypeString)
-	case irtypes.ValueKindInt:
+	case irtypes.LiteralKindInt:
 		return primitiveTypeRef(irtypes.PrimitiveTypeInt)
-	case irtypes.ValueKindFloat:
+	case irtypes.LiteralKindFloat:
 		return primitiveTypeRef(irtypes.PrimitiveTypeFloat)
-	case irtypes.ValueKindBool:
+	case irtypes.LiteralKindBool:
 		return primitiveTypeRef(irtypes.PrimitiveTypeBool)
 
-	case irtypes.ValueKindObject:
+	case irtypes.LiteralKindObject:
 		entries := value.GetObjectEntries()
 		fields := make([]irtypes.Field, 0, len(entries))
 		for _, entry := range entries {
@@ -308,7 +336,7 @@ func inferTypeRefFromValue(value irtypes.Value) irtypes.TypeRef {
 		}
 		return irtypes.TypeRef{Kind: irtypes.TypeKindObject, ObjectFields: &fields}
 
-	case irtypes.ValueKindArray:
+	case irtypes.LiteralKindArray:
 		items := value.GetArrayItems()
 		if len(items) == 0 {
 			dims := int64(1)
@@ -332,7 +360,7 @@ func inferTypeRefFromValue(value irtypes.Value) irtypes.TypeRef {
 type valueResolver struct {
 	consts      map[string]*analysis.ConstSymbol
 	enums       map[string]*analysis.EnumSymbol
-	constValues map[string]irtypes.Value
+	constValues map[string]irtypes.LiteralValue
 	resolving   map[string]bool
 }
 
@@ -340,22 +368,22 @@ func newValueResolver(program *analysis.Program) *valueResolver {
 	return &valueResolver{
 		consts:      program.Consts,
 		enums:       program.Enums,
-		constValues: make(map[string]irtypes.Value, len(program.Consts)),
+		constValues: make(map[string]irtypes.LiteralValue, len(program.Consts)),
 		resolving:   make(map[string]bool, len(program.Consts)),
 	}
 }
 
-func (r *valueResolver) resolveConstValue(name string) (irtypes.Value, bool) {
+func (r *valueResolver) resolveConstValue(name string) (irtypes.LiteralValue, bool) {
 	if v, ok := r.constValues[name]; ok {
 		return v, true
 	}
 	if r.resolving[name] {
-		return irtypes.Value{}, false
+		return irtypes.LiteralValue{}, false
 	}
 
 	cnst := r.consts[name]
 	if cnst == nil || cnst.AST == nil || cnst.AST.Value == nil {
-		return irtypes.Value{}, false
+		return irtypes.LiteralValue{}, false
 	}
 
 	r.resolving[name] = true
@@ -368,9 +396,9 @@ func (r *valueResolver) resolveConstValue(name string) (irtypes.Value, bool) {
 	return v, ok
 }
 
-func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Value, bool) {
+func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.LiteralValue, bool) {
 	if lit == nil {
-		return irtypes.Value{}, false
+		return irtypes.LiteralValue{}, false
 	}
 
 	if lit.Scalar != nil {
@@ -389,7 +417,7 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Value,
 					continue
 				}
 				spreadValue, ok := r.resolveConstValue(entry.Spread.Ref.Name)
-				if !ok || spreadValue.Kind != irtypes.ValueKindObject {
+				if !ok || spreadValue.Kind != irtypes.LiteralKindObject {
 					continue
 				}
 				entries = append(entries, spreadValue.GetObjectEntries()...)
@@ -403,14 +431,14 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Value,
 			entries = append(entries, irtypes.ObjectEntry{Key: entry.Key, Value: value})
 		}
 
-		return irtypes.Value{
-			Kind:          irtypes.ValueKindObject,
+		return irtypes.LiteralValue{
+			Kind:          irtypes.LiteralKindObject,
 			ObjectEntries: &entries,
 		}, true
 	}
 
 	if lit.Array != nil {
-		items := make([]irtypes.Value, 0, len(lit.Array.Elements))
+		items := make([]irtypes.LiteralValue, 0, len(lit.Array.Elements))
 		for _, element := range lit.Array.Elements {
 			value, ok := r.resolveDataLiteral(element)
 			if !ok {
@@ -419,41 +447,41 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Value,
 			items = append(items, value)
 		}
 
-		return irtypes.Value{
-			Kind:       irtypes.ValueKindArray,
+		return irtypes.LiteralValue{
+			Kind:       irtypes.LiteralKindArray,
 			ArrayItems: &items,
 		}, true
 	}
 
-	return irtypes.Value{}, false
+	return irtypes.LiteralValue{}, false
 }
 
-func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral) (irtypes.Value, bool) {
+func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral) (irtypes.LiteralValue, bool) {
 	if s.Str != nil {
 		value := string(*s.Str)
-		return irtypes.Value{Kind: irtypes.ValueKindString, StringValue: &value}, true
+		return irtypes.LiteralValue{Kind: irtypes.LiteralKindString, StringValue: &value}, true
 	}
 	if s.Int != nil {
 		n, err := strconv.ParseInt(*s.Int, 10, 64)
 		if err != nil {
-			return irtypes.Value{}, false
+			return irtypes.LiteralValue{}, false
 		}
-		return irtypes.Value{Kind: irtypes.ValueKindInt, IntValue: &n}, true
+		return irtypes.LiteralValue{Kind: irtypes.LiteralKindInt, IntValue: &n}, true
 	}
 	if s.Float != nil {
 		f, err := strconv.ParseFloat(*s.Float, 64)
 		if err != nil {
-			return irtypes.Value{}, false
+			return irtypes.LiteralValue{}, false
 		}
-		return irtypes.Value{Kind: irtypes.ValueKindFloat, FloatValue: &f}, true
+		return irtypes.LiteralValue{Kind: irtypes.LiteralKindFloat, FloatValue: &f}, true
 	}
 	if s.True {
 		b := true
-		return irtypes.Value{Kind: irtypes.ValueKindBool, BoolValue: &b}, true
+		return irtypes.LiteralValue{Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
 	}
 	if s.False {
 		b := false
-		return irtypes.Value{Kind: irtypes.ValueKindBool, BoolValue: &b}, true
+		return irtypes.LiteralValue{Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
 	}
 	if s.Ref != nil {
 		if s.Ref.Member == nil {
@@ -462,7 +490,7 @@ func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral) (irtypes.Valu
 		return lookupEnumMemberValue(r.enums, s.Ref.Name, *s.Ref.Member)
 	}
 
-	return irtypes.Value{}, false
+	return irtypes.LiteralValue{}, false
 }
 
 func normalizeDoc(raw *string) string {

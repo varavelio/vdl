@@ -2,6 +2,11 @@
   "constants": [
     {
       "name": "maxPageSize",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 32,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -14,6 +19,11 @@
     },
     {
       "name": "queryDefaults",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 34,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -62,17 +72,28 @@
   "enums": [
     {
       "name": "UserEventAction",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 27,
+        "column": 1
+      },
       "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "Created",
-          "value": "created",
+          "value": {
+            "kind": "string",
+            "stringValue": "created"
+          },
           "annotations": []
         },
         {
           "name": "Updated",
-          "value": "updated",
+          "value": {
+            "kind": "string",
+            "stringValue": "updated"
+          },
           "annotations": []
         }
       ]
@@ -81,6 +102,11 @@
   "types": [
     {
       "name": "PaginatedResponse",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 6,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -108,6 +134,11 @@
     },
     {
       "name": "PaginationParams",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -135,6 +166,11 @@
     },
     {
       "name": "User",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 11,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -171,6 +207,11 @@
     },
     {
       "name": "UserListResult",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 22,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -211,6 +252,11 @@
     },
     {
       "name": "UserQuery",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+        "line": 17,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",

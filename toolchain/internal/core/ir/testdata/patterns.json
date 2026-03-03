@@ -3,6 +3,11 @@
     {
       "name": "sessionCacheKey",
       "doc": "Cache key template for sessions.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
+        "line": 5,
+        "column": 1
+      },
       "annotations": [
         {
           "name": "cacheTemplate"
@@ -20,6 +25,11 @@
     {
       "name": "simpleKey",
       "doc": "Simple key template.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
+        "line": 9,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -33,6 +43,11 @@
     {
       "name": "userEventSubject",
       "doc": "Subject template for user events.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [
         {
           "name": "topicTemplate"

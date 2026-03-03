@@ -4,6 +4,11 @@
   "types": [
     {
       "name": "OptionalFields",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/basic_types.vdl",
+        "line": 11,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -40,6 +45,11 @@
     },
     {
       "name": "SimpleType",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/basic_types.vdl",
+        "line": 3,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -95,7 +105,12 @@
   ],
   "docs": [
     {
-      "content": "Basic types test schema."
+      "content": "Basic types test schema.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/basic_types.vdl",
+        "line": 1,
+        "column": 1
+      }
     }
   ]
 }

@@ -4,27 +4,44 @@
     {
       "name": "HttpMethod",
       "doc": "HTTP methods with explicit string values.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
+        "line": 18,
+        "column": 1
+      },
       "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "Get",
-          "value": "GET",
+          "value": {
+            "kind": "string",
+            "stringValue": "GET"
+          },
           "annotations": []
         },
         {
           "name": "Post",
-          "value": "POST",
+          "value": {
+            "kind": "string",
+            "stringValue": "POST"
+          },
           "annotations": []
         },
         {
           "name": "Put",
-          "value": "PUT",
+          "value": {
+            "kind": "string",
+            "stringValue": "PUT"
+          },
           "annotations": []
         },
         {
           "name": "Delete",
-          "value": "DELETE",
+          "value": {
+            "kind": "string",
+            "stringValue": "DELETE"
+          },
           "annotations": []
         }
       ]
@@ -32,32 +49,52 @@
     {
       "name": "OrderStatus",
       "doc": "Order status enum with implicit string values.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "Pending",
-          "value": "Pending",
+          "value": {
+            "kind": "string",
+            "stringValue": "Pending"
+          },
           "annotations": []
         },
         {
           "name": "Processing",
-          "value": "Processing",
+          "value": {
+            "kind": "string",
+            "stringValue": "Processing"
+          },
           "annotations": []
         },
         {
           "name": "Shipped",
-          "value": "Shipped",
+          "value": {
+            "kind": "string",
+            "stringValue": "Shipped"
+          },
           "annotations": []
         },
         {
           "name": "Delivered",
-          "value": "Delivered",
+          "value": {
+            "kind": "string",
+            "stringValue": "Delivered"
+          },
           "annotations": []
         },
         {
           "name": "Cancelled",
-          "value": "Cancelled",
+          "value": {
+            "kind": "string",
+            "stringValue": "Cancelled"
+          },
           "annotations": []
         }
       ]
@@ -65,27 +102,44 @@
     {
       "name": "Priority",
       "doc": "Priority levels with explicit int values.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
+        "line": 10,
+        "column": 1
+      },
       "annotations": [],
       "enumType": "int",
       "members": [
         {
           "name": "Low",
-          "value": "1",
+          "value": {
+            "kind": "int",
+            "intValue": 1
+          },
           "annotations": []
         },
         {
           "name": "Medium",
-          "value": "2",
+          "value": {
+            "kind": "int",
+            "intValue": 2
+          },
           "annotations": []
         },
         {
           "name": "High",
-          "value": "3",
+          "value": {
+            "kind": "int",
+            "intValue": 3
+          },
           "annotations": []
         },
         {
           "name": "Critical",
-          "value": "10",
+          "value": {
+            "kind": "int",
+            "intValue": 10
+          },
           "annotations": []
         }
       ]
@@ -94,6 +148,11 @@
   "types": [
     {
       "name": "Order",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
+        "line": 26,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",

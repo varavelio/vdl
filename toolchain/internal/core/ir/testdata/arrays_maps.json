@@ -4,6 +4,11 @@
   "types": [
     {
       "name": "Combined",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
+        "line": 18,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -45,6 +50,11 @@
     },
     {
       "name": "Item",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -63,6 +73,11 @@
     },
     {
       "name": "WithArrays",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
+        "line": 5,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -124,6 +139,11 @@
     },
     {
       "name": "WithMaps",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
+        "line": 12,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",

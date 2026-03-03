@@ -2,6 +2,11 @@
   "constants": [
     {
       "name": "emptyString",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 55,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -14,6 +19,11 @@
     },
     {
       "name": "matrix",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 56,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "array",
@@ -57,6 +67,11 @@
     },
     {
       "name": "nestedObj",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 57,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -123,6 +138,11 @@
     },
     {
       "name": "zeroInt",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 54,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -137,17 +157,28 @@
   "enums": [
     {
       "name": "Status",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 42,
+        "column": 1
+      },
       "annotations": [],
       "enumType": "string",
       "members": [
         {
           "name": "On",
-          "value": "On",
+          "value": {
+            "kind": "string",
+            "stringValue": "On"
+          },
           "annotations": []
         },
         {
           "name": "Off",
-          "value": "Off",
+          "value": {
+            "kind": "string",
+            "stringValue": "Off"
+          },
           "annotations": []
         }
       ]
@@ -156,6 +187,11 @@
   "types": [
     {
       "name": "DeepInline",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 12,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -204,6 +240,11 @@
     },
     {
       "name": "EmptyType",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 5,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -212,6 +253,11 @@
     },
     {
       "name": "EnumsEverywhere",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 47,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -272,6 +318,11 @@
     },
     {
       "name": "InlineWithSpread",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 35,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -309,6 +360,11 @@
     },
     {
       "name": "OptionalComplex",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 22,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -374,6 +430,11 @@
     },
     {
       "name": "SingleField",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 8,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -392,6 +453,11 @@
     },
     {
       "name": "SpreadBase",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 31,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -411,7 +477,12 @@
   ],
   "docs": [
     {
-      "content": "Edge case schema for IR conversion."
+      "content": "Edge case schema for IR conversion.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+        "line": 1,
+        "column": 1
+      }
     }
   ]
 }

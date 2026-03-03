@@ -98,10 +98,10 @@ func expandEnumMembers(
 func lookupEnumMemberValue(
 	enums map[string]*analysis.EnumSymbol,
 	enumName, memberName string,
-) (irtypes.Value, bool) {
+) (irtypes.LiteralValue, bool) {
 	enum := enums[enumName]
 	if enum == nil {
-		return irtypes.Value{}, false
+		return irtypes.LiteralValue{}, false
 	}
 
 	members := expandEnumMembers(enum, enums, map[string]bool{})
@@ -113,21 +113,21 @@ func lookupEnumMemberValue(
 		if enum.ValueType == analysis.EnumValueTypeInt {
 			n, err := strconv.ParseInt(m.Value, 10, 64)
 			if err != nil {
-				return irtypes.Value{}, false
+				return irtypes.LiteralValue{}, false
 			}
-			return irtypes.Value{
-				Kind:     irtypes.ValueKindInt,
+			return irtypes.LiteralValue{
+				Kind:     irtypes.LiteralKindInt,
 				IntValue: irtypes.Ptr(n),
 			}, true
 		}
 
-		return irtypes.Value{
-			Kind:        irtypes.ValueKindString,
+		return irtypes.LiteralValue{
+			Kind:        irtypes.LiteralKindString,
 			StringValue: irtypes.Ptr(m.Value),
 		}, true
 	}
 
-	return irtypes.Value{}, false
+	return irtypes.LiteralValue{}, false
 }
 
 func cloneVisited(src map[string]bool) map[string]bool {

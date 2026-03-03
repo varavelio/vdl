@@ -3,6 +3,11 @@
     {
       "name": "apiVersion",
       "doc": "API version string.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 5,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -15,6 +20,11 @@
     },
     {
       "name": "baseConfig",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 19,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
@@ -61,6 +71,11 @@
     },
     {
       "name": "defaultLimit",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 17,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -74,6 +89,11 @@
     {
       "name": "defaultTaxRate",
       "doc": "Default tax rate.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 8,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -87,6 +107,11 @@
     {
       "name": "featureNewUi",
       "doc": "Feature flag for new UI.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 11,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -100,6 +125,11 @@
     {
       "name": "legacyMode",
       "doc": "Legacy mode disabled.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 14,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "primitive",
@@ -113,6 +143,11 @@
     {
       "name": "maxPageSize",
       "doc": "Maximum items per page.",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 1,
+        "column": 1
+      },
       "annotations": [
         {
           "name": "config"
@@ -129,6 +164,11 @@
     },
     {
       "name": "prodConfig",
+      "position": {
+        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+        "line": 24,
+        "column": 1
+      },
       "annotations": [],
       "typeRef": {
         "kind": "object",
