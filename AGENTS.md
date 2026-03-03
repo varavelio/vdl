@@ -101,6 +101,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Discover commands**: `task --list-all`
 - **Core verification**: `task test`, `task lint`, `task format`
+- **Build**: `task build`
 - **Dependencies**: `task deps`
 - **Codegen workflow**: `task codegen`
 - **Install local CLI**: `task tc:install`
@@ -110,5 +111,4 @@ When updating this document, do so with the context of the entire document in mi
 
 ### Current Caveats
 
-- `task ci` references a `build` task not currently defined in the root `Taskfile.yml`; verify CI task wiring before relying on it locally.
 - `task tc:build:wasm` exists in `Taskfile.yml`, but the corresponding `toolchain/cmd/vdlwasm` entrypoint is currently absent.
