@@ -1,0 +1,179 @@
+package formatter
+
+import (
+	"strings"
+
+	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
+)
+
+func formatTypeName(name string) string {
+	if isPrimitiveName(name) {
+		return name
+	}
+	return strutil.ToPascalCase(name)
+}
+
+func isPrimitiveName(name string) bool {
+	switch name {
+	case "string", "int", "float", "bool", "datetime":
+		return true
+	default:
+		return false
+	}
+}
+
+func renderFieldType(ft fieldTypeNode) string {
+	base := ""
+	switch {
+	case ft.Named != nil:
+		base = formatTypeName(*ft.Named)
+	case ft.Map != nil:
+		base = "map[" + renderFieldType(*ft.Map) + "]"
+	case ft.Obj != nil:
+		base = renderObjectType(*ft.Obj)
+	}
+	for i := 0; i < ft.Dims; i++ {
+		base += "[]"
+	}
+	return base
+}
+
+func renderObjectType(obj objectTypeNode) string {
+	if len(obj.Members) == 0 {
+		return "{}"
+	}
+	w := newFmtWriter()
+	w.line("{")
+	w.indent++
+	for i, m := range obj.Members {
+		if i > 0 && shouldBreakTypeMembers(obj.Members[i-1], m) {
+			w.blank()
+		}
+		printTypeMember(w, m)
+	}
+	w.indent--
+	w.line("}")
+	return strings.TrimSuffix(w.String(), "\n")
+}
+
+func renderLiteral(l literalNode, ctx literalRenderCtx) string {
+	if l.Obj != nil {
+		return renderObjectLiteral(*l.Obj, ctx)
+	}
+	if l.Array != nil {
+		return renderArrayLiteral(*l.Array, ctx)
+	}
+	if l.Scalar != nil {
+		return renderScalar(*l.Scalar, ctx)
+	}
+	return ""
+}
+
+func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
+	if len(o.Entries) == 0 {
+		return "{}"
+	}
+	if len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil {
+		e := o.Entries[0]
+		if e.Value != nil && e.Value.Scalar != nil {
+			return "{ " + strutil.ToCamelCase(e.Key) + " " + renderLiteral(*e.Value, ctx) + " }"
+		}
+	}
+
+	w := newFmtWriter()
+	w.line("{")
+	w.indent++
+	for _, e := range o.Entries {
+		switch {
+		case e.Comment != nil:
+			w.line(e.Comment.Text)
+		case e.Spread != nil:
+			w.line("..." + renderReference(*e.Spread, ctx.spreadRef))
+		default:
+			key := strutil.ToCamelCase(e.Key)
+			val := renderLiteral(*e.Value, ctx)
+			if !strings.Contains(val, "\n") {
+				w.line(key + " " + val)
+				continue
+			}
+			lines := strings.Split(val, "\n")
+			w.line(key + " " + lines[0])
+			for i := 1; i < len(lines); i++ {
+				w.line(lines[i])
+			}
+		}
+	}
+	w.indent--
+	w.line("}")
+	return strings.TrimSuffix(w.String(), "\n")
+}
+
+func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
+	if len(a.Elements) == 0 {
+		return "[]"
+	}
+	parts := make([]string, 0, len(a.Elements))
+	hasMultiline := false
+	for _, e := range a.Elements {
+		if e.Comment != nil {
+			continue
+		}
+		rendered := renderLiteral(*e.Value, ctx)
+		hasMultiline = hasMultiline || strings.Contains(rendered, "\n")
+		parts = append(parts, rendered)
+	}
+	if !hasMultiline {
+		return "[" + strings.Join(parts, " ") + "]"
+	}
+
+	w := newFmtWriter()
+	w.line("[")
+	w.indent++
+	for _, part := range parts {
+		if !strings.Contains(part, "\n") {
+			w.line(part)
+			continue
+		}
+		for _, line := range strings.Split(part, "\n") {
+			w.line(line)
+		}
+	}
+	w.indent--
+	w.line("]")
+	return strings.TrimSuffix(w.String(), "\n")
+}
+
+func renderScalar(s scalarLiteralNode, ctx literalRenderCtx) string {
+	switch {
+	case s.Str != nil:
+		return `"` + strutil.EscapeQuotes(*s.Str) + `"`
+	case s.Float != nil:
+		return *s.Float
+	case s.Int != nil:
+		return *s.Int
+	case s.True:
+		return "true"
+	case s.False:
+		return "false"
+	case s.Ref != nil && s.Ref.Member != nil:
+		return renderReference(*s.Ref, ctx.enumMemberRef)
+	case s.Ref != nil:
+		return renderReference(*s.Ref, ctx.scalarRef)
+	default:
+		return ""
+	}
+}
+
+func renderReference(r referenceNode, c refCase) string {
+	name := r.Name
+	switch c {
+	case refTypeDecl, refEnumDecl:
+		name = strutil.ToPascalCase(name)
+	case refConstDecl:
+		name = strutil.ToCamelCase(name)
+	}
+	if r.Member != nil {
+		return strutil.ToPascalCase(name) + "." + strutil.ToPascalCase(*r.Member)
+	}
+	return name
+}
