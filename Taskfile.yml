@@ -7,11 +7,6 @@
 # versions different from those in package.json are not downloaded. #
 #####################################################################
 
-###############################################################################
-# BUILD PIPELINE:                                                             #
-### Install deps -> Build WASM binary -> Build Playground -> Build VDL binary #
-###############################################################################
-
 version: "3"
 
 tasks:
@@ -42,15 +37,7 @@ tasks:
     cmds:
       - npm install
       - cd ./toolchain && go mod download
-      - cd ./playground && npm install
       - cd ./docs && npm install
-
-  build:
-    desc: "Build everything for current system (WASM, Playground, and VDL CLI)"
-    cmds:
-      - task: tc:build:wasm # <- Required by the playground
-      - task: pg:build # <- Required by the final VDL binary
-      - task: tc:install
 
   codegen:
     desc: "Run all code generators"
@@ -67,11 +54,10 @@ tasks:
       - dprint fmt --config ./dprint.json --log-level warn
 
   test:
-    desc: "Run all tests (Toolchain, Toolchain E2E and Playground)"
+    desc: "Run all tests"
     cmds:
       - cd ./toolchain && go test ./...
       - cd ./toolchain && go test -race ./...
-      - cd ./playground && npx --no vitest run
 
   lint:
     desc: "Lint all code"
@@ -85,8 +71,6 @@ tasks:
           echo "$UNFORMATTED"
           exit 1
         fi
-      - cd ./playground && npx --no svelte-kit sync
-      - cd ./playground && npx --no svelte-check --tsconfig ./tsconfig.json
       - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - dprint check --config ./dprint.json --log-level warn
 
@@ -100,31 +84,11 @@ tasks:
     cmd: go install ./cmd/vdl/.
 
   tc:build:wasm:
-    desc: "Toolchain: Build WASM binary for Playground"
+    desc: "Toolchain: Build WASM binary and copy wasm_exec.js"
     dir: ./toolchain
     cmds:
       - GOOS=js GOARCH=wasm go build -o ./dist/vdl.wasm ./cmd/vdlwasm/.
       - cp "/usr/local/go/lib/wasm/wasm_exec.js" ./dist/wasm_exec.js
-
-  ####################
-  # PLAYGROUND TASKS #
-  ####################
-
-  pg:dev:
-    desc: "Playground: Start Vite dev server"
-    dir: ./playground
-    deps:
-      - tc:build:wasm
-    cmd: npx --no vite dev
-
-  pg:build:
-    desc: "Playground: Build static assets for embedding"
-    dir: ./playground
-    deps:
-      - tc:build:wasm
-    cmds:
-      - npx --no vite build
-      - node ./postbuild.ts
 
   ##########################
   # VSCODE EXTENSION TASKS #

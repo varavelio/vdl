@@ -22,24 +22,6 @@ targets:
       filename: ir.vdl
 
   - go:
-      schema: ./schemas/config.vdl
-      output: ./toolchain/internal/codegen/config/configtypes
-      clean: true
-      package: configtypes
-
-  - jsonschema:
-      schema: ./schemas/config.vdl
-      output: ./docs/public/schemas/v0
-      filename: config.schema.json
-      id: https://vdl.varavel.com/schemas/v0/config.schema.json
-      root: VdlCodegenConfig
-
-  - vdl:
-      schema: ./schemas/config.vdl
-      output: ./docs/public/schemas/v0
-      filename: config.vdl
-
-  - go:
       schema: ./schemas/plugin.vdl
       output: ./toolchain/internal/codegen/plugin/plugintypes
       clean: true
@@ -68,14 +50,3 @@ targets:
       schema: ./schemas/pluginOutput.vdl
       output: ./docs/public/schemas/v0
       filename: pluginOutput.vdl
-
-  - go:
-      schema: ./schemas/wasm.vdl
-      output: ./toolchain/internal/wasm/wasmtypes
-      clean: true
-      package: wasmtypes
-
-  - typescript:
-      schema: ./schemas/wasm.vdl
-      output: ./playground/src/lib/wasm/wasmtypes
-      clean: true
