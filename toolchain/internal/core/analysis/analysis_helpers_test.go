@@ -282,7 +282,9 @@ func applyAssertion(t *testing.T, a goldenAssertion, program *analysis.Program, 
 	case assertTypeSpread:
 		requireArgs(2)
 		typ := getType(t, program, a.Args[0])
-		for _, s := range typ.Spreads {
+		require.True(t, typ.IsObject(), "type %q is not an object type", a.Args[0])
+		require.NotNil(t, typ.Type.ObjectDef, "type %q has no object definition", a.Args[0])
+		for _, s := range typ.Type.ObjectDef.Spreads {
 			if s.Name == a.Args[1] {
 				return
 			}
@@ -365,7 +367,9 @@ func getConst(t *testing.T, program *analysis.Program, name string) *analysis.Co
 func getTypeField(t *testing.T, program *analysis.Program, typeName, fieldName string) *analysis.FieldSymbol {
 	t.Helper()
 	typ := getType(t, program, typeName)
-	for _, f := range typ.Fields {
+	require.True(t, typ.IsObject(), "type %q is not an object type", typeName)
+	require.NotNil(t, typ.Type.ObjectDef, "type %q has no object definition", typeName)
+	for _, f := range typ.Type.ObjectDef.Fields {
 		if f.Name == fieldName {
 			return f
 		}

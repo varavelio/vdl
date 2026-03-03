@@ -8,13 +8,121 @@ import (
 )
 
 // validateTypes checks that all type references point to existing types.
-// This includes field types in type declarations, inline objects, and map values.
+// This includes type expressions (non-object types), object type fields, inline objects, and map values.
 func validateTypes(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
-	// Check type fields
 	for _, typ := range symbols.types {
-		diagnostics = append(diagnostics, validateFieldTypes(symbols, typ.Fields, "type", typ.Name)...)
+		if typ.Type == nil {
+			continue
+		}
+		diagnostics = append(diagnostics, validateTypeRef(symbols, typ)...)
+	}
+
+	return diagnostics
+}
+
+// validateTypeRef validates the type reference of a TypeSymbol.
+func validateTypeRef(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
+	typeInfo := typ.Type
+	if typeInfo == nil {
+		return nil
+	}
+
+	var diagnostics []Diagnostic
+
+	switch typeInfo.Kind {
+	case FieldTypeKindPrimitive:
+		// Primitive types are always valid
+
+	case FieldTypeKindCustom:
+		typeSym := symbols.lookupType(typeInfo.Name)
+		enumSym := symbols.lookupEnum(typeInfo.Name)
+
+		if typeSym != nil {
+			typeInfo.ResolvedType = typeSym
+		} else if enumSym != nil {
+			typeInfo.ResolvedEnum = enumSym
+		} else {
+			msg := fmt.Sprintf(
+				"undefined type %q in type %q",
+				typeInfo.Name, typ.Name,
+			)
+			suggestions, _ := strutil.FuzzySearch(symbols.allFieldTypeNames(), typeInfo.Name)
+			if len(suggestions) > 0 {
+				msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
+			}
+			diagnostics = append(diagnostics, newDiagnostic(
+				typ.File,
+				typ.Pos,
+				typ.EndPos,
+				CodeTypeNotDeclared,
+				msg,
+			))
+		}
+
+	case FieldTypeKindMap:
+		if typeInfo.MapValue != nil {
+			diagnostics = append(diagnostics, validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
+		}
+
+	case FieldTypeKindObject:
+		// Validate object type field references
+		if typeInfo.ObjectDef != nil {
+			diagnostics = append(diagnostics, validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "type", typ.Name)...)
+		}
+	}
+
+	return diagnostics
+}
+
+// validateNestedTypeRef validates type references within nested types (e.g., map values).
+func validateNestedTypeRef(symbols *symbolTable, typeInfo *FieldTypeInfo, typ *TypeSymbol) []Diagnostic {
+	if typeInfo == nil {
+		return nil
+	}
+
+	var diagnostics []Diagnostic
+
+	switch typeInfo.Kind {
+	case FieldTypeKindPrimitive:
+		// Always valid
+
+	case FieldTypeKindCustom:
+		typeSym := symbols.lookupType(typeInfo.Name)
+		enumSym := symbols.lookupEnum(typeInfo.Name)
+
+		if typeSym != nil {
+			typeInfo.ResolvedType = typeSym
+		} else if enumSym != nil {
+			typeInfo.ResolvedEnum = enumSym
+		} else {
+			msg := fmt.Sprintf(
+				"undefined type %q in type %q",
+				typeInfo.Name, typ.Name,
+			)
+			suggestions, _ := strutil.FuzzySearch(symbols.allFieldTypeNames(), typeInfo.Name)
+			if len(suggestions) > 0 {
+				msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
+			}
+			diagnostics = append(diagnostics, newDiagnostic(
+				typ.File,
+				typ.Pos,
+				typ.EndPos,
+				CodeTypeNotDeclared,
+				msg,
+			))
+		}
+
+	case FieldTypeKindMap:
+		if typeInfo.MapValue != nil {
+			diagnostics = append(diagnostics, validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
+		}
+
+	case FieldTypeKindObject:
+		if typeInfo.ObjectDef != nil {
+			diagnostics = append(diagnostics, validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "inline object in type", typ.Name)...)
+		}
 	}
 
 	return diagnostics
@@ -95,6 +203,11 @@ func validateFieldType(symbols *symbolTable, typeInfo *FieldTypeInfo, field *Fie
 
 // buildFieldTypeInfo converts an AST FieldType to a FieldTypeInfo.
 func buildFieldTypeInfo(ft *ast.FieldType) *FieldTypeInfo {
+	return buildFieldTypeInfoWithFile(ft, "")
+}
+
+// buildFieldTypeInfoWithFile converts an AST FieldType to a FieldTypeInfo with a file path for diagnostics.
+func buildFieldTypeInfoWithFile(ft *ast.FieldType, file string) *FieldTypeInfo {
 	if ft == nil || ft.Base == nil {
 		return nil
 	}
@@ -113,17 +226,17 @@ func buildFieldTypeInfo(ft *ast.FieldType) *FieldTypeInfo {
 		info.Name = name
 	} else if ft.Base.Map != nil {
 		info.Kind = FieldTypeKindMap
-		info.MapValue = buildFieldTypeInfo(ft.Base.Map.ValueType)
+		info.MapValue = buildFieldTypeInfoWithFile(ft.Base.Map.ValueType, file)
 	} else if ft.Base.Object != nil {
 		info.Kind = FieldTypeKindObject
-		info.ObjectDef = buildInlineObject(ft.Base.Object)
+		info.ObjectDef = buildInlineObjectWithFile(ft.Base.Object, file)
 	}
 
 	return info
 }
 
-// buildInlineObject converts an AST FieldTypeObject to an InlineObject.
-func buildInlineObject(obj *ast.FieldTypeObject) *InlineObject {
+// buildInlineObjectWithFile converts an AST FieldTypeObject to an InlineObject with a file path for diagnostics.
+func buildInlineObjectWithFile(obj *ast.FieldTypeObject, file string) *InlineObject {
 	if obj == nil {
 		return nil
 	}
@@ -135,7 +248,7 @@ func buildInlineObject(obj *ast.FieldTypeObject) *InlineObject {
 
 	for _, child := range obj.Members {
 		if child.Field != nil {
-			inline.Fields = append(inline.Fields, buildFieldSymbol(child.Field, ""))
+			inline.Fields = append(inline.Fields, buildFieldSymbol(child.Field, file))
 		}
 		if child.Spread != nil {
 			inline.Spreads = append(inline.Spreads, &SpreadRef{

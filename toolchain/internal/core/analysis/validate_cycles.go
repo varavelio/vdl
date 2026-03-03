@@ -51,15 +51,12 @@ func findTypeCycle(symbols *symbolTable, typeName string, visited []string, hasO
 
 	newVisited := append(visited, typeName)
 
-	// Check all fields for type references
-	for _, field := range typ.Fields {
-		fieldOptional := hasOptional || field.Optional
-		if cycle := findFieldTypeCycle(symbols, field.Type, newVisited, fieldOptional); cycle != nil {
-			return cycle
-		}
+	// Follow the type's reference for cycles
+	if typ.Type == nil {
+		return nil
 	}
 
-	return nil
+	return findFieldTypeCycle(symbols, typ.Type, newVisited, hasOptional)
 }
 
 // findFieldTypeCycle checks a field type for cycles.

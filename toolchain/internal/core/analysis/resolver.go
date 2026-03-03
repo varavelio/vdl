@@ -159,7 +159,7 @@ func (r *resolver) resolveDocstrings(schema *ast.Schema, filePath string) {
 		if typeDecl.Docstring != nil {
 			r.resolveDocstring(typeDecl.Docstring, filePath)
 		}
-		r.resolveTypeMemberDocstrings(typeDecl.Members, filePath)
+		r.resolveTypeMemberDocstrings(typeDecl.Members(), filePath)
 	}
 
 	// Const docstrings

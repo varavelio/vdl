@@ -14,9 +14,11 @@ func validateStructure(symbols *symbolTable) []Diagnostic {
 
 	// Validate type field uniqueness
 	for _, typ := range symbols.types {
-		diagnostics = append(diagnostics, validateFieldUniqueness(typ.Fields, "type", typ.Name, typ.File)...)
-		for _, field := range typ.Fields {
-			diagnostics = append(diagnostics, validateInlineFieldUniqueness(field.Type, typ.File, field.Name)...)
+		if typ.IsObject() && typ.Type.ObjectDef != nil {
+			diagnostics = append(diagnostics, validateFieldUniqueness(typ.Type.ObjectDef.Fields, "type", typ.Name, typ.File)...)
+			for _, field := range typ.Type.ObjectDef.Fields {
+				diagnostics = append(diagnostics, validateInlineFieldUniqueness(field.Type, typ.File, field.Name)...)
+			}
 		}
 	}
 

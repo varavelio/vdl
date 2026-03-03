@@ -48,11 +48,18 @@ type AnnotationRef struct {
 }
 
 // TypeSymbol represents a type declaration in the global namespace.
+// A type IS its type reference, it can be a primitive, custom type, map, array, or object.
+// This unified model eliminates the alias/object duality: all type declarations
+// produce a single Type field describing what the type IS.
 type TypeSymbol struct {
 	Symbol
-	AST     *ast.TypeDecl  // Original AST node
-	Fields  []*FieldSymbol // Direct fields (not expanded from spreads)
-	Spreads []*SpreadRef   // Spread references for validation
+	AST  *ast.TypeDecl  // Original AST node
+	Type *FieldTypeInfo // What this type IS (primitive, custom, map, array, or object with fields/spreads)
+}
+
+// IsObject returns true if this type has an object body (fields and/or spreads).
+func (t *TypeSymbol) IsObject() bool {
+	return t.Type != nil && t.Type.Kind == FieldTypeKindObject
 }
 
 // FieldSymbol represents a field within a type or inline object.

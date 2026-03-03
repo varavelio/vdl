@@ -88,6 +88,7 @@ func (v *validator) buildTypeSymbol(decl *ast.TypeDecl, file string) *TypeSymbol
 		docstring = &s
 	}
 
+	ft := decl.Type()
 	typ := &TypeSymbol{
 		Symbol: Symbol{
 			Name:        decl.Name,
@@ -97,24 +98,8 @@ func (v *validator) buildTypeSymbol(decl *ast.TypeDecl, file string) *TypeSymbol
 			Docstring:   docstring,
 			Annotations: buildAnnotationRefs(decl.Annotations),
 		},
-		AST:     decl,
-		Fields:  []*FieldSymbol{},
-		Spreads: []*SpreadRef{},
-	}
-
-	// Process members
-	for _, child := range decl.Members {
-		if child.Field != nil {
-			typ.Fields = append(typ.Fields, buildFieldSymbol(child.Field, file))
-		}
-		if child.Spread != nil {
-			typ.Spreads = append(typ.Spreads, &SpreadRef{
-				Name:   child.Spread.Ref.Name,
-				Member: child.Spread.Ref.Member,
-				Pos:    child.Spread.Pos,
-				EndPos: child.Spread.EndPos,
-			})
-		}
+		AST:  decl,
+		Type: buildFieldTypeInfoWithFile(&ft, file),
 	}
 
 	return typ

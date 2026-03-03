@@ -26,7 +26,10 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 				fmt.Sprintf("type name %q must be in PascalCase", typ.Name),
 			))
 		}
-		diagnostics = append(diagnostics, validateFieldNaming(typ.Fields, "type", typ.Name)...)
+		// Validate field naming for object types
+		if typ.IsObject() && typ.Type.ObjectDef != nil {
+			diagnostics = append(diagnostics, validateFieldNaming(typ.Type.ObjectDef.Fields, "type", typ.Name)...)
+		}
 		diagnostics = append(diagnostics, validateAnnotationNaming(typ.Annotations, typ.File, "type", typ.Name)...)
 	}
 
