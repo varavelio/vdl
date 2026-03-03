@@ -597,9 +597,9 @@ func TestParserTypeDecl(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "MyType",
-			Members: []*ast.TypeMember{{
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{{
 				Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}},
-			}},
+			}}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -619,9 +619,9 @@ func TestParserTypeDecl(t *testing.T) {
 			Docstring:   &ast.Docstring{Value: " My type description "},
 			Annotations: []*ast.Annotation{{Name: "entity"}},
 			Name:        "MyType",
-			Members: []*ast.TypeMember{{
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{{
 				Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}},
-			}},
+			}}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -643,8 +643,8 @@ func TestParserTypeDecl(t *testing.T) {
 		require.Len(t, parsed.Declarations, 1)
 		typeDecl := parsed.Declarations[0].Type
 		require.Equal(t, "MyType", typeDecl.Name)
-		require.Len(t, typeDecl.Members, 6)
-		require.True(t, typeDecl.Members[5].Field.Optional)
+		require.Len(t, typeDecl.Members(), 6)
+		require.True(t, typeDecl.Members()[5].Field.Optional)
 	})
 
 	t.Run("Type with arrays and multidimensional arrays", func(t *testing.T) {
@@ -659,10 +659,10 @@ func TestParserTypeDecl(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "MyType",
-			Members: []*ast.TypeMember{
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
 				{Field: &ast.Field{Name: "tags", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}, Dimensions: 1}}},
 				{Field: &ast.Field{Name: "scores", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("int")}, Dimensions: 2}}},
-			},
+			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -681,8 +681,8 @@ func TestParserTypeDecl(t *testing.T) {
 
 		require.Len(t, parsed.Declarations, 1)
 		typeDecl := parsed.Declarations[0].Type
-		require.Len(t, typeDecl.Members, 1)
-		location := typeDecl.Members[0].Field
+		require.Len(t, typeDecl.Members(), 1)
+		location := typeDecl.Members()[0].Field
 		require.Equal(t, "location", location.Name)
 		require.NotNil(t, location.Type.Base.Object)
 		require.Len(t, location.Type.Base.Object.Members, 2)
@@ -700,10 +700,10 @@ func TestParserTypeDecl(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "MyType",
-			Members: []*ast.TypeMember{
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
 				{Field: &ast.Field{Name: "counts", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: new("int")}}}}}}},
 				{Field: &ast.Field{Name: "users", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: new("User")}}}}}}},
-			},
+			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -721,10 +721,10 @@ func TestParserTypeDecl(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "Article",
-			Members: []*ast.TypeMember{
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
 				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "AuditMetadata"}}},
 				{Field: &ast.Field{Annotations: []*ast.Annotation{{Name: "title"}}, Name: "heading", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}},
-			},
+			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -753,8 +753,8 @@ func TestParserTypeDecl(t *testing.T) {
 		require.Equal(t, "Chat", rpcType.Name)
 		require.Len(t, rpcType.Annotations, 1)
 		require.Equal(t, "rpc", rpcType.Annotations[0].Name)
-		require.Len(t, rpcType.Members, 1)
-		sendMessage := rpcType.Members[0].Field
+		require.Len(t, rpcType.Members(), 1)
+		sendMessage := rpcType.Members()[0].Field
 		require.Equal(t, "SendMessage", sendMessage.Name)
 		require.Len(t, sendMessage.Annotations, 1)
 		require.Equal(t, "proc", sendMessage.Annotations[0].Name)
@@ -801,7 +801,7 @@ func TestParserDocstrings(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
 			{Docstring: &ast.Docstring{Value: " This is standalone "}},
-			{Type: &ast.TypeDecl{Name: "MyType", Members: []*ast.TypeMember{{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}}}}},
+			{Type: &ast.TypeDecl{Name: "MyType", Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}}}}}}},
 		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -829,7 +829,7 @@ func TestParserEdgeCases(t *testing.T) {
 		require.NoError(t, err)
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
-			{Type: &ast.TypeDecl{Name: "EmptyType", Members: nil}},
+			{Type: &ast.TypeDecl{Name: "EmptyType", Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{}}}},
 			{Enum: &ast.EnumDecl{Name: "EmptyEnum", Members: nil}},
 		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -850,7 +850,7 @@ func TestParserEdgeCases(t *testing.T) {
 
 		require.Len(t, parsed.Declarations, 1)
 		require.Equal(t, "Deep", parsed.Declarations[0].Type.Name)
-		require.NotNil(t, parsed.Declarations[0].Type.Members[0].Field.Type.Base.Object)
+		require.NotNil(t, parsed.Declarations[0].Type.Members()[0].Field.Type.Base.Object)
 	})
 
 	t.Run("Array of inline objects", func(t *testing.T) {
@@ -865,7 +865,7 @@ func TestParserEdgeCases(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, parsed.Declarations, 1)
-		items := parsed.Declarations[0].Type.Members[0].Field
+		items := parsed.Declarations[0].Type.Members()[0].Field
 		require.Equal(t, ast.ArrayDimensions(1), items.Type.Dimensions)
 		require.NotNil(t, items.Type.Base.Object)
 	})
@@ -880,7 +880,7 @@ func TestParserEdgeCases(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, parsed.Declarations, 1)
-		field := parsed.Declarations[0].Type.Members[0].Field
+		field := parsed.Declarations[0].Type.Members()[0].Field
 		require.NotNil(t, field.Type.Base.Map)
 		require.Equal(t, ast.ArrayDimensions(1), field.Type.Base.Map.ValueType.Dimensions)
 	})
@@ -893,7 +893,7 @@ func TestParserEdgeCases(t *testing.T) {
 		`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
-		require.Equal(t, "User", *parsed.Declarations[0].Type.Members[0].Field.Type.Base.Named)
+		require.Equal(t, "User", *parsed.Declarations[0].Type.Members()[0].Field.Type.Base.Named)
 	})
 }
 
@@ -911,10 +911,10 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 		require.NoError(t, err)
 
 		typeDecl := parsed.Declarations[0].Type
-		require.Equal(t, ast.ArrayDimensions(0), typeDecl.Members[0].Field.Type.Dimensions)
-		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Members[1].Field.Type.Dimensions)
-		require.Equal(t, ast.ArrayDimensions(2), typeDecl.Members[2].Field.Type.Dimensions)
-		require.Equal(t, ast.ArrayDimensions(3), typeDecl.Members[3].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(0), typeDecl.Members()[0].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Members()[1].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(2), typeDecl.Members()[2].Field.Type.Dimensions)
+		require.Equal(t, ast.ArrayDimensions(3), typeDecl.Members()[3].Field.Type.Dimensions)
 	})
 
 	t.Run("Map with multi-dimensional array value", func(t *testing.T) {
@@ -926,7 +926,7 @@ func TestParserMultiDimensionalArrays(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		field := parsed.Declarations[0].Type.Members[0].Field
+		field := parsed.Declarations[0].Type.Members()[0].Field
 		require.Equal(t, ast.ArrayDimensions(3), field.Type.Dimensions)
 		require.NotNil(t, field.Type.Base.Map)
 		require.Equal(t, ast.ArrayDimensions(2), field.Type.Base.Map.ValueType.Dimensions)
@@ -962,7 +962,7 @@ func TestParserKeywordsAsFieldNames(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 		require.Len(t, parsed.Declarations, 1)
-		require.Len(t, parsed.Declarations[0].Type.Members, 19)
+		require.Len(t, parsed.Declarations[0].Type.Members(), 19)
 	})
 
 	t.Run("Keywords as optional field names", func(t *testing.T) {
@@ -977,9 +977,9 @@ func TestParserKeywordsAsFieldNames(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 		typeDecl := parsed.Declarations[0].Type
-		require.True(t, typeDecl.Members[0].Field.Optional)
-		require.True(t, typeDecl.Members[1].Field.Optional)
-		require.True(t, typeDecl.Members[2].Field.Optional)
+		require.True(t, typeDecl.Members()[0].Field.Optional)
+		require.True(t, typeDecl.Members()[1].Field.Optional)
+		require.True(t, typeDecl.Members()[2].Field.Optional)
 	})
 }
 
@@ -1003,8 +1003,8 @@ func TestParserAnnotations(t *testing.T) {
 		require.Equal(t, "deprecated", typeDecl.Annotations[1].Name)
 		require.NotNil(t, typeDecl.Annotations[1].Argument)
 		require.Equal(t, "Use UserV2", typeDecl.Annotations[1].Argument.Scalar.Str.String())
-		require.Len(t, typeDecl.Members[0].Field.Annotations, 1)
-		require.Equal(t, "id", typeDecl.Members[0].Field.Annotations[0].Name)
+		require.Len(t, typeDecl.Members(), 1)
+		require.Equal(t, "id", typeDecl.Members()[0].Field.Annotations[0].Name)
 	})
 
 	t.Run("Complex annotation payload", func(t *testing.T) {
@@ -1059,7 +1059,7 @@ func TestParserAnnotations(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		field := parsed.Declarations[0].Type.Members[0].Field
+		field := parsed.Declarations[0].Type.Members()[0].Field
 		require.Len(t, field.Annotations, 1)
 		ann := field.Annotations[0]
 		require.Equal(t, "db", ann.Name)
@@ -1298,7 +1298,7 @@ func TestParserAnnotationPayloadVariants(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		field := parsed.Declarations[0].Type.Members[0].Field
+		field := parsed.Declarations[0].Type.Members()[0].Field
 		require.Len(t, field.Annotations, 1)
 		ann := field.Annotations[0]
 		require.Equal(t, "default", ann.Name)
@@ -1356,13 +1356,13 @@ func TestParserDocstringInsideTypeBody(t *testing.T) {
 
 		typeDecl := parsed.Declarations[0].Type
 		// Without a blank line, the docstring attaches to the field (same as top-level behavior)
-		require.Len(t, typeDecl.Members, 2)
-		require.NotNil(t, typeDecl.Members[0].Field)
-		require.NotNil(t, typeDecl.Members[0].Field.Docstring)
-		require.Equal(t, " This docstring attaches to id ", typeDecl.Members[0].Field.Docstring.Value.String())
-		require.Equal(t, "id", typeDecl.Members[0].Field.Name)
-		require.NotNil(t, typeDecl.Members[1].Field)
-		require.Equal(t, "name", typeDecl.Members[1].Field.Name)
+		require.Len(t, typeDecl.Members(), 2)
+		require.NotNil(t, typeDecl.Members()[0].Field)
+		require.NotNil(t, typeDecl.Members()[0].Field.Docstring)
+		require.Equal(t, " This docstring attaches to id ", typeDecl.Members()[0].Field.Docstring.Value.String())
+		require.Equal(t, "id", typeDecl.Members()[0].Field.Name)
+		require.NotNil(t, typeDecl.Members()[1].Field)
+		require.Equal(t, "name", typeDecl.Members()[1].Field.Name)
 	})
 
 	t.Run("docstring attached to field inside type body", func(t *testing.T) {
@@ -1376,15 +1376,15 @@ func TestParserDocstringInsideTypeBody(t *testing.T) {
 		require.NoError(t, err)
 
 		typeDecl := parsed.Declarations[0].Type
-		require.Len(t, typeDecl.Members, 1)
-		field := typeDecl.Members[0].Field
+		require.Len(t, typeDecl.Members(), 1)
+		field := typeDecl.Members()[0].Field
 		require.NotNil(t, field)
 		require.NotNil(t, field.Docstring)
 		require.Equal(t, " The user ID ", field.Docstring.Value.String())
 		require.Equal(t, "id", field.Name)
 	})
 
-	t.Run("docstring with blank line becomes standalone in type body", func(t *testing.T) {
+	t.Run("docstring with blank line in type body is a parse error", func(t *testing.T) {
 		input := `
 			type User {
 				""" Section header """
@@ -1392,18 +1392,11 @@ func TestParserDocstringInsideTypeBody(t *testing.T) {
 				id string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		typeDecl := parsed.Declarations[0].Type
-		require.Len(t, typeDecl.Members, 2)
-		require.NotNil(t, typeDecl.Members[0].Docstring)
-		require.Equal(t, " Section header ", typeDecl.Members[0].Docstring.Value.String())
-		require.NotNil(t, typeDecl.Members[1].Field)
-		require.Equal(t, "id", typeDecl.Members[1].Field.Name)
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err, "standalone docstrings are no longer allowed inside type bodies")
 	})
 
-	t.Run("multiple docstrings in type body", func(t *testing.T) {
+	t.Run("multiple standalone docstrings in type body are parse errors", func(t *testing.T) {
 		input := `
 			type User {
 				""" Identity fields """
@@ -1416,21 +1409,8 @@ func TestParserDocstringInsideTypeBody(t *testing.T) {
 				email string
 			}
 		`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		typeDecl := parsed.Declarations[0].Type
-		require.Len(t, typeDecl.Members, 5)
-		require.NotNil(t, typeDecl.Members[0].Docstring)
-		require.Equal(t, " Identity fields ", typeDecl.Members[0].Docstring.Value.String())
-		require.NotNil(t, typeDecl.Members[1].Field)
-		require.Equal(t, "id", typeDecl.Members[1].Field.Name)
-		require.NotNil(t, typeDecl.Members[2].Field)
-		require.Equal(t, "name", typeDecl.Members[2].Field.Name)
-		require.NotNil(t, typeDecl.Members[3].Docstring)
-		require.Equal(t, " Contact info ", typeDecl.Members[3].Docstring.Value.String())
-		require.NotNil(t, typeDecl.Members[4].Field)
-		require.Equal(t, "email", typeDecl.Members[4].Field.Name)
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err, "standalone docstrings are no longer allowed inside type bodies")
 	})
 
 	t.Run("docstring attached to annotated field in type body", func(t *testing.T) {
@@ -1445,13 +1425,202 @@ func TestParserDocstringInsideTypeBody(t *testing.T) {
 		require.NoError(t, err)
 
 		typeDecl := parsed.Declarations[0].Type
-		require.Len(t, typeDecl.Members, 1)
-		field := typeDecl.Members[0].Field
+		require.Len(t, typeDecl.Members(), 1)
+		field := typeDecl.Members()[0].Field
 		require.NotNil(t, field.Docstring)
 		require.Equal(t, " The email address ", field.Docstring.Value.String())
 		require.Len(t, field.Annotations, 1)
 		require.Equal(t, "unique", field.Annotations[0].Name)
 		require.Equal(t, "email", field.Name)
+	})
+}
+
+func TestParserTypeAlias(t *testing.T) {
+	t.Run("alias to primitive", func(t *testing.T) {
+		input := `type Foo string`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "Foo", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.False(t, typeDecl.IsObject())
+		require.Equal(t, "string", *typeDecl.Base.Named)
+		require.Equal(t, ast.ArrayDimensions(0), typeDecl.Dimensions)
+	})
+
+	t.Run("alias to int", func(t *testing.T) {
+		input := `type UserId int`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "UserId", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "int", *typeDecl.Base.Named)
+	})
+
+	t.Run("alias to array of primitives", func(t *testing.T) {
+		input := `type Ids int[]`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "Ids", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "int", *typeDecl.Base.Named)
+		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Dimensions)
+		require.True(t, typeDecl.Dimensions > 0)
+	})
+
+	t.Run("alias to multi-dimensional array", func(t *testing.T) {
+		input := `type Matrix float[][]`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "Matrix", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "float", *typeDecl.Base.Named)
+		require.Equal(t, ast.ArrayDimensions(2), typeDecl.Dimensions)
+	})
+
+	t.Run("alias to custom type", func(t *testing.T) {
+		input := `type ActiveUser User`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "ActiveUser", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "User", *typeDecl.Base.Named)
+	})
+
+	t.Run("alias to array of custom type", func(t *testing.T) {
+		input := `type Users User[]`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "Users", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "User", *typeDecl.Base.Named)
+		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Dimensions)
+	})
+
+	t.Run("alias to map", func(t *testing.T) {
+		input := `type Config map[string]`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "Config", typeDecl.Name)
+		require.NotNil(t, typeDecl.Base.Map)
+		require.NotNil(t, typeDecl.Base.Map.ValueType.Base.Named)
+		require.Equal(t, "string", *typeDecl.Base.Map.ValueType.Base.Named)
+	})
+
+	t.Run("alias to map of arrays", func(t *testing.T) {
+		input := `type UsersByRole map[User[]]`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.NotNil(t, typeDecl.Base.Map)
+		require.Equal(t, "User", *typeDecl.Base.Map.ValueType.Base.Named)
+		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Base.Map.ValueType.Dimensions)
+	})
+
+	t.Run("alias with docstring", func(t *testing.T) {
+		input := `
+			""" A list of user identifiers """
+			type UserIds int[]
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.NotNil(t, typeDecl.Docstring)
+		require.Equal(t, " A list of user identifiers ", typeDecl.Docstring.Value.String())
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "int", *typeDecl.Base.Named)
+		require.Equal(t, ast.ArrayDimensions(1), typeDecl.Dimensions)
+	})
+
+	t.Run("alias with annotations", func(t *testing.T) {
+		input := `
+			@deprecated
+			type OldId string
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Len(t, typeDecl.Annotations, 1)
+		require.Equal(t, "deprecated", typeDecl.Annotations[0].Name)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "string", *typeDecl.Base.Named)
+	})
+
+	t.Run("alias with docstring and annotations", func(t *testing.T) {
+		input := `
+			""" Old identifier type """
+			@deprecated
+			@meta({ since "v2" })
+			type OldId string
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.NotNil(t, typeDecl.Docstring)
+		require.Len(t, typeDecl.Annotations, 2)
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "string", *typeDecl.Base.Named)
+	})
+
+	t.Run("object type still works", func(t *testing.T) {
+		input := `type User { id int name string }`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.Equal(t, "User", typeDecl.Name)
+		require.True(t, typeDecl.IsObject())
+		require.Len(t, typeDecl.Members(), 2)
+	})
+
+	t.Run("alias and object coexist", func(t *testing.T) {
+		input := `
+			type Ids int[]
+			type User { id int name string }
+		`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		require.Len(t, parsed.Declarations, 2)
+
+		require.NotNil(t, parsed.Declarations[0].Type.Base.Named)
+		require.True(t, parsed.Declarations[1].Type.IsObject())
+	})
+
+	t.Run("alias to bool", func(t *testing.T) {
+		input := `type Flag bool`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "bool", *typeDecl.Base.Named)
+	})
+
+	t.Run("alias to datetime", func(t *testing.T) {
+		input := `type Timestamp datetime`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		typeDecl := parsed.Declarations[0].Type
+		require.NotNil(t, typeDecl.Base.Named)
+		require.Equal(t, "datetime", *typeDecl.Base.Named)
 	})
 }
 
@@ -1527,8 +1696,8 @@ func TestParserLargeSchema(t *testing.T) {
 	require.Equal(t, "Chat", chat.Name)
 	require.Len(t, chat.Annotations, 1)
 	require.Equal(t, "rpc", chat.Annotations[0].Name)
-	require.Len(t, chat.Members, 2)
-	require.NotNil(t, chat.Members[1].Spread)
+	require.Len(t, chat.Members(), 2)
+	require.NotNil(t, chat.Members()[1].Spread)
 
 	cfg := parsed.Declarations[3].Const
 	require.Equal(t, "compilerConfig", cfg.Name)
@@ -1588,10 +1757,10 @@ func TestParserNamespacedSpread(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "User",
-			Members: []*ast.TypeMember{
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
 				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "auth", Member: new("BaseUser")}}},
 				{Field: &ast.Field{Name: "name", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}},
-			},
+			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -1650,26 +1819,26 @@ func TestParserNamespacedSpread(t *testing.T) {
 
 		typeDecl := parsed.Declarations[0].Type
 		require.Equal(t, "FullUser", typeDecl.Name)
-		require.Len(t, typeDecl.Members, 4)
+		require.Len(t, typeDecl.Members(), 4)
 
 		// Local spread
-		require.NotNil(t, typeDecl.Members[0].Spread)
-		require.Equal(t, "BaseUser", typeDecl.Members[0].Spread.Ref.Name)
-		require.Nil(t, typeDecl.Members[0].Spread.Ref.Member)
+		require.NotNil(t, typeDecl.Members()[0].Spread)
+		require.Equal(t, "BaseUser", typeDecl.Members()[0].Spread.Ref.Name)
+		require.Nil(t, typeDecl.Members()[0].Spread.Ref.Member)
 
 		// Namespaced spread 1
-		require.NotNil(t, typeDecl.Members[1].Spread)
-		require.Equal(t, "auth", typeDecl.Members[1].Spread.Ref.Name)
-		require.Equal(t, "Credentials", *typeDecl.Members[1].Spread.Ref.Member)
+		require.NotNil(t, typeDecl.Members()[1].Spread)
+		require.Equal(t, "auth", typeDecl.Members()[1].Spread.Ref.Name)
+		require.Equal(t, "Credentials", *typeDecl.Members()[1].Spread.Ref.Member)
 
 		// Namespaced spread 2
-		require.NotNil(t, typeDecl.Members[2].Spread)
-		require.Equal(t, "billing", typeDecl.Members[2].Spread.Ref.Name)
-		require.Equal(t, "PaymentInfo", *typeDecl.Members[2].Spread.Ref.Member)
+		require.NotNil(t, typeDecl.Members()[2].Spread)
+		require.Equal(t, "billing", typeDecl.Members()[2].Spread.Ref.Name)
+		require.Equal(t, "PaymentInfo", *typeDecl.Members()[2].Spread.Ref.Member)
 
 		// Regular field
-		require.NotNil(t, typeDecl.Members[3].Field)
-		require.Equal(t, "name", typeDecl.Members[3].Field.Name)
+		require.NotNil(t, typeDecl.Members()[3].Field)
+		require.Equal(t, "name", typeDecl.Members()[3].Field.Name)
 	})
 
 	t.Run("Mixed local and namespaced spreads in enum body", func(t *testing.T) {
@@ -1748,15 +1917,15 @@ func TestParserNamespacedSpread(t *testing.T) {
 		require.Equal(t, "UserService", typeDecl.Name)
 		require.Len(t, typeDecl.Annotations, 1)
 		require.Equal(t, "rpc", typeDecl.Annotations[0].Name)
-		require.Len(t, typeDecl.Members, 2)
+		require.Len(t, typeDecl.Members(), 2)
 
 		// First child: namespaced spread
-		require.NotNil(t, typeDecl.Members[0].Spread)
-		require.Equal(t, "common", typeDecl.Members[0].Spread.Ref.Name)
-		require.Equal(t, "BaseService", *typeDecl.Members[0].Spread.Ref.Member)
+		require.NotNil(t, typeDecl.Members()[0].Spread)
+		require.Equal(t, "common", typeDecl.Members()[0].Spread.Ref.Name)
+		require.Equal(t, "BaseService", *typeDecl.Members()[0].Spread.Ref.Member)
 
 		// Second child: proc field with nested objects
-		proc := typeDecl.Members[1].Field
+		proc := typeDecl.Members()[1].Field
 		require.Equal(t, "GetUser", proc.Name)
 		require.NotNil(t, proc.Type.Base.Object)
 		require.Len(t, proc.Type.Base.Object.Members, 2)
