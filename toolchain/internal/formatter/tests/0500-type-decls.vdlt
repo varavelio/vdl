@@ -1,32 +1,19 @@
-type 
-Foo {
-  
-                      }deprecated
+type foo string
 
-type Bar 
-{}                  /* This
-is a comment */
+@entity type bar map[user[]]
 
-type Baz
-{} // This is a comment
-
- """
-This is a test
-""" deprecated("Deprecated")
-type Qux
-{}
+"""
+A doc
+"""
+@rpc type users {}
 
 // >>>>
 
-type Foo {}
+type Foo string
 
-deprecated type Bar {} /* This
-is a comment */
+@entity
+type Bar map[User[]]
 
-type Baz {} // This is a comment
-
-"""
-This is a test
-"""
-deprecated("Deprecated")
-type Qux {}
+""" A doc """
+@rpc
+type Users {}

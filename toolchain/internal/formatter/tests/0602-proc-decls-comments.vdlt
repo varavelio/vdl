@@ -1,61 +1,36 @@
-rpc   Service	{ 
+@rpc type service {
 // Comment
-proc Test { // Comment
-input {	/* Comment */
-field   :   {   // Comment
-subfield :	{   
-subsubfield   :   string[]	
-}   [] 
-} []   
-} 
+@proc test { // Comment
+input {
+// A
+id string
+}
 
-// Comment
-output { // Comment
-field : {	// Comment
-subfield	: { // Comment
-subsubfield   :   string[]  	  
-} [] 
-}   [] 
-} 
-
-// Comment
-// Comment
-
-// Comment
-/* Comment */
-// Comment
-// Comment
-}   
-} 
+/* B */
+output {
+// C
+ok bool
+}
+}
+}
 
 // >>>>
 
-rpc Service {
+@rpc
+type Service {
   // Comment
-  proc Test { // Comment
-    input { /* Comment */
-      field: { // Comment
-        subfield: {
-          subsubfield: string[]
-        }[]
-      }[]
+  @proc
+  Test {
+    // Comment
+    input {
+      // A
+      id string
     }
 
-    // Comment
-    output { // Comment
-      field: { // Comment
-        subfield: { // Comment
-          subsubfield: string[]
-        }[]
-      }[]
+    /* B */
+    output {
+      // C
+      ok bool
     }
-
-    // Comment
-    // Comment
-
-    // Comment
-    /* Comment */
-    // Comment
-    // Comment
   }
 }

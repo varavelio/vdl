@@ -1,73 +1,42 @@
-rpc Service {
-/* With docstring */          """
-This is a test proc.
-"""deprecated("Deprecated")
-proc 
-Test   {    
-                    } 
-
-
-deprecated proc ProcWithInput {input{
-  field1: string
-}
+@rpc type catalog {
+@proc create_product {
+input { product_id string }
+output { ok bool }
 }
 
-// With output
-proc ProcWithOutput {
-  output
-  {  field1: datetime[
-
-  ]
+@proc get_product {
+input { id string }
+output {
+""" doc """
+result string
 }
 }
-
-
-
-// With input and output
-proc ProcFull {input{
-  field1: string
-}
-output
-  {  field1: datetime[
-
-  ]""" Docstring """field2:string
-}      }
 }
 
 // >>>>
 
-rpc Service {
-  /* With docstring */
-  """
-  This is a test proc.
-  """
-  deprecated("Deprecated")
-  proc Test {}
-
-  deprecated proc ProcWithInput {
+@rpc
+type Catalog {
+  @proc
+  CreateProduct {
     input {
-      field1: string
-    }
-  }
-
-  // With output
-  proc ProcWithOutput {
-    output {
-      field1: datetime[]
-    }
-  }
-
-  // With input and output
-  proc ProcFull {
-    input {
-      field1: string
+      productId string
     }
 
     output {
-      field1: datetime[]
+      ok bool
+    }
+  }
 
-      """ Docstring """
-      field2: string
+  @proc
+  GetProduct {
+    input {
+      id string
+    }
+
+    output {
+      """ doc """
+      result string
     }
   }
 }

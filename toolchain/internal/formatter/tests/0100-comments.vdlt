@@ -1,28 +1,19 @@
+// top level
+/* block */
 
-
-            // This is a comment
-
-
-      /*
-This is a multiline
-comment
-    */
-
-
-        // Comment 1
-    // Comment 2
-                              /* Comment 3 */ // Comment 4
+type x {
+// inside
+id string
+/* final */
+}
 
 // >>>>
 
-// This is a comment
+// top level
+/* block */
 
-/*
-This is a multiline
-comment
-    */
-
-// Comment 1
-// Comment 2
-/* Comment 3 */
-// Comment 4
+type X {
+  // inside
+  id string
+  /* final */
+}

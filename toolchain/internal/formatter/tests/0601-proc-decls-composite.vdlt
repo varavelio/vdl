@@ -1,114 +1,41 @@
-rpc Service   {  	  
-// Nested fields
-proc	Test {   
-input   {  	  
-field : { 
-subfield :	{ 
-subsubfield   : string[] 
-} 
-}   
-} 
-
-output  	  { 
-field : { 
-subfield :   {  	  /* Comment */
-
-""" 
-Field
-
-      Multi-line
-  """
-subsubfield : string[] 
-} 
-} 
-}   
-} 
-
-// Array fields
-proc  	  Test {   
-input {   
-field : string[] 
-} 
-
-output { 
-field :	string[] 
-}	
-} 
-
-// Nested array fields
-proc   Test {	
-input   { 
-field : { 
-subfield	: { 
-subsubfield :   string[] 
-} [] 
-}   [] 
-} 
-
-output  	  { 
-field : { 
-subfield	: { 
-subsubfield : string[]   
-}   [] 
-}	[] 
-} 
-}  	  
-} 
+@rpc type service {
+@proc test {
+input {
+payload {
+nested {
+ids string[]
+}
+}
+}
+output {
+payload {
+nested {
+ids string[]
+}
+}[]
+}
+}
+}
 
 // >>>>
 
-rpc Service {
-  // Nested fields
-  proc Test {
+@rpc
+type Service {
+  @proc
+  Test {
     input {
-      field: {
-        subfield: {
-          subsubfield: string[]
+      payload {
+        nested {
+          ids string[]
         }
       }
     }
 
     output {
-      field: {
-        subfield: { /* Comment */
-
-          """
-          Field
-
-                Multi-line
-          """
-          subsubfield: string[]
+      payload {
+        nested {
+          ids string[]
         }
-      }
-    }
-  }
-
-  // Array fields
-  proc Test {
-    input {
-      field: string[]
-    }
-
-    output {
-      field: string[]
-    }
-  }
-
-  // Nested array fields
-  proc Test {
-    input {
-      field: {
-        subfield: {
-          subsubfield: string[]
-        }[]
-      }[]
-    }
-
-    output {
-      field: {
-        subfield: {
-          subsubfield: string[]
-        }[]
       }[]
     }
   }

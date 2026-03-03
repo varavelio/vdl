@@ -1,103 +1,26 @@
 """ Standalone """
 
-""" Standalone """ // Comment
-  """ 
-    Standalone
-    
-          Multi-line
-    """
+""" Attached """ type user {}
 
-
-""" Standalone """/* Comment */""" Standalone """""" Associated """ type Test {} """ Standalone """
-
-rpc Service { """ Associated """ proc Test {} }
-
-""" Standalone """
-// Comment
-""" Standalone """
-
-// Comment
-
-""" Standalone """
-
-// Nested Docstring
-rpc MyRpc {
-  proc MyProc {
-    input {
-      foo: {
-        bar: {
-          baz: {
-            qux: {
+type demo {
 """
-        This Docstring
-    Should
-      be
-        Formatted Correctly
-          """
-              field1: string
-                  """This one too""" field2: int
-            }
-          }
-        }
-      }
-    }
-  }
+  Multi line
+    doc
+"""
+name string
 }
 
 // >>>>
 
 """ Standalone """
 
-""" Standalone """ // Comment
-"""
-Standalone
+""" Attached """
+type User {}
 
-      Multi-line
-"""
-
-""" Standalone """ /* Comment */
-""" Standalone """
-
-""" Associated """
-type Test {}
-
-""" Standalone """
-
-rpc Service {
-  """ Associated """
-  proc Test {}
-}
-
-""" Standalone """
-// Comment
-""" Standalone """
-
-// Comment
-
-""" Standalone """
-
-// Nested Docstring
-rpc MyRpc {
-  proc MyProc {
-    input {
-      foo: {
-        bar: {
-          baz: {
-            qux: {
-              """
-                  This Docstring
-              Should
-                be
-                  Formatted Correctly
-              """
-              field1: string
-
-              """ This one too """
-              field2: int
-            }
-          }
-        }
-      }
-    }
-  }
+type Demo {
+  """
+  Multi line
+    doc
+  """
+  name string
 }

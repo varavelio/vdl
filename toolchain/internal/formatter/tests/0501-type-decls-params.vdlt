@@ -1,42 +1,19 @@
-type Foo { // This is a comment
-  
-                      }
-
-
-type Foo{ /* This is a comment */}
-
-type Foo {
-  // This is a comment
+type user {
+id string // id
+name? string
+age int
+meta {
+created_at datetime
 }
-
-type Foo {
-  /* This is a comment */ field1: string  field2: int
-  field3: float
-
-
-
-  field4?: bool
-  field5: datetime
 }
 
 // >>>>
 
-type Foo { // This is a comment
-}
-
-type Foo { /* This is a comment */
-}
-
-type Foo {
-  // This is a comment
-}
-
-type Foo {
-  /* This is a comment */
-  field1: string
-  field2: int
-  field3: float
-
-  field4?: bool
-  field5: datetime
+type User {
+  id string // id
+  name? string
+  age int
+  meta {
+    createdAt datetime
+  }
 }

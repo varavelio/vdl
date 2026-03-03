@@ -1,6 +1,6 @@
 // Edge cases: Empty blocks, weird spacing
 
-    rpc emptyService {}
+    @rpc type emptyService {}
 
 enum emptyEnum    {}
 
@@ -9,25 +9,25 @@ type      emptyType {}
 type nestedDestructure {
   ...AuditMetadata
     ...OwnershipInfo
-name: string }
+name string }
 
 type withOptional {
-  field?: string
-    other?: int
+  field? string
+    other? int
 
 
   }
 
 type withGenerics {
-  items: string[]
-    counts: map<int>
-      matrix: float[][]
-        complex: map<User[]>
+  items string[]
+    counts map[int]
+      matrix float[][]
+        complex map[User[]]
   }
 
-type inlineBlocks {  data: {
-    x: int
-    y: int
+type inlineBlocks {  data {
+    x int
+    y int
   }
 }
 
@@ -35,7 +35,8 @@ type inlineBlocks {  data: {
 
 // Edge cases: Empty blocks, weird spacing
 
-rpc EmptyService {}
+@rpc
+type EmptyService {}
 
 enum EmptyEnum {}
 
@@ -44,24 +45,24 @@ type EmptyType {}
 type NestedDestructure {
   ...AuditMetadata
   ...OwnershipInfo
-  name: string
+  name string
 }
 
 type WithOptional {
-  field?: string
-  other?: int
+  field? string
+  other? int
 }
 
 type WithGenerics {
-  items: string[]
-  counts: map<int>
-  matrix: float[][]
-  complex: map<User[]>
+  items string[]
+  counts map[int]
+  matrix float[][]
+  complex map[User[]]
 }
 
 type InlineBlocks {
-  data: {
-    x: int
-    y: int
+  data {
+    x int
+    y int
   }
 }
