@@ -74,6 +74,11 @@ tasks:
       - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - dprint check --config ./dprint.json --log-level warn
 
+  build:
+    desc: "Build core CLI binary"
+    cmds:
+      - cd ./toolchain && go build -o ./dist/vdl ./cmd/vdl/.
+
   ###################
   # TOOLCHAIN TASKS #
   ###################
