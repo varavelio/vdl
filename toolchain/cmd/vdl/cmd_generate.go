@@ -1,13 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
-	"github.com/varavelio/tinta"
 	"github.com/varavelio/vdl/toolchain/internal/codegen"
 )
 
@@ -34,31 +31,7 @@ func cmdGenerate(args *cmdGenerateArgs) {
 
 	fileCount, err := codegen.Run(args.ConfigPath)
 	if err != nil {
-		errStr := "VDL error: " + err.Error()
-
-		// Make the first line red bold
-		if idx := strings.Index(errStr, "\n"); idx != -1 {
-			errStr = tinta.Text().Red().Bold().String(errStr[:idx]) + errStr[idx:]
-		} else {
-			errStr = tinta.Text().Red().Bold().String(errStr)
-		}
-
-		// Add 2 spaces after each newline for better indentation
-		errStr = strings.ReplaceAll(errStr, "\n", "\n  ")
-
-		// Paint error[XXXX] patterns in red
-		errorCodePattern := regexp.MustCompile(`error\[[^\]]+\]`)
-		errStr = errorCodePattern.ReplaceAllStringFunc(errStr, func(s string) string {
-			return tinta.Text().Red().String(s)
-		})
-
-		// Make "did you mean ... ?" patterns cyan
-		didYouMeanPattern := regexp.MustCompile(`did you mean[^?]+\?`)
-		errStr = didYouMeanPattern.ReplaceAllStringFunc(errStr, func(s string) string {
-			return tinta.Text().Cyan().String(s)
-		})
-
-		fmt.Fprintf(os.Stderr, "%s\n", errStr)
+		printVDLError(err.Error())
 		os.Exit(1)
 	}
 
