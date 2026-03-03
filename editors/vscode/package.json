@@ -16,7 +16,7 @@
       "url": "https://eduardo.lat"
     }
   ],
-  "version": "0.1.3",
+  "version": "0.1.4",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -34,8 +34,7 @@
         "aliases": [
           "Varavel Definition Language",
           "VDL",
-          "vdl",
-          "vdl-rpc"
+          "vdl"
         ],
         "extensions": [
           ".vdl"
@@ -72,7 +71,7 @@
     "commands": [
       {
         "command": "vdl.init",
-        "title": "VDL: Initialize a new vdl.yaml and schema.vdl files"
+        "title": "VDL: Initialize VDL project"
       },
       {
         "command": "vdl.restart",

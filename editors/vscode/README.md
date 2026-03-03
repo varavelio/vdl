@@ -40,7 +40,7 @@ If the binary is not in your operating system PATH, you can set a custom path in
 
 ## Commands
 
-- `vdl.init`: Initialize a new `vdl.yaml` and `schema.vdl` files
+- `vdl.init`: Initialize VDL project
 - `vdl.restart`: Restart Language Server
 - `vdl.openLogs`: Open Language Server Logs
 
@@ -67,6 +67,11 @@ The following snippets are available for `.vdl` files:
 ## Release Notes
 
 Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/editors/vscode/CHANGELOG.md).
+
+### v0.1.4 - 2026-03-03
+
+- Rewrote syntax highlighting grammar to align with current VDL spec and remove legacy rules.
+- Rewrote snippets to match current VDL syntax.
 
 ### v0.1.3 - 2026-02-02
 
