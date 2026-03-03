@@ -1385,7 +1385,8 @@ func (p *preObjectEntry) transform() ObjectEntry {
 
 // Flattened type definition.
 //
-// All spreads are already expanded into `fields`.
+// All spreads are already expanded. The unified `typeRef` describes what this
+// type IS — a primitive, custom reference, map, array, or object with fields.
 type TypeDef struct {
 	// Type name
 	Name string `json:"name"`
@@ -1393,8 +1394,8 @@ type TypeDef struct {
 	Doc *string `json:"doc,omitempty"`
 	// Type annotations in source order
 	Annotations []Annotation `json:"annotations"`
-	// Type fields in source order
-	Fields []Field `json:"fields"`
+	// Unified type reference describing what this type IS
+	TypeRef TypeRef `json:"typeRef"`
 }
 
 // GetName returns the value of Name or the zero value if the receiver or field is nil.
@@ -1448,19 +1449,19 @@ func (x *TypeDef) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
 	return defaultValue
 }
 
-// GetFields returns the value of Fields or the zero value if the receiver or field is nil.
-func (x *TypeDef) GetFields() []Field {
+// GetTypeRef returns the value of TypeRef or the zero value if the receiver or field is nil.
+func (x *TypeDef) GetTypeRef() TypeRef {
 	if x != nil {
-		return x.Fields
+		return x.TypeRef
 	}
-	var zero []Field
+	var zero TypeRef
 	return zero
 }
 
-// GetFieldsOr returns the value of Fields or the provided default if the receiver or field is nil.
-func (x *TypeDef) GetFieldsOr(defaultValue []Field) []Field {
+// GetTypeRefOr returns the value of TypeRef or the provided default if the receiver or field is nil.
+func (x *TypeDef) GetTypeRefOr(defaultValue TypeRef) TypeRef {
 	if x != nil {
-		return x.Fields
+		return x.TypeRef
 	}
 	return defaultValue
 }
@@ -1470,7 +1471,7 @@ type preTypeDef struct {
 	Name        *string          `json:"name,omitempty"`
 	Doc         *string          `json:"doc,omitempty"`
 	Annotations *[]preAnnotation `json:"annotations,omitempty"`
-	Fields      *[]preField      `json:"fields,omitempty"`
+	TypeRef     *preTypeRef      `json:"typeRef,omitempty"`
 }
 
 // validate validates the required fields of TypeDef
@@ -1498,15 +1499,13 @@ func (p *preTypeDef) validate() error {
 		}
 	}
 
-	// Validation for field "fields"
-	if p.Fields == nil {
-		return errorMissingRequiredField("field fields is required")
+	// Validation for field "typeRef"
+	if p.TypeRef == nil {
+		return errorMissingRequiredField("field typeRef is required")
 	}
-	if p.Fields != nil {
-		for _, item := range *p.Fields {
-			if err := item.validate(); err != nil {
-				return errorMissingRequiredField("field fields: " + err.Error())
-			}
+	if p.TypeRef != nil {
+		if err := p.TypeRef.validate(); err != nil {
+			return errorMissingRequiredField("field typeRef: " + err.Error())
 		}
 	}
 
@@ -1525,20 +1524,15 @@ func (p *preTypeDef) transform() TypeDef {
 		tmp_ = v.transform()
 		transAnnotations[i] = tmp_
 	}
-	var transFields []Field
-	transFields = make([]Field, len(*p.Fields))
-	for i, v := range *p.Fields {
-		var tmp_ Field
-		tmp_ = v.transform()
-		transFields[i] = tmp_
-	}
+	var transTypeRef TypeRef
+	transTypeRef = p.TypeRef.transform()
 
 	// Assignments
 	return TypeDef{
 		Name:        transName,
 		Doc:         transDoc,
 		Annotations: transAnnotations,
-		Fields:      transFields,
+		TypeRef:     transTypeRef,
 	}
 }
 

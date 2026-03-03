@@ -2,6 +2,7 @@
 IrSchema is the generator-facing representation of a VDL program.
 
 This model is intentionally "flat" and "resolved":
+
 - spreads are already expanded
 - references are already resolved
 - collections are in deterministic order
@@ -56,6 +57,7 @@ enum EnumType {
 Kind discriminator for Value.
 
 Value is used for fully resolved literal data in:
+
 - constant values
 - annotation arguments
 """
@@ -147,6 +149,7 @@ type Field {
 Fully resolved literal value.
 
 The selected payload is determined by `kind`:
+
 - `string` -> `stringValue`
 - `int` -> `intValue`
 - `float` -> `floatValue`
@@ -193,7 +196,8 @@ type ObjectEntry {
 """
 Flattened type definition.
 
-All spreads are already expanded into `fields`.
+All spreads are already expanded. The unified `typeRef` describes what this
+type IS, a primitive, custom reference, map, array, or object with fields.
 """
 type TypeDef {
   """ Type name """
@@ -205,8 +209,8 @@ type TypeDef {
   """ Type annotations in source order """
   annotations: Annotation[]
 
-  """ Type fields in source order """
-  fields: Field[]
+  """ Unified type reference describing what this type IS """
+  typeRef: TypeRef
 }
 
 """
