@@ -22,7 +22,7 @@ ids string[]
 @rpc
 type Service {
   @proc
-  Test {
+  test {
     input {
       payload {
         nested {

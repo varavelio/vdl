@@ -1,0 +1,42 @@
+const base_config = { host "localhost" port 8080 tls true }
+const prod_config={...base_config port 443 status env_status.active}
+const dashboards = [{name "ops" widgets [1 2]} {name "biz" widgets [3 4]}]
+
+enum env_status {
+active
+inactive
+}
+
+type cfg_ref map[env_status]
+
+// >>>>
+
+const baseConfig = {
+  host "localhost"
+  port 8080
+  tls true
+}
+
+const prodConfig = {
+  ...baseConfig
+  port 443
+  status EnvStatus.Active
+}
+
+const dashboards = [
+  {
+    name "ops"
+    widgets [1 2]
+  }
+  {
+    name "biz"
+    widgets [3 4]
+  }
+]
+
+enum EnvStatus {
+  Active
+  Inactive
+}
+
+type CfgRef map[EnvStatus]

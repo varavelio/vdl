@@ -1,0 +1,44 @@
+const A=1
+const B=2
+@flag const C=3
+const D=4
+const E={foo 1 bar "x"}
+const F=5
+const G=[1 2 3]
+const H={ nested { deep [1 2 { value true }] } }
+const I = [{ a 1 b 2 } { a 3 b 4 }]
+
+// >>>>
+
+const a = 1
+const b = 2
+
+@flag
+const c = 3
+
+const d = 4
+
+const e = {
+  foo 1
+  bar "x"
+}
+
+const f = 5
+const g = [1 2 3]
+
+const h = {
+  nested {
+    deep [1 2 { value true }]
+  }
+}
+
+const i = [
+  {
+    a 1
+    b 2
+  }
+  {
+    a 3
+    b 4
+  }
+]

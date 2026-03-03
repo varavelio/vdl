@@ -74,7 +74,6 @@ include "./bar.vdl"
 const userEventSubject = "events.users.{userId}.{eventType}"
 
 const apiVersion = "1.0.0"
-
 const retryCount int = 3
 
 enum OrderStatus {
@@ -87,7 +86,7 @@ enum OrderStatus {
 type CatalogService {
   """ Product operations """
   @proc
-  ListProducts {
+  listProducts {
     input {
       page int
       limit int
@@ -100,7 +99,7 @@ type CatalogService {
   }
 
   @stream
-  WatchProducts {
+  watchProducts {
     input {
       filter? string
     }
@@ -124,6 +123,7 @@ type Product {
   status OrderStatus
   tags string[]
   meta map[string]
+
   config {
     enabled bool
     retries int

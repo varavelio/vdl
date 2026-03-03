@@ -47,7 +47,7 @@ const userEventSubject = "events.users.{userId}"
 @rpc
 type MyService {
   @proc
-  GetUser {
+  getUser {
     input {
       userId string
     }

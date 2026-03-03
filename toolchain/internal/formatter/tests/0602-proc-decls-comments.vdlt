@@ -20,7 +20,7 @@ ok bool
 type Service {
   // Comment
   @proc
-  Test {
+  test {
     // Comment
     input {
       // A

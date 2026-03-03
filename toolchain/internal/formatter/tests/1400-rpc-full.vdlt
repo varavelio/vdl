@@ -29,7 +29,7 @@ type Catalog {
   Endpoints for creating and managing products.
   """
   @proc
-  CreateProduct {
+  createProduct {
     input {
       product Product
     }
@@ -42,7 +42,7 @@ type Catalog {
 
   """ Subscribes to new messages. """
   @stream
-  NewMessages {
+  newMessages {
     input {
       channelId string
     }

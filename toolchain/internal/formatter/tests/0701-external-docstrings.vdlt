@@ -21,7 +21,7 @@ type Docs {}
 @rpc
 type Service {
   @proc
-  List {
+  list {
     input {}
 
     output {

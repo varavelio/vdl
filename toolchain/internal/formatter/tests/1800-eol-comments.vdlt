@@ -30,7 +30,7 @@ type User {
 @rpc
 type Svc {
   @proc
-  GetUser {
+  getUser {
     // proc
     input {
       userId string

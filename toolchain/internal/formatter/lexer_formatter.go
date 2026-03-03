@@ -212,7 +212,8 @@ func formatLexerBased(filename, content string) (string, error) {
 	w := newFmtWriter()
 	printDocument(w, doc)
 
-	out := strings.TrimSpace(w.String())
+	out := strutil.LimitConsecutiveNewlines(w.String(), 2)
+	out = strings.TrimSpace(out)
 	if out == "" {
 		return "", nil
 	}
@@ -905,11 +906,7 @@ func (w *fmtWriter) blank() {
 	if w.b.Len() == 0 {
 		return
 	}
-	out := w.b.String()
-	if strings.HasSuffix(out, "\n\n") {
-		return
-	}
-	if !strings.HasSuffix(out, "\n") {
+	if !strings.HasSuffix(w.b.String(), "\n") {
 		w.b.WriteByte('\n')
 	}
 	w.b.WriteByte('\n')
@@ -936,6 +933,14 @@ func shouldBreakBetweenTop(prev, curr node) bool {
 		return curr.startLine()-prev.endLine() > 1
 	}
 	if prev.nodeKind() == "docstring" || curr.nodeKind() == "docstring" {
+		return true
+	}
+	prevConst, prevIsConst := prev.(*constNode)
+	currConst, currIsConst := curr.(*constNode)
+	if prevIsConst && currIsConst {
+		if isSingleLineConst(prevConst) && isSingleLineConst(currConst) {
+			return false
+		}
 		return true
 	}
 	return true
@@ -1049,6 +1054,9 @@ func printEnumMember(w *fmtWriter, m *enumMemberNode) {
 		w.lineWithTrailing("..."+renderReference(*m.Spread, refEnumDecl), m.Trailing)
 		return
 	}
+	if m.Name == "" {
+		return
+	}
 	line := strutil.ToPascalCase(m.Name)
 	if m.Value != nil {
 		if m.Value.Str != nil {
@@ -1066,7 +1074,17 @@ func printAnnotation(w *fmtWriter, a *annotationNode) {
 		w.line("@" + name)
 		return
 	}
-	w.line("@" + name + "(" + renderLiteral(*a.Arg, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember}) + ")")
+	renderedArg := renderLiteral(*a.Arg, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
+	if !strings.Contains(renderedArg, "\n") {
+		w.line("@" + name + "(" + renderedArg + ")")
+		return
+	}
+	lines := strings.Split(renderedArg, "\n")
+	w.line("@" + name + "(" + lines[0])
+	for i := 1; i < len(lines)-1; i++ {
+		w.line(lines[i])
+	}
+	w.line(lines[len(lines)-1] + ")")
 }
 
 func printDocstring(w *fmtWriter, raw string) {
@@ -1187,14 +1205,13 @@ func shouldBreakTypeMembers(prev, curr *typeMemberNode) bool {
 		return true
 	}
 	if prev.Field != nil && curr.Field != nil {
-		if (hasAnnotation(prev.Field.Ann, "proc") || hasAnnotation(prev.Field.Ann, "stream")) && (hasAnnotation(curr.Field.Ann, "proc") || hasAnnotation(curr.Field.Ann, "stream")) {
+		if !isSingleLineField(prev.Field) || !isSingleLineField(curr.Field) {
 			return true
 		}
-		prevName := strutil.ToCamelCase(prev.Field.Name)
-		currName := strutil.ToCamelCase(curr.Field.Name)
-		if prevName == "input" && currName == "output" {
-			return true
-		}
+		return false
+	}
+	if (prev.Field != nil && !isSingleLineField(prev.Field)) || (curr.Field != nil && !isSingleLineField(curr.Field)) {
+		return true
 	}
 	return false
 }
@@ -1228,9 +1245,6 @@ func printField(w *fmtWriter, f *fieldNode) {
 		printAnnotation(w, a)
 	}
 	name := strutil.ToCamelCase(f.Name)
-	if hasAnnotation(f.Ann, "proc") || hasAnnotation(f.Ann, "stream") {
-		name = strutil.ToPascalCase(f.Name)
-	}
 	if f.Optional {
 		name += "?"
 	}
@@ -1296,7 +1310,17 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 			w.line("..." + renderReference(*e.Spread, ctx.spreadRef))
 			continue
 		}
-		w.line(strutil.ToCamelCase(e.Key) + " " + renderLiteral(*e.Value, ctx))
+		key := strutil.ToCamelCase(e.Key)
+		val := renderLiteral(*e.Value, ctx)
+		if !strings.Contains(val, "\n") {
+			w.line(key + " " + val)
+			continue
+		}
+		lines := strings.Split(val, "\n")
+		w.line(key + " " + lines[0])
+		for i := 1; i < len(lines); i++ {
+			w.line(lines[i])
+		}
 	}
 	w.indent--
 	w.line("}")
@@ -1308,13 +1332,35 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 		return "[]"
 	}
 	parts := make([]string, 0, len(a.Elements))
+	hasMultiline := false
 	for _, e := range a.Elements {
 		if e.Comment != nil {
 			continue
 		}
-		parts = append(parts, renderLiteral(*e.Value, ctx))
+		rendered := renderLiteral(*e.Value, ctx)
+		if strings.Contains(rendered, "\n") {
+			hasMultiline = true
+		}
+		parts = append(parts, rendered)
 	}
-	return "[" + strings.Join(parts, " ") + "]"
+	if !hasMultiline {
+		return "[" + strings.Join(parts, " ") + "]"
+	}
+	w := newFmtWriter()
+	w.line("[")
+	w.indent++
+	for _, part := range parts {
+		if !strings.Contains(part, "\n") {
+			w.line(part)
+			continue
+		}
+		for _, line := range strings.Split(part, "\n") {
+			w.line(line)
+		}
+	}
+	w.indent--
+	w.line("]")
+	return strings.TrimSuffix(w.String(), "\n")
 }
 
 func renderScalar(s scalarLiteralNode, ctx literalRenderCtx) string {
@@ -1381,11 +1427,26 @@ func printMultilineStatement(w *fmtWriter, lhs, rhs string, trailing *commentNod
 	w.line(last)
 }
 
-func hasAnnotation(anns []*annotationNode, target string) bool {
-	for _, a := range anns {
-		if strutil.ToCamelCase(a.Name) == target {
-			return true
-		}
+func isSingleLineConst(c *constNode) bool {
+	if c == nil {
+		return false
 	}
-	return false
+	if c.Doc != nil || len(c.Ann) > 0 {
+		return false
+	}
+	rhs := renderLiteral(c.Value, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
+	return !strings.Contains(rhs, "\n")
+}
+
+func isSingleLineField(f *fieldNode) bool {
+	if f == nil {
+		return false
+	}
+	if f.Doc != nil || len(f.Ann) > 0 {
+		return false
+	}
+	if f.Type.Obj != nil && len(f.Type.Obj.Members) > 0 {
+		return false
+	}
+	return true
 }

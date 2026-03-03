@@ -16,10 +16,12 @@ tags string[]
 
 type Product {
   ...AuditMetadata
+
   dimensions {
     width float
     height float
   }
+
   variants {
     sku string
     attrs map[string]

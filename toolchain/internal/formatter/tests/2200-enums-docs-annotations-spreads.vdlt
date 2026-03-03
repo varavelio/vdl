@@ -1,0 +1,31 @@
+enum merged {
+...base_roles
+""" docs """
+@deprecated("x")
+legacy="legacy"
+
+active
+}
+
+enum priority {
+low = 1
+medium=2
+high =3
+}
+
+// >>>>
+
+enum Merged {
+  ...BaseRoles
+
+  """ docs """
+  @deprecated("x")
+  Legacy = "legacy"
+  Active
+}
+
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}

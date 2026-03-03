@@ -1,0 +1,92 @@
+@rpc type service {
+@proc get_user {
+input {id string}
+output {
+profile {
+display_name string
+roles string[]
+}
+}
+}
+
+@stream watch_user {
+input {id string}
+output {
+events {
+kind string
+payload {raw string}
+}[]
+}
+}
+}
+
+type deep_type {
+...base_entity
+meta {a {b {c {d {e {f string}}}}}}
+matrix int[][][]
+dictionary map[map[user]]
+}
+
+type alias_one string[]
+type alias_two map[deep_type]
+
+// >>>>
+
+@rpc
+type Service {
+  @proc
+  getUser {
+    input {
+      id string
+    }
+
+    output {
+      profile {
+        displayName string
+        roles string[]
+      }
+    }
+  }
+
+  @stream
+  watchUser {
+    input {
+      id string
+    }
+
+    output {
+      events {
+        kind string
+
+        payload {
+          raw string
+        }
+      }[]
+    }
+  }
+}
+
+type DeepType {
+  ...BaseEntity
+
+  meta {
+    a {
+      b {
+        c {
+          d {
+            e {
+              f string
+            }
+          }
+        }
+      }
+    }
+  }
+
+  matrix int[][][]
+  dictionary map[map[User]]
+}
+
+type AliasOne string[]
+
+type AliasTwo map[DeepType]

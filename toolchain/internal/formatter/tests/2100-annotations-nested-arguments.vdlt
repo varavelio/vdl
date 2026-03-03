@@ -1,0 +1,35 @@
+@meta({ owner "core" flags ["a" "b"] cfg { retries 3 backoff [100 200] }})
+type annotated {
+@validator({ min 1 max 10 })
+value int
+}
+
+enum flags {
+@meta({ reason "legacy" })
+old
+new
+}
+
+// >>>>
+
+@meta({
+  owner "core"
+  flags ["a" "b"]
+  cfg {
+    retries 3
+    backoff [100 200]
+  }
+})
+type Annotated {
+  @validator({
+    min 1
+    max 10
+  })
+  value int
+}
+
+enum Flags {
+  @meta({ reason "legacy" })
+  Old
+  New
+}

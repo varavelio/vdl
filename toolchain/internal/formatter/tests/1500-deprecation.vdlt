@@ -25,9 +25,8 @@ type LegacyUser {
 type OldService {
   @deprecated
   @proc
-  FetchData {
+  fetchData {
     input {}
-
     output {}
   }
 }
