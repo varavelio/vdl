@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
   "constants": [],
   "enums": [
     {
@@ -20,6 +21,11 @@
           },
           "name": "Get",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "GET"
           },
@@ -33,6 +39,11 @@
           },
           "name": "Post",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "POST"
           },
@@ -46,6 +57,11 @@
           },
           "name": "Put",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "PUT"
           },
@@ -59,6 +75,11 @@
           },
           "name": "Delete",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "DELETE"
           },
@@ -85,6 +106,11 @@
           },
           "name": "Pending",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Pending"
           },
@@ -98,6 +124,11 @@
           },
           "name": "Processing",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Processing"
           },
@@ -111,6 +142,11 @@
           },
           "name": "Shipped",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Shipped"
           },
@@ -124,6 +160,11 @@
           },
           "name": "Delivered",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Delivered"
           },
@@ -137,6 +178,11 @@
           },
           "name": "Cancelled",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Cancelled"
           },
@@ -163,6 +209,11 @@
           },
           "name": "Low",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 1
           },
@@ -176,6 +227,11 @@
           },
           "name": "Medium",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 2
           },
@@ -189,6 +245,11 @@
           },
           "name": "High",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 3
           },
@@ -202,6 +263,11 @@
           },
           "name": "Critical",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 10
           },

@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/basic_types.vdl",
   "constants": [],
   "enums": [],
   "types": [

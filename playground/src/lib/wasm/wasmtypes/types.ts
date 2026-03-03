@@ -845,6 +845,7 @@ export function validateGoTargetConfig(_input: unknown, _path = "GoTargetConfig"
  * to re-run parser or semantic-analysis logic.
  */
 export type IrSchema = {
+  entryPoint: string
   constants: ConstantDef[]
   enums: EnumDef[]
   types: TypeDef[]
@@ -852,11 +853,13 @@ export type IrSchema = {
 }
 
 export function hydrateIrSchema(input: IrSchema): IrSchema {
+  const hydratedEntryPoint = input.entryPoint
   const hydratedConstants = input.constants.map(el => hydrateConstantDef(el))
   const hydratedEnums = input.enums.map(el => hydrateEnumDef(el))
   const hydratedTypes = input.types.map(el => hydrateTypeDef(el))
   const hydratedDocs = input.docs.map(el => hydrateTopLevelDoc(el))
   return {
+    entryPoint: hydratedEntryPoint,
     constants: hydratedConstants,
     enums: hydratedEnums,
     types: hydratedTypes,
@@ -1005,6 +1008,7 @@ export function validateJsonSchemaTargetConfig(_input: unknown, _path = "JsonSch
  * - `array` -> `arrayItems`
  */
 export type LiteralValue = {
+  position: Position
   kind: LiteralKind
   stringValue?: string
   intValue?: number
@@ -1015,6 +1019,7 @@ export type LiteralValue = {
 }
 
 export function hydrateLiteralValue(input: LiteralValue): LiteralValue {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedKind = input.kind
   const hydratedStringValue = input.stringValue ? input.stringValue : input.stringValue
   const hydratedIntValue = input.intValue ? input.intValue : input.intValue
@@ -1023,6 +1028,7 @@ export function hydrateLiteralValue(input: LiteralValue): LiteralValue {
   const hydratedObjectEntries = input.objectEntries ? input.objectEntries.map(el => hydrateObjectEntry(el)) : input.objectEntries
   const hydratedArrayItems = input.arrayItems ? input.arrayItems.map(el => hydrateLiteralValue(el)) : input.arrayItems
   return {
+    position: hydratedPosition,
     kind: hydratedKind,
     stringValue: hydratedStringValue,
     intValue: hydratedIntValue,
@@ -1039,6 +1045,13 @@ export function validateLiteralValue(input: unknown, path = "LiteralValue"): str
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.kind === undefined || obj.kind === null) {
     return `${path}.kind: required field is missing`;
   }
@@ -1080,14 +1093,17 @@ export function validateLiteralValue(input: unknown, path = "LiteralValue"): str
  * ObjectEntry Key/value pair inside an object LiteralValue payload
  */
 export type ObjectEntry = {
+  position: Position
   key: string
   value: LiteralValue
 }
 
 export function hydrateObjectEntry(input: ObjectEntry): ObjectEntry {
+  const hydratedPosition = hydratePosition(input.position)
   const hydratedKey = input.key
   const hydratedValue = hydrateLiteralValue(input.value)
   return {
+    position: hydratedPosition,
     key: hydratedKey,
     value: hydratedValue,
   }
@@ -1099,6 +1115,13 @@ export function validateObjectEntry(input: unknown, path = "ObjectEntry"): strin
   }
   const obj = input as Record<string, unknown>;
 
+  if (obj.position === undefined || obj.position === null) {
+    return `${path}.position: required field is missing`;
+  }
+  {
+    const err = validatePosition(obj.position, `${path}.position`);
+    if (err !== null) return err;
+  }
   if (obj.value === undefined || obj.value === null) {
     return `${path}.value: required field is missing`;
   }

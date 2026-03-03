@@ -16,10 +16,11 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 	resolver := newValueResolver(program)
 
 	schema := &irtypes.IrSchema{
-		Types:     make([]irtypes.TypeDef, 0, len(program.Types)),
-		Enums:     make([]irtypes.EnumDef, 0, len(program.Enums)),
-		Constants: make([]irtypes.ConstantDef, 0, len(program.Consts)),
-		Docs:      make([]irtypes.TopLevelDoc, 0, len(program.StandaloneDocs)),
+		EntryPoint: program.EntryPoint,
+		Types:      make([]irtypes.TypeDef, 0, len(program.Types)),
+		Enums:      make([]irtypes.EnumDef, 0, len(program.Enums)),
+		Constants:  make([]irtypes.ConstantDef, 0, len(program.Consts)),
+		Docs:       make([]irtypes.TopLevelDoc, 0, len(program.StandaloneDocs)),
 	}
 
 	for _, typ := range program.Types {
@@ -406,8 +407,10 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Litera
 		return irtypes.LiteralValue{}, false
 	}
 
+	pos := convertPosition(lit.Pos.Filename, lit.Pos)
+
 	if lit.Scalar != nil {
-		return r.resolveScalarLiteral(lit.Scalar)
+		return r.resolveScalarLiteral(lit.Scalar, pos)
 	}
 
 	if lit.Object != nil {
@@ -433,10 +436,15 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Litera
 			if !ok {
 				continue
 			}
-			entries = append(entries, irtypes.ObjectEntry{Key: entry.Key, Value: value})
+			entries = append(entries, irtypes.ObjectEntry{
+				Position: convertPosition(entry.Pos.Filename, entry.Pos),
+				Key:      entry.Key,
+				Value:    value,
+			})
 		}
 
 		return irtypes.LiteralValue{
+			Position:      pos,
 			Kind:          irtypes.LiteralKindObject,
 			ObjectEntries: &entries,
 		}, true
@@ -453,6 +461,7 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Litera
 		}
 
 		return irtypes.LiteralValue{
+			Position:   pos,
 			Kind:       irtypes.LiteralKindArray,
 			ArrayItems: &items,
 		}, true
@@ -461,32 +470,32 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Litera
 	return irtypes.LiteralValue{}, false
 }
 
-func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral) (irtypes.LiteralValue, bool) {
+func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral, pos irtypes.Position) (irtypes.LiteralValue, bool) {
 	if s.Str != nil {
 		value := string(*s.Str)
-		return irtypes.LiteralValue{Kind: irtypes.LiteralKindString, StringValue: &value}, true
+		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindString, StringValue: &value}, true
 	}
 	if s.Int != nil {
 		n, err := strconv.ParseInt(*s.Int, 10, 64)
 		if err != nil {
 			return irtypes.LiteralValue{}, false
 		}
-		return irtypes.LiteralValue{Kind: irtypes.LiteralKindInt, IntValue: &n}, true
+		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindInt, IntValue: &n}, true
 	}
 	if s.Float != nil {
 		f, err := strconv.ParseFloat(*s.Float, 64)
 		if err != nil {
 			return irtypes.LiteralValue{}, false
 		}
-		return irtypes.LiteralValue{Kind: irtypes.LiteralKindFloat, FloatValue: &f}, true
+		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindFloat, FloatValue: &f}, true
 	}
 	if s.True {
 		b := true
-		return irtypes.LiteralValue{Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
+		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
 	}
 	if s.False {
 		b := false
-		return irtypes.LiteralValue{Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
+		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
 	}
 	if s.Ref != nil {
 		if s.Ref.Member == nil {

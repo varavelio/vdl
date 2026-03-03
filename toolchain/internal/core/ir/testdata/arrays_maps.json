@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
   "constants": [],
   "enums": [],
   "types": [

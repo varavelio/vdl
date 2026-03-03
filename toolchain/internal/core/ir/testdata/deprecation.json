@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
   "constants": [
     {
       "position": {
@@ -16,6 +17,11 @@
           },
           "name": "deprecated",
           "argument": {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
+              "line": 18,
+              "column": 13
+            },
             "kind": "string",
             "stringValue": "Will be removed in v3.0"
           }
@@ -26,6 +32,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
+          "line": 19,
+          "column": 18
+        },
         "kind": "int",
         "intValue": 50
       }
@@ -50,6 +61,11 @@
           },
           "name": "Legacy",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Legacy"
           },
@@ -62,6 +78,11 @@
               },
               "name": "deprecated",
               "argument": {
+                "position": {
+                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
+                  "line": 22,
+                  "column": 15
+                },
                 "kind": "string",
                 "stringValue": "Use Active"
               }
@@ -76,6 +97,11 @@
           },
           "name": "Active",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Active"
           },
@@ -110,6 +136,11 @@
           },
           "name": "Active",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Active"
           },
@@ -123,6 +154,11 @@
           },
           "name": "Inactive",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Inactive"
           },
@@ -160,6 +196,11 @@
                 },
                 "name": "deprecated",
                 "argument": {
+                  "position": {
+                    "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
+                    "line": 28,
+                    "column": 15
+                  },
                   "kind": "string",
                   "stringValue": "Use accountId"
                 }
@@ -254,6 +295,11 @@
           },
           "name": "deprecated",
           "argument": {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
+              "line": 7,
+              "column": 13
+            },
             "kind": "string",
             "stringValue": "Use UserV2 instead"
           }

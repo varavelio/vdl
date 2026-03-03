@@ -11,6 +11,9 @@ A code generator should be able to consume IrSchema directly, without needing
 to re-run parser or semantic-analysis logic.
 """
 type IrSchema {
+  """ Absolute path to the main file that triggered the compilation """
+  entryPoint: string
+
   """ Constant definitions, sorted by name """
   constants: ConstantDef[]
 
@@ -180,6 +183,9 @@ The selected payload is determined by `kind`:
 - `array` -> `arrayItems`
 """
 type LiteralValue {
+  """ Source position of this literal value """
+  position: Position
+
   """ Value category discriminator """
   kind: LiteralKind
 
@@ -204,6 +210,9 @@ type LiteralValue {
 
 """ Key/value pair inside an object LiteralValue payload """
 type ObjectEntry {
+  """ Source position of this key-value pair """
+  position: Position
+
   """ Object key """
   key: string
 
@@ -222,7 +231,10 @@ All spreads are already expanded. The unified `typeRef` describes what this
 type IS, a primitive, custom reference, map, array, or object with fields.
 """
 type TypeDef {
-  """ Source position of this definition """
+  """
+  Source position of this type definition.
+  Will be zero valued if the type was inferred by the compiler.
+  """
   position: Position
 
   """ Type name """

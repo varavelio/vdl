@@ -271,6 +271,10 @@
           },
           "type": "array"
         },
+        "entryPoint": {
+          "description": "Absolute path to the main file that triggered the compilation",
+          "type": "string"
+        },
         "enums": {
           "description": "Enum definitions, sorted by name",
           "items": {
@@ -289,6 +293,7 @@
       "required": [
         "constants",
         "docs",
+        "entryPoint",
         "enums",
         "types"
       ],
@@ -345,13 +350,24 @@
           },
           "type": "array"
         },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this literal value"
+            }
+          ]
+        },
         "stringValue": {
           "description": "Payload for `kind = string`",
           "type": "string"
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "position"
       ],
       "type": "object"
     },
@@ -361,6 +377,16 @@
         "key": {
           "description": "Object key",
           "type": "string"
+        },
+        "position": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "description": "Source position of this key-value pair"
+            }
+          ]
         },
         "value": {
           "allOf": [
@@ -375,6 +401,7 @@
       },
       "required": [
         "key",
+        "position",
         "value"
       ],
       "type": "object"
@@ -461,7 +488,7 @@
               "$ref": "#/$defs/Position"
             },
             {
-              "description": "Source position of this definition"
+              "description": "Source position of this type definition.\nWill be zero valued if the type was inferred by the compiler."
             }
           ]
         },

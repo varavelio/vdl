@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
   "constants": [
     {
       "position": {
@@ -13,6 +14,11 @@
         "primitiveName": "string"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+          "line": 55,
+          "column": 21
+        },
         "kind": "string",
         "stringValue": ""
       }
@@ -34,29 +40,64 @@
         "arrayDims": 2
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+          "line": 56,
+          "column": 16
+        },
         "kind": "array",
         "arrayItems": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+              "line": 56,
+              "column": 17
+            },
             "kind": "array",
             "arrayItems": [
               {
+                "position": {
+                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                  "line": 56,
+                  "column": 18
+                },
                 "kind": "int",
                 "intValue": 1
               },
               {
+                "position": {
+                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                  "line": 56,
+                  "column": 20
+                },
                 "kind": "int",
                 "intValue": 2
               }
             ]
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+              "line": 56,
+              "column": 23
+            },
             "kind": "array",
             "arrayItems": [
               {
+                "position": {
+                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                  "line": 56,
+                  "column": 24
+                },
                 "kind": "int",
                 "intValue": 3
               },
               {
+                "position": {
+                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                  "line": 56,
+                  "column": 26
+                },
                 "kind": "int",
                 "intValue": 4
               }
@@ -123,21 +164,56 @@
         ]
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+          "line": 57,
+          "column": 19
+        },
         "kind": "object",
         "objectEntries": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+              "line": 58,
+              "column": 3
+            },
             "key": "a",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                "line": 58,
+                "column": 5
+              },
               "kind": "object",
               "objectEntries": [
                 {
+                  "position": {
+                    "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                    "line": 59,
+                    "column": 5
+                  },
                   "key": "b",
                   "value": {
+                    "position": {
+                      "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                      "line": 59,
+                      "column": 7
+                    },
                     "kind": "object",
                     "objectEntries": [
                       {
+                        "position": {
+                          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                          "line": 60,
+                          "column": 7
+                        },
                         "key": "c",
                         "value": {
+                          "position": {
+                            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+                            "line": 60,
+                            "column": 9
+                          },
                           "kind": "bool",
                           "boolValue": true
                         }
@@ -164,6 +240,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
+          "line": 54,
+          "column": 17
+        },
         "kind": "int",
         "intValue": 0
       }
@@ -188,6 +269,11 @@
           },
           "name": "On",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "On"
           },
@@ -201,6 +287,11 @@
           },
           "name": "Off",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Off"
           },

@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
   "constants": [
     {
       "position": {
@@ -23,6 +24,11 @@
         "primitiveName": "string"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
+          "line": 7,
+          "column": 25
+        },
         "kind": "string",
         "stringValue": "cache:session:{sessionId}"
       }
@@ -41,6 +47,11 @@
         "primitiveName": "string"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
+          "line": 10,
+          "column": 19
+        },
         "kind": "string",
         "stringValue": "key:{id}"
       }
@@ -68,6 +79,11 @@
         "primitiveName": "string"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
+          "line": 3,
+          "column": 26
+        },
         "kind": "string",
         "stringValue": "events.users.{userId}.{eventType}"
       }

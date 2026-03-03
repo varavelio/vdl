@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
   "constants": [
     {
       "position": {
@@ -13,6 +14,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+          "line": 32,
+          "column": 21
+        },
         "kind": "int",
         "intValue": 100
       }
@@ -59,18 +65,43 @@
         ]
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+          "line": 34,
+          "column": 23
+        },
         "kind": "object",
         "objectEntries": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 35,
+              "column": 3
+            },
             "key": "page",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+                "line": 35,
+                "column": 8
+              },
               "kind": "int",
               "intValue": 1
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+              "line": 36,
+              "column": 3
+            },
             "key": "limit",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/rpc_complete.vdl",
+                "line": 32,
+                "column": 21
+              },
               "kind": "int",
               "intValue": 100
             }
@@ -98,6 +129,11 @@
           },
           "name": "Created",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "created"
           },
@@ -111,6 +147,11 @@
           },
           "name": "Updated",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "updated"
           },

@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
   "constants": [],
   "enums": [
     {
@@ -20,6 +21,11 @@
           },
           "name": "First",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "First"
           },
@@ -33,6 +39,11 @@
           },
           "name": "Second",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Second"
           },

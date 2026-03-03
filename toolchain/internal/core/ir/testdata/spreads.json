@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spreads.vdl",
   "constants": [],
   "enums": [],
   "types": [

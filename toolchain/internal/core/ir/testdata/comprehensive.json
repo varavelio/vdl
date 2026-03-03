@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
   "constants": [
     {
       "position": {
@@ -42,18 +43,43 @@
         ]
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+          "line": 57,
+          "column": 20
+        },
         "kind": "object",
         "objectEntries": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 58,
+              "column": 3
+            },
             "key": "retries",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                "line": 58,
+                "column": 11
+              },
               "kind": "int",
               "intValue": 3
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 59,
+              "column": 3
+            },
             "key": "timeoutMs",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                "line": 59,
+                "column": 13
+              },
               "kind": "int",
               "intValue": 2500
             }
@@ -78,13 +104,28 @@
         "arrayDims": 1
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+          "line": 54,
+          "column": 18
+        },
         "kind": "array",
         "arrayItems": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 54,
+              "column": 19
+            },
             "kind": "string",
             "stringValue": "api"
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 54,
+              "column": 25
+            },
             "kind": "string",
             "stringValue": "core"
           }
@@ -104,6 +145,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "",
+          "line": 0,
+          "column": 0
+        },
         "kind": "int",
         "intValue": 2
       }
@@ -121,6 +167,11 @@
         "primitiveName": "string"
       },
       "value": {
+        "position": {
+          "file": "",
+          "line": 0,
+          "column": 0
+        },
         "kind": "string",
         "stringValue": "Active"
       }
@@ -147,6 +198,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+          "line": 53,
+          "column": 21
+        },
         "kind": "int",
         "intValue": 100
       }
@@ -225,39 +281,94 @@
         ]
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+          "line": 61,
+          "column": 23
+        },
         "kind": "object",
         "objectEntries": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 58,
+              "column": 3
+            },
             "key": "retries",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                "line": 58,
+                "column": 11
+              },
               "kind": "int",
               "intValue": 3
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 59,
+              "column": 3
+            },
             "key": "timeoutMs",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                "line": 59,
+                "column": 13
+              },
               "kind": "int",
               "intValue": 2500
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 63,
+              "column": 3
+            },
             "key": "name",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                "line": 63,
+                "column": 8
+              },
               "kind": "string",
               "stringValue": "users"
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+              "line": 64,
+              "column": 3
+            },
             "key": "tags",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                "line": 54,
+                "column": 18
+              },
               "kind": "array",
               "arrayItems": [
                 {
+                  "position": {
+                    "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                    "line": 54,
+                    "column": 19
+                  },
                   "kind": "string",
                   "stringValue": "api"
                 },
                 {
+                  "position": {
+                    "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/comprehensive.vdl",
+                    "line": 54,
+                    "column": 25
+                  },
                   "kind": "string",
                   "stringValue": "core"
                 }
@@ -287,6 +398,11 @@
           },
           "name": "Low",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 1
           },
@@ -300,6 +416,11 @@
           },
           "name": "Medium",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 2
           },
@@ -313,6 +434,11 @@
           },
           "name": "High",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "int",
             "intValue": 3
           },
@@ -338,6 +464,11 @@
           },
           "name": "Active",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Active"
           },
@@ -351,6 +482,11 @@
           },
           "name": "Inactive",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "Inactive"
           },
@@ -364,6 +500,11 @@
           },
           "name": "Suspended",
           "value": {
+            "position": {
+              "file": "",
+              "line": 0,
+              "column": 0
+            },
             "kind": "string",
             "stringValue": "suspended"
           },

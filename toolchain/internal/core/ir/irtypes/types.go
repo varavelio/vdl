@@ -1231,6 +1231,8 @@ func (p *preField) transform() Field {
 // A code generator should be able to consume IrSchema directly, without needing
 // to re-run parser or semantic-analysis logic.
 type IrSchema struct {
+	// Absolute path to the main file that triggered the compilation
+	EntryPoint string `json:"entryPoint"`
 	// Constant definitions, sorted by name
 	Constants []ConstantDef `json:"constants"`
 	// Enum definitions, sorted by name
@@ -1239,6 +1241,23 @@ type IrSchema struct {
 	Types []TypeDef `json:"types"`
 	// Standalone documentation blocks in source traversal order
 	Docs []TopLevelDoc `json:"docs"`
+}
+
+// GetEntryPoint returns the value of EntryPoint or the zero value if the receiver or field is nil.
+func (x *IrSchema) GetEntryPoint() string {
+	if x != nil {
+		return x.EntryPoint
+	}
+	var zero string
+	return zero
+}
+
+// GetEntryPointOr returns the value of EntryPoint or the provided default if the receiver or field is nil.
+func (x *IrSchema) GetEntryPointOr(defaultValue string) string {
+	if x != nil {
+		return x.EntryPoint
+	}
+	return defaultValue
 }
 
 // GetConstants returns the value of Constants or the zero value if the receiver or field is nil.
@@ -1311,16 +1330,22 @@ func (x *IrSchema) GetDocsOr(defaultValue []TopLevelDoc) []TopLevelDoc {
 
 // preIrSchema is the version of IrSchema previous to the required field validation
 type preIrSchema struct {
-	Constants *[]preConstantDef `json:"constants,omitempty"`
-	Enums     *[]preEnumDef     `json:"enums,omitempty"`
-	Types     *[]preTypeDef     `json:"types,omitempty"`
-	Docs      *[]preTopLevelDoc `json:"docs,omitempty"`
+	EntryPoint *string           `json:"entryPoint,omitempty"`
+	Constants  *[]preConstantDef `json:"constants,omitempty"`
+	Enums      *[]preEnumDef     `json:"enums,omitempty"`
+	Types      *[]preTypeDef     `json:"types,omitempty"`
+	Docs       *[]preTopLevelDoc `json:"docs,omitempty"`
 }
 
 // validate validates the required fields of IrSchema
 func (p *preIrSchema) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preIrSchema is nil")
+	}
+
+	// Validation for field "entryPoint"
+	if p.EntryPoint == nil {
+		return errorMissingRequiredField("field entryPoint is required")
 	}
 
 	// Validation for field "constants"
@@ -1377,6 +1402,7 @@ func (p *preIrSchema) validate() error {
 // transform transforms the preIrSchema type to the final IrSchema type
 func (p *preIrSchema) transform() IrSchema {
 	// Transformations
+	transEntryPoint := *p.EntryPoint
 	var transConstants []ConstantDef
 	transConstants = make([]ConstantDef, len(*p.Constants))
 	for i, v := range *p.Constants {
@@ -1408,10 +1434,11 @@ func (p *preIrSchema) transform() IrSchema {
 
 	// Assignments
 	return IrSchema{
-		Constants: transConstants,
-		Enums:     transEnums,
-		Types:     transTypes,
-		Docs:      transDocs,
+		EntryPoint: transEntryPoint,
+		Constants:  transConstants,
+		Enums:      transEnums,
+		Types:      transTypes,
+		Docs:       transDocs,
 	}
 }
 
@@ -1426,6 +1453,8 @@ func (p *preIrSchema) transform() IrSchema {
 // - `object` -> `objectEntries`
 // - `array` -> `arrayItems`
 type LiteralValue struct {
+	// Source position of this literal value
+	Position Position `json:"position"`
 	// Value category discriminator
 	Kind LiteralKind `json:"kind"`
 	// Payload for `kind = string`
@@ -1440,6 +1469,23 @@ type LiteralValue struct {
 	ObjectEntries *[]ObjectEntry `json:"objectEntries,omitempty"`
 	// Payload for `kind = array`
 	ArrayItems *[]LiteralValue `json:"arrayItems,omitempty"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *LiteralValue) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *LiteralValue) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetKind returns the value of Kind or the zero value if the receiver or field is nil.
@@ -1563,6 +1609,7 @@ func (x *LiteralValue) GetArrayItemsOr(defaultValue []LiteralValue) []LiteralVal
 
 // preLiteralValue is the version of LiteralValue previous to the required field validation
 type preLiteralValue struct {
+	Position      *prePosition       `json:"position,omitempty"`
 	Kind          *LiteralKind       `json:"kind,omitempty"`
 	StringValue   *string            `json:"stringValue,omitempty"`
 	IntValue      *int64             `json:"intValue,omitempty"`
@@ -1576,6 +1623,16 @@ type preLiteralValue struct {
 func (p *preLiteralValue) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preLiteralValue is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "kind"
@@ -1615,6 +1672,8 @@ func (p *preLiteralValue) validate() error {
 // transform transforms the preLiteralValue type to the final LiteralValue type
 func (p *preLiteralValue) transform() LiteralValue {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transKind := *p.Kind
 	transStringValue := p.StringValue
 	transIntValue := p.IntValue
@@ -1645,6 +1704,7 @@ func (p *preLiteralValue) transform() LiteralValue {
 
 	// Assignments
 	return LiteralValue{
+		Position:      transPosition,
 		Kind:          transKind,
 		StringValue:   transStringValue,
 		IntValue:      transIntValue,
@@ -1657,10 +1717,29 @@ func (p *preLiteralValue) transform() LiteralValue {
 
 // Key/value pair inside an object LiteralValue payload
 type ObjectEntry struct {
+	// Source position of this key-value pair
+	Position Position `json:"position"`
 	// Object key
 	Key string `json:"key"`
 	// Fully resolved value for this key
 	Value LiteralValue `json:"value"`
+}
+
+// GetPosition returns the value of Position or the zero value if the receiver or field is nil.
+func (x *ObjectEntry) GetPosition() Position {
+	if x != nil {
+		return x.Position
+	}
+	var zero Position
+	return zero
+}
+
+// GetPositionOr returns the value of Position or the provided default if the receiver or field is nil.
+func (x *ObjectEntry) GetPositionOr(defaultValue Position) Position {
+	if x != nil {
+		return x.Position
+	}
+	return defaultValue
 }
 
 // GetKey returns the value of Key or the zero value if the receiver or field is nil.
@@ -1699,14 +1778,25 @@ func (x *ObjectEntry) GetValueOr(defaultValue LiteralValue) LiteralValue {
 
 // preObjectEntry is the version of ObjectEntry previous to the required field validation
 type preObjectEntry struct {
-	Key   *string          `json:"key,omitempty"`
-	Value *preLiteralValue `json:"value,omitempty"`
+	Position *prePosition     `json:"position,omitempty"`
+	Key      *string          `json:"key,omitempty"`
+	Value    *preLiteralValue `json:"value,omitempty"`
 }
 
 // validate validates the required fields of ObjectEntry
 func (p *preObjectEntry) validate() error {
 	if p == nil {
 		return errorMissingRequiredField("preObjectEntry is nil")
+	}
+
+	// Validation for field "position"
+	if p.Position == nil {
+		return errorMissingRequiredField("field position is required")
+	}
+	if p.Position != nil {
+		if err := p.Position.validate(); err != nil {
+			return errorMissingRequiredField("field position: " + err.Error())
+		}
 	}
 
 	// Validation for field "key"
@@ -1730,14 +1820,17 @@ func (p *preObjectEntry) validate() error {
 // transform transforms the preObjectEntry type to the final ObjectEntry type
 func (p *preObjectEntry) transform() ObjectEntry {
 	// Transformations
+	var transPosition Position
+	transPosition = p.Position.transform()
 	transKey := *p.Key
 	var transValue LiteralValue
 	transValue = p.Value.transform()
 
 	// Assignments
 	return ObjectEntry{
-		Key:   transKey,
-		Value: transValue,
+		Position: transPosition,
+		Key:      transKey,
+		Value:    transValue,
 	}
 }
 
@@ -1941,7 +2034,8 @@ func (p *preTopLevelDoc) transform() TopLevelDoc {
 // All spreads are already expanded. The unified `typeRef` describes what this
 // type IS, a primitive, custom reference, map, array, or object with fields.
 type TypeDef struct {
-	// Source position of this definition
+	// Source position of this type definition.
+	// Will be zero valued if the type was inferred by the compiler.
 	Position Position `json:"position"`
 	// Type name
 	Name string `json:"name"`

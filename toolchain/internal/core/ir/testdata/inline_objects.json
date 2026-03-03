@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
   "constants": [],
   "enums": [],
   "types": [

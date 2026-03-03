@@ -1,4 +1,5 @@
 {
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
   "constants": [
     {
       "position": {
@@ -14,6 +15,11 @@
         "primitiveName": "string"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 6,
+          "column": 20
+        },
         "kind": "string",
         "stringValue": "1.0.0"
       }
@@ -60,18 +66,43 @@
         ]
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 19,
+          "column": 20
+        },
         "kind": "object",
         "objectEntries": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+              "line": 20,
+              "column": 3
+            },
             "key": "host",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+                "line": 20,
+                "column": 8
+              },
               "kind": "string",
               "stringValue": "localhost"
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+              "line": 21,
+              "column": 3
+            },
             "key": "port",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+                "line": 21,
+                "column": 8
+              },
               "kind": "int",
               "intValue": 8080
             }
@@ -92,6 +123,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 3,
+          "column": 21
+        },
         "kind": "int",
         "intValue": 100
       }
@@ -110,6 +146,11 @@
         "primitiveName": "float"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 9,
+          "column": 24
+        },
         "kind": "float",
         "floatValue": 0.21
       }
@@ -128,6 +169,11 @@
         "primitiveName": "bool"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 12,
+          "column": 22
+        },
         "kind": "bool",
         "boolValue": true
       }
@@ -146,6 +192,11 @@
         "primitiveName": "bool"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 15,
+          "column": 20
+        },
         "kind": "bool",
         "boolValue": false
       }
@@ -173,6 +224,11 @@
         "primitiveName": "int"
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 3,
+          "column": 21
+        },
         "kind": "int",
         "intValue": 100
       }
@@ -233,25 +289,60 @@
         ]
       },
       "value": {
+        "position": {
+          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+          "line": 24,
+          "column": 20
+        },
         "kind": "object",
         "objectEntries": [
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+              "line": 20,
+              "column": 3
+            },
             "key": "host",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+                "line": 20,
+                "column": 8
+              },
               "kind": "string",
               "stringValue": "localhost"
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+              "line": 21,
+              "column": 3
+            },
             "key": "port",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+                "line": 21,
+                "column": 8
+              },
               "kind": "int",
               "intValue": 8080
             }
           },
           {
+            "position": {
+              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+              "line": 26,
+              "column": 3
+            },
             "key": "secure",
             "value": {
+              "position": {
+                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
+                "line": 26,
+                "column": 10
+              },
               "kind": "bool",
               "boolValue": true
             }
