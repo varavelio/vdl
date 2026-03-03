@@ -253,35 +253,38 @@
     {
       "name": "Address",
       "annotations": [],
-      "fields": [
-        {
-          "name": "street",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "street",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "city",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "location",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Coordinates"
+            }
           }
-        },
-        {
-          "name": "city",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "location",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "type",
-            "typeName": "Coordinates"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "AuditFields",
@@ -290,158 +293,167 @@
           "name": "entity"
         }
       ],
-      "fields": [
-        {
-          "name": "createdAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "createdAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
           }
-        },
-        {
-          "name": "updatedAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "Coordinates",
       "annotations": [],
-      "fields": [
-        {
-          "name": "lat",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "float"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "lat",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "float"
+            }
+          },
+          {
+            "name": "lng",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "float"
+            }
           }
-        },
-        {
-          "name": "lng",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "float"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "User",
       "annotations": [],
-      "fields": [
-        {
-          "name": "createdAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
-          }
-        },
-        {
-          "name": "updatedAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
-          }
-        },
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [
-            {
-              "name": "id"
-            }
-          ],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "email",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "address",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "type",
-            "typeName": "Address"
-          }
-        },
-        {
-          "name": "tags",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "createdAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
               "kind": "primitive",
-              "primitiveName": "string"
-            },
-            "arrayDims": 1
-          }
-        },
-        {
-          "name": "metadata",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
-              "kind": "primitive",
-              "primitiveName": "string"
+              "primitiveName": "datetime"
             }
-          }
-        },
-        {
-          "name": "preferences",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "object",
-            "objectFields": [
+          },
+          {
+            "name": "updatedAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [
               {
-                "name": "locale",
-                "optional": false,
-                "annotations": [],
-                "typeRef": {
-                  "kind": "primitive",
-                  "primitiveName": "string"
-                }
-              },
-              {
-                "name": "notifications",
-                "optional": false,
-                "annotations": [],
-                "typeRef": {
-                  "kind": "primitive",
-                  "primitiveName": "bool"
-                }
+                "name": "id"
               }
-            ]
+            ],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "email",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "address",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Address"
+            }
+          },
+          {
+            "name": "tags",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              },
+              "arrayDims": 1
+            }
+          },
+          {
+            "name": "metadata",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              }
+            }
+          },
+          {
+            "name": "preferences",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "locale",
+                  "optional": false,
+                  "annotations": [],
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "name": "notifications",
+                  "optional": false,
+                  "annotations": [],
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "bool"
+                  }
+                }
+              ]
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": [

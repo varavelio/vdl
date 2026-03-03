@@ -95,37 +95,40 @@
     {
       "name": "Order",
       "annotations": [],
-      "fields": [
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "status",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "enum",
+              "enumName": "OrderStatus",
+              "enumType": "string"
+            }
+          },
+          {
+            "name": "priority",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "enum",
+              "enumName": "Priority",
+              "enumType": "int"
+            }
           }
-        },
-        {
-          "name": "status",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "enum",
-            "enumName": "OrderStatus",
-            "enumType": "string"
-          }
-        },
-        {
-          "name": "priority",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "enum",
-            "enumName": "Priority",
-            "enumType": "int"
-          }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": []

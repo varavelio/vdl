@@ -52,12 +52,26 @@ func convertType(
 	enums map[string]*analysis.EnumSymbol,
 	resolver *valueResolver,
 ) irtypes.TypeDef {
-	return irtypes.TypeDef{
+	def := irtypes.TypeDef{
 		Name:        typ.Name,
 		Doc:         normalizeDocPtr(typ.Docstring),
 		Annotations: convertAnnotations(typ.Annotations, resolver),
-		Fields:      flattenTypeFields(typ, types, enums, resolver),
 	}
+
+	// Convert the unified type reference to an IR TypeRef
+	typeRef := convertFieldType(typ.Type, types, enums, resolver)
+
+	// For object types, flatten spreads into the fields
+	if typ.IsObject() && typ.Type != nil && typ.Type.ObjectDef != nil {
+		fields := flattenTypeFields(typ, types, enums, resolver)
+		typeRef = irtypes.TypeRef{
+			Kind:         irtypes.TypeKindObject,
+			ObjectFields: &fields,
+		}
+	}
+
+	def.TypeRef = typeRef
+	return def
 }
 
 func convertEnum(

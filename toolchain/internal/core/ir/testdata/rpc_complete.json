@@ -82,153 +82,168 @@
     {
       "name": "PaginatedResponse",
       "annotations": [],
-      "fields": [
-        {
-          "name": "totalItems",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "totalItems",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "totalPages",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
           }
-        },
-        {
-          "name": "totalPages",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "PaginationParams",
       "annotations": [],
-      "fields": [
-        {
-          "name": "page",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "page",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "limit",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
           }
-        },
-        {
-          "name": "limit",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "User",
       "annotations": [],
-      "fields": [
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "name",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "email",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "name",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "email",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "UserListResult",
       "annotations": [],
-      "fields": [
-        {
-          "name": "totalItems",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "totalItems",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "totalPages",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "users",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "type",
+                "typeName": "User"
+              },
+              "arrayDims": 1
+            }
           }
-        },
-        {
-          "name": "totalPages",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        },
-        {
-          "name": "users",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "type",
-              "typeName": "User"
-            },
-            "arrayDims": 1
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "UserQuery",
       "annotations": [],
-      "fields": [
-        {
-          "name": "page",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "page",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "limit",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "filterByName",
+            "optional": true,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "limit",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        },
-        {
-          "name": "filterByName",
-          "optional": true,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": []

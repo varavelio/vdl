@@ -5,149 +5,164 @@
     {
       "name": "AuditFields",
       "annotations": [],
-      "fields": [
-        {
-          "name": "createdAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "createdAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
           }
-        },
-        {
-          "name": "updatedAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "BaseEntity",
       "annotations": [],
-      "fields": [
-        {
-          "name": "timestamp",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "timestamp",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "NestedSpread",
       "annotations": [],
-      "fields": [
-        {
-          "name": "timestamp",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "timestamp",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "name",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "active",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "bool"
+            }
           }
-        },
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "name",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "active",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "bool"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "Timestamps",
       "annotations": [],
-      "fields": [
-        {
-          "name": "timestamp",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "timestamp",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "User",
       "annotations": [],
-      "fields": [
-        {
-          "name": "createdAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "createdAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "updatedAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "name",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "updatedAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
-          }
-        },
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "name",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": []

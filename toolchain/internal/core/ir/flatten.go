@@ -13,10 +13,10 @@ func flattenTypeFields(
 	enums map[string]*analysis.EnumSymbol,
 	resolver *valueResolver,
 ) []irtypes.Field {
-	if typ == nil {
+	if typ == nil || !typ.IsObject() || typ.Type.ObjectDef == nil {
 		return nil
 	}
-	return flattenFieldsWithSpreads(typ.Fields, typ.Spreads, types, enums, resolver, map[string]bool{typ.Name: true})
+	return flattenFieldsWithSpreads(typ.Type.ObjectDef.Fields, typ.Type.ObjectDef.Spreads, types, enums, resolver, map[string]bool{typ.Name: true})
 }
 
 func flattenFieldsWithSpreads(
@@ -34,13 +34,13 @@ func flattenFieldsWithSpreads(
 			continue
 		}
 		spreadType := types[spread.Name]
-		if spreadType == nil || visiting[spreadType.Name] {
+		if spreadType == nil || !spreadType.IsObject() || spreadType.Type.ObjectDef == nil || visiting[spreadType.Name] {
 			continue
 		}
 
 		nextVisiting := cloneVisited(visiting)
 		nextVisiting[spreadType.Name] = true
-		spreadFields := flattenFieldsWithSpreads(spreadType.Fields, spreadType.Spreads, types, enums, resolver, nextVisiting)
+		spreadFields := flattenFieldsWithSpreads(spreadType.Type.ObjectDef.Fields, spreadType.Type.ObjectDef.Spreads, types, enums, resolver, nextVisiting)
 		result = append(result, spreadFields...)
 	}
 

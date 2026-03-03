@@ -5,86 +5,92 @@
     {
       "name": "OptionalFields",
       "annotations": [],
-      "fields": [
-        {
-          "name": "required",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "required",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "optional",
+            "optional": true,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "optionalInt",
+            "optional": true,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
           }
-        },
-        {
-          "name": "optional",
-          "optional": true,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "optionalInt",
-          "optional": true,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "SimpleType",
       "annotations": [],
-      "fields": [
-        {
-          "name": "name",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "name",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "age",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "name": "score",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "float"
+            }
+          },
+          {
+            "name": "active",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "bool"
+            }
+          },
+          {
+            "name": "createdAt",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
           }
-        },
-        {
-          "name": "age",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "int"
-          }
-        },
-        {
-          "name": "score",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "float"
-          }
-        },
-        {
-          "name": "active",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "bool"
-          }
-        },
-        {
-          "name": "createdAt",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "datetime"
-          }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": [

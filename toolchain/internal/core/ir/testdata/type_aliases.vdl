@@ -1,0 +1,33 @@
+""" Type alias test schema. """
+
+type Name string
+
+type Age int
+
+type Score float
+
+type Active bool
+
+type Timestamp datetime
+
+type Names string[]
+
+type Matrix int[][]
+
+type UserConfig map[string]
+
+type UserMap map[User]
+
+type UserList User[]
+
+""" A documented alias type. """
+@entity
+type UserID string
+
+type User {
+  id UserID
+  name Name
+  age Age
+  scores Score[]
+  config UserConfig
+}

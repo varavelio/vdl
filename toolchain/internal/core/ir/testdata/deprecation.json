@@ -73,34 +73,37 @@
     {
       "name": "Account",
       "annotations": [],
-      "fields": [
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [
-            {
-              "name": "deprecated",
-              "argument": {
-                "kind": "string",
-                "stringValue": "Use accountId"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [
+              {
+                "name": "deprecated",
+                "argument": {
+                  "kind": "string",
+                  "stringValue": "Use accountId"
+                }
               }
+            ],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
             }
-          ],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+          },
+          {
+            "name": "accountId",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "accountId",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "LegacyUser",
@@ -109,26 +112,29 @@
           "name": "deprecated"
         }
       ],
-      "fields": [
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "name",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "name",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "OldUser",
@@ -141,17 +147,20 @@
           }
         }
       ],
-      "fields": [
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": []

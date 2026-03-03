@@ -157,235 +157,256 @@
     {
       "name": "DeepInline",
       "annotations": [],
-      "fields": [
-        {
-          "name": "level1",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "object",
-            "objectFields": [
-              {
-                "name": "level2",
-                "optional": false,
-                "annotations": [],
-                "typeRef": {
-                  "kind": "object",
-                  "objectFields": [
-                    {
-                      "name": "level3",
-                      "optional": false,
-                      "annotations": [],
-                      "typeRef": {
-                        "kind": "object",
-                        "objectFields": [
-                          {
-                            "name": "value",
-                            "optional": false,
-                            "annotations": [],
-                            "typeRef": {
-                              "kind": "primitive",
-                              "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "level1",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "level2",
+                  "optional": false,
+                  "annotations": [],
+                  "typeRef": {
+                    "kind": "object",
+                    "objectFields": [
+                      {
+                        "name": "level3",
+                        "optional": false,
+                        "annotations": [],
+                        "typeRef": {
+                          "kind": "object",
+                          "objectFields": [
+                            {
+                              "name": "value",
+                              "optional": false,
+                              "annotations": [],
+                              "typeRef": {
+                                "kind": "primitive",
+                                "primitiveName": "string"
+                              }
                             }
-                          }
-                        ]
+                          ]
+                        }
                       }
-                    }
-                  ]
+                    ]
+                  }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "EmptyType",
       "annotations": [],
-      "fields": []
+      "typeRef": {
+        "kind": "object",
+        "objectFields": []
+      }
     },
     {
       "name": "EnumsEverywhere",
       "annotations": [],
-      "fields": [
-        {
-          "name": "status",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "enum",
-            "enumName": "Status",
-            "enumType": "string"
-          }
-        },
-        {
-          "name": "statusList",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "enum",
-              "enumName": "Status",
-              "enumType": "string"
-            },
-            "arrayDims": 1
-          }
-        },
-        {
-          "name": "statusMatrix",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "enum",
-              "enumName": "Status",
-              "enumType": "string"
-            },
-            "arrayDims": 2
-          }
-        },
-        {
-          "name": "statusMap",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "status",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
               "kind": "enum",
               "enumName": "Status",
               "enumType": "string"
             }
+          },
+          {
+            "name": "statusList",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "enum",
+                "enumName": "Status",
+                "enumType": "string"
+              },
+              "arrayDims": 1
+            }
+          },
+          {
+            "name": "statusMatrix",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "enum",
+                "enumName": "Status",
+                "enumType": "string"
+              },
+              "arrayDims": 2
+            }
+          },
+          {
+            "name": "statusMap",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "enum",
+                "enumName": "Status",
+                "enumType": "string"
+              }
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "InlineWithSpread",
       "annotations": [],
-      "fields": [
-        {
-          "name": "baseField",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        },
-        {
-          "name": "inlineObj",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "object",
-            "objectFields": [
-              {
-                "name": "nested",
-                "optional": false,
-                "annotations": [],
-                "typeRef": {
-                  "kind": "primitive",
-                  "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "baseField",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "inlineObj",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "nested",
+                  "optional": false,
+                  "annotations": [],
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "OptionalComplex",
       "annotations": [],
-      "fields": [
-        {
-          "name": "optMatrix",
-          "optional": true,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "primitive",
-              "primitiveName": "int"
-            },
-            "arrayDims": 2
-          }
-        },
-        {
-          "name": "optMapMap",
-          "optional": true,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "optMatrix",
+            "optional": true,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "int"
+              },
+              "arrayDims": 2
+            }
+          },
+          {
+            "name": "optMapMap",
+            "optional": true,
+            "annotations": [],
+            "typeRef": {
               "kind": "map",
               "mapType": {
-                "kind": "primitive",
-                "primitiveName": "string"
-              }
-            }
-          }
-        },
-        {
-          "name": "optObject",
-          "optional": true,
-          "annotations": [],
-          "typeRef": {
-            "kind": "object",
-            "objectFields": [
-              {
-                "name": "innerOpt",
-                "optional": true,
-                "annotations": [],
-                "typeRef": {
+                "kind": "map",
+                "mapType": {
                   "kind": "primitive",
                   "primitiveName": "string"
                 }
-              },
-              {
-                "name": "innerReq",
-                "optional": false,
-                "annotations": [],
-                "typeRef": {
-                  "kind": "primitive",
-                  "primitiveName": "int"
-                }
               }
-            ]
+            }
+          },
+          {
+            "name": "optObject",
+            "optional": true,
+            "annotations": [],
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "name": "innerOpt",
+                  "optional": true,
+                  "annotations": [],
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "name": "innerReq",
+                  "optional": false,
+                  "annotations": [],
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                }
+              ]
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "SingleField",
       "annotations": [],
-      "fields": [
-        {
-          "name": "only",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "only",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "name": "SpreadBase",
       "annotations": [],
-      "fields": [
-        {
-          "name": "baseField",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "baseField",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": [

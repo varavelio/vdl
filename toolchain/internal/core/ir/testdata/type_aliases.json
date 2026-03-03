@@ -1,0 +1,180 @@
+{
+  "constants": [],
+  "enums": [],
+  "types": [
+    {
+      "name": "Active",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "bool"
+      }
+    },
+    {
+      "name": "Age",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "int"
+      }
+    },
+    {
+      "name": "Matrix",
+      "annotations": [],
+      "typeRef": {
+        "kind": "array",
+        "arrayType": {
+          "kind": "primitive",
+          "primitiveName": "int"
+        },
+        "arrayDims": 2
+      }
+    },
+    {
+      "name": "Name",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      }
+    },
+    {
+      "name": "Names",
+      "annotations": [],
+      "typeRef": {
+        "kind": "array",
+        "arrayType": {
+          "kind": "primitive",
+          "primitiveName": "string"
+        },
+        "arrayDims": 1
+      }
+    },
+    {
+      "name": "Score",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "float"
+      }
+    },
+    {
+      "name": "Timestamp",
+      "annotations": [],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "datetime"
+      }
+    },
+    {
+      "name": "User",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "type",
+              "typeName": "UserID"
+            }
+          },
+          {
+            "name": "name",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Name"
+            }
+          },
+          {
+            "name": "age",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Age"
+            }
+          },
+          {
+            "name": "scores",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "type",
+                "typeName": "Score"
+              },
+              "arrayDims": 1
+            }
+          },
+          {
+            "name": "config",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "type",
+              "typeName": "UserConfig"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserConfig",
+      "annotations": [],
+      "typeRef": {
+        "kind": "map",
+        "mapType": {
+          "kind": "primitive",
+          "primitiveName": "string"
+        }
+      }
+    },
+    {
+      "name": "UserID",
+      "doc": "A documented alias type.",
+      "annotations": [
+        {
+          "name": "entity"
+        }
+      ],
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      }
+    },
+    {
+      "name": "UserList",
+      "annotations": [],
+      "typeRef": {
+        "kind": "array",
+        "arrayType": {
+          "kind": "type",
+          "typeName": "User"
+        },
+        "arrayDims": 1
+      }
+    },
+    {
+      "name": "UserMap",
+      "annotations": [],
+      "typeRef": {
+        "kind": "map",
+        "mapType": {
+          "kind": "type",
+          "typeName": "User"
+        }
+      }
+    }
+  ],
+  "docs": [
+    {
+      "content": "Type alias test schema."
+    }
+  ]
+}

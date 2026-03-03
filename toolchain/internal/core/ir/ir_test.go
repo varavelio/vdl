@@ -63,10 +63,10 @@ func TestNormalizeDoc(t *testing.T) {
 		expected string
 	}{
 		{name: "nil input", input: nil, expected: ""},
-		{name: "empty string", input: ptr(""), expected: ""},
-		{name: "single line", input: ptr("Hello World"), expected: "Hello World"},
-		{name: "single line with whitespace", input: ptr("  Hello World  "), expected: "Hello World"},
-		{name: "multi-line with indent", input: ptr("    Line 1\n    Line 2\n    Line 3"), expected: "Line 1\nLine 2\nLine 3"},
+		{name: "empty string", input: new(""), expected: ""},
+		{name: "single line", input: new("Hello World"), expected: "Hello World"},
+		{name: "single line with whitespace", input: new("  Hello World  "), expected: "Hello World"},
+		{name: "multi-line with indent", input: new("    Line 1\n    Line 2\n    Line 3"), expected: "Line 1\nLine 2\nLine 3"},
 	}
 
 	for _, tt := range tests {
@@ -149,12 +149,15 @@ type Extended {
 		}
 	}
 	require.NotNil(t, extended)
-	require.Len(t, extended.Fields, 4)
+	require.Equal(t, irtypes.TypeKindObject, extended.TypeRef.Kind)
+	require.NotNil(t, extended.TypeRef.ObjectFields)
+	require.Len(t, *extended.TypeRef.ObjectFields, 4)
 
-	assert.Equal(t, "id", extended.Fields[0].Name)
-	assert.Equal(t, "createdAt", extended.Fields[1].Name)
-	assert.Equal(t, "name", extended.Fields[2].Name)
-	assert.Equal(t, "active", extended.Fields[3].Name)
+	fields := *extended.TypeRef.ObjectFields
+	assert.Equal(t, "id", fields[0].Name)
+	assert.Equal(t, "createdAt", fields[1].Name)
+	assert.Equal(t, "name", fields[2].Name)
+	assert.Equal(t, "active", fields[3].Name)
 }
 
 func TestConstantResolution(t *testing.T) {
@@ -267,14 +270,17 @@ func TestIrSchemaJSONSerialization(t *testing.T) {
 			{
 				Name:        "User",
 				Annotations: []irtypes.Annotation{},
-				Fields: []irtypes.Field{
-					{
-						Name:        "id",
-						Optional:    false,
-						Annotations: []irtypes.Annotation{},
-						TypeRef: irtypes.TypeRef{
-							Kind:          irtypes.TypeKindPrimitive,
-							PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString),
+				TypeRef: irtypes.TypeRef{
+					Kind: irtypes.TypeKindObject,
+					ObjectFields: &[]irtypes.Field{
+						{
+							Name:        "id",
+							Optional:    false,
+							Annotations: []irtypes.Annotation{},
+							TypeRef: irtypes.TypeRef{
+								Kind:          irtypes.TypeKindPrimitive,
+								PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeString),
+							},
 						},
 					},
 				},
@@ -306,11 +312,8 @@ func TestIrSchemaJSONSerialization(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "User", parsed.Types[0].Name)
-	assert.Equal(t, "id", parsed.Types[0].Fields[0].Name)
+	require.NotNil(t, parsed.Types[0].TypeRef.ObjectFields)
+	assert.Equal(t, "id", (*parsed.Types[0].TypeRef.ObjectFields)[0].Name)
 	assert.Equal(t, "maxRetries", parsed.Constants[0].Name)
 	assert.Equal(t, int64(3), parsed.Constants[0].Value.GetIntValue())
-}
-
-func ptr(s string) *string {
-	return &s
 }

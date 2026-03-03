@@ -25,28 +25,31 @@
       "name": "DocumentedType",
       "doc": "This docstring has leading indentation\nthat should be stripped.\n\n- Indented list\n  - Nested item",
       "annotations": [],
-      "fields": [
-        {
-          "name": "id",
-          "doc": "The unique identifier.",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "doc": "The unique identifier.",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "name": "description",
+            "doc": "A longer field description\nspanning multiple lines.",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
           }
-        },
-        {
-          "name": "description",
-          "doc": "A longer field description\nspanning multiple lines.",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": [

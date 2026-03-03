@@ -5,14 +5,73 @@
     {
       "name": "Combined",
       "annotations": [],
-      "fields": [
-        {
-          "name": "items",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "items",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "array",
+                "arrayType": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                },
+                "arrayDims": 1
+              }
+            }
+          },
+          {
+            "name": "lookup",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "map",
+                "mapType": {
+                  "kind": "primitive",
+                  "primitiveName": "int"
+                }
+              },
+              "arrayDims": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Item",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "id",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithArrays",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "tags",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
               "kind": "array",
               "arrayType": {
                 "kind": "primitive",
@@ -20,143 +79,96 @@
               },
               "arrayDims": 1
             }
+          },
+          {
+            "name": "scores",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "int"
+              },
+              "arrayDims": 1
+            }
+          },
+          {
+            "name": "matrix",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "float"
+              },
+              "arrayDims": 2
+            }
+          },
+          {
+            "name": "items",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "array",
+              "arrayType": {
+                "kind": "type",
+                "typeName": "Item"
+              },
+              "arrayDims": 1
+            }
           }
-        },
-        {
-          "name": "lookup",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
+        ]
+      }
+    },
+    {
+      "name": "WithMaps",
+      "annotations": [],
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "name": "metadata",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              }
+            }
+          },
+          {
+            "name": "counts",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
               "kind": "map",
               "mapType": {
                 "kind": "primitive",
                 "primitiveName": "int"
               }
-            },
-            "arrayDims": 1
-          }
-        }
-      ]
-    },
-    {
-      "name": "Item",
-      "annotations": [],
-      "fields": [
-        {
-          "name": "id",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "primitive",
-            "primitiveName": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "WithArrays",
-      "annotations": [],
-      "fields": [
-        {
-          "name": "tags",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "primitive",
-              "primitiveName": "string"
-            },
-            "arrayDims": 1
-          }
-        },
-        {
-          "name": "scores",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "primitive",
-              "primitiveName": "int"
-            },
-            "arrayDims": 1
-          }
-        },
-        {
-          "name": "matrix",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "primitive",
-              "primitiveName": "float"
-            },
-            "arrayDims": 2
-          }
-        },
-        {
-          "name": "items",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "array",
-            "arrayType": {
-              "kind": "type",
-              "typeName": "Item"
-            },
-            "arrayDims": 1
-          }
-        }
-      ]
-    },
-    {
-      "name": "WithMaps",
-      "annotations": [],
-      "fields": [
-        {
-          "name": "metadata",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
-              "kind": "primitive",
-              "primitiveName": "string"
             }
-          }
-        },
-        {
-          "name": "counts",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
-              "kind": "primitive",
-              "primitiveName": "int"
-            }
-          }
-        },
-        {
-          "name": "nested",
-          "optional": false,
-          "annotations": [],
-          "typeRef": {
-            "kind": "map",
-            "mapType": {
+          },
+          {
+            "name": "nested",
+            "optional": false,
+            "annotations": [],
+            "typeRef": {
               "kind": "map",
               "mapType": {
-                "kind": "primitive",
-                "primitiveName": "bool"
+                "kind": "map",
+                "mapType": {
+                  "kind": "primitive",
+                  "primitiveName": "bool"
+                }
               }
             }
           }
-        }
-      ]
+        ]
+      }
     }
   ],
   "docs": []
