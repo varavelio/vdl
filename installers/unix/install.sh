@@ -1,27 +1,27 @@
 #!/bin/sh
 set -e
 
-# ======================================================================================
-# VDL Installer Script (macOS/Linux)
-#
-# Usage:
-#   curl -fsSL https://get.varavel.com/vdl | sh
-#
-# Options:
-#   VERSION      : Specify a version (e.g., vx.x.x). Defaults to "latest".
-#   INSTALL_DIR  : Directory to install the binary. Defaults to "/usr/local/bin".
-#   QUIET        : Set to "true" to suppress all output (e.g., QUIET=true).
-#
-# Examples:
-#   # Install or update to latest version
-#   curl -fsSL https://get.varavel.com/vdl | sh
-#
-#   # Install specific version
-#   curl -fsSL https://get.varavel.com/vdl | VERSION=vx.x.x sh
-#
-#   # Install to a custom directory quietly
-#   curl -fsSL https://get.varavel.com/vdl | INSTALL_DIR=$HOME/.local/bin QUIET=true sh
-# ======================================================================================
+# ====================================================================================== #
+# VDL Installer Script (macOS/Linux)                                                     #
+#                                                                                        #
+# Usage:                                                                                 #
+#   curl -fsSL https://get.varavel.com/vdl | sh                                          #
+#                                                                                        #
+# Options:                                                                               #
+#   VERSION      : Specify a version (e.g., vx.x.x). Defaults to "latest".               #
+#   INSTALL_DIR  : Directory to install the binary. Defaults to "/usr/local/bin".        #
+#   QUIET        : Set to "true" to suppress all output (e.g., QUIET=true).              #
+#                                                                                        #
+# Examples:                                                                              #
+#   # Install or update to latest version                                                #
+#   curl -fsSL https://get.varavel.com/vdl | sh                                          #
+#                                                                                        #
+#   # Install specific version                                                           #
+#   curl -fsSL https://get.varavel.com/vdl | VERSION=vx.x.x sh                           #
+#                                                                                        #
+#   # Install to a custom directory quietly                                              #
+#   curl -fsSL https://get.varavel.com/vdl | INSTALL_DIR=$HOME/.local/bin QUIET=true sh  #
+# ====================================================================================== #
 
 # Configuration
 REPO="varavelio/vdl"
