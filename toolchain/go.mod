@@ -7,7 +7,7 @@ require (
 	github.com/alexflint/go-arg v1.6.1
 	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/stretchr/testify v1.11.1
-	github.com/varavelio/tinta v0.1.1
+	github.com/varavelio/tinta v0.2.0
 	golang.org/x/text v0.32.0
 )
 
