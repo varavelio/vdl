@@ -2,10 +2,8 @@ package version
 
 import (
 	"strings"
-	"unicode/utf8"
 
 	"github.com/varavelio/tinta"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 // These variables are set at build time using ldflags.
@@ -18,76 +16,60 @@ var (
 	Date = "unknown"
 )
 
-// asciiArtRaw is used to generate AsciiArt.
-var asciiArtRaw = strings.TrimSpace(`
-██╗  ██╗█████╗ ██╗
-██║  ██║██╔═██╗██║
-╚██╗██╔╝██║ ██║██║
- ╚███╔╝ █████╔╝█████╗
-  ╚══╝  ╚════╝ ╚════╝
-`)
-
-// basicInfoRaw is used to generate AsciiArt.
-var basicInfoRaw = strings.Join([]string{
-	"Star the repo: https://github.com/varavelio/vdl",
-	"Show usage:    vdl --help",
-	"Show version:  vdl --version",
-}, "\n")
+// asciiLogo is used to generate AsciiArt.
+var asciiLogo = []string{
+	"██╗  ██╗█████╗ ██╗   ",
+	"██║  ██║██╔═██╗██║   ",
+	"╚██╗██╔╝██║ ██║██║   ",
+	" ╚███╔╝ █████╔╝█████╗",
+	"  ╚══╝  ╚════╝ ╚════╝",
+}
 
 // AsciiArt is the ASCII art for the VDL logo, dynamically generated
 // to ensure proper centering and consistent line widths.
 var AsciiArt = func() string {
-	maxWidth := 0
-	for line := range strings.SplitSeq(basicInfoRaw, "\n") {
-		if w := utf8.RuneCountInString(line); w > maxWidth {
-			maxWidth = w
-		}
+	textBold := tinta.Text().White().Bold()
+	textLink := tinta.Text().Cyan().Bold().Underline()
+	textBlue := tinta.Text().Blue().Bold()
+	textGreen := tinta.Text().Green().Bold()
+
+	content := strings.Builder{}
+
+	// Write ascii logo
+	for _, line := range asciiLogo {
+		content.WriteString(textBlue.String(line))
+		content.WriteString("\n")
 	}
 
-	logoSection := strutil.CenterText(asciiArtRaw, maxWidth)
-	versionSection := strutil.CenterText("v"+Version, maxWidth)
-	combined := strings.Join([]string{logoSection, versionSection, "", basicInfoRaw}, "\n")
+	// Write version
+	content.WriteString(textGreen.String("v" + Version))
+	content.WriteString("\n\n")
 
-	githubURL := "https://github.com/varavelio/vdl"
-	logoLineCount := strings.Count(logoSection, "\n") + 1
-	versionLineIndex := logoLineCount
+	// Write basic info
+	content.WriteString(textBold.String("Star the repo: ") + textLink.String("https://github.com/varavelio/vdl"))
+	content.WriteString("\n")
+	content.WriteString(textBold.String("Show usage:    ") + "vdl --help")
+	content.WriteString("\n")
+	content.WriteString(textBold.String("Show version:  ") + "vdl --version")
 
-	var contentLines strings.Builder
-	for lineIndex, line := range strings.Split(combined, "\n") {
-		var coloredLine string
-		switch {
-		case lineIndex < logoLineCount:
-			coloredLine = tinta.Text().Blue().Bold().String(line)
-		case lineIndex == versionLineIndex:
-			coloredLine = tinta.Text().Green().Bold().String(line)
-		case strings.Contains(line, githubURL):
-			coloredLine = strings.Replace(line, "Star the repo:", tinta.Text().White().Bold().String("Star the repo:"), 1)
-			coloredLine = strings.Replace(coloredLine, githubURL, tinta.Text().Cyan().Bold().Underline().String(githubURL), 1)
-		case strings.HasPrefix(line, "Show usage:"):
-			coloredLine = strings.Replace(line, "Show usage:", tinta.Text().White().Bold().String("Show usage:"), 1)
-		case strings.HasPrefix(line, "Show version:"):
-			coloredLine = strings.Replace(line, "Show version:", tinta.Text().White().Bold().String("Show version:"), 1)
-		default:
-			coloredLine = line
-		}
-
-		if contentLines.Len() > 0 {
-			contentLines.WriteByte('\n')
-		}
-		contentLines.WriteString(coloredLine)
-	}
-
-	return tinta.Box().
-		BorderHeavy().
-		Blue().Bold().
-		Shadow(tinta.ShadowBottomRight, tinta.ShadowStyle{
-			TopRight:    tinta.BorderDouble.TopRight,
-			TopLeft:     tinta.BorderDouble.TopLeft,
-			BottomRight: tinta.BorderDouble.BottomRight,
-			BottomLeft:  tinta.BorderDouble.BottomLeft,
-			Vertical:    tinta.BorderDouble.Vertical,
-			Horizontal:  tinta.BorderDouble.Horizontal,
-		}).
+	mainBox := tinta.Box().
+		Border(tinta.BorderHeavy).
+		Blue().
+		Bold().
 		PaddingX(1).
-		String(contentLines.String())
+		CenterLine(0).
+		CenterLine(1).
+		CenterLine(2).
+		CenterLine(3).
+		CenterLine(4).
+		CenterLine(5).
+		String(content.String())
+
+	shadowBox := tinta.Box().
+		Border(tinta.BorderDouble).
+		Blue().
+		PaddingX(1).
+		String(content.String())
+
+	return tinta.Canvas().Add(shadowBox, 1, 1).Add(mainBox, 0, 0).String()
 }()
