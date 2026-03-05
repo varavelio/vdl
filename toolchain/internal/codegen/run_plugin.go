@@ -56,7 +56,7 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 
 	// Inject a simple console polyfill to allow plugins to log messages.
 	console := vm.NewObject()
-	console.Set("log", func(call goja.FunctionCall) goja.Value {
+	err := console.Set("log", func(call goja.FunctionCall) goja.Value {
 		tinta.Text().Bold().Print("[PLUGIN LOG] ")
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
@@ -64,7 +64,11 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 		fmt.Println()
 		return goja.Undefined()
 	})
-	console.Set("error", func(call goja.FunctionCall) goja.Value {
+	if err != nil {
+		return plugintypes.PluginOutput{}, fmt.Errorf("error initializing environment: %w", err)
+	}
+
+	err = console.Set("error", func(call goja.FunctionCall) goja.Value {
 		tinta.Text().Red().Bold().Print("[PLUGIN ERROR] ")
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
@@ -72,7 +76,11 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 		fmt.Println()
 		return goja.Undefined()
 	})
-	console.Set("warn", func(call goja.FunctionCall) goja.Value {
+	if err != nil {
+		return plugintypes.PluginOutput{}, fmt.Errorf("error initializing environment: %w", err)
+	}
+
+	err = console.Set("warn", func(call goja.FunctionCall) goja.Value {
 		tinta.Text().Yellow().Bold().Print("[PLUGIN WARN] ")
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
@@ -80,7 +88,11 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 		fmt.Println()
 		return goja.Undefined()
 	})
-	console.Set("info", func(call goja.FunctionCall) goja.Value {
+	if err != nil {
+		return plugintypes.PluginOutput{}, fmt.Errorf("error initializing environment: %w", err)
+	}
+
+	err = console.Set("info", func(call goja.FunctionCall) goja.Value {
 		tinta.Text().Cyan().Bold().Print("[PLUGIN INFO] ")
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
@@ -88,7 +100,14 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 		fmt.Println()
 		return goja.Undefined()
 	})
-	vm.Set("console", console)
+	if err != nil {
+		return plugintypes.PluginOutput{}, fmt.Errorf("error initializing environment: %w", err)
+	}
+
+	err = vm.Set("console", console)
+	if err != nil {
+		return plugintypes.PluginOutput{}, fmt.Errorf("error initializing environment: %w", err)
+	}
 
 	// Inject the polyfill to allow plugins to use CJS module system (exports, module.exports).
 	if _, err := vm.RunString(cjsPolyfill); err != nil {
