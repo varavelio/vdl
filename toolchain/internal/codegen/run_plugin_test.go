@@ -12,7 +12,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/plugintypes"
 )
 
-const runPluginGoldenRoot = "testdata/run_plugin/cases"
+const runPluginGoldenRoot = "testdata/run_plugin"
 
 type runPluginGoldenCase struct {
 	Name         string
