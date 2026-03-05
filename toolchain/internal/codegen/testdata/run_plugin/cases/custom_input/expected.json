@@ -1,0 +1,24 @@
+{
+  "input": {
+    "version": "9.9.9",
+    "ir": {
+      "entryPoint": "/custom/entry.vdl",
+      "constants": [],
+      "enums": [],
+      "types": [],
+      "docs": []
+    },
+    "options": {
+      "target": "go",
+      "module": "cjs"
+    }
+  },
+  "output": {
+    "files": [
+      {
+        "path": "input.txt",
+        "content": "9.9.9|/custom/entry.vdl|cjs"
+      }
+    ]
+  }
+}

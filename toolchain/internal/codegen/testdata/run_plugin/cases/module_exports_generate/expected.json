@@ -1,0 +1,10 @@
+{
+  "output": {
+    "files": [
+      {
+        "path": "module.txt",
+        "content": "module=esm"
+      }
+    ]
+  }
+}

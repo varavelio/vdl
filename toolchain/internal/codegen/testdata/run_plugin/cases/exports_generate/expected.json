@@ -1,0 +1,10 @@
+{
+  "output": {
+    "files": [
+      {
+        "path": "exports.txt",
+        "content": "version=1.2.3;target=typescript"
+      }
+    ]
+  }
+}

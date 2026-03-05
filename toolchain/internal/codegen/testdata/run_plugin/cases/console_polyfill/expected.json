@@ -1,0 +1,10 @@
+{
+  "output": {
+    "files": [
+      {
+        "path": "console.txt",
+        "content": "ok"
+      }
+    ]
+  }
+}
