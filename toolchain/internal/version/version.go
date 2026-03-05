@@ -52,18 +52,18 @@ var AsciiArt = func() string {
 	content.WriteString("\n")
 	content.WriteString(textBold.String("Show version:  ") + "vdl --version")
 
-	mainBox := tinta.Box().
+	mainBoxBuilder := tinta.Box().
 		Border(tinta.BorderHeavy).
 		Blue().
 		Bold().
-		PaddingX(1).
-		CenterLine(0).
-		CenterLine(1).
-		CenterLine(2).
-		CenterLine(3).
-		CenterLine(4).
-		CenterLine(5).
-		String(content.String())
+		PaddingX(1)
+
+	// Center logo and version
+	for i := range len(asciiLogo) + 1 {
+		mainBoxBuilder = mainBoxBuilder.CenterLine(i)
+	}
+
+	mainBox := mainBoxBuilder.String(content.String())
 
 	shadowBox := tinta.Box().
 		Border(tinta.BorderDouble).
