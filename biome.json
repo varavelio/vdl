@@ -46,6 +46,9 @@
   },
   "linter": {
     "enabled": true,
+    "includes": [
+      "!toolchain/internal/codegen/testdata/run_plugin"
+    ],
     "rules": {
       "recommended": true,
       "style": {
