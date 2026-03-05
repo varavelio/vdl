@@ -1,0 +1,14 @@
+"""
+It represents a position within a file and is used for error
+reporting, diagnostics, plugins, and tooling support.
+"""
+type Position {
+  """ Absolute file path """
+  file: string
+
+  """ Line number (1-indexed) """
+  line: int
+
+  """ Column number (1-indexed) """
+  column: int
+}

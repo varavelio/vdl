@@ -1,9 +1,14 @@
-"""
-PluginOutput represents the response payload written by a plugin to stdout.
+include "./common/position.vdl"
 
-After processing the input schema, the plugin outputs this JSON object
-containing all files to be generated. VDL then writes these files to the
-configured output directory.
+"""
+PluginOutput represents the response payload returned by the `plugin` function.
+
+After processing the input schema, the plugin outputs this object containing
+all files to be generated or errors to be displayed to the user.
+
+If there are no errors and at least one file is returned, VDL will write each
+file to the specified path within the output directory. If there are errors,
+VDL will display them to the user and not write any files.
 """
 type PluginOutput {
   """
@@ -16,6 +21,13 @@ type PluginOutput {
   If no files are returned, VDL will not write anything.
   """
   files?: PluginOutputFile[]
+
+  """
+  List of semantic errors encountered by the plugin.
+
+  If present, VDL will stop the compilation and display them to the user.
+  """
+  errors?: PluginOutputError[]
 }
 
 """
@@ -42,4 +54,19 @@ type PluginOutputFile {
   VDL writes this content as-is without additional processing.
   """
   content: string
+}
+
+"""
+A structured error reported by the plugin.
+"""
+type PluginOutputError {
+  """ Human-readable error message explaining what went wrong """
+  message: string
+
+  """
+  Optional source position associated with this error.
+  If provided, VDL will print a beautiful snippet highlighting the exact code.
+  If omitted, the error is treated as a global configuration/plugin error.
+  """
+  position?: Position
 }

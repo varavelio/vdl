@@ -1,37 +1,19 @@
 """
 VDL Plugin Protocol Schema
 
-This schema defines the JSON-based communication protocol between the VDL code generator
-and external plugin executables. Plugins enable extending VDL's code generation capabilities
-to support custom languages, frameworks, or output formats.
+This schema defines the exact communication protocol between the VDL compiler
+core and the sandboxed plugin environment (JavaScript via Goja).
 
 ## Protocol Overview
 
-1. VDL invokes the plugin as a subprocess using the configured command
-2. VDL writes PluginInput as JSON to the plugin's stdin
-3. The plugin processes the IR and writes PluginOutput as JSON to stdout
-4. VDL reads the output and writes the generated files to disk
+1. VDL parses and compiles the schema into an IrSchema.
+2. VDL instantiates a secure JavaScript sandbox using Goja.
+3. VDL invokes the plugin's exported `generate` function, passing a `PluginInput` object.
+4. The `generate` function returns a `PluginOutput` object (or throws a fatal error).
+5. VDL reads the output. If `errors` are present, it aborts and prints them. Otherwise, it writes the `files` to the disk.
 
-## Plugin Implementation Guidelines
-
-- Read JSON from stdin, parse as PluginInput
-- Process the IrSchema to generate code for your target
-- Write JSON to stdout, formatted as PluginOutput
-- Use stderr for logging/debugging (forwarded to user)
-- Exit with code 0 on success, non-zero on failure
-
-## Example Usage in vdl.yaml
-
-```yaml
-targets:
-  - plugin:
-      command: ["python3", "my_plugin.py"]
-      output: ./generated
-      options:
-        framework: "flask"
-        version: "2.0"
-```
+A plugin SHOULD be a pure function: `function generate(input: PluginInput): PluginOutput`
 """
 
-include "./pluginInput.vdl"
-include "./pluginOutput.vdl"
+include "./plugin_input.vdl"
+include "./plugin_output.vdl"

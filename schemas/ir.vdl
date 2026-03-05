@@ -1,3 +1,5 @@
+include "./common/position.vdl"
+
 """
 IrSchema is the generator-facing representation of a VDL program.
 
@@ -71,22 +73,6 @@ enum LiteralKind {
   Bool = "bool"
   Object = "object"
   Array = "array"
-}
-
-/***********
-* POSITION *
-***********/
-
-""" Source position where a declaration was defined """
-type Position {
-  """ Absolute file path """
-  file: string
-
-  """ Line number (1-indexed) """
-  line: int
-
-  """ Column number (1-indexed) """
-  column: int
 }
 
 /*******************
