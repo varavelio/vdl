@@ -1,0 +1,25 @@
+{
+  "input": {
+    "version": "1.2.3",
+    "ir": {
+      "entryPoint": "/schema/main.vdl",
+      "constants": [],
+      "enums": [],
+      "types": [],
+      "docs": []
+    },
+    "options": {
+      "target": "typescript",
+      "module": "esm",
+      "note": "line 1\n\"quote\" and \\\\"
+    }
+  },
+  "output": {
+    "files": [
+      {
+        "path": "special.txt",
+        "content": "line 1\n\"quote\" and \\\\"
+      }
+    ]
+  }
+}

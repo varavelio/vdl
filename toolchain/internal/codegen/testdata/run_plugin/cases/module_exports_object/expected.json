@@ -1,0 +1,10 @@
+{
+  "output": {
+    "files": [
+      {
+        "path": "module-object.txt",
+        "content": "typescript"
+      }
+    ]
+  }
+}

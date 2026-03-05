@@ -1,0 +1,10 @@
+{
+  "output": {
+    "files": [
+      {
+        "path": "winner.txt",
+        "content": "exports"
+      }
+    ]
+  }
+}
