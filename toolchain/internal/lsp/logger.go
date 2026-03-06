@@ -5,11 +5,12 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/varavelio/vdl/toolchain/internal/dirs"
 )
 
 const (
 	maxLogSizeBytes = 3 * 1024 * 1024 // 3MB
-	logDirName      = "vdl"
 	logFileName     = "lsp.log"
 	oldLogFileName  = "lsp.old.log"
 )
@@ -25,16 +26,7 @@ type LSPLogger struct {
 // GetLogFilePath returns the absolute path to the log file.
 // Used by the CLI (vdl lsp --log-path) and the Logger.
 func GetLogFilePath() string {
-	cacheDir, err := os.UserCacheDir()
-	if err != nil {
-		cacheDir = os.TempDir()
-	}
-
-	// Ensure directory exists
-	dir := filepath.Join(cacheDir, logDirName)
-	_ = os.MkdirAll(dir, 0755)
-
-	return filepath.Join(dir, logFileName)
+	return filepath.Join(dirs.GetLogsDir(), logFileName)
 }
 
 func NewLSPLogger() *LSPLogger {
@@ -57,11 +49,11 @@ func (l *LSPLogger) ensureFileOpen() {
 		return
 	}
 
-	// Open in append mode for performance
-	file, err := os.OpenFile(l.path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, path, err := dirs.OpenLog(logFileName)
 	if err != nil {
 		return
 	}
+	l.path = path
 	l.file = file
 
 	// Initialize size from disk

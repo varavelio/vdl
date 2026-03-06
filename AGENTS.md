@@ -35,6 +35,7 @@ When updating this document, do so with the context of the entire document in mi
   - `internal/formatter/`: Lexer-based formatter implementation and golden tests.
   - `internal/lsp/`: Language Server handlers (definition/hover/references/rename/completion/document symbols/links).
   - `internal/codegen/`: Generation entrypoint currently under migration; plugin-oriented direction.
+  - `internal/dirs/`: VDL runtime directory helpers for home/cache/log resolution and log file creation.
   - `internal/util/`: Shared helpers (`cliutil`, `strutil`, `filepathutil`, etc.).
   - `tests/`: Currently only repository notes (`README.md`); legacy E2E suite has been removed.
 
