@@ -1,0 +1,22 @@
+"""
+VDL Lock File Schema.
+
+It ensures that builds are reproducible and secure by locking the exact 
+cryptographic hashes of all remote dependencies (plugins and schemas and
+any other remote files).
+"""
+type VdlLockFileSchema {
+  """ The version of the lockfile format. This should be set to 1. """
+  version: int
+
+  """
+  A flat map of all locked remote dependencies and its SHA-256 hash.
+
+  The key MUST be the fully resolved, canonical HTTPS URL. For GitHub
+  syntactic sugar ("owner/repo@tag"), the key will be the raw CDN URL.
+
+  The value is the SHA-256 hash of the downloaded file's content
+  in the format "sha256-<hex-string>".
+  """
+  hashes?: map<string>
+}
