@@ -62,7 +62,7 @@ func runPlugin(
 	// Inject a simple console polyfill to allow plugins to log messages.
 	console := vm.NewObject()
 	err := console.Set("log", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Bold().Print(buildPluginLogPrefix(pluginName, "log"))
+		tinta.Text().Magenta().Bold().Print(buildPluginLogPrefix(pluginName, "log"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
@@ -74,7 +74,7 @@ func runPlugin(
 	}
 
 	err = console.Set("error", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Bold().Print(buildPluginLogPrefix(pluginName, "error"))
+		tinta.Text().Red().Bold().Print(buildPluginLogPrefix(pluginName, "error"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
@@ -98,7 +98,7 @@ func runPlugin(
 	}
 
 	err = console.Set("info", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Cyan().Bold().Print(buildPluginLogPrefix(pluginName, "info"))
+		tinta.Text().Blue().Bold().Print(buildPluginLogPrefix(pluginName, "info"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
