@@ -8,21 +8,26 @@
 \*************************************************************/
 
 const config = {
+  version 1
+
   plugins [
     // {
-    //   name "varavelio/vdl-plugin-golang@v0.1.0"
-    //   output "./gen/go"
+    //   src "varavelio/vdl-plugin-golang@v0.1.0"
+    //   schema "./schema.vdl"
+    //   outDir "./gen/go"
     //   options {
     //     package "vdl"
     //   }
     // }
     // {
-    //   name "varavelio/vdl-plugin-typescript@v0.1.0"
-    //   output "./gen/ts"
+    //   src "varavelio/vdl-plugin-typescript@v0.1.0"
+    //   schema "./schema.vdl"
+    //   outDir "./gen/ts"
     // }
     // {
-    //   name "varavelio/vdl-plugin-json-schema@v0.1.0"
-    //   output "./gen/jsonschema"
+    //   src "varavelio/vdl-plugin-json-schema@v0.1.0"
+    //   schema "./schema.vdl"
+    //   outDir "./gen/jsonschema"
     //   options {
     //     id "https://example.com/schema.json"
     //     root "MyRpcBarProcInput"
@@ -30,8 +35,9 @@ const config = {
     //   }
     // }
     // {
-    //   name "varavelio/vdl-plugin-openapi@v0.1.0"
-    //   output "./gen/openapi"
+    //   src "varavelio/vdl-plugin-openapi@v0.1.0"
+    //   schema "./schema.vdl"
+    //   outDir "./gen/openapi"
     //   options {
     //     title "VDL API"
     //     version "1.0.0"
