@@ -1,0 +1,129 @@
+""" VDL configuration file schema. """
+type VdlConfig {
+  """ The version of the configuration file format. This should be set to 1. """
+  version: int
+
+  """ If VDL should clean the output directories before generating code. Default is true. """
+  cleanOutDir?: bool
+
+  """
+  Optional list of remote repositories or servers that can be used to fetch plugins.
+  Not required but useful if you want to use plugins from private repositories or
+  servers that require authentication. Each plugin will be matched against the remotes
+  based on the host.
+  """
+  remotes?: VdlConfigRemote[]
+
+  """ List of plugins to be used for code generation. """
+  plugins?: VdlConfigPlugin[]
+}
+
+""" VDL remote configuration. """
+type VdlConfigRemote {
+  """
+  The host URL of the remote repository or server without http(s):// prefix
+  e.g. "github.com", "github.com/owner/repo", "example.com" or "example.com/plugins".
+
+  If a plugin match multiple remotes, the most specific match will be used
+  e.g. if a plugin is from "github.com/owner/repo/plugin.js", the remote with
+  host "github.com/owner/repo" will be used instead of the remote with host "github.com".
+  """
+  host: string
+
+  """ Authentication details for accessing this remote host. """
+  auth?: VdlConfigRemoteAuth
+}
+
+""" VDL remote authentication configuration. """
+type VdlConfigRemoteAuth {
+  """ GitHub authentication details. """
+  github?: VdlConfigRemoteAuthGithub
+
+  """ Header-based authentication details. """
+  header?: VdlConfigRemoteAuthHeader
+
+  """ Bearer token authentication details. """
+  bearer?: VdlConfigRemoteAuthBearer
+
+  """ Basic authentication details. """
+  basic?: VdlConfigRemoteAuthBasic
+}
+
+"""
+GitHub authentication configuration. The environment variable should contain a
+GitHub Personal Access Token (PAT). The token should have "repo" scope for private
+repos or "public_repo" scope for public repos.
+"""
+type VdlConfigRemoteAuthGithub {
+  """ The name of the environment variable that contains the GitHub Personal Access Token (PAT). """
+  tokenEnv: string
+}
+
+"""
+Header-based authentication configuration. The environment variables should contain the header
+name and value to be sent with each request to the remote host.
+"""
+type VdlConfigRemoteAuthHeader {
+  """ The name of the environment variable that contains the header name to be sent. """
+  nameEnv: string
+
+  """ The name of the environment variable that contains the header value to be sent. """
+  valueEnv: string
+}
+
+"""
+Bearer token authentication configuration. The environment variable should contain
+the token to be sent as a header with the name "Authorization" and the value
+will be "Bearer <token>".
+"""
+type VdlConfigRemoteAuthBearer {
+  """ The name of the environment variable that contains the bearer token to be sent. """
+  tokenEnv: string
+}
+
+"""
+Basic authentication configuration. The environment variables should contain the
+username and password to be sent as a header with the name "Authorization" and
+the value will be "Basic <base64-encoded credentials>".
+"""
+type VdlConfigRemoteAuthBasic {
+  """ The name of the environment variable that contains the username. """
+  userEnv: string
+
+  """ The name of the environment variable that contains the password. """
+  passEnv: string
+}
+
+""" VDL plugin configuration. """
+type VdlConfigPlugin {
+  """
+  The source of the plugin, it can be:
+
+  - A GitHub repo in the format "owner/repo@ref" containing a plugin file (plugin.js) at the root.
+    The ref MUST be a tag (release version) or a full commit hash (branches are highly discouraged
+    to prevent lockfile conflicts).
+  - A local path to a plugin file, e.g. "./plugins/<plugin-name>/plugin.js" (always start with . or /).
+  - A remote URL to a plugin file, e.g. "https://example.com/plugin.js". (always start with https://).
+  """
+  src: string
+
+  """
+  Relative path to the input schema file for this plugin. VDL passes the processed intermediate
+  representation of this schema to the plugin for code generation and then writes the generated
+  code to the output directory specified by outDir.
+  """
+  schema: string
+
+  """
+  The output directory for the generated code. All generated files from this plugin will be relatively
+  placed under this directory.
+  """
+  outDir: string
+
+  """
+  Optional map of options to be passed to the plugin. The content of this map will be plugin-specific
+  and is passed as-is to the plugin. The plugin can define its own options so read the plugin
+  documentation for details.
+  """
+  options?: map<string>
+}
