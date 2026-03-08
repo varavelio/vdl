@@ -1,0 +1,3 @@
+type ImportedType {
+  value string
+}

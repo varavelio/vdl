@@ -1,0 +1,8 @@
+// @expect: E006
+// @expect: E007
+
+include "./Bad_file.vdl"
+
+type MainType {
+  name string
+}

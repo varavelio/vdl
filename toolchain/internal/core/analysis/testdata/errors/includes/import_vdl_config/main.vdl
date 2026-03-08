@@ -1,0 +1,7 @@
+// @expect: E007
+
+include "./vdl.config.vdl"
+
+type MainType {
+  name string
+}

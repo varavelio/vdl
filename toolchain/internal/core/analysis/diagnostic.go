@@ -15,6 +15,8 @@ const (
 	CodeDocstringFileNotFound = "E003"
 	CodeFileReadError         = "E004"
 	CodeParseError            = "E005"
+	CodeInvalidFileName       = "E006"
+	CodeInvalidIncludeFile    = "E007"
 )
 
 // Naming errors (E10x).

@@ -164,6 +164,11 @@ func (v *validator) buildConstSymbol(decl *ast.ConstDecl, file string) *ConstSym
 func (v *validator) validate() []Diagnostic {
 	var diagnostics []Diagnostic
 
+	diagnostics = append(diagnostics, v.validateFileNames()...)
+	if v.ctx.Err() != nil {
+		return diagnostics
+	}
+
 	// List of validators to run
 	validators := []func(*symbolTable) []Diagnostic{
 		validateNaming,

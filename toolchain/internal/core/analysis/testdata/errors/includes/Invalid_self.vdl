@@ -1,0 +1,5 @@
+// @expect: E006
+
+type User {
+  name string
+}
