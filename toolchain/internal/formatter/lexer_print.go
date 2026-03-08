@@ -281,21 +281,7 @@ func printField(w *fmtWriter, f *fieldNode) {
 }
 
 func printMultilineStatement(w *fmtWriter, lhs, rhs string, trailing *commentNode) {
-	if !strings.Contains(rhs, "\n") {
-		w.lineWithTrailing(lhs+rhs, trailing)
-		return
-	}
-	lines := strings.Split(rhs, "\n")
-	w.line(lhs + lines[0])
-	for i := 1; i < len(lines)-1; i++ {
-		w.line(lines[i])
-	}
-	last := lines[len(lines)-1]
-	if trailing != nil {
-		w.line(last + " " + trailing.Text)
-		return
-	}
-	w.line(last)
+	writeRenderedValue(w, lhs, rhs, trailing)
 }
 
 func isSingleLineConst(c *constNode) bool {

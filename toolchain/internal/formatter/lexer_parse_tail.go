@@ -85,7 +85,11 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 		for !p.is("RBrace") && !p.is("EOF") {
 			if p.is("Comment") || p.is("CommentBlock") {
 				c := p.parseComment()
-				entries = append(entries, &objectEntryNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+				if c.Inline && len(entries) > 0 {
+					entries[len(entries)-1].Trailing = c
+				} else {
+					entries = append(entries, &objectEntryNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+				}
 				continue
 			}
 			if p.is("Spread") {
@@ -118,7 +122,11 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 		for !p.is("RBracket") && !p.is("EOF") {
 			if p.is("Comment") || p.is("CommentBlock") {
 				c := p.parseComment()
-				elements = append(elements, &arrayElementNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+				if c.Inline && len(elements) > 0 {
+					elements[len(elements)-1].Trailing = c
+				} else {
+					elements = append(elements, &arrayElementNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+				}
 				continue
 			}
 			lit, end, err := p.parseLiteral()

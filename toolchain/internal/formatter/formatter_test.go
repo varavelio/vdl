@@ -28,16 +28,18 @@ func TestFormat(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, file := range files {
-		content, err := testFiles.ReadFile(path.Join("tests", file.Name()))
-		require.NoError(t, err)
+		t.Run(file.Name(), func(t *testing.T) {
+			content, err := testFiles.ReadFile(path.Join("tests", file.Name()))
+			require.NoError(t, err)
 
-		separator := "\n// >>>>\n\n"
-		input := strutil.GetStrBefore(string(content), separator)
-		expected := strutil.GetStrAfter(string(content), separator)
+			separator := "\n// >>>>\n\n"
+			input := strutil.GetStrBefore(string(content), separator)
+			expected := strutil.GetStrAfter(string(content), separator)
 
-		formatted, err := Format(file.Name(), input)
-		require.NoError(t, err, "error formatting %s", file.Name())
-		require.Equal(t, expected, formatted, "incorrect formatting for %s", file.Name())
+			formatted, err := Format(file.Name(), input)
+			require.NoError(t, err)
+			require.Equal(t, expected, formatted)
+		})
 	}
 }
 
@@ -54,15 +56,17 @@ func TestFormatOnlyOne(t *testing.T) {
 			continue
 		}
 
-		content, err := testFiles.ReadFile(path.Join("tests", file.Name()))
-		require.NoError(t, err)
+		t.Run(file.Name(), func(t *testing.T) {
+			content, err := testFiles.ReadFile(path.Join("tests", file.Name()))
+			require.NoError(t, err)
 
-		separator := "\n// >>>>\n\n"
-		input := strutil.GetStrBefore(string(content), separator)
-		expected := strutil.GetStrAfter(string(content), separator)
+			separator := "\n// >>>>\n\n"
+			input := strutil.GetStrBefore(string(content), separator)
+			expected := strutil.GetStrAfter(string(content), separator)
 
-		formatted, err := Format(file.Name(), input)
-		require.NoError(t, err, "error formatting %s", file.Name())
-		require.Equal(t, expected, formatted, "incorrect formatting for %s", file.Name())
+			formatted, err := Format(file.Name(), input)
+			require.NoError(t, err)
+			require.Equal(t, expected, formatted)
+		})
 	}
 }

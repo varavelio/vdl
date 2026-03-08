@@ -73,7 +73,7 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 	if len(o.Entries) == 0 {
 		return "{}"
 	}
-	if len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil {
+	if len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil && o.Entries[0].Trailing == nil {
 		e := o.Entries[0]
 		if e.Value != nil && e.Value.Scalar != nil {
 			return "{ " + strutil.ToCamelCase(e.Key) + " " + renderLiteral(*e.Value, ctx) + " }"
@@ -88,19 +88,11 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 		case e.Comment != nil:
 			w.line(e.Comment.Text)
 		case e.Spread != nil:
-			w.line("..." + renderReference(*e.Spread, ctx.spreadRef))
+			w.lineWithTrailing("..."+renderReference(*e.Spread, ctx.spreadRef), e.Trailing)
 		default:
 			key := strutil.ToCamelCase(e.Key)
 			val := renderLiteral(*e.Value, ctx)
-			if !strings.Contains(val, "\n") {
-				w.line(key + " " + val)
-				continue
-			}
-			lines := strings.Split(val, "\n")
-			w.line(key + " " + lines[0])
-			for i := 1; i < len(lines); i++ {
-				w.line(lines[i])
-			}
+			writeRenderedValue(w, key+" ", val, e.Trailing)
 		}
 	}
 	w.indent--
@@ -113,34 +105,57 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 		return "[]"
 	}
 	parts := make([]string, 0, len(a.Elements))
+	hasComments := false
+	hasTrailingComments := false
 	hasMultiline := false
 	for _, e := range a.Elements {
 		if e.Comment != nil {
+			hasComments = true
+			parts = append(parts, e.Comment.Text)
 			continue
 		}
 		rendered := renderLiteral(*e.Value, ctx)
 		hasMultiline = hasMultiline || strings.Contains(rendered, "\n")
+		hasTrailingComments = hasTrailingComments || e.Trailing != nil
 		parts = append(parts, rendered)
 	}
-	if !hasMultiline {
+	if !hasComments && !hasTrailingComments && !hasMultiline {
 		return "[" + strings.Join(parts, " ") + "]"
 	}
 
 	w := newFmtWriter()
 	w.line("[")
 	w.indent++
-	for _, part := range parts {
-		if !strings.Contains(part, "\n") {
-			w.line(part)
-			continue
-		}
-		for _, line := range strings.Split(part, "\n") {
-			w.line(line)
+	for _, e := range a.Elements {
+		switch {
+		case e.Comment != nil:
+			w.line(e.Comment.Text)
+		case e.Value != nil:
+			writeRenderedValue(w, "", renderLiteral(*e.Value, ctx), e.Trailing)
 		}
 	}
 	w.indent--
 	w.line("]")
 	return strings.TrimSuffix(w.String(), "\n")
+}
+
+func writeRenderedValue(w *fmtWriter, prefix, value string, trailing *commentNode) {
+	if !strings.Contains(value, "\n") {
+		w.lineWithTrailing(prefix+value, trailing)
+		return
+	}
+
+	lines := strings.Split(value, "\n")
+	w.line(prefix + lines[0])
+	for i := 1; i < len(lines)-1; i++ {
+		w.line(lines[i])
+	}
+	last := lines[len(lines)-1]
+	if trailing != nil {
+		w.line(last + " " + trailing.Text)
+		return
+	}
+	w.line(last)
 }
 
 func renderScalar(s scalarLiteralNode, ctx literalRenderCtx) string {

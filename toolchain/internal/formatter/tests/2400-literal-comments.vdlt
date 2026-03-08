@@ -1,0 +1,42 @@
+const Foo={ foo 1 // keep
+}
+
+const Config={
+// before
+bar "baz" // hello
+...base_config /* keep spread */
+nested { qux true zap 1 } // nested
+}
+
+const Items=[
+// before
+1 // first
+/* between */
+{ value 2 label "x" } /* second */
+]
+
+// >>>>
+
+const foo = {
+  foo 1 // keep
+}
+
+const config = {
+  // before
+  bar "baz" // hello
+  ...baseConfig /* keep spread */
+  nested {
+    qux true
+    zap 1
+  } // nested
+}
+
+const items = [
+  // before
+  1 // first
+  /* between */
+  {
+    value 2
+    label "x"
+  } /* second */
+]
