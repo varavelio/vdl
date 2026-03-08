@@ -56,17 +56,20 @@ func runPlugin(
 	script string,
 	input plugintypes.PluginInput,
 ) (plugintypes.PluginOutput, error) {
+	var logBuffer strings.Builder
+	defer flushPluginLogs(&logBuffer)
+
 	// Create the JavaScript runtime using goja.
 	vm := goja.New()
 
 	// Inject a simple console polyfill to allow plugins to log messages.
 	console := vm.NewObject()
 	err := console.Set("log", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Magenta().Bold().Print(buildPluginLogPrefix(pluginName, "log"))
-		for _, arg := range call.Arguments {
-			fmt.Printf("%v ", arg.Export())
-		}
-		fmt.Println()
+		appendPluginLogLine(
+			&logBuffer,
+			tinta.Text().Magenta().Bold().String(buildPluginLogPrefix(pluginName, "log")),
+			call.Arguments,
+		)
 		return goja.Undefined()
 	})
 	if err != nil {
@@ -74,11 +77,11 @@ func runPlugin(
 	}
 
 	err = console.Set("error", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Red().Bold().Print(buildPluginLogPrefix(pluginName, "error"))
-		for _, arg := range call.Arguments {
-			fmt.Printf("%v ", arg.Export())
-		}
-		fmt.Println()
+		appendPluginLogLine(
+			&logBuffer,
+			tinta.Text().Red().Bold().String(buildPluginLogPrefix(pluginName, "error")),
+			call.Arguments,
+		)
 		return goja.Undefined()
 	})
 	if err != nil {
@@ -86,11 +89,11 @@ func runPlugin(
 	}
 
 	err = console.Set("warn", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Yellow().Bold().Print(buildPluginLogPrefix(pluginName, "warn"))
-		for _, arg := range call.Arguments {
-			fmt.Printf("%v ", arg.Export())
-		}
-		fmt.Println()
+		appendPluginLogLine(
+			&logBuffer,
+			tinta.Text().Yellow().Bold().String(buildPluginLogPrefix(pluginName, "warn")),
+			call.Arguments,
+		)
 		return goja.Undefined()
 	})
 	if err != nil {
@@ -98,11 +101,11 @@ func runPlugin(
 	}
 
 	err = console.Set("info", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Blue().Bold().Print(buildPluginLogPrefix(pluginName, "info"))
-		for _, arg := range call.Arguments {
-			fmt.Printf("%v ", arg.Export())
-		}
-		fmt.Println()
+		appendPluginLogLine(
+			&logBuffer,
+			tinta.Text().Blue().Bold().String(buildPluginLogPrefix(pluginName, "info")),
+			call.Arguments,
+		)
 		return goja.Undefined()
 	})
 	if err != nil {
@@ -172,4 +175,28 @@ func buildPluginLogPrefix(pluginName string, prefix string) string {
 		return fmt.Sprintf("[%s] ", prefix)
 	}
 	return fmt.Sprintf("[%s %s] ", pluginName, prefix)
+}
+
+// appendPluginLogLine appends a single plugin log line to the in-memory buffer.
+func appendPluginLogLine(buffer *strings.Builder, prefix string, args []goja.Value) {
+	if buffer.Len() > 0 {
+		buffer.WriteByte('\n')
+	}
+
+	buffer.WriteString(prefix)
+	for i, arg := range args {
+		if i > 0 {
+			buffer.WriteByte(' ')
+		}
+		fmt.Fprint(buffer, arg.Export())
+	}
+}
+
+// flushPluginLogs writes the buffered plugin logs to stdout using a single print operation.
+func flushPluginLogs(buffer *strings.Builder) {
+	if buffer.Len() == 0 {
+		return
+	}
+
+	fmt.Println(buffer.String())
 }
