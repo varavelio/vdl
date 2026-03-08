@@ -57,9 +57,8 @@ func loadLockFile(path string) (locktypes.VdlLockFileSchema, error) {
 // writeLockFile persists the normalized lockfile contents as pretty-printed
 // JSON.
 func writeLockFile(path string, lockFile locktypes.VdlLockFileSchema) error {
-	hashes := cloneStringMap(lockFile.GetHashesOr(map[string]string{}))
 	lockFile.Version = lockFileVersion
-	lockFile.Hashes = &hashes
+	lockFile.Hashes = normalizeLockHashes(lockFile.GetHashesOr(map[string]string{}))
 
 	data, err := json.MarshalIndent(lockFile, "", "  ")
 	if err != nil {
@@ -87,13 +86,14 @@ func materializeRemotePlugins(plugins []runtimePlugin, lockFile *locktypes.VdlLo
 		return fmt.Errorf("failed to create cache directory %q: %w", cacheLockDir, err)
 	}
 
-	hashes := cloneStringMap(lockFile.GetHashesOr(map[string]string{}))
+	existingHashes := cloneStringMap(lockFile.GetHashesOr(map[string]string{}))
+	usedHashes := make(map[string]string)
 	for i := range plugins {
 		if plugins[i].Source.Kind != pluginSourceKindRemote {
 			continue
 		}
 
-		expectedHash := hashes[plugins[i].Source.CanonicalURL]
+		expectedHash := existingHashes[plugins[i].Source.CanonicalURL]
 		cachePath, actualHash, err := materializeRemoteDependency(
 			plugins[i].Source.CanonicalURL,
 			plugins[i].Source.Headers,
@@ -105,11 +105,11 @@ func materializeRemotePlugins(plugins []runtimePlugin, lockFile *locktypes.VdlLo
 		}
 
 		plugins[i].Source.CachePath = cachePath
-		hashes[plugins[i].Source.CanonicalURL] = actualHash
+		usedHashes[plugins[i].Source.CanonicalURL] = actualHash
 	}
 
 	lockFile.Version = lockFileVersion
-	lockFile.Hashes = &hashes
+	lockFile.Hashes = normalizeLockHashes(usedHashes)
 	return nil
 }
 
@@ -141,7 +141,7 @@ func materializeRemoteDependency(rawURL string, headers http.Header, expectedHas
 	actualHash := sha256Digest(data)
 	if expectedHash != "" && actualHash != expectedHash {
 		return "", "", fmt.Errorf(
-			"CRITICAL: remote dependency %q changed hash from %q to %q; the remote server may have been compromised",
+			"CRITICAL: remote dependency %q changed hash from %q to %q; the remote server or the transport may have been compromised",
 			rawURL,
 			expectedHash,
 			actualHash,
@@ -211,4 +211,15 @@ func cloneHTTPHeader(header http.Header) http.Header {
 		return make(http.Header)
 	}
 	return header.Clone()
+}
+
+// normalizeLockHashes returns a stable lockfile hash map and omits the field
+// entirely when no remote dependencies are in use.
+func normalizeLockHashes(hashes map[string]string) *map[string]string {
+	if len(hashes) == 0 {
+		return nil
+	}
+
+	cloned := cloneStringMap(hashes)
+	return &cloned
 }

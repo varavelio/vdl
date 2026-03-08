@@ -42,6 +42,39 @@ func TestRunWithLocalPlugin(t *testing.T) {
 	require.FileExists(t, filepath.Join(dir, defaultLockFileName))
 }
 
+func TestRunPrunesUnusedLockHashes(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
+	writeTestFile(t, filepath.Join(dir, "plugin.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
+	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
+		const config = {
+			version 1
+			plugins [
+				{
+					src "./plugin.js"
+					schema "./schema.vdl"
+					outDir "./gen"
+				}
+			]
+		}
+	`)
+	writeTestFile(t, filepath.Join(dir, defaultLockFileName), `{
+	  "version": 1,
+	  "hashes": {
+	    "https://example.com/old.js": "sha256-deadbeef"
+	  }
+	}
+`)
+
+	_, err := Run(dir)
+	require.NoError(t, err)
+
+	lockContents, err := os.ReadFile(filepath.Join(dir, defaultLockFileName))
+	require.NoError(t, err)
+	require.NotContains(t, string(lockContents), "https://example.com/old.js")
+	require.NotContains(t, string(lockContents), `"hashes"`)
+}
+
 func TestRunRejectsTraversalBeforeCleaningOutputs(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
