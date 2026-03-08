@@ -20,3 +20,9 @@ targets:
       output: ./toolchain/internal/codegen/configtypes
       clean: true
       package: configtypes
+
+  - go:
+      schema: ./schemas/lock_file.vdl
+      output: ./toolchain/internal/codegen/locktypes
+      clean: true
+      package: locktypes
