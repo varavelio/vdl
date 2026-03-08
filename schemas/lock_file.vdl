@@ -4,6 +4,9 @@ VDL Lock File Schema.
 It ensures that builds are reproducible and secure by locking the exact 
 cryptographic hashes of all remote dependencies (plugins and schemas and
 any other remote files).
+
+Should be generated and consumed by VDL tooling using the `vdl.lock` file
+in the project root.
 """
 type VdlLockFileSchema {
   """ The version of the lockfile format. This should be set to 1. """
