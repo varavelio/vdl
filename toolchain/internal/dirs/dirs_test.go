@@ -98,12 +98,13 @@ func TestGetCacheDir(t *testing.T) {
 			return nil
 		}
 
-		cacheDir := GetCacheDir()
+		cacheDir, err := GetCacheDir()
+		require.NoError(t, err)
 		require.Equal(t, filepath.Join(customHome, "cache"), cacheDir)
 		require.Equal(t, []string{filepath.Join(customHome, "cache")}, created)
 	})
 
-	t.Run("returns primary cache directory when creation fails", func(t *testing.T) {
+	t.Run("returns error when creation fails", func(t *testing.T) {
 		reset := setTestHooks(t)
 		defer reset()
 
@@ -122,8 +123,10 @@ func TestGetCacheDir(t *testing.T) {
 			return errors.New("permission denied")
 		}
 
-		cacheDir := GetCacheDir()
-		require.Equal(t, primary, cacheDir)
+		cacheDir, err := GetCacheDir()
+		require.Error(t, err)
+		require.Empty(t, cacheDir)
+		require.Contains(t, err.Error(), primary)
 		require.Equal(t, []string{primary}, created)
 	})
 }
@@ -146,12 +149,13 @@ func TestGetLogsDir(t *testing.T) {
 			return nil
 		}
 
-		logsDir := GetLogsDir()
+		logsDir, err := GetLogsDir()
+		require.NoError(t, err)
 		require.Equal(t, filepath.Join(customHome, "logs"), logsDir)
 		require.Equal(t, []string{filepath.Join(customHome, "logs")}, created)
 	})
 
-	t.Run("returns primary logs directory when creation fails", func(t *testing.T) {
+	t.Run("returns error when creation fails", func(t *testing.T) {
 		reset := setTestHooks(t)
 		defer reset()
 
@@ -170,8 +174,10 @@ func TestGetLogsDir(t *testing.T) {
 			return errors.New("permission denied")
 		}
 
-		logsDir := GetLogsDir()
-		require.Equal(t, primary, logsDir)
+		logsDir, err := GetLogsDir()
+		require.Error(t, err)
+		require.Empty(t, logsDir)
+		require.Contains(t, err.Error(), primary)
 		require.Equal(t, []string{primary}, created)
 	})
 }

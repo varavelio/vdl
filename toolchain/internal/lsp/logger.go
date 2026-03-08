@@ -25,13 +25,19 @@ type LSPLogger struct {
 
 // GetLogFilePath returns the absolute path to the log file.
 // Used by the CLI (vdl lsp --log-path) and the Logger.
-func GetLogFilePath() string {
-	return filepath.Join(dirs.GetLogsDir(), logFileName)
+func GetLogFilePath() (string, error) {
+	logsDir, err := dirs.GetLogsDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(logsDir, logFileName), nil
 }
 
 func NewLSPLogger() *LSPLogger {
+	logPath, _ := GetLogFilePath()
+
 	l := &LSPLogger{
-		path: GetLogFilePath(),
+		path: logPath,
 	}
 
 	// Ensure file is open and initial rotation check

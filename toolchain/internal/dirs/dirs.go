@@ -51,12 +51,12 @@ func GetVDLHome() string {
 }
 
 // GetCacheDir returns the absolute directory used for plugins and downloads.
-func GetCacheDir() string {
+func GetCacheDir() (string, error) {
 	return ensureDir(filepath.Join(GetVDLHome(), cacheDirName))
 }
 
 // GetLogsDir returns the absolute logs directory.
-func GetLogsDir() string {
+func GetLogsDir() (string, error) {
 	return ensureDir(filepath.Join(GetVDLHome(), logsDirName))
 }
 
@@ -70,7 +70,12 @@ func OpenLog(name string) (*os.File, string, error) {
 		return nil, "", fmt.Errorf("log file name must not contain path separators: %q", name)
 	}
 
-	path := filepath.Join(GetLogsDir(), name)
+	logsDir, err := GetLogsDir()
+	if err != nil {
+		return nil, "", err
+	}
+
+	path := filepath.Join(logsDir, name)
 	file, err := openFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, logFileMode)
 	if err != nil {
 		return nil, "", fmt.Errorf("open log file %q: %w", path, err)
@@ -79,9 +84,11 @@ func OpenLog(name string) (*os.File, string, error) {
 	return file, path, nil
 }
 
-func ensureDir(path string) string {
-	_ = makeDir(path, directoryMode)
-	return path
+func ensureDir(path string) (string, error) {
+	if err := makeDir(path, directoryMode); err != nil {
+		return "", fmt.Errorf("create directory %q: %w", path, err)
+	}
+	return path, nil
 }
 
 func normalizePath(path string) string {

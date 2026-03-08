@@ -15,7 +15,11 @@ type cmdLSPArgs struct {
 func cmdLSP(_ *cmdLSPArgs) {
 	// Manual parsing for flags that need to bypass the strict lsp mode
 	if slices.Contains(os.Args, "--log-path") {
-		fmt.Println(lsp.GetLogFilePath())
+		path, err := lsp.GetLogFilePath()
+		if err != nil {
+			printFatal("VDL lsp error: %v", err)
+		}
+		fmt.Println(path)
 		return
 	}
 
