@@ -14,3 +14,9 @@ targets:
       output: ./toolchain/internal/codegen/plugintypes
       clean: true
       package: plugintypes
+
+  - go:
+      schema: ./schemas/config_file.vdl
+      output: ./toolchain/internal/codegen/configtypes
+      clean: true
+      package: configtypes
