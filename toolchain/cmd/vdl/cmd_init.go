@@ -12,7 +12,7 @@ import (
 //go:embed cmd_init_schema.vdl
 var initSchema []byte
 
-//go:embed cmd_init_config.yaml
+//go:embed cmd_init_config.vdl
 var initConfig []byte
 
 type cmdInitArgs struct {
@@ -59,7 +59,7 @@ func cmdInit(args *cmdInitArgs) {
 // - configPath: The path to the config file.
 func generateUniqueFilenames(dir string) (string, string, string, string) {
 	schemaName := "schema.vdl"
-	configName := "vdl.yaml"
+	configName := "vdl.config.vdl"
 
 	schemaPath := filepath.Join(dir, schemaName)
 	configPath := filepath.Join(dir, configName)
@@ -74,7 +74,7 @@ func generateUniqueFilenames(dir string) (string, string, string, string) {
 	// Generate unique suffix using unix timestamp
 	timestamp := time.Now().Unix()
 	schemaName = fmt.Sprintf("schema-%d.vdl", timestamp)
-	configName = fmt.Sprintf("vdl-%d.yaml", timestamp)
+	configName = fmt.Sprintf("vdl.config-%d.vdl", timestamp)
 
 	return schemaName, filepath.Join(dir, schemaName), configName, filepath.Join(dir, configName)
 }

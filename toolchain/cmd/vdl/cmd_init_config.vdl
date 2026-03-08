@@ -1,0 +1,42 @@
+/*************************************************************\
+* VDL Configuration File                                      *
+*                                                             *
+* Star the repo at https://github.com/varavelio/vdl           *
+* See all available options at https://vdl.varavel.com/config *
+*                                                             *
+* Tweak this file and run "vdl generate"                      *
+\*************************************************************/
+
+const config = {
+  plugins [
+    // {
+    //   name "varavelio/vdl-plugin-golang@v0.1.0"
+    //   output "./gen/go"
+    //   options {
+    //     package "vdl"
+    //   }
+    // }
+    // {
+    //   name "varavelio/vdl-plugin-typescript@v0.1.0"
+    //   output "./gen/ts"
+    // }
+    // {
+    //   name "varavelio/vdl-plugin-json-schema@v0.1.0"
+    //   output "./gen/jsonschema"
+    //   options {
+    //     id "https://example.com/schema.json"
+    //     root "MyRpcBarProcInput"
+    //     filename "schema.json"
+    //   }
+    // }
+    // {
+    //   name "varavelio/vdl-plugin-openapi@v0.1.0"
+    //   output "./gen/openapi"
+    //   options {
+    //     title "VDL API"
+    //     version "1.0.0"
+    //     filename "openapi.yaml"
+    //   }
+    // }
+  ]
+}

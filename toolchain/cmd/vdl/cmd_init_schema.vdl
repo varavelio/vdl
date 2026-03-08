@@ -2,18 +2,19 @@
 // More info: https://vdl.varavel.com
 
 type FooType {
-  firstField: string
-  secondField: int[]
+  firstField string
+  secondField int[]
 }
 
-rpc MyRpc {
-  proc BarProc {
+@rpc
+type MyRpc {
+  @proc barProc {
     input {
-      foo: FooType
+      foo FooType
     }
 
     output {
-      baz: bool
+      baz bool
     }
   }
 }
