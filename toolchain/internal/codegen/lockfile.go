@@ -25,6 +25,8 @@ const (
 
 var remoteHTTPClient = &http.Client{}
 
+// loadLockFile reads `vdl.lock` from disk and returns an empty in-memory lock
+// representation when the file does not exist yet.
 func loadLockFile(path string) (locktypes.VdlLockFileSchema, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -52,6 +54,8 @@ func loadLockFile(path string) (locktypes.VdlLockFileSchema, error) {
 	return lockFile, nil
 }
 
+// writeLockFile persists the normalized lockfile contents as pretty-printed
+// JSON.
 func writeLockFile(path string, lockFile locktypes.VdlLockFileSchema) error {
 	hashes := cloneStringMap(lockFile.GetHashesOr(map[string]string{}))
 	lockFile.Version = lockFileVersion
@@ -70,6 +74,8 @@ func writeLockFile(path string, lockFile locktypes.VdlLockFileSchema) error {
 	return nil
 }
 
+// materializeRemotePlugins downloads or reuses cached remote plugin scripts and
+// updates the lockfile hashes accordingly.
 func materializeRemotePlugins(plugins []runtimePlugin, lockFile *locktypes.VdlLockFileSchema) error {
 	cacheDir, err := dirs.GetCacheDir()
 	if err != nil {
@@ -107,6 +113,8 @@ func materializeRemotePlugins(plugins []runtimePlugin, lockFile *locktypes.VdlLo
 	return nil
 }
 
+// materializeRemoteDependency returns the local cached path for a remote
+// dependency and verifies it against the expected lockfile hash when present.
 func materializeRemoteDependency(rawURL string, headers http.Header, expectedHash, cacheDir string) (string, string, error) {
 	cachePath := filepath.Join(cacheDir, hashRemoteCacheKey(rawURL)+".js")
 
@@ -147,6 +155,8 @@ func materializeRemoteDependency(rawURL string, headers http.Header, expectedHas
 	return cachePath, actualHash, nil
 }
 
+// downloadRemoteDependency fetches a remote dependency using the configured
+// HTTP client and headers.
 func downloadRemoteDependency(rawURL string, headers http.Header) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
 	if err != nil {
@@ -172,6 +182,8 @@ func downloadRemoteDependency(rawURL string, headers http.Header) ([]byte, error
 	return data, nil
 }
 
+// newLockFile creates the default in-memory lockfile representation used when
+// `vdl.lock` does not exist yet.
 func newLockFile() locktypes.VdlLockFileSchema {
 	hashes := map[string]string{}
 	return locktypes.VdlLockFileSchema{
@@ -180,16 +192,20 @@ func newLockFile() locktypes.VdlLockFileSchema {
 	}
 }
 
+// hashRemoteCacheKey derives the cache file name for a remote dependency URL.
 func hashRemoteCacheKey(rawURL string) string {
 	sum := sha256.Sum256([]byte(rawURL))
 	return hex.EncodeToString(sum[:])
 }
 
+// sha256Digest returns the lockfile digest format used for remote
+// dependencies.
 func sha256Digest(data []byte) string {
 	sum := sha256.Sum256(data)
 	return "sha256-" + hex.EncodeToString(sum[:])
 }
 
+// cloneHTTPHeader returns a copy of header and always returns a non-nil map.
 func cloneHTTPHeader(header http.Header) http.Header {
 	if len(header) == 0 {
 		return make(http.Header)

@@ -17,6 +17,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/version"
 )
 
+// preparePlugins loads plugin scripts from disk and builds the input payload for
+// each configured plugin.
 func preparePlugins(plugins []runtimePlugin) ([]preparedPlugin, error) {
 	prepared := make([]preparedPlugin, 0, len(plugins))
 	for _, plugin := range plugins {
@@ -45,6 +47,8 @@ func preparePlugins(plugins []runtimePlugin) ([]preparedPlugin, error) {
 	return prepared, nil
 }
 
+// buildPluginInput analyzes the plugin schema and converts its IR into the
+// generated plugin input types.
 func buildPluginInput(plugin runtimePlugin) (plugintypes.PluginInput, error) {
 	fs := vfs.New()
 	program, diagnostics := analysis.Analyze(fs, plugin.SchemaPath)
@@ -65,6 +69,8 @@ func buildPluginInput(plugin runtimePlugin) (plugintypes.PluginInput, error) {
 	}, nil
 }
 
+// convertIRSchema converts the core IR representation into the generated plugin
+// IR types through JSON compatibility.
 func convertIRSchema(schema *irtypes.IrSchema) (plugintypes.IrSchema, error) {
 	data, err := json.Marshal(schema)
 	if err != nil {
@@ -79,6 +85,8 @@ func convertIRSchema(schema *irtypes.IrSchema) (plugintypes.IrSchema, error) {
 	return pluginIR, nil
 }
 
+// executePlugins runs all prepared plugins concurrently and fails fast once any
+// plugin returns an execution or semantic error.
 func executePlugins(prepared []preparedPlugin) ([]executedPlugin, error) {
 	results := make([]executedPlugin, len(prepared))
 	errCh := make(chan error, len(prepared))
@@ -116,6 +124,8 @@ func executePlugins(prepared []preparedPlugin) ([]executedPlugin, error) {
 	return results, nil
 }
 
+// formatPluginOutputErrors renders plugin-reported errors into the multi-line
+// message format used by the CLI.
 func formatPluginOutputErrors(errors []plugintypes.PluginOutputError) string {
 	lines := make([]string, 0, len(errors))
 	for _, pluginErr := range errors {
@@ -134,6 +144,8 @@ func formatPluginOutputErrors(errors []plugintypes.PluginOutputError) string {
 	return strings.Join(lines, "\n")
 }
 
+// planOutputWrites validates all generated files and builds the final set of
+// writes to perform atomically.
 func planOutputWrites(results []executedPlugin) (outputPlan, error) {
 	plan := outputPlan{
 		OutDirs: make([]string, 0, len(results)),
@@ -182,6 +194,8 @@ func planOutputWrites(results []executedPlugin) (outputPlan, error) {
 	return plan, nil
 }
 
+// resolveOutputWritePath validates a plugin-emitted relative path and resolves
+// its absolute destination under outDir.
 func resolveOutputWritePath(outDir, rawRelativePath string) (string, string, error) {
 	relativePath := strings.TrimSpace(rawRelativePath)
 	if relativePath == "" {
@@ -213,6 +227,8 @@ func resolveOutputWritePath(outDir, rawRelativePath string) (string, string, err
 	return normalized, absolutePath, nil
 }
 
+// applyOutputWrites stages every generated file and then applies the final
+// filesystem changes only after all validation has succeeded.
 func applyOutputWrites(config runtimeConfig, plan outputPlan) error {
 	stagingRoot, err := os.MkdirTemp(config.Dir, ".vdl-generate-")
 	if err != nil {
@@ -246,6 +262,7 @@ func applyOutputWrites(config runtimeConfig, plan outputPlan) error {
 	return mergeOutputDirs(plan.OutDirs, plan.Writes, stagingDirs)
 }
 
+// replaceOutputDirs swaps each output directory with its staged replacement.
 func replaceOutputDirs(outDirs []string, stagingDirs map[string]string) error {
 	for i := len(outDirs) - 1; i >= 0; i-- {
 		if err := os.RemoveAll(outDirs[i]); err != nil {
@@ -265,6 +282,8 @@ func replaceOutputDirs(outDirs []string, stagingDirs map[string]string) error {
 	return nil
 }
 
+// mergeOutputDirs writes staged files into existing output directories without
+// removing pre-existing files.
 func mergeOutputDirs(outDirs []string, writes []outputWrite, stagingDirs map[string]string) error {
 	for _, outDir := range outDirs {
 		if err := os.MkdirAll(outDir, generatedDirMode); err != nil {
@@ -289,6 +308,8 @@ func mergeOutputDirs(outDirs []string, writes []outputWrite, stagingDirs map[str
 	return nil
 }
 
+// sortOutputDirs orders output directories so parent directories are processed
+// before nested directories.
 func sortOutputDirs(outDirs []string) {
 	sort.Slice(outDirs, func(i, j int) bool {
 		if len(outDirs[i]) == len(outDirs[j]) {

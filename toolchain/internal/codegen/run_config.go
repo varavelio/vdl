@@ -20,6 +20,8 @@ const (
 	configConstName       = "config"
 )
 
+// loadRuntimeConfig analyzes the VDL config file, extracts `const config`, and
+// converts it into the generated Go configuration types.
 func loadRuntimeConfig(inputPath string) (runtimeConfig, error) {
 	configPath, err := resolveConfigFilePath(inputPath)
 	if err != nil {
@@ -58,6 +60,8 @@ func loadRuntimeConfig(inputPath string) (runtimeConfig, error) {
 	}, nil
 }
 
+// resolveConfigFilePath resolves the input CLI path into an absolute
+// `vdl.config.vdl` file path.
 func resolveConfigFilePath(inputPath string) (string, error) {
 	path := strings.TrimSpace(inputPath)
 	if path == "" {
@@ -100,6 +104,7 @@ func resolveConfigFilePath(inputPath string) (string, error) {
 	return absPath, nil
 }
 
+// findConstByName returns the first constant with name from the IR schema.
 func findConstByName(constants []irtypes.ConstantDef, name string) (*irtypes.ConstantDef, bool) {
 	for i := range constants {
 		if constants[i].Name == name {
@@ -109,6 +114,8 @@ func findConstByName(constants []irtypes.ConstantDef, name string) (*irtypes.Con
 	return nil, false
 }
 
+// literalValueToJSON converts an IR literal into standard JSON bytes so it can
+// be decoded into generated config structs.
 func literalValueToJSON(value irtypes.LiteralValue) ([]byte, error) {
 	decoded, err := literalValueToAny(value)
 	if err != nil {
@@ -123,6 +130,8 @@ func literalValueToJSON(value irtypes.LiteralValue) ([]byte, error) {
 	return payload, nil
 }
 
+// literalValueToAny converts an IR literal into plain Go values compatible with
+// `encoding/json`.
 func literalValueToAny(value irtypes.LiteralValue) (any, error) {
 	switch value.Kind {
 	case irtypes.LiteralKindString:
@@ -160,6 +169,8 @@ func literalValueToAny(value irtypes.LiteralValue) (any, error) {
 	}
 }
 
+// diagnosticsToError joins analysis diagnostics into a single error value that
+// preserves the original one-per-line formatting.
 func diagnosticsToError(diagnostics []analysis.Diagnostic) error {
 	parts := make([]string, len(diagnostics))
 	for i, diag := range diagnostics {

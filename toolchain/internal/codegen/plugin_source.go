@@ -18,6 +18,8 @@ const expectedConfigVersion int64 = 1
 
 var githubPluginPattern = regexp.MustCompile(`^([^/\s]+)/([^@/\s]+)@([^\s]+)$`)
 
+// resolveRuntimePlugins validates the high-level generator configuration and
+// normalizes every configured plugin into a runtime-ready description.
 func resolveRuntimePlugins(config runtimeConfig) ([]runtimePlugin, error) {
 	if config.Config.GetVersion() != expectedConfigVersion {
 		return nil, fmt.Errorf(
@@ -63,6 +65,8 @@ func resolveRuntimePlugins(config runtimeConfig) ([]runtimePlugin, error) {
 	return plugins, nil
 }
 
+// normalizeRemoteAuths validates configured remotes and converts them into the
+// host matcher representation used during remote plugin resolution.
 func normalizeRemoteAuths(remotes []configtypes.VdlConfigRemote) ([]remoteHostAuth, error) {
 	result := make([]remoteHostAuth, 0, len(remotes))
 	for i, remote := range remotes {
@@ -85,17 +89,15 @@ func normalizeRemoteAuths(remotes []configtypes.VdlConfigRemote) ([]remoteHostAu
 	return result, nil
 }
 
+// resolvePluginSource classifies a plugin source as local or remote and returns
+// its normalized runtime metadata.
 func resolvePluginSource(baseDir, rawSrc string, remotes []remoteHostAuth) (pluginSource, error) {
 	src := strings.TrimSpace(rawSrc)
 	if src == "" {
 		return pluginSource{}, fmt.Errorf("plugin src is required")
 	}
 
-	if strings.HasPrefix(src, "http://") {
-		return pluginSource{}, fmt.Errorf("plugin src %q is invalid: only HTTPS URLs are allowed", src)
-	}
-
-	if strings.HasPrefix(src, "https://") {
+	if strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://") {
 		canonicalURL, err := canonicalizeRemotePluginURL(src)
 		if err != nil {
 			return pluginSource{}, err
@@ -173,6 +175,8 @@ func resolvePluginSource(baseDir, rawSrc string, remotes []remoteHostAuth) (plug
 	}, nil
 }
 
+// canonicalizeRemotePluginURL validates a remote plugin URL and returns its
+// canonical form.
 func canonicalizeRemotePluginURL(rawURL string) (string, error) {
 	parsed, err := url.Parse(rawURL)
 	if err != nil {
@@ -180,7 +184,13 @@ func canonicalizeRemotePluginURL(rawURL string) (string, error) {
 	}
 
 	if parsed.Scheme != "https" {
-		return "", fmt.Errorf("plugin src %q is invalid: only HTTPS URLs are allowed", rawURL)
+		if parsed.Scheme != "http" || !insecureHTTPAllowed() {
+			return "", fmt.Errorf(
+				"plugin src %q is invalid: only HTTPS URLs are allowed unless %s=true",
+				rawURL,
+				"VDL_INSECURE_ALLOW_HTTP",
+			)
+		}
 	}
 	if parsed.Host == "" {
 		return "", fmt.Errorf("plugin src %q is invalid: missing host", rawURL)
@@ -193,6 +203,8 @@ func canonicalizeRemotePluginURL(rawURL string) (string, error) {
 	return parsed.String(), nil
 }
 
+// resolveRemoteHeaders returns the HTTP headers that should be attached to a
+// remote plugin request after matching the most specific configured remote.
 func resolveRemoteHeaders(rawURL string, remotes []remoteHostAuth) (http.Header, error) {
 	matchedRemote, ok := matchRemoteHost(rawURL, remotes)
 	if !ok {
@@ -202,6 +214,8 @@ func resolveRemoteHeaders(rawURL string, remotes []remoteHostAuth) (http.Header,
 	return buildAuthHeaders(matchedRemote)
 }
 
+// matchRemoteHost selects the most specific configured remote whose host prefix
+// matches the target URL.
 func matchRemoteHost(rawURL string, remotes []remoteHostAuth) (remoteHostAuth, bool) {
 	parsed, err := url.Parse(rawURL)
 	if err != nil {
@@ -232,6 +246,8 @@ func matchRemoteHost(rawURL string, remotes []remoteHostAuth) (remoteHostAuth, b
 	return best, true
 }
 
+// buildAuthHeaders materializes HTTP headers for a matched remote
+// authentication configuration.
 func buildAuthHeaders(remote remoteHostAuth) (http.Header, error) {
 	methods := 0
 	headers := make(http.Header)
@@ -288,6 +304,8 @@ func buildAuthHeaders(remote remoteHostAuth) (http.Header, error) {
 	return headers, nil
 }
 
+// readRequiredEnv returns the value of a required environment variable and
+// reports which remote requires it when it is missing.
 func readRequiredEnv(name, remoteHost string) (string, error) {
 	name = strings.TrimSpace(name)
 	if name == "" {
@@ -302,6 +320,8 @@ func readRequiredEnv(name, remoteHost string) (string, error) {
 	return value, nil
 }
 
+// resolveAbsolutePath resolves a path relative to the config directory and
+// enforces an optional file extension.
 func resolveAbsolutePath(baseDir, rawPath, expectedExt, fieldName string) (string, error) {
 	path := strings.TrimSpace(rawPath)
 	if path == "" {
@@ -324,6 +344,8 @@ func resolveAbsolutePath(baseDir, rawPath, expectedExt, fieldName string) (strin
 	return absPath, nil
 }
 
+// normalizeRemoteHost strips optional schemes and separators so remote hosts
+// can be compared consistently against request URLs.
 func normalizeRemoteHost(host string) string {
 	host = strings.TrimSpace(host)
 	host = strings.TrimPrefix(host, "https://")
@@ -332,13 +354,29 @@ func normalizeRemoteHost(host string) string {
 	return strings.ToLower(host)
 }
 
+// isLocalPluginSource reports whether src uses the local-path form supported by
+// the configuration schema.
 func isLocalPluginSource(src string) bool {
 	return filepath.IsAbs(src) || strings.HasPrefix(src, ".")
 }
 
+// cloneStringMap returns a shallow copy of values and always returns a
+// non-nil map.
 func cloneStringMap(values map[string]string) map[string]string {
 	if len(values) == 0 {
 		return map[string]string{}
 	}
 	return maps.Clone(values)
+}
+
+// insecureHTTPAllowed reports whether insecure HTTP plugin URLs are enabled for
+// local development and bootstrapping scenarios.
+func insecureHTTPAllowed() bool {
+	value, ok := os.LookupEnv("VDL_INSECURE_ALLOW_HTTP")
+	if !ok {
+		return false
+	}
+
+	value = strings.TrimSpace(strings.ToLower(value))
+	return value == "1" || value == "true" || value == "yes" || value == "on"
 }

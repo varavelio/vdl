@@ -165,6 +165,7 @@ func runPlugin(
 	return output, nil
 }
 
+// buildPluginLogPrefix returns the console prefix used for plugin log output.
 func buildPluginLogPrefix(pluginName string, prefix string) string {
 	pluginName = strings.TrimSpace(pluginName)
 	if pluginName == "" {

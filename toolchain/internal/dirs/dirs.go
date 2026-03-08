@@ -84,6 +84,8 @@ func OpenLog(name string) (*os.File, string, error) {
 	return file, path, nil
 }
 
+// ensureDir creates path when necessary and returns the normalized directory
+// path on success.
 func ensureDir(path string) (string, error) {
 	if err := makeDir(path, directoryMode); err != nil {
 		return "", fmt.Errorf("create directory %q: %w", path, err)
@@ -91,6 +93,7 @@ func ensureDir(path string) (string, error) {
 	return path, nil
 }
 
+// normalizePath converts path to an absolute clean path when possible.
 func normalizePath(path string) string {
 	if filepath.IsAbs(path) {
 		return filepath.Clean(path)

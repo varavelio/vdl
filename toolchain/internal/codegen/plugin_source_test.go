@@ -74,6 +74,28 @@ func TestResolveRuntimePlugins(t *testing.T) {
 		require.Contains(t, err.Error(), "only HTTPS URLs are allowed")
 	})
 
+	t.Run("allows insecure http plugins when enabled by environment", func(t *testing.T) {
+		dir := t.TempDir()
+		t.Setenv("VDL_INSECURE_ALLOW_HTTP", "true")
+		config := runtimeConfig{
+			Path: filepath.Join(dir, defaultConfigFileName),
+			Dir:  dir,
+			Config: configtypes.VdlConfig{
+				Version: 1,
+				Plugins: &[]configtypes.VdlConfigPlugin{{
+					Src:    "http://example.com/plugin.js",
+					Schema: "./schema.vdl",
+					OutDir: "./gen",
+				}},
+			},
+		}
+
+		plugins, err := resolveRuntimePlugins(config)
+		require.NoError(t, err)
+		require.Len(t, plugins, 1)
+		require.Equal(t, "http://example.com/plugin.js", plugins[0].Source.CanonicalURL)
+	})
+
 	t.Run("applies the most specific remote auth headers", func(t *testing.T) {
 		dir := t.TempDir()
 		t.Setenv("REMOTE_HEADER_NAME", "X-Token")

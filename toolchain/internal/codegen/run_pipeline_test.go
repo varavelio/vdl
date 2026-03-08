@@ -133,6 +133,43 @@ func TestRunWithRemotePluginUsesCacheAndWritesLockFile(t *testing.T) {
 	require.Equal(t, "remote", string(writeBytes))
 }
 
+func TestRunWithRemoteHTTPPluginWhenEnabled(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("VDL_HOME", filepath.Join(dir, ".vdl-home"))
+	t.Setenv("VDL_INSECURE_ALLOW_HTTP", "true")
+	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, "/plugins/insecure.js", r.URL.Path)
+		_, _ = w.Write([]byte(`exports.generate = () => ({ files: [{ path: "http.txt", content: "insecure-ok" }] })`))
+	}))
+	defer server.Close()
+
+	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), fmt.Sprintf(`
+		const config = {
+			version 1
+			plugins [
+				{
+					src %q
+					schema "./schema.vdl"
+					outDir "./gen"
+				}
+			]
+		}
+	`, server.URL+"/plugins/insecure.js"))
+
+	fileCount, err := Run(dir)
+	require.NoError(t, err)
+	require.Equal(t, 1, fileCount)
+	writeBytes, err := os.ReadFile(filepath.Join(dir, "gen", "http.txt"))
+	require.NoError(t, err)
+	require.Equal(t, "insecure-ok", string(writeBytes))
+
+	lockContents, err := os.ReadFile(filepath.Join(dir, defaultLockFileName))
+	require.NoError(t, err)
+	require.Contains(t, string(lockContents), server.URL+"/plugins/insecure.js")
+}
+
 func TestMaterializeRemoteDependencyRejectsHashChanges(t *testing.T) {
 	content := []byte("console.log('v2')")
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

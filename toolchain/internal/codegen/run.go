@@ -6,8 +6,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/configtypes"
 )
 
-// Run runs the code generator and returns the total number of files generated
-// and anerror if one occurred.
+// Run executes the full code generation pipeline and returns the number of
+// written files.
 func Run(configPath string) (int, error) {
 	runtimeConfig, err := loadRuntimeConfig(configPath)
 	if err != nil {
@@ -24,6 +24,8 @@ type runtimeConfig struct {
 	Config   configtypes.VdlConfig
 }
 
+// runWithConfig orchestrates the generation pipeline after the config file has
+// already been loaded and normalized.
 func runWithConfig(config runtimeConfig) (int, error) {
 	plugins, err := resolveRuntimePlugins(config)
 	if err != nil {
