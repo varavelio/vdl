@@ -133,7 +133,7 @@ func materializeRemoteDependency(rawURL string, headers http.Header, expectedHas
 	actualHash := sha256Digest(data)
 	if expectedHash != "" && actualHash != expectedHash {
 		return "", "", fmt.Errorf(
-			"remote dependency %q changed hash from %q to %q; the remote server may have been compromised",
+			"CRITICAL: remote dependency %q changed hash from %q to %q; the remote server may have been compromised",
 			rawURL,
 			expectedHash,
 			actualHash,
