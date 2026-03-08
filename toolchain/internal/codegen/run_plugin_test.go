@@ -35,7 +35,7 @@ func TestRunPluginGolden(t *testing.T) {
 			script := readTextFixture(t, tc.PluginPath)
 			expected := readExpectedFixture(t, tc.ExpectedPath)
 			input := resolveInput(t, expected)
-			output, err := runPlugin(script, input)
+			output, err := runPlugin("", script, input)
 
 			if expected.ErrorContains != "" {
 				require.Error(t, err)

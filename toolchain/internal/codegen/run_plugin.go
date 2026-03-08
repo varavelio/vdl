@@ -3,6 +3,7 @@ package codegen
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/varavelio/tinta"
@@ -50,14 +51,18 @@ const scriptWrapper = `
 
 // runPlugin executes the given plugin script with the provided input and returns the
 // output or an error if one occurred.
-func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.PluginOutput, error) {
+func runPlugin(
+	pluginName string,
+	script string,
+	input plugintypes.PluginInput,
+) (plugintypes.PluginOutput, error) {
 	// Create the JavaScript runtime using goja.
 	vm := goja.New()
 
 	// Inject a simple console polyfill to allow plugins to log messages.
 	console := vm.NewObject()
 	err := console.Set("log", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Bold().Print("[PLUGIN LOG] ")
+		tinta.Text().Bold().Print(buildPluginLogPrefix(pluginName, "log"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
@@ -69,7 +74,7 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 	}
 
 	err = console.Set("error", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Red().Bold().Print("[PLUGIN ERROR] ")
+		tinta.Text().Bold().Print(buildPluginLogPrefix(pluginName, "error"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
@@ -81,7 +86,7 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 	}
 
 	err = console.Set("warn", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Yellow().Bold().Print("[PLUGIN WARN] ")
+		tinta.Text().Yellow().Bold().Print(buildPluginLogPrefix(pluginName, "warn"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
@@ -93,7 +98,7 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 	}
 
 	err = console.Set("info", func(call goja.FunctionCall) goja.Value {
-		tinta.Text().Cyan().Bold().Print("[PLUGIN INFO] ")
+		tinta.Text().Cyan().Bold().Print(buildPluginLogPrefix(pluginName, "info"))
 		for _, arg := range call.Arguments {
 			fmt.Printf("%v ", arg.Export())
 		}
@@ -158,4 +163,12 @@ func runPlugin(script string, input plugintypes.PluginInput) (plugintypes.Plugin
 	}
 
 	return output, nil
+}
+
+func buildPluginLogPrefix(pluginName string, prefix string) string {
+	pluginName = strings.TrimSpace(pluginName)
+	if pluginName == "" {
+		return fmt.Sprintf("[%s] ", prefix)
+	}
+	return fmt.Sprintf("[%s %s] ", pluginName, prefix)
 }
