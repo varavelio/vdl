@@ -34,7 +34,7 @@ When updating this document, do so with the context of the entire document in mi
   - `internal/core/`: Compiler pipeline (`vfs`, `parser`, `ast`, `analysis`, `ir`).
   - `internal/formatter/`: Lexer-based formatter implementation and golden tests.
   - `internal/lsp/`: Language Server handlers (definition/hover/references/rename/completion/document symbols/links).
-  - `internal/codegen/`: Generation entrypoint currently under migration; plugin-oriented direction. `Run` now loads `vdl.config.vdl` by analyzing it as VDL, building IR, and decoding `const config` into `configtypes.VdlConfig`.
+  - `internal/codegen/`: Generation entrypoint currently under migration; plugin-oriented direction. `Run` loads `vdl.config.vdl` by analyzing it as VDL, builds IR, decodes `const config` into `configtypes.VdlConfig`, resolves plugin sources (local, HTTPS, or GitHub shorthand), caches remote dependencies under the VDL cache directory, and persists remote hashes in `vdl.lock` JSON using `locktypes`.
   - `internal/dirs/`: VDL runtime directory helpers for home/cache/log resolution and log file creation.
   - `internal/util/`: Shared helpers (`cliutil`, `strutil`, `filepathutil`, etc.).
   - `tests/`: Currently only repository notes (`README.md`); legacy E2E suite has been removed.
