@@ -48,9 +48,13 @@ func loadRuntimeConfig(inputPath string) (runtimeConfig, error) {
 		return runtimeConfig{}, fmt.Errorf("failed to unmarshal const %q into VdlConfig: %w", configConstName, err)
 	}
 
+	configDir := filepath.Dir(configPath)
+
 	return runtimeConfig{
-		Path:   configPath,
-		Config: config,
+		Path:     configPath,
+		Dir:      configDir,
+		LockPath: filepath.Join(configDir, defaultLockFileName),
+		Config:   config,
 	}, nil
 }
 
