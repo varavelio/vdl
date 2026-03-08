@@ -6,7 +6,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/codegen/configtypes"
 )
 
-// Run runs the code generator and returns the total number of files generated and an error if one occurred.
+// Run runs the code generator and returns the total number of files generated
+// and anerror if one occurred.
 func Run(configPath string) (int, error) {
 	runtimeConfig, err := loadRuntimeConfig(configPath)
 	if err != nil {
@@ -17,10 +18,49 @@ func Run(configPath string) (int, error) {
 }
 
 type runtimeConfig struct {
-	Path   string
-	Config configtypes.VdlConfig
+	Path     string
+	Dir      string
+	LockPath string
+	Config   configtypes.VdlConfig
 }
 
-func runWithConfig(_ runtimeConfig) (int, error) {
-	return 0, nil
+func runWithConfig(config runtimeConfig) (int, error) {
+	plugins, err := resolveRuntimePlugins(config)
+	if err != nil {
+		return 0, err
+	}
+
+	lockFile, err := loadLockFile(config.LockPath)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := materializeRemotePlugins(plugins, &lockFile); err != nil {
+		return 0, err
+	}
+
+	preparedPlugins, err := preparePlugins(plugins)
+	if err != nil {
+		return 0, err
+	}
+
+	results, err := executePlugins(preparedPlugins)
+	if err != nil {
+		return 0, err
+	}
+
+	plan, err := planOutputWrites(results)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := writeLockFile(config.LockPath, lockFile); err != nil {
+		return 0, err
+	}
+
+	if err := applyOutputWrites(config, plan); err != nil {
+		return 0, err
+	}
+
+	return len(plan.Writes), nil
 }
