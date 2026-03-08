@@ -68,11 +68,6 @@ func run() error {
 		return fmt.Errorf("failed to create dist directory: %w", err)
 	}
 
-	// Build and archive WASM
-	if err := buildAndArchiveWasm(root, distDir); err != nil {
-		return fmt.Errorf("failed to build and archive wasm: %w", err)
-	}
-
 	// Build and Archive CLI Binaries
 	for _, bin := range Binaries {
 		fmt.Printf("Building %s/%s...\n", bin.OS, bin.Arch)
@@ -121,66 +116,6 @@ func initVariables() error {
 		return fmt.Errorf("git rev-parse failed: %w", err)
 	}
 	Commit = strings.TrimSpace(string(out))
-	return nil
-}
-
-func buildAndArchiveWasm(root, distDir string) error {
-	fmt.Println("Building WASM...")
-
-	// Build vdl.wasm
-	wasmPath := filepath.Join(distDir, "vdl.wasm")
-	cmd := exec.Command("go", "build", "-o", wasmPath, "./cmd/vdlwasm/.")
-	cmd.Dir = filepath.Join(root, "toolchain")
-	cmd.Env = append(os.Environ(), "GOOS=js", "GOARCH=wasm")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to build wasm: %w", err)
-	}
-
-	// Copy wasm_exec.js
-	// We need to locate where Go is installed to find wasm_exec.js
-	// Usually GOROOT is set, or we can use `go env GOROOT`
-	goRootOut, err := exec.Command("go", "env", "GOROOT").Output()
-	if err != nil {
-		return fmt.Errorf("failed to get GOROOT: %w", err)
-	}
-	goRoot := strings.TrimSpace(string(goRootOut))
-	wasmExecSrc := filepath.Join(goRoot, "lib/wasm/wasm_exec.js")
-	wasmExecDst := filepath.Join(distDir, "wasm_exec.js")
-
-	if err := copyFile(wasmExecSrc, wasmExecDst); err != nil {
-		return fmt.Errorf("failed to copy wasm_exec.js: %w", err)
-	}
-
-	// Prepare extra files for archive (README, LICENSE)
-	extraFiles := []string{"README.md", "LICENSE"}
-
-	filesToArchive := make(map[string]string) // src -> name in archive
-	filesToArchive[wasmPath] = "vdl.wasm"
-	filesToArchive[wasmExecDst] = "wasm_exec.js"
-
-	for _, f := range extraFiles {
-		src := filepath.Join(root, f)
-		if _, err := os.Stat(src); err == nil {
-			filesToArchive[src] = f
-		}
-	}
-
-	// Create vdl_wasm.tar.gz
-	archivePath := filepath.Join(distDir, "vdl_wasm.tar.gz")
-	if err := createTarGz(archivePath, filesToArchive); err != nil {
-		return fmt.Errorf("failed to create wasm archive: %w", err)
-	}
-
-	// Cleanup raw WASM files
-	if err := os.Remove(wasmPath); err != nil {
-		return fmt.Errorf("failed to remove vdl.wasm: %w", err)
-	}
-	if err := os.Remove(wasmExecDst); err != nil {
-		return fmt.Errorf("failed to remove wasm_exec.js: %w", err)
-	}
-
 	return nil
 }
 
