@@ -12,21 +12,21 @@ func TestLoadRuntimeConfig(t *testing.T) {
 	t.Run("loads config from directory path", func(t *testing.T) {
 		dir := t.TempDir()
 		writeConfigFile(t, dir, `
-const config = {
-  version 1
-  cleanOutDir true
-  plugins [
-    {
-      src "./plugin.js"
-      schema "./schema.vdl"
-      outDir "./gen"
-      options {
-        target "typescript"
-      }
-    }
-  ]
-}
-`)
+			const config = {
+				version 1
+				cleanOutDir true
+				plugins [
+					{
+						src "./plugin.js"
+						schema "./schema.vdl"
+						outDir "./gen"
+						options {
+							target "typescript"
+						}
+					}
+				]
+			}
+		`)
 
 		runtimeConfig, err := loadRuntimeConfig(dir)
 		require.NoError(t, err)
@@ -44,10 +44,10 @@ const config = {
 	t.Run("loads config from explicit file path", func(t *testing.T) {
 		dir := t.TempDir()
 		configPath := writeConfigFile(t, dir, `
-const config = {
-  version 1
-}
-`)
+			const config = {
+				version 1
+			}
+		`)
 
 		runtimeConfig, err := loadRuntimeConfig(configPath)
 		require.NoError(t, err)
@@ -58,10 +58,10 @@ const config = {
 	t.Run("fails when const config is missing", func(t *testing.T) {
 		dir := t.TempDir()
 		writeConfigFile(t, dir, `
-const other = {
-  version 1
-}
-`)
+			const other = {
+				version 1
+			}
+		`)
 
 		_, err := loadRuntimeConfig(dir)
 		require.Error(t, err)
