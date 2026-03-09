@@ -8,7 +8,8 @@ type FooType {
 
 @rpc
 type MyRpc {
-  @proc barProc {
+  @proc
+  barProc {
     input {
       foo FooType
     }

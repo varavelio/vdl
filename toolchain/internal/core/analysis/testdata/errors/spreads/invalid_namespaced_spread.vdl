@@ -5,5 +5,5 @@ type Base {
 }
 
 type User {
-  ...auth.Base
+  ...Auth.Base
 }

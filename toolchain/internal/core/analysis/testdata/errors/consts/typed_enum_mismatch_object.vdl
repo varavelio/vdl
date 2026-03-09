@@ -4,6 +4,4 @@ enum Status {
   Active
 }
 
-const bad Status = {
-  value "active"
-}
+const bad Status = { value "active" }

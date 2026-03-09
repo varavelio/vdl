@@ -13,21 +13,26 @@ type Flags {
 
 type Catalog {
   ...Audit
+
   sections {
     id string
     title string
     flags Flags
+
     entries {
       id string
+
       metadata {
         labels string[]
         scores int[][]
       }
+
       variants {
         code string
         price float
       }[]
     }[]
   }[]
+
   byId map[string]
 }

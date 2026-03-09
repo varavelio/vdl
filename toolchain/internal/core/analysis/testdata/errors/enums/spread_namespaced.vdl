@@ -1,6 +1,6 @@
 // @expect: E202
 
 enum Role {
-  ...auth.BaseRole
+  ...Auth.BaseRole
   Admin
 }

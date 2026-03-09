@@ -1,6 +1,3 @@
 // @expect: E207
 
-const weird = [
-  [1 2]
-  { value 1 }
-]
+const weird = [[1 2] { value 1 }]

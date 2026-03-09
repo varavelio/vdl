@@ -1,9 +1,11 @@
 type User {
   id string
+
   contact {
     email string
     phone? string
   }
+
   preferences {
     notifications {
       email bool
