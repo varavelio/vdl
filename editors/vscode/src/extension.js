@@ -34,10 +34,10 @@ async function activate(context) {
 
   // Command Registration (Lazy Loading of path for robustness)
   context.subscriptions.push(
-    vscode.commands.registerCommand("vdl.init", () => {
+    vscode.commands.registerCommand("vdl.init", async () => {
       try {
         const path = getBinaryPath();
-        initCommand(path);
+        await initCommand(path);
       } catch (e) {
         vscode.window.showErrorMessage(e.message);
       }
@@ -56,10 +56,10 @@ async function activate(context) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("vdl.openLogs", () => {
+    vscode.commands.registerCommand("vdl.openLogs", async () => {
       try {
         const path = getBinaryPath();
-        openLogsCommand(path);
+        await openLogsCommand(path);
       } catch (e) {
         vscode.window.showErrorMessage(e.message);
       }

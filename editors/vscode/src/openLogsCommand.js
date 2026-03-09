@@ -1,29 +1,30 @@
 const vscode = require("vscode");
-const cp = require("node:child_process");
+const { runVdl } = require("./runVdl.js");
 
 async function openLogsCommand(binaryPath) {
-  cp.execFile(binaryPath, ["lsp", "--log-path"], async (error, stdout, _) => {
-    if (error) {
-      vscode.window.showErrorMessage(`Failed to get VDL log path: ${error.message}`);
-      return;
-    }
+  let logPath;
 
-    const logPath = stdout.trim();
+  try {
+    const result = await runVdl(binaryPath, ["lsp", "--log-path"]);
+    logPath = result.stdout.trim();
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to get VDL log path: ${error.message}`);
+    return;
+  }
 
-    if (!logPath) {
-      vscode.window.showWarningMessage("VDL returned an empty log path.");
-      return;
-    }
+  if (!logPath) {
+    vscode.window.showWarningMessage("VDL returned an empty log path.");
+    return;
+  }
 
-    try {
-      const uri = vscode.Uri.file(logPath);
+  try {
+    const uri = vscode.Uri.file(logPath);
+    const doc = await vscode.workspace.openTextDocument(uri);
 
-      const doc = await vscode.workspace.openTextDocument(uri);
-      await vscode.window.showTextDocument(doc);
-    } catch (err) {
-      vscode.window.showErrorMessage(`Failed to open log file at ${logPath}: ${err.message}`);
-    }
-  });
+    await vscode.window.showTextDocument(doc);
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to open log file at ${logPath}: ${error.message}`);
+  }
 }
 
 module.exports = {

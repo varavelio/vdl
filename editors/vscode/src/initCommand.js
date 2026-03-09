@@ -1,5 +1,5 @@
 const vscode = require("vscode");
-const execProcess = require("node:child_process").exec;
+const { runVdl } = require("./runVdl.js");
 
 async function initCommand(binaryPath) {
   let defaultUri;
@@ -23,21 +23,19 @@ async function initCommand(binaryPath) {
 
   const folderPath = folderUri[0].fsPath;
 
-  // Quote paths to support spaces (e.g. "Program Files")
-  const cmd = `"${binaryPath}" init "${folderPath}"`;
-
   console.log(`VDL: Initializing at ${folderPath}`);
 
-  execProcess(cmd, (error, stdout, _) => {
-    if (error) {
-      vscode.window.showErrorMessage(`VDL Init Failed: ${error.message}`);
-      return;
+  try {
+    const result = await runVdl(binaryPath, ["init", folderPath]);
+
+    if (result.stdout) {
+      console.log(result.stdout);
     }
 
-    if (stdout) console.log(stdout);
-
     vscode.window.showInformationMessage(`VDL initialized successfully in: ${folderPath}`);
-  });
+  } catch (error) {
+    vscode.window.showErrorMessage(`VDL Init Failed: ${error.message}`);
+  }
 }
 
 module.exports = {
