@@ -24,7 +24,7 @@ The following features are provided by the extension for `.vdl` files.
 
 ## Requirements
 
-This extension requires the VDL (`vdl`) binary on your operating system PATH.
+This extension requires the VDL (`vdl`) binary to be available to VS Code.
 
 You can download the binary for any OS/Arch in the [VDL Releases page.](https://github.com/varavelio/vdl/releases)
 
@@ -33,7 +33,7 @@ For more information on how to install `vdl`, read the [VDL documentation.](http
 The extension looks for `vdl` in this order:
 
 1. `vdl.binaryPath`
-2. The current workspace's local `node_modules/.bin` install
+2. The current workspace's local `node_modules/.bin` install, then parent `node_modules/.bin` directories up to the filesystem root
 3. `GOBIN`
 4. Your operating system PATH
 
@@ -43,7 +43,7 @@ If the binary is not found automatically, you can set a custom path with `vdl.bi
 
 - `vdl.enable`: Enable VDL language support. If disabled, the only feature that will be available is Syntax Highlighting. Default `true`.
 
-- `vdl.binaryPath`: Path to the VDL binary. If not set, the extension looks for a workspace-local `node_modules/.bin/vdl`, then `GOBIN`, then `PATH`. Default `<not set>`.
+- `vdl.binaryPath`: Path to the VDL binary. If not set, the extension looks for `node_modules/.bin/vdl` in the current workspace and parent directories, then `GOBIN`, then `PATH`. Default `<not set>`.
 
 ## Commands
 

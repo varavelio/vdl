@@ -24,38 +24,81 @@ function expandHomeDir(filePath) {
   return filePath;
 }
 
-function getWorkspaceFoldersInPriorityOrder(preferredUri) {
+function getExistingDirectoryPath(filePath) {
+  try {
+    if (!filePath || !fs.existsSync(filePath)) {
+      return undefined;
+    }
+
+    return fs.statSync(filePath).isDirectory() ? filePath : path.dirname(filePath);
+  } catch (_error) {
+    return undefined;
+  }
+}
+
+function getSearchRootsInPriorityOrder(preferredUri) {
   const workspaceFolders = vscode.workspace.workspaceFolders || [];
+  const roots = [];
+  const seenRoots = new Set();
   const activeUri = preferredUri || vscode.window.activeTextEditor?.document?.uri;
 
-  if (!activeUri) {
-    return workspaceFolders;
+  const pushRoot = (rootPath) => {
+    if (!rootPath || seenRoots.has(rootPath)) {
+      return;
+    }
+
+    seenRoots.add(rootPath);
+    roots.push(rootPath);
+  };
+
+  if (activeUri?.scheme === "file") {
+    const preferredFolder = vscode.workspace.getWorkspaceFolder(activeUri);
+    pushRoot(preferredFolder?.uri.fsPath || getExistingDirectoryPath(activeUri.fsPath));
   }
 
-  const preferredFolder = vscode.workspace.getWorkspaceFolder(activeUri);
-
-  if (!preferredFolder) {
-    return workspaceFolders;
+  for (const folder of workspaceFolders) {
+    pushRoot(folder.uri.fsPath);
   }
 
-  return [
-    preferredFolder,
-    ...workspaceFolders.filter(
-      (folder) => folder.uri.toString() !== preferredFolder.uri.toString(),
-    ),
-  ];
+  return roots;
+}
+
+function getAncestorNodeBinDirectories(rootPath) {
+  const directories = [];
+  let currentPath = rootPath;
+
+  while (currentPath) {
+    directories.push(path.join(currentPath, "node_modules", ".bin"));
+
+    const parentPath = path.dirname(currentPath);
+    if (parentPath === currentPath) {
+      break;
+    }
+
+    currentPath = parentPath;
+  }
+
+  return directories;
 }
 
 function getWorkspaceNodeBinCandidates(preferredUri) {
   const isWindows = process.platform === "win32";
   const binaryNames = isWindows ? ["vdl.exe", "vdl.cmd", "vdl.bat", "vdl"] : ["vdl"];
   const candidates = [];
+  const seenCandidates = new Set();
 
-  for (const folder of getWorkspaceFoldersInPriorityOrder(preferredUri)) {
-    const binDir = path.join(folder.uri.fsPath, "node_modules", ".bin");
+  for (const rootPath of getSearchRootsInPriorityOrder(preferredUri)) {
+    for (const binDir of getAncestorNodeBinDirectories(rootPath)) {
+      for (const binaryName of binaryNames) {
+        const candidate = path.join(binDir, binaryName);
 
-    for (const binaryName of binaryNames) {
-      candidates.push(path.join(binDir, binaryName));
+        if (seenCandidates.has(candidate)) {
+          continue;
+        }
+
+        seenCandidates.add(candidate);
+        candidates.push(candidate);
+      }
     }
   }
 
@@ -118,7 +161,7 @@ function getBinaryPath(preferredUri) {
   }
 
   let errMsg = "Could not find the vdl binary. ";
-  errMsg += "Checked 'vdl.binaryPath', workspace 'node_modules/.bin', GOBIN, and PATH. ";
+  errMsg += "Checked 'vdl.binaryPath', workspace and parent 'node_modules/.bin', GOBIN, and PATH. ";
   errMsg += "Please install VDL or set 'vdl.binaryPath' in VS Code settings.";
   throw new Error(errMsg);
 }

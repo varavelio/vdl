@@ -64,7 +64,7 @@
         "vdl.binaryPath": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Path to the VDL binary. If not set, the extension looks for a workspace-local `node_modules/.bin/vdl` first, then `GOBIN`, then your PATH."
+          "markdownDescription": "Path to the VDL binary. If not set, the extension looks for `node_modules/.bin/vdl` in the current workspace and parent directories first, then `GOBIN`, then your PATH."
         }
       }
     },
