@@ -30,13 +30,20 @@ You can download the binary for any OS/Arch in the [VDL Releases page.](https://
 
 For more information on how to install `vdl`, read the [VDL documentation.](https://vdl.varavel.com)
 
-If the binary is not in your operating system PATH, you can set a custom path in the `vdl.binaryPath` setting.
+The extension looks for `vdl` in this order:
+
+1. `vdl.binaryPath`
+2. The current workspace's local `node_modules/.bin` install
+3. `GOBIN`
+4. Your operating system PATH
+
+If the binary is not found automatically, you can set a custom path with `vdl.binaryPath`.
 
 ## Extension Settings
 
 - `vdl.enable`: Enable VDL language support. If disabled, the only feature that will be available is Syntax Highlighting. Default `true`.
 
-- `vdl.binaryPath`: Path to the VDL binary. If not set, the extension will try to find `vdl` or `vdl.exe` in your PATH. Default `<not set>`.
+- `vdl.binaryPath`: Path to the VDL binary. If not set, the extension looks for a workspace-local `node_modules/.bin/vdl`, then `GOBIN`, then `PATH`. Default `<not set>`.
 
 ## Commands
 
