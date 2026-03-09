@@ -133,12 +133,12 @@ func resolvePluginSource(baseDir, rawSrc string, remotes []remoteHostAuth) (plug
 		}
 
 		canonicalURL := fmt.Sprintf(
-			"https://raw.githubusercontent.com/%s/%s/%s/plugin.js",
+			"https://raw.githubusercontent.com/%s/%s/%s/dist/index.js",
 			owner,
 			repo,
 			ref,
 		)
-		authMatchURL := fmt.Sprintf("https://github.com/%s/%s/plugin.js", owner, repo)
+		authMatchURL := fmt.Sprintf("https://github.com/%s/%s/dist/index.js", owner, repo)
 
 		headers, err := resolveRemoteHeaders(authMatchURL, remotes)
 		if err != nil {

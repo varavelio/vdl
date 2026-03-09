@@ -29,7 +29,7 @@ func TestResolveRuntimePlugins(t *testing.T) {
 		require.Len(t, plugins, 1)
 		require.Equal(
 			t,
-			"https://raw.githubusercontent.com/varavelio/vdl-plugin-demo/v1.2.3/plugin.js",
+			"https://raw.githubusercontent.com/varavelio/vdl-plugin-demo/v1.2.3/dist/index.js",
 			plugins[0].Source.CanonicalURL,
 		)
 	})
@@ -62,7 +62,7 @@ func TestResolveRuntimePlugins(t *testing.T) {
 			Config: configtypes.VdlConfig{
 				Version: 1,
 				Plugins: &[]configtypes.VdlConfigPlugin{{
-					Src:    "http://example.com/plugin.js",
+					Src:    "http://example.com/plugin/index.js",
 					Schema: "./schema.vdl",
 					OutDir: "./gen",
 				}},
@@ -83,7 +83,7 @@ func TestResolveRuntimePlugins(t *testing.T) {
 			Config: configtypes.VdlConfig{
 				Version: 1,
 				Plugins: &[]configtypes.VdlConfigPlugin{{
-					Src:    "http://example.com/plugin.js",
+					Src:    "http://example.com/plugin/index.js",
 					Schema: "./schema.vdl",
 					OutDir: "./gen",
 				}},
@@ -93,7 +93,7 @@ func TestResolveRuntimePlugins(t *testing.T) {
 		plugins, err := resolveRuntimePlugins(config)
 		require.NoError(t, err)
 		require.Len(t, plugins, 1)
-		require.Equal(t, "http://example.com/plugin.js", plugins[0].Source.CanonicalURL)
+		require.Equal(t, "http://example.com/plugin/index.js", plugins[0].Source.CanonicalURL)
 	})
 
 	t.Run("applies the most specific remote auth headers", func(t *testing.T) {

@@ -63,7 +63,7 @@ func discoverRunPluginGoldenCases(t *testing.T) []runPluginGoldenCase {
 			return nil
 		}
 
-		pluginPath := filepath.Join(path, "plugin.js")
+		pluginPath := filepath.Join(path, "index.js")
 		expectedPath := filepath.Join(path, "expected.json")
 		if !isFile(pluginPath) || !isFile(expectedPath) {
 			return nil

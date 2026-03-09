@@ -176,11 +176,11 @@ func (p *preVdlConfig) transform() VdlConfig {
 type VdlConfigPlugin struct {
 	// The source of the plugin, it can be:
 	//
-	// - A GitHub repo in the format "owner/repo@ref" containing a plugin file (plugin.js) at the root.
+	// - A GitHub repo in the format "owner/repo@ref" containing a plugin file at ./dist/index.js.
 	//   The ref MUST be a tag (release version) or a full commit hash (branches are highly discouraged
 	//   to prevent lockfile conflicts).
-	// - A local path to a plugin file, e.g. "./plugins/<plugin-name>/plugin.js" (always start with . or /).
-	// - A remote URL to a plugin file, e.g. "https://example.com/plugin.js". (always start with https://).
+	// - A local path to a plugin file, e.g. "./plugins/<plugin-name>/plugin/index.js" (always start with . or /).
+	// - A remote URL to a plugin file, e.g. "https://example.com/plugin/index.js". (always start with https://).
 	Src string `json:"src"`
 	// Relative path to the input schema file for this plugin. VDL passes the processed intermediate
 	// representation of this schema to the plugin for code generation and then writes the generated
@@ -320,7 +320,7 @@ type VdlConfigRemote struct {
 	// e.g. "github.com", "github.com/owner/repo", "example.com" or "example.com/plugins".
 	//
 	// If a plugin match multiple remotes, the most specific match will be used
-	// e.g. if a plugin is from "github.com/owner/repo/plugin.js", the remote with
+	// e.g. if a plugin is from "github.com/owner/repo/dist/index.js", the remote with
 	// host "github.com/owner/repo" will be used instead of the remote with host "github.com".
 	Host string `json:"host"`
 	// Authentication details for accessing this remote host.

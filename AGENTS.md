@@ -79,7 +79,7 @@ When updating this document, do so with the context of the entire document in mi
 ## Testing & Quality
 
 - **Primary test strategy**: package-level Go unit tests (`*_test.go`) in `toolchain/internal/**`.
-- **Codegen plugin runtime tests**: `toolchain/internal/codegen/testdata/run_plugin/cases/` uses folder-driven fixtures (`plugin.js` + `expected.json`) so new plugin execution scenarios can be added without test harness changes.
+- **Codegen plugin runtime tests**: `toolchain/internal/codegen/testdata/run_plugin/cases/` uses folder-driven fixtures (`index.js` + `expected.json`) so new plugin execution scenarios can be added without test harness changes.
 - **Formatter quality**: relies on golden-style fixtures in `toolchain/internal/formatter/tests/`.
 - **LSP quality**: behavior tests live in `toolchain/internal/lsp/*_test.go` and should stay aligned with the current declaration-centric AST/program model.
 - **E2E note**: `toolchain/tests/` no longer contains the old multi-language E2E harness; do not assume legacy `testdata`-driven E2E structure exists.

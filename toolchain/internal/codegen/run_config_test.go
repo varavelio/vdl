@@ -17,7 +17,7 @@ func TestLoadRuntimeConfig(t *testing.T) {
 				cleanOutDir true
 				plugins [
 					{
-						src "./plugin.js"
+						src "./plugin/index.js"
 						schema "./schema.vdl"
 						outDir "./gen"
 						options {
@@ -33,7 +33,7 @@ func TestLoadRuntimeConfig(t *testing.T) {
 		require.Equal(t, int64(1), runtimeConfig.Config.Version)
 		require.Equal(t, true, runtimeConfig.Config.GetCleanOutDir())
 		require.Len(t, runtimeConfig.Config.GetPlugins(), 1)
-		require.Equal(t, "./plugin.js", runtimeConfig.Config.GetPlugins()[0].Src)
+		require.Equal(t, "./plugin/index.js", runtimeConfig.Config.GetPlugins()[0].Src)
 		require.Equal(
 			t,
 			filepath.Join(dir, defaultConfigFileName),

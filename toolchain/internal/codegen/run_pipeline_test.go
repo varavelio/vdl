@@ -15,13 +15,13 @@ import (
 func TestRunWithLocalPlugin(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin.js"), `exports.generate = () => ({ files: [{ path: "nested/generated.txt", content: "hello" }] })`)
+	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "nested/generated.txt", content: "hello" }] })`)
 	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
 		const config = {
 			version 1
 			plugins [
 				{
-					src "./plugin.js"
+					src "./plugin/index.js"
 					schema "./schema.vdl"
 					outDir "./gen"
 				}
@@ -45,13 +45,13 @@ func TestRunWithLocalPlugin(t *testing.T) {
 func TestRunPrunesUnusedLockHashes(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
+	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
 	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
 		const config = {
 			version 1
 			plugins [
 				{
-					src "./plugin.js"
+					src "./plugin/index.js"
 					schema "./schema.vdl"
 					outDir "./gen"
 				}
@@ -78,13 +78,13 @@ func TestRunPrunesUnusedLockHashes(t *testing.T) {
 func TestRunRejectsTraversalBeforeCleaningOutputs(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin.js"), `exports.generate = () => ({ files: [{ path: "../escape.txt", content: "bad" }] })`)
+	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "../escape.txt", content: "bad" }] })`)
 	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
 		const config = {
 			version 1
 			plugins [
 				{
-					src "./plugin.js"
+					src "./plugin/index.js"
 					schema "./schema.vdl"
 					outDir "./gen"
 				}
@@ -217,7 +217,7 @@ func TestMaterializeRemoteDependencyRejectsHashChanges(t *testing.T) {
 	cacheDir := filepath.Join(t.TempDir(), "lock")
 	require.NoError(t, os.MkdirAll(cacheDir, generatedDirMode))
 
-	_, _, err := materializeRemoteDependency(server.URL+"/plugin.js", http.Header{}, sha256Digest([]byte("console.log('v1')")), cacheDir)
+	_, _, err := materializeRemoteDependency(server.URL+"/plugin/index.js", http.Header{}, sha256Digest([]byte("console.log('v1')")), cacheDir)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "may have been compromised")
 }
