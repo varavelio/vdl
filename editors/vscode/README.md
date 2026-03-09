@@ -75,6 +75,12 @@ The following snippets are available for `.vdl` files:
 
 Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/editors/vscode/CHANGELOG.md).
 
+### v0.1.5 - 2026-03-09
+
+- Added workspace-local VDL binary discovery through `node_modules/.bin`, including parent directories up to the filesystem root.
+- Prioritized project-local VDL installations before `GOBIN` and `PATH` to better match monorepo and dev dependency workflows.
+- Unified binary execution so `vdl`, `vdl.exe`, `vdl.cmd`, and `vdl.bat` work consistently for commands and the language server.
+
 ### v0.1.4 - 2026-03-03
 
 - Rewrote syntax highlighting grammar to align with current VDL spec and remove legacy rules.
