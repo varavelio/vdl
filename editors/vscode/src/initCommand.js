@@ -1,19 +1,19 @@
 const vscode = require("vscode");
+const getBinaryPath = require("./getBinaryPath.js");
 const { runVdl } = require("./runVdl.js");
 
-async function initCommand(binaryPath) {
-  let defaultUri;
-
-  // Open dialog in current project folder
-  if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-    defaultUri = vscode.workspace.workspaceFolders[0].uri;
-  }
+async function initCommand() {
+  const activeUri = vscode.window.activeTextEditor?.document?.uri;
+  const activeWorkspaceUri = activeUri
+    ? vscode.workspace.getWorkspaceFolder(activeUri)?.uri
+    : undefined;
+  const defaultUri = activeWorkspaceUri || activeUri || vscode.workspace.workspaceFolders?.[0]?.uri;
 
   const folderUri = await vscode.window.showOpenDialog({
     canSelectFiles: false,
     canSelectFolders: true,
     canSelectMany: false,
-    defaultUri: defaultUri,
+    defaultUri,
     openLabel: "Initialize VDL Here",
   });
 
@@ -21,7 +21,9 @@ async function initCommand(binaryPath) {
     return;
   }
 
-  const folderPath = folderUri[0].fsPath;
+  const selectedUri = folderUri[0];
+  const folderPath = selectedUri.fsPath;
+  const binaryPath = getBinaryPath(selectedUri);
 
   console.log(`VDL: Initializing at ${folderPath}`);
 

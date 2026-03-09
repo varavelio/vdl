@@ -13,6 +13,10 @@ function isExtensionEnabled() {
   return config.get("enable") === true;
 }
 
+function getPreferredUri() {
+  return vscode.window.activeTextEditor?.document?.uri;
+}
+
 async function activate(context) {
   // Idempotent bootstrap function
   const bootstrap = async () => {
@@ -22,7 +26,7 @@ async function activate(context) {
     }
 
     try {
-      const binaryPath = getBinaryPath();
+      const binaryPath = getBinaryPath(getPreferredUri());
       await startLanguageServer(binaryPath);
     } catch (error) {
       vscode.window.showErrorMessage(error.message);
@@ -36,8 +40,7 @@ async function activate(context) {
   context.subscriptions.push(
     vscode.commands.registerCommand("vdl.init", async () => {
       try {
-        const path = getBinaryPath();
-        await initCommand(path);
+        await initCommand();
       } catch (e) {
         vscode.window.showErrorMessage(e.message);
       }
@@ -47,7 +50,7 @@ async function activate(context) {
   context.subscriptions.push(
     vscode.commands.registerCommand("vdl.restart", async () => {
       try {
-        const path = getBinaryPath();
+        const path = getBinaryPath(getPreferredUri());
         await restartLanguageServer(path);
       } catch (e) {
         vscode.window.showErrorMessage(e.message);
@@ -58,7 +61,7 @@ async function activate(context) {
   context.subscriptions.push(
     vscode.commands.registerCommand("vdl.openLogs", async () => {
       try {
-        const path = getBinaryPath();
+        const path = getBinaryPath(getPreferredUri());
         await openLogsCommand(path);
       } catch (e) {
         vscode.window.showErrorMessage(e.message);

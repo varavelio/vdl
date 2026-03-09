@@ -119,7 +119,7 @@ function getBinaryPath(preferredUri) {
 
   let errMsg = "Could not find the vdl binary. ";
   errMsg += "Checked 'vdl.binaryPath', workspace 'node_modules/.bin', GOBIN, and PATH. ";
-  errMsg += "Please ensure it is installed or set 'vdl.binaryPath' in VS Code settings.";
+  errMsg += "Please install VDL or set 'vdl.binaryPath' in VS Code settings.";
   throw new Error(errMsg);
 }
 
