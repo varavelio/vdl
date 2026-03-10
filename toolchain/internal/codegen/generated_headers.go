@@ -38,6 +38,7 @@ var (
 )
 
 var generatedFileHeaderLanguages = []generatedFileHeaderLanguage{
+	{Name: "VDL", Extensions: []string{".vdl"}, Comment: lineSlashComment},
 	{Name: "JavaScript", Extensions: []string{".js", ".mjs", ".cjs"}, Comment: lineSlashComment},
 	{Name: "TypeScript", Extensions: []string{".ts", ".mts", ".cts"}, Comment: lineSlashComment},
 	{Name: "JSX", Extensions: []string{".jsx"}, Comment: lineSlashComment},
