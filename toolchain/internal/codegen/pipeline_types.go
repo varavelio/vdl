@@ -23,6 +23,7 @@ type pluginSource struct {
 	AuthMatchURL string
 	Headers      http.Header
 	CachePath    string
+	ContentHash  string
 }
 
 type runtimePlugin struct {

@@ -50,6 +50,7 @@ func runWithConfig(config runtimeConfig) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	applyGeneratedFileHeaders(results)
 
 	plan, err := planOutputWrites(results)
 	if err != nil {

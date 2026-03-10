@@ -31,6 +31,7 @@ func preparePlugins(plugins []runtimePlugin) ([]preparedPlugin, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to read plugin script %q: %w", plugin.Source.DisplayName, err)
 		}
+		plugin.Source.ContentHash = sha256Digest(scriptBytes)
 
 		input, err := buildPluginInput(plugin)
 		if err != nil {
