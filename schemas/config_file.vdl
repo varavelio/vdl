@@ -121,6 +121,15 @@ type VdlConfigPlugin {
   outDir: string
 
   """
+  Whether to generate header comments in the generated files. Default is true.
+  
+  If true, VDL will add a header comment to each generated file indicating that it was generated
+  by VDL and should not be edited manually, along with the VDL and plugin version information
+  for auditing purposes.
+  """
+  generateHeader?: bool
+
+  """
   Optional map of options to be passed to the plugin. The content of this map will be plugin-specific
   and is passed as-is to the plugin. The plugin can define its own options so read the plugin
   documentation for details.

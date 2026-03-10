@@ -189,6 +189,12 @@ type VdlConfigPlugin struct {
 	// The output directory for the generated code. All generated files from this plugin will be relatively
 	// placed under this directory.
 	OutDir string `json:"outDir"`
+	// Whether to generate header comments in the generated files. Default is true.
+	//
+	// If true, VDL will add a header comment to each generated file indicating that it was generated
+	// by VDL and should not be edited manually, along with the VDL and plugin version information
+	// for auditing purposes.
+	GenerateHeader *bool `json:"generateHeader,omitempty"`
 	// Optional map of options to be passed to the plugin. The content of this map will be plugin-specific
 	// and is passed as-is to the plugin. The plugin can define its own options so read the plugin
 	// documentation for details.
@@ -246,6 +252,23 @@ func (x *VdlConfigPlugin) GetOutDirOr(defaultValue string) string {
 	return defaultValue
 }
 
+// GetGenerateHeader returns the value of GenerateHeader or the zero value if the receiver or field is nil.
+func (x *VdlConfigPlugin) GetGenerateHeader() bool {
+	if x != nil && x.GenerateHeader != nil {
+		return *x.GenerateHeader
+	}
+	var zero bool
+	return zero
+}
+
+// GetGenerateHeaderOr returns the value of GenerateHeader or the provided default if the receiver or field is nil.
+func (x *VdlConfigPlugin) GetGenerateHeaderOr(defaultValue bool) bool {
+	if x != nil && x.GenerateHeader != nil {
+		return *x.GenerateHeader
+	}
+	return defaultValue
+}
+
 // GetOptions returns the value of Options or the zero value if the receiver or field is nil.
 func (x *VdlConfigPlugin) GetOptions() map[string]string {
 	if x != nil && x.Options != nil {
@@ -265,10 +288,11 @@ func (x *VdlConfigPlugin) GetOptionsOr(defaultValue map[string]string) map[strin
 
 // preVdlConfigPlugin is the version of VdlConfigPlugin previous to the required field validation
 type preVdlConfigPlugin struct {
-	Src     *string            `json:"src,omitempty"`
-	Schema  *string            `json:"schema,omitempty"`
-	OutDir  *string            `json:"outDir,omitempty"`
-	Options *map[string]string `json:"options,omitempty"`
+	Src            *string            `json:"src,omitempty"`
+	Schema         *string            `json:"schema,omitempty"`
+	OutDir         *string            `json:"outDir,omitempty"`
+	GenerateHeader *bool              `json:"generateHeader,omitempty"`
+	Options        *map[string]string `json:"options,omitempty"`
 }
 
 // validate validates the required fields of VdlConfigPlugin
@@ -292,6 +316,8 @@ func (p *preVdlConfigPlugin) validate() error {
 		return errorMissingRequiredField("field outDir is required")
 	}
 
+	// Validation for field "generateHeader"
+
 	// Validation for field "options"
 
 	return nil
@@ -303,14 +329,16 @@ func (p *preVdlConfigPlugin) transform() VdlConfigPlugin {
 	transSrc := *p.Src
 	transSchema := *p.Schema
 	transOutDir := *p.OutDir
+	transGenerateHeader := p.GenerateHeader
 	transOptions := p.Options
 
 	// Assignments
 	return VdlConfigPlugin{
-		Src:     transSrc,
-		Schema:  transSchema,
-		OutDir:  transOutDir,
-		Options: transOptions,
+		Src:            transSrc,
+		Schema:         transSchema,
+		OutDir:         transOutDir,
+		GenerateHeader: transGenerateHeader,
+		Options:        transOptions,
 	}
 }
 
