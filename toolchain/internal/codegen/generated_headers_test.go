@@ -15,7 +15,7 @@ func TestApplyGeneratedFileHeaders(t *testing.T) {
 			Content: "package main\n",
 		}}
 		results := []executedPlugin{{
-			Plugin: runtimePlugin{Source: pluginSource{Original: "owner/vdl-plugin-demo@v1.0.0", ContentHash: "sha256-1234567890abcdef"}},
+			Plugin: runtimePlugin{Source: pluginSource{Original: "owner/vdl-plugin-demo@v1.0.0", ContentHash: "sha256-1234567890abcdef"}, GenerateHeader: true},
 			Output: plugintypes.PluginOutput{Files: &files},
 		}}
 
@@ -34,7 +34,7 @@ func TestApplyGeneratedFileHeaders(t *testing.T) {
 			Content: "select 1;\n",
 		}}
 		results := []executedPlugin{{
-			Plugin: runtimePlugin{Source: pluginSource{Original: "https://example.com/plugin.js"}},
+			Plugin: runtimePlugin{Source: pluginSource{Original: "https://example.com/plugin.js"}, GenerateHeader: true},
 			Output: plugintypes.PluginOutput{Files: &files},
 		}}
 
@@ -53,7 +53,7 @@ func TestApplyGeneratedFileHeaders(t *testing.T) {
 			Content: "<main>Hello</main>\n",
 		}}
 		results := []executedPlugin{{
-			Plugin: runtimePlugin{Source: pluginSource{Original: "./plugin.js"}},
+			Plugin: runtimePlugin{Source: pluginSource{Original: "./plugin.js"}, GenerateHeader: true},
 			Output: plugintypes.PluginOutput{Files: &files},
 		}}
 
@@ -72,7 +72,7 @@ func TestApplyGeneratedFileHeaders(t *testing.T) {
 			Content: "FROM alpine:3.21\n",
 		}}
 		results := []executedPlugin{{
-			Plugin: runtimePlugin{Source: pluginSource{Original: "./plugin.js"}},
+			Plugin: runtimePlugin{Source: pluginSource{Original: "./plugin.js"}, GenerateHeader: true},
 			Output: plugintypes.PluginOutput{Files: &files},
 		}}
 
@@ -98,6 +98,24 @@ func TestApplyGeneratedFileHeaders(t *testing.T) {
 		applyGeneratedFileHeaders(results)
 
 		require.Equal(t, "hello\n", results[0].Output.GetFiles()[0].GetContent())
+	})
+
+	t.Run("skips headers when plugin disables them", func(t *testing.T) {
+		files := []plugintypes.PluginOutputFile{{
+			Path:    "main.go",
+			Content: "package main\n",
+		}}
+		results := []executedPlugin{{
+			Plugin: runtimePlugin{
+				Source:         pluginSource{Original: "./plugin.js", ContentHash: "sha256-abcdef1234567890"},
+				GenerateHeader: false,
+			},
+			Output: plugintypes.PluginOutput{Files: &files},
+		}}
+
+		applyGeneratedFileHeaders(results)
+
+		require.Equal(t, "package main\n", results[0].Output.GetFiles()[0].GetContent())
 	})
 
 	t.Run("shortens plugin hashes for header labels", func(t *testing.T) {

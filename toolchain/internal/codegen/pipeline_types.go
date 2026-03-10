@@ -27,11 +27,12 @@ type pluginSource struct {
 }
 
 type runtimePlugin struct {
-	Index      int
-	Source     pluginSource
-	SchemaPath string
-	OutDir     string
-	Options    map[string]string
+	Index          int
+	Source         pluginSource
+	SchemaPath     string
+	OutDir         string
+	Options        map[string]string
+	GenerateHeader bool
 }
 
 type preparedPlugin struct {

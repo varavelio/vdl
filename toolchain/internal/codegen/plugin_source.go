@@ -54,11 +54,12 @@ func resolveRuntimePlugins(config runtimeConfig) ([]runtimePlugin, error) {
 		}
 
 		plugins = append(plugins, runtimePlugin{
-			Index:      i,
-			Source:     source,
-			SchemaPath: schemaPath,
-			OutDir:     outDir,
-			Options:    cloneStringMap(pluginConfig.GetOptionsOr(map[string]string{})),
+			Index:          i,
+			Source:         source,
+			SchemaPath:     schemaPath,
+			OutDir:         outDir,
+			Options:        cloneStringMap(pluginConfig.GetOptionsOr(map[string]string{})),
+			GenerateHeader: configtypes.Or(pluginConfig.GenerateHeader, true),
 		})
 	}
 

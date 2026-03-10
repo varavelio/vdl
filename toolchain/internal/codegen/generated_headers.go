@@ -120,9 +120,14 @@ var generatedFileHeaderLanguages = []generatedFileHeaderLanguage{
 }
 
 // applyGeneratedFileHeaders prepends the standard VDL generated-file header to
-// every plugin output whose path matches a supported language or IDL.
+// every plugin output whose path matches a supported language or IDL, unless
+// the plugin explicitly disables generated headers.
 func applyGeneratedFileHeaders(results []executedPlugin) {
 	for i := range results {
+		if !results[i].Plugin.GenerateHeader {
+			continue
+		}
+
 		files := results[i].Output.GetFiles()
 		if len(files) == 0 {
 			continue

@@ -96,6 +96,49 @@ func TestResolveRuntimePlugins(t *testing.T) {
 		require.Equal(t, "http://example.com/plugin/index.js", plugins[0].Source.CanonicalURL)
 	})
 
+	t.Run("defaults generateHeader to true", func(t *testing.T) {
+		dir := t.TempDir()
+		config := runtimeConfig{
+			Path: filepath.Join(dir, defaultConfigFileName),
+			Dir:  dir,
+			Config: configtypes.VdlConfig{
+				Version: 1,
+				Plugins: &[]configtypes.VdlConfigPlugin{{
+					Src:    "https://example.com/plugin/index.js",
+					Schema: "./schema.vdl",
+					OutDir: "./gen",
+				}},
+			},
+		}
+
+		plugins, err := resolveRuntimePlugins(config)
+		require.NoError(t, err)
+		require.Len(t, plugins, 1)
+		require.True(t, plugins[0].GenerateHeader)
+	})
+
+	t.Run("respects generateHeader when disabled", func(t *testing.T) {
+		dir := t.TempDir()
+		config := runtimeConfig{
+			Path: filepath.Join(dir, defaultConfigFileName),
+			Dir:  dir,
+			Config: configtypes.VdlConfig{
+				Version: 1,
+				Plugins: &[]configtypes.VdlConfigPlugin{{
+					Src:            "https://example.com/plugin/index.js",
+					Schema:         "./schema.vdl",
+					OutDir:         "./gen",
+					GenerateHeader: configtypes.Ptr(false),
+				}},
+			},
+		}
+
+		plugins, err := resolveRuntimePlugins(config)
+		require.NoError(t, err)
+		require.Len(t, plugins, 1)
+		require.False(t, plugins[0].GenerateHeader)
+	})
+
 	t.Run("applies the most specific remote auth headers", func(t *testing.T) {
 		dir := t.TempDir()
 		t.Setenv("REMOTE_HEADER_NAME", "X-Token")
