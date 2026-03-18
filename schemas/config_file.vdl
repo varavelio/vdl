@@ -1,10 +1,10 @@
 """ VDL configuration file schema. """
 type VdlConfig {
   """ The version of the configuration file format. This should be set to 1. """
-  version: int
+  version int
 
   """ If VDL should clean the output directories before generating code. Default is true. """
-  cleanOutDir?: bool
+  cleanOutDir? bool
 
   """
   Optional list of remote repositories or servers that can be used to fetch plugins.
@@ -12,10 +12,10 @@ type VdlConfig {
   servers that require authentication. Each plugin will be matched against the remotes
   based on the host.
   """
-  remotes?: VdlConfigRemote[]
+  remotes? VdlConfigRemote[]
 
   """ List of plugins to be used for code generation. """
-  plugins?: VdlConfigPlugin[]
+  plugins? VdlConfigPlugin[]
 }
 
 """ VDL remote configuration. """
@@ -23,30 +23,30 @@ type VdlConfigRemote {
   """
   The host URL of the remote repository or server without http(s):// prefix
   e.g. "github.com", "github.com/owner/repo", "example.com" or "example.com/plugins".
-
+  
   If a plugin match multiple remotes, the most specific match will be used
   e.g. if a plugin is from "github.com/owner/repo/dist/index.js", the remote with
   host "github.com/owner/repo" will be used instead of the remote with host "github.com".
   """
-  host: string
+  host string
 
   """ Authentication details for accessing this remote host. """
-  auth?: VdlConfigRemoteAuth
+  auth? VdlConfigRemoteAuth
 }
 
 """ VDL remote authentication configuration. """
 type VdlConfigRemoteAuth {
   """ GitHub authentication details. """
-  github?: VdlConfigRemoteAuthGithub
+  github? VdlConfigRemoteAuthGithub
 
   """ Header-based authentication details. """
-  header?: VdlConfigRemoteAuthHeader
+  header? VdlConfigRemoteAuthHeader
 
   """ Bearer token authentication details. """
-  bearer?: VdlConfigRemoteAuthBearer
+  bearer? VdlConfigRemoteAuthBearer
 
   """ Basic authentication details. """
-  basic?: VdlConfigRemoteAuthBasic
+  basic? VdlConfigRemoteAuthBasic
 }
 
 """
@@ -56,7 +56,7 @@ repos or "public_repo" scope for public repos.
 """
 type VdlConfigRemoteAuthGithub {
   """ The name of the environment variable that contains the GitHub Personal Access Token (PAT). """
-  tokenEnv: string
+  tokenEnv string
 }
 
 """
@@ -65,10 +65,10 @@ name and value to be sent with each request to the remote host.
 """
 type VdlConfigRemoteAuthHeader {
   """ The name of the environment variable that contains the header name to be sent. """
-  nameEnv: string
+  nameEnv string
 
   """ The name of the environment variable that contains the header value to be sent. """
-  valueEnv: string
+  valueEnv string
 }
 
 """
@@ -78,7 +78,7 @@ will be "Bearer <token>".
 """
 type VdlConfigRemoteAuthBearer {
   """ The name of the environment variable that contains the bearer token to be sent. """
-  tokenEnv: string
+  tokenEnv string
 }
 
 """
@@ -88,37 +88,37 @@ the value will be "Basic <base64-encoded credentials>".
 """
 type VdlConfigRemoteAuthBasic {
   """ The name of the environment variable that contains the username. """
-  userEnv: string
+  userEnv string
 
   """ The name of the environment variable that contains the password. """
-  passEnv: string
+  passEnv string
 }
 
 """ VDL plugin configuration. """
 type VdlConfigPlugin {
   """
   The source of the plugin, it can be:
-
+  
   - A GitHub repo in the format "owner/repo@ref" containing a plugin file at ./dist/index.js.
     The ref MUST be a tag (release version) or a full commit hash (branches are highly discouraged
     to prevent lockfile conflicts).
   - A local path to a plugin file, e.g. "./plugins/<plugin-name>/plugin/index.js" (always start with . or /).
   - A remote URL to a plugin file, e.g. "https://example.com/plugin/index.js". (always start with https://).
   """
-  src: string
+  src string
 
   """
   Relative path to the input schema file for this plugin. VDL passes the processed intermediate
   representation of this schema to the plugin for code generation and then writes the generated
   code to the output directory specified by outDir.
   """
-  schema: string
+  schema string
 
   """
   The output directory for the generated code. All generated files from this plugin will be relatively
   placed under this directory.
   """
-  outDir: string
+  outDir string
 
   """
   Whether to generate header comments in the generated files. Default is true.
@@ -127,12 +127,12 @@ type VdlConfigPlugin {
   by VDL and should not be edited manually, along with the VDL and plugin version information
   for auditing purposes.
   """
-  generateHeader?: bool
+  generateHeader? bool
 
   """
   Optional map of options to be passed to the plugin. The content of this map will be plugin-specific
   and is passed as-is to the plugin. The plugin can define its own options so read the plugin
   documentation for details.
   """
-  options?: map<string>
+  options? map[string]
 }

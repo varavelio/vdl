@@ -4,11 +4,11 @@ reporting, diagnostics, plugins, and tooling support.
 """
 type Position {
   """ Absolute file path """
-  file: string
+  file string
 
   """ Line number (1-indexed) """
-  line: int
+  line int
 
   """ Column number (1-indexed) """
-  column: int
+  column int
 }

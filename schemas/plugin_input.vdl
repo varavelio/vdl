@@ -9,22 +9,22 @@ configuration options from `vdl.config.vdl`.
 """
 type PluginInput {
   """ The VDL binary version (without v prefix, e.g. 1.0.0) """
-  version: string
+  version string
 
   """
   The complete VDL Intermediate Representation.
-
+  
   Contains all types, enums, constants, and documentation from the compiled
   schema, fully resolved and ready for code generation.
   """
-  ir: IrSchema
+  ir IrSchema
 
   """
   Arbitrary key-value options passed from the `vdl.config.vdl` plugin configuration.
-
+  
   These allow users to customize plugin behavior without modifying the plugin
   itself. Common use cases include specifying target frameworks, API versions,
   naming conventions, or feature flags.
   """
-  options: map<string>
+  options map[string]
 }
