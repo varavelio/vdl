@@ -282,7 +282,6 @@ type EnumMember {
 """
 Fully resolved constant definition.
 
-`typeRef` is explicit or inferred by analysis.
 `value` contains the fully resolved literal payload.
 """
 type ConstantDef {
