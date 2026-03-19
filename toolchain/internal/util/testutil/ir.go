@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -30,6 +31,36 @@ func IRSchemaEqualNoPos(t *testing.T, expected, actual *irtypes.IrSchema, msgAnd
 	irCleanPositionsRecursively(reflect.ValueOf(actualCopy), reflect.ValueOf(irtypes.Position{}))
 
 	IRSchemaEqual(t, expectedCopy, actualCopy, msgAndArgs...)
+}
+
+// IRJSONEqualNoPos compares two IR JSON payloads and ignores all nested
+// `position` keys recursively.
+func IRJSONEqualNoPos(t *testing.T, expectedJSON, actualJSON []byte, msgAndArgs ...any) {
+	t.Helper()
+
+	expectedClean, err := StripPositionsFromJSON(expectedJSON)
+	require.NoError(t, err)
+
+	actualClean, err := StripPositionsFromJSON(actualJSON)
+	require.NoError(t, err)
+
+	require.Equal(t, string(expectedClean), string(actualClean), msgAndArgs...)
+}
+
+// StripPositionsFromJSON removes all `position` keys recursively from a JSON payload.
+func StripPositionsFromJSON(input []byte) ([]byte, error) {
+	var data any
+	if err := json.Unmarshal(input, &data); err != nil {
+		return nil, fmt.Errorf("unmarshal json: %w", err)
+	}
+
+	clean := stripPositionKeys(data)
+	out, err := json.MarshalIndent(clean, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("marshal cleaned json: %w", err)
+	}
+
+	return append(out, '\n'), nil
 }
 
 func cloneIRSchema(t *testing.T, schema *irtypes.IrSchema) *irtypes.IrSchema {
@@ -69,5 +100,27 @@ func irCleanPositionsRecursively(val reflect.Value, emptyPos reflect.Value) {
 		for i := range val.Len() {
 			irCleanPositionsRecursively(val.Index(i), emptyPos)
 		}
+	}
+}
+
+func stripPositionKeys(value any) any {
+	switch v := value.(type) {
+	case map[string]any:
+		clean := make(map[string]any, len(v))
+		for key, entry := range v {
+			if key == "position" {
+				continue
+			}
+			clean[key] = stripPositionKeys(entry)
+		}
+		return clean
+	case []any:
+		clean := make([]any, len(v))
+		for i, entry := range v {
+			clean[i] = stripPositionKeys(entry)
+		}
+		return clean
+	default:
+		return v
 	}
 }
