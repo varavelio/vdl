@@ -72,6 +72,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Always re-scan structure first**: run `task --list-all` and inspect relevant directories before changing behavior.
 - **Trust current tree, not historical assumptions**: `playground/` and legacy E2E layout are removed; do not reintroduce WASM/playground coupling unless explicitly requested.
 - **VDL model alignment**: keep parser/analysis/lsp changes declaration-centric (`include`, docstrings, `type`, `enum`, `const`, annotations, spreads). Avoid legacy RPC/pattern/proc/stream assumptions.
+- **Constants are dynamic literals**: `const` declarations do not accept explicit type names.
 - **Plugin-first generation**: treat `schemas/plugin*.vdl` as the contract for generator integrations; prefer extending plugin flows rather than adding fixed built-in generators.
 - **Command policy**: prefer root Taskfile tasks; use direct subproject commands only when a focused Taskfile task does not exist.
 - **Formatting/linting split**: Go uses `go fmt` + `vdl format`; JS/TS/Astro/Svelte use Biome; JSON/YAML/Markdown/CSS/HTML-like formats use dprint.
