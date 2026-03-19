@@ -115,7 +115,6 @@ func (x *Annotation) GetArgumentOr(defaultValue LiteralValue) LiteralValue {
 
 // Fully resolved constant definition.
 //
-// `typeRef` is explicit or inferred by analysis.
 // `value` contains the fully resolved literal payload.
 type ConstantDef struct {
 	// Source position of this definition
