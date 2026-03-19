@@ -1,8 +1,10 @@
 """ Subject template for user events. """
+
 @topicTemplate
 const userEventSubject = "events.users.{userId}.{eventType}"
 
 """ Cache key template for sessions. """
+
 @cacheTemplate
 const sessionCacheKey = "cache:session:{sessionId}"
 

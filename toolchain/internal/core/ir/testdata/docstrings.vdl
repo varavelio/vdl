@@ -25,9 +25,7 @@ type DocumentedType {
   description string
 }
 
-"""
-Enum with documented members.
-"""
+""" Enum with documented members. """
 enum DocumentedEnum {
   First
   Second

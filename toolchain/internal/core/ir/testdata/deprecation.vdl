@@ -27,5 +27,6 @@ enum AccountState {
 type Account {
   @deprecated("Use accountId")
   id string
+
   accountId string
 }

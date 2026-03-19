@@ -3,47 +3,22 @@
   "constants": [],
   "enums": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-        "line": 28,
-        "column": 1
-      },
       "name": "DocumentedEnum",
       "doc": "Enum with documented members.",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-            "line": 32,
-            "column": 3
-          },
           "name": "First",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "First"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-            "line": 33,
-            "column": 3
-          },
           "name": "Second",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Second"
           },
@@ -54,11 +29,6 @@
   ],
   "types": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-        "line": 10,
-        "column": 1
-      },
       "name": "DocumentedType",
       "doc": "This docstring has leading indentation\nthat should be stripped.\n\n- Indented list\n  - Nested item",
       "annotations": [],
@@ -66,11 +36,6 @@
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-              "line": 18,
-              "column": 3
-            },
             "name": "id",
             "doc": "The unique identifier.",
             "optional": false,
@@ -81,11 +46,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-              "line": 21,
-              "column": 3
-            },
             "name": "description",
             "doc": "A longer field description\nspanning multiple lines.",
             "optional": false,
@@ -101,11 +61,6 @@
   ],
   "docs": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/docstrings.vdl",
-        "line": 1,
-        "column": 1
-      },
       "content": "This is a multi-line docstring.\n\nIt has multiple paragraphs and should be normalized.\n\n- Item 1\n- Item 2"
     }
   ]

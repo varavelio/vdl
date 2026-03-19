@@ -6,6 +6,7 @@ type Location {
 type Address {
   street string
   city string
+
   location {
     lat float
     lng float
@@ -14,9 +15,11 @@ type Address {
 
 type Company {
   name string
+
   headquarters {
     address string
     floors int
+
     amenities {
       hasGym bool
       hasCafeteria bool

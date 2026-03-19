@@ -4,22 +4,12 @@
   "enums": [],
   "types": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-        "line": 6,
-        "column": 1
-      },
       "name": "Address",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 7,
-              "column": 3
-            },
             "name": "street",
             "optional": false,
             "annotations": [],
@@ -29,11 +19,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 8,
-              "column": 3
-            },
             "name": "city",
             "optional": false,
             "annotations": [],
@@ -43,11 +28,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 9,
-              "column": 3
-            },
             "name": "location",
             "optional": false,
             "annotations": [],
@@ -55,11 +35,6 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "position": {
-                    "file": "",
-                    "line": 10,
-                    "column": 5
-                  },
                   "name": "lat",
                   "optional": false,
                   "annotations": [],
@@ -69,11 +44,6 @@
                   }
                 },
                 {
-                  "position": {
-                    "file": "",
-                    "line": 11,
-                    "column": 5
-                  },
                   "name": "lng",
                   "optional": false,
                   "annotations": [],
@@ -89,22 +59,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-        "line": 15,
-        "column": 1
-      },
       "name": "Company",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 16,
-              "column": 3
-            },
             "name": "name",
             "optional": false,
             "annotations": [],
@@ -114,11 +74,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 17,
-              "column": 3
-            },
             "name": "headquarters",
             "optional": false,
             "annotations": [],
@@ -126,11 +81,6 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "position": {
-                    "file": "",
-                    "line": 18,
-                    "column": 5
-                  },
                   "name": "address",
                   "optional": false,
                   "annotations": [],
@@ -140,11 +90,6 @@
                   }
                 },
                 {
-                  "position": {
-                    "file": "",
-                    "line": 19,
-                    "column": 5
-                  },
                   "name": "floors",
                   "optional": false,
                   "annotations": [],
@@ -154,11 +99,6 @@
                   }
                 },
                 {
-                  "position": {
-                    "file": "",
-                    "line": 20,
-                    "column": 5
-                  },
                   "name": "amenities",
                   "optional": false,
                   "annotations": [],
@@ -166,11 +106,6 @@
                     "kind": "object",
                     "objectFields": [
                       {
-                        "position": {
-                          "file": "",
-                          "line": 21,
-                          "column": 7
-                        },
                         "name": "hasGym",
                         "optional": false,
                         "annotations": [],
@@ -180,11 +115,6 @@
                         }
                       },
                       {
-                        "position": {
-                          "file": "",
-                          "line": 22,
-                          "column": 7
-                        },
                         "name": "hasCafeteria",
                         "optional": false,
                         "annotations": [],
@@ -203,22 +133,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-        "line": 1,
-        "column": 1
-      },
       "name": "Location",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 2,
-              "column": 3
-            },
             "name": "latitude",
             "optional": false,
             "annotations": [],
@@ -228,11 +148,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/inline_objects.vdl",
-              "line": 3,
-              "column": 3
-            },
             "name": "longitude",
             "optional": false,
             "annotations": [],

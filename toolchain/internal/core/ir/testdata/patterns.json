@@ -2,88 +2,34 @@
   "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
   "constants": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-        "line": 5,
-        "column": 1
-      },
       "name": "sessionCacheKey",
-      "doc": "Cache key template for sessions.",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-            "line": 6,
-            "column": 1
-          },
           "name": "cacheTemplate"
         }
       ],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "string"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-          "line": 7,
-          "column": 25
-        },
         "kind": "string",
         "stringValue": "cache:session:{sessionId}"
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-        "line": 9,
-        "column": 1
-      },
       "name": "simpleKey",
       "doc": "Simple key template.",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "string"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-          "line": 10,
-          "column": 19
-        },
         "kind": "string",
         "stringValue": "key:{id}"
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-        "line": 1,
-        "column": 1
-      },
       "name": "userEventSubject",
-      "doc": "Subject template for user events.",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-            "line": 2,
-            "column": 1
-          },
           "name": "topicTemplate"
         }
       ],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "string"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/patterns.vdl",
-          "line": 3,
-          "column": 26
-        },
         "kind": "string",
         "stringValue": "events.users.{userId}.{eventType}"
       }
@@ -91,5 +37,12 @@
   ],
   "enums": [],
   "types": [],
-  "docs": []
+  "docs": [
+    {
+      "content": "Subject template for user events."
+    },
+    {
+      "content": "Cache key template for sessions."
+    }
+  ]
 }

@@ -2,107 +2,30 @@
   "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
   "constants": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 5,
-        "column": 1
-      },
       "name": "apiVersion",
       "doc": "API version string.",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "string"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 6,
-          "column": 20
-        },
         "kind": "string",
         "stringValue": "1.0.0"
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 19,
-        "column": 1
-      },
       "name": "baseConfig",
       "annotations": [],
-      "typeRef": {
-        "kind": "object",
-        "objectFields": [
-          {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
-            "name": "host",
-            "optional": false,
-            "annotations": [],
-            "typeRef": {
-              "kind": "primitive",
-              "primitiveName": "string"
-            }
-          },
-          {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
-            "name": "port",
-            "optional": false,
-            "annotations": [],
-            "typeRef": {
-              "kind": "primitive",
-              "primitiveName": "int"
-            }
-          }
-        ]
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 19,
-          "column": 20
-        },
         "kind": "object",
         "objectEntries": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-              "line": 20,
-              "column": 3
-            },
             "key": "host",
             "value": {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-                "line": 20,
-                "column": 8
-              },
               "kind": "string",
               "stringValue": "localhost"
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-              "line": 21,
-              "column": 3
-            },
             "key": "port",
             "value": {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-                "line": 21,
-                "column": 8
-              },
               "kind": "int",
               "intValue": 8080
             }
@@ -111,238 +34,75 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 17,
-        "column": 1
-      },
       "name": "defaultLimit",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "int"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 3,
-          "column": 21
-        },
         "kind": "int",
         "intValue": 100
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 8,
-        "column": 1
-      },
       "name": "defaultTaxRate",
       "doc": "Default tax rate.",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "float"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 9,
-          "column": 24
-        },
         "kind": "float",
         "floatValue": 0.21
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 11,
-        "column": 1
-      },
       "name": "featureNewUi",
       "doc": "Feature flag for new UI.",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "bool"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 12,
-          "column": 22
-        },
         "kind": "bool",
         "boolValue": true
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 14,
-        "column": 1
-      },
       "name": "legacyMode",
       "doc": "Legacy mode disabled.",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "bool"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 15,
-          "column": 20
-        },
         "kind": "bool",
         "boolValue": false
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 1,
-        "column": 1
-      },
       "name": "maxPageSize",
-      "doc": "Maximum items per page.",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-            "line": 2,
-            "column": 1
-          },
           "name": "config"
         }
       ],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "int"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 3,
-          "column": 21
-        },
         "kind": "int",
         "intValue": 100
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-        "line": 24,
-        "column": 1
-      },
       "name": "prodConfig",
       "annotations": [],
-      "typeRef": {
-        "kind": "object",
-        "objectFields": [
-          {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
-            "name": "host",
-            "optional": false,
-            "annotations": [],
-            "typeRef": {
-              "kind": "primitive",
-              "primitiveName": "string"
-            }
-          },
-          {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
-            "name": "port",
-            "optional": false,
-            "annotations": [],
-            "typeRef": {
-              "kind": "primitive",
-              "primitiveName": "int"
-            }
-          },
-          {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
-            "name": "secure",
-            "optional": false,
-            "annotations": [],
-            "typeRef": {
-              "kind": "primitive",
-              "primitiveName": "bool"
-            }
-          }
-        ]
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-          "line": 24,
-          "column": 20
-        },
         "kind": "object",
         "objectEntries": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-              "line": 20,
-              "column": 3
-            },
             "key": "host",
             "value": {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-                "line": 20,
-                "column": 8
-              },
               "kind": "string",
               "stringValue": "localhost"
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-              "line": 21,
-              "column": 3
-            },
             "key": "port",
             "value": {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-                "line": 21,
-                "column": 8
-              },
               "kind": "int",
               "intValue": 8080
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-              "line": 26,
-              "column": 3
-            },
             "key": "secure",
             "value": {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/constants.vdl",
-                "line": 26,
-                "column": 10
-              },
               "kind": "bool",
               "boolValue": true
             }
@@ -353,5 +113,9 @@
   ],
   "enums": [],
   "types": [],
-  "docs": []
+  "docs": [
+    {
+      "content": "Maximum items per page."
+    }
+  ]
 }

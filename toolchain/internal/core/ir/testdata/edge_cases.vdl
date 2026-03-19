@@ -1,9 +1,6 @@
-"""
-Edge case schema for IR conversion.
-"""
+""" Edge case schema for IR conversion. """
 
-type EmptyType {
-}
+type EmptyType {}
 
 type SingleField {
   only string
@@ -22,6 +19,7 @@ type DeepInline {
 type OptionalComplex {
   optMatrix? int[][]
   optMapMap? map[map[string]]
+
   optObject? {
     innerOpt? string
     innerReq int
@@ -34,6 +32,7 @@ type SpreadBase {
 
 type InlineWithSpread {
   ...SpreadBase
+
   inlineObj {
     nested string
   }
@@ -54,10 +53,9 @@ type EnumsEverywhere {
 const zeroInt = 0
 const emptyString = ""
 const matrix = [[1 2] [3 4]]
+
 const nestedObj = {
   a {
-    b {
-      c true
-    }
+    b { c true }
   }
 }

@@ -2,41 +2,17 @@
   "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
   "constants": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-        "line": 18,
-        "column": 1
-      },
       "name": "oldLimit",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 18,
-            "column": 1
-          },
           "name": "deprecated",
           "argument": {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 18,
-              "column": 13
-            },
             "kind": "string",
             "stringValue": "Will be removed in v3.0"
           }
         }
       ],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "int"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-          "line": 19,
-          "column": 18
-        },
         "kind": "int",
         "intValue": 50
       }
@@ -44,45 +20,20 @@
   ],
   "enums": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-        "line": 21,
-        "column": 1
-      },
       "name": "AccountState",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 22,
-            "column": 3
-          },
           "name": "Legacy",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Legacy"
           },
           "annotations": [
             {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-                "line": 22,
-                "column": 3
-              },
               "name": "deprecated",
               "argument": {
-                "position": {
-                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-                  "line": 22,
-                  "column": 15
-                },
                 "kind": "string",
                 "stringValue": "Use Active"
               }
@@ -90,18 +41,8 @@
           ]
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 24,
-            "column": 3
-          },
           "name": "Active",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Active"
           },
@@ -110,55 +51,25 @@
       ]
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-        "line": 12,
-        "column": 1
-      },
       "name": "OldStatus",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 12,
-            "column": 1
-          },
           "name": "deprecated"
         }
       ],
       "enumType": "string",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 14,
-            "column": 3
-          },
           "name": "Active",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Active"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 15,
-            "column": 3
-          },
           "name": "Inactive",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Inactive"
           },
@@ -169,38 +80,18 @@
   ],
   "types": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-        "line": 27,
-        "column": 1
-      },
       "name": "Account",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 28,
-              "column": 3
-            },
             "name": "id",
             "optional": false,
             "annotations": [
               {
-                "position": {
-                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-                  "line": 28,
-                  "column": 3
-                },
                 "name": "deprecated",
                 "argument": {
-                  "position": {
-                    "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-                    "line": 28,
-                    "column": 15
-                  },
                   "kind": "string",
                   "stringValue": "Use accountId"
                 }
@@ -212,11 +103,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 30,
-              "column": 3
-            },
             "name": "accountId",
             "optional": false,
             "annotations": [],
@@ -229,19 +115,9 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-        "line": 1,
-        "column": 1
-      },
       "name": "LegacyUser",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 1,
-            "column": 1
-          },
           "name": "deprecated"
         }
       ],
@@ -249,11 +125,6 @@
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 3,
-              "column": 3
-            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -263,11 +134,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 4,
-              "column": 3
-            },
             "name": "name",
             "optional": false,
             "annotations": [],
@@ -280,26 +146,11 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-        "line": 7,
-        "column": 1
-      },
       "name": "OldUser",
       "annotations": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-            "line": 7,
-            "column": 1
-          },
           "name": "deprecated",
           "argument": {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 7,
-              "column": 13
-            },
             "kind": "string",
             "stringValue": "Use UserV2 instead"
           }
@@ -309,11 +160,6 @@
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/deprecation.vdl",
-              "line": 9,
-              "column": 3
-            },
             "name": "id",
             "optional": false,
             "annotations": [],

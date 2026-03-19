@@ -4,22 +4,12 @@
   "enums": [],
   "types": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-        "line": 18,
-        "column": 1
-      },
       "name": "Combined",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 19,
-              "column": 3
-            },
             "name": "items",
             "optional": false,
             "annotations": [],
@@ -36,11 +26,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 20,
-              "column": 3
-            },
             "name": "lookup",
             "optional": false,
             "annotations": [],
@@ -60,22 +45,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-        "line": 1,
-        "column": 1
-      },
       "name": "Item",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 2,
-              "column": 3
-            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -88,22 +63,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-        "line": 5,
-        "column": 1
-      },
       "name": "WithArrays",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 6,
-              "column": 3
-            },
             "name": "tags",
             "optional": false,
             "annotations": [],
@@ -117,11 +82,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 7,
-              "column": 3
-            },
             "name": "scores",
             "optional": false,
             "annotations": [],
@@ -135,11 +95,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 8,
-              "column": 3
-            },
             "name": "matrix",
             "optional": false,
             "annotations": [],
@@ -153,11 +108,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 9,
-              "column": 3
-            },
             "name": "items",
             "optional": false,
             "annotations": [],
@@ -174,22 +124,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-        "line": 12,
-        "column": 1
-      },
       "name": "WithMaps",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 13,
-              "column": 3
-            },
             "name": "metadata",
             "optional": false,
             "annotations": [],
@@ -202,11 +142,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 14,
-              "column": 3
-            },
             "name": "counts",
             "optional": false,
             "annotations": [],
@@ -219,11 +154,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/arrays_maps.vdl",
-              "line": 15,
-              "column": 3
-            },
             "name": "nested",
             "optional": false,
             "annotations": [],

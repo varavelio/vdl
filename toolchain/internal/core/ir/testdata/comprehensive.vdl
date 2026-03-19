@@ -1,10 +1,6 @@
-"""
-Comprehensive schema to validate IR flattening and value resolution.
-"""
+""" Comprehensive schema to validate IR flattening and value resolution. """
 
-"""
-Standalone documentation block.
-"""
+""" Standalone documentation block. """
 
 @entity
 type AuditFields {
@@ -25,12 +21,15 @@ type Address {
 
 type User {
   ...AuditFields
+
   @id
   id string
+
   email string
   address Address
   tags string[]
   metadata map[string]
+
   preferences {
     locale string
     notifications bool
@@ -51,13 +50,16 @@ enum Priority {
 
 @featureFlag
 const maxPageSize = 100
+
 const baseTags = ["api" "core"]
 const defaultStatus = UserStatus.Active
 const defaultPriority = Priority.Medium
+
 const baseConfig = {
   retries 3
   timeoutMs 2500
 }
+
 const serviceConfig = {
   ...baseConfig
   name "users"

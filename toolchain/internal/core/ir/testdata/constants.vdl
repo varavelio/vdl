@@ -1,4 +1,5 @@
 """ Maximum items per page. """
+
 @config
 const maxPageSize = 100
 

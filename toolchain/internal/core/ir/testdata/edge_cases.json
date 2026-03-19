@@ -2,102 +2,40 @@
   "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
   "constants": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 55,
-        "column": 1
-      },
       "name": "emptyString",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "string"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-          "line": 55,
-          "column": 21
-        },
         "kind": "string",
         "stringValue": ""
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 56,
-        "column": 1
-      },
       "name": "matrix",
       "annotations": [],
-      "typeRef": {
-        "kind": "array",
-        "arrayType": {
-          "kind": "primitive",
-          "primitiveName": "int"
-        },
-        "arrayDims": 2
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-          "line": 56,
-          "column": 16
-        },
         "kind": "array",
         "arrayItems": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 56,
-              "column": 17
-            },
             "kind": "array",
             "arrayItems": [
               {
-                "position": {
-                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                  "line": 56,
-                  "column": 18
-                },
                 "kind": "int",
                 "intValue": 1
               },
               {
-                "position": {
-                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                  "line": 56,
-                  "column": 20
-                },
                 "kind": "int",
                 "intValue": 2
               }
             ]
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 56,
-              "column": 23
-            },
             "kind": "array",
             "arrayItems": [
               {
-                "position": {
-                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                  "line": 56,
-                  "column": 24
-                },
                 "kind": "int",
                 "intValue": 3
               },
               {
-                "position": {
-                  "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                  "line": 56,
-                  "column": 26
-                },
                 "kind": "int",
                 "intValue": 4
               }
@@ -107,113 +45,24 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 57,
-        "column": 1
-      },
       "name": "nestedObj",
       "annotations": [],
-      "typeRef": {
-        "kind": "object",
-        "objectFields": [
-          {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
-            "name": "a",
-            "optional": false,
-            "annotations": [],
-            "typeRef": {
-              "kind": "object",
-              "objectFields": [
-                {
-                  "position": {
-                    "file": "",
-                    "line": 0,
-                    "column": 0
-                  },
-                  "name": "b",
-                  "optional": false,
-                  "annotations": [],
-                  "typeRef": {
-                    "kind": "object",
-                    "objectFields": [
-                      {
-                        "position": {
-                          "file": "",
-                          "line": 0,
-                          "column": 0
-                        },
-                        "name": "c",
-                        "optional": false,
-                        "annotations": [],
-                        "typeRef": {
-                          "kind": "primitive",
-                          "primitiveName": "bool"
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-          "line": 57,
-          "column": 19
-        },
         "kind": "object",
         "objectEntries": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 58,
-              "column": 3
-            },
             "key": "a",
             "value": {
-              "position": {
-                "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                "line": 58,
-                "column": 5
-              },
               "kind": "object",
               "objectEntries": [
                 {
-                  "position": {
-                    "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                    "line": 59,
-                    "column": 5
-                  },
                   "key": "b",
                   "value": {
-                    "position": {
-                      "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                      "line": 59,
-                      "column": 7
-                    },
                     "kind": "object",
                     "objectEntries": [
                       {
-                        "position": {
-                          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                          "line": 60,
-                          "column": 7
-                        },
                         "key": "c",
                         "value": {
-                          "position": {
-                            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-                            "line": 60,
-                            "column": 9
-                          },
                           "kind": "bool",
                           "boolValue": true
                         }
@@ -228,23 +77,9 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 54,
-        "column": 1
-      },
       "name": "zeroInt",
       "annotations": [],
-      "typeRef": {
-        "kind": "primitive",
-        "primitiveName": "int"
-      },
       "value": {
-        "position": {
-          "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-          "line": 54,
-          "column": 17
-        },
         "kind": "int",
         "intValue": 0
       }
@@ -252,46 +87,21 @@
   ],
   "enums": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 42,
-        "column": 1
-      },
       "name": "Status",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-            "line": 43,
-            "column": 3
-          },
           "name": "On",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "On"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-            "line": 44,
-            "column": 3
-          },
           "name": "Off",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Off"
           },
@@ -302,22 +112,12 @@
   ],
   "types": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 12,
-        "column": 1
-      },
       "name": "DeepInline",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 13,
-              "column": 3
-            },
             "name": "level1",
             "optional": false,
             "annotations": [],
@@ -325,11 +125,6 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "position": {
-                    "file": "",
-                    "line": 14,
-                    "column": 5
-                  },
                   "name": "level2",
                   "optional": false,
                   "annotations": [],
@@ -337,11 +132,6 @@
                     "kind": "object",
                     "objectFields": [
                       {
-                        "position": {
-                          "file": "",
-                          "line": 15,
-                          "column": 7
-                        },
                         "name": "level3",
                         "optional": false,
                         "annotations": [],
@@ -349,11 +139,6 @@
                           "kind": "object",
                           "objectFields": [
                             {
-                              "position": {
-                                "file": "",
-                                "line": 16,
-                                "column": 9
-                              },
                               "name": "value",
                               "optional": false,
                               "annotations": [],
@@ -375,11 +160,6 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 5,
-        "column": 1
-      },
       "name": "EmptyType",
       "annotations": [],
       "typeRef": {
@@ -388,22 +168,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 47,
-        "column": 1
-      },
       "name": "EnumsEverywhere",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 48,
-              "column": 3
-            },
             "name": "status",
             "optional": false,
             "annotations": [],
@@ -414,11 +184,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 49,
-              "column": 3
-            },
             "name": "statusList",
             "optional": false,
             "annotations": [],
@@ -433,11 +198,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 50,
-              "column": 3
-            },
             "name": "statusMatrix",
             "optional": false,
             "annotations": [],
@@ -452,11 +212,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 51,
-              "column": 3
-            },
             "name": "statusMap",
             "optional": false,
             "annotations": [],
@@ -473,22 +228,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 35,
-        "column": 1
-      },
       "name": "InlineWithSpread",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 32,
-              "column": 3
-            },
             "name": "baseField",
             "optional": false,
             "annotations": [],
@@ -498,11 +243,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 37,
-              "column": 3
-            },
             "name": "inlineObj",
             "optional": false,
             "annotations": [],
@@ -510,11 +250,6 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "position": {
-                    "file": "",
-                    "line": 38,
-                    "column": 5
-                  },
                   "name": "nested",
                   "optional": false,
                   "annotations": [],
@@ -530,22 +265,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 22,
-        "column": 1
-      },
       "name": "OptionalComplex",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 23,
-              "column": 3
-            },
             "name": "optMatrix",
             "optional": true,
             "annotations": [],
@@ -559,11 +284,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 24,
-              "column": 3
-            },
             "name": "optMapMap",
             "optional": true,
             "annotations": [],
@@ -579,11 +299,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 25,
-              "column": 3
-            },
             "name": "optObject",
             "optional": true,
             "annotations": [],
@@ -591,11 +306,6 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "position": {
-                    "file": "",
-                    "line": 26,
-                    "column": 5
-                  },
                   "name": "innerOpt",
                   "optional": true,
                   "annotations": [],
@@ -605,11 +315,6 @@
                   }
                 },
                 {
-                  "position": {
-                    "file": "",
-                    "line": 27,
-                    "column": 5
-                  },
                   "name": "innerReq",
                   "optional": false,
                   "annotations": [],
@@ -625,22 +330,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 8,
-        "column": 1
-      },
       "name": "SingleField",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 9,
-              "column": 3
-            },
             "name": "only",
             "optional": false,
             "annotations": [],
@@ -653,22 +348,12 @@
       }
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 31,
-        "column": 1
-      },
       "name": "SpreadBase",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-              "line": 32,
-              "column": 3
-            },
             "name": "baseField",
             "optional": false,
             "annotations": [],
@@ -683,11 +368,6 @@
   ],
   "docs": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/edge_cases.vdl",
-        "line": 1,
-        "column": 1
-      },
       "content": "Edge case schema for IR conversion."
     }
   ]

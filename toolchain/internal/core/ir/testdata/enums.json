@@ -3,83 +3,38 @@
   "constants": [],
   "enums": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-        "line": 18,
-        "column": 1
-      },
       "name": "HttpMethod",
       "doc": "HTTP methods with explicit string values.",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 20,
-            "column": 3
-          },
           "name": "Get",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "GET"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 21,
-            "column": 3
-          },
           "name": "Post",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "POST"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 22,
-            "column": 3
-          },
           "name": "Put",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "PUT"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 23,
-            "column": 3
-          },
           "name": "Delete",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "DELETE"
           },
@@ -88,101 +43,46 @@
       ]
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-        "line": 1,
-        "column": 1
-      },
       "name": "OrderStatus",
       "doc": "Order status enum with implicit string values.",
       "annotations": [],
       "enumType": "string",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 3,
-            "column": 3
-          },
           "name": "Pending",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Pending"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 4,
-            "column": 3
-          },
           "name": "Processing",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Processing"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 5,
-            "column": 3
-          },
           "name": "Shipped",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Shipped"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 6,
-            "column": 3
-          },
           "name": "Delivered",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Delivered"
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 7,
-            "column": 3
-          },
           "name": "Cancelled",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "string",
             "stringValue": "Cancelled"
           },
@@ -191,83 +91,38 @@
       ]
     },
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-        "line": 10,
-        "column": 1
-      },
       "name": "Priority",
       "doc": "Priority levels with explicit int values.",
       "annotations": [],
       "enumType": "int",
       "members": [
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 12,
-            "column": 3
-          },
           "name": "Low",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "int",
             "intValue": 1
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 13,
-            "column": 3
-          },
           "name": "Medium",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "int",
             "intValue": 2
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 14,
-            "column": 3
-          },
           "name": "High",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "int",
             "intValue": 3
           },
           "annotations": []
         },
         {
-          "position": {
-            "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-            "line": 15,
-            "column": 3
-          },
           "name": "Critical",
           "value": {
-            "position": {
-              "file": "",
-              "line": 0,
-              "column": 0
-            },
             "kind": "int",
             "intValue": 10
           },
@@ -278,22 +133,12 @@
   ],
   "types": [
     {
-      "position": {
-        "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-        "line": 26,
-        "column": 1
-      },
       "name": "Order",
       "annotations": [],
       "typeRef": {
         "kind": "object",
         "objectFields": [
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-              "line": 27,
-              "column": 3
-            },
             "name": "id",
             "optional": false,
             "annotations": [],
@@ -303,11 +148,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-              "line": 28,
-              "column": 3
-            },
             "name": "status",
             "optional": false,
             "annotations": [],
@@ -318,11 +158,6 @@
             }
           },
           {
-            "position": {
-              "file": "/workspaces/vdl/toolchain/internal/core/ir/testdata/enums.vdl",
-              "line": 29,
-              "column": 3
-            },
             "name": "priority",
             "optional": false,
             "annotations": [],

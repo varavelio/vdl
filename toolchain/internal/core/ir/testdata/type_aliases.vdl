@@ -21,11 +21,12 @@ type UserMap map[User]
 type UserList User[]
 
 """ A documented alias type. """
+
 @entity
-type UserID string
+type UserId string
 
 type User {
-  id UserID
+  id UserId
   name Name
   age Age
   scores Score[]
