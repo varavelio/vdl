@@ -1,3 +1,4 @@
+// fmt:off
 // @expect: E201
 // @expect: E102
 // @assert: has-type ValidType

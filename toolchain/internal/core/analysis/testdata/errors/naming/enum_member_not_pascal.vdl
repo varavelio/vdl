@@ -1,3 +1,4 @@
+// fmt:off
 // @expect: E103
 
 enum Status {

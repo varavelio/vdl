@@ -1,3 +1,4 @@
+// fmt:off
 // @expect: E206
 
 const baseConfig = {

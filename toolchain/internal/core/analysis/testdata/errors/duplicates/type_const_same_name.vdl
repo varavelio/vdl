@@ -1,3 +1,4 @@
+// fmt:off
 // @expect: E804
 
 type Limits {
