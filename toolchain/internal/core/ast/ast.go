@@ -264,7 +264,6 @@ type ConstDecl struct {
 	Docstring   *Docstring    `parser:"(@@ (?! Newline Newline))?"`
 	Annotations []*Annotation `parser:"@@*"`
 	Name        string        `parser:"Const @Ident"`
-	TypeName    *string       `parser:"(@Ident)?"`
 	Value       *DataLiteral  `parser:"Equals @@"`
 }
 
