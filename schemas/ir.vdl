@@ -80,7 +80,7 @@ enum LiteralKind {
 *******************/
 
 """
-Normalized type reference used by fields and constants.
+Normalized type reference used by fields.
 
 `kind` selects which payload fields are meaningful. Generators should inspect
 `kind` first, then read the related payload fields.
@@ -297,9 +297,6 @@ type ConstantDef {
 
   """ Constant annotations in source order """
   annotations Annotation[]
-
-  """ Normalized constant type reference (explicit or inferred) """
-  typeRef TypeRef
 
   """ Fully resolved constant value """
   value LiteralValue

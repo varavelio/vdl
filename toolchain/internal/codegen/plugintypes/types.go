@@ -126,8 +126,6 @@ type ConstantDef struct {
 	Doc *string `json:"doc,omitempty"`
 	// Constant annotations in source order
 	Annotations []Annotation `json:"annotations"`
-	// Normalized constant type reference (explicit or inferred)
-	TypeRef TypeRef `json:"typeRef"`
 	// Fully resolved constant value
 	Value LiteralValue `json:"value"`
 }
@@ -138,7 +136,6 @@ type preConstantDef struct {
 	Name *string `json:"name"`
 	Doc *string `json:"doc,omitempty"`
 	Annotations *[]Annotation `json:"annotations"`
-	TypeRef *TypeRef `json:"typeRef"`
 	Value *LiteralValue `json:"value"`
 }
 
@@ -153,9 +150,6 @@ func (p *preConstantDef) validate() error {
 	if p.Annotations == nil {
 		return fmt.Errorf("field %q is required", "annotations")
 	}
-	if p.TypeRef == nil {
-		return fmt.Errorf("field %q is required", "typeRef")
-	}
 	if p.Value == nil {
 		return fmt.Errorf("field %q is required", "value")
 	}
@@ -169,7 +163,6 @@ func (p *preConstantDef) transform() ConstantDef {
 		Name: *p.Name,
 		Doc: p.Doc,
 		Annotations: *p.Annotations,
-		TypeRef: *p.TypeRef,
 		Value: *p.Value,
 	}
 }
@@ -251,23 +244,6 @@ func (x *ConstantDef) GetAnnotations() []Annotation {
 func (x *ConstantDef) GetAnnotationsOr(defaultValue []Annotation) []Annotation {
 	if x != nil {
 		return x.Annotations
-	}
-	return defaultValue
-}
-
-// GetTypeRef returns the TypeRef field. It returns the zero value when the receiver is nil.
-func (x *ConstantDef) GetTypeRef() TypeRef {
-	if x != nil {
-		return x.TypeRef
-	}
-	var zero TypeRef
-	return zero
-}
-
-// GetTypeRefOr returns the TypeRef field. It returns defaultValue when the receiver is nil.
-func (x *ConstantDef) GetTypeRefOr(defaultValue TypeRef) TypeRef {
-	if x != nil {
-		return x.TypeRef
 	}
 	return defaultValue
 }
@@ -1948,7 +1924,7 @@ func (x *TypeDef) GetTypeRefOr(defaultValue TypeRef) TypeRef {
 	return defaultValue
 }
 
-// Normalized type reference used by fields and constants.
+// Normalized type reference used by fields.
 //
 // `kind` selects which payload fields are meaningful. Generators should inspect
 // `kind` first, then read the related payload fields.
