@@ -2,6 +2,6 @@
 // @expect: E102
 
 enum Status {
-  @badAnn
+  @BadAnn
   Active
 }

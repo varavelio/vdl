@@ -5,4 +5,4 @@ enum Limit {
   Low
 }
 
-const limit = 10
+const Limit = 10

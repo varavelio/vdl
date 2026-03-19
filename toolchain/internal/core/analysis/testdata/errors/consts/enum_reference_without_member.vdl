@@ -5,4 +5,4 @@ enum Status {
   Active
 }
 
-const bad = status
+const bad = Status

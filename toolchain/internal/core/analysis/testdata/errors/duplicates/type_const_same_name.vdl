@@ -5,4 +5,4 @@ type Limits {
   max int
 }
 
-const limits = 10
+const Limits = 10

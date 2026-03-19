@@ -1,7 +1,7 @@
 // format:off
 // @expect: E102
 
-@badAnn
+@BadAnn
 type User {
   id string
 }

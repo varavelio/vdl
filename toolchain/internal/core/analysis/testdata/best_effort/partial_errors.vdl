@@ -15,4 +15,4 @@ type InvalidType {
 }
 
 const validConst = 100
-const badConst = 200
+const BAD_CONST = 200

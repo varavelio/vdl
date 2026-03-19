@@ -2,5 +2,5 @@
 // @expect: E102
 
 type User {
-  userId string
+  UserId string
 }

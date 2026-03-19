@@ -1,6 +1,6 @@
 // format:off
 // @expect: E101
 
-type User {
+type user {
   id string
 }
