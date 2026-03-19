@@ -1,0 +1,50 @@
+/*************************************************************\
+* VDL Configuration File                                      *
+*                                                             *
+* Star the repo at https://github.com/varavelio/vdl           *
+* See all available options at https://vdl.varavel.com/config *
+*                                                             *
+* Tweak this file and run "vdl generate"                      *
+\*************************************************************/
+
+const config = {
+  version 1
+  plugins [
+    {
+      src "varavelio/vdl-plugin-go@2b01c8e"
+      schema "./schemas/ir.vdl"
+      outDir "./toolchain/internal/core/ir/irtypes"
+      options {
+        package "irtypes"
+        genMeta "no"
+      }
+    }
+    {
+      src "varavelio/vdl-plugin-go@2b01c8e"
+      schema "./schemas/plugin.vdl"
+      outDir "./toolchain/internal/codegen/plugintypes"
+      options {
+        package "plugintypes"
+        genMeta "no"
+      }
+    }
+    {
+      src "varavelio/vdl-plugin-go@2b01c8e"
+      schema "./schemas/config_file.vdl"
+      outDir "./toolchain/internal/codegen/configtypes"
+      options {
+        package "configtypes"
+        genMeta "no"
+      }
+    }
+    {
+      src "varavelio/vdl-plugin-go@2b01c8e"
+      schema "./schemas/lock_file.vdl"
+      outDir "./toolchain/internal/codegen/locktypes"
+      options {
+        package "locktypes"
+        genMeta "no"
+      }
+    }
+  ]
+}
