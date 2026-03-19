@@ -83,6 +83,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Codegen plugin runtime tests**: `toolchain/internal/codegen/testdata/run_plugin/cases/` uses folder-driven fixtures (`index.js` + `expected.json`) so new plugin execution scenarios can be added without test harness changes.
 - **Formatter quality**: relies on golden-style fixtures in `toolchain/internal/formatter/tests/`.
 - **LSP quality**: behavior tests live in `toolchain/internal/lsp/*_test.go` and should stay aligned with the current declaration-centric AST/program model.
+- **IR golden stability**: IR golden JSON fixtures under `toolchain/internal/core/ir/testdata/*.json` intentionally omit `position`; `toolchain/internal/core/ir/ir_test.go` normalizes generated output via `toolchain/internal/util/testutil/ir.go` (`StripPositionsFromJSON` / `IRJSONEqualNoPos`).
 - **E2E note**: `toolchain/tests/` no longer contains the old multi-language E2E harness; do not assume legacy `testdata`-driven E2E structure exists.
 - **Verification commands**:
   - `task test`
