@@ -30,54 +30,7 @@ func validateConst(symbols *symbolTable, cnst *ConstSymbol) []Diagnostic {
 		cnst.ValueType = inferred
 	}
 
-	if cnst.ExplicitTypeName != nil {
-		diagnostics = append(diagnostics, validateExplicitConstType(symbols, cnst, inferred)...)
-	}
-
 	return diagnostics
-}
-
-func validateExplicitConstType(symbols *symbolTable, cnst *ConstSymbol, inferred ConstValueType) []Diagnostic {
-	typeName := *cnst.ExplicitTypeName
-
-	if ast.IsPrimitiveType(typeName) {
-		expected := primitiveNameToConstType(typeName)
-		if expected != ConstValueTypeUnknown && inferred != ConstValueTypeUnknown && inferred != expected {
-			return []Diagnostic{newDiagnostic(
-				cnst.File,
-				cnst.Pos,
-				cnst.EndPos,
-				CodeTypeNotDeclared,
-				fmt.Sprintf("constant %q has explicit type %q but value is %s", cnst.Name, typeName, constValueTypeName(inferred)),
-			)}
-		}
-		return nil
-	}
-
-	if symbols.lookupType(typeName) != nil {
-		return nil
-	}
-
-	if symbols.lookupEnum(typeName) != nil {
-		if inferred != ConstValueTypeString && inferred != ConstValueTypeInt && inferred != ConstValueTypeUnknown {
-			return []Diagnostic{newDiagnostic(
-				cnst.File,
-				cnst.Pos,
-				cnst.EndPos,
-				CodeTypeNotDeclared,
-				fmt.Sprintf("constant %q has explicit enum type %q but value is %s", cnst.Name, typeName, constValueTypeName(inferred)),
-			)}
-		}
-		return nil
-	}
-
-	msg := fmt.Sprintf("undefined type %q in constant %q", typeName, cnst.Name)
-	suggestions, _ := strutil.FuzzySearch(symbols.allFieldTypeNames(), typeName)
-	if len(suggestions) > 0 {
-		msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
-	}
-
-	return []Diagnostic{newDiagnostic(cnst.File, cnst.Pos, cnst.EndPos, CodeTypeNotDeclared, msg)}
 }
 
 func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral, visiting map[string]bool) ([]Diagnostic, ConstValueType) {
@@ -248,40 +201,4 @@ func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral
 	}
 
 	return diagnostics, ConstValueTypeUnknown
-}
-
-func primitiveNameToConstType(name string) ConstValueType {
-	switch name {
-	case "string":
-		return ConstValueTypeString
-	case "int":
-		return ConstValueTypeInt
-	case "float":
-		return ConstValueTypeFloat
-	case "bool":
-		return ConstValueTypeBool
-	default:
-		return ConstValueTypeUnknown
-	}
-}
-
-func constValueTypeName(vt ConstValueType) string {
-	switch vt {
-	case ConstValueTypeString:
-		return "string"
-	case ConstValueTypeInt:
-		return "int"
-	case ConstValueTypeFloat:
-		return "float"
-	case ConstValueTypeBool:
-		return "bool"
-	case ConstValueTypeObject:
-		return "object"
-	case ConstValueTypeArray:
-		return "array"
-	case ConstValueTypeReference:
-		return "reference"
-	default:
-		return "unknown"
-	}
 }

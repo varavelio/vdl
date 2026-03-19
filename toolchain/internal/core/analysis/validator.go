@@ -122,9 +122,8 @@ func (v *validator) buildConstSymbol(decl *ast.ConstDecl, file string) *ConstSym
 			Docstring:   docstring,
 			Annotations: buildAnnotationRefs(decl.Annotations),
 		},
-		AST:              decl,
-		ExplicitTypeName: decl.TypeName,
-		ValueType:        ConstValueTypeUnknown,
+		AST:       decl,
+		ValueType: ConstValueTypeUnknown,
 	}
 
 	if decl.Value != nil && decl.Value.Scalar != nil {

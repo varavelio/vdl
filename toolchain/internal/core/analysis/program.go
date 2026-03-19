@@ -136,10 +136,9 @@ type EnumMemberSymbol struct {
 // ConstSymbol represents a constant declaration in the global namespace.
 type ConstSymbol struct {
 	Symbol
-	AST              *ast.ConstDecl // Original AST node
-	ExplicitTypeName *string
-	ValueType        ConstValueType // Inferred top-level value type
-	Value            string         // String representation for scalar values
+	AST       *ast.ConstDecl // Original AST node
+	ValueType ConstValueType // Inferred top-level value type
+	Value     string         // String representation for scalar values
 }
 
 // ConstValueType indicates the type of a constant's value.
