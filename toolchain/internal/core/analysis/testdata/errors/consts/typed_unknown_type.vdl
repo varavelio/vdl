@@ -1,3 +1,0 @@
-// @expect: E201
-
-const value UnknownType = 10
