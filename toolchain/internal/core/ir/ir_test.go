@@ -196,7 +196,6 @@ const cfgAlias = cfg
 
 	cfg, ok := constants["cfg"]
 	require.True(t, ok)
-	assert.Equal(t, irtypes.TypeKindObject, cfg.TypeRef.Kind)
 	assert.Equal(t, irtypes.LiteralKindObject, cfg.Value.Kind)
 
 	entries := cfg.Value.GetObjectEntries()
@@ -293,10 +292,6 @@ func TestIrSchemaJSONSerialization(t *testing.T) {
 				Name:        "maxRetries",
 				Position:    irtypes.Position{},
 				Annotations: []irtypes.Annotation{},
-				TypeRef: irtypes.TypeRef{
-					Kind:          irtypes.TypeKindPrimitive,
-					PrimitiveName: irtypes.Ptr(irtypes.PrimitiveTypeInt),
-				},
 				Value: irtypes.LiteralValue{
 					Kind:     irtypes.LiteralKindInt,
 					IntValue: irtypes.Ptr(int64(3)),

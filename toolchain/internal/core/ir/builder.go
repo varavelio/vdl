@@ -30,7 +30,7 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 		schema.Enums = append(schema.Enums, convertEnum(enum, program.Enums, resolver))
 	}
 	for _, cnst := range program.Consts {
-		schema.Constants = append(schema.Constants, convertConstant(cnst, program, resolver))
+		schema.Constants = append(schema.Constants, convertConstant(cnst, resolver))
 	}
 	for _, doc := range program.StandaloneDocs {
 		normalized := normalizeDoc(&doc.Content)
@@ -131,7 +131,6 @@ func resolveEnumMemberValue(valueType analysis.EnumValueType, rawValue string) i
 
 func convertConstant(
 	cnst *analysis.ConstSymbol,
-	program *analysis.Program,
 	resolver *valueResolver,
 ) irtypes.ConstantDef {
 	value, ok := resolver.resolveConstValue(cnst.Name)
@@ -147,7 +146,6 @@ func convertConstant(
 		Doc:         normalizeDocPtr(cnst.Docstring),
 		Position:    convertPosition(cnst.File, cnst.Pos),
 		Annotations: convertAnnotations(cnst.Annotations, resolver),
-		TypeRef:     inferConstTypeRef(cnst, value, program.Types, program.Enums),
 		Value:       value,
 	}
 }
@@ -289,78 +287,6 @@ func convertAnnotations(annotations []*analysis.AnnotationRef, resolver *valueRe
 		return []irtypes.Annotation{}
 	}
 	return result
-}
-
-func inferConstTypeRef(
-	cnst *analysis.ConstSymbol,
-	value irtypes.LiteralValue,
-	types map[string]*analysis.TypeSymbol,
-	enums map[string]*analysis.EnumSymbol,
-) irtypes.TypeRef {
-	if cnst.ExplicitTypeName != nil {
-		typeName := *cnst.ExplicitTypeName
-		if ast.IsPrimitiveType(typeName) {
-			return primitiveTypeRef(convertPrimitiveType(typeName))
-		}
-		if enum, ok := enums[typeName]; ok {
-			enumType := convertEnumType(enum.ValueType)
-			return irtypes.TypeRef{
-				Kind:     irtypes.TypeKindEnum,
-				EnumName: &typeName,
-				EnumType: &enumType,
-			}
-		}
-		if _, ok := types[typeName]; ok {
-			return irtypes.TypeRef{Kind: irtypes.TypeKindType, TypeName: &typeName}
-		}
-	}
-
-	return inferTypeRefFromValue(value)
-}
-
-func inferTypeRefFromValue(value irtypes.LiteralValue) irtypes.TypeRef {
-	switch value.Kind {
-	case irtypes.LiteralKindString:
-		return primitiveTypeRef(irtypes.PrimitiveTypeString)
-	case irtypes.LiteralKindInt:
-		return primitiveTypeRef(irtypes.PrimitiveTypeInt)
-	case irtypes.LiteralKindFloat:
-		return primitiveTypeRef(irtypes.PrimitiveTypeFloat)
-	case irtypes.LiteralKindBool:
-		return primitiveTypeRef(irtypes.PrimitiveTypeBool)
-
-	case irtypes.LiteralKindObject:
-		entries := value.GetObjectEntries()
-		fields := make([]irtypes.Field, 0, len(entries))
-		for _, entry := range entries {
-			fields = append(fields, irtypes.Field{
-				Name:        entry.Key,
-				Optional:    false,
-				Annotations: []irtypes.Annotation{},
-				TypeRef:     inferTypeRefFromValue(entry.Value),
-			})
-		}
-		return irtypes.TypeRef{Kind: irtypes.TypeKindObject, ObjectFields: &fields}
-
-	case irtypes.LiteralKindArray:
-		items := value.GetArrayItems()
-		if len(items) == 0 {
-			dims := int64(1)
-			base := primitiveTypeRef(irtypes.PrimitiveTypeString)
-			return irtypes.TypeRef{Kind: irtypes.TypeKindArray, ArrayType: &base, ArrayDims: &dims}
-		}
-
-		elemType := inferTypeRefFromValue(items[0])
-		if elemType.Kind == irtypes.TypeKindArray && elemType.ArrayDims != nil && elemType.ArrayType != nil {
-			dims := *elemType.ArrayDims + 1
-			return irtypes.TypeRef{Kind: irtypes.TypeKindArray, ArrayType: elemType.ArrayType, ArrayDims: &dims}
-		}
-
-		dims := int64(1)
-		return irtypes.TypeRef{Kind: irtypes.TypeKindArray, ArrayType: &elemType, ArrayDims: &dims}
-	}
-
-	return primitiveTypeRef(irtypes.PrimitiveTypeString)
 }
 
 type valueResolver struct {
