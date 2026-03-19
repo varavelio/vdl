@@ -13,6 +13,7 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
 	"github.com/varavelio/vdl/toolchain/internal/core/ir/irtypes"
 	"github.com/varavelio/vdl/toolchain/internal/core/vfs"
+	"github.com/varavelio/vdl/toolchain/internal/util/testutil"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -51,7 +52,13 @@ func TestFromProgram_Golden(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			assert.JSONEq(t, string(want), string(got))
+			var wantSchema irtypes.IrSchema
+			require.NoError(t, json.Unmarshal(want, &wantSchema))
+
+			var gotSchema irtypes.IrSchema
+			require.NoError(t, json.Unmarshal(got, &gotSchema))
+
+			testutil.IRSchemaEqualNoPos(t, &wantSchema, &gotSchema)
 		})
 	}
 }
