@@ -24,8 +24,8 @@ type Annotation struct {
 
 // preAnnotation mirrors Annotation during strict JSON decoding.
 type preAnnotation struct {
-	Position *Position `json:"position"`
-	Name *string `json:"name"`
+	Position *Position     `json:"position"`
+	Name     *string       `json:"name"`
 	Argument *LiteralValue `json:"argument,omitempty"`
 }
 
@@ -44,7 +44,7 @@ func (p *preAnnotation) validate() error {
 func (p *preAnnotation) transform() Annotation {
 	return Annotation{
 		Position: *p.Position,
-		Name: *p.Name,
+		Name:     *p.Name,
 		Argument: p.Argument,
 	}
 }
@@ -132,11 +132,11 @@ type ConstantDef struct {
 
 // preConstantDef mirrors ConstantDef during strict JSON decoding.
 type preConstantDef struct {
-	Position *Position `json:"position"`
-	Name *string `json:"name"`
-	Doc *string `json:"doc,omitempty"`
+	Position    *Position     `json:"position"`
+	Name        *string       `json:"name"`
+	Doc         *string       `json:"doc,omitempty"`
 	Annotations *[]Annotation `json:"annotations"`
-	Value *LiteralValue `json:"value"`
+	Value       *LiteralValue `json:"value"`
 }
 
 // validate reports whether all required JSON fields are present in preConstantDef.
@@ -159,11 +159,11 @@ func (p *preConstantDef) validate() error {
 // transform converts preConstantDef to ConstantDef.
 func (p *preConstantDef) transform() ConstantDef {
 	return ConstantDef{
-		Position: *p.Position,
-		Name: *p.Name,
-		Doc: p.Doc,
+		Position:    *p.Position,
+		Name:        *p.Name,
+		Doc:         p.Doc,
 		Annotations: *p.Annotations,
-		Value: *p.Value,
+		Value:       *p.Value,
 	}
 }
 
@@ -285,12 +285,12 @@ type EnumDef struct {
 
 // preEnumDef mirrors EnumDef during strict JSON decoding.
 type preEnumDef struct {
-	Position *Position `json:"position"`
-	Name *string `json:"name"`
-	Doc *string `json:"doc,omitempty"`
-	Annotations *[]Annotation `json:"annotations"`
-	EnumType *EnumValueType `json:"enumType"`
-	Members *[]EnumMember `json:"members"`
+	Position    *Position      `json:"position"`
+	Name        *string        `json:"name"`
+	Doc         *string        `json:"doc,omitempty"`
+	Annotations *[]Annotation  `json:"annotations"`
+	EnumType    *EnumValueType `json:"enumType"`
+	Members     *[]EnumMember  `json:"members"`
 }
 
 // validate reports whether all required JSON fields are present in preEnumDef.
@@ -316,12 +316,12 @@ func (p *preEnumDef) validate() error {
 // transform converts preEnumDef to EnumDef.
 func (p *preEnumDef) transform() EnumDef {
 	return EnumDef{
-		Position: *p.Position,
-		Name: *p.Name,
-		Doc: p.Doc,
+		Position:    *p.Position,
+		Name:        *p.Name,
+		Doc:         p.Doc,
 		Annotations: *p.Annotations,
-		EnumType: *p.EnumType,
-		Members: *p.Members,
+		EnumType:    *p.EnumType,
+		Members:     *p.Members,
 	}
 }
 
@@ -456,10 +456,10 @@ type EnumMember struct {
 
 // preEnumMember mirrors EnumMember during strict JSON decoding.
 type preEnumMember struct {
-	Position *Position `json:"position"`
-	Name *string `json:"name"`
-	Value *LiteralValue `json:"value"`
-	Doc *string `json:"doc,omitempty"`
+	Position    *Position     `json:"position"`
+	Name        *string       `json:"name"`
+	Value       *LiteralValue `json:"value"`
+	Doc         *string       `json:"doc,omitempty"`
 	Annotations *[]Annotation `json:"annotations"`
 }
 
@@ -483,10 +483,10 @@ func (p *preEnumMember) validate() error {
 // transform converts preEnumMember to EnumMember.
 func (p *preEnumMember) transform() EnumMember {
 	return EnumMember{
-		Position: *p.Position,
-		Name: *p.Name,
-		Value: *p.Value,
-		Doc: p.Doc,
+		Position:    *p.Position,
+		Name:        *p.Name,
+		Value:       *p.Value,
+		Doc:         p.Doc,
 		Annotations: *p.Annotations,
 	}
 }
@@ -607,12 +607,12 @@ type Field struct {
 
 // preField mirrors Field during strict JSON decoding.
 type preField struct {
-	Position *Position `json:"position"`
-	Name *string `json:"name"`
-	Doc *string `json:"doc,omitempty"`
-	Optional *bool `json:"optional"`
+	Position    *Position     `json:"position"`
+	Name        *string       `json:"name"`
+	Doc         *string       `json:"doc,omitempty"`
+	Optional    *bool         `json:"optional"`
 	Annotations *[]Annotation `json:"annotations"`
-	TypeRef *TypeRef `json:"typeRef"`
+	TypeRef     *TypeRef      `json:"typeRef"`
 }
 
 // validate reports whether all required JSON fields are present in preField.
@@ -638,12 +638,12 @@ func (p *preField) validate() error {
 // transform converts preField to Field.
 func (p *preField) transform() Field {
 	return Field{
-		Position: *p.Position,
-		Name: *p.Name,
-		Doc: p.Doc,
-		Optional: *p.Optional,
+		Position:    *p.Position,
+		Name:        *p.Name,
+		Doc:         p.Doc,
+		Optional:    *p.Optional,
 		Annotations: *p.Annotations,
-		TypeRef: *p.TypeRef,
+		TypeRef:     *p.TypeRef,
 	}
 }
 
@@ -787,11 +787,11 @@ type IrSchema struct {
 
 // preIrSchema mirrors IrSchema during strict JSON decoding.
 type preIrSchema struct {
-	EntryPoint *string `json:"entryPoint"`
-	Constants *[]ConstantDef `json:"constants"`
-	Enums *[]EnumDef `json:"enums"`
-	Types *[]TypeDef `json:"types"`
-	Docs *[]TopLevelDoc `json:"docs"`
+	EntryPoint *string        `json:"entryPoint"`
+	Constants  *[]ConstantDef `json:"constants"`
+	Enums      *[]EnumDef     `json:"enums"`
+	Types      *[]TypeDef     `json:"types"`
+	Docs       *[]TopLevelDoc `json:"docs"`
 }
 
 // validate reports whether all required JSON fields are present in preIrSchema.
@@ -818,10 +818,10 @@ func (p *preIrSchema) validate() error {
 func (p *preIrSchema) transform() IrSchema {
 	return IrSchema{
 		EntryPoint: *p.EntryPoint,
-		Constants: *p.Constants,
-		Enums: *p.Enums,
-		Types: *p.Types,
-		Docs: *p.Docs,
+		Constants:  *p.Constants,
+		Enums:      *p.Enums,
+		Types:      *p.Types,
+		Docs:       *p.Docs,
 	}
 }
 
@@ -954,14 +954,14 @@ type LiteralValue struct {
 
 // preLiteralValue mirrors LiteralValue during strict JSON decoding.
 type preLiteralValue struct {
-	Position *Position `json:"position"`
-	Kind *LiteralKind `json:"kind"`
-	StringValue *string `json:"stringValue,omitempty"`
-	IntValue *int64 `json:"intValue,omitempty"`
-	FloatValue *float64 `json:"floatValue,omitempty"`
-	BoolValue *bool `json:"boolValue,omitempty"`
-	ObjectEntries *[]ObjectEntry `json:"objectEntries,omitempty"`
-	ArrayItems *[]LiteralValue `json:"arrayItems,omitempty"`
+	Position      *Position       `json:"position"`
+	Kind          *LiteralKind    `json:"kind"`
+	StringValue   *string         `json:"stringValue,omitempty"`
+	IntValue      *int64          `json:"intValue,omitempty"`
+	FloatValue    *float64        `json:"floatValue,omitempty"`
+	BoolValue     *bool           `json:"boolValue,omitempty"`
+	ObjectEntries *[]ObjectEntry  `json:"objectEntries,omitempty"`
+	ArrayItems    *[]LiteralValue `json:"arrayItems,omitempty"`
 }
 
 // validate reports whether all required JSON fields are present in preLiteralValue.
@@ -978,14 +978,14 @@ func (p *preLiteralValue) validate() error {
 // transform converts preLiteralValue to LiteralValue.
 func (p *preLiteralValue) transform() LiteralValue {
 	return LiteralValue{
-		Position: *p.Position,
-		Kind: *p.Kind,
-		StringValue: p.StringValue,
-		IntValue: p.IntValue,
-		FloatValue: p.FloatValue,
-		BoolValue: p.BoolValue,
+		Position:      *p.Position,
+		Kind:          *p.Kind,
+		StringValue:   p.StringValue,
+		IntValue:      p.IntValue,
+		FloatValue:    p.FloatValue,
+		BoolValue:     p.BoolValue,
 		ObjectEntries: p.ObjectEntries,
-		ArrayItems: p.ArrayItems,
+		ArrayItems:    p.ArrayItems,
 	}
 }
 
@@ -1150,9 +1150,9 @@ type ObjectEntry struct {
 
 // preObjectEntry mirrors ObjectEntry during strict JSON decoding.
 type preObjectEntry struct {
-	Position *Position `json:"position"`
-	Key *string `json:"key"`
-	Value *LiteralValue `json:"value"`
+	Position *Position     `json:"position"`
+	Key      *string       `json:"key"`
+	Value    *LiteralValue `json:"value"`
 }
 
 // validate reports whether all required JSON fields are present in preObjectEntry.
@@ -1173,8 +1173,8 @@ func (p *preObjectEntry) validate() error {
 func (p *preObjectEntry) transform() ObjectEntry {
 	return ObjectEntry{
 		Position: *p.Position,
-		Key: *p.Key,
-		Value: *p.Value,
+		Key:      *p.Key,
+		Value:    *p.Value,
 	}
 }
 
@@ -1255,9 +1255,9 @@ type Position struct {
 
 // prePosition mirrors Position during strict JSON decoding.
 type prePosition struct {
-	File *string `json:"file"`
-	Line *int64 `json:"line"`
-	Column *int64 `json:"column"`
+	File   *string `json:"file"`
+	Line   *int64  `json:"line"`
+	Column *int64  `json:"column"`
 }
 
 // validate reports whether all required JSON fields are present in prePosition.
@@ -1277,8 +1277,8 @@ func (p *prePosition) validate() error {
 // transform converts prePosition to Position.
 func (p *prePosition) transform() Position {
 	return Position{
-		File: *p.File,
-		Line: *p.Line,
+		File:   *p.File,
+		Line:   *p.Line,
 		Column: *p.Column,
 	}
 }
@@ -1360,7 +1360,7 @@ type TopLevelDoc struct {
 // preTopLevelDoc mirrors TopLevelDoc during strict JSON decoding.
 type preTopLevelDoc struct {
 	Position *Position `json:"position"`
-	Content *string `json:"content"`
+	Content  *string   `json:"content"`
 }
 
 // validate reports whether all required JSON fields are present in preTopLevelDoc.
@@ -1378,7 +1378,7 @@ func (p *preTopLevelDoc) validate() error {
 func (p *preTopLevelDoc) transform() TopLevelDoc {
 	return TopLevelDoc{
 		Position: *p.Position,
-		Content: *p.Content,
+		Content:  *p.Content,
 	}
 }
 
@@ -1449,11 +1449,11 @@ type TypeDef struct {
 
 // preTypeDef mirrors TypeDef during strict JSON decoding.
 type preTypeDef struct {
-	Position *Position `json:"position"`
-	Name *string `json:"name"`
-	Doc *string `json:"doc,omitempty"`
+	Position    *Position     `json:"position"`
+	Name        *string       `json:"name"`
+	Doc         *string       `json:"doc,omitempty"`
 	Annotations *[]Annotation `json:"annotations"`
-	TypeRef *TypeRef `json:"typeRef"`
+	TypeRef     *TypeRef      `json:"typeRef"`
 }
 
 // validate reports whether all required JSON fields are present in preTypeDef.
@@ -1476,11 +1476,11 @@ func (p *preTypeDef) validate() error {
 // transform converts preTypeDef to TypeDef.
 func (p *preTypeDef) transform() TypeDef {
 	return TypeDef{
-		Position: *p.Position,
-		Name: *p.Name,
-		Doc: p.Doc,
+		Position:    *p.Position,
+		Name:        *p.Name,
+		Doc:         p.Doc,
 		Annotations: *p.Annotations,
-		TypeRef: *p.TypeRef,
+		TypeRef:     *p.TypeRef,
 	}
 }
 
@@ -1609,15 +1609,15 @@ type TypeRef struct {
 
 // preTypeRef mirrors TypeRef during strict JSON decoding.
 type preTypeRef struct {
-	Kind *TypeKind `json:"kind"`
+	Kind          *TypeKind      `json:"kind"`
 	PrimitiveName *PrimitiveType `json:"primitiveName,omitempty"`
-	TypeName *string `json:"typeName,omitempty"`
-	EnumName *string `json:"enumName,omitempty"`
-	EnumType *EnumValueType `json:"enumType,omitempty"`
-	ArrayType *TypeRef `json:"arrayType,omitempty"`
-	ArrayDims *int64 `json:"arrayDims,omitempty"`
-	MapType *TypeRef `json:"mapType,omitempty"`
-	ObjectFields *[]Field `json:"objectFields,omitempty"`
+	TypeName      *string        `json:"typeName,omitempty"`
+	EnumName      *string        `json:"enumName,omitempty"`
+	EnumType      *EnumValueType `json:"enumType,omitempty"`
+	ArrayType     *TypeRef       `json:"arrayType,omitempty"`
+	ArrayDims     *int64         `json:"arrayDims,omitempty"`
+	MapType       *TypeRef       `json:"mapType,omitempty"`
+	ObjectFields  *[]Field       `json:"objectFields,omitempty"`
 }
 
 // validate reports whether all required JSON fields are present in preTypeRef.
@@ -1631,15 +1631,15 @@ func (p *preTypeRef) validate() error {
 // transform converts preTypeRef to TypeRef.
 func (p *preTypeRef) transform() TypeRef {
 	return TypeRef{
-		Kind: *p.Kind,
+		Kind:          *p.Kind,
 		PrimitiveName: p.PrimitiveName,
-		TypeName: p.TypeName,
-		EnumName: p.EnumName,
-		EnumType: p.EnumType,
-		ArrayType: p.ArrayType,
-		ArrayDims: p.ArrayDims,
-		MapType: p.MapType,
-		ObjectFields: p.ObjectFields,
+		TypeName:      p.TypeName,
+		EnumName:      p.EnumName,
+		EnumType:      p.EnumType,
+		ArrayType:     p.ArrayType,
+		ArrayDims:     p.ArrayDims,
+		MapType:       p.MapType,
+		ObjectFields:  p.ObjectFields,
 	}
 }
 

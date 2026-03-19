@@ -15,7 +15,7 @@ type EnumValueType string
 // EnumValueType constants define the declared values of EnumValueType.
 const (
 	EnumValueTypeString EnumValueType = "string"
-	EnumValueTypeInt EnumValueType = "int"
+	EnumValueTypeInt    EnumValueType = "int"
 )
 
 // EnumValueTypeList contains every valid EnumValueType value.
@@ -32,8 +32,8 @@ func (e EnumValueType) String() string {
 // IsValid reports whether the value belongs to EnumValueType.
 func (e EnumValueType) IsValid() bool {
 	switch e {
-		case EnumValueTypeString, EnumValueTypeInt:
-			return true
+	case EnumValueTypeString, EnumValueTypeInt:
+		return true
 	}
 	return false
 }
@@ -71,11 +71,11 @@ type LiteralKind string
 // LiteralKind constants define the declared values of LiteralKind.
 const (
 	LiteralKindString LiteralKind = "string"
-	LiteralKindInt LiteralKind = "int"
-	LiteralKindFloat LiteralKind = "float"
-	LiteralKindBool LiteralKind = "bool"
+	LiteralKindInt    LiteralKind = "int"
+	LiteralKindFloat  LiteralKind = "float"
+	LiteralKindBool   LiteralKind = "bool"
 	LiteralKindObject LiteralKind = "object"
-	LiteralKindArray LiteralKind = "array"
+	LiteralKindArray  LiteralKind = "array"
 )
 
 // LiteralKindList contains every valid LiteralKind value.
@@ -96,8 +96,8 @@ func (e LiteralKind) String() string {
 // IsValid reports whether the value belongs to LiteralKind.
 func (e LiteralKind) IsValid() bool {
 	switch e {
-		case LiteralKindString, LiteralKindInt, LiteralKindFloat, LiteralKindBool, LiteralKindObject, LiteralKindArray:
-			return true
+	case LiteralKindString, LiteralKindInt, LiteralKindFloat, LiteralKindBool, LiteralKindObject, LiteralKindArray:
+		return true
 	}
 	return false
 }
@@ -129,10 +129,10 @@ type PrimitiveType string
 
 // PrimitiveType constants define the declared values of PrimitiveType.
 const (
-	PrimitiveTypeString PrimitiveType = "string"
-	PrimitiveTypeInt PrimitiveType = "int"
-	PrimitiveTypeFloat PrimitiveType = "float"
-	PrimitiveTypeBool PrimitiveType = "bool"
+	PrimitiveTypeString   PrimitiveType = "string"
+	PrimitiveTypeInt      PrimitiveType = "int"
+	PrimitiveTypeFloat    PrimitiveType = "float"
+	PrimitiveTypeBool     PrimitiveType = "bool"
 	PrimitiveTypeDatetime PrimitiveType = "datetime"
 )
 
@@ -153,8 +153,8 @@ func (e PrimitiveType) String() string {
 // IsValid reports whether the value belongs to PrimitiveType.
 func (e PrimitiveType) IsValid() bool {
 	switch e {
-		case PrimitiveTypeString, PrimitiveTypeInt, PrimitiveTypeFloat, PrimitiveTypeBool, PrimitiveTypeDatetime:
-			return true
+	case PrimitiveTypeString, PrimitiveTypeInt, PrimitiveTypeFloat, PrimitiveTypeBool, PrimitiveTypeDatetime:
+		return true
 	}
 	return false
 }
@@ -187,11 +187,11 @@ type TypeKind string
 // TypeKind constants define the declared values of TypeKind.
 const (
 	TypeKindPrimitive TypeKind = "primitive"
-	TypeKindType TypeKind = "type"
-	TypeKindEnum TypeKind = "enum"
-	TypeKindArray TypeKind = "array"
-	TypeKindMap TypeKind = "map"
-	TypeKindObject TypeKind = "object"
+	TypeKindType      TypeKind = "type"
+	TypeKindEnum      TypeKind = "enum"
+	TypeKindArray     TypeKind = "array"
+	TypeKindMap       TypeKind = "map"
+	TypeKindObject    TypeKind = "object"
 )
 
 // TypeKindList contains every valid TypeKind value.
@@ -212,8 +212,8 @@ func (e TypeKind) String() string {
 // IsValid reports whether the value belongs to TypeKind.
 func (e TypeKind) IsValid() bool {
 	switch e {
-		case TypeKindPrimitive, TypeKindType, TypeKindEnum, TypeKindArray, TypeKindMap, TypeKindObject:
-			return true
+	case TypeKindPrimitive, TypeKindType, TypeKindEnum, TypeKindArray, TypeKindMap, TypeKindObject:
+		return true
 	}
 	return false
 }

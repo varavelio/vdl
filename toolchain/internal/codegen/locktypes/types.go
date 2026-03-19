@@ -32,8 +32,8 @@ type VdlLockFileSchema struct {
 
 // preVdlLockFileSchema mirrors VdlLockFileSchema during strict JSON decoding.
 type preVdlLockFileSchema struct {
-	Version *int64 `json:"version"`
-	Hashes *map[string]string `json:"hashes,omitempty"`
+	Version *int64             `json:"version"`
+	Hashes  *map[string]string `json:"hashes,omitempty"`
 }
 
 // validate reports whether all required JSON fields are present in preVdlLockFileSchema.
@@ -48,7 +48,7 @@ func (p *preVdlLockFileSchema) validate() error {
 func (p *preVdlLockFileSchema) transform() VdlLockFileSchema {
 	return VdlLockFileSchema{
 		Version: *p.Version,
-		Hashes: p.Hashes,
+		Hashes:  p.Hashes,
 	}
 }
 

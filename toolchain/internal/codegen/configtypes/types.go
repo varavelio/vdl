@@ -26,10 +26,10 @@ type VdlConfig struct {
 
 // preVdlConfig mirrors VdlConfig during strict JSON decoding.
 type preVdlConfig struct {
-	Version *int64 `json:"version"`
-	CleanOutDir *bool `json:"cleanOutDir,omitempty"`
-	Remotes *[]VdlConfigRemote `json:"remotes,omitempty"`
-	Plugins *[]VdlConfigPlugin `json:"plugins,omitempty"`
+	Version     *int64             `json:"version"`
+	CleanOutDir *bool              `json:"cleanOutDir,omitempty"`
+	Remotes     *[]VdlConfigRemote `json:"remotes,omitempty"`
+	Plugins     *[]VdlConfigPlugin `json:"plugins,omitempty"`
 }
 
 // validate reports whether all required JSON fields are present in preVdlConfig.
@@ -43,10 +43,10 @@ func (p *preVdlConfig) validate() error {
 // transform converts preVdlConfig to VdlConfig.
 func (p *preVdlConfig) transform() VdlConfig {
 	return VdlConfig{
-		Version: *p.Version,
+		Version:     *p.Version,
 		CleanOutDir: p.CleanOutDir,
-		Remotes: p.Remotes,
-		Plugins: p.Plugins,
+		Remotes:     p.Remotes,
+		Plugins:     p.Plugins,
 	}
 }
 
@@ -162,11 +162,11 @@ type VdlConfigPlugin struct {
 
 // preVdlConfigPlugin mirrors VdlConfigPlugin during strict JSON decoding.
 type preVdlConfigPlugin struct {
-	Src *string `json:"src"`
-	Schema *string `json:"schema"`
-	OutDir *string `json:"outDir"`
-	GenerateHeader *bool `json:"generateHeader,omitempty"`
-	Options *map[string]string `json:"options,omitempty"`
+	Src            *string            `json:"src"`
+	Schema         *string            `json:"schema"`
+	OutDir         *string            `json:"outDir"`
+	GenerateHeader *bool              `json:"generateHeader,omitempty"`
+	Options        *map[string]string `json:"options,omitempty"`
 }
 
 // validate reports whether all required JSON fields are present in preVdlConfigPlugin.
@@ -186,11 +186,11 @@ func (p *preVdlConfigPlugin) validate() error {
 // transform converts preVdlConfigPlugin to VdlConfigPlugin.
 func (p *preVdlConfigPlugin) transform() VdlConfigPlugin {
 	return VdlConfigPlugin{
-		Src: *p.Src,
-		Schema: *p.Schema,
-		OutDir: *p.OutDir,
+		Src:            *p.Src,
+		Schema:         *p.Schema,
+		OutDir:         *p.OutDir,
 		GenerateHeader: p.GenerateHeader,
-		Options: p.Options,
+		Options:        p.Options,
 	}
 }
 
@@ -307,7 +307,7 @@ type VdlConfigRemote struct {
 
 // preVdlConfigRemote mirrors VdlConfigRemote during strict JSON decoding.
 type preVdlConfigRemote struct {
-	Host *string `json:"host"`
+	Host *string              `json:"host"`
 	Auth *VdlConfigRemoteAuth `json:"auth,omitempty"`
 }
 
@@ -663,7 +663,7 @@ type VdlConfigRemoteAuthHeader struct {
 
 // preVdlConfigRemoteAuthHeader mirrors VdlConfigRemoteAuthHeader during strict JSON decoding.
 type preVdlConfigRemoteAuthHeader struct {
-	NameEnv *string `json:"nameEnv"`
+	NameEnv  *string `json:"nameEnv"`
 	ValueEnv *string `json:"valueEnv"`
 }
 
@@ -681,7 +681,7 @@ func (p *preVdlConfigRemoteAuthHeader) validate() error {
 // transform converts preVdlConfigRemoteAuthHeader to VdlConfigRemoteAuthHeader.
 func (p *preVdlConfigRemoteAuthHeader) transform() VdlConfigRemoteAuthHeader {
 	return VdlConfigRemoteAuthHeader{
-		NameEnv: *p.NameEnv,
+		NameEnv:  *p.NameEnv,
 		ValueEnv: *p.ValueEnv,
 	}
 }
