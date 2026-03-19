@@ -123,7 +123,7 @@ func TestLexerTypeAndConstSamples(t *testing.T) {
 			}
 		}
 
-		const appConfig AppConfigType = {
+		const appConfig = {
 			...baseConfig
 			port 8080
 			targets [

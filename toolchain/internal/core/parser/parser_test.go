@@ -93,21 +93,6 @@ func TestParserConstDecl(t *testing.T) {
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("Constant with optional explicit type", func(t *testing.T) {
-		input := `const appConfig AppConfigType = { port 8080 }`
-		parsed, err := ParserInstance.ParseString("schema.vdl", input)
-		require.NoError(t, err)
-
-		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
-			Name:     "appConfig",
-			TypeName: new("AppConfigType"),
-			Value: &ast.DataLiteral{Object: &ast.DataLiteralObject{Entries: []*ast.DataLiteralObjectEntry{
-				{Key: "port", Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("8080")}}},
-			}}},
-		}}}}
-		testutil.ASTEqualNoPos(t, expected, parsed)
-	})
-
 	t.Run("Constant with docstring", func(t *testing.T) {
 		input := `
 			""" The maximum number of items allowed per request. """
@@ -156,7 +141,6 @@ func TestParserConstDecl(t *testing.T) {
 		require.Len(t, parsed.Declarations, 1)
 		decl := parsed.Declarations[0].Const
 		require.NotNil(t, decl)
-		require.Nil(t, decl.TypeName)
 		require.NotNil(t, decl.Value)
 		require.NotNil(t, decl.Value.Object)
 		require.Len(t, decl.Value.Object.Entries, 3)
@@ -1099,14 +1083,13 @@ func TestParserConstWithReferences(t *testing.T) {
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
-	t.Run("const with typed enum member reference value", func(t *testing.T) {
-		input := `const DEFAULT_STATUS StatusEnum = Status.Active`
+	t.Run("const with enum member reference value and no explicit type", func(t *testing.T) {
+		input := `const DEFAULT_STATUS = Status.Active`
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
-			Name:     "DEFAULT_STATUS",
-			TypeName: new("StatusEnum"),
+			Name: "DEFAULT_STATUS",
 			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Ref: &ast.Reference{
 				Name:   "Status",
 				Member: new("Active"),
@@ -1639,6 +1622,12 @@ func TestParserInvalidSyntax(t *testing.T) {
 
 	t.Run("Array with commas fails", func(t *testing.T) {
 		input := `const bad = [1, 2]`
+		_, err := ParserInstance.ParseString("schema.vdl", input)
+		require.Error(t, err)
+	})
+
+	t.Run("Const with explicit type fails", func(t *testing.T) {
+		input := `const timeoutMs int = 2500`
 		_, err := ParserInstance.ParseString("schema.vdl", input)
 		require.Error(t, err)
 	})
