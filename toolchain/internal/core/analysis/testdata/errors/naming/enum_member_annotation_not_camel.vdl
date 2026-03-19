@@ -1,7 +1,7 @@
-// fmt:off
+// format:off
 // @expect: E102
 
 enum Status {
-  @BadAnn
+  @badAnn
   Active
 }

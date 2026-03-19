@@ -1,10 +1,8 @@
-// fmt:off
+// format:off
 // @expect: E206
 
-const baseConfig = {
-  host "localhost"
-}
+const baseConfig = { host "localhost" }
 
 const cfg = {
-  ...env.baseConfig
+  ...Env.BaseConfig
 }

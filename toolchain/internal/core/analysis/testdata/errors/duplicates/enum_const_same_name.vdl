@@ -1,8 +1,8 @@
-// fmt:off
+// format:off
 // @expect: E804
 
 enum Limit {
   Low
 }
 
-const Limit = 10
+const limit = 10

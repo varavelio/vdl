@@ -1,11 +1,11 @@
-//fmt:off
+//format:off
 type   User   {
   id  :  string
 }
 
 // >>>>
 
-//fmt:off
+//format:off
 type   User   {
   id  :  string
 }

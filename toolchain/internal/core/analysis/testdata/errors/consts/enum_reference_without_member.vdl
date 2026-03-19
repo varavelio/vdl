@@ -1,8 +1,8 @@
-// fmt:off
+// format:off
 // @expect: E205
 
 enum Status {
   Active
 }
 
-const bad = Status
+const bad = status

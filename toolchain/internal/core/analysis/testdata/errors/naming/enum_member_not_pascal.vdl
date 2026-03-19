@@ -1,6 +1,6 @@
-// fmt:off
+// format:off
 // @expect: E103
 
 enum Status {
-  active
+  Active
 }

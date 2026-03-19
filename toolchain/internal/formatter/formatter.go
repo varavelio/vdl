@@ -13,9 +13,9 @@ func Format(filename, content string) (string, error) {
 		return "", nil
 	}
 
-	// Check if the file starts with // fmt:off or //fmt:off
+	// Check if the file starts with // format:off or //format:off
 	trimmed := strings.TrimSpace(content)
-	if strings.HasPrefix(trimmed, "// fmt:off") || strings.HasPrefix(trimmed, "//fmt:off") {
+	if strings.HasPrefix(trimmed, "// format:off") || strings.HasPrefix(trimmed, "//format:off") {
 		return content, nil
 	}
 

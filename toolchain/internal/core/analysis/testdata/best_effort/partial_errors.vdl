@@ -1,4 +1,4 @@
-// fmt:off
+// format:off
 // @expect: E201
 // @expect: E102
 // @assert: has-type ValidType
@@ -15,4 +15,4 @@ type InvalidType {
 }
 
 const validConst = 100
-const BAD_CONST = 200
+const badConst = 200
