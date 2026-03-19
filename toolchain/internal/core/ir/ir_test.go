@@ -38,9 +38,12 @@ func TestFromProgram_Golden(t *testing.T) {
 			got, err := json.MarshalIndent(schema, "", "  ")
 			require.NoError(t, err)
 
+			gotNoPos, err := testutil.StripPositionsFromJSON(got)
+			require.NoError(t, err)
+
 			goldenPath := strings.TrimSuffix(input, ".vdl") + ".json"
 			if *update {
-				err := os.WriteFile(goldenPath, got, 0644)
+				err := os.WriteFile(goldenPath, gotNoPos, 0644)
 				require.NoError(t, err)
 				t.Logf("updated golden file: %s", goldenPath)
 				return
@@ -52,13 +55,7 @@ func TestFromProgram_Golden(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			var wantSchema irtypes.IrSchema
-			require.NoError(t, json.Unmarshal(want, &wantSchema))
-
-			var gotSchema irtypes.IrSchema
-			require.NoError(t, json.Unmarshal(got, &gotSchema))
-
-			testutil.IRSchemaEqualNoPos(t, &wantSchema, &gotSchema)
+			testutil.IRJSONEqualNoPos(t, want, got)
 		})
 	}
 }
