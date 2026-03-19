@@ -97,11 +97,6 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 		if err != nil {
 			return nil, err
 		}
-		var typeName *string
-		if p.isNameToken(p.peek()) && p.peek().Type != "Equals" {
-			t := p.next().Value
-			typeName = &t
-		}
 		if _, err := p.expect("Equals"); err != nil {
 			return nil, err
 		}
@@ -109,7 +104,7 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 		if err != nil {
 			return nil, err
 		}
-		return &constNode{baseNode: baseNode{start: start, end: endLine}, Doc: doc, Ann: anns, Name: nameTok.Value, TypeName: typeName, Value: lit}, nil
+		return &constNode{baseNode: baseNode{start: start, end: endLine}, Doc: doc, Ann: anns, Name: nameTok.Value, Value: lit}, nil
 	case "Enum":
 		p.next()
 		nameTok, err := p.expect("Ident")

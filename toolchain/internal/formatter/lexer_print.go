@@ -96,11 +96,7 @@ func printConstDecl(w *fmtWriter, t *constNode) {
 	for _, a := range t.Ann {
 		printAnnotation(w, a)
 	}
-	typeName := ""
-	if t.TypeName != nil {
-		typeName = " " + formatTypeName(*t.TypeName)
-	}
-	lhs := "const " + strutil.ToCamelCase(t.Name) + typeName + " = "
+	lhs := "const " + strutil.ToCamelCase(t.Name) + " = "
 	rhs := renderLiteral(t.Value, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
 	printMultilineStatement(w, lhs, rhs, t.Trailing)
 }

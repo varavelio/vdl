@@ -4,7 +4,7 @@ const   MAX_ITEMS  	  = 50
 const Version="2.1.0"
 const Pi = 3.14159
 const Is_Enabled = true
-const RetryCount int = 3
+const RetryCount = 3
 
 // >>>>
 
@@ -15,4 +15,4 @@ const version = "2.1.0"
 
 const pi = 3.14159
 const isEnabled = true
-const retryCount int = 3
+const retryCount = 3

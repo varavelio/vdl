@@ -70,7 +70,6 @@ type constNode struct {
 	Doc      *docstringNode
 	Ann      []*annotationNode
 	Name     string
-	TypeName *string
 	Value    literalNode
 	Trailing *commentNode
 }
