@@ -31,7 +31,7 @@ type User {
 }
 
 @config
-const maxPageSize int = 100
+const maxPageSize = 100
 
 enum Status {
   Active
@@ -135,10 +135,10 @@ const maxRetries = 5
 const featureEnabled = true
 ```
 
-Constants support explicit type or inferred type:
+Constants are dynamic values:
 
 ```vdl
-const timeoutMs int = 2500
+const timeoutMs = 2500
 const serviceName = "billing"
 ```
 
