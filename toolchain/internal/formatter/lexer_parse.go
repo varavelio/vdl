@@ -8,7 +8,7 @@ func (p *tokenParser) parseDocument() (*docNode, error) {
 	for !p.is("EOF") {
 		tok := p.peek()
 
-		if pendingDoc != nil && tok.Line-pendingDoc.endLine() > 1 {
+		if pendingDoc != nil && tok.Line-pendingAttachmentEndLine(pendingDoc, pendingAnn) > 1 {
 			items = append(items, pendingDoc)
 			pendingDoc = nil
 		}
@@ -68,6 +68,17 @@ func attachTrailing(prev node, c *commentNode) {
 	case *enumNode:
 		n.Trailing = c
 	}
+}
+
+func pendingAttachmentEndLine(doc *docstringNode, anns []*annotationNode) int {
+	if doc == nil {
+		return 0
+	}
+	endLine := doc.endLine()
+	if len(anns) == 0 {
+		return endLine
+	}
+	return max(endLine, anns[len(anns)-1].endLine())
 }
 
 func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (node, error) {
@@ -131,7 +142,7 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 
 	for !p.is("RBrace") && !p.is("EOF") {
 		tok := p.peek()
-		if pendingDoc != nil && tok.Line-pendingDoc.endLine() > 1 {
+		if pendingDoc != nil && tok.Line-pendingAttachmentEndLine(pendingDoc, pendingAnn) > 1 {
 			members = append(members, &enumMemberNode{baseNode: baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()}, Doc: pendingDoc})
 			pendingDoc = nil
 		}

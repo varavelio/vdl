@@ -73,7 +73,7 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 	if len(o.Entries) == 0 {
 		return "{}"
 	}
-	if len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil && o.Entries[0].Trailing == nil {
+	if !ctx.forceObjectMultiline && len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil && o.Entries[0].Trailing == nil {
 		e := o.Entries[0]
 		if e.Value != nil && e.Value.Scalar != nil {
 			return "{ " + strutil.ToCamelCase(e.Key) + " " + renderLiteral(*e.Value, ctx) + " }"
@@ -108,18 +108,27 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 	hasComments := false
 	hasTrailingComments := false
 	hasMultiline := false
+	hasCompoundElements := false
 	for _, e := range a.Elements {
 		if e.Comment != nil {
 			hasComments = true
 			parts = append(parts, e.Comment.Text)
 			continue
 		}
+		hasCompoundElements = hasCompoundElements || (e.Value != nil && (e.Value.Obj != nil || e.Value.Array != nil))
 		rendered := renderLiteral(*e.Value, ctx)
 		hasMultiline = hasMultiline || strings.Contains(rendered, "\n")
 		hasTrailingComments = hasTrailingComments || e.Trailing != nil
 		parts = append(parts, rendered)
 	}
-	if !hasComments && !hasTrailingComments && !hasMultiline {
+	shouldMultiline := hasComments || hasTrailingComments || hasMultiline
+	if ctx.forceCompoundArrayMultiline && hasCompoundElements {
+		shouldMultiline = true
+	}
+	if ctx.respectArrayMultilineIntent && a.MultilineIntent {
+		shouldMultiline = true
+	}
+	if !shouldMultiline {
 		return "[" + strings.Join(parts, " ") + "]"
 	}
 

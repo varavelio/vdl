@@ -97,7 +97,14 @@ func printConstDecl(w *fmtWriter, t *constNode) {
 		printAnnotation(w, a)
 	}
 	lhs := "const " + strutil.ToCamelCase(t.Name) + " = "
-	rhs := renderLiteral(t.Value, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
+	rhs := renderLiteral(t.Value, literalRenderCtx{
+		spreadRef:                   refConstDecl,
+		scalarRef:                   refConstDecl,
+		enumMemberRef:               refEnumMember,
+		forceObjectMultiline:        true,
+		respectArrayMultilineIntent: true,
+		forceCompoundArrayMultiline: true,
+	})
 	printMultilineStatement(w, lhs, rhs, t.Trailing)
 }
 
@@ -185,26 +192,18 @@ func printAnnotation(w *fmtWriter, a *annotationNode) {
 
 func printDocstring(w *fmtWriter, raw string) {
 	content := strings.TrimSuffix(strings.TrimPrefix(raw, `"""`), `"""`)
-	if !strings.Contains(content, "\n") {
+	if !strings.Contains(raw, "\n") {
 		w.line(`""" ` + strings.TrimSpace(content) + ` """`)
 		return
 	}
 
 	normalized := strutil.NormalizeIndent(content)
 	lines := strings.Split(normalized, "\n")
-	for len(lines) > 0 && strings.TrimSpace(lines[0]) == "" {
+	if len(lines) > 0 && lines[0] == "" {
 		lines = lines[1:]
 	}
-	for len(lines) > 0 && strings.TrimSpace(lines[len(lines)-1]) == "" {
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
 		lines = lines[:len(lines)-1]
-	}
-	if len(lines) <= 1 {
-		if len(lines) == 0 {
-			w.line(`""" """`)
-			return
-		}
-		w.line(`""" ` + strings.TrimSpace(lines[0]) + ` """`)
-		return
 	}
 	w.line(`"""`)
 	for _, l := range lines {
@@ -284,7 +283,14 @@ func isSingleLineConst(c *constNode) bool {
 	if c == nil || c.Doc != nil || len(c.Ann) > 0 {
 		return false
 	}
-	rhs := renderLiteral(c.Value, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
+	rhs := renderLiteral(c.Value, literalRenderCtx{
+		spreadRef:                   refConstDecl,
+		scalarRef:                   refConstDecl,
+		enumMemberRef:               refEnumMember,
+		forceObjectMultiline:        true,
+		respectArrayMultilineIntent: true,
+		forceCompoundArrayMultiline: true,
+	})
 	return !strings.Contains(rhs, "\n")
 }
 

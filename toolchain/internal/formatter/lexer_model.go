@@ -153,7 +153,8 @@ type objectEntryNode struct {
 }
 
 type arrayLiteralNode struct {
-	Elements []*arrayElementNode
+	Elements        []*arrayElementNode
+	MultilineIntent bool
 }
 
 type arrayElementNode struct {
@@ -196,7 +197,10 @@ const (
 )
 
 type literalRenderCtx struct {
-	spreadRef     refCase
-	scalarRef     refCase
-	enumMemberRef refCase
+	spreadRef                   refCase
+	scalarRef                   refCase
+	enumMemberRef               refCase
+	forceObjectMultiline        bool
+	respectArrayMultilineIntent bool
+	forceCompoundArrayMultiline bool
 }

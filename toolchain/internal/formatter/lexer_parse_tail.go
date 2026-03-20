@@ -9,7 +9,7 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 
 	for !p.is("RBrace") && !p.is("EOF") {
 		tok := p.peek()
-		if pendingDoc != nil && tok.Line-pendingDoc.endLine() > 1 {
+		if pendingDoc != nil && tok.Line-pendingAttachmentEndLine(pendingDoc, pendingAnn) > 1 {
 			members = append(members, &typeMemberNode{baseNode: baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()}, Standalone: pendingDoc})
 			pendingDoc = nil
 		}
@@ -117,7 +117,8 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 		}
 		return literalNode{Obj: &objectLiteralNode{Entries: entries}}, r.EndLine, nil
 	case "LBracket":
-		p.next()
+		lb := p.next()
+		multilineIntent := !p.is("RBracket") && p.peek().Line > lb.Line
 		elements := []*arrayElementNode{}
 		for !p.is("RBracket") && !p.is("EOF") {
 			if p.is("Comment") || p.is("CommentBlock") {
@@ -139,7 +140,7 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 		if err != nil {
 			return literalNode{}, 0, err
 		}
-		return literalNode{Array: &arrayLiteralNode{Elements: elements}}, r.EndLine, nil
+		return literalNode{Array: &arrayLiteralNode{Elements: elements, MultilineIntent: multilineIntent}}, r.EndLine, nil
 	default:
 		s, endLine, err := p.parseScalarLiteral()
 		if err != nil {
