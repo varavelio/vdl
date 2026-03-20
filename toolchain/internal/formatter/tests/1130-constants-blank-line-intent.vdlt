@@ -1,0 +1,52 @@
+const config = {
+version 1
+
+
+hooks {
+foo "bar"
+
+baz "qux"
+}
+
+steps [
+"one"
+
+
+{
+key 1
+
+arr [
+1
+
+
+2
+]
+}
+]
+}
+
+// >>>>
+
+const config = {
+  version 1
+
+  hooks {
+    foo "bar"
+
+    baz "qux"
+  }
+
+  steps [
+    "one"
+
+    {
+      key 1
+
+      arr [
+        1
+
+        2
+      ]
+    }
+  ]
+}

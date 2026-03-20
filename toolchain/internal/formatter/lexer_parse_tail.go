@@ -130,11 +130,12 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 				}
 				continue
 			}
+			elemStart := p.peek().Line
 			lit, end, err := p.parseLiteral()
 			if err != nil {
 				return literalNode{}, 0, err
 			}
-			elements = append(elements, &arrayElementNode{baseNode: baseNode{start: tok.Line, end: end}, Value: &lit})
+			elements = append(elements, &arrayElementNode{baseNode: baseNode{start: elemStart, end: end}, Value: &lit})
 		}
 		r, err := p.expect("RBracket")
 		if err != nil {

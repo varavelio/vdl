@@ -83,7 +83,10 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 	w := newFmtWriter()
 	w.line("{")
 	w.indent++
-	for _, e := range o.Entries {
+	for i, e := range o.Entries {
+		if i > 0 && hasSourceBlankLine(o.Entries[i-1], e) {
+			w.blank()
+		}
 		switch {
 		case e.Comment != nil:
 			w.line(e.Comment.Text)
@@ -135,7 +138,10 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 	w := newFmtWriter()
 	w.line("[")
 	w.indent++
-	for _, e := range a.Elements {
+	for i, e := range a.Elements {
+		if i > 0 && hasSourceBlankLine(a.Elements[i-1], e) {
+			w.blank()
+		}
 		switch {
 		case e.Comment != nil:
 			w.line(e.Comment.Text)
@@ -148,6 +154,18 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 	return strings.TrimSuffix(w.String(), "\n")
 }
 
+type lineSpan interface {
+	startLine() int
+	endLine() int
+}
+
+func hasSourceBlankLine(prev, curr lineSpan) bool {
+	if prev == nil || curr == nil {
+		return false
+	}
+	return curr.startLine()-prev.endLine() > 1
+}
+
 func writeRenderedValue(w *fmtWriter, prefix, value string, trailing *commentNode) {
 	if !strings.Contains(value, "\n") {
 		w.lineWithTrailing(prefix+value, trailing)
@@ -157,6 +175,10 @@ func writeRenderedValue(w *fmtWriter, prefix, value string, trailing *commentNod
 	lines := strings.Split(value, "\n")
 	w.line(prefix + lines[0])
 	for i := 1; i < len(lines)-1; i++ {
+		if lines[i] == "" {
+			w.blank()
+			continue
+		}
 		w.line(lines[i])
 	}
 	last := lines[len(lines)-1]

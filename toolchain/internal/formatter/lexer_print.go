@@ -185,6 +185,10 @@ func printAnnotation(w *fmtWriter, a *annotationNode) {
 	lines := strings.Split(renderedArg, "\n")
 	w.line("@" + name + "(" + lines[0])
 	for i := 1; i < len(lines)-1; i++ {
+		if lines[i] == "" {
+			w.blank()
+			continue
+		}
 		w.line(lines[i])
 	}
 	w.line(lines[len(lines)-1] + ")")
