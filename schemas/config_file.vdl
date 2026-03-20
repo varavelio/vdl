@@ -16,6 +16,27 @@ type VdlConfig {
 
   """ List of plugins to be used for code generation. """
   plugins? VdlConfigPlugin[]
+
+  """
+  Global lifecycle hooks executed on the host machine.
+  These hooks are ignored in cloud or otherwise sandboxed execution environments.
+  """
+  hooks? VdlConfigHooks
+}
+
+""" VDL global hook configuration. """
+type VdlConfigHooks {
+  """
+  Commands executed before the generation pipeline starts.
+  If any command fails, generation stops immediately.
+  """
+  preGenerate? string[]
+
+  """
+  Commands executed after generated files are written to disk.
+  Failed commands are reported as warnings and do not roll back generated files.
+  """
+  postGenerate? string[]
 }
 
 """ VDL remote configuration. """

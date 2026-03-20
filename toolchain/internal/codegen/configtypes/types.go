@@ -22,6 +22,9 @@ type VdlConfig struct {
 	Remotes *[]VdlConfigRemote `json:"remotes,omitempty"`
 	// List of plugins to be used for code generation.
 	Plugins *[]VdlConfigPlugin `json:"plugins,omitempty"`
+	// Global lifecycle hooks executed on the host machine.
+	// These hooks are ignored in cloud or otherwise sandboxed execution environments.
+	Hooks *VdlConfigHooks `json:"hooks,omitempty"`
 }
 
 // preVdlConfig mirrors VdlConfig during strict JSON decoding.
@@ -30,6 +33,7 @@ type preVdlConfig struct {
 	CleanOutDir *bool              `json:"cleanOutDir,omitempty"`
 	Remotes     *[]VdlConfigRemote `json:"remotes,omitempty"`
 	Plugins     *[]VdlConfigPlugin `json:"plugins,omitempty"`
+	Hooks       *VdlConfigHooks    `json:"hooks,omitempty"`
 }
 
 // validate reports whether all required JSON fields are present in preVdlConfig.
@@ -47,6 +51,7 @@ func (p *preVdlConfig) transform() VdlConfig {
 		CleanOutDir: p.CleanOutDir,
 		Remotes:     p.Remotes,
 		Plugins:     p.Plugins,
+		Hooks:       p.Hooks,
 	}
 }
 
@@ -127,6 +132,67 @@ func (x *VdlConfig) GetPlugins() []VdlConfigPlugin {
 func (x *VdlConfig) GetPluginsOr(defaultValue []VdlConfigPlugin) []VdlConfigPlugin {
 	if x != nil && x.Plugins != nil {
 		return *x.Plugins
+	}
+	return defaultValue
+}
+
+// GetHooks returns the Hooks field. It returns the zero value when the receiver or field is nil.
+func (x *VdlConfig) GetHooks() VdlConfigHooks {
+	if x != nil && x.Hooks != nil {
+		return *x.Hooks
+	}
+	var zero VdlConfigHooks
+	return zero
+}
+
+// GetHooksOr returns the Hooks field. It returns defaultValue when the receiver or field is nil.
+func (x *VdlConfig) GetHooksOr(defaultValue VdlConfigHooks) VdlConfigHooks {
+	if x != nil && x.Hooks != nil {
+		return *x.Hooks
+	}
+	return defaultValue
+}
+
+// VDL global hook configuration.
+type VdlConfigHooks struct {
+	// Commands executed before the generation pipeline starts.
+	// If any command fails, generation stops immediately.
+	PreGenerate *[]string `json:"preGenerate,omitempty"`
+	// Commands executed after generated files are written to disk.
+	// Failed commands are reported as warnings and do not roll back generated files.
+	PostGenerate *[]string `json:"postGenerate,omitempty"`
+}
+
+// GetPreGenerate returns the PreGenerate field. It returns the zero value when the receiver or field is nil.
+func (x *VdlConfigHooks) GetPreGenerate() []string {
+	if x != nil && x.PreGenerate != nil {
+		return *x.PreGenerate
+	}
+	var zero []string
+	return zero
+}
+
+// GetPreGenerateOr returns the PreGenerate field. It returns defaultValue when the receiver or field is nil.
+func (x *VdlConfigHooks) GetPreGenerateOr(defaultValue []string) []string {
+	if x != nil && x.PreGenerate != nil {
+		return *x.PreGenerate
+	}
+	return defaultValue
+}
+
+// GetPostGenerate returns the PostGenerate field. It returns the zero value when the receiver or field is nil.
+func (x *VdlConfigHooks) GetPostGenerate() []string {
+	if x != nil && x.PostGenerate != nil {
+		return *x.PostGenerate
+	}
+	var zero []string
+	return zero
+}
+
+// GetPostGenerateOr returns the PostGenerate field. It returns defaultValue when the receiver or field is nil.
+func (x *VdlConfigHooks) GetPostGenerateOr(defaultValue []string) []string {
+	if x != nil && x.PostGenerate != nil {
+		return *x.PostGenerate
 	}
 	return defaultValue
 }
