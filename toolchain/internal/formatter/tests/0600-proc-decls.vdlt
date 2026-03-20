@@ -22,7 +22,6 @@ type Catalog {
     input {
       productId string
     }
-
     output {
       ok bool
     }
@@ -33,7 +32,6 @@ type Catalog {
     input {
       id string
     }
-
     output {
       """ doc """
       result string

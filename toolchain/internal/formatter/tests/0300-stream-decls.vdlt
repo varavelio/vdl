@@ -15,7 +15,6 @@ type Service {
     input {
       userId string
     }
-
     output {
       eventName string
       createdAt datetime[]

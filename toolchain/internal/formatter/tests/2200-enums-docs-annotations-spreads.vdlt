@@ -17,10 +17,10 @@ high =3
 
 enum Merged {
   ...BaseRoles
-
   """ docs """
   @deprecated("x")
   Legacy = "legacy"
+
   Active
 }
 

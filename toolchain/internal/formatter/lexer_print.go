@@ -8,34 +8,18 @@ import (
 
 func printDocument(w *fmtWriter, d *docNode) {
 	for i, item := range d.Items {
-		if i > 0 && shouldBreakBetweenTop(d.Items[i-1], item) {
+		if i > 0 && hasTopLevelBlankLine(d.Items[i-1], item) {
 			w.blank()
 		}
 		printTopNode(w, item)
 	}
 }
 
-func shouldBreakBetweenTop(prev, curr node) bool {
+func hasTopLevelBlankLine(prev, curr node) bool {
 	if prev == nil || curr == nil {
 		return false
 	}
-	if prev.nodeKind() == "include" && curr.nodeKind() == "include" {
-		return false
-	}
-	if prev.nodeKind() == "comment" || curr.nodeKind() == "comment" {
-		return curr.startLine()-prev.endLine() > 1
-	}
-	if prev.nodeKind() == "docstring" || curr.nodeKind() == "docstring" {
-		return true
-	}
-
-	prevConst, prevIsConst := prev.(*constNode)
-	currConst, currIsConst := curr.(*constNode)
-	if prevIsConst && currIsConst {
-		return !isSingleLineConst(prevConst) || !isSingleLineConst(currConst)
-	}
-
-	return true
+	return topNodeStartLine(curr)-topNodeEndLine(prev) > 1
 }
 
 func printTopNode(w *fmtWriter, n node) {
@@ -80,7 +64,7 @@ func printTypeDecl(w *fmtWriter, t *typeNode) {
 	w.line("type " + name + " {")
 	w.indent++
 	for i, m := range t.Type.Obj.Members {
-		if i > 0 && shouldBreakTypeMembers(t.Type.Obj.Members[i-1], m) {
+		if i > 0 && hasTypeMemberBlankLine(t.Type.Obj.Members[i-1], m) {
 			w.blank()
 		}
 		printTypeMember(w, m)
@@ -123,23 +107,13 @@ func printEnumDecl(w *fmtWriter, t *enumNode) {
 	w.line("enum " + name + " {")
 	w.indent++
 	for i, m := range t.Members {
-		if i > 0 && shouldBreakEnumMembers(t.Members[i-1], m) {
+		if i > 0 && hasEnumMemberBlankLine(t.Members[i-1], m) {
 			w.blank()
 		}
 		printEnumMember(w, m)
 	}
 	w.indent--
 	w.line("}")
-}
-
-func shouldBreakEnumMembers(prev, curr *enumMemberNode) bool {
-	if prev == nil || curr == nil {
-		return false
-	}
-	if curr.Comment != nil || prev.Comment != nil {
-		return curr.startLine()-prev.endLine() > 1
-	}
-	return curr.Doc != nil
 }
 
 func printEnumMember(w *fmtWriter, m *enumMemberNode) {
@@ -216,22 +190,6 @@ func printDocstring(w *fmtWriter, raw string) {
 	w.line(`"""`)
 }
 
-func shouldBreakTypeMembers(prev, curr *typeMemberNode) bool {
-	if prev == nil || curr == nil {
-		return false
-	}
-	if curr.Comment != nil || prev.Comment != nil {
-		return curr.startLine()-prev.endLine() > 1
-	}
-	if curr.Standalone != nil || (curr.Field != nil && curr.Field.Doc != nil) {
-		return true
-	}
-	if prev.Field != nil && curr.Field != nil {
-		return !isSingleLineField(prev.Field) || !isSingleLineField(curr.Field)
-	}
-	return (prev.Field != nil && !isSingleLineField(prev.Field)) || (curr.Field != nil && !isSingleLineField(curr.Field))
-}
-
 func printTypeMember(w *fmtWriter, m *typeMemberNode) {
 	switch {
 	case m.Comment != nil:
@@ -270,7 +228,7 @@ func printField(w *fmtWriter, f *fieldNode) {
 	w.line(name + " {")
 	w.indent++
 	for i, m := range f.Type.Obj.Members {
-		if i > 0 && shouldBreakTypeMembers(f.Type.Obj.Members[i-1], m) {
+		if i > 0 && hasTypeMemberBlankLine(f.Type.Obj.Members[i-1], m) {
 			w.blank()
 		}
 		printTypeMember(w, m)
@@ -283,27 +241,83 @@ func printMultilineStatement(w *fmtWriter, lhs, rhs string, trailing *commentNod
 	writeRenderedValue(w, lhs, rhs, trailing)
 }
 
-func isSingleLineConst(c *constNode) bool {
-	if c == nil || c.Doc != nil || len(c.Ann) > 0 {
+func hasTypeMemberBlankLine(prev, curr *typeMemberNode) bool {
+	if prev == nil || curr == nil {
 		return false
 	}
-	rhs := renderLiteral(c.Value, literalRenderCtx{
-		spreadRef:                   refConstDecl,
-		scalarRef:                   refConstDecl,
-		enumMemberRef:               refEnumMember,
-		forceObjectMultiline:        true,
-		respectArrayMultilineIntent: true,
-		forceCompoundArrayMultiline: true,
-	})
-	return !strings.Contains(rhs, "\n")
+	return typeMemberStartLine(curr)-typeMemberEndLine(prev) > 1
 }
 
-func isSingleLineField(f *fieldNode) bool {
-	if f == nil || f.Doc != nil || len(f.Ann) > 0 {
+func hasEnumMemberBlankLine(prev, curr *enumMemberNode) bool {
+	if prev == nil || curr == nil {
 		return false
 	}
-	if f.Type.Obj != nil && len(f.Type.Obj.Members) > 0 {
-		return false
+	return enumMemberStartLine(curr)-enumMemberEndLine(prev) > 1
+}
+
+func topNodeStartLine(n node) int {
+	switch t := n.(type) {
+	case *includeNode:
+		return declarationStartLine(t.Doc, t.Ann, t.startLine())
+	case *typeNode:
+		return declarationStartLine(t.Doc, t.Ann, t.startLine())
+	case *constNode:
+		return declarationStartLine(t.Doc, t.Ann, t.startLine())
+	case *enumNode:
+		return declarationStartLine(t.Doc, t.Ann, t.startLine())
+	default:
+		return n.startLine()
 	}
-	return true
+}
+
+func topNodeEndLine(n node) int {
+	if n == nil {
+		return 0
+	}
+	return n.endLine()
+}
+
+func declarationStartLine(doc *docstringNode, anns []*annotationNode, fallback int) int {
+	start := fallback
+	if len(anns) > 0 {
+		start = min(start, anns[0].startLine())
+	}
+	if doc != nil {
+		start = min(start, doc.startLine())
+	}
+	return start
+}
+
+func typeMemberStartLine(m *typeMemberNode) int {
+	if m == nil {
+		return 0
+	}
+	if m.Field != nil {
+		return declarationStartLine(m.Field.Doc, m.Field.Ann, m.Field.startLine())
+	}
+	return m.startLine()
+}
+
+func typeMemberEndLine(m *typeMemberNode) int {
+	if m == nil {
+		return 0
+	}
+	if m.Field != nil {
+		return m.Field.endLine()
+	}
+	return m.endLine()
+}
+
+func enumMemberStartLine(m *enumMemberNode) int {
+	if m == nil {
+		return 0
+	}
+	return declarationStartLine(m.Doc, m.Ann, m.startLine())
+}
+
+func enumMemberEndLine(m *enumMemberNode) int {
+	if m == nil {
+		return 0
+	}
+	return m.endLine()
 }

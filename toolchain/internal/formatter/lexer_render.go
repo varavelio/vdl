@@ -46,7 +46,7 @@ func renderObjectType(obj objectTypeNode) string {
 	w.line("{")
 	w.indent++
 	for i, m := range obj.Members {
-		if i > 0 && shouldBreakTypeMembers(obj.Members[i-1], m) {
+		if i > 0 && hasTypeMemberBlankLine(obj.Members[i-1], m) {
 			w.blank()
 		}
 		printTypeMember(w, m)

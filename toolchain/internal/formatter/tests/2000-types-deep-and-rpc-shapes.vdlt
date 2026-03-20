@@ -39,7 +39,6 @@ type Service {
     input {
       id string
     }
-
     output {
       profile {
         displayName string
@@ -53,11 +52,9 @@ type Service {
     input {
       id string
     }
-
     output {
       events {
         kind string
-
         payload {
           raw string
         }
@@ -68,7 +65,6 @@ type Service {
 
 type DeepType {
   ...BaseEntity
-
   meta {
     a {
       b {
@@ -82,11 +78,9 @@ type DeepType {
       }
     }
   }
-
   matrix int[][][]
   dictionary map[map[User]]
 }
 
 type AliasOne string[]
-
 type AliasTwo map[DeepType]

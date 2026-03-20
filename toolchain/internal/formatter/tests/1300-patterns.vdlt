@@ -8,13 +8,10 @@
 
 @pattern
 const userEventSubject = "events.users.{userId}.{eventType}"
-
 """ Generates a Redis cache key for a session. """
 @pattern
 const sessionCacheKey = "cache:session:{sessionId}"
-
 @pattern
 const topic = "topic.{id}"
-
 @pattern
 const queue = "queue.{id}"

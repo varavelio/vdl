@@ -40,7 +40,6 @@ enum OrderStatus {
 
 @deprecated
 const maxPageSize = 100
-
 @pattern
 const userEventSubject = "events.users.{userId}"
 
@@ -51,7 +50,6 @@ type MyService {
     input {
       userId string
     }
-
     output {
       userData MyType
     }

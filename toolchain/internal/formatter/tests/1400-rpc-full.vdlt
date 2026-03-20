@@ -33,7 +33,6 @@ type Catalog {
     input {
       product Product
     }
-
     output {
       success bool
       productId string
@@ -48,7 +47,6 @@ type Catalog {
     input {
       channelId string
     }
-
     output {
       text string
     }

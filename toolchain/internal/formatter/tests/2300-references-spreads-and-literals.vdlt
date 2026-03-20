@@ -16,13 +16,11 @@ const baseConfig = {
   port 8080
   tls true
 }
-
 const prodConfig = {
   ...baseConfig
   port 443
   status EnvStatus.Active
 }
-
 const dashboards = [
   {
     name "ops"

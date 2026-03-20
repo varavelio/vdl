@@ -13,7 +13,6 @@ type User {
   id string // id
   name? string
   age int
-
   meta {
     createdAt datetime
   }

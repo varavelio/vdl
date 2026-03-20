@@ -30,15 +30,12 @@ type detached string
 const singleObj = {
   bar 123
 }
-
 const verbs = ["GET" "POST" "PUT"]
-
 const verbsMultiline = [
   "GET"
   "POST"
   "PUT"
 ]
-
 const bundles = [
   {
     name "starter"

@@ -12,20 +12,15 @@ const I = [{ a 1 b 2 } { a 3 b 4 }]
 
 const a = 1
 const b = 2
-
 @flag
 const c = 3
-
 const d = 4
-
 const e = {
   foo 1
   bar "x"
 }
-
 const f = 5
 const g = [1 2 3]
-
 const h = {
   nested {
     deep [
@@ -37,7 +32,6 @@ const h = {
     ]
   }
 }
-
 const i = [
   {
     a 1

@@ -35,7 +35,6 @@ type Svc {
     input {
       userId string
     }
-
     output {
       ok bool
     }
