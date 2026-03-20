@@ -34,7 +34,7 @@ When updating this document, do so with the context of the entire document in mi
   - `internal/core/`: Compiler pipeline (`vfs`, `parser`, `ast`, `analysis`, `ir`).
   - `internal/formatter/`: Lexer-based formatter implementation and golden tests.
   - `internal/lsp/`: Language Server handlers (definition/hover/references/rename/completion/document symbols/links).
-  - `internal/codegen/`: Generation entrypoint currently under migration; plugin-oriented direction. `Run` loads `vdl.config.vdl` by analyzing it as VDL, builds IR, decodes `const config` into `configtypes.VdlConfig`, resolves plugin sources (local, HTTPS, or GitHub shorthand), caches remote dependencies under the VDL cache directory, and persists remote hashes in `vdl.lock` JSON using `locktypes`.
+  - `internal/codegen/`: Generation entrypoint currently under migration; plugin-oriented direction. `Run` loads `vdl.config.vdl` by analyzing it as VDL, decodes `const config` into `configtypes.VdlConfig`, executes optional global host hooks (`hooks.preGenerate` fail-fast, `hooks.postGenerate` warn-and-continue), resolves plugin sources (local, HTTPS, or GitHub shorthand), caches remote dependencies under the VDL cache directory, and persists remote hashes in `vdl.lock` JSON using `locktypes`.
   - `internal/dirs/`: VDL runtime directory helpers for home/cache/log resolution and log file creation.
   - `internal/util/`: Shared helpers (`cliutil`, `strutil`, `filepathutil`, etc.).
   - `tests/`: Currently only repository notes (`README.md`); legacy E2E suite has been removed.
@@ -43,7 +43,9 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Role**: Source-of-truth schema contracts consumed by generation and docs artifacts.
 - **Key files**:
+  - `config_file.vdl`: `vdl.config.vdl` contract used by the generator runtime.
   - `ir.vdl`: Flattened/resolved IR contract for generators.
+  - `lock_file.vdl`: `vdl.lock` contract for cached remote plugin hashes.
   - `plugin.vdl`: Plugin protocol umbrella schema.
   - `pluginInput.vdl`: Input payload sent to plugins over stdin.
   - `pluginOutput.vdl`: Output payload returned by plugins over stdout.
