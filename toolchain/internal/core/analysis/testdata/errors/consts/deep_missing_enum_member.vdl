@@ -6,5 +6,7 @@ enum Region {
 }
 
 const cfg = {
-  routing { region Region.ApSouth1 }
+  routing {
+    region Region.ApSouth1
+  }
 }

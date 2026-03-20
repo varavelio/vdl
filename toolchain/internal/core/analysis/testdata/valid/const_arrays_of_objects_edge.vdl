@@ -31,4 +31,6 @@ const pointRows = [
   ]
 ]
 
-const payload = { points pointRows }
+const payload = {
+  points pointRows
+}

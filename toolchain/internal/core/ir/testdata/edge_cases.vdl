@@ -52,10 +52,16 @@ type EnumsEverywhere {
 
 const zeroInt = 0
 const emptyString = ""
-const matrix = [[1 2] [3 4]]
+
+const matrix = [
+  [1 2]
+  [3 4]
+]
 
 const nestedObj = {
   a {
-    b { c true }
+    b {
+      c true
+    }
   }
 }
