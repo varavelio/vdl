@@ -9,6 +9,9 @@
 
 const config = {
   version 1
+  hooks {
+    postGenerate ["go -C toolchain fmt ./... > /dev/null"]
+  }
   plugins [
     {
       src "varavelio/vdl-plugin-go@2b01c8e"

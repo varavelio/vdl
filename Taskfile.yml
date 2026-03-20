@@ -43,7 +43,6 @@ tasks:
     cmds:
       - task: tc:install
       - vdl generate
-      - task: format
 
   format:
     desc: "Format all code"
