@@ -9,6 +9,7 @@
 
 const config = {
   version 1
+
   plugins [
     // {
     //   src "varavelio/vdl-plugin-golang@v0.1.0"
