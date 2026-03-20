@@ -40,7 +40,9 @@ type Catalog {
     }
   }
 
-  """ Subscribes to new messages. """
+  """
+  Subscribes to new messages.
+  """
   @stream
   newMessages {
     input {

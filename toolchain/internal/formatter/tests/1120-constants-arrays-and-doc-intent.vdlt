@@ -1,0 +1,65 @@
+const single_obj = { bar 123 }
+const verbs = ["GET" "POST" "PUT"]
+const verbs_multiline = [
+"GET"
+"POST"
+"PUT"
+]
+const bundles = [{ name "starter" tier "free" }]
+
+"""
+Test
+"""
+type sample string
+
+""" An alias type. """
+@entity
+type user_id string
+
+""" Maximum items per page. """
+@config
+const max_page_size = 100
+
+""" Detached docs. """
+
+@entity
+type detached string
+
+// >>>>
+
+const singleObj = {
+  bar 123
+}
+
+const verbs = ["GET" "POST" "PUT"]
+
+const verbsMultiline = [
+  "GET"
+  "POST"
+  "PUT"
+]
+
+const bundles = [
+  {
+    name "starter"
+    tier "free"
+  }
+]
+
+"""
+Test
+"""
+type Sample string
+
+""" An alias type. """
+@entity
+type UserId string
+
+""" Maximum items per page. """
+@config
+const maxPageSize = 100
+
+""" Detached docs. """
+
+@entity
+type Detached string

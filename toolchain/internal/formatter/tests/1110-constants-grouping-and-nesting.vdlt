@@ -28,7 +28,13 @@ const g = [1 2 3]
 
 const h = {
   nested {
-    deep [1 2 { value true }]
+    deep [
+      1
+      2
+      {
+        value true
+      }
+    ]
   }
 }
 
