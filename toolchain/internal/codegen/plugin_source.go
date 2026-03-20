@@ -373,11 +373,5 @@ func cloneStringMap(values map[string]string) map[string]string {
 // insecureHTTPAllowed reports whether insecure HTTP plugin URLs are enabled for
 // local development and bootstrapping scenarios.
 func insecureHTTPAllowed() bool {
-	value, ok := os.LookupEnv("VDL_INSECURE_ALLOW_HTTP")
-	if !ok {
-		return false
-	}
-
-	value = strings.TrimSpace(strings.ToLower(value))
-	return value == "1" || value == "true" || value == "yes" || value == "on"
+	return isTruthyEnv("VDL_INSECURE_ALLOW_HTTP")
 }

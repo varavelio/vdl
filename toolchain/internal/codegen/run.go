@@ -27,6 +27,10 @@ type runtimeConfig struct {
 // runWithConfig orchestrates the generation pipeline after the config file has
 // already been loaded and normalized.
 func runWithConfig(config runtimeConfig) (int, error) {
+	if err := runPreGenerateHooks(config); err != nil {
+		return 0, err
+	}
+
 	plugins, err := resolveRuntimePlugins(config)
 	if err != nil {
 		return 0, err
@@ -64,6 +68,8 @@ func runWithConfig(config runtimeConfig) (int, error) {
 	if err := applyOutputWrites(config, plan); err != nil {
 		return 0, err
 	}
+
+	runPostGenerateHooks(config)
 
 	return len(plan.Writes), nil
 }

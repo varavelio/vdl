@@ -55,6 +55,26 @@ func TestLoadRuntimeConfig(t *testing.T) {
 		require.Equal(t, configPath, runtimeConfig.Path)
 	})
 
+	t.Run("loads global hooks from config", func(t *testing.T) {
+		dir := t.TempDir()
+		writeConfigFile(t, dir, `
+			const config = {
+				version 1
+				hooks {
+					preGenerate ["echo pre"]
+					postGenerate ["echo post"]
+				}
+			}
+		`)
+
+		runtimeConfig, err := loadRuntimeConfig(dir)
+		require.NoError(t, err)
+
+		hooks := runtimeConfig.Config.GetHooks()
+		require.Equal(t, []string{"echo pre"}, hooks.GetPreGenerate())
+		require.Equal(t, []string{"echo post"}, hooks.GetPostGenerate())
+	})
+
 	t.Run("fails when const config is missing", func(t *testing.T) {
 		dir := t.TempDir()
 		writeConfigFile(t, dir, `
