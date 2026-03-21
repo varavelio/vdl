@@ -1,6 +1,6 @@
 {
   "version": 1,
   "hashes": {
-    "https://raw.githubusercontent.com/varavelio/vdl-plugin-go/2b01c8e/dist/index.js": "sha256-46ed831ab52c7c1ffe07698c451695eac4f74a8b8c396439a5065a8913b318bd"
+    "https://raw.githubusercontent.com/varavelio/vdl-plugin-go/v0.1.0/dist/index.js": "sha256-c4cd3d26de3705598182169c6f1adb60d8d9277f896019c18e8d28c978bb5244"
   }
 }

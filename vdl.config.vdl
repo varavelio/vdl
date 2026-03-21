@@ -16,7 +16,7 @@ const config = {
 
   plugins [
     {
-      src "varavelio/vdl-plugin-go@2b01c8e"
+      src "varavelio/vdl-plugin-go@v0.1.0"
       schema "./schemas/ir.vdl"
       outDir "./toolchain/internal/core/ir/irtypes"
       options {
@@ -25,7 +25,7 @@ const config = {
       }
     }
     {
-      src "varavelio/vdl-plugin-go@2b01c8e"
+      src "varavelio/vdl-plugin-go@v0.1.0"
       schema "./schemas/plugin.vdl"
       outDir "./toolchain/internal/codegen/plugintypes"
       options {
@@ -34,7 +34,7 @@ const config = {
       }
     }
     {
-      src "varavelio/vdl-plugin-go@2b01c8e"
+      src "varavelio/vdl-plugin-go@v0.1.0"
       schema "./schemas/config_file.vdl"
       outDir "./toolchain/internal/codegen/configtypes"
       options {
@@ -43,7 +43,7 @@ const config = {
       }
     }
     {
-      src "varavelio/vdl-plugin-go@2b01c8e"
+      src "varavelio/vdl-plugin-go@v0.1.0"
       schema "./schemas/lock_file.vdl"
       outDir "./toolchain/internal/codegen/locktypes"
       options {
