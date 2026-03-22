@@ -32,7 +32,7 @@ func renderFieldType(ft fieldTypeNode) string {
 	case ft.Obj != nil:
 		base = renderObjectType(*ft.Obj)
 	}
-	for i := 0; i < ft.Dims; i++ {
+	for range ft.Dims {
 		base += "[]"
 	}
 	return base
@@ -42,18 +42,20 @@ func renderObjectType(obj objectTypeNode) string {
 	if len(obj.Members) == 0 {
 		return "{}"
 	}
-	w := newFmtWriter()
-	w.line("{")
-	w.indent++
-	for i, m := range obj.Members {
-		if i > 0 && hasTypeMemberBlankLine(obj.Members[i-1], m) {
-			w.blank()
+
+	output := newFormatterOutput()
+	output.Line("{")
+	output.Block(func() {
+		for i, member := range obj.Members {
+			if i > 0 && hasTypeMemberBlankLine(obj.Members[i-1], member) {
+				blankLine(output)
+			}
+			printTypeMember(output, member)
 		}
-		printTypeMember(w, m)
-	}
-	w.indent--
-	w.line("}")
-	return strings.TrimSuffix(w.String(), "\n")
+	})
+	output.Line("}")
+
+	return strings.TrimSuffix(output.String(), "\n")
 }
 
 func renderLiteral(l literalNode, ctx literalRenderCtx) string {
@@ -74,56 +76,59 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 		return "{}"
 	}
 	if !ctx.forceObjectMultiline && len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil && o.Entries[0].Trailing == nil {
-		e := o.Entries[0]
-		if e.Value != nil && e.Value.Scalar != nil {
-			return "{ " + strutil.ToCamelCase(e.Key) + " " + renderLiteral(*e.Value, ctx) + " }"
+		entry := o.Entries[0]
+		if entry.Value != nil && entry.Value.Scalar != nil {
+			return "{ " + strutil.ToCamelCase(entry.Key) + " " + renderLiteral(*entry.Value, ctx) + " }"
 		}
 	}
 
-	w := newFmtWriter()
-	w.line("{")
-	w.indent++
-	for i, e := range o.Entries {
-		if i > 0 && hasSourceBlankLine(o.Entries[i-1], e) {
-			w.blank()
+	output := newFormatterOutput()
+	output.Line("{")
+	output.Block(func() {
+		for i, entry := range o.Entries {
+			if i > 0 && hasSourceBlankLine(o.Entries[i-1], entry) {
+				blankLine(output)
+			}
+			switch {
+			case entry.Comment != nil:
+				output.Line(entry.Comment.Text)
+			case entry.Spread != nil:
+				lineWithTrailing(output, "..."+renderReference(*entry.Spread, ctx.spreadRef), entry.Trailing)
+			default:
+				key := strutil.ToCamelCase(entry.Key)
+				value := renderLiteral(*entry.Value, ctx)
+				writeRenderedValue(output, key+" ", value, entry.Trailing)
+			}
 		}
-		switch {
-		case e.Comment != nil:
-			w.line(e.Comment.Text)
-		case e.Spread != nil:
-			w.lineWithTrailing("..."+renderReference(*e.Spread, ctx.spreadRef), e.Trailing)
-		default:
-			key := strutil.ToCamelCase(e.Key)
-			val := renderLiteral(*e.Value, ctx)
-			writeRenderedValue(w, key+" ", val, e.Trailing)
-		}
-	}
-	w.indent--
-	w.line("}")
-	return strings.TrimSuffix(w.String(), "\n")
+	})
+	output.Line("}")
+
+	return strings.TrimSuffix(output.String(), "\n")
 }
 
 func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 	if len(a.Elements) == 0 {
 		return "[]"
 	}
+
 	parts := make([]string, 0, len(a.Elements))
 	hasComments := false
 	hasTrailingComments := false
 	hasMultiline := false
 	hasCompoundElements := false
-	for _, e := range a.Elements {
-		if e.Comment != nil {
+	for _, element := range a.Elements {
+		if element.Comment != nil {
 			hasComments = true
-			parts = append(parts, e.Comment.Text)
+			parts = append(parts, element.Comment.Text)
 			continue
 		}
-		hasCompoundElements = hasCompoundElements || (e.Value != nil && (e.Value.Obj != nil || e.Value.Array != nil))
-		rendered := renderLiteral(*e.Value, ctx)
+		hasCompoundElements = hasCompoundElements || (element.Value != nil && (element.Value.Obj != nil || element.Value.Array != nil))
+		rendered := renderLiteral(*element.Value, ctx)
 		hasMultiline = hasMultiline || strings.Contains(rendered, "\n")
-		hasTrailingComments = hasTrailingComments || e.Trailing != nil
+		hasTrailingComments = hasTrailingComments || element.Trailing != nil
 		parts = append(parts, rendered)
 	}
+
 	shouldMultiline := hasComments || hasTrailingComments || hasMultiline
 	if ctx.forceCompoundArrayMultiline && hasCompoundElements {
 		shouldMultiline = true
@@ -135,23 +140,24 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 		return "[" + strings.Join(parts, " ") + "]"
 	}
 
-	w := newFmtWriter()
-	w.line("[")
-	w.indent++
-	for i, e := range a.Elements {
-		if i > 0 && hasSourceBlankLine(a.Elements[i-1], e) {
-			w.blank()
+	output := newFormatterOutput()
+	output.Line("[")
+	output.Block(func() {
+		for i, element := range a.Elements {
+			if i > 0 && hasSourceBlankLine(a.Elements[i-1], element) {
+				blankLine(output)
+			}
+			switch {
+			case element.Comment != nil:
+				output.Line(element.Comment.Text)
+			case element.Value != nil:
+				writeRenderedValue(output, "", renderLiteral(*element.Value, ctx), element.Trailing)
+			}
 		}
-		switch {
-		case e.Comment != nil:
-			w.line(e.Comment.Text)
-		case e.Value != nil:
-			writeRenderedValue(w, "", renderLiteral(*e.Value, ctx), e.Trailing)
-		}
-	}
-	w.indent--
-	w.line("]")
-	return strings.TrimSuffix(w.String(), "\n")
+	})
+	output.Line("]")
+
+	return strings.TrimSuffix(output.String(), "\n")
 }
 
 type lineSpan interface {
@@ -164,29 +170,6 @@ func hasSourceBlankLine(prev, curr lineSpan) bool {
 		return false
 	}
 	return curr.startLine()-prev.endLine() > 1
-}
-
-func writeRenderedValue(w *fmtWriter, prefix, value string, trailing *commentNode) {
-	if !strings.Contains(value, "\n") {
-		w.lineWithTrailing(prefix+value, trailing)
-		return
-	}
-
-	lines := strings.Split(value, "\n")
-	w.line(prefix + lines[0])
-	for i := 1; i < len(lines)-1; i++ {
-		if lines[i] == "" {
-			w.blank()
-			continue
-		}
-		w.line(lines[i])
-	}
-	last := lines[len(lines)-1]
-	if trailing != nil {
-		w.line(last + " " + trailing.Text)
-		return
-	}
-	w.line(last)
 }
 
 func renderScalar(s scalarLiteralNode, ctx literalRenderCtx) string {

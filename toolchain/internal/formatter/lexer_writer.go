@@ -1,47 +1,48 @@
 package formatter
 
-import "strings"
+import (
+	"strings"
 
-type fmtWriter struct {
-	b           strings.Builder
-	indent      int
-	lineStarted bool
+	"github.com/varavelio/gen"
+)
+
+func newFormatterOutput() *gen.Generator {
+	return gen.New().WithSpaces(2)
 }
 
-func newFmtWriter() *fmtWriter { return &fmtWriter{} }
-
-func (w *fmtWriter) String() string { return w.b.String() }
-
-func (w *fmtWriter) writeIndent() {
-	if w.lineStarted {
-		return
-	}
-	w.b.WriteString(strings.Repeat("  ", w.indent))
-	w.lineStarted = true
-}
-
-func (w *fmtWriter) line(s string) {
-	w.writeIndent()
-	w.b.WriteString(s)
-	w.b.WriteByte('\n')
-	w.lineStarted = false
-}
-
-func (w *fmtWriter) lineWithTrailing(s string, trailing *commentNode) {
+func lineWithTrailing(output *gen.Generator, content string, trailing *commentNode) {
 	if trailing == nil {
-		w.line(s)
+		output.Line(content)
 		return
 	}
-	w.line(s + " " + trailing.Text)
+	output.Line(content + " " + trailing.Text)
 }
 
-func (w *fmtWriter) blank() {
-	if w.b.Len() == 0 {
+func blankLine(output *gen.Generator) {
+	if output.String() == "" {
 		return
 	}
-	if !strings.HasSuffix(w.b.String(), "\n") {
-		w.b.WriteByte('\n')
+	if !strings.HasSuffix(output.String(), "\n") {
+		output.Break()
 	}
-	w.b.WriteByte('\n')
-	w.lineStarted = false
+	output.Break()
+}
+
+func writeRenderedValue(output *gen.Generator, prefix, value string, trailing *commentNode) {
+	if !strings.Contains(value, "\n") {
+		lineWithTrailing(output, prefix+value, trailing)
+		return
+	}
+
+	lines := strings.Split(value, "\n")
+	output.Line(prefix + lines[0])
+	for i := 1; i < len(lines)-1; i++ {
+		if lines[i] == "" {
+			blankLine(output)
+			continue
+		}
+		output.Line(lines[i])
+	}
+
+	lineWithTrailing(output, lines[len(lines)-1], trailing)
 }

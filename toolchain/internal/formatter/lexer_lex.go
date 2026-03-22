@@ -20,10 +20,10 @@ func formatLexerBased(filename, content string) (string, error) {
 		return "", err
 	}
 
-	w := newFmtWriter()
-	printDocument(w, doc)
+	output := newFormatterOutput()
+	printDocument(output, doc)
 
-	out := strutil.LimitConsecutiveNewlines(w.String(), 2)
+	out := strutil.LimitConsecutiveNewlines(output.String(), 2)
 	out = strings.TrimSpace(out)
 	if out == "" {
 		return "", nil

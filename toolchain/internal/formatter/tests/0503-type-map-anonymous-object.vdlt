@@ -1,0 +1,13 @@
+type envelope {
+lookup map[{
+id string
+}]
+}
+
+// >>>>
+
+type Envelope {
+  lookup map[{
+    id string
+  }]
+}

@@ -3,15 +3,16 @@ package formatter
 import (
 	"strings"
 
+	"github.com/varavelio/gen"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
-func printDocument(w *fmtWriter, d *docNode) {
+func printDocument(output *gen.Generator, d *docNode) {
 	for i, item := range d.Items {
 		if i > 0 && hasTopLevelBlankLine(d.Items[i-1], item) {
-			w.blank()
+			blankLine(output)
 		}
-		printTopNode(w, item)
+		printTopNode(output, item)
 	}
 }
 
@@ -22,64 +23,67 @@ func hasTopLevelBlankLine(prev, curr node) bool {
 	return topNodeStartLine(curr)-topNodeEndLine(prev) > 1
 }
 
-func printTopNode(w *fmtWriter, n node) {
+func printTopNode(output *gen.Generator, n node) {
 	switch t := n.(type) {
 	case *commentNode:
-		w.line(t.Text)
+		output.Line(t.Text)
 	case *docstringNode:
-		printDocstring(w, t.Raw)
+		printDocstring(output, t.Raw)
 	case *includeNode:
 		if t.Doc != nil {
-			printDocstring(w, t.Doc.Raw)
+			printDocstring(output, t.Doc.Raw)
 		}
 		for _, a := range t.Ann {
-			printAnnotation(w, a)
+			printAnnotation(output, a)
 		}
-		w.lineWithTrailing(`include "`+strutil.EscapeQuotes(t.Path)+`"`, t.Trailing)
+		lineWithTrailing(output, `include "`+strutil.EscapeQuotes(t.Path)+`"`, t.Trailing)
 	case *typeNode:
-		printTypeDecl(w, t)
+		printTypeDecl(output, t)
 	case *constNode:
-		printConstDecl(w, t)
+		printConstDecl(output, t)
 	case *enumNode:
-		printEnumDecl(w, t)
+		printEnumDecl(output, t)
 	}
 }
 
-func printTypeDecl(w *fmtWriter, t *typeNode) {
+func printTypeDecl(output *gen.Generator, t *typeNode) {
 	if t.Doc != nil {
-		printDocstring(w, t.Doc.Raw)
+		printDocstring(output, t.Doc.Raw)
 	}
 	for _, a := range t.Ann {
-		printAnnotation(w, a)
+		printAnnotation(output, a)
 	}
+
 	name := strutil.ToPascalCase(t.Name)
 	if t.Type.Obj == nil {
-		w.lineWithTrailing("type "+name+" "+renderFieldType(t.Type), t.Trailing)
+		writeRenderedValue(output, "type "+name+" ", renderFieldType(t.Type), t.Trailing)
 		return
 	}
 	if len(t.Type.Obj.Members) == 0 {
-		w.lineWithTrailing("type "+name+" {}"+strings.Repeat("[]", t.Type.Dims), t.Trailing)
+		lineWithTrailing(output, "type "+name+" {}"+strings.Repeat("[]", t.Type.Dims), t.Trailing)
 		return
 	}
-	w.line("type " + name + " {")
-	w.indent++
-	for i, m := range t.Type.Obj.Members {
-		if i > 0 && hasTypeMemberBlankLine(t.Type.Obj.Members[i-1], m) {
-			w.blank()
+
+	output.Line("type " + name + " {")
+	output.Block(func() {
+		for i, m := range t.Type.Obj.Members {
+			if i > 0 && hasTypeMemberBlankLine(t.Type.Obj.Members[i-1], m) {
+				blankLine(output)
+			}
+			printTypeMember(output, m)
 		}
-		printTypeMember(w, m)
-	}
-	w.indent--
-	w.lineWithTrailing("}"+strings.Repeat("[]", t.Type.Dims), t.Trailing)
+	})
+	lineWithTrailing(output, "}"+strings.Repeat("[]", t.Type.Dims), t.Trailing)
 }
 
-func printConstDecl(w *fmtWriter, t *constNode) {
+func printConstDecl(output *gen.Generator, t *constNode) {
 	if t.Doc != nil {
-		printDocstring(w, t.Doc.Raw)
+		printDocstring(output, t.Doc.Raw)
 	}
 	for _, a := range t.Ann {
-		printAnnotation(w, a)
+		printAnnotation(output, a)
 	}
+
 	lhs := "const " + strutil.ToCamelCase(t.Name) + " = "
 	rhs := renderLiteral(t.Value, literalRenderCtx{
 		spreadRef:                   refConstDecl,
@@ -89,51 +93,54 @@ func printConstDecl(w *fmtWriter, t *constNode) {
 		respectArrayMultilineIntent: true,
 		forceCompoundArrayMultiline: true,
 	})
-	printMultilineStatement(w, lhs, rhs, t.Trailing)
+	writeRenderedValue(output, lhs, rhs, t.Trailing)
 }
 
-func printEnumDecl(w *fmtWriter, t *enumNode) {
+func printEnumDecl(output *gen.Generator, t *enumNode) {
 	if t.Doc != nil {
-		printDocstring(w, t.Doc.Raw)
+		printDocstring(output, t.Doc.Raw)
 	}
 	for _, a := range t.Ann {
-		printAnnotation(w, a)
+		printAnnotation(output, a)
 	}
+
 	name := strutil.ToPascalCase(t.Name)
 	if len(t.Members) == 0 {
-		w.lineWithTrailing("enum "+name+" {}", t.Trailing)
+		lineWithTrailing(output, "enum "+name+" {}", t.Trailing)
 		return
 	}
-	w.line("enum " + name + " {")
-	w.indent++
-	for i, m := range t.Members {
-		if i > 0 && hasEnumMemberBlankLine(t.Members[i-1], m) {
-			w.blank()
+
+	output.Line("enum " + name + " {")
+	output.Block(func() {
+		for i, m := range t.Members {
+			if i > 0 && hasEnumMemberBlankLine(t.Members[i-1], m) {
+				blankLine(output)
+			}
+			printEnumMember(output, m)
 		}
-		printEnumMember(w, m)
-	}
-	w.indent--
-	w.line("}")
+	})
+	output.Line("}")
 }
 
-func printEnumMember(w *fmtWriter, m *enumMemberNode) {
+func printEnumMember(output *gen.Generator, m *enumMemberNode) {
 	if m.Comment != nil {
-		w.line(m.Comment.Text)
+		output.Line(m.Comment.Text)
 		return
 	}
 	if m.Doc != nil {
-		printDocstring(w, m.Doc.Raw)
+		printDocstring(output, m.Doc.Raw)
 	}
 	for _, a := range m.Ann {
-		printAnnotation(w, a)
+		printAnnotation(output, a)
 	}
 	if m.Spread != nil {
-		w.lineWithTrailing("..."+renderReference(*m.Spread, refEnumDecl), m.Trailing)
+		lineWithTrailing(output, "..."+renderReference(*m.Spread, refEnumDecl), m.Trailing)
 		return
 	}
 	if m.Name == "" {
 		return
 	}
+
 	line := strutil.ToPascalCase(m.Name)
 	if m.Value != nil {
 		if m.Value.Str != nil {
@@ -142,36 +149,38 @@ func printEnumMember(w *fmtWriter, m *enumMemberNode) {
 			line += " = " + *m.Value.Int
 		}
 	}
-	w.lineWithTrailing(line, m.Trailing)
+	lineWithTrailing(output, line, m.Trailing)
 }
 
-func printAnnotation(w *fmtWriter, a *annotationNode) {
+func printAnnotation(output *gen.Generator, a *annotationNode) {
 	name := strutil.ToCamelCase(a.Name)
 	if a.Arg == nil {
-		w.line("@" + name)
+		output.Line("@" + name)
 		return
 	}
+
 	renderedArg := renderLiteral(*a.Arg, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
 	if !strings.Contains(renderedArg, "\n") {
-		w.line("@" + name + "(" + renderedArg + ")")
+		output.Line("@" + name + "(" + renderedArg + ")")
 		return
 	}
+
 	lines := strings.Split(renderedArg, "\n")
-	w.line("@" + name + "(" + lines[0])
+	output.Line("@" + name + "(" + lines[0])
 	for i := 1; i < len(lines)-1; i++ {
 		if lines[i] == "" {
-			w.blank()
+			blankLine(output)
 			continue
 		}
-		w.line(lines[i])
+		output.Line(lines[i])
 	}
-	w.line(lines[len(lines)-1] + ")")
+	output.Line(lines[len(lines)-1] + ")")
 }
 
-func printDocstring(w *fmtWriter, raw string) {
+func printDocstring(output *gen.Generator, raw string) {
 	content := strings.TrimSuffix(strings.TrimPrefix(raw, `"""`), `"""`)
 	if !strings.Contains(raw, "\n") {
-		w.line(`""" ` + strings.TrimSpace(content) + ` """`)
+		output.Line(`""" ` + strings.TrimSpace(content) + ` """`)
 		return
 	}
 
@@ -183,62 +192,61 @@ func printDocstring(w *fmtWriter, raw string) {
 	if len(lines) > 0 && lines[len(lines)-1] == "" {
 		lines = lines[:len(lines)-1]
 	}
-	w.line(`"""`)
-	for _, l := range lines {
-		w.line(l)
+
+	output.Line(`"""`)
+	for _, line := range lines {
+		output.Line(line)
 	}
-	w.line(`"""`)
+	output.Line(`"""`)
 }
 
-func printTypeMember(w *fmtWriter, m *typeMemberNode) {
+func printTypeMember(output *gen.Generator, m *typeMemberNode) {
 	switch {
 	case m.Comment != nil:
-		w.line(m.Comment.Text)
+		output.Line(m.Comment.Text)
 	case m.Standalone != nil:
-		printDocstring(w, m.Standalone.Raw)
+		printDocstring(output, m.Standalone.Raw)
 	case m.Spread != nil:
-		w.lineWithTrailing("..."+renderReference(*m.Spread, refTypeDecl), m.Trailing)
+		lineWithTrailing(output, "..."+renderReference(*m.Spread, refTypeDecl), m.Trailing)
 	case m.Field != nil:
 		if m.Trailing != nil && m.Field.Trailing == nil {
 			m.Field.Trailing = m.Trailing
 		}
-		printField(w, m.Field)
+		printField(output, m.Field)
 	}
 }
 
-func printField(w *fmtWriter, f *fieldNode) {
+func printField(output *gen.Generator, f *fieldNode) {
 	if f.Doc != nil {
-		printDocstring(w, f.Doc.Raw)
+		printDocstring(output, f.Doc.Raw)
 	}
 	for _, a := range f.Ann {
-		printAnnotation(w, a)
+		printAnnotation(output, a)
 	}
+
 	name := strutil.ToCamelCase(f.Name)
 	if f.Optional {
 		name += "?"
 	}
 	if f.Type.Obj == nil {
-		w.lineWithTrailing(name+" "+renderFieldType(f.Type), f.Trailing)
+		writeRenderedValue(output, name+" ", renderFieldType(f.Type), f.Trailing)
 		return
 	}
 	if len(f.Type.Obj.Members) == 0 {
-		w.lineWithTrailing(name+" {}"+strings.Repeat("[]", f.Type.Dims), f.Trailing)
+		lineWithTrailing(output, name+" {}"+strings.Repeat("[]", f.Type.Dims), f.Trailing)
 		return
 	}
-	w.line(name + " {")
-	w.indent++
-	for i, m := range f.Type.Obj.Members {
-		if i > 0 && hasTypeMemberBlankLine(f.Type.Obj.Members[i-1], m) {
-			w.blank()
-		}
-		printTypeMember(w, m)
-	}
-	w.indent--
-	w.lineWithTrailing("}"+strings.Repeat("[]", f.Type.Dims), f.Trailing)
-}
 
-func printMultilineStatement(w *fmtWriter, lhs, rhs string, trailing *commentNode) {
-	writeRenderedValue(w, lhs, rhs, trailing)
+	output.Line(name + " {")
+	output.Block(func() {
+		for i, m := range f.Type.Obj.Members {
+			if i > 0 && hasTypeMemberBlankLine(f.Type.Obj.Members[i-1], m) {
+				blankLine(output)
+			}
+			printTypeMember(output, m)
+		}
+	})
+	lineWithTrailing(output, "}"+strings.Repeat("[]", f.Type.Dims), f.Trailing)
 }
 
 func hasTypeMemberBlankLine(prev, curr *typeMemberNode) bool {
