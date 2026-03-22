@@ -8,6 +8,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/dop251/goja v0.0.0-20260305124333-6a7976c22267
 	github.com/stretchr/testify v1.11.1
+	github.com/varavelio/gen v0.2.0
 	github.com/varavelio/tinta v0.2.0
 	golang.org/x/text v0.34.0
 )

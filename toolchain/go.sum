@@ -29,6 +29,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+github.com/varavelio/gen v0.2.0 h1:E9jvHoSoaTHN+75+400CPX9oSEhAKytUN9t7GOIxu2U=
+github.com/varavelio/gen v0.2.0/go.mod h1:ylzmIHQ+/IlkKJsGJDmnziz+fYmeEoQlQIBZRBTYIJM=
 github.com/varavelio/tinta v0.2.0 h1:1k1kQP3JqQX2IEfP3hvfskpTz6QoCMpwyQRpcAaaTUw=
 github.com/varavelio/tinta v0.2.0/go.mod h1:uF5scmiALnynp5CD/c6swCjVGyd0sglpjJRdIRvm/vY=
 golang.org/x/text v0.34.0 h1:oL/Qq0Kdaqxa1KbNeMKwQq0reLCCaFtqu2eNuSeNHbk=
