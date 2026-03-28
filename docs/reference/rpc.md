@@ -15,7 +15,7 @@ RPC services in VDL are modeled with annotations on core language declarations.
 @rpc
 type Users {
   @proc
-  GetUser {
+  getUser {
     input {
       userId string
     }
@@ -26,7 +26,7 @@ type Users {
   }
 
   @stream
-  UserEvents {
+  userEvents {
     input {
       userId string
     }
@@ -65,7 +65,7 @@ The client sends an HTTP `POST` request.
 
 - **Method:** `POST`
 - **URL Structure:** `<baseURL>/<RPCName>/<ProcedureName>`
-  - Example: `https://api.example.com/rpc/Users/GetUser`
+  - Example: `https://api.example.com/rpc/Users/getUser`
 - **Headers:**
   - `Content-Type: application/json`
   - `Accept: application/json`
