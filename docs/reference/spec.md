@@ -387,5 +387,5 @@ const sampleTags = ["featured" "popular" "seasonal"]
 ## Related Specifications
 
 - RPC modeling and request lifecycle are documented in [`rpc.md`](./rpc.md).
-- Pattern annotation rules are documented in [`patterns.md`](./patterns.md).
+- Event annotation rules are documented in [`events.md`](./events.md).
 - Deprecation annotation rules are documented in [`deprecations.md`](./deprecations.md).
