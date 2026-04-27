@@ -30,6 +30,8 @@ To ensure events are fully self-contained and agnostic to the underlying network
 
 1. **Explicit Field Binding:** Every placeholder used in the `@event` subject **must** exactly match a field defined within the annotated `type`.
 2. **Type Safety:** If a subject references `{tenantId}`, the `tenantId` field must exist in the type definition so its data type is statically known.
+3. **Repeated Placeholders:** The same placeholder can appear multiple times in the subject. Subject builders should accept that field once and reuse the same value in every occurrence.
+4. **Primitive, Top-Level Placeholders Only:** Placeholders must reference top-level primitive fields. Nested paths (for example `{user.id}`) and non-primitive fields (such as objects, arrays, or maps) are not allowed.
 
 ```vdl
 // VALID: 'orderId' exists in the payload
@@ -44,6 +46,20 @@ type OrderStatusChanged {
 type DeliveryFailed {
   deliveryId string
 }
+
+// VALID: repeated placeholder uses the same field value
+@event("audit.{tenantId}.users.{tenantId}.created")
+type UserAuditCreated {
+  tenantId string
+}
+
+// INVALID: nested placeholder path is not allowed
+@event("accounts.{user.id}.created")
+type AccountCreated {
+  user object {
+    id string
+  }
+}
 ```
 
 This strict validation guarantees that when an event is persisted to a database or forwarded via a protocol without native routing headers (like HTTP), the payload retains 100% of the context required to identify it.
@@ -51,6 +67,8 @@ This strict validation guarantees that when an event is persisted to a database 
 ## Generated API Shape
 
 Generators transform an `@event` declaration into primary components: the payload data structure and the subject formatting utilities. Depending on the target, generators may also emit a centralized event catalog.
+
+Subject builders always return a `string`. If a placeholder field uses a non-string primitive type, subject builders must convert that value to string when composing the final subject.
 
 ### TypeScript Shape
 
