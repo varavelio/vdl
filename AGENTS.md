@@ -55,10 +55,11 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Role**: Public documentation and reference material.
 - **Key paths**:
+  - `index.md`: Symlink to root `README.md`; used as the Zensical home page.
   - `about.md`: Project overview and positioning.
-  - `installation.md`: Detailed CLI installation guide.
-  - `plugins.md`: Official plugin guide.
-  - `creating-plugins.md`: Practical plugin authoring guide.
+  - `guides/installation.md`: Detailed CLI installation guide.
+  - `guides/plugins.md`: Official plugin guide.
+  - `guides/creating-plugins.md`: Practical plugin authoring guide.
   - `reference/`: Language, formatting, RPC, event, and related reference material.
 
 ### `editors/` (IDE Integrations)
