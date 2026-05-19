@@ -35,7 +35,7 @@ WORKDIR /fetcher
 RUN \
   apk add --quiet curl unzip && \
   # Fetch task
-  sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /fetcher v3.48.0 && \
+  sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /fetcher v3.50.0 && \
   chmod +x ./task
 
 # -- final --------------------------------------------------------------------
@@ -47,10 +47,10 @@ RUN \
 FROM golang:1.26-trixie
 
 # Install Node.js
-COPY --from=node:24.14.0-trixie /usr/local/ /usr/local/
+COPY --from=node:24.15.0-trixie /usr/local/ /usr/local/
 
 # Install golangci-lint
-COPY --from=golangci/golangci-lint:v2.10.1 /usr/bin/golangci-lint /usr/local/bin/golangci-lint
+COPY --from=golangci/golangci-lint:v2.12.2 /usr/bin/golangci-lint /usr/local/bin/golangci-lint
 
 # Install dprint and task
 COPY --from=fetcher /fetcher/dprint /usr/local/bin/dprint
