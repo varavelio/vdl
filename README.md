@@ -54,7 +54,7 @@ Select the method that best fits your workflow.
 | **Any**           | NPM        | `npm install -D @varavel/vdl`                                  |
 | **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
-For version pinning, experimental releases, npm usage, and manual installs, see the [complete installation guide](./docs/installation.md).
+For version pinning, experimental releases, npm usage, and manual installs, see the [complete installation guide](https://vdl.varavel.com/guides/installation/).
 
 ## What is VDL?
 
@@ -160,11 +160,11 @@ Plugin sources can be local `.js` files, HTTPS `.js` URLs, or GitHub shorthand r
 
 Useful docs:
 
-- [Available plugins](./docs/plugins.md)
-- [Creating plugins](./docs/creating-plugins.md)
-- [VDL language specification](./docs/reference/spec.md)
-- [RPC annotation model](./docs/reference/rpc.md)
-- [Event annotation model](./docs/reference/events.md)
+- [Available plugins](https://vdl.varavel.com/guides/plugins/)
+- [Creating plugins](https://vdl.varavel.com/guides/creating-plugins/)
+- [VDL language specification](https://vdl.varavel.com/reference/spec/)
+- [RPC annotation model](https://vdl.varavel.com/reference/rpc/)
+- [Event annotation model](https://vdl.varavel.com/reference/events/)
 
 ## Who is VDL for?
 
