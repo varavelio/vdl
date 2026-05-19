@@ -14,10 +14,10 @@ When updating this document, do so with the context of the entire document in mi
 
 ### Root Layout
 
-- `Taskfile.yml`: Central command orchestration for CI, test, lint, format, release, docs, and VS Code extension tasks.
+- `Taskfile.yml`: Central command orchestration for CI, test, lint, format, release, codegen, build, and VS Code extension tasks.
 - `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
-- `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `pluginInput.vdl`, `pluginOutput.vdl`).
-- `docs/`: Astro/Starlight documentation site.
+- `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `plugin_input.vdl`, `plugin_output.vdl`).
+- `docs/`: Plain Markdown documentation and reference pages.
 - `editors/`: Editor integrations (`vscode/`, `neovim/`).
 - `installers/`: Distribution installers (`brew/`, `npm/`, `unix/`, `windows/`).
 - `scripts/`: Release automation (`scripts/release/main.go`).
@@ -29,7 +29,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Role**: Implements language tooling and project analysis for VDL.
 - **Entry points**:
-  - `cmd/vdl/main.go`: CLI entry point (`vdl init`, `vdl format`, `vdl generate`, `vdl lsp`, `vdl version`).
+  - `cmd/vdl/main.go`: CLI entry point (`vdl init`, `vdl format`, `vdl generate`, `vdl compile`, `vdl lsp`, `vdl version`).
 - **Key directories**:
   - `internal/core/`: Compiler pipeline (`vfs`, `parser`, `ast`, `analysis`, `ir`).
   - `internal/formatter/`: Lexer-based formatter implementation and golden tests.
@@ -47,16 +47,18 @@ When updating this document, do so with the context of the entire document in mi
   - `ir.vdl`: Flattened/resolved IR contract for generators.
   - `lock_file.vdl`: `vdl.lock` contract for cached remote plugin hashes.
   - `plugin.vdl`: Plugin protocol umbrella schema.
-  - `pluginInput.vdl`: Input payload sent to plugins over stdin.
-  - `pluginOutput.vdl`: Output payload returned by plugins over stdout.
+  - `plugin_input.vdl`: Input payload passed to plugins.
+  - `plugin_output.vdl`: Output payload returned by plugins.
 - **Important direction**: New generator behavior should align with plugin contracts instead of hardcoded language generators.
 
-### `docs/` (Documentation Site)
+### `docs/` (Documentation)
 
-- **Role**: Public documentation and schema artifact publishing.
+- **Role**: Public documentation and reference material.
 - **Key paths**:
-  - `src/content/docs/`: Markdown/MDX documentation source.
-  - `public/schemas/v0/`: Published schema artifacts.
+  - `about.md`: Project overview and positioning.
+  - `plugins.md`: Official plugin guide.
+  - `creating-plugins.md`: Practical plugin authoring guide.
+  - `reference/`: Language, formatting, RPC, event, and related reference material.
 
 ### `editors/` (IDE Integrations)
 
@@ -95,7 +97,7 @@ When updating this document, do so with the context of the entire document in mi
 ## Tech Stack & Conventions
 
 - **Go**: 1.26 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
-- **Docs**: Astro 5 + Starlight + Tailwind CSS 4 (`docs/`).
+- **Docs**: Plain Markdown in `docs/`, formatted with dprint.
 - **Editor extension**: VS Code extension in Node/JS with `vscode-languageclient`.
 - **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools.
 - **Code style goals**:
@@ -111,7 +113,6 @@ When updating this document, do so with the context of the entire document in mi
 - **Dependencies**: `task deps`
 - **Codegen workflow**: `task codegen`
 - **Install local CLI**: `task tc:install`
-- **Docs**: `task dc:dev`, `task dc:build`
 - **VS Code extension**: `task vs:dev`, `task vs:build`, `task vs:package`, `task vs:package:ls`
 - **Release pipeline**: `task release`
 
