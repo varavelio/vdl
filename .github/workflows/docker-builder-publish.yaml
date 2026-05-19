@@ -1,0 +1,86 @@
+name: Build and Push VDL Builder Image
+
+env:
+  GHCR_IMAGE: ghcr.io/varavelio/vdl-builder
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docker/Dockerfile.builder
+  workflow_dispatch:
+
+jobs:
+  set-tag:
+    name: Compute tag
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - id: tag
+        run: echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+  build-and-push:
+    name: Build and push ${{ matrix.vars.platform }}
+    needs: set-tag
+    runs-on: ${{ matrix.vars.os }}
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        vars:
+          - os: ubuntu-24.04
+            platform: amd64
+          - os: ubuntu-24.04-arm
+            platform: arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}-${{ matrix.vars.platform }}" \
+            --build-arg TARGETPLATFORM="linux/${{ matrix.vars.platform }}" \
+            --file ./docker/Dockerfile.builder \
+            .
+
+      - name: Push Docker image
+        run: docker push "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}-${{ matrix.vars.platform }}"
+
+  merge-and-push-manifest:
+    name: Merge manifest
+    needs: [set-tag, build-and-push]
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge and push manifest
+        run: |
+          docker manifest create "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}" \
+            --amend "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}-amd64" \
+            --amend "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}-arm64"
+
+          docker manifest push "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}"
