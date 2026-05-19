@@ -56,6 +56,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Role**: Public documentation and reference material.
 - **Key paths**:
   - `about.md`: Project overview and positioning.
+  - `installation.md`: Detailed CLI installation guide.
   - `plugins.md`: Official plugin guide.
   - `creating-plugins.md`: Practical plugin authoring guide.
   - `reference/`: Language, formatting, RPC, event, and related reference material.
