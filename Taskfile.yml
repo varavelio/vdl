@@ -78,6 +78,10 @@ tasks:
     cmds:
       - cd ./toolchain && go build -o ./dist/vdl ./cmd/vdl/.
 
+  docs:
+    desc: "Build documentation site using Zensical"
+    cmd: zensical build
+
   ###################
   # TOOLCHAIN TASKS #
   ###################
