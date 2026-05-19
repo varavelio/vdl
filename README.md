@@ -48,9 +48,9 @@ Select the method that best fits your workflow.
 
 | Platform          | Method     | Command                                                        |
 | ----------------- | ---------- | -------------------------------------------------------------- |
-| **Linux / macOS** | Shell      | `curl -fsSL https://get.varavel.com/vdl \| sh`                 |
+| **Linux / macOS** | Shell      | <code>curl -fsSL https://get.varavel.com/vdl &#124; sh</code>  |
 | **Linux / macOS** | Homebrew   | `brew install varavelio/tap/vdl`                               |
-| **Windows**       | PowerShell | `irm https://get.varavel.com/vdl.ps1 \| iex`                   |
+| **Windows**       | PowerShell | <code>irm https://get.varavel.com/vdl.ps1 &#124; iex</code>    |
 | **Any**           | NPM        | `npm install -D @varavel/vdl`                                  |
 | **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
