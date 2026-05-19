@@ -9,7 +9,7 @@
 <h1 align="center">Varavel Definition Language</h1>
 
 <p align="center">
-  VDL is an open source, multi language, and easily extensible schema definition language and code generation toolchain.
+  VDL is an open-source, type-safe, multi-language, and easily extensible schema definition language and code generation toolchain.
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
   </a>
 </p>
 
-Easily define typed data models, constants, enums, documentation, RPC API's, and domain-specific contracts once in `.vdl` files, then use plugins to generate the artifacts your stack needs.
+Easily define typed data models, constants, enums, documentation, RPC APIs, and domain-specific contracts once in `.vdl` files, then use plugins to generate type-safe code and the supporting artifacts your stack needs.
 
 The core language focuses on structured data. APIs, RPC services, events, schemas, documentation, and custom internal contracts are modeled through annotations and generated through plugins.
 
@@ -44,7 +44,7 @@ Learn more at [https://vdl.varavel.com](https://vdl.varavel.com).
 
 ## Installation
 
-The easiest way to get VDL on your system. Select the method that best fits your workflow.
+Select the method that best fits your workflow.
 
 | Platform          | Method     | Command                                                        |
 | ----------------- | ---------- | -------------------------------------------------------------- |
@@ -54,63 +54,7 @@ The easiest way to get VDL on your system. Select the method that best fits your
 | **Any**           | NPM        | `npm install -D @varavel/vdl`                                  |
 | **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
-### Linux & macOS
-
-**Shell script:**
-
-```bash
-curl -fsSL https://get.varavel.com/vdl | sh
-```
-
-> [!TIP]
-> For more installation options using this installer, visit [https://get.varavel.com/vdl](https://get.varavel.com/vdl).
->
-> To install a specific version: `curl -fsSL https://get.varavel.com/vdl | VERSION=vx.x.x sh`.
-
-**Homebrew:**
-
-```bash
-brew install varavelio/tap/vdl
-```
-
-> [!TIP]
-> To install the latest experimental release: `brew install varavelio/tap/vdl-next`.
->
-> To install a specific version: `brew install varavelio/tap/vdl@x.x.x`.
-
-### Windows
-
-```powershell
-irm https://get.varavel.com/vdl.ps1 | iex
-```
-
-> [!TIP]
-> For more installation options using this installer, visit [https://get.varavel.com/vdl.ps1](https://get.varavel.com/vdl.ps1).
->
-> To install a specific version: `$env:VERSION = "vx.x.x"; irm https://get.varavel.com/vdl.ps1 | iex`.
-
-### NPM (Cross platform)
-
-**Local (Recommended):**
-Ensures version consistency across your team. Use it from your `package.json` scripts.
-
-```bash
-npm install --save-dev @varavel/vdl
-```
-
-**Global:**
-Makes `vdl` available system-wide.
-
-```bash
-npm install --global @varavel/vdl
-```
-
-> [!TIP]
-> For more details using this package, visit the [npm package page](https://www.npmjs.com/package/@varavel/vdl).
->
-> To install the latest experimental release: `npm install --global @varavel/vdl@next`.
->
-> To install a specific version: `npm install --global @varavel/vdl@x.x.x`.
+For version pinning, experimental releases, npm usage, and manual installs, see the [complete installation guide](./docs/installation.md).
 
 ## What is VDL?
 
