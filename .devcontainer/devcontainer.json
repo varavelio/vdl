@@ -20,7 +20,8 @@
         "bradlc.vscode-tailwindcss",
         "vitest.explorer",
         "dprint.dprint",
-        "biomejs.biome"
+        "biomejs.biome",
+        "tamasfe.even-better-toml"
       ],
       "settings": {
         "files.eol": "\n",
