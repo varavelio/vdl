@@ -15,7 +15,7 @@ flowchart LR
   AST --> Analysis
   Analysis -- "Resolve Imports" --> VFS
   Analysis --> IR
-  IR --> Generators["Generators (Go/TS/etc)"]
+  IR --> Generators["Plugin Runtime / Generators"]
 ```
 
 ## Package Overview
@@ -38,7 +38,7 @@ flowchart LR
 **"How the code is written."**
 
 - **Responsibility:** Defines the data structures that represent the raw syntactic structure of a `.vdl` file.
-- **Contents:** Node definitions (e.g., `Schema`, `RPCDecl`, `TypeDecl`, `EnumDecl`, `ConstDecl`, `PatternDecl`).
+- **Contents:** Node definitions for the current declaration model, including `Schema`, `Include`, `Docstring`, `TypeDecl`, `EnumDecl`, `ConstDecl`, annotations, fields, spreads, references, and data literals.
 
 **Characteristics:**
 
@@ -73,15 +73,17 @@ flowchart LR
 **Contents:**
 
 - **Resolver:** Parses the entry point, recursively resolves `include` statements, detects circular dependencies, and inlines external markdown docstrings.
-- **Symbol Table:** Collects and registers all types, enums, constants, patterns, and RPCs into a global namespace.
+- **Symbol Table:** Collects and registers all types, enums, constants, and standalone documentation blocks into a global namespace.
 - **Validators:** Modular validation passes for:
-  - Naming conventions (PascalCase, camelCase, UPPER_SNAKE_CASE)
-  - Type references (undefined types, spreads)
+  - Naming conventions (PascalCase and camelCase)
+  - Type references (undefined types, maps, arrays, and inline objects)
   - Enum consistency (mixed types, duplicate values)
-  - Pattern syntax (invalid placeholders)
-  - RPC structure (duplicate procs/streams)
+  - Constant literals and references
+  - Field and object literal uniqueness
+  - Spread validity for types and enums
   - Cycle detection (circular type dependencies)
   - Global uniqueness (cross-category name collisions)
+  - File naming conventions
 - **Diagnostics:** Errors are reported as `Diagnostic` with file, position, error code (e.g., `E001`), and message.
 
 **Key Design:** Uses a **best-effort strategy** — always returns a `Program` that is as complete as possible, even when errors are found. This enables LSP features (hover, go-to-definition, completions) to remain functional in files with errors.
@@ -97,10 +99,11 @@ flowchart LR
 
 **Design Principles:**
 
-- **Source Amnesia:** No line numbers, file paths, or AST references. Generators don't need source context.
-- **Aggressive Flattening:** Spreads (`...Audit`) are fully expanded; generators see flat field lists.
-- **Deterministic Order:** All collections are sorted alphabetically for reproducible output.
-- **Serializable:** Designed for JSON export (`ToJSON()`), useful for the WASM playground and writing tests.
+- **Resolved Shape:** Generators consume normalized type references and resolved literal values rather than raw AST nodes.
+- **Aggressive Flattening:** Type and enum spreads are expanded so generators see final field/member lists.
+- **Deterministic Order:** Top-level collections are sorted alphabetically for reproducible output.
+- **Source Positions:** IR keeps source positions so plugins can report useful diagnostics.
+- **Serializable:** Designed for JSON export, useful for `vdl compile`, plugins, and tests.
 
 **Contents:**
 
@@ -108,7 +111,7 @@ flowchart LR
 - **Doc Normalization:** Docstrings are trimmed and dedented for consistent formatting.
 
 - **Input:** `*analysis.Program`.
-- **Output:** `*ir.Schema` (The "Golden Copy" used by `codegen/golang`, `codegen/typescript`, etc.).
+- **Output:** `*irtypes.IrSchema` (the generator-facing model passed to plugins and emitted by `vdl compile`).
 
 ---
 
@@ -120,6 +123,6 @@ flowchart LR
 | **Includes**  | Raw Strings (`"./a.vdl"`) | Resolved Graph      | Merged/Invisible          |
 | **Spreads**   | Reference (`...Base`)     | Resolved Pointer    | Copied Fields (Flattened) |
 | **Docs**      | Raw (`""" ./doc.md """`)  | Validated/Inlined   | Normalized Content        |
-| **Positions** | Full (line, column)       | Full (for LSP)      | None (Source Amnesia)     |
+| **Positions** | Full (line, column)       | Full (for LSP)      | Preserved for diagnostics |
 | **Errors**    | Syntax Errors             | Diagnostics (codes) | None (assumes valid)      |
-| **Used By**   | Parser, Formatter         | LSP, IR Builder     | Generators                |
+| **Used By**   | Parser, Formatter         | LSP, IR Builder     | Plugin runtime/generators |
