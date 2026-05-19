@@ -1,9 +1,46 @@
-<img src="./assets/png/vdl.png" height="100"/>
-<h1>Varavel Definition Language</h1>
+<p align="center">
+  <img
+    src="https://cdn.jsdelivr.net/gh/varavelio/vdl@9cb843/assets/png/vdl.png"
+    alt="VDL logo"
+    width="150"
+  />
+</p>
 
-VDL is the open-source cross-language definition engine for modern stacks. Define your data structures, APIs, contracts, and generate type-safe code for your backend and frontend instantly.
+<h1 align="center">Varavel Definition Language</h1>
 
-Learn more at [https://varavel.com/vdl](https://varavel.com/vdl).
+<p align="center">
+  VDL is an open source, multi language, and easily extensible schema definition language and code generation toolchain.
+</p>
+
+<p align="center">
+  <a href="https://github.com/varavelio/vdl/actions">
+    <img src="https://github.com/varavelio/vdl/actions/workflows/ci.yaml/badge.svg" alt="CI status"/>
+  </a>
+  <a href="https://github.com/varavelio/vdl/releases/latest">
+    <img src="https://img.shields.io/github/release/varavelio/vdl.svg" alt="Release Version"/>
+  </a>
+  <a href="https://github.com/varavelio/vdl">
+    <img src="https://img.shields.io/github/stars/varavelio/vdl?style=flat&label=github+stars" alt="GitHub Stars"/>
+  </a>
+  <a href="https://github.com/varavelio/vdl/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/varavelio/vdl.svg" alt="License"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://varavel.com">
+    <img src="https://cdn.jsdelivr.net/gh/varavelio/brand@1.0.1/dist/badges/project.svg" alt="A Varavel project"/>
+  </a>
+  <a href="https://vdl.varavel.com">
+    <img src="https://cdn.jsdelivr.net/gh/varavelio/brand@1.0.1/dist/badges/documentation.svg" alt="VDL Documentation"/>
+  </a>
+</p>
+
+Easily define typed data models, constants, enums, documentation, RPC API's, and domain-specific contracts once in `.vdl` files, then use plugins to generate the artifacts your stack needs.
+
+The core language focuses on structured data. APIs, RPC services, events, schemas, documentation, and custom internal contracts are modeled through annotations and generated through plugins.
+
+Learn more at [https://vdl.varavel.com](https://vdl.varavel.com).
 
 ## Installation
 
@@ -77,54 +114,129 @@ npm install --global @varavel/vdl
 
 ## What is VDL?
 
-At its core, VDL is a system built on a **schema as the single source of truth**. You define your API's structure once in a simple, human-readable language, and VDL handles the rest.
+VDL is a schema-first language for describing data contracts in a compact, readable format. The core language is intentionally small: `include`, documentation blocks, `type`, `enum`, `const`, annotations, arrays, maps, inline objects, literals, and spreads.
 
-The ecosystem is comprised of three fundamental pillars:
+Domain semantics are added with annotations and plugins. For example, `@rpc` can describe RPC services, `@event` can describe event routing contracts, and a custom annotation can be interpreted by your own plugin.
 
-1. **A Definition Language (DSL):** A simple and intuitive language (`.vdl`) for defining data types, procedures (request-response), and streams (real-time communication).
-2. **First-Class Developer Tooling:** A suite of tools that makes working with the DSL a pleasure, including an **LSP** for autocompletion and validation in your editor, automatic formatters, and a **VSCode extension**.
-3. **Multi-Language Code Generators:** A powerful engine that reads your schema and generates fully functional, strongly-typed, and resilient clients and servers, initially for **Go** and **TypeScript**.
+```vdl
+include "./shared.vdl"
 
-The result is a workflow where you can design, implement, document, and consume APIs with unprecedented speed and confidence.
+""" A customer account shared across systems. """
+type Account {
+  id string
+  email string
+  createdAt datetime
+  tags? string[]
+}
 
-## Core Philosophy
+enum AccountStatus {
+  Active = "active"
+  Suspended = "suspended"
+}
 
-VDL is built on a series of key principles:
+const apiVersion = "2026-05"
+```
 
-- **Developer Experience (DX) First:** Tools should be intuitive and eliminate friction. From the DSL to the generated code and the Playground, everything is designed to be easy to use and to boost productivity.
-- **Pragmatism Over Dogma:** We use standard, proven, and accessible technologies like **HTTP, JSON, and Server-Sent Events (SSE)**. We prioritize solutions that work in the real world and are easy to debug, rather than complex binary protocols or overly prescriptive architectures.
-- **Simplicity is Power:** We believe that good design eliminates unnecessary complexity. VDL offers the robustness of traditional RPC systems without the overhead and complex configuration.
-- **Strong Contracts, Flexible Implementations:** The schema is the law. This guarantees end-to-end type safety. However, the framework is flexible, allowing for the injection of custom HTTP clients, application contexts, and business logic that is completely framework-agnostic.
+The compiler resolves includes, validates semantics, expands spreads, resolves constants and annotations, and produces a deterministic Intermediate Representation (IR). Plugins consume that IR and generate code, schemas, documentation, catalogs, or any other text artifact.
 
-## Key Features
+## Core Capabilities
 
-- **A Human-Centric DSL:** Define your APIs in `.vdl` files that are as easy to read as they are to write. Documentation (in Markdown) lives alongside your code, ensuring it never becomes outdated.
-- **Type-Safe, Multi-Language Code Generation:** First-class support for the most modern stacks. V1 includes:
-  - **Go Server & Client:** For building high-performance backends.
-  - **TypeScript Server & Client:** For seamless integration with the JavaScript/Node.js ecosystem and modern frontends.
-  - **Dart Client:** For building mobile and desktop applications with Flutter.
-- **"Batteries-Included" Interactive Playground:** Every VDL project can generate a static, self-contained web portal where developers can:
-  - Explore all operations and data types.
-  - Read the complete Markdown documentation.
-  - Execute procedures and subscribe to streams directly from the browser via auto-generated forms.
-  - Get ready-to-use `curl` commands and client code snippets.
-- **Resilient Clients & Servers by Default:** The generated clients are not simple wrappers. They come with built-in policies for **retries with exponential backoff**, **per-request timeouts**, and **automatic reconnection for streams**, making your applications robust from day one.
-- **Interoperability with OpenAPI:** Automatically generate an OpenAPI v3 specification from your `.vdl` schema, enabling integration with the vast ecosystem of existing tools.
+- **General data modeling:** define reusable types, aliases, inline objects, arrays, maps, optional fields, enums, and constants.
+- **Documentation next to contracts:** attach Markdown docstrings to declarations, fields, enum members, and top-level docs.
+- **Annotations as extension points:** keep the language small while allowing plugins to interpret domain-specific metadata such as RPC operations, events, deprecations, IDs, ownership, or framework hints.
+- **Project-aware analysis:** resolve `include` graphs, validate references, catch duplicate declarations, detect invalid spreads and cycles, and report diagnostics with source positions.
+- **Stable IR for generators:** plugins receive a flattened, resolved, sorted schema representation instead of raw source text.
+- **Developer tooling:** use the CLI formatter, JSON IR compiler, and LSP for editor diagnostics, completion, hover, definitions, references, rename, document symbols, formatting, and document links.
+- **Plugin-first generation:** official and custom JavaScript plugins generate Go, TypeScript, JSON Schema, OpenAPI, event catalogs, schema explorers, metadata exports, and more.
+
+## Quick Start
+
+Create a project:
+
+```bash
+# This creates a `schema.vdl` and `vdl.config.vdl` in the current directory.
+vdl init
+```
+
+Generate outputs with the plugins configured in `vdl.config.vdl`:
+
+```bash
+vdl generate
+```
+
+Format VDL files:
+
+```bash
+vdl format
+```
+
+Compile a schema to IR JSON:
+
+```bash
+vdl compile ./schema.vdl
+```
+
+Start the language server:
+
+```bash
+vdl lsp
+```
+
+## Plugin System
+
+VDL generation is handled by plugins. A plugin is just a JavaScript file that exports a `generate(input)` function. VDL passes `{ version, ir, options }` into the function and writes the returned virtual files into the configured output directory.
+
+Example `vdl.config.vdl`:
+
+```vdl
+const config = {
+  version 1
+  plugins [
+    {
+      src "varavelio/vdl-plugin-go@v0.1.3"
+      schema "./schema.vdl"
+      outDir "./gen/go"
+      options {
+        package "contracts"
+      }
+    }
+    {
+      src "varavelio/vdl-plugin-json-schema@v0.1.0"
+      schema "./schema.vdl"
+      outDir "./gen/json-schema"
+      options {
+        root "Account"
+      }
+    }
+  ]
+}
+```
+
+Plugin sources can be local `.js` files, HTTPS `.js` URLs, or GitHub shorthand references like `owner/vdl-plugin-name@v0.1.0`. Remote plugins are cached and recorded in `vdl.lock` for reproducibility.
+
+Useful docs:
+
+- [Available plugins](./docs/plugins.md)
+- [Creating plugins](./docs/creating-plugins.md)
+- [VDL language specification](./docs/reference/spec.md)
+- [RPC annotation model](./docs/reference/rpc.md)
+- [Event annotation model](./docs/reference/events.md)
 
 ## Who is VDL for?
 
-VDL is the ideal tool for teams and developers who:
+VDL is useful when you want one contract to drive many outputs:
 
-- Want the **type safety of gRPC** without the complexity of Protobuf and HTTP/2.
-- Need clear, well-defined APIs but don't require the **querying flexibility of GraphQL**.
-- Are looking for the **simplicity of tRPC** but need to support a **polyglot ecosystem** (beyond just TypeScript).
-- Value a fast workflow, exceptional tooling, and the ability to move confidently between the backend and frontend.
-
-In short, if you want to build modern APIs quickly and safely, VDL is built for you.
+- shared backend/frontend data models
+- generated Go or TypeScript contract packages
+- JSON Schema for validators, forms, or external integrations
+- OpenAPI documents for annotation-based RPC services
+- event subject builders and event catalogs
+- static schema explorers and metadata exports
+- custom internal generators for your own frameworks and conventions
 
 ## License
 
-VDL is **100% open source** and released under MIT license:
+VDL is **100% open source** and released under MIT license.
 
 ### Disclaimer
 
