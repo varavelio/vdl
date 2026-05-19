@@ -55,7 +55,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Role**: Public documentation and reference material.
 - **Key paths**:
-  - `index.md`: Symlink to root `README.md`; used as the Zensical home page.
+  - `index.md`: Zensical home page with frontmatter that includes the root `README.md` via pymdownx snippets.
   - `about.md`: Project overview and positioning.
   - `guides/installation.md`: Detailed CLI installation guide.
   - `guides/plugins.md`: Official plugin guide.
