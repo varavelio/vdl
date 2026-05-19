@@ -108,7 +108,7 @@ type Product {
 }
 ```
 
-Type bodies accept field members (`<name>[?] <FieldType>`), spread members (`...<Reference>`), and standalone docstring members.
+Type bodies accept field members (`<name>[?] <FieldType>`) and spread members (`...<Reference>`). Field members can have attached docstrings and annotations.
 
 Type spreads reference complete type declaration names.
 
@@ -327,7 +327,7 @@ type User {
 
 A blank line separates a standalone docstring from the next declaration in the same scope.
 
-Type bodies support standalone docstring members. Enum bodies attach docstrings to the following named member and do not support standalone docstring-only entries.
+Inside type bodies, docstrings attach to the following field. Enum bodies attach docstrings to the following named member. Type and enum bodies do not support docstring-only entries.
 
 ### External Documentation Files
 
