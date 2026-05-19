@@ -18,6 +18,7 @@
       "!**/build",
       "!**/out",
       "!**/gen",
+      "!**/site",
       "!**/tmp",
       "!**/temp",
       "!**/.svelte-kit",

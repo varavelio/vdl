@@ -29,6 +29,7 @@
     "**/build",
     "**/out",
     "**/gen",
+    "**/site",
     "**/.svelte-kit",
     "**/immutable",
     "**/_app",
