@@ -52,7 +52,7 @@ This lets VDL support many domains without turning the parser into a collection 
 ## Next Steps
 
 - Read the [language specification](./reference/spec.md).
-- Browse [available plugins](./plugins.md).
-- Learn how to [create plugins](./creating-plugins.md).
+- Browse [available plugins](./guides/plugins.md).
+- Learn how to [create plugins](./guides/creating-plugins.md).
 - Review the [RPC annotation model](./reference/rpc.md).
 - Review the [event annotation model](./reference/events.md).
