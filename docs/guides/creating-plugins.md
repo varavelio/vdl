@@ -153,14 +153,6 @@ exports.generate = (input) => ({ files: [] });
 module.exports.generate = (input) => ({ files: [] });
 ```
 
-```js
-function generate(input) {
-  return { files: [] };
-}
-```
-
-Use `exports.generate` for plain JavaScript plugins and `export const generate = ...` when using the SDK and TypeScript bundling.
-
 ## Important Runtime Rules
 
 - The plugin runs as JavaScript, not as a full Node.js process.
