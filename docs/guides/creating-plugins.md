@@ -3,6 +3,8 @@ title: Creating VDL Plugins
 description: A practical guide to writing VDL plugins
 ---
 
+> **Note:** You do not need Node.js or any JavaScript runtime installed on your machine. VDL executes plugin JavaScript code through [Goja](https://github.com/dop251/goja), an embedded ECMAScript runtime built into the VDL binary.
+
 ## The Short Version
 
 A VDL plugin is just a JavaScript file that exports a `generate(input)` function.
@@ -234,6 +236,8 @@ export const generate = definePlugin((input) => {
   };
 });
 ```
+
+> **How exports work:** SDK plugins use `export const generate`, not `exports.generate`. The `vdl-plugin build` command converts the ESM export into `exports.generate` automatically when bundling into `dist/index.js`. The final artifact that VDL loads always uses the CommonJS `exports.generate` form.
 
 Check and build:
 
