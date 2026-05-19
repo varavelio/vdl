@@ -57,7 +57,9 @@ When updating this document, do so with the context of the entire document in mi
 - **Key paths**:
   - `index.md`: Zensical home page with frontmatter that includes the root `README.md` via pymdownx snippets.
   - `about.md`: Project overview and positioning.
+  - `language/`: Progressive reader-friendly VDL language guide pages.
   - `guides/installation.md`: Detailed CLI installation guide.
+  - `guides/configuration.md`: `vdl.config.vdl` project configuration guide.
   - `guides/plugins.md`: Official plugin guide.
   - `guides/creating-plugins.md`: Practical plugin authoring guide.
   - `reference/`: Language, formatting, RPC, event, and related reference material.
