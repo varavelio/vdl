@@ -162,6 +162,8 @@ Useful docs:
 
 - [Available plugins](https://vdl.varavel.com/guides/plugins/)
 - [Creating plugins](https://vdl.varavel.com/guides/creating-plugins/)
+- [Language guide](https://vdl.varavel.com/language/)
+- [Project configuration](https://vdl.varavel.com/guides/configuration/)
 - [VDL language specification](https://vdl.varavel.com/reference/spec/)
 - [RPC annotation model](https://vdl.varavel.com/reference/rpc/)
 - [Event annotation model](https://vdl.varavel.com/reference/events/)
