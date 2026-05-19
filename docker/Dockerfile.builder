@@ -21,6 +21,10 @@
 # After bumping tool versions in this file, push to main, the pipeline
 # publishes the new image automatically. You may then update the tag in
 # every downstream Dockerfile manually when ready.
+#
+# You can also use workflow_dispatch in github actions to trigger a manual
+# build and publish of this image, which is useful for testing changes before
+# merging to main.
 # =============================================================================
 
 # -- fetcher ------------------------------------------------------------------
