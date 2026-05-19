@@ -3,14 +3,30 @@ version: "2"
 linters:
   default: none
   enable:
-    - errcheck
     - govet
+    - errcheck
     - ineffassign
     - staticcheck
     - unused
+    - modernize
     - bodyclose
     - godoclint
     - godot
+    - errorlint
+    - nilerr
+    - nilnesserr
+    - durationcheck
+    - makezero
+    - noctx
+    - nolintlint
+  settings:
+    modernize:
+      disable:
+        # VDL generates vdl.Ptr() helpers
+        - newexpr
+    nolintlint:
+      # Enable to require an explanation of nonzero length after each nolint directive.
+      require-explanation: true
   exclusions:
     generated: lax
     presets:
