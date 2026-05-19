@@ -13,8 +13,22 @@ Copyright &copy; Varavel
 nav = [
   { "Overview" = "index.md" },
   { "About VDL" = "about.md" },
+  { "Language Guide" = [
+    { "Start Here" = "language/index.md" },
+    { "Files and Comments" = "language/files.md" },
+    { "Includes" = "language/includes.md" },
+    { "Docstrings" = "language/docstrings.md" },
+    { "Types" = "language/types.md" },
+    { "Field Types" = "language/field-types.md" },
+    { "Enums" = "language/enums.md" },
+    { "Constants and Literals" = "language/constants.md" },
+    { "Annotations" = "language/annotations.md" },
+    { "Spreads and References" = "language/spreads-references.md" },
+    { "Naming and Validation" = "language/naming-validation.md" }
+  ] },
   { "Guides" = [
     { "Installation" = "guides/installation.md" },
+    { "Project Configuration" = "guides/configuration.md" },
     { "Available Plugins" = "guides/plugins.md" },
     { "Creating Plugins" = "guides/creating-plugins.md" }
   ] },
