@@ -50,7 +50,7 @@ tasks:
       - cd ./toolchain && go fmt ./...
       - cd ./toolchain && go run ./cmd/vdl/. format
       - npx --no biome format --write --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
-      - dprint fmt --config ./dprint.json --log-level warn
+      - npx --no dprint fmt --config ./dprint.json --log-level warn
 
   test:
     desc: "Run all tests"
@@ -71,7 +71,7 @@ tasks:
           exit 1
         fi
       - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
-      - dprint check --config ./dprint.json --log-level warn
+      - npx --no dprint check --config ./dprint.json --log-level warn
 
   build:
     desc: "Build core CLI binary"
