@@ -24,6 +24,13 @@ linters:
       - examples$
 
 formatters:
+  enable:
+    - gofumpt
+    - goimports
+    - golines
+  settings:
+    gofumpt:
+      extra-rules: true
   exclusions:
     generated: lax
     paths:

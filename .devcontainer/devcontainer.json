@@ -31,23 +31,44 @@
         "editor.codeActionsOnSave": {
           "source.fixAll.biome": "explicit"
         },
+
         "css.validate": false,
-        "svelte.enable-ts-plugin": true,
+        "files.associations": {
+          "*.css": "tailwindcss"
+        },
+
         "[javascript]": {
           "editor.defaultFormatter": "biomejs.biome"
         },
         "[typescript]": {
           "editor.defaultFormatter": "biomejs.biome"
         },
+
+        "svelte.enable-ts-plugin": true,
         "[svelte]": {
           "editor.defaultFormatter": "biomejs.biome"
         },
+
         "[go]": {
           "editor.defaultFormatter": "golang.go"
         },
+        "go.useLanguageServer": true,
+        "go.testFlags": ["-v"],
+
+        // https://golangci-lint.run/docs/welcome/integrations/#visual-studio-code
         "go.lintTool": "golangci-lint",
-        "go.lintFlags": ["--fast"],
-        "go.testFlags": ["-v"]
+        "go.lintFlags": [
+          "--path-mode=abs",
+          "--fast-only"
+        ],
+        "go.formatTool": "custom",
+        "go.alternateTools": {
+          "customFormatter": "golangci-lint"
+        },
+        "go.formatFlags": [
+          "fmt",
+          "--stdin"
+        ]
       }
     }
   }

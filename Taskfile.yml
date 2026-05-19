@@ -19,9 +19,10 @@ tasks:
   ##############
 
   ci:
-    desc: "Run full CI pipeline (deps, test, lint, build)"
+    desc: "Run full CI pipeline (deps, format, test, lint, build)"
     cmds:
       - task: deps
+      - task: format
       - task: test
       - task: lint
       - task: build
@@ -47,7 +48,7 @@ tasks:
   format:
     desc: "Format all code"
     cmds:
-      - cd ./toolchain && go fmt ./...
+      - cd ./toolchain && golangci-lint fmt ./...
       - cd ./toolchain && go run ./cmd/vdl/. format
       - npx --no biome format --write --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - npx --no dprint fmt --config ./dprint.json --log-level warn
@@ -62,14 +63,6 @@ tasks:
     desc: "Lint all code"
     cmds:
       - cd ./toolchain && golangci-lint run ./...
-      - |
-        cd ./toolchain
-        UNFORMATTED=$(gofmt -l .)
-        if [ -n "$UNFORMATTED" ]; then
-          echo "The following files are not formatted correctly:"
-          echo "$UNFORMATTED"
-          exit 1
-        fi
       - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - npx --no dprint check --config ./dprint.json --log-level warn
 
