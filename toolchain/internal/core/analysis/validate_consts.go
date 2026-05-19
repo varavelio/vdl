@@ -24,7 +24,12 @@ func validateConst(symbols *symbolTable, cnst *ConstSymbol) []Diagnostic {
 		return diagnostics
 	}
 
-	valueDiagnostics, inferred := validateDataLiteral(symbols, cnst.File, cnst.AST.Value, map[string]bool{cnst.Name: true})
+	valueDiagnostics, inferred := validateDataLiteral(
+		symbols,
+		cnst.File,
+		cnst.AST.Value,
+		map[string]bool{cnst.Name: true},
+	)
 	diagnostics = append(diagnostics, valueDiagnostics...)
 	if inferred != ConstValueTypeUnknown {
 		cnst.ValueType = inferred
@@ -33,7 +38,12 @@ func validateConst(symbols *symbolTable, cnst *ConstSymbol) []Diagnostic {
 	return diagnostics
 }
 
-func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral, visiting map[string]bool) ([]Diagnostic, ConstValueType) {
+func validateDataLiteral(
+	symbols *symbolTable,
+	file string,
+	lit *ast.DataLiteral,
+	visiting map[string]bool,
+) ([]Diagnostic, ConstValueType) {
 	if lit == nil {
 		return nil, ConstValueTypeUnknown
 	}
@@ -60,7 +70,10 @@ func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral
 					if len(suggestions) > 0 {
 						msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
 					}
-					diagnostics = append(diagnostics, newDiagnostic(file, s.Ref.Pos, s.Ref.EndPos, CodeInvalidReference, msg))
+					diagnostics = append(
+						diagnostics,
+						newDiagnostic(file, s.Ref.Pos, s.Ref.EndPos, CodeInvalidReference, msg),
+					)
 					return diagnostics, ConstValueTypeUnknown
 				}
 
@@ -70,7 +83,12 @@ func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral
 
 				if refConst.AST != nil && refConst.AST.Value != nil {
 					visiting[s.Ref.Name] = true
-					childDiags, kind := validateDataLiteral(symbols, refConst.File, refConst.AST.Value, visiting)
+					childDiags, kind := validateDataLiteral(
+						symbols,
+						refConst.File,
+						refConst.AST.Value,
+						visiting,
+					)
 					delete(visiting, s.Ref.Name)
 					diagnostics = append(diagnostics, childDiags...)
 					if kind != ConstValueTypeUnknown {
@@ -88,7 +106,10 @@ func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral
 				if len(suggestions) > 0 {
 					msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
 				}
-				diagnostics = append(diagnostics, newDiagnostic(file, s.Ref.Pos, s.Ref.EndPos, CodeInvalidReference, msg))
+				diagnostics = append(
+					diagnostics,
+					newDiagnostic(file, s.Ref.Pos, s.Ref.EndPos, CodeInvalidReference, msg),
+				)
 				return diagnostics, ConstValueTypeUnknown
 			}
 
@@ -141,25 +162,37 @@ func validateDataLiteral(symbols *symbolTable, file string, lit *ast.DataLiteral
 						entry.Spread.Pos,
 						entry.Spread.EndPos,
 						CodeInvalidReference,
-						fmt.Sprintf("undefined constant reference %q in object spread", entry.Spread.Ref.Name),
+						fmt.Sprintf(
+							"undefined constant reference %q in object spread",
+							entry.Spread.Ref.Name,
+						),
 					))
 					continue
 				}
 
-				if refConst.AST == nil || refConst.AST.Value == nil || refConst.AST.Value.Object == nil {
+				if refConst.AST == nil || refConst.AST.Value == nil ||
+					refConst.AST.Value.Object == nil {
 					diagnostics = append(diagnostics, newDiagnostic(
 						file,
 						entry.Spread.Pos,
 						entry.Spread.EndPos,
 						CodeConstSpreadNotObject,
-						fmt.Sprintf("constant %q used in object spread is not an object literal", entry.Spread.Ref.Name),
+						fmt.Sprintf(
+							"constant %q used in object spread is not an object literal",
+							entry.Spread.Ref.Name,
+						),
 					))
 					continue
 				}
 
 				if !visiting[entry.Spread.Ref.Name] {
 					visiting[entry.Spread.Ref.Name] = true
-					childDiags, _ := validateDataLiteral(symbols, refConst.File, refConst.AST.Value, visiting)
+					childDiags, _ := validateDataLiteral(
+						symbols,
+						refConst.File,
+						refConst.AST.Value,
+						visiting,
+					)
 					delete(visiting, entry.Spread.Ref.Name)
 					diagnostics = append(diagnostics, childDiags...)
 				}

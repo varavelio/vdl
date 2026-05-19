@@ -13,8 +13,12 @@ func TestHandleTextDocumentDocumentLink(t *testing.T) {
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentDocumentLink{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"}},
-		Params:         RequestMessageTextDocumentDocumentLinkParams{TextDocument: TextDocumentIdentifier{URI: uri}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"},
+		},
+		Params: RequestMessageTextDocumentDocumentLinkParams{
+			TextDocument: TextDocumentIdentifier{URI: uri},
+		},
 	}
 	b, _ := json.Marshal(req)
 	anyResp, err := l.handleTextDocumentDocumentLink(b)
@@ -35,8 +39,12 @@ func TestHandleTextDocumentDocumentLinkRanges(t *testing.T) {
 		l := newTestLSP(t, schema, uri)
 
 		req := RequestMessageTextDocumentDocumentLink{
-			RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"}},
-			Params:         RequestMessageTextDocumentDocumentLinkParams{TextDocument: TextDocumentIdentifier{URI: uri}},
+			RequestMessage: RequestMessage{
+				Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"},
+			},
+			Params: RequestMessageTextDocumentDocumentLinkParams{
+				TextDocument: TextDocumentIdentifier{URI: uri},
+			},
 		}
 		b, _ := json.Marshal(req)
 		anyResp, err := l.handleTextDocumentDocumentLink(b)
@@ -60,8 +68,12 @@ func TestHandleTextDocumentDocumentLinkRanges(t *testing.T) {
 		l := newTestLSP(t, schema, uri)
 
 		req := RequestMessageTextDocumentDocumentLink{
-			RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"}},
-			Params:         RequestMessageTextDocumentDocumentLinkParams{TextDocument: TextDocumentIdentifier{URI: uri}},
+			RequestMessage: RequestMessage{
+				Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"},
+			},
+			Params: RequestMessageTextDocumentDocumentLinkParams{
+				TextDocument: TextDocumentIdentifier{URI: uri},
+			},
 		}
 		b, _ := json.Marshal(req)
 		anyResp, err := l.handleTextDocumentDocumentLink(b)
@@ -87,8 +99,12 @@ type User {
 		l := newTestLSP(t, schema, uri)
 
 		req := RequestMessageTextDocumentDocumentLink{
-			RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"}},
-			Params:         RequestMessageTextDocumentDocumentLinkParams{TextDocument: TextDocumentIdentifier{URI: uri}},
+			RequestMessage: RequestMessage{
+				Message: Message{JSONRPC: "2.0", Method: "textDocument/documentLink", ID: "1"},
+			},
+			Params: RequestMessageTextDocumentDocumentLinkParams{
+				TextDocument: TextDocumentIdentifier{URI: uri},
+			},
 		}
 		b, _ := json.Marshal(req)
 		anyResp, err := l.handleTextDocumentDocumentLink(b)

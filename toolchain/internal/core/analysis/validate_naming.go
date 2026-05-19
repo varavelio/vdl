@@ -29,9 +29,13 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 		}
 		// Validate field naming for object types
 		if typ.IsObject() && typ.Type.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldNaming(typ.Type.ObjectDef.Fields, "type", typ.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateFieldNaming(typ.Type.ObjectDef.Fields, "type", typ.Name)...)
 		}
-		diagnostics = append(diagnostics, validateAnnotationNaming(typ.Annotations, typ.File, "type", typ.Name)...)
+		diagnostics = append(
+			diagnostics,
+			validateAnnotationNaming(typ.Annotations, typ.File, "type", typ.Name)...)
 	}
 
 	// Validate enum names and member names
@@ -52,12 +56,25 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 					member.Pos,
 					member.EndPos,
 					CodeEnumMemberNotPascal,
-					fmt.Sprintf("enum member %q in enum %q must be in PascalCase", member.Name, enum.Name),
+					fmt.Sprintf(
+						"enum member %q in enum %q must be in PascalCase",
+						member.Name,
+						enum.Name,
+					),
 				))
 			}
-			diagnostics = append(diagnostics, validateAnnotationNaming(member.Annotations, enum.File, "enum member", member.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateAnnotationNaming(
+					member.Annotations,
+					enum.File,
+					"enum member",
+					member.Name,
+				)...)
 		}
-		diagnostics = append(diagnostics, validateAnnotationNaming(enum.Annotations, enum.File, "enum", enum.Name)...)
+		diagnostics = append(
+			diagnostics,
+			validateAnnotationNaming(enum.Annotations, enum.File, "enum", enum.Name)...)
 	}
 
 	// Validate constant names
@@ -71,7 +88,9 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 				fmt.Sprintf("constant name %q must be in camelCase", cnst.Name),
 			))
 		}
-		diagnostics = append(diagnostics, validateAnnotationNaming(cnst.Annotations, cnst.File, "constant", cnst.Name)...)
+		diagnostics = append(
+			diagnostics,
+			validateAnnotationNaming(cnst.Annotations, cnst.File, "constant", cnst.Name)...)
 	}
 
 	return diagnostics
@@ -87,19 +106,32 @@ func validateFieldNaming(fields []*FieldSymbol, context, parentName string) []Di
 				field.Pos,
 				field.EndPos,
 				CodeNotCamelCase,
-				fmt.Sprintf("field %q in %s %q must be in camelCase", field.Name, context, parentName),
+				fmt.Sprintf(
+					"field %q in %s %q must be in camelCase",
+					field.Name,
+					context,
+					parentName,
+				),
 			))
 		}
 		// Recursively check inline object fields
-		if field.Type != nil && field.Type.Kind == FieldTypeKindObject && field.Type.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldNaming(field.Type.ObjectDef.Fields, "inline object in", field.Name)...)
+		if field.Type != nil && field.Type.Kind == FieldTypeKindObject &&
+			field.Type.ObjectDef != nil {
+			diagnostics = append(
+				diagnostics,
+				validateFieldNaming(field.Type.ObjectDef.Fields, "inline object in", field.Name)...)
 		}
-		diagnostics = append(diagnostics, validateAnnotationNaming(field.Annotations, field.File, "field", field.Name)...)
+		diagnostics = append(
+			diagnostics,
+			validateAnnotationNaming(field.Annotations, field.File, "field", field.Name)...)
 	}
 	return diagnostics
 }
 
-func validateAnnotationNaming(annotations []*AnnotationRef, file, context, parentName string) []Diagnostic {
+func validateAnnotationNaming(
+	annotations []*AnnotationRef,
+	file, context, parentName string,
+) []Diagnostic {
 	var diagnostics []Diagnostic
 	for _, ann := range annotations {
 		if !isCamelCase(ann.Name) {
@@ -108,7 +140,12 @@ func validateAnnotationNaming(annotations []*AnnotationRef, file, context, paren
 				ann.Pos,
 				ann.EndPos,
 				CodeNotCamelCase,
-				fmt.Sprintf("annotation %q in %s %q must be in camelCase", ann.Name, context, parentName),
+				fmt.Sprintf(
+					"annotation %q in %s %q must be in camelCase",
+					ann.Name,
+					context,
+					parentName,
+				),
 			))
 		}
 	}

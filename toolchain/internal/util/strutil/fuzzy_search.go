@@ -112,7 +112,11 @@ func compareMatches(a, b fuzzyMatch) int {
 // evaluateMatch determines if and how a word matches the query.
 // Returns the match and whether it qualifies.
 // Uses short-circuit evaluation: structural matches skip edit distance calculation.
-func evaluateMatch(word, normalizedQuery string, queryRunes []rune, queryLen, maxDist int) (fuzzyMatch, bool) {
+func evaluateMatch(
+	word, normalizedQuery string,
+	queryRunes []rune,
+	queryLen, maxDist int,
+) (fuzzyMatch, bool) {
 	normalizedWord := normalize(word)
 	wordLen := len([]rune(normalizedWord))
 	lenDiff := abs(queryLen - wordLen)
@@ -175,7 +179,12 @@ func evaluateMatch(word, normalizedQuery string, queryRunes []rune, queryLen, ma
 	return fuzzyMatch{}, false
 }
 
-func searchSequential(data []string, normalizedQuery string, queryRunes []rune, queryLen, maxDist int) []fuzzyMatch {
+func searchSequential(
+	data []string,
+	normalizedQuery string,
+	queryRunes []rune,
+	queryLen, maxDist int,
+) []fuzzyMatch {
 	matches := make([]fuzzyMatch, 0, min(len(data), maxFuzzyResults*2))
 
 	for _, word := range data {
@@ -187,7 +196,12 @@ func searchSequential(data []string, normalizedQuery string, queryRunes []rune, 
 	return matches
 }
 
-func searchParallel(data []string, normalizedQuery string, queryRunes []rune, queryLen, maxDist int) []fuzzyMatch {
+func searchParallel(
+	data []string,
+	normalizedQuery string,
+	queryRunes []rune,
+	queryLen, maxDist int,
+) []fuzzyMatch {
 	type result struct {
 		match fuzzyMatch
 		ok    bool

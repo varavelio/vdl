@@ -46,7 +46,9 @@ var AsciiArt = func() string {
 	content.WriteString("\n\n")
 
 	// Write basic info
-	content.WriteString(textBold.String("Star the repo: ") + textLink.String("https://github.com/varavelio/vdl"))
+	content.WriteString(
+		textBold.String("Star the repo: ") + textLink.String("https://github.com/varavelio/vdl"),
+	)
 	content.WriteString("\n")
 	content.WriteString(textBold.String("Show usage:    ") + "vdl --help")
 	content.WriteString("\n")

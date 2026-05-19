@@ -83,7 +83,7 @@ func TestFileSystem_ReadFile(t *testing.T) {
 		filePath := filepath.Join(tempDir, "test.txt")
 		expectedContent := []byte("hello world")
 
-		err := os.WriteFile(filePath, expectedContent, 0644)
+		err := os.WriteFile(filePath, expectedContent, 0o644)
 		require.NoError(t, err)
 
 		content, err := fs.ReadFile(filePath)
@@ -106,7 +106,7 @@ func TestFileSystem_ReadFile(t *testing.T) {
 		filePath := filepath.Join(tempDir, "test.txt")
 		originalContent := []byte("original content")
 
-		err := os.WriteFile(filePath, originalContent, 0644)
+		err := os.WriteFile(filePath, originalContent, 0o644)
 		require.NoError(t, err)
 
 		// First read - caches the content
@@ -116,13 +116,18 @@ func TestFileSystem_ReadFile(t *testing.T) {
 
 		// Modify the file on disk
 		modifiedContent := []byte("modified content")
-		err = os.WriteFile(filePath, modifiedContent, 0644)
+		err = os.WriteFile(filePath, modifiedContent, 0o644)
 		require.NoError(t, err)
 
 		// Second read - should return cached content
 		content2, err := fs.ReadFile(filePath)
 		require.NoError(t, err)
-		require.Equal(t, originalContent, content2, "should return cached content, not modified file")
+		require.Equal(
+			t,
+			originalContent,
+			content2,
+			"should return cached content, not modified file",
+		)
 	})
 
 	t.Run("returns error for non-existent file", func(t *testing.T) {
@@ -143,7 +148,7 @@ func TestFileSystem_ReadFile(t *testing.T) {
 		filePath := filepath.Join(tempDir, "test.txt")
 		expectedContent := []byte("content")
 
-		err := os.WriteFile(filePath, expectedContent, 0644)
+		err := os.WriteFile(filePath, expectedContent, 0o644)
 		require.NoError(t, err)
 
 		// Read using a path with redundant elements
@@ -166,7 +171,7 @@ func TestFileSystem_ReadFile(t *testing.T) {
 		tempDir := t.TempDir()
 		filePath := filepath.Join(tempDir, "empty.txt")
 
-		err := os.WriteFile(filePath, []byte{}, 0644)
+		err := os.WriteFile(filePath, []byte{}, 0o644)
 		require.NoError(t, err)
 
 		content, err := fs.ReadFile(filePath)
@@ -229,7 +234,7 @@ func TestFileSystem_WriteFileCache(t *testing.T) {
 		diskContent := []byte("disk content")
 		memoryContent := []byte("memory content")
 
-		err := os.WriteFile(filePath, diskContent, 0644)
+		err := os.WriteFile(filePath, diskContent, 0o644)
 		require.NoError(t, err)
 
 		fs.WriteFileCache(filePath, memoryContent)
@@ -308,7 +313,7 @@ func TestFileSystem_RemoveFileCache(t *testing.T) {
 		diskContent := []byte("disk content")
 		cacheContent := []byte("cache content")
 
-		err := os.WriteFile(filePath, diskContent, 0644)
+		err := os.WriteFile(filePath, diskContent, 0o644)
 		require.NoError(t, err)
 
 		fs.WriteFileCache(filePath, cacheContent)
@@ -380,7 +385,7 @@ func TestFileSystem_Concurrency(t *testing.T) {
 		filePath := filepath.Join(tempDir, "concurrent.txt")
 		content := []byte("concurrent content")
 
-		err := os.WriteFile(filePath, content, 0644)
+		err := os.WriteFile(filePath, content, 0o644)
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
@@ -428,7 +433,7 @@ func TestFileSystem_Concurrency(t *testing.T) {
 		filePath := filepath.Join(tempDir, "mixed.txt")
 		initialContent := []byte("initial")
 
-		err := os.WriteFile(filePath, initialContent, 0644)
+		err := os.WriteFile(filePath, initialContent, 0o644)
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup

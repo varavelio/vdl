@@ -43,7 +43,12 @@ func resolveRuntimePlugins(config runtimeConfig) ([]runtimePlugin, error) {
 			return nil, fmt.Errorf("plugin %d: %w", i+1, err)
 		}
 
-		schemaPath, err := resolveAbsolutePath(config.Dir, pluginConfig.GetSchema(), ".vdl", "schema")
+		schemaPath, err := resolveAbsolutePath(
+			config.Dir,
+			pluginConfig.GetSchema(),
+			".vdl",
+			"schema",
+		)
 		if err != nil {
 			return nil, fmt.Errorf("plugin %d: %w", i+1, err)
 		}
@@ -197,7 +202,10 @@ func canonicalizeRemotePluginURL(rawURL string) (string, error) {
 		return "", fmt.Errorf("plugin src %q is invalid: missing host", rawURL)
 	}
 	if !strings.HasSuffix(parsed.Path, ".js") {
-		return "", fmt.Errorf("plugin src %q is invalid: remote plugins must point to a .js file", rawURL)
+		return "", fmt.Errorf(
+			"plugin src %q is invalid: remote plugins must point to a .js file",
+			rawURL,
+		)
 	}
 
 	parsed.Fragment = ""
@@ -299,7 +307,10 @@ func buildAuthHeaders(remote remoteHostAuth) (http.Header, error) {
 	}
 
 	if methods > 1 {
-		return nil, fmt.Errorf("remote %q must define exactly one authentication method", remote.Host)
+		return nil, fmt.Errorf(
+			"remote %q must define exactly one authentication method",
+			remote.Host,
+		)
 	}
 
 	return headers, nil
@@ -330,7 +341,12 @@ func resolveAbsolutePath(baseDir, rawPath, expectedExt, fieldName string) (strin
 	}
 
 	if expectedExt != "" && !strings.HasSuffix(path, expectedExt) {
-		return "", fmt.Errorf("%s %q is invalid: expected a %s file", fieldName, rawPath, expectedExt)
+		return "", fmt.Errorf(
+			"%s %q is invalid: expected a %s file",
+			fieldName,
+			rawPath,
+			expectedExt,
+		)
 	}
 
 	if !filepath.IsAbs(path) {

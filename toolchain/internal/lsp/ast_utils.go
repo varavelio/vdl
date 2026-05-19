@@ -201,7 +201,11 @@ func collectIdentifiersFromConst(c *ast.ConstDecl, content string, ids *[]Identi
 	collectIdentifiersFromDataLiteral(c.Value, content, ids)
 }
 
-func collectIdentifiersFromAnnotations(annotations []*ast.Annotation, content string, ids *[]IdentifierInfo) {
+func collectIdentifiersFromAnnotations(
+	annotations []*ast.Annotation,
+	content string,
+	ids *[]IdentifierInfo,
+) {
 	for _, ann := range annotations {
 		if ann == nil || ann.Argument == nil {
 			continue
@@ -210,7 +214,11 @@ func collectIdentifiersFromAnnotations(annotations []*ast.Annotation, content st
 	}
 }
 
-func collectIdentifiersFromDataLiteral(lit *ast.DataLiteral, content string, ids *[]IdentifierInfo) {
+func collectIdentifiersFromDataLiteral(
+	lit *ast.DataLiteral,
+	content string,
+	ids *[]IdentifierInfo,
+) {
 	if lit == nil {
 		return
 	}
@@ -275,7 +283,11 @@ func findReferencesInSchema(schema *ast.Schema, symbolName, content string) []Id
 
 // findIdentifierRange finds the precise start and end position of an identifier in content
 // starting search from startSearchPos.
-func findIdentifierRange(content string, startSearchPos ast.Position, name string) (ast.Position, ast.Position) {
+func findIdentifierRange(
+	content string,
+	startSearchPos ast.Position,
+	name string,
+) (ast.Position, ast.Position) {
 	startOffset := startSearchPos.Offset
 	if startOffset >= len(content) {
 		return startSearchPos, startSearchPos

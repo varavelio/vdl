@@ -163,7 +163,13 @@ func (l *LSP) analyzeAndPublishDiagnosticsDebounced(filePath, uri string) {
 		// Recover from any panic inside the goroutine so the server keeps running
 		defer func() {
 			if r := recover(); r != nil {
-				l.logger.Error("panic during diagnostics analysis", "panic", r, "stack", string(debug.Stack()))
+				l.logger.Error(
+					"panic during diagnostics analysis",
+					"panic",
+					r,
+					"stack",
+					string(debug.Stack()),
+				)
 			}
 		}()
 

@@ -37,10 +37,30 @@ func TestNormalize(t *testing.T) {
 			expectedPath       string
 		}{
 			{"Absolute path with empty base", "", "/absolute/path.txt", "/absolute/path.txt"},
-			{"Absolute path with base", "/base/dir/file.txt", "/absolute/path.txt", "/absolute/path.txt"},
-			{"Absolute path with base and redundant slashes", "/base/dir/file.txt", "/absolute//path.txt", "/absolute/path.txt"},
-			{"Absolute path with base and dot segments", "/base/dir/file.txt", "/absolute/./path.txt", "/absolute/path.txt"},
-			{"Absolute path with base and parent segments", "/base/dir/file.txt", "/absolute/../absolute/path.txt", "/absolute/path.txt"},
+			{
+				"Absolute path with base",
+				"/base/dir/file.txt",
+				"/absolute/path.txt",
+				"/absolute/path.txt",
+			},
+			{
+				"Absolute path with base and redundant slashes",
+				"/base/dir/file.txt",
+				"/absolute//path.txt",
+				"/absolute/path.txt",
+			},
+			{
+				"Absolute path with base and dot segments",
+				"/base/dir/file.txt",
+				"/absolute/./path.txt",
+				"/absolute/path.txt",
+			},
+			{
+				"Absolute path with base and parent segments",
+				"/base/dir/file.txt",
+				"/absolute/../absolute/path.txt",
+				"/absolute/path.txt",
+			},
 		}
 
 		for _, tc := range testCases {
@@ -61,8 +81,18 @@ func TestNormalize(t *testing.T) {
 		}{
 			{"Simple relative path", "/base/dir/file.txt", "other.txt", "/base/dir/other.txt"},
 			{"Parent directory", "/base/dir/file.txt", "../other.txt", "/base/other.txt"},
-			{"Multiple parent directories", "/base/dir/subdir/file.txt", "../../other.txt", "/base/other.txt"},
-			{"Relative path with base", "/base/dir/file.txt", "relative/path.txt", "/base/dir/relative/path.txt"},
+			{
+				"Multiple parent directories",
+				"/base/dir/subdir/file.txt",
+				"../../other.txt",
+				"/base/other.txt",
+			},
+			{
+				"Relative path with base",
+				"/base/dir/file.txt",
+				"relative/path.txt",
+				"/base/dir/relative/path.txt",
+			},
 		}
 
 		for _, tc := range testCases {
@@ -82,10 +112,25 @@ func TestNormalize(t *testing.T) {
 			expectedPath       string
 		}{
 			{"File URI", "", "file:///path/to/file.txt", "/path/to/file.txt"},
-			{"File URI with base", "/base/dir/file.txt", "file:///path/to/file.txt", "/path/to/file.txt"},
+			{
+				"File URI with base",
+				"/base/dir/file.txt",
+				"file:///path/to/file.txt",
+				"/path/to/file.txt",
+			},
 			{"Base as file URI", "file:///base/dir/file.txt", "other.txt", "/base/dir/other.txt"},
-			{"Both as file URIs", "file:///base/dir/file.txt", "file:///path/to/file.txt", "/path/to/file.txt"},
-			{"Relative path with base as URI", "file:///base/dir/file.txt", "../other.txt", "/base/other.txt"},
+			{
+				"Both as file URIs",
+				"file:///base/dir/file.txt",
+				"file:///path/to/file.txt",
+				"/path/to/file.txt",
+			},
+			{
+				"Relative path with base as URI",
+				"file:///base/dir/file.txt",
+				"../other.txt",
+				"/base/other.txt",
+			},
 		}
 
 		for _, tc := range testCases {
@@ -104,7 +149,12 @@ func TestNormalize(t *testing.T) {
 			filePath           string
 			errorPattern       string
 		}{
-			{"Non-absolute relativeToFilePath", "relative/path", "file.txt", "relativeToFilePath must be an absolute path"},
+			{
+				"Non-absolute relativeToFilePath",
+				"relative/path",
+				"file.txt",
+				"relativeToFilePath must be an absolute path",
+			},
 			{"Non-absolute result path", "", "relative/path", "file path must be an absolute path"},
 		}
 

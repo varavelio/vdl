@@ -169,7 +169,10 @@ const (
 )
 
 // getCompletionContext returns the completion prefix and kind.
-func getCompletionContext(content string, pos TextDocumentPosition) (string, CompletionContextKind, bool) {
+func getCompletionContext(
+	content string,
+	pos TextDocumentPosition,
+) (string, CompletionContextKind, bool) {
 	lines := strings.Split(content, "\n")
 	if pos.Line >= len(lines) {
 		return "", 0, false
@@ -242,8 +245,10 @@ func getCompletionContext(content string, pos TextDocumentPosition) (string, Com
 }
 
 // Regex for fallback extraction.
-var typeDefRegex = regexp.MustCompile(`\btype\s+([a-zA-Z_]\w*)`)
-var enumDefRegex = regexp.MustCompile(`\benum\s+([a-zA-Z_]\w*)`)
+var (
+	typeDefRegex = regexp.MustCompile(`\btype\s+([a-zA-Z_]\w*)`)
+	enumDefRegex = regexp.MustCompile(`\benum\s+([a-zA-Z_]\w*)`)
+)
 
 // collectCustomTypesFromContent parses the content and returns type names.
 // Note: We ignore parse errors because the parser returns partial results

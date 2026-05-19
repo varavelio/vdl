@@ -15,7 +15,7 @@ import (
 
 // astCleanPositionsRecursively cleans all position fields recursively in any struct or array of structs.
 // If includeRoot is true, it will also clean the position fields of the root object.
-func astCleanPositionsRecursively(val reflect.Value, emptyPos reflect.Value, includeRoot bool) {
+func astCleanPositionsRecursively(val, emptyPos reflect.Value, includeRoot bool) {
 	if !val.IsValid() {
 		return
 	}
@@ -29,10 +29,16 @@ func astCleanPositionsRecursively(val reflect.Value, emptyPos reflect.Value, inc
 	case reflect.Struct:
 		// Set Pos and EndPos fields to empty value if they exist and we should process this level
 		if includeRoot {
-			if f := val.FieldByName("Pos"); f.IsValid() && f.CanSet() && f.Type() == emptyPos.Type() {
+			if f := val.FieldByName(
+				"Pos",
+			); f.IsValid() && f.CanSet() &&
+				f.Type() == emptyPos.Type() {
 				f.Set(emptyPos)
 			}
-			if f := val.FieldByName("EndPos"); f.IsValid() && f.CanSet() && f.Type() == emptyPos.Type() {
+			if f := val.FieldByName(
+				"EndPos",
+			); f.IsValid() && f.CanSet() &&
+				f.Type() == emptyPos.Type() {
 				f.Set(emptyPos)
 			}
 		}

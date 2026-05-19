@@ -18,7 +18,9 @@ type Bar {
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentRename{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentRenameParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 3, Character: 7}, // Foo reference
@@ -63,7 +65,9 @@ func TestHandleTextDocumentRename_CrossFile(t *testing.T) {
 
 	// Rename Foo in A
 	req := RequestMessageTextDocumentRename{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentRenameParams{
 			TextDocument: TextDocumentIdentifier{URI: uriA},
 			Position:     TextDocumentPosition{Line: 0, Character: 6}, // "Foo"
@@ -131,7 +135,9 @@ type Main {
 
 	// Rename MyType in shared.vdl
 	req := RequestMessageTextDocumentRename{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/rename", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentRenameParams{
 			TextDocument: TextDocumentIdentifier{URI: uriShared},
 			Position:     TextDocumentPosition{Line: 0, Character: 6}, // "MyType"

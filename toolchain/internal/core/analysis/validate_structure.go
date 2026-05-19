@@ -16,16 +16,22 @@ func validateStructure(symbols *symbolTable) []Diagnostic {
 	// Validate type field uniqueness
 	for _, typ := range symbols.types {
 		if typ.IsObject() && typ.Type.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldUniqueness(typ.Type.ObjectDef.Fields, "type", typ.Name, typ.File)...)
+			diagnostics = append(
+				diagnostics,
+				validateFieldUniqueness(typ.Type.ObjectDef.Fields, "type", typ.Name, typ.File)...)
 			for _, field := range typ.Type.ObjectDef.Fields {
-				diagnostics = append(diagnostics, validateInlineFieldUniqueness(field.Type, typ.File, field.Name)...)
+				diagnostics = append(
+					diagnostics,
+					validateInlineFieldUniqueness(field.Type, typ.File, field.Name)...)
 			}
 		}
 	}
 
 	for _, cnst := range symbols.consts {
 		if cnst.AST != nil && cnst.AST.Value != nil {
-			diagnostics = append(diagnostics, validateObjectLiteralUniqueness(cnst.AST.Value, cnst.File)...)
+			diagnostics = append(
+				diagnostics,
+				validateObjectLiteralUniqueness(cnst.AST.Value, cnst.File)...)
 		}
 	}
 
@@ -52,7 +58,8 @@ func validateFieldUniqueness(fields []*FieldSymbol, context, parentName, file st
 		}
 
 		// Recursively check inline object fields
-		if field.Type != nil && field.Type.Kind == FieldTypeKindObject && field.Type.ObjectDef != nil {
+		if field.Type != nil && field.Type.Kind == FieldTypeKindObject &&
+			field.Type.ObjectDef != nil {
 			diagnostics = append(diagnostics, validateFieldUniqueness(
 				field.Type.ObjectDef.Fields,
 				"inline object in",
@@ -78,9 +85,13 @@ func validateInlineFieldUniqueness(typeInfo *FieldTypeInfo, file, owner string) 
 		if typeInfo.ObjectDef == nil {
 			return nil
 		}
-		diagnostics = append(diagnostics, validateFieldUniqueness(typeInfo.ObjectDef.Fields, "inline object in", owner, file)...)
+		diagnostics = append(
+			diagnostics,
+			validateFieldUniqueness(typeInfo.ObjectDef.Fields, "inline object in", owner, file)...)
 		for _, f := range typeInfo.ObjectDef.Fields {
-			diagnostics = append(diagnostics, validateInlineFieldUniqueness(f.Type, file, f.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateInlineFieldUniqueness(f.Type, file, f.Name)...)
 		}
 	}
 
@@ -97,7 +108,9 @@ func validateObjectLiteralUniqueness(lit *ast.DataLiteral, file string) []Diagno
 		seen := map[string]ast.Position{}
 		for _, entry := range lit.Object.Entries {
 			if entry.Spread != nil {
-				diagnostics = append(diagnostics, validateObjectLiteralUniqueness(entry.Value, file)...)
+				diagnostics = append(
+					diagnostics,
+					validateObjectLiteralUniqueness(entry.Value, file)...)
 				continue
 			}
 			if existing, ok := seen[entry.Key]; ok {
@@ -106,7 +119,11 @@ func validateObjectLiteralUniqueness(lit *ast.DataLiteral, file string) []Diagno
 					entry.Pos,
 					entry.EndPos,
 					CodeDuplicateField,
-					fmt.Sprintf("object key %q is already declared at line %d", entry.Key, existing.Line),
+					fmt.Sprintf(
+						"object key %q is already declared at line %d",
+						entry.Key,
+						existing.Line,
+					),
 				))
 			} else {
 				seen[entry.Key] = entry.Pos

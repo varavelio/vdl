@@ -10,7 +10,7 @@ import (
 )
 
 type cmdFormatArgs struct {
-	Patterns []string `arg:"positional" help:"The file patterns to format (supports recursive globs) - Default ./**/*.vdl"`
+	Patterns []string `arg:"positional"   help:"The file patterns to format (supports recursive globs) - Default ./**/*.vdl"`
 	Verbose  bool     `arg:"-v,--verbose" help:"Verbose output prints all formatted files"`
 }
 
@@ -79,7 +79,7 @@ func cmdFmt(args *cmdFormatArgs) {
 			printFatal("VDL failed to format '%s': %v", match, err)
 		}
 
-		if err := os.WriteFile(match, []byte(formatted), 0644); err != nil {
+		if err := os.WriteFile(match, []byte(formatted), 0o644); err != nil {
 			printFatal("VDL failed to write file '%s': %v", match, err)
 		}
 

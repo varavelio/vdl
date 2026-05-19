@@ -188,7 +188,11 @@ func TestLexerLiteralsAndComments(t *testing.T) {
 			types = append(types, tok.Type)
 		}
 
-		require.Equal(t, []string{"CommentBlock", "Comment", "Docstring", "Spread", "Ident", "EOF"}, types)
+		require.Equal(
+			t,
+			[]string{"CommentBlock", "Comment", "Docstring", "Spread", "Ident", "EOF"},
+			types,
+		)
 	})
 }
 
@@ -388,14 +392,51 @@ func TestLexerFullSampleTypes(t *testing.T) {
 	}
 
 	require.Equal(t, []string{
-		"Include", "StringLiteral",
-		"At", "Ident", "Type", "Ident", "LBrace",
-		"At", "Ident", "Ident", "LBrace",
-		"Ident", "LBrace", "Ident", "String", "LBracket", "RBracket", "Ident", "Map", "LBracket", "String", "RBracket", "RBrace",
-		"Ident", "LBrace", "Ident", "String", "RBrace",
-		"RBrace", "RBrace",
-		"At", "Ident", "Const", "Ident", "Equals", "StringLiteral",
-		"Enum", "Ident", "LBrace", "Ident", "Equals", "StringLiteral", "Spread", "Ident", "RBrace",
+		"Include",
+		"StringLiteral",
+		"At",
+		"Ident",
+		"Type",
+		"Ident",
+		"LBrace",
+		"At",
+		"Ident",
+		"Ident",
+		"LBrace",
+		"Ident",
+		"LBrace",
+		"Ident",
+		"String",
+		"LBracket",
+		"RBracket",
+		"Ident",
+		"Map",
+		"LBracket",
+		"String",
+		"RBracket",
+		"RBrace",
+		"Ident",
+		"LBrace",
+		"Ident",
+		"String",
+		"RBrace",
+		"RBrace",
+		"RBrace",
+		"At",
+		"Ident",
+		"Const",
+		"Ident",
+		"Equals",
+		"StringLiteral",
+		"Enum",
+		"Ident",
+		"LBrace",
+		"Ident",
+		"Equals",
+		"StringLiteral",
+		"Spread",
+		"Ident",
+		"RBrace",
 		"EOF",
 	}, actualTypes)
 }

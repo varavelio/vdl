@@ -32,9 +32,21 @@ var (
 	lineSemiComment    = generatedFileCommentStyle{LinePrefix: ";"}
 	lineBangComment    = generatedFileCommentStyle{LinePrefix: "!"}
 	linePercentComment = generatedFileCommentStyle{LinePrefix: "%"}
-	cBlockComment      = generatedFileCommentStyle{BlockStart: "/*", BlockLine: " *", BlockEnd: " */"}
-	htmlBlockComment   = generatedFileCommentStyle{BlockStart: "<!--", BlockLine: "  ", BlockEnd: "-->"}
-	ocamlBlockComment  = generatedFileCommentStyle{BlockStart: "(*", BlockLine: " *", BlockEnd: " *)"}
+	cBlockComment      = generatedFileCommentStyle{
+		BlockStart: "/*",
+		BlockLine:  " *",
+		BlockEnd:   " */",
+	}
+	htmlBlockComment = generatedFileCommentStyle{
+		BlockStart: "<!--",
+		BlockLine:  "  ",
+		BlockEnd:   "-->",
+	}
+	ocamlBlockComment = generatedFileCommentStyle{
+		BlockStart: "(*",
+		BlockLine:  " *",
+		BlockEnd:   " *)",
+	}
 )
 
 var generatedFileHeaderLanguages = []generatedFileHeaderLanguage{
@@ -55,12 +67,21 @@ var generatedFileHeaderLanguages = []generatedFileHeaderLanguage{
 	{Name: "Swift", Extensions: []string{".swift"}, Comment: lineSlashComment},
 	{Name: "Rust", Extensions: []string{".rs"}, Comment: lineSlashComment},
 	{Name: "C", Extensions: []string{".c", ".h"}, Comment: lineSlashComment},
-	{Name: "C++", Extensions: []string{".cc", ".cpp", ".cxx", ".hpp", ".hh", ".hxx"}, Comment: lineSlashComment},
+	{
+		Name:       "C++",
+		Extensions: []string{".cc", ".cpp", ".cxx", ".hpp", ".hh", ".hxx"},
+		Comment:    lineSlashComment,
+	},
 	{Name: "C#", Extensions: []string{".cs"}, Comment: lineSlashComment},
 	{Name: "F#", Extensions: []string{".fs", ".fsi", ".fsx"}, Comment: lineSlashComment},
 	{Name: "Dart", Extensions: []string{".dart"}, Comment: lineSlashComment},
 	{Name: "Lua", Extensions: []string{".lua"}, Comment: lineDashComment},
-	{Name: "Shell", Extensions: []string{".sh", ".bash", ".zsh", ".fish"}, Basenames: []string{".envrc"}, Comment: lineHashComment},
+	{
+		Name:       "Shell",
+		Extensions: []string{".sh", ".bash", ".zsh", ".fish"},
+		Basenames:  []string{".envrc"},
+		Comment:    lineHashComment,
+	},
 	{Name: "PowerShell", Extensions: []string{".ps1", ".psm1", ".psd1"}, Comment: lineHashComment},
 	{Name: "SQL", Extensions: []string{".sql"}, Comment: lineDashComment},
 	{Name: "R", Extensions: []string{".r"}, Comment: lineHashComment},
@@ -73,17 +94,29 @@ var generatedFileHeaderLanguages = []generatedFileHeaderLanguage{
 	{Name: "Nim", Extensions: []string{".nim"}, Comment: lineHashComment},
 	{Name: "Zig", Extensions: []string{".zig", ".zon"}, Comment: lineSlashComment},
 	{Name: "Solidity", Extensions: []string{".sol"}, Comment: lineSlashComment},
-	{Name: "GraphQL", Extensions: []string{".graphql", ".gql", ".graphqls"}, Comment: lineHashComment},
+	{
+		Name:       "GraphQL",
+		Extensions: []string{".graphql", ".gql", ".graphqls"},
+		Comment:    lineHashComment,
+	},
 	{Name: "YAML", Extensions: []string{".yaml", ".yml"}, Comment: lineHashComment},
 	{Name: "TOML", Extensions: []string{".toml"}, Comment: lineHashComment},
 	{Name: "Nix", Extensions: []string{".nix"}, Comment: lineHashComment},
 	{Name: "Tcl", Extensions: []string{".tcl"}, Comment: lineHashComment},
 	{Name: "Ada", Extensions: []string{".adb", ".ads"}, Comment: lineDashComment},
-	{Name: "Fortran", Extensions: []string{".f90", ".f95", ".f03", ".f08"}, Comment: lineBangComment},
+	{
+		Name:       "Fortran",
+		Extensions: []string{".f90", ".f95", ".f03", ".f08"},
+		Comment:    lineBangComment,
+	},
 	{Name: "Assembly", Extensions: []string{".asm", ".s", ".S"}, Comment: lineSemiComment},
 	{Name: "Lisp", Extensions: []string{".lisp", ".lsp", ".el"}, Comment: lineSemiComment},
 	{Name: "Scheme", Extensions: []string{".scm", ".ss"}, Comment: lineSemiComment},
-	{Name: "Clojure", Extensions: []string{".clj", ".cljs", ".cljc", ".edn"}, Comment: generatedFileCommentStyle{LinePrefix: ";;"}},
+	{
+		Name:       "Clojure",
+		Extensions: []string{".clj", ".cljs", ".cljc", ".edn"},
+		Comment:    generatedFileCommentStyle{LinePrefix: ";;"},
+	},
 	{Name: "Verilog", Extensions: []string{".v", ".sv", ".svh"}, Comment: lineSlashComment},
 	{Name: "HCL", Extensions: []string{".hcl", ".tf", ".tfvars"}, Comment: lineHashComment},
 	{Name: "Protocol Buffers", Extensions: []string{".proto"}, Comment: lineSlashComment},
@@ -98,21 +131,53 @@ var generatedFileHeaderLanguages = []generatedFileHeaderLanguage{
 	{Name: "Puppet", Extensions: []string{".pp"}, Comment: lineHashComment},
 	{Name: "Bicep", Extensions: []string{".bicep"}, Comment: lineSlashComment},
 	{Name: "Prisma", Extensions: []string{".prisma"}, Comment: lineSlashComment},
-	{Name: "OCaml", Extensions: []string{".ml", ".mli", ".mll", ".mly"}, Comment: ocamlBlockComment},
+	{
+		Name:       "OCaml",
+		Extensions: []string{".ml", ".mli", ".mll", ".mly"},
+		Comment:    ocamlBlockComment,
+	},
 	{Name: "Reason", Extensions: []string{".re", ".rei"}, Comment: ocamlBlockComment},
 	{Name: "HTML", Extensions: []string{".html", ".htm"}, Comment: htmlBlockComment},
-	{Name: "XML", Extensions: []string{".xml", ".xsd", ".xsl", ".xslt", ".svg", ".plist"}, Comment: htmlBlockComment},
+	{
+		Name:       "XML",
+		Extensions: []string{".xml", ".xsd", ".xsl", ".xslt", ".svg", ".plist"},
+		Comment:    htmlBlockComment,
+	},
 	{Name: "CSS", Extensions: []string{".css", ".pcss", ".scss", ".less"}, Comment: cBlockComment},
 	{Name: "Sass", Extensions: []string{".sass"}, Comment: lineSlashComment},
 	{Name: "Vue", Extensions: []string{".vue"}, Comment: htmlBlockComment},
 	{Name: "Svelte", Extensions: []string{".svelte"}, Comment: htmlBlockComment},
 	{Name: "Astro", Extensions: []string{".astro"}, Comment: htmlBlockComment},
 	{Name: "Markdown", Extensions: []string{".md", ".mdx", ".markdown"}, Comment: htmlBlockComment},
-	{Name: "Docker", Basenames: []string{"Dockerfile"}, Extensions: []string{".dockerfile"}, Comment: lineHashComment},
-	{Name: "Make", Basenames: []string{"Makefile", "GNUmakefile"}, Extensions: []string{".mk"}, Comment: lineHashComment},
-	{Name: "CMake", Basenames: []string{"CMakeLists.txt"}, Extensions: []string{".cmake"}, Comment: lineHashComment},
-	{Name: "Bazel", Basenames: []string{"BUILD", "WORKSPACE", "MODULE.bazel"}, Extensions: []string{".bzl", ".bazel"}, Comment: lineHashComment},
-	{Name: "Properties", Extensions: []string{".properties", ".ini", ".cfg", ".conf"}, Comment: lineHashComment},
+	{
+		Name:       "Docker",
+		Basenames:  []string{"Dockerfile"},
+		Extensions: []string{".dockerfile"},
+		Comment:    lineHashComment,
+	},
+	{
+		Name:       "Make",
+		Basenames:  []string{"Makefile", "GNUmakefile"},
+		Extensions: []string{".mk"},
+		Comment:    lineHashComment,
+	},
+	{
+		Name:       "CMake",
+		Basenames:  []string{"CMakeLists.txt"},
+		Extensions: []string{".cmake"},
+		Comment:    lineHashComment,
+	},
+	{
+		Name:       "Bazel",
+		Basenames:  []string{"BUILD", "WORKSPACE", "MODULE.bazel"},
+		Extensions: []string{".bzl", ".bazel"},
+		Comment:    lineHashComment,
+	},
+	{
+		Name:       "Properties",
+		Extensions: []string{".properties", ".ini", ".cfg", ".conf"},
+		Comment:    lineHashComment,
+	},
 	{Name: "LaTeX", Extensions: []string{".tex", ".sty", ".bib"}, Comment: linePercentComment},
 	{Name: "Crystal", Extensions: []string{".cr"}, Comment: lineHashComment},
 	{Name: "Apex", Extensions: []string{".cls", ".trigger"}, Comment: lineSlashComment},
@@ -139,7 +204,10 @@ func applyGeneratedFileHeaders(results []executedPlugin) {
 			if !ok {
 				continue
 			}
-			files[fileIndex].Content = buildGeneratedFileHeader(pluginName, commentStyle) + files[fileIndex].GetContent()
+			files[fileIndex].Content = buildGeneratedFileHeader(
+				pluginName,
+				commentStyle,
+			) + files[fileIndex].GetContent()
 		}
 
 		results[i].Output.Files = &files
@@ -183,7 +251,12 @@ func buildGeneratedFileHeader(pluginName string, commentStyle generatedFileComme
 // generated-file banner.
 func generatedFileHeaderLines(pluginName string) []string {
 	return []string{
-		fmt.Sprintf("Code generated by VDL v%s (commit %s) using %s", version.Version, version.Commit, pluginName),
+		fmt.Sprintf(
+			"Code generated by VDL v%s (commit %s) using %s",
+			version.Version,
+			version.Commit,
+			pluginName,
+		),
 		"Any changes will be overwritten the next time VDL is run. DO NOT EDIT.",
 		fmt.Sprintf("Learn more: %s", generatedFileHeaderRepoURL),
 	}

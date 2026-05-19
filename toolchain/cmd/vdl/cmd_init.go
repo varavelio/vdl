@@ -30,7 +30,7 @@ func cmdInit(args *cmdInitArgs) {
 	}
 
 	// Create directory if it doesn't exist
-	if err := os.MkdirAll(args.Path, 0755); err != nil {
+	if err := os.MkdirAll(args.Path, 0o755); err != nil {
 		printFatal("VDL failed to create directory: %v", err)
 	}
 
@@ -38,12 +38,12 @@ func cmdInit(args *cmdInitArgs) {
 	schemaName, schemaPath, _, configPath := generateUniqueFilenames(args.Path)
 
 	// Write both files
-	if err := os.WriteFile(schemaPath, initSchema, 0644); err != nil {
+	if err := os.WriteFile(schemaPath, initSchema, 0o644); err != nil {
 		printFatal("VDL failed to write schema file: %v", err)
 	}
 
 	initConfigStr := strings.ReplaceAll(string(initConfig), "{{schema_path}}", "./"+schemaName)
-	if err := os.WriteFile(configPath, []byte(initConfigStr), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte(initConfigStr), 0o644); err != nil {
 		printFatal("VDL failed to write config file: %v", err)
 	}
 

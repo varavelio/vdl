@@ -51,7 +51,15 @@ func lexTokens(filename, content string) ([]fmtToken, error) {
 		}
 
 		if tok.Type == lexer.EOF {
-			result = append(result, fmtToken{Type: "EOF", Line: tok.Pos.Line, Column: tok.Pos.Column, EndLine: tok.Pos.Line})
+			result = append(
+				result,
+				fmtToken{
+					Type:    "EOF",
+					Line:    tok.Pos.Line,
+					Column:  tok.Pos.Column,
+					EndLine: tok.Pos.Line,
+				},
+			)
 			break
 		}
 

@@ -13,7 +13,7 @@ import (
 // Parameters:
 //   - relativeToFilePath: Optional base path for resolving relative paths
 //   - filePath: Path to normalize (absolute or relative to relativeToFilePath)
-func Normalize(relativeToFilePath string, filePath string) (string, error) {
+func Normalize(relativeToFilePath, filePath string) (string, error) {
 	// Convert URI to file path if needed
 	filePath = FromURI(filePath)
 
@@ -27,7 +27,10 @@ func Normalize(relativeToFilePath string, filePath string) (string, error) {
 		relativeToFilePath = FromURI(relativeToFilePath)
 
 		if !filepath.IsAbs(relativeToFilePath) {
-			return "", fmt.Errorf("relativeToFilePath must be an absolute path, got %s", relativeToFilePath)
+			return "", fmt.Errorf(
+				"relativeToFilePath must be an absolute path, got %s",
+				relativeToFilePath,
+			)
 		}
 
 		// Keep only the directory

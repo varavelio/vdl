@@ -193,7 +193,8 @@ func (r *resolver) resolveTypeMemberDocstrings(children []*ast.TypeMember, fileP
 			r.resolveDocstring(child.Field.Docstring, filePath)
 		}
 		// Recursively handle inline objects
-		if child.Field != nil && child.Field.Type.Base != nil && child.Field.Type.Base.Object != nil {
+		if child.Field != nil && child.Field.Type.Base != nil &&
+			child.Field.Type.Base.Object != nil {
 			r.resolveTypeMemberDocstrings(child.Field.Type.Base.Object.Members, filePath)
 		}
 	}

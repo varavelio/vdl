@@ -33,12 +33,20 @@ func loadLockFile(path string) (locktypes.VdlLockFileSchema, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return newLockFile(), nil
 		}
-		return locktypes.VdlLockFileSchema{}, fmt.Errorf("failed to read lock file %q: %w", path, err)
+		return locktypes.VdlLockFileSchema{}, fmt.Errorf(
+			"failed to read lock file %q: %w",
+			path,
+			err,
+		)
 	}
 
 	var lockFile locktypes.VdlLockFileSchema
 	if err := json.Unmarshal(data, &lockFile); err != nil {
-		return locktypes.VdlLockFileSchema{}, fmt.Errorf("failed to parse lock file %q: %w", path, err)
+		return locktypes.VdlLockFileSchema{}, fmt.Errorf(
+			"failed to parse lock file %q: %w",
+			path,
+			err,
+		)
 	}
 	if lockFile.GetVersion() != lockFileVersion {
 		return locktypes.VdlLockFileSchema{}, fmt.Errorf(
@@ -75,7 +83,10 @@ func writeLockFile(path string, lockFile locktypes.VdlLockFileSchema) error {
 
 // materializeRemotePlugins downloads or reuses cached remote plugin scripts and
 // updates the lockfile hashes accordingly.
-func materializeRemotePlugins(plugins []runtimePlugin, lockFile *locktypes.VdlLockFileSchema) error {
+func materializeRemotePlugins(
+	plugins []runtimePlugin,
+	lockFile *locktypes.VdlLockFileSchema,
+) error {
 	cacheDir, err := dirs.GetCacheDir()
 	if err != nil {
 		return err
@@ -115,7 +126,11 @@ func materializeRemotePlugins(plugins []runtimePlugin, lockFile *locktypes.VdlLo
 
 // materializeRemoteDependency returns the local cached path for a remote
 // dependency and verifies it against the expected lockfile hash when present.
-func materializeRemoteDependency(rawURL string, headers http.Header, expectedHash, cacheDir string) (string, string, error) {
+func materializeRemoteDependency(
+	rawURL string,
+	headers http.Header,
+	expectedHash, cacheDir string,
+) (string, string, error) {
 	cachePath := filepath.Join(cacheDir, hashRemoteCacheKey(rawURL)+".js")
 
 	if data, err := os.ReadFile(cachePath); err == nil {
@@ -171,7 +186,11 @@ func downloadRemoteDependency(rawURL string, headers http.Header) ([]byte, error
 	defer resp.Body.Close()
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("failed to download %q: unexpected HTTP status %s", rawURL, resp.Status)
+		return nil, fmt.Errorf(
+			"failed to download %q: unexpected HTTP status %s",
+			rawURL,
+			resp.Status,
+		)
 	}
 
 	data, err := io.ReadAll(resp.Body)

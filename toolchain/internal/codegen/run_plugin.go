@@ -138,7 +138,9 @@ func runPlugin(
 	// to execute the plugin.
 	wrapper, ok := goja.AssertFunction(vm.Get("__vdl__generate"))
 	if !ok {
-		return plugintypes.PluginOutput{}, fmt.Errorf("error finding the __vdl__generate wrapper function in the plugin script")
+		return plugintypes.PluginOutput{}, fmt.Errorf(
+			"error finding the __vdl__generate wrapper function in the plugin script",
+		)
 	}
 
 	// Serialize the input from Go to a JSON string that can be passed to the plugin.
@@ -154,7 +156,10 @@ func runPlugin(
 	if err != nil {
 		// If plugin does a "throw new Error()" or the execution fails for any
 		// reason, we catch it here and return an error.
-		return plugintypes.PluginOutput{}, fmt.Errorf("the plugin failed during generation: %w", err)
+		return plugintypes.PluginOutput{}, fmt.Errorf(
+			"the plugin failed during generation: %w",
+			err,
+		)
 	}
 
 	// Deserialize the output from the plugin back into a Go struct. The plugin is expected
@@ -162,14 +167,17 @@ func runPlugin(
 	// to JSON and then deserialized here.
 	var output plugintypes.PluginOutput
 	if err := json.Unmarshal([]byte(res.String()), &output); err != nil {
-		return plugintypes.PluginOutput{}, fmt.Errorf("the plugin returned an invalid output: %w", err)
+		return plugintypes.PluginOutput{}, fmt.Errorf(
+			"the plugin returned an invalid output: %w",
+			err,
+		)
 	}
 
 	return output, nil
 }
 
 // buildPluginLogPrefix returns the console prefix used for plugin log output.
-func buildPluginLogPrefix(pluginName string, prefix string) string {
+func buildPluginLogPrefix(pluginName, prefix string) string {
 	pluginName = strings.TrimSpace(pluginName)
 	if pluginName == "" {
 		return fmt.Sprintf("[%s] ", prefix)

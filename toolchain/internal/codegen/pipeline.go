@@ -29,7 +29,11 @@ func preparePlugins(plugins []runtimePlugin) ([]preparedPlugin, error) {
 
 		scriptBytes, err := os.ReadFile(scriptPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read plugin script %q: %w", plugin.Source.DisplayName, err)
+			return nil, fmt.Errorf(
+				"failed to read plugin script %q: %w",
+				plugin.Source.DisplayName,
+				err,
+			)
 		}
 		plugin.Source.ContentHash = sha256Digest(scriptBytes)
 
@@ -60,7 +64,11 @@ func buildPluginInput(plugin runtimePlugin) (plugintypes.PluginInput, error) {
 	schema := ir.FromProgram(program)
 	pluginIR, err := convertIRSchema(schema)
 	if err != nil {
-		return plugintypes.PluginInput{}, fmt.Errorf("failed to build plugin IR for %q: %w", plugin.Source.DisplayName, err)
+		return plugintypes.PluginInput{}, fmt.Errorf(
+			"failed to build plugin IR for %q: %w",
+			plugin.Source.DisplayName,
+			err,
+		)
 	}
 
 	return plugintypes.PluginInput{
@@ -80,7 +88,10 @@ func convertIRSchema(schema *irtypes.IrSchema) (plugintypes.IrSchema, error) {
 
 	var pluginIR plugintypes.IrSchema
 	if err := json.Unmarshal(data, &pluginIR); err != nil {
-		return plugintypes.IrSchema{}, fmt.Errorf("failed to unmarshal IR into plugin input schema: %w", err)
+		return plugintypes.IrSchema{}, fmt.Errorf(
+			"failed to unmarshal IR into plugin input schema: %w",
+			err,
+		)
 	}
 
 	return pluginIR, nil
@@ -162,9 +173,16 @@ func planOutputWrites(results []executedPlugin) (outputPlan, error) {
 		}
 
 		for _, file := range result.Output.GetFiles() {
-			relativePath, absolutePath, err := resolveOutputWritePath(result.Plugin.OutDir, file.GetPath())
+			relativePath, absolutePath, err := resolveOutputWritePath(
+				result.Plugin.OutDir,
+				file.GetPath(),
+			)
 			if err != nil {
-				return outputPlan{}, fmt.Errorf("plugin %q: %w", result.Plugin.Source.DisplayName, err)
+				return outputPlan{}, fmt.Errorf(
+					"plugin %q: %w",
+					result.Plugin.Source.DisplayName,
+					err,
+				)
 			}
 
 			if previousPlugin, exists := seenPaths[absolutePath]; exists {
@@ -205,10 +223,16 @@ func resolveOutputWritePath(outDir, rawRelativePath string) (string, string, err
 
 	normalized := filepath.Clean(filepath.FromSlash(relativePath))
 	if normalized == "." || normalized == ".." || filepath.IsAbs(normalized) {
-		return "", "", fmt.Errorf("plugin output path %q is invalid: it must stay inside the outDir", rawRelativePath)
+		return "", "", fmt.Errorf(
+			"plugin output path %q is invalid: it must stay inside the outDir",
+			rawRelativePath,
+		)
 	}
 	if strings.HasPrefix(normalized, ".."+string(filepath.Separator)) {
-		return "", "", fmt.Errorf("plugin output path %q is invalid: it must stay inside the outDir", rawRelativePath)
+		return "", "", fmt.Errorf(
+			"plugin output path %q is invalid: it must stay inside the outDir",
+			rawRelativePath,
+		)
 	}
 
 	absolutePath := filepath.Join(outDir, normalized)
@@ -222,7 +246,10 @@ func resolveOutputWritePath(outDir, rawRelativePath string) (string, string, err
 		return "", "", fmt.Errorf("failed to validate output path %q: %w", rawRelativePath, err)
 	}
 	if relToOutDir == ".." || strings.HasPrefix(relToOutDir, ".."+string(filepath.Separator)) {
-		return "", "", fmt.Errorf("plugin output path %q is invalid: it escapes the outDir", rawRelativePath)
+		return "", "", fmt.Errorf(
+			"plugin output path %q is invalid: it escapes the outDir",
+			rawRelativePath,
+		)
 	}
 
 	return normalized, absolutePath, nil
@@ -295,7 +322,11 @@ func mergeOutputDirs(outDirs []string, writes []outputWrite, stagingDirs map[str
 	for _, write := range writes {
 		stagePath := filepath.Join(stagingDirs[write.OutDir], write.RelativePath)
 		if err := os.MkdirAll(filepath.Dir(write.AbsolutePath), generatedDirMode); err != nil {
-			return fmt.Errorf("failed to create parent directory for %q: %w", write.AbsolutePath, err)
+			return fmt.Errorf(
+				"failed to create parent directory for %q: %w",
+				write.AbsolutePath,
+				err,
+			)
 		}
 		data, err := os.ReadFile(stagePath)
 		if err != nil {

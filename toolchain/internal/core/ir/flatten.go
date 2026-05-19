@@ -16,7 +16,14 @@ func flattenTypeFields(
 	if typ == nil || !typ.IsObject() || typ.Type.ObjectDef == nil {
 		return nil
 	}
-	return flattenFieldsWithSpreads(typ.Type.ObjectDef.Fields, typ.Type.ObjectDef.Spreads, types, enums, resolver, map[string]bool{typ.Name: true})
+	return flattenFieldsWithSpreads(
+		typ.Type.ObjectDef.Fields,
+		typ.Type.ObjectDef.Spreads,
+		types,
+		enums,
+		resolver,
+		map[string]bool{typ.Name: true},
+	)
 }
 
 func flattenFieldsWithSpreads(
@@ -34,13 +41,21 @@ func flattenFieldsWithSpreads(
 			continue
 		}
 		spreadType := types[spread.Name]
-		if spreadType == nil || !spreadType.IsObject() || spreadType.Type.ObjectDef == nil || visiting[spreadType.Name] {
+		if spreadType == nil || !spreadType.IsObject() || spreadType.Type.ObjectDef == nil ||
+			visiting[spreadType.Name] {
 			continue
 		}
 
 		nextVisiting := cloneVisited(visiting)
 		nextVisiting[spreadType.Name] = true
-		spreadFields := flattenFieldsWithSpreads(spreadType.Type.ObjectDef.Fields, spreadType.Type.ObjectDef.Spreads, types, enums, resolver, nextVisiting)
+		spreadFields := flattenFieldsWithSpreads(
+			spreadType.Type.ObjectDef.Fields,
+			spreadType.Type.ObjectDef.Spreads,
+			types,
+			enums,
+			resolver,
+			nextVisiting,
+		)
 		result = append(result, spreadFields...)
 	}
 
@@ -60,7 +75,14 @@ func flattenInlineObjectFields(
 	if obj == nil {
 		return nil
 	}
-	fields := flattenFieldsWithSpreads(obj.Fields, obj.Spreads, types, enums, resolver, map[string]bool{})
+	fields := flattenFieldsWithSpreads(
+		obj.Fields,
+		obj.Spreads,
+		types,
+		enums,
+		resolver,
+		map[string]bool{},
+	)
 	return &fields
 }
 

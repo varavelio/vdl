@@ -9,12 +9,12 @@ import (
 )
 
 type allArgs struct {
-	Init     *cmdInitArgs     `arg:"subcommand:init" help:"Initialize a new VDL schema in the specified path"`
-	Format   *cmdFormatArgs   `arg:"subcommand:format" help:"Format the VDL schema in the specified path"`
+	Init     *cmdInitArgs     `arg:"subcommand:init"     help:"Initialize a new VDL schema in the specified path"`
+	Format   *cmdFormatArgs   `arg:"subcommand:format"   help:"Format the VDL schema in the specified path"`
 	Generate *cmdGenerateArgs `arg:"subcommand:generate" help:"Generate code from the VDL schema"`
-	Compile  *cmdCompileArgs  `arg:"subcommand:compile" help:"Compile a VDL file and emit its IR as JSON"`
-	LSP      *cmdLSPArgs      `arg:"subcommand:lsp" help:"Start the VDL Language Server"`
-	Version  *struct{}        `arg:"subcommand:version" help:"Show vdl version information"`
+	Compile  *cmdCompileArgs  `arg:"subcommand:compile"  help:"Compile a VDL file and emit its IR as JSON"`
+	LSP      *cmdLSPArgs      `arg:"subcommand:lsp"      help:"Start the VDL Language Server"`
+	Version  *struct{}        `arg:"subcommand:version"  help:"Show vdl version information"`
 }
 
 func printVersion() {

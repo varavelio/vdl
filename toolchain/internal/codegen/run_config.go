@@ -37,7 +37,11 @@ func loadRuntimeConfig(inputPath string) (runtimeConfig, error) {
 	schema := ir.FromProgram(program)
 	constant, ok := findConstByName(schema.Constants, configConstName)
 	if !ok {
-		return runtimeConfig{}, fmt.Errorf("config file %q must declare const %q", configPath, configConstName)
+		return runtimeConfig{}, fmt.Errorf(
+			"config file %q must declare const %q",
+			configPath,
+			configConstName,
+		)
 	}
 
 	payload, err := literalValueToJSON(constant.Value)
@@ -47,7 +51,11 @@ func loadRuntimeConfig(inputPath string) (runtimeConfig, error) {
 
 	var config configtypes.VdlConfig
 	if err := json.Unmarshal(payload, &config); err != nil {
-		return runtimeConfig{}, fmt.Errorf("failed to unmarshal const %q into VdlConfig: %w", configConstName, err)
+		return runtimeConfig{}, fmt.Errorf(
+			"failed to unmarshal const %q into VdlConfig: %w",
+			configConstName,
+			err,
+		)
 	}
 
 	configDir := filepath.Dir(configPath)
@@ -82,7 +90,11 @@ func resolveConfigFilePath(inputPath string) (string, error) {
 	}
 
 	if filepath.Base(configPath) != defaultConfigFileName {
-		return "", fmt.Errorf("invalid config file %q: expected %q", configPath, defaultConfigFileName)
+		return "", fmt.Errorf(
+			"invalid config file %q: expected %q",
+			configPath,
+			defaultConfigFileName,
+		)
 	}
 
 	configInfo, err := os.Stat(configPath)

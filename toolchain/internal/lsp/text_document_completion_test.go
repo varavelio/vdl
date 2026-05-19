@@ -19,7 +19,9 @@ rpc Test {
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentCompletion{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 4, Character: 18}, // after colon and space
@@ -64,7 +66,9 @@ type Main {
 
 	// Trigger completion in Main after "f: "
 	req := RequestMessageTextDocumentCompletion{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uriMain},
 			Position:     TextDocumentPosition{Line: 3, Character: 5},
@@ -97,7 +101,9 @@ type Derived {
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentCompletion{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 2, Character: 5}, // after "..."
@@ -132,7 +138,9 @@ type Bar {
 
 	// Test case 1: "map<"
 	req := RequestMessageTextDocumentCompletion{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 2, Character: 9}, // after "map<"
@@ -162,7 +170,9 @@ type Bar {
   m: map < F
 }`))
 	req = RequestMessageTextDocumentCompletion{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "2"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "2"},
+		},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 2, Character: 12}, // after "map < F"
@@ -203,7 +213,9 @@ enum EnumC { X }
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentCompletion{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/completion", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentCompletionParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 1, Character: 5}, // after "f: "

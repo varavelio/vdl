@@ -43,7 +43,7 @@ func TestFromProgram_Golden(t *testing.T) {
 
 			goldenPath := strings.TrimSuffix(input, ".vdl") + ".json"
 			if *update {
-				err := os.WriteFile(goldenPath, gotNoPos, 0644)
+				err := os.WriteFile(goldenPath, gotNoPos, 0o644)
 				require.NoError(t, err)
 				t.Logf("updated golden file: %s", goldenPath)
 				return
@@ -69,8 +69,16 @@ func TestNormalizeDoc(t *testing.T) {
 		{name: "nil input", input: nil, expected: ""},
 		{name: "empty string", input: new(""), expected: ""},
 		{name: "single line", input: new("Hello World"), expected: "Hello World"},
-		{name: "single line with whitespace", input: new("  Hello World  "), expected: "Hello World"},
-		{name: "multi-line with indent", input: new("    Line 1\n    Line 2\n    Line 3"), expected: "Line 1\nLine 2\nLine 3"},
+		{
+			name:     "single line with whitespace",
+			input:    new("  Hello World  "),
+			expected: "Hello World",
+		},
+		{
+			name:     "multi-line with indent",
+			input:    new("    Line 1\n    Line 2\n    Line 3"),
+			expected: "Line 1\nLine 2\nLine 3",
+		},
 	}
 
 	for _, tt := range tests {

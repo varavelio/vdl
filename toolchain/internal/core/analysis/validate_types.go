@@ -63,13 +63,17 @@ func validateTypeRef(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 
 	case FieldTypeKindMap:
 		if typeInfo.MapValue != nil {
-			diagnostics = append(diagnostics, validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
+			diagnostics = append(
+				diagnostics,
+				validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
 		}
 
 	case FieldTypeKindObject:
 		// Validate object type field references
 		if typeInfo.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "type", typ.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "type", typ.Name)...)
 		}
 	}
 
@@ -77,7 +81,11 @@ func validateTypeRef(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 }
 
 // validateNestedTypeRef validates type references within nested types (e.g., map values).
-func validateNestedTypeRef(symbols *symbolTable, typeInfo *FieldTypeInfo, typ *TypeSymbol) []Diagnostic {
+func validateNestedTypeRef(
+	symbols *symbolTable,
+	typeInfo *FieldTypeInfo,
+	typ *TypeSymbol,
+) []Diagnostic {
 	if typeInfo == nil {
 		return nil
 	}
@@ -116,12 +124,21 @@ func validateNestedTypeRef(symbols *symbolTable, typeInfo *FieldTypeInfo, typ *T
 
 	case FieldTypeKindMap:
 		if typeInfo.MapValue != nil {
-			diagnostics = append(diagnostics, validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
+			diagnostics = append(
+				diagnostics,
+				validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
 		}
 
 	case FieldTypeKindObject:
 		if typeInfo.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "inline object in type", typ.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateFieldTypes(
+					symbols,
+					typeInfo.ObjectDef.Fields,
+					"inline object in type",
+					typ.Name,
+				)...)
 		}
 	}
 
@@ -129,18 +146,29 @@ func validateNestedTypeRef(symbols *symbolTable, typeInfo *FieldTypeInfo, typ *T
 }
 
 // validateFieldTypes validates that all field types reference existing types.
-func validateFieldTypes(symbols *symbolTable, fields []*FieldSymbol, context, parentName string) []Diagnostic {
+func validateFieldTypes(
+	symbols *symbolTable,
+	fields []*FieldSymbol,
+	context, parentName string,
+) []Diagnostic {
 	var diagnostics []Diagnostic
 
 	for _, field := range fields {
-		diagnostics = append(diagnostics, validateFieldType(symbols, field.Type, field, context, parentName)...)
+		diagnostics = append(
+			diagnostics,
+			validateFieldType(symbols, field.Type, field, context, parentName)...)
 	}
 
 	return diagnostics
 }
 
 // validateFieldType validates a single field type recursively.
-func validateFieldType(symbols *symbolTable, typeInfo *FieldTypeInfo, field *FieldSymbol, context, parentName string) []Diagnostic {
+func validateFieldType(
+	symbols *symbolTable,
+	typeInfo *FieldTypeInfo,
+	field *FieldSymbol,
+	context, parentName string,
+) []Diagnostic {
 	if typeInfo == nil {
 		return nil
 	}
@@ -188,13 +216,22 @@ func validateFieldType(symbols *symbolTable, typeInfo *FieldTypeInfo, field *Fie
 	case FieldTypeKindMap:
 		// Validate map value type
 		if typeInfo.MapValue != nil {
-			diagnostics = append(diagnostics, validateFieldType(symbols, typeInfo.MapValue, field, context, parentName)...)
+			diagnostics = append(
+				diagnostics,
+				validateFieldType(symbols, typeInfo.MapValue, field, context, parentName)...)
 		}
 
 	case FieldTypeKindObject:
 		// Validate inline object fields recursively
 		if typeInfo.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "inline object in", field.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateFieldTypes(
+					symbols,
+					typeInfo.ObjectDef.Fields,
+					"inline object in",
+					field.Name,
+				)...)
 		}
 	}
 

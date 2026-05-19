@@ -62,7 +62,7 @@ func (l *LSP) handleTextDocumentDocumentLink(rawMessage []byte) (any, error) {
 }
 
 // collectDocumentLinks scans the document content for external docstring references and include paths.
-func collectDocumentLinks(content string, docPath string) []DocumentLink {
+func collectDocumentLinks(content, docPath string) []DocumentLink {
 	var links []DocumentLink
 
 	// Parse the content to get the AST
@@ -105,7 +105,11 @@ func collectDocumentLinks(content string, docPath string) []DocumentLink {
 	return links
 }
 
-func collectTypeMemberDocstringLinks(links *[]DocumentLink, members []*ast.TypeMember, baseDir string) {
+func collectTypeMemberDocstringLinks(
+	links *[]DocumentLink,
+	members []*ast.TypeMember,
+	baseDir string,
+) {
 	for _, member := range members {
 		if member == nil || member.Field == nil {
 			continue

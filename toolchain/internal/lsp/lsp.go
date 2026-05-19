@@ -61,7 +61,10 @@ func New(reader io.Reader, writer io.Writer) *LSP {
 
 // analyze runs the analysis pipeline on the given file path and returns the program and diagnostics.
 // It also updates the dependency graph based on the resolved imports.
-func (l *LSP) analyze(ctx context.Context, filePath string) (*analysis.Program, []analysis.Diagnostic) {
+func (l *LSP) analyze(
+	ctx context.Context,
+	filePath string,
+) (*analysis.Program, []analysis.Diagnostic) {
 	// Check for cancellation before starting
 	if ctx.Err() != nil {
 		return nil, nil
@@ -113,7 +116,13 @@ func (l *LSP) handleMessage(rawBytes []byte) (bool, error) {
 	// Add panic recovery to prevent crashes. Instead of crashing, log the panic.
 	defer func() {
 		if r := recover(); r != nil {
-			l.logger.Error("panic while handling message", "panic", r, "stack", string(debug.Stack()))
+			l.logger.Error(
+				"panic while handling message",
+				"panic",
+				r,
+				"stack",
+				string(debug.Stack()),
+			)
 		}
 	}()
 
@@ -132,7 +141,15 @@ func (l *LSP) handleMessage(rawBytes []byte) (bool, error) {
 	}
 
 	if messageHasID {
-		l.logger.Info("message received", "id", messageID, "method", messageMethod, "raw", rawMessage)
+		l.logger.Info(
+			"message received",
+			"id",
+			messageID,
+			"method",
+			messageMethod,
+			"raw",
+			rawMessage,
+		)
 	} else {
 		l.logger.Info("notification received", "method", messageMethod, "raw", rawMessage)
 	}

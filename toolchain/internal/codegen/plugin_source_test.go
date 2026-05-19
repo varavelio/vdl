@@ -154,17 +154,21 @@ func TestResolveRuntimePlugins(t *testing.T) {
 				Remotes: &[]configtypes.VdlConfigRemote{
 					{
 						Host: "example.com",
-						Auth: &configtypes.VdlConfigRemoteAuth{Header: &configtypes.VdlConfigRemoteAuthHeader{
-							NameEnv:  "REMOTE_FALLBACK_NAME",
-							ValueEnv: "REMOTE_FALLBACK_VALUE",
-						}},
+						Auth: &configtypes.VdlConfigRemoteAuth{
+							Header: &configtypes.VdlConfigRemoteAuthHeader{
+								NameEnv:  "REMOTE_FALLBACK_NAME",
+								ValueEnv: "REMOTE_FALLBACK_VALUE",
+							},
+						},
 					},
 					{
 						Host: "example.com/plugins",
-						Auth: &configtypes.VdlConfigRemoteAuth{Header: &configtypes.VdlConfigRemoteAuthHeader{
-							NameEnv:  "REMOTE_HEADER_NAME",
-							ValueEnv: "REMOTE_HEADER_VALUE",
-						}},
+						Auth: &configtypes.VdlConfigRemoteAuth{
+							Header: &configtypes.VdlConfigRemoteAuthHeader{
+								NameEnv:  "REMOTE_HEADER_NAME",
+								ValueEnv: "REMOTE_HEADER_VALUE",
+							},
+						},
 					},
 				},
 				Plugins: &[]configtypes.VdlConfigPlugin{{

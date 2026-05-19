@@ -19,7 +19,9 @@ func TestParserInclude(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Include: &ast.Include{Path: "./foo.vdl"}}}}
+		expected := &ast.Schema{
+			Declarations: []*ast.TopLevelDecl{{Include: &ast.Include{Path: "./foo.vdl"}}},
+		}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -87,8 +89,18 @@ func TestParserConstDecl(t *testing.T) {
 		require.NoError(t, err)
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
-			{Const: &ast.ConstDecl{Name: "FEATURE_FLAG_ENABLED", Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{True: true}}}},
-			{Const: &ast.ConstDecl{Name: "DEBUG_MODE", Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{False: true}}}},
+			{
+				Const: &ast.ConstDecl{
+					Name:  "FEATURE_FLAG_ENABLED",
+					Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{True: true}},
+				},
+			},
+			{
+				Const: &ast.ConstDecl{
+					Name:  "DEBUG_MODE",
+					Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{False: true}},
+				},
+			},
 		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -115,10 +127,14 @@ func TestParserConstDecl(t *testing.T) {
 		require.NoError(t, err)
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
-			Annotations: []*ast.Annotation{{
-				Name:     "deprecated",
-				Argument: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Str: qptr("Use NEW_LIMIT instead")}},
-			}},
+			Annotations: []*ast.Annotation{
+				{
+					Name: "deprecated",
+					Argument: &ast.DataLiteral{
+						Scalar: &ast.ScalarLiteral{Str: qptr("Use NEW_LIMIT instead")},
+					},
+				},
+			},
 			Name:  "OLD_LIMIT",
 			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("100")}},
 		}}}}
@@ -258,7 +274,11 @@ func TestParserEnumMemberAnnotations(t *testing.T) {
 		require.Len(t, members[0].Annotations, 1)
 		require.Equal(t, "deprecated", members[0].Annotations[0].Name)
 		require.NotNil(t, members[0].Annotations[0].Argument)
-		require.Equal(t, "Use Crimson instead", members[0].Annotations[0].Argument.Scalar.Str.String())
+		require.Equal(
+			t,
+			"Use Crimson instead",
+			members[0].Annotations[0].Argument.Scalar.Str.String(),
+		)
 		require.Equal(t, "Red", members[0].Name)
 		require.Equal(t, "red", members[0].Value.Str.String())
 		require.Len(t, members[1].Annotations, 0)
@@ -351,8 +371,16 @@ func TestParserEnumMemberAnnotations(t *testing.T) {
 		require.Len(t, members[0].Annotations, 1)
 		require.NotNil(t, members[0].Annotations[0].Argument.Array)
 		require.Len(t, members[0].Annotations[0].Argument.Array.Elements, 2)
-		require.Equal(t, "core", members[0].Annotations[0].Argument.Array.Elements[0].Scalar.Str.String())
-		require.Equal(t, "stable", members[0].Annotations[0].Argument.Array.Elements[1].Scalar.Str.String())
+		require.Equal(
+			t,
+			"core",
+			members[0].Annotations[0].Argument.Array.Elements[0].Scalar.Str.String(),
+		)
+		require.Equal(
+			t,
+			"stable",
+			members[0].Annotations[0].Argument.Array.Elements[1].Scalar.Str.String(),
+		)
 		require.Len(t, members[1].Annotations, 1)
 		require.Len(t, members[1].Annotations[0].Argument.Array.Elements, 1)
 	})
@@ -581,9 +609,14 @@ func TestParserTypeDecl(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "MyType",
-			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{{
-				Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}},
-			}}}},
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
+				{
+					Field: &ast.Field{
+						Name: "field",
+						Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}},
+					},
+				},
+			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -603,9 +636,14 @@ func TestParserTypeDecl(t *testing.T) {
 			Docstring:   &ast.Docstring{Value: " My type description "},
 			Annotations: []*ast.Annotation{{Name: "entity"}},
 			Name:        "MyType",
-			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{{
-				Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}},
-			}}}},
+			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
+				{
+					Field: &ast.Field{
+						Name: "field",
+						Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}},
+					},
+				},
+			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -644,8 +682,24 @@ func TestParserTypeDecl(t *testing.T) {
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "MyType",
 			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
-				{Field: &ast.Field{Name: "tags", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}, Dimensions: 1}}},
-				{Field: &ast.Field{Name: "scores", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("int")}, Dimensions: 2}}},
+				{
+					Field: &ast.Field{
+						Name: "tags",
+						Type: ast.FieldType{
+							Base:       &ast.FieldTypeBase{Named: new("string")},
+							Dimensions: 1,
+						},
+					},
+				},
+				{
+					Field: &ast.Field{
+						Name: "scores",
+						Type: ast.FieldType{
+							Base:       &ast.FieldTypeBase{Named: new("int")},
+							Dimensions: 2,
+						},
+					},
+				},
 			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -685,8 +739,34 @@ func TestParserTypeDecl(t *testing.T) {
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Type: &ast.TypeDecl{
 			Name: "MyType",
 			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
-				{Field: &ast.Field{Name: "counts", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: new("int")}}}}}}},
-				{Field: &ast.Field{Name: "users", Type: ast.FieldType{Base: &ast.FieldTypeBase{Map: &ast.FieldTypeMap{ValueType: &ast.FieldType{Base: &ast.FieldTypeBase{Named: new("User")}}}}}}},
+				{
+					Field: &ast.Field{
+						Name: "counts",
+						Type: ast.FieldType{
+							Base: &ast.FieldTypeBase{
+								Map: &ast.FieldTypeMap{
+									ValueType: &ast.FieldType{
+										Base: &ast.FieldTypeBase{Named: new("int")},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Field: &ast.Field{
+						Name: "users",
+						Type: ast.FieldType{
+							Base: &ast.FieldTypeBase{
+								Map: &ast.FieldTypeMap{
+									ValueType: &ast.FieldType{
+										Base: &ast.FieldTypeBase{Named: new("User")},
+									},
+								},
+							},
+						},
+					},
+				},
 			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -707,7 +787,13 @@ func TestParserTypeDecl(t *testing.T) {
 			Name: "Article",
 			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
 				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "AuditMetadata"}}},
-				{Field: &ast.Field{Annotations: []*ast.Annotation{{Name: "title"}}, Name: "heading", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}},
+				{
+					Field: &ast.Field{
+						Annotations: []*ast.Annotation{{Name: "title"}},
+						Name:        "heading",
+						Type:        ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}},
+					},
+				},
 			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -753,7 +839,11 @@ func TestParserDocstrings(t *testing.T) {
 		parsed, err := ParserInstance.ParseString("schema.vdl", input)
 		require.NoError(t, err)
 
-		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Docstring: &ast.Docstring{Value: " This is a standalone docstring. "}}}}
+		expected := &ast.Schema{
+			Declarations: []*ast.TopLevelDecl{
+				{Docstring: &ast.Docstring{Value: " This is a standalone docstring. "}},
+			},
+		}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
 
@@ -785,7 +875,25 @@ func TestParserDocstrings(t *testing.T) {
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
 			{Docstring: &ast.Docstring{Value: " This is standalone "}},
-			{Type: &ast.TypeDecl{Name: "MyType", Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{{Field: &ast.Field{Name: "field", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}}}}}}},
+			{
+				Type: &ast.TypeDecl{
+					Name: "MyType",
+					Base: &ast.FieldTypeBase{
+						Object: &ast.FieldTypeObject{
+							Members: []*ast.TypeMember{
+								{
+									Field: &ast.Field{
+										Name: "field",
+										Type: ast.FieldType{
+											Base: &ast.FieldTypeBase{Named: new("string")},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
 	})
@@ -813,7 +921,12 @@ func TestParserEdgeCases(t *testing.T) {
 		require.NoError(t, err)
 
 		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{
-			{Type: &ast.TypeDecl{Name: "EmptyType", Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{}}}},
+			{
+				Type: &ast.TypeDecl{
+					Name: "EmptyType",
+					Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{}},
+				},
+			},
 			{Enum: &ast.EnumDecl{Name: "EmptyEnum", Members: nil}},
 		}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -1342,7 +1455,11 @@ func TestParserDocstringInsideTypeBody(t *testing.T) {
 		require.Len(t, typeDecl.Members(), 2)
 		require.NotNil(t, typeDecl.Members()[0].Field)
 		require.NotNil(t, typeDecl.Members()[0].Field.Docstring)
-		require.Equal(t, " This docstring attaches to id ", typeDecl.Members()[0].Field.Docstring.Value.String())
+		require.Equal(
+			t,
+			" This docstring attaches to id ",
+			typeDecl.Members()[0].Field.Docstring.Value.String(),
+		)
 		require.Equal(t, "id", typeDecl.Members()[0].Field.Name)
 		require.NotNil(t, typeDecl.Members()[1].Field)
 		require.Equal(t, "name", typeDecl.Members()[1].Field.Name)
@@ -1748,7 +1865,12 @@ func TestParserNamespacedSpread(t *testing.T) {
 			Name: "User",
 			Base: &ast.FieldTypeBase{Object: &ast.FieldTypeObject{Members: []*ast.TypeMember{
 				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "auth", Member: new("BaseUser")}}},
-				{Field: &ast.Field{Name: "name", Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}}}},
+				{
+					Field: &ast.Field{
+						Name: "name",
+						Type: ast.FieldType{Base: &ast.FieldTypeBase{Named: new("string")}},
+					},
+				},
 			}}},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)
@@ -1768,7 +1890,11 @@ func TestParserNamespacedSpread(t *testing.T) {
 			Name: "AllRoles",
 			Members: []*ast.EnumMember{
 				{Name: "Admin", Value: &ast.EnumValue{Str: qptr("admin")}},
-				{Spread: &ast.Spread{Ref: &ast.Reference{Name: "auth", Member: new("StandardRoles")}}},
+				{
+					Spread: &ast.Spread{
+						Ref: &ast.Reference{Name: "auth", Member: new("StandardRoles")},
+					},
+				},
 			},
 		}}}}
 		testutil.ASTEqualNoPos(t, expected, parsed)

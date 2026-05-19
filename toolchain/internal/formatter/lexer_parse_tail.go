@@ -10,7 +10,13 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 	for !p.is("RBrace") && !p.is("EOF") {
 		tok := p.peek()
 		if pendingDoc != nil && tok.Line-pendingAttachmentEndLine(pendingDoc, pendingAnn) > 1 {
-			members = append(members, &typeMemberNode{baseNode: baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()}, Standalone: pendingDoc})
+			members = append(
+				members,
+				&typeMemberNode{
+					baseNode:   baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()},
+					Standalone: pendingDoc,
+				},
+			)
 			pendingDoc = nil
 		}
 
@@ -20,7 +26,13 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 			if c.Inline && len(members) > 0 {
 				members[len(members)-1].Trailing = c
 			} else {
-				members = append(members, &typeMemberNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+				members = append(
+					members,
+					&typeMemberNode{
+						baseNode: baseNode{start: c.startLine(), end: c.endLine()},
+						Comment:  c,
+					},
+				)
 			}
 		case "Docstring":
 			pendingDoc = p.parseDocstring()
@@ -36,7 +48,10 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 			if err != nil {
 				return nil, 0, err
 			}
-			members = append(members, &typeMemberNode{baseNode: baseNode{start: spTok.Line, end: endLine}, Spread: ref})
+			members = append(
+				members,
+				&typeMemberNode{baseNode: baseNode{start: spTok.Line, end: endLine}, Spread: ref},
+			)
 			pendingDoc = nil
 			pendingAnn = nil
 		default:
@@ -47,7 +62,13 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 			if err != nil {
 				return nil, 0, err
 			}
-			members = append(members, &typeMemberNode{baseNode: baseNode{start: field.startLine(), end: field.endLine()}, Field: field})
+			members = append(
+				members,
+				&typeMemberNode{
+					baseNode: baseNode{start: field.startLine(), end: field.endLine()},
+					Field:    field,
+				},
+			)
 			pendingDoc = nil
 			pendingAnn = nil
 		}
@@ -62,7 +83,12 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 
 func (p *tokenParser) parseField(doc *docstringNode, anns []*annotationNode) (*fieldNode, error) {
 	nameTok := p.next()
-	f := &fieldNode{baseNode: baseNode{start: nameTok.Line, end: nameTok.EndLine}, Doc: doc, Ann: anns, Name: nameTok.Value}
+	f := &fieldNode{
+		baseNode: baseNode{start: nameTok.Line, end: nameTok.EndLine},
+		Doc:      doc,
+		Ann:      anns,
+		Name:     nameTok.Value,
+	}
 	if p.is("Question") {
 		p.next()
 		f.Optional = true
@@ -88,7 +114,13 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 				if c.Inline && len(entries) > 0 {
 					entries[len(entries)-1].Trailing = c
 				} else {
-					entries = append(entries, &objectEntryNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+					entries = append(
+						entries,
+						&objectEntryNode{
+							baseNode: baseNode{start: c.startLine(), end: c.endLine()},
+							Comment:  c,
+						},
+					)
 				}
 				continue
 			}
@@ -98,7 +130,10 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 				if err != nil {
 					return literalNode{}, 0, err
 				}
-				entries = append(entries, &objectEntryNode{baseNode: baseNode{start: sp.Line, end: end}, Spread: ref})
+				entries = append(
+					entries,
+					&objectEntryNode{baseNode: baseNode{start: sp.Line, end: end}, Spread: ref},
+				)
 				continue
 			}
 			if !p.isNameToken(p.peek()) {
@@ -109,7 +144,14 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 			if err != nil {
 				return literalNode{}, 0, err
 			}
-			entries = append(entries, &objectEntryNode{baseNode: baseNode{start: k.Line, end: end}, Key: k.Value, Value: &lit})
+			entries = append(
+				entries,
+				&objectEntryNode{
+					baseNode: baseNode{start: k.Line, end: end},
+					Key:      k.Value,
+					Value:    &lit,
+				},
+			)
 		}
 		r, err := p.expect("RBrace")
 		if err != nil {
@@ -126,7 +168,13 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 				if c.Inline && len(elements) > 0 {
 					elements[len(elements)-1].Trailing = c
 				} else {
-					elements = append(elements, &arrayElementNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+					elements = append(
+						elements,
+						&arrayElementNode{
+							baseNode: baseNode{start: c.startLine(), end: c.endLine()},
+							Comment:  c,
+						},
+					)
 				}
 				continue
 			}
@@ -135,13 +183,18 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 			if err != nil {
 				return literalNode{}, 0, err
 			}
-			elements = append(elements, &arrayElementNode{baseNode: baseNode{start: elemStart, end: end}, Value: &lit})
+			elements = append(
+				elements,
+				&arrayElementNode{baseNode: baseNode{start: elemStart, end: end}, Value: &lit},
+			)
 		}
 		r, err := p.expect("RBracket")
 		if err != nil {
 			return literalNode{}, 0, err
 		}
-		return literalNode{Array: &arrayLiteralNode{Elements: elements, MultilineIntent: multilineIntent}}, r.EndLine, nil
+		return literalNode{
+			Array: &arrayLiteralNode{Elements: elements, MultilineIntent: multilineIntent},
+		}, r.EndLine, nil
 	default:
 		s, endLine, err := p.parseScalarLiteral()
 		if err != nil {
@@ -219,7 +272,10 @@ func (p *tokenParser) parseAnnotation() (*annotationNode, error) {
 	if err != nil {
 		return nil, err
 	}
-	ann := &annotationNode{baseNode: baseNode{start: at.Line, end: nameTok.EndLine}, Name: nameTok.Value}
+	ann := &annotationNode{
+		baseNode: baseNode{start: at.Line, end: nameTok.EndLine},
+		Name:     nameTok.Value,
+	}
 	if p.is("LParen") {
 		p.next()
 		lit, endLine, err := p.parseLiteral()
@@ -237,7 +293,11 @@ func (p *tokenParser) parseAnnotation() (*annotationNode, error) {
 
 func (p *tokenParser) parseComment() *commentNode {
 	tok := p.next()
-	return &commentNode{baseNode: baseNode{start: tok.Line, end: tok.EndLine}, Text: tok.Value, Inline: tok.Inline}
+	return &commentNode{
+		baseNode: baseNode{start: tok.Line, end: tok.EndLine},
+		Text:     tok.Value,
+		Inline:   tok.Inline,
+	}
 }
 
 func (p *tokenParser) parseDocstring() *docstringNode {
@@ -246,7 +306,14 @@ func (p *tokenParser) parseDocstring() *docstringNode {
 }
 
 func (p *tokenParser) unexpected(tok fmtToken, expected string) error {
-	return fmt.Errorf("format parse error at line %d:%d, expected %s, got %s (%q)", tok.Line, tok.Column, expected, tok.Type, tok.Value)
+	return fmt.Errorf(
+		"format parse error at line %d:%d, expected %s, got %s (%q)",
+		tok.Line,
+		tok.Column,
+		expected,
+		tok.Type,
+		tok.Value,
+	)
 }
 
 func (p *tokenParser) expect(tt string) (fmtToken, error) {
@@ -280,7 +347,19 @@ func (p *tokenParser) peek() fmtToken {
 
 func (p *tokenParser) isNameToken(tok fmtToken) bool {
 	switch tok.Type {
-	case "Ident", "Include", "Const", "Enum", "Map", "Type", "String", "Int", "Float", "Bool", "Datetime", "True", "False":
+	case "Ident",
+		"Include",
+		"Const",
+		"Enum",
+		"Map",
+		"Type",
+		"String",
+		"Int",
+		"Float",
+		"Bool",
+		"Datetime",
+		"True",
+		"False":
 		return true
 	default:
 		return false

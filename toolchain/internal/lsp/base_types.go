@@ -10,11 +10,9 @@ const (
 	ErrorCodeInvalidParams = -32602
 )
 
-var (
-	DefaultMessage = Message{
-		JSONRPC: "2.0",
-	}
-)
+var DefaultMessage = Message{
+	JSONRPC: "2.0",
+}
 
 // Message is a general message as defined by JSON-RPC. The language server protocol
 // always uses “2.0” as the jsonrpc version.

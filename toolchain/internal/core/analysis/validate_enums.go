@@ -80,8 +80,11 @@ func validateEnum(symbols *symbolTable, enum *EnumSymbol) []Diagnostic {
 					member.Pos,
 					member.EndPos,
 					CodeEnumIntNeedsValues,
-					fmt.Sprintf("int enum %q requires explicit values for all members, but %q has none",
-						enum.Name, member.Name),
+					fmt.Sprintf(
+						"int enum %q requires explicit values for all members, but %q has none",
+						enum.Name,
+						member.Name,
+					),
 				))
 			}
 		}
@@ -161,7 +164,10 @@ func buildEnumSymbol(decl *ast.EnumDecl, file string) *EnumSymbol {
 	return enum
 }
 
-func expandEnumMembers(symbols *symbolTable, enum *EnumSymbol) ([]*EnumMemberSymbol, EnumValueType, []Diagnostic) {
+func expandEnumMembers(
+	symbols *symbolTable,
+	enum *EnumSymbol,
+) ([]*EnumMemberSymbol, EnumValueType, []Diagnostic) {
 	var diagnostics []Diagnostic
 	stack := []string{}
 	seen := map[string]bool{}

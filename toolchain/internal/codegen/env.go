@@ -14,5 +14,7 @@ func isTruthyEnv(name string) bool {
 	}
 
 	value = strings.TrimSpace(strings.ToLower(value))
-	return value == "1" || value == "true" || value == "yes" || value == "y" || value == "on" || value == "enable" || value == "enabled"
+	return value == "1" || value == "true" || value == "yes" || value == "y" || value == "on" ||
+		value == "enable" ||
+		value == "enabled"
 }

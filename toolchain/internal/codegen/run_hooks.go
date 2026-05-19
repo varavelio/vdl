@@ -36,7 +36,12 @@ func runPostGenerateHooks(config runtimeConfig) {
 }
 
 // runHostHooks runs lifecycle hooks in definition order.
-func runHostHooks(config runtimeConfig, phase hostHookPhase, commands []string, continueOnError bool) error {
+func runHostHooks(
+	config runtimeConfig,
+	phase hostHookPhase,
+	commands []string,
+	continueOnError bool,
+) error {
 	if hostHooksDisabled() || len(commands) == 0 {
 		return nil
 	}

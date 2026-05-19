@@ -34,7 +34,12 @@ func validateCycles(symbols *symbolTable) []Diagnostic {
 // findTypeCycle performs DFS to detect cycles in type dependencies.
 // Returns the cycle path if found, nil otherwise.
 // The hasOptional parameter tracks whether we've encountered an optional field in the current path.
-func findTypeCycle(symbols *symbolTable, typeName string, visited []string, hasOptional bool) []string {
+func findTypeCycle(
+	symbols *symbolTable,
+	typeName string,
+	visited []string,
+	hasOptional bool,
+) []string {
 	// Check if we've already visited this type in the current path
 	if slices.Contains(visited, typeName) {
 		// Cycle detected, but only report it if no optional field was found
@@ -62,7 +67,12 @@ func findTypeCycle(symbols *symbolTable, typeName string, visited []string, hasO
 // findFieldTypeCycle checks a field type for cycles.
 // All type references are checked, including arrays and maps.
 // The hasOptional parameter tracks whether the current field or any ancestor is optional.
-func findFieldTypeCycle(symbols *symbolTable, typeInfo *FieldTypeInfo, visited []string, hasOptional bool) []string {
+func findFieldTypeCycle(
+	symbols *symbolTable,
+	typeInfo *FieldTypeInfo,
+	visited []string,
+	hasOptional bool,
+) []string {
 	if typeInfo == nil {
 		return nil
 	}
@@ -85,7 +95,12 @@ func findFieldTypeCycle(symbols *symbolTable, typeInfo *FieldTypeInfo, visited [
 		if typeInfo.ObjectDef != nil {
 			for _, field := range typeInfo.ObjectDef.Fields {
 				fieldOptional := hasOptional || field.Optional
-				if cycle := findFieldTypeCycle(symbols, field.Type, visited, fieldOptional); cycle != nil {
+				if cycle := findFieldTypeCycle(
+					symbols,
+					field.Type,
+					visited,
+					fieldOptional,
+				); cycle != nil {
 					return cycle
 				}
 			}

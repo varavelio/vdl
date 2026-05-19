@@ -17,7 +17,9 @@ func validateSpreads(symbols *symbolTable) []Diagnostic {
 		// Validate inline object spreads within fields
 		if typ.IsObject() && typ.Type.ObjectDef != nil {
 			for _, field := range typ.Type.ObjectDef.Fields {
-				diagnostics = append(diagnostics, validateInlineObjectSpreads(symbols, field.Type, typ.File, field.Name)...)
+				diagnostics = append(
+					diagnostics,
+					validateInlineObjectSpreads(symbols, field.Type, typ.File, field.Name)...)
 			}
 		}
 	}
@@ -58,7 +60,10 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 			if len(suggestions) > 0 {
 				msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
 			}
-			diagnostics = append(diagnostics, newDiagnostic(typ.File, spread.Pos, spread.EndPos, CodeSpreadTypeNotFound, msg))
+			diagnostics = append(
+				diagnostics,
+				newDiagnostic(typ.File, spread.Pos, spread.EndPos, CodeSpreadTypeNotFound, msg),
+			)
 			continue
 		}
 
@@ -68,7 +73,10 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 				spread.Pos,
 				spread.EndPos,
 				CodeSpreadTypeNotFound,
-				fmt.Sprintf("cannot spread non-object type %q; only object types can be spread", spread.Name),
+				fmt.Sprintf(
+					"cannot spread non-object type %q; only object types can be spread",
+					spread.Name,
+				),
 			))
 			continue
 		}
@@ -80,8 +88,15 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 					spread.Pos,
 					spread.EndPos,
 					CodeSpreadFieldConflict,
-					fmt.Sprintf("field %q from spread %q conflicts with %s at %s:%d:%d",
-						name, spread.Name, existing.Source, existing.File, existing.Pos.Line, existing.Pos.Column),
+					fmt.Sprintf(
+						"field %q from spread %q conflicts with %s at %s:%d:%d",
+						name,
+						spread.Name,
+						existing.Source,
+						existing.File,
+						existing.Pos.Line,
+						existing.Pos.Column,
+					),
 				))
 				continue
 			}
@@ -92,7 +107,11 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 	return diagnostics
 }
 
-func validateInlineObjectSpreads(symbols *symbolTable, typeInfo *FieldTypeInfo, file, owner string) []Diagnostic {
+func validateInlineObjectSpreads(
+	symbols *symbolTable,
+	typeInfo *FieldTypeInfo,
+	file, owner string,
+) []Diagnostic {
 	if typeInfo == nil {
 		return nil
 	}
@@ -110,7 +129,9 @@ func validateInlineObjectSpreads(symbols *symbolTable, typeInfo *FieldTypeInfo, 
 		fieldNames := map[string]FieldOrigin{}
 		for _, f := range typeInfo.ObjectDef.Fields {
 			fieldNames[f.Name] = FieldOrigin{File: file, Pos: f.Pos, Source: "direct field"}
-			diagnostics = append(diagnostics, validateInlineObjectSpreads(symbols, f.Type, file, f.Name)...)
+			diagnostics = append(
+				diagnostics,
+				validateInlineObjectSpreads(symbols, f.Type, file, f.Name)...)
 		}
 
 		for _, spread := range typeInfo.ObjectDef.Spreads {
@@ -127,12 +148,19 @@ func validateInlineObjectSpreads(symbols *symbolTable, typeInfo *FieldTypeInfo, 
 
 			refType := symbols.lookupType(spread.Name)
 			if refType == nil {
-				msg := fmt.Sprintf("spread in inline object %q references undefined type %q", owner, spread.Name)
+				msg := fmt.Sprintf(
+					"spread in inline object %q references undefined type %q",
+					owner,
+					spread.Name,
+				)
 				suggestions, _ := strutil.FuzzySearch(symbols.allTypeNames(), spread.Name)
 				if len(suggestions) > 0 {
 					msg += fmt.Sprintf("; did you mean %s?", formatSuggestions(suggestions))
 				}
-				diagnostics = append(diagnostics, newDiagnostic(file, spread.Pos, spread.EndPos, CodeSpreadTypeNotFound, msg))
+				diagnostics = append(
+					diagnostics,
+					newDiagnostic(file, spread.Pos, spread.EndPos, CodeSpreadTypeNotFound, msg),
+				)
 				continue
 			}
 
@@ -142,7 +170,11 @@ func validateInlineObjectSpreads(symbols *symbolTable, typeInfo *FieldTypeInfo, 
 					spread.Pos,
 					spread.EndPos,
 					CodeSpreadTypeNotFound,
-					fmt.Sprintf("cannot spread non-object type %q in inline object %q; only object types can be spread", spread.Name, owner),
+					fmt.Sprintf(
+						"cannot spread non-object type %q in inline object %q; only object types can be spread",
+						spread.Name,
+						owner,
+					),
 				))
 				continue
 			}
@@ -154,8 +186,16 @@ func validateInlineObjectSpreads(symbols *symbolTable, typeInfo *FieldTypeInfo, 
 						spread.Pos,
 						spread.EndPos,
 						CodeSpreadFieldConflict,
-						fmt.Sprintf("field %q from spread %q in inline object %q conflicts with %s at %s:%d:%d",
-							name, spread.Name, owner, existing.Source, existing.File, existing.Pos.Line, existing.Pos.Column),
+						fmt.Sprintf(
+							"field %q from spread %q in inline object %q conflicts with %s at %s:%d:%d",
+							name,
+							spread.Name,
+							owner,
+							existing.Source,
+							existing.File,
+							existing.Pos.Line,
+							existing.Pos.Column,
+						),
 					))
 					continue
 				}
@@ -175,7 +215,11 @@ type FieldOrigin struct {
 
 type Position = ast.Position
 
-func flattenTypeFieldOrigins(symbols *symbolTable, typ *TypeSymbol, visiting map[string]bool) map[string]FieldOrigin {
+func flattenTypeFieldOrigins(
+	symbols *symbolTable,
+	typ *TypeSymbol,
+	visiting map[string]bool,
+) map[string]FieldOrigin {
 	result := map[string]FieldOrigin{}
 	if typ == nil || !typ.IsObject() || typ.Type.ObjectDef == nil {
 		return result
@@ -186,7 +230,11 @@ func flattenTypeFieldOrigins(symbols *symbolTable, typ *TypeSymbol, visiting map
 	visiting[typ.Name] = true
 
 	for _, f := range typ.Type.ObjectDef.Fields {
-		result[f.Name] = FieldOrigin{File: f.File, Pos: f.Pos, Source: fmt.Sprintf("spread ...%s", typ.Name)}
+		result[f.Name] = FieldOrigin{
+			File:   f.File,
+			Pos:    f.Pos,
+			Source: fmt.Sprintf("spread ...%s", typ.Name),
+		}
 	}
 
 	for _, spread := range typ.Type.ObjectDef.Spreads {

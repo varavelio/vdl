@@ -90,7 +90,12 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 		if err != nil {
 			return nil, err
 		}
-		return &includeNode{baseNode: baseNode{start: start, end: strTok.EndLine}, Doc: doc, Ann: anns, Path: unquote(strTok.Value)}, nil
+		return &includeNode{
+			baseNode: baseNode{start: start, end: strTok.EndLine},
+			Doc:      doc,
+			Ann:      anns,
+			Path:     unquote(strTok.Value),
+		}, nil
 	case "Type":
 		p.next()
 		nameTok, err := p.expect("Ident")
@@ -101,7 +106,13 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 		if err != nil {
 			return nil, err
 		}
-		return &typeNode{baseNode: baseNode{start: start, end: endLine}, Doc: doc, Ann: anns, Name: nameTok.Value, Type: ft}, nil
+		return &typeNode{
+			baseNode: baseNode{start: start, end: endLine},
+			Doc:      doc,
+			Ann:      anns,
+			Name:     nameTok.Value,
+			Type:     ft,
+		}, nil
 	case "Const":
 		p.next()
 		nameTok, err := p.expect("Ident")
@@ -115,7 +126,13 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 		if err != nil {
 			return nil, err
 		}
-		return &constNode{baseNode: baseNode{start: start, end: endLine}, Doc: doc, Ann: anns, Name: nameTok.Value, Value: lit}, nil
+		return &constNode{
+			baseNode: baseNode{start: start, end: endLine},
+			Doc:      doc,
+			Ann:      anns,
+			Name:     nameTok.Value,
+			Value:    lit,
+		}, nil
 	case "Enum":
 		p.next()
 		nameTok, err := p.expect("Ident")
@@ -129,7 +146,13 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 		if err != nil {
 			return nil, err
 		}
-		return &enumNode{baseNode: baseNode{start: start, end: endLine}, Doc: doc, Ann: anns, Name: nameTok.Value, Members: members}, nil
+		return &enumNode{
+			baseNode: baseNode{start: start, end: endLine},
+			Doc:      doc,
+			Ann:      anns,
+			Name:     nameTok.Value,
+			Members:  members,
+		}, nil
 	default:
 		return nil, p.unexpected(p.peek(), "declaration")
 	}
@@ -143,7 +166,13 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 	for !p.is("RBrace") && !p.is("EOF") {
 		tok := p.peek()
 		if pendingDoc != nil && tok.Line-pendingAttachmentEndLine(pendingDoc, pendingAnn) > 1 {
-			members = append(members, &enumMemberNode{baseNode: baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()}, Doc: pendingDoc})
+			members = append(
+				members,
+				&enumMemberNode{
+					baseNode: baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()},
+					Doc:      pendingDoc,
+				},
+			)
 			pendingDoc = nil
 		}
 
@@ -153,7 +182,13 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 			if c.Inline && len(members) > 0 {
 				members[len(members)-1].Trailing = c
 			} else {
-				members = append(members, &enumMemberNode{baseNode: baseNode{start: c.startLine(), end: c.endLine()}, Comment: c})
+				members = append(
+					members,
+					&enumMemberNode{
+						baseNode: baseNode{start: c.startLine(), end: c.endLine()},
+						Comment:  c,
+					},
+				)
 			}
 		case "Docstring":
 			pendingDoc = p.parseDocstring()
@@ -170,7 +205,10 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 			if err != nil {
 				return nil, 0, err
 			}
-			members = append(members, &enumMemberNode{baseNode: baseNode{start: spStart, end: endLine}, Spread: ref})
+			members = append(
+				members,
+				&enumMemberNode{baseNode: baseNode{start: spStart, end: endLine}, Spread: ref},
+			)
 			pendingDoc = nil
 			pendingAnn = nil
 		default:
@@ -178,7 +216,12 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 				return nil, 0, p.unexpected(tok, "enum member")
 			}
 			nameTok := p.next()
-			member := &enumMemberNode{baseNode: baseNode{start: nameTok.Line, end: nameTok.EndLine}, Doc: pendingDoc, Ann: pendingAnn, Name: nameTok.Value}
+			member := &enumMemberNode{
+				baseNode: baseNode{start: nameTok.Line, end: nameTok.EndLine},
+				Doc:      pendingDoc,
+				Ann:      pendingAnn,
+				Name:     nameTok.Value,
+			}
 			if p.is("Equals") {
 				p.next()
 				switch {

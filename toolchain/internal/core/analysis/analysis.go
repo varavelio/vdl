@@ -88,7 +88,11 @@ func Analyze(fs *vfs.FileSystem, entryPoint string) (*Program, []Diagnostic) {
 // If the context is cancelled, this function returns nil, nil immediately.
 //
 // See Analyze for full documentation.
-func AnalyzeWithContext(ctx context.Context, fs *vfs.FileSystem, entryPoint string) (*Program, []Diagnostic) {
+func AnalyzeWithContext(
+	ctx context.Context,
+	fs *vfs.FileSystem,
+	entryPoint string,
+) (*Program, []Diagnostic) {
 	// Check for cancellation before starting
 	if ctx.Err() != nil {
 		return nil, nil

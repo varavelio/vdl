@@ -29,7 +29,7 @@ func New() *FileSystem {
 //   - If path is already absolute, it returns the cleaned version.
 //   - If baseFile is empty (entry point scenario), path is resolved relative to the current working directory.
 //   - Otherwise, path is resolved relative to the directory containing baseFile.
-func (fs *FileSystem) Resolve(baseFile string, path string) string {
+func (fs *FileSystem) Resolve(baseFile, path string) string {
 	if filepath.IsAbs(path) {
 		return filepath.Clean(path)
 	}

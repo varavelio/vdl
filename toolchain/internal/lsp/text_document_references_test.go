@@ -18,7 +18,9 @@ type Bar {
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentReferences{
-		RequestMessage: RequestMessage{Message: Message{JSONRPC: "2.0", Method: "textDocument/references", ID: "1"}},
+		RequestMessage: RequestMessage{
+			Message: Message{JSONRPC: "2.0", Method: "textDocument/references", ID: "1"},
+		},
 		Params: RequestMessageTextDocumentReferencesParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 			Position:     TextDocumentPosition{Line: 3, Character: 7}, // Foo reference

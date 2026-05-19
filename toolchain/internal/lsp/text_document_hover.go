@@ -91,7 +91,11 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 }
 
 // findHoverInfo finds hover information for a symbol in the program.
-func findHoverInfo(fs interface{ ReadFile(string) ([]byte, error) }, identifier string, program *analysis.Program) *HoverResult {
+func findHoverInfo(
+	fs interface{ ReadFile(string) ([]byte, error) },
+	identifier string,
+	program *analysis.Program,
+) *HoverResult {
 	// Check if the identifier is a type
 	if t, ok := program.Types[identifier]; ok {
 		sourceCode, err := extractSourceCode(fs, t.File, t.Pos.Line, t.EndPos.Line)
@@ -158,7 +162,11 @@ func findHoverInfo(fs interface{ ReadFile(string) ([]byte, error) }, identifier 
 }
 
 // extractSourceCode extracts a range of lines from a file.
-func extractSourceCode(fs interface{ ReadFile(string) ([]byte, error) }, filePath string, startLine, endLine int) (string, error) {
+func extractSourceCode(
+	fs interface{ ReadFile(string) ([]byte, error) },
+	filePath string,
+	startLine, endLine int,
+) (string, error) {
 	content, err := fs.ReadFile(filePath)
 	if err != nil {
 		return "", err

@@ -75,10 +75,17 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 	if len(o.Entries) == 0 {
 		return "{}"
 	}
-	if !ctx.forceObjectMultiline && len(o.Entries) == 1 && o.Entries[0].Spread == nil && o.Entries[0].Comment == nil && o.Entries[0].Trailing == nil {
+	if !ctx.forceObjectMultiline && len(o.Entries) == 1 && o.Entries[0].Spread == nil &&
+		o.Entries[0].Comment == nil &&
+		o.Entries[0].Trailing == nil {
 		entry := o.Entries[0]
 		if entry.Value != nil && entry.Value.Scalar != nil {
-			return "{ " + strutil.ToCamelCase(entry.Key) + " " + renderLiteral(*entry.Value, ctx) + " }"
+			return "{ " + strutil.ToCamelCase(
+				entry.Key,
+			) + " " + renderLiteral(
+				*entry.Value,
+				ctx,
+			) + " }"
 		}
 	}
 
@@ -93,7 +100,11 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 			case entry.Comment != nil:
 				output.Line(entry.Comment.Text)
 			case entry.Spread != nil:
-				lineWithTrailing(output, "..."+renderReference(*entry.Spread, ctx.spreadRef), entry.Trailing)
+				lineWithTrailing(
+					output,
+					"..."+renderReference(*entry.Spread, ctx.spreadRef),
+					entry.Trailing,
+				)
 			default:
 				key := strutil.ToCamelCase(entry.Key)
 				value := renderLiteral(*entry.Value, ctx)
@@ -122,7 +133,8 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 			parts = append(parts, element.Comment.Text)
 			continue
 		}
-		hasCompoundElements = hasCompoundElements || (element.Value != nil && (element.Value.Obj != nil || element.Value.Array != nil))
+		hasCompoundElements = hasCompoundElements ||
+			(element.Value != nil && (element.Value.Obj != nil || element.Value.Array != nil))
 		rendered := renderLiteral(*element.Value, ctx)
 		hasMultiline = hasMultiline || strings.Contains(rendered, "\n")
 		hasTrailingComments = hasTrailingComments || element.Trailing != nil

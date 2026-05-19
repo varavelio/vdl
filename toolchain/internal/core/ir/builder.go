@@ -24,7 +24,10 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 	}
 
 	for _, typ := range program.Types {
-		schema.Types = append(schema.Types, convertType(typ, program.Types, program.Enums, resolver))
+		schema.Types = append(
+			schema.Types,
+			convertType(typ, program.Types, program.Enums, resolver),
+		)
 	}
 	for _, enum := range program.Enums {
 		schema.Enums = append(schema.Enums, convertEnum(enum, program.Enums, resolver))
@@ -43,9 +46,18 @@ func FromProgram(program *analysis.Program) *irtypes.IrSchema {
 		})
 	}
 
-	sort.Slice(schema.Types, func(i, j int) bool { return schema.Types[i].Name < schema.Types[j].Name })
-	sort.Slice(schema.Enums, func(i, j int) bool { return schema.Enums[i].Name < schema.Enums[j].Name })
-	sort.Slice(schema.Constants, func(i, j int) bool { return schema.Constants[i].Name < schema.Constants[j].Name })
+	sort.Slice(
+		schema.Types,
+		func(i, j int) bool { return schema.Types[i].Name < schema.Types[j].Name },
+	)
+	sort.Slice(
+		schema.Enums,
+		func(i, j int) bool { return schema.Enums[i].Name < schema.Enums[j].Name },
+	)
+	sort.Slice(
+		schema.Constants,
+		func(i, j int) bool { return schema.Constants[i].Name < schema.Constants[j].Name },
+	)
 
 	return schema
 }
@@ -117,7 +129,10 @@ func convertEnum(
 
 // resolveEnumMemberValue converts a raw enum member value string into a
 // properly typed LiteralValue based on the enum's underlying storage kind.
-func resolveEnumMemberValue(valueType analysis.EnumValueType, rawValue string) irtypes.LiteralValue {
+func resolveEnumMemberValue(
+	valueType analysis.EnumValueType,
+	rawValue string,
+) irtypes.LiteralValue {
 	if valueType == analysis.EnumValueTypeInt {
 		n, err := strconv.ParseInt(rawValue, 10, 64)
 		if err != nil {
@@ -259,7 +274,10 @@ func primitiveTypeRef(primitive irtypes.PrimitiveType) irtypes.TypeRef {
 	}
 }
 
-func convertAnnotations(annotations []*analysis.AnnotationRef, resolver *valueResolver) []irtypes.Annotation {
+func convertAnnotations(
+	annotations []*analysis.AnnotationRef,
+	resolver *valueResolver,
+) []irtypes.Annotation {
 	if len(annotations) == 0 {
 		return []irtypes.Annotation{}
 	}
@@ -396,10 +414,17 @@ func (r *valueResolver) resolveDataLiteral(lit *ast.DataLiteral) (irtypes.Litera
 	return irtypes.LiteralValue{}, false
 }
 
-func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral, pos irtypes.Position) (irtypes.LiteralValue, bool) {
+func (r *valueResolver) resolveScalarLiteral(
+	s *ast.ScalarLiteral,
+	pos irtypes.Position,
+) (irtypes.LiteralValue, bool) {
 	if s.Str != nil {
 		value := string(*s.Str)
-		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindString, StringValue: &value}, true
+		return irtypes.LiteralValue{
+			Position:    pos,
+			Kind:        irtypes.LiteralKindString,
+			StringValue: &value,
+		}, true
 	}
 	if s.Int != nil {
 		n, err := strconv.ParseInt(*s.Int, 10, 64)
@@ -413,15 +438,27 @@ func (r *valueResolver) resolveScalarLiteral(s *ast.ScalarLiteral, pos irtypes.P
 		if err != nil {
 			return irtypes.LiteralValue{}, false
 		}
-		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindFloat, FloatValue: &f}, true
+		return irtypes.LiteralValue{
+			Position:   pos,
+			Kind:       irtypes.LiteralKindFloat,
+			FloatValue: &f,
+		}, true
 	}
 	if s.True {
 		b := true
-		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
+		return irtypes.LiteralValue{
+			Position:  pos,
+			Kind:      irtypes.LiteralKindBool,
+			BoolValue: &b,
+		}, true
 	}
 	if s.False {
 		b := false
-		return irtypes.LiteralValue{Position: pos, Kind: irtypes.LiteralKindBool, BoolValue: &b}, true
+		return irtypes.LiteralValue{
+			Position:  pos,
+			Kind:      irtypes.LiteralKindBool,
+			BoolValue: &b,
+		}, true
 	}
 	if s.Ref != nil {
 		if s.Ref.Member == nil {

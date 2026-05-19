@@ -15,7 +15,11 @@ import (
 func TestRunWithLocalPlugin(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "nested/generated.txt", content: "hello" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "nested/generated.txt", content: "hello" }] })`,
+	)
 	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
 		const config = {
 			version 1
@@ -45,7 +49,11 @@ func TestRunWithLocalPlugin(t *testing.T) {
 func TestRunPrunesUnusedLockHashes(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`,
+	)
 	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
 		const config = {
 			version 1
@@ -78,7 +86,11 @@ func TestRunPrunesUnusedLockHashes(t *testing.T) {
 func TestRunRejectsTraversalBeforeCleaningOutputs(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "../escape.txt", content: "bad" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "../escape.txt", content: "bad" }] })`,
+	)
 	writeTestFile(t, filepath.Join(dir, defaultConfigFileName), `
 		const config = {
 			version 1
@@ -110,7 +122,11 @@ func TestRunWithRemotePluginUsesCacheAndWritesLockFile(t *testing.T) {
 		requestCount++
 		require.Equal(t, "/plugins/remote.js", r.URL.Path)
 		require.Equal(t, "secret-value", r.Header.Get("X-Plugin-Token"))
-		_, _ = w.Write([]byte(`exports.generate = () => ({ files: [{ path: "remote.txt", content: "remote" }] })`))
+		_, _ = w.Write(
+			[]byte(
+				`exports.generate = () => ({ files: [{ path: "remote.txt", content: "remote" }] })`,
+			),
+		)
 	}))
 	defer server.Close()
 
@@ -174,7 +190,11 @@ func TestRunWithRemoteHTTPPluginWhenEnabled(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/plugins/insecure.js", r.URL.Path)
-		_, _ = w.Write([]byte(`exports.generate = () => ({ files: [{ path: "http.txt", content: "insecure-ok" }] })`))
+		_, _ = w.Write(
+			[]byte(
+				`exports.generate = () => ({ files: [{ path: "http.txt", content: "insecure-ok" }] })`,
+			),
+		)
 	}))
 	defer server.Close()
 
@@ -217,7 +237,12 @@ func TestMaterializeRemoteDependencyRejectsHashChanges(t *testing.T) {
 	cacheDir := filepath.Join(t.TempDir(), "lock")
 	require.NoError(t, os.MkdirAll(cacheDir, generatedDirMode))
 
-	_, _, err := materializeRemoteDependency(server.URL+"/plugin/index.js", http.Header{}, sha256Digest([]byte("console.log('v1')")), cacheDir)
+	_, _, err := materializeRemoteDependency(
+		server.URL+"/plugin/index.js",
+		http.Header{},
+		sha256Digest([]byte("console.log('v1')")),
+		cacheDir,
+	)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "may have been compromised")
 }

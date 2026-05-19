@@ -165,7 +165,13 @@ func parseGoldenSpec(t *testing.T, entryFile string) goldenSpec {
 		switch {
 		case strings.HasPrefix(line, directiveExpect):
 			code := strings.TrimSpace(strings.TrimPrefix(line, directiveExpect))
-			require.Truef(t, len(code) == 4 && strings.HasPrefix(code, "E"), "invalid expect code %q in %s", code, entryFile)
+			require.Truef(
+				t,
+				len(code) == 4 && strings.HasPrefix(code, "E"),
+				"invalid expect code %q in %s",
+				code,
+				entryFile,
+			)
 			spec.ExpectCodes = append(spec.ExpectCodes, code)
 		case strings.HasPrefix(line, directiveExpectNoErr):
 			spec.ExpectNoError = true
@@ -173,7 +179,10 @@ func parseGoldenSpec(t *testing.T, entryFile string) goldenSpec {
 			raw := strings.TrimSpace(strings.TrimPrefix(line, directiveAssert))
 			parts := strings.Fields(raw)
 			require.NotEmptyf(t, parts, "invalid assert directive in %s: %q", entryFile, line)
-			spec.Assertions = append(spec.Assertions, goldenAssertion{Key: parts[0], Args: parts[1:], Raw: raw})
+			spec.Assertions = append(
+				spec.Assertions,
+				goldenAssertion{Key: parts[0], Args: parts[1:], Raw: raw},
+			)
 		}
 	}
 	require.NoError(t, scanner.Err())
@@ -224,16 +233,33 @@ func runGoldenCase(t *testing.T, tc goldenCase) (*analysis.Program, []analysis.D
 	return analysis.Analyze(fs, "/"+filepath.ToSlash(tc.EntryFile))
 }
 
-func assertGoldenResult(t *testing.T, tc goldenCase, program *analysis.Program, diagnostics []analysis.Diagnostic) {
+func assertGoldenResult(
+	t *testing.T,
+	tc goldenCase,
+	program *analysis.Program,
+	diagnostics []analysis.Diagnostic,
+) {
 	t.Helper()
 	require.NotNil(t, program)
 
 	if tc.Spec.ExpectNoError {
-		require.Emptyf(t, diagnostics, "expected no diagnostics, got %s", formatDiagnosticCodes(diagnostics))
+		require.Emptyf(
+			t,
+			diagnostics,
+			"expected no diagnostics, got %s",
+			formatDiagnosticCodes(diagnostics),
+		)
 	} else {
 		codes := extractCodes(diagnostics)
 		for _, expected := range tc.Spec.ExpectCodes {
-			require.Containsf(t, codes, expected, "expected code %s not found in %v", expected, codes)
+			require.Containsf(
+				t,
+				codes,
+				expected,
+				"expected code %s not found in %v",
+				expected,
+				codes,
+			)
 		}
 	}
 
@@ -242,7 +268,12 @@ func assertGoldenResult(t *testing.T, tc goldenCase, program *analysis.Program, 
 	}
 }
 
-func applyAssertion(t *testing.T, a goldenAssertion, program *analysis.Program, diagnostics []analysis.Diagnostic) {
+func applyAssertion(
+	t *testing.T,
+	a goldenAssertion,
+	program *analysis.Program,
+	diagnostics []analysis.Diagnostic,
+) {
 	t.Helper()
 
 	requireArgs := func(n int) {
@@ -309,13 +340,21 @@ func applyAssertion(t *testing.T, a goldenAssertion, program *analysis.Program, 
 		requireArgs(2)
 		typ := getType(t, program, a.Args[0])
 		require.NotNil(t, typ.Docstring)
-		require.Contains(t, strings.ToLower(*typ.Docstring), strings.ToLower(strings.Join(a.Args[1:], " ")))
+		require.Contains(
+			t,
+			strings.ToLower(*typ.Docstring),
+			strings.ToLower(strings.Join(a.Args[1:], " ")),
+		)
 
 	case assertFieldDocContain:
 		requireArgs(3)
 		f := getTypeField(t, program, a.Args[0], a.Args[1])
 		require.NotNil(t, f.Docstring)
-		require.Contains(t, strings.ToLower(*f.Docstring), strings.ToLower(strings.Join(a.Args[2:], " ")))
+		require.Contains(
+			t,
+			strings.ToLower(*f.Docstring),
+			strings.ToLower(strings.Join(a.Args[2:], " ")),
+		)
 
 	case assertStdDocContains:
 		requireArgs(1)
@@ -364,7 +403,11 @@ func getConst(t *testing.T, program *analysis.Program, name string) *analysis.Co
 	return cnst
 }
 
-func getTypeField(t *testing.T, program *analysis.Program, typeName, fieldName string) *analysis.FieldSymbol {
+func getTypeField(
+	t *testing.T,
+	program *analysis.Program,
+	typeName, fieldName string,
+) *analysis.FieldSymbol {
 	t.Helper()
 	typ := getType(t, program, typeName)
 	require.True(t, typ.IsObject(), "type %q is not an object type", typeName)

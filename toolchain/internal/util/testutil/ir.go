@@ -16,7 +16,11 @@ import (
 func IRSchemaEqual(t *testing.T, expected, actual *irtypes.IrSchema, msgAndArgs ...any) {
 	t.Helper()
 
-	require.Equal(t, debugutil.ToBeautyJSON(expected), debugutil.ToBeautyJSON(actual), msgAndArgs...)
+	require.Equal(
+		t,
+		debugutil.ToBeautyJSON(expected),
+		debugutil.ToBeautyJSON(actual),
+		msgAndArgs...)
 }
 
 // IRSchemaEqualNoPos compares two IR schemas and fails if they are not equal.
@@ -79,7 +83,7 @@ func cloneIRSchema(t *testing.T, schema *irtypes.IrSchema) *irtypes.IrSchema {
 	return &out
 }
 
-func irCleanPositionsRecursively(val reflect.Value, emptyPos reflect.Value) {
+func irCleanPositionsRecursively(val, emptyPos reflect.Value) {
 	if !val.IsValid() {
 		return
 	}

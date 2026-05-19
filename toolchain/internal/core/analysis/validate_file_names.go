@@ -64,12 +64,20 @@ func validateSelfFileName(filePath string) *Diagnostic {
 		pos,
 		pos,
 		CodeInvalidFileName,
-		fmt.Sprintf("file name %q is invalid: expected [a-z0-9_]+.vdl (or %q for self file validation)", base, configSchemaFileName),
+		fmt.Sprintf(
+			"file name %q is invalid: expected [a-z0-9_]+.vdl (or %q for self file validation)",
+			base,
+			configSchemaFileName,
+		),
 	)
 	return &diag
 }
 
-func validateIncludeFileName(currentFile string, include *ast.Include, includeTarget string) *Diagnostic {
+func validateIncludeFileName(
+	currentFile string,
+	include *ast.Include,
+	includeTarget string,
+) *Diagnostic {
 	base := filepath.Base(includeTarget)
 
 	if base == configSchemaFileName {
@@ -78,7 +86,11 @@ func validateIncludeFileName(currentFile string, include *ast.Include, includeTa
 			include.Pos,
 			include.EndPos,
 			CodeInvalidIncludeFile,
-			fmt.Sprintf("include %q is invalid: %q cannot be imported", string(include.Path), configSchemaFileName),
+			fmt.Sprintf(
+				"include %q is invalid: %q cannot be imported",
+				string(include.Path),
+				configSchemaFileName,
+			),
 		)
 		return &diag
 	}
@@ -92,7 +104,11 @@ func validateIncludeFileName(currentFile string, include *ast.Include, includeTa
 		include.Pos,
 		include.EndPos,
 		CodeInvalidIncludeFile,
-		fmt.Sprintf("include %q is invalid: target file name %q must match [a-z0-9_]+.vdl", string(include.Path), base),
+		fmt.Sprintf(
+			"include %q is invalid: target file name %q must match [a-z0-9_]+.vdl",
+			string(include.Path),
+			base,
+		),
 	)
 	return &diag
 }

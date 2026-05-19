@@ -13,8 +13,18 @@ func TestDocstringIsExternal(t *testing.T) {
 		expected string
 		ok       bool
 	}{
-		{name: "valid markdown path", input: " ./docs/readme.md ", expected: "./docs/readme.md", ok: true},
-		{name: "valid windows path", input: `C:\docs\readme.md`, expected: `C:\docs\readme.md`, ok: true},
+		{
+			name:     "valid markdown path",
+			input:    " ./docs/readme.md ",
+			expected: "./docs/readme.md",
+			ok:       true,
+		},
+		{
+			name:     "valid windows path",
+			input:    `C:\docs\readme.md`,
+			expected: `C:\docs\readme.md`,
+			ok:       true,
+		},
 		{name: "invalid when multiline", input: "./docs\nreadme.md", expected: "", ok: false},
 		{name: "invalid extension", input: "./docs/readme.txt", expected: "", ok: false},
 		{name: "uppercase extension invalid", input: "./docs/README.MD", expected: "", ok: false},
@@ -62,10 +72,22 @@ func TestSchemaChildKind(t *testing.T) {
 		child    *TopLevelDecl
 		expected DeclKind
 	}{
-		{name: "include", child: &TopLevelDecl{Include: &Include{Path: "./foo.vdl"}}, expected: DeclKindInclude},
-		{name: "docstring", child: &TopLevelDecl{Docstring: &Docstring{Value: " doc "}}, expected: DeclKindDocstring},
+		{
+			name:     "include",
+			child:    &TopLevelDecl{Include: &Include{Path: "./foo.vdl"}},
+			expected: DeclKindInclude,
+		},
+		{
+			name:     "docstring",
+			child:    &TopLevelDecl{Docstring: &Docstring{Value: " doc "}},
+			expected: DeclKindDocstring,
+		},
 		{name: "type", child: &TopLevelDecl{Type: &TypeDecl{Name: "User"}}, expected: DeclKindType},
-		{name: "const", child: &TopLevelDecl{Const: &ConstDecl{Name: "Config"}}, expected: DeclKindConst},
+		{
+			name:     "const",
+			child:    &TopLevelDecl{Const: &ConstDecl{Name: "Config"}},
+			expected: DeclKindConst,
+		},
 		{name: "enum", child: &TopLevelDecl{Enum: &EnumDecl{Name: "Role"}}, expected: DeclKindEnum},
 		{name: "empty", child: &TopLevelDecl{}, expected: ""},
 	}
@@ -110,7 +132,12 @@ func TestFlattenedFields(t *testing.T) {
 		Base: &FieldTypeBase{
 			Object: &FieldTypeObject{
 				Members: []*TypeMember{
-					{Field: &Field{Name: "id", Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}}}},
+					{
+						Field: &Field{
+							Name: "id",
+							Type: FieldType{Base: &FieldTypeBase{Named: &primitiveInt}},
+						},
+					},
 					{Field: fProfile},
 				},
 			},
@@ -159,7 +186,10 @@ func TestFieldTypeIsArray(t *testing.T) {
 	ptr := func(s string) *string { return &s }
 
 	require.False(t, (&FieldType{Base: &FieldTypeBase{Named: ptr("string")}}).IsArray())
-	require.True(t, (&FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 2}).IsArray())
+	require.True(
+		t,
+		(&FieldType{Base: &FieldTypeBase{Named: ptr("string")}, Dimensions: 2}).IsArray(),
+	)
 }
 
 func TestArrayDimensionsCapture(t *testing.T) {
@@ -225,13 +255,21 @@ func TestScalarLiteralStringAllTypes(t *testing.T) {
 		expected string
 	}{
 		{name: "string literal", literal: ScalarLiteral{Str: qptr("hello")}, expected: `"hello"`},
-		{name: "string with quotes", literal: ScalarLiteral{Str: qptr(`say "hi"`)}, expected: `"say \"hi\""`},
+		{
+			name:     "string with quotes",
+			literal:  ScalarLiteral{Str: qptr(`say "hi"`)},
+			expected: `"say \"hi\""`,
+		},
 		{name: "int literal", literal: ScalarLiteral{Int: ptr("42")}, expected: "42"},
 		{name: "float literal", literal: ScalarLiteral{Float: ptr("3.14")}, expected: "3.14"},
 		{name: "true literal", literal: ScalarLiteral{True: true}, expected: "true"},
 		{name: "false literal", literal: ScalarLiteral{False: true}, expected: "false"},
 		{name: "simple ref", literal: ScalarLiteral{Ref: &Reference{Name: "FOO"}}, expected: "FOO"},
-		{name: "enum ref", literal: ScalarLiteral{Ref: &Reference{Name: "Color", Member: ptr("Red")}}, expected: "Color.Red"},
+		{
+			name:     "enum ref",
+			literal:  ScalarLiteral{Ref: &Reference{Name: "Color", Member: ptr("Red")}},
+			expected: "Color.Red",
+		},
 		{name: "empty literal", literal: ScalarLiteral{}, expected: ""},
 	}
 
@@ -441,8 +479,14 @@ func TestEnumMemberStructure(t *testing.T) {
 	t.Run("member with multiple annotations", func(t *testing.T) {
 		m := &EnumMember{
 			Annotations: []*Annotation{
-				{Name: "deprecated", Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("Use X")}}},
-				{Name: "alias", Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("old_val")}}},
+				{
+					Name:     "deprecated",
+					Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("Use X")}},
+				},
+				{
+					Name:     "alias",
+					Argument: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("old_val")}},
+				},
 			},
 			Name: "Legacy",
 		}
@@ -463,10 +507,12 @@ func TestEnumMemberStructure(t *testing.T) {
 
 	t.Run("member with docstring and annotations", func(t *testing.T) {
 		m := &EnumMember{
-			Docstring:   &Docstring{Value: " Full access role "},
-			Annotations: []*Annotation{{Name: "rbac", Argument: &DataLiteral{Scalar: &ScalarLiteral{Int: ptr("100")}}}},
-			Name:        "Admin",
-			Value:       &EnumValue{Str: qptr("admin")},
+			Docstring: &Docstring{Value: " Full access role "},
+			Annotations: []*Annotation{
+				{Name: "rbac", Argument: &DataLiteral{Scalar: &ScalarLiteral{Int: ptr("100")}}},
+			},
+			Name:  "Admin",
+			Value: &EnumValue{Str: qptr("admin")},
 		}
 		require.NotNil(t, m.Docstring)
 		require.Equal(t, " Full access role ", m.Docstring.Value.String())
@@ -479,13 +525,25 @@ func TestEnumMemberStructure(t *testing.T) {
 
 	t.Run("member with annotation with object payload", func(t *testing.T) {
 		m := &EnumMember{
-			Annotations: []*Annotation{{
-				Name: "meta",
-				Argument: &DataLiteral{Object: &DataLiteralObject{Entries: []*DataLiteralObjectEntry{
-					{Key: "level", Value: &DataLiteral{Scalar: &ScalarLiteral{Int: ptr("100")}}},
-					{Key: "label", Value: &DataLiteral{Scalar: &ScalarLiteral{Str: qptr("Super Admin")}}},
-				}}},
-			}},
+			Annotations: []*Annotation{
+				{
+					Name: "meta",
+					Argument: &DataLiteral{
+						Object: &DataLiteralObject{Entries: []*DataLiteralObjectEntry{
+							{
+								Key:   "level",
+								Value: &DataLiteral{Scalar: &ScalarLiteral{Int: ptr("100")}},
+							},
+							{
+								Key: "label",
+								Value: &DataLiteral{
+									Scalar: &ScalarLiteral{Str: qptr("Super Admin")},
+								},
+							},
+						}},
+					},
+				},
+			},
 			Name: "SuperAdmin",
 		}
 		require.Len(t, m.Annotations, 1)

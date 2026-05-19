@@ -16,7 +16,11 @@ import (
 func TestRunWithConfigHooksUseGlobalSandwichOrder(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "nested/generated.txt", content: "hello" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "nested/generated.txt", content: "hello" }] })`,
+	)
 	writeHookConfigFile(t, dir, []string{"pre-1", "pre-2"}, []string{"check-generated", "post-2"})
 
 	var calls []string
@@ -30,7 +34,9 @@ func TestRunWithConfigHooksUseGlobalSandwichOrder(t *testing.T) {
 				return fmt.Errorf("pre hook ran after output generation")
 			}
 		case "check-generated":
-			if _, err := os.Stat(filepath.Join(workDir, "gen", "nested", "generated.txt")); err != nil {
+			if _, err := os.Stat(
+				filepath.Join(workDir, "gen", "nested", "generated.txt"),
+			); err != nil {
 				return fmt.Errorf("generated file not ready for post hook: %w", err)
 			}
 		}
@@ -49,12 +55,16 @@ func TestRunWithConfigHooksUseGlobalSandwichOrder(t *testing.T) {
 func TestRunWithConfigPreGenerateHookFailureAbortsPipeline(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`,
+	)
 	writeHookConfigFile(t, dir, []string{"fail-pre"}, []string{"post-never"})
 
 	var calls []string
 	warningBuffer := &bytes.Buffer{}
-	setHostHookTestDoubles(t, func(_ string, command string) error {
+	setHostHookTestDoubles(t, func(_, command string) error {
 		calls = append(calls, command)
 		if command == "fail-pre" {
 			return errors.New("pre failed")
@@ -73,12 +83,16 @@ func TestRunWithConfigPreGenerateHookFailureAbortsPipeline(t *testing.T) {
 func TestRunWithConfigPostGenerateHookFailureWarnsAndContinues(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`,
+	)
 	writeHookConfigFile(t, dir, nil, []string{"fail-post", "post-ok"})
 
 	var calls []string
 	warningBuffer := &bytes.Buffer{}
-	setHostHookTestDoubles(t, func(_ string, command string) error {
+	setHostHookTestDoubles(t, func(_, command string) error {
 		calls = append(calls, command)
 		if command == "fail-post" {
 			return errors.New("post failed")
@@ -97,12 +111,16 @@ func TestRunWithConfigPostGenerateHookFailureWarnsAndContinues(t *testing.T) {
 func TestRunWithConfigSkipsHooksWhenDisabled(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.vdl"), "type User {\n  name string\n}\n")
-	writeTestFile(t, filepath.Join(dir, "plugin/index.js"), `exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`)
+	writeTestFile(
+		t,
+		filepath.Join(dir, "plugin/index.js"),
+		`exports.generate = () => ({ files: [{ path: "generated.txt", content: "hello" }] })`,
+	)
 	writeHookConfigFile(t, dir, []string{"pre-1"}, []string{"post-1"})
 
 	var calls []string
 	warningBuffer := &bytes.Buffer{}
-	setHostHookTestDoubles(t, func(_ string, command string) error {
+	setHostHookTestDoubles(t, func(_, command string) error {
 		calls = append(calls, command)
 		return nil
 	}, warningBuffer)
@@ -116,7 +134,11 @@ func TestRunWithConfigSkipsHooksWhenDisabled(t *testing.T) {
 	require.FileExists(t, filepath.Join(dir, "gen", "generated.txt"))
 }
 
-func setHostHookTestDoubles(t *testing.T, runner func(workDir, command string) error, warningWriter *bytes.Buffer) {
+func setHostHookTestDoubles(
+	t *testing.T,
+	runner func(workDir, command string) error,
+	warningWriter *bytes.Buffer,
+) {
 	t.Helper()
 
 	originalRunner := hostHookCommandRunner

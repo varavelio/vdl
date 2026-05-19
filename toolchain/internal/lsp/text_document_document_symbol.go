@@ -106,10 +106,16 @@ func buildDocumentSymbols(program *analysis.Program, filePath string) []Document
 			}
 
 			sym := DocumentSymbol{
-				Name:           name,
-				Kind:           SymbolKindString,
-				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(ds.Pos), End: convertASTPositionToLSPPosition(ds.EndPos)},
-				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(ds.Pos), End: convertASTPositionToLSPPosition(ds.Pos)},
+				Name: name,
+				Kind: SymbolKindString,
+				Range: TextDocumentRange{
+					Start: convertASTPositionToLSPPosition(ds.Pos),
+					End:   convertASTPositionToLSPPosition(ds.EndPos),
+				},
+				SelectionRange: TextDocumentRange{
+					Start: convertASTPositionToLSPPosition(ds.Pos),
+					End:   convertASTPositionToLSPPosition(ds.Pos),
+				},
 			}
 			symbols = append(symbols, sym)
 		}
@@ -121,10 +127,16 @@ func buildDocumentSymbols(program *analysis.Program, filePath string) []Document
 			continue
 		}
 		sym := DocumentSymbol{
-			Name:           t.Name,
-			Kind:           SymbolKindStruct,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(t.Pos), End: convertASTPositionToLSPPosition(t.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(t.Pos), End: convertASTPositionToLSPPosition(t.Pos)},
+			Name: t.Name,
+			Kind: SymbolKindStruct,
+			Range: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(t.Pos),
+				End:   convertASTPositionToLSPPosition(t.EndPos),
+			},
+			SelectionRange: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(t.Pos),
+				End:   convertASTPositionToLSPPosition(t.Pos),
+			},
 		}
 		symbols = append(symbols, sym)
 	}
@@ -135,10 +147,16 @@ func buildDocumentSymbols(program *analysis.Program, filePath string) []Document
 			continue
 		}
 		sym := DocumentSymbol{
-			Name:           e.Name,
-			Kind:           SymbolKindEnum,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(e.Pos), End: convertASTPositionToLSPPosition(e.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(e.Pos), End: convertASTPositionToLSPPosition(e.Pos)},
+			Name: e.Name,
+			Kind: SymbolKindEnum,
+			Range: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(e.Pos),
+				End:   convertASTPositionToLSPPosition(e.EndPos),
+			},
+			SelectionRange: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(e.Pos),
+				End:   convertASTPositionToLSPPosition(e.Pos),
+			},
 		}
 		symbols = append(symbols, sym)
 	}
@@ -149,10 +167,16 @@ func buildDocumentSymbols(program *analysis.Program, filePath string) []Document
 			continue
 		}
 		sym := DocumentSymbol{
-			Name:           c.Name,
-			Kind:           SymbolKindConstant,
-			Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(c.Pos), End: convertASTPositionToLSPPosition(c.EndPos)},
-			SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(c.Pos), End: convertASTPositionToLSPPosition(c.Pos)},
+			Name: c.Name,
+			Kind: SymbolKindConstant,
+			Range: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(c.Pos),
+				End:   convertASTPositionToLSPPosition(c.EndPos),
+			},
+			SelectionRange: TextDocumentRange{
+				Start: convertASTPositionToLSPPosition(c.Pos),
+				End:   convertASTPositionToLSPPosition(c.Pos),
+			},
 		}
 		symbols = append(symbols, sym)
 	}
@@ -164,10 +188,16 @@ func buildDocumentSymbols(program *analysis.Program, filePath string) []Document
 
 		for _, m := range e.Members {
 			sym := DocumentSymbol{
-				Name:           m.Name,
-				Kind:           SymbolKindEnumMember,
-				Range:          TextDocumentRange{Start: convertASTPositionToLSPPosition(m.Pos), End: convertASTPositionToLSPPosition(m.EndPos)},
-				SelectionRange: TextDocumentRange{Start: convertASTPositionToLSPPosition(m.Pos), End: convertASTPositionToLSPPosition(m.Pos)},
+				Name: m.Name,
+				Kind: SymbolKindEnumMember,
+				Range: TextDocumentRange{
+					Start: convertASTPositionToLSPPosition(m.Pos),
+					End:   convertASTPositionToLSPPosition(m.EndPos),
+				},
+				SelectionRange: TextDocumentRange{
+					Start: convertASTPositionToLSPPosition(m.Pos),
+					End:   convertASTPositionToLSPPosition(m.Pos),
+				},
 			}
 			symbols = append(symbols, sym)
 		}

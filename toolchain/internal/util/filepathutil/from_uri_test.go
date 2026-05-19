@@ -37,10 +37,22 @@ func TestFromURI(t *testing.T) {
 			{"Simple file URI", "file:///path/to/file.txt", "/path/to/file.txt"},
 			{"File URI with redundant slashes", "file:///path//to/file.txt", "/path/to/file.txt"},
 			{"File URI with dot segments", "file:///path/./to/file.txt", "/path/to/file.txt"},
-			{"File URI with parent segments", "file:///path/to/../to/file.txt", "/path/to/file.txt"},
-			{"File URI with query parameters", "file:///path/to/file.txt?query=value", "/path/to/file.txt"},
+			{
+				"File URI with parent segments",
+				"file:///path/to/../to/file.txt",
+				"/path/to/file.txt",
+			},
+			{
+				"File URI with query parameters",
+				"file:///path/to/file.txt?query=value",
+				"/path/to/file.txt",
+			},
 			{"File URI with fragment", "file:///path/to/file.txt#fragment", "/path/to/file.txt"},
-			{"File URI with encoded characters", "file:///path/to/file%20with spaces.txt", "/path/to/file with spaces.txt"},
+			{
+				"File URI with encoded characters",
+				"file:///path/to/file%20with spaces.txt",
+				"/path/to/file with spaces.txt",
+			},
 		}
 
 		for _, tc := range testCases {
@@ -59,8 +71,16 @@ func TestFromURI(t *testing.T) {
 			expected string
 		}{
 			{"Windows drive path", "C:/path/to/file.txt", "C:/path/to/file.txt"},
-			{"Windows drive path with backslashes", "C:\\path\\to\\file.txt", "C:\\path\\to\\file.txt"},
-			{"Windows UNC path", "\\\\server\\share\\path\\file.txt", "\\\\server\\share\\path\\file.txt"},
+			{
+				"Windows drive path with backslashes",
+				"C:\\path\\to\\file.txt",
+				"C:\\path\\to\\file.txt",
+			},
+			{
+				"Windows UNC path",
+				"\\\\server\\share\\path\\file.txt",
+				"\\\\server\\share\\path\\file.txt",
+			},
 		}
 
 		for _, tc := range testCases {
@@ -80,7 +100,11 @@ func TestFromURI(t *testing.T) {
 			expected string
 		}{
 			{"Windows drive file URI", "file:///C:/path/to/file.txt", "C:/path/to/file.txt"},
-			{"Windows drive file URI with spaces", "file:///C:/path/to/file%20with spaces.txt", "C:/path/to/file with spaces.txt"},
+			{
+				"Windows drive file URI with spaces",
+				"file:///C:/path/to/file%20with spaces.txt",
+				"C:/path/to/file with spaces.txt",
+			},
 		}
 
 		for _, tc := range testCases {

@@ -159,7 +159,14 @@ func printAnnotation(output *gen.Generator, a *annotationNode) {
 		return
 	}
 
-	renderedArg := renderLiteral(*a.Arg, literalRenderCtx{spreadRef: refConstDecl, scalarRef: refConstDecl, enumMemberRef: refEnumMember})
+	renderedArg := renderLiteral(
+		*a.Arg,
+		literalRenderCtx{
+			spreadRef:     refConstDecl,
+			scalarRef:     refConstDecl,
+			enumMemberRef: refEnumMember,
+		},
+	)
 	if !strings.Contains(renderedArg, "\n") {
 		output.Line("@" + name + "(" + renderedArg + ")")
 		return
