@@ -56,8 +56,7 @@ COPY --from=node:24.15.0-trixie /usr/local/ /usr/local/
 # Install golangci-lint
 COPY --from=golangci/golangci-lint:v2.12.2 /usr/bin/golangci-lint /usr/local/bin/golangci-lint
 
-# Install dprint and task
-COPY --from=fetcher /fetcher/dprint /usr/local/bin/dprint
+# Install tools from fetcher
 COPY --from=fetcher /fetcher/task /usr/local/bin/task
 
 # Set environment variables
