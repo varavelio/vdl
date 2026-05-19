@@ -11,7 +11,7 @@ Copyright &copy; Varavel
 """
 
 nav = [
-  { "Home" = "index.md" },
+  { "Overview" = "index.md" },
   { "About VDL" = "about.md" },
   { "Guides" = [
     { "Installation" = "guides/installation.md" },
@@ -31,6 +31,8 @@ nav = [
 logo = "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/vdl.svg"
 favicon = "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/icon.svg"
 language = "en"
+font.text = "Geist"
+font.code = "Geist Mono"
 
 features = [
   "announce.dismiss",
@@ -103,6 +105,8 @@ pygments_lang_class = true
 [project.markdown_extensions.pymdownx.magiclink]
 [project.markdown_extensions.pymdownx.mark]
 [project.markdown_extensions.pymdownx.smartsymbols]
+[project.markdown_extensions.pymdownx.snippets]
+base_path = ["."]
 [project.markdown_extensions.pymdownx.superfences]
 custom_fences = [
   { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
