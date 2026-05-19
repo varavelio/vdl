@@ -31,7 +31,10 @@ RUN set -e && \
     # Update and install system dependencies
     apt-get update -qq && \
     apt-get install -yqq --no-install-recommends \
-        ca-certificates wget curl zip unzip p7zip-full tzdata git tree ripgrep && \
+        ca-certificates wget curl zip unzip p7zip-full tzdata git tree ripgrep \
+        python3 python3-pip && \
+    # Install zensical
+    pip3 install --break-system-packages -qq zensical && \
     # Final setup: git config, and cleanup
     git config --global --add safe.directory '*' && \
     cd / && rm -rf /tmp/bin-downloads /var/lib/apt/lists/*
