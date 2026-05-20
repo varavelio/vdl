@@ -37,10 +37,10 @@ FROM alpine:3.23.3 AS fetcher
 WORKDIR /fetcher
 
 RUN \
-  apk add --quiet curl unzip && \
-  # Fetch task
-  sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /fetcher v3.50.0 && \
-  chmod +x ./task
+    apk add --quiet curl unzip && \
+    # Fetch task
+    sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /fetcher v3.50.0 && \
+    chmod +x ./task
 
 # -- final --------------------------------------------------------------------
 # Reusable builder image.  Includes Go, Node.js, linting tools, and every
@@ -66,10 +66,10 @@ RUN set -e && \
     # Update and install system dependencies
     apt-get update -qq && \
     apt-get install -yqq --no-install-recommends \
-        ca-certificates wget curl zip unzip p7zip-full tzdata git tree ripgrep \
-        python3 python3-pip && \
+    ca-certificates wget curl zip unzip p7zip-full tzdata git tree ripgrep \
+    python3 python3-pip && \
     # Install zensical
-    pip3 install --break-system-packages -qq zensical && \
+    pip3 install --no-cache-dir --break-system-packages -qq zensical && \
     # Final setup: git config, and cleanup
     git config --global --add safe.directory '*' && \
     cd / && rm -rf /tmp/bin-downloads /var/lib/apt/lists/*
