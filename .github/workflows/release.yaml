@@ -5,10 +5,27 @@ on:
     types: [published]
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.vars.outputs.should_run }}
+      tag: ${{ steps.vars.outputs.tag }}
+      clean_tag: ${{ steps.vars.outputs.clean_tag }}
+    steps:
+      - id: vars
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          echo "should_run=${{ !contains(github.event.release.tag_name, 'vscode') }}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "clean_tag=${TAG#v}" >> "$GITHUB_OUTPUT"
+
   build-and-upload:
     name: Build and upload release assets
     runs-on: ubuntu-latest
-    if: "!contains(github.event.release.tag_name, 'vscode')"
+    needs: setup
+    if: needs.setup.outputs.should_run == 'true'
     permissions:
       contents: write
     timeout-minutes: 20
@@ -38,12 +55,14 @@ jobs:
   publish-npm:
     name: Publish to npm
     runs-on: ubuntu-latest
-    needs: build-and-upload
-    if: "!contains(github.event.release.tag_name, 'vscode')"
+    needs: [setup, build-and-upload]
+    if: needs.setup.outputs.should_run == 'true'
     permissions:
       contents: read
       id-token: write
     timeout-minutes: 10
+    env:
+      TAG: ${{ needs.setup.outputs.tag }}
 
     steps:
       - name: Checkout code
@@ -59,13 +78,12 @@ jobs:
         run: |
           cd ./installers/npm
 
-          VERSION=${{ github.event.release.tag_name }}
-          echo "Publishing version: $VERSION"
+          echo "Publishing version: $TAG"
 
-          # Update package.json version (this automatically removes v prefix)
-          npm version $VERSION --no-git-tag-version --allow-same-version
+          # Update package.json version
+          npm version $TAG --no-git-tag-version --allow-same-version
 
-          if [[ "$VERSION" == *"-"* ]]; then
+          if [[ "$TAG" == *"-"* ]]; then
             NPM_TAG="next"
           else
             NPM_TAG="latest"
@@ -77,11 +95,13 @@ jobs:
   publish-homebrew:
     name: Publish to Homebrew Tap
     runs-on: ubuntu-latest
-    needs: build-and-upload
-    if: "!contains(github.event.release.tag_name, 'vscode')"
+    needs: [setup, build-and-upload]
+    if: needs.setup.outputs.should_run == 'true'
     permissions:
       contents: read
     timeout-minutes: 10
+    env:
+      TAG: ${{ needs.setup.outputs.tag }}
 
     steps:
       - name: Checkout code
@@ -93,7 +113,7 @@ jobs:
           go-version: "1.25"
 
       - name: Generate Homebrew Formulas
-        run: go run -C ./installers/brew main.go ${{ github.event.release.tag_name }}
+        run: go run -C ./installers/brew main.go $TAG
 
       - name: Update Homebrew Tap
         env:
@@ -116,15 +136,15 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes detected in Formula directory"
           else
-            git commit -m "chore: update vdl to ${{ github.event.release.tag_name }}"
+            git commit -m "chore: update vdl to $TAG"
             git push origin main
           fi
 
-  build-and-push-docker-images:
+  build-and-push-images:
     name: Build and push ${{ matrix.vars.platform }}
     runs-on: ${{ matrix.vars.os }}
-    needs: build-and-upload
-    if: "!contains(github.event.release.tag_name, 'vscode')"
+    needs: [setup, build-and-upload]
+    if: needs.setup.outputs.should_run == 'true'
     permissions:
       contents: read
       packages: write
@@ -134,15 +154,13 @@ jobs:
         vars:
           - { os: ubuntu-24.04, platform: amd64 }
           - { os: ubuntu-24.04-arm, platform: arm64 }
+    env:
+      CLEAN_TAG: ${{ needs.setup.outputs.clean_tag }}
+      PLATFORM: ${{ matrix.vars.platform }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Strip "v" prefix from tag
-        run: |
-          TAG="${{ github.event.release.tag_name }}"
-          echo "CLEAN_TAG=${TAG#v}" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
         uses: docker/login-action@v4
@@ -160,32 +178,29 @@ jobs:
       - name: Build the Docker image
         run: >
           docker build
-          --tag varavel/vdl:${{ env.CLEAN_TAG }}-${{ matrix.vars.platform }}
-          --tag ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}-${{ matrix.vars.platform }}
-          --build-arg VDL_VERSION=${{ env.CLEAN_TAG }}
+          --tag varavel/vdl:${CLEAN_TAG}-${PLATFORM}
+          --tag ghcr.io/varavelio/vdl:${CLEAN_TAG}-${PLATFORM}
+          --build-arg VDL_VERSION=${CLEAN_TAG}
           --file ./docker/Dockerfile .
 
       - name: Push the Docker images
         run: |
-          docker push varavel/vdl:${{ env.CLEAN_TAG }}-${{ matrix.vars.platform }}
-          docker push ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}-${{ matrix.vars.platform }}
+          docker push varavel/vdl:${CLEAN_TAG}-${PLATFORM}
+          docker push ghcr.io/varavelio/vdl:${CLEAN_TAG}-${PLATFORM}
 
-  merge-and-push-docker-manifest:
+  merge-and-push-manifest:
     name: Merge and push manifest
     runs-on: ubuntu-latest
-    needs: build-and-push-docker-images
-    if: "!contains(github.event.release.tag_name, 'vscode')"
+    needs: [setup, build-and-push-images]
+    if: needs.setup.outputs.should_run == 'true'
     permissions:
       contents: read
       packages: write
     timeout-minutes: 10
+    env:
+      CLEAN_TAG: ${{ needs.setup.outputs.clean_tag }}
 
     steps:
-      - name: Strip "v" prefix from tag
-        run: |
-          TAG="${{ github.event.release.tag_name }}"
-          echo "CLEAN_TAG=${TAG#v}" >> $GITHUB_ENV
-
       - name: Login to Docker Hub
         uses: docker/login-action@v4
         with:
@@ -201,22 +216,22 @@ jobs:
 
       - name: Merge and push manifests
         run: |
-          docker manifest create varavel/vdl:${{ env.CLEAN_TAG }} \
-            --amend varavel/vdl:${{ env.CLEAN_TAG }}-amd64 \
-            --amend varavel/vdl:${{ env.CLEAN_TAG }}-arm64
-          docker manifest push varavel/vdl:${{ env.CLEAN_TAG }}
+          docker manifest create varavel/vdl:${CLEAN_TAG} \
+            --amend varavel/vdl:${CLEAN_TAG}-amd64 \
+            --amend varavel/vdl:${CLEAN_TAG}-arm64
+          docker manifest push varavel/vdl:${CLEAN_TAG}
 
           docker manifest create varavel/vdl:latest \
-            --amend varavel/vdl:${{ env.CLEAN_TAG }}-amd64 \
-            --amend varavel/vdl:${{ env.CLEAN_TAG }}-arm64
+            --amend varavel/vdl:${CLEAN_TAG}-amd64 \
+            --amend varavel/vdl:${CLEAN_TAG}-arm64
           docker manifest push varavel/vdl:latest
 
-          docker manifest create ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }} \
-            --amend ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}-amd64 \
-            --amend ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}-arm64
-          docker manifest push ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}
+          docker manifest create ghcr.io/varavelio/vdl:${CLEAN_TAG} \
+            --amend ghcr.io/varavelio/vdl:${CLEAN_TAG}-amd64 \
+            --amend ghcr.io/varavelio/vdl:${CLEAN_TAG}-arm64
+          docker manifest push ghcr.io/varavelio/vdl:${CLEAN_TAG}
 
           docker manifest create ghcr.io/varavelio/vdl:latest \
-            --amend ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}-amd64 \
-            --amend ghcr.io/varavelio/vdl:${{ env.CLEAN_TAG }}-arm64
+            --amend ghcr.io/varavelio/vdl:${CLEAN_TAG}-amd64 \
+            --amend ghcr.io/varavelio/vdl:${CLEAN_TAG}-arm64
           docker manifest push ghcr.io/varavelio/vdl:latest
