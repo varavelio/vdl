@@ -95,3 +95,57 @@ jobs:
             git commit -m "chore: update vdl to ${{ github.event.release.tag_name }}"
             git push origin main
           fi
+
+  build-and-push-docker:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    needs: build-and-upload
+    if: "!contains(github.event.release.tag_name, 'vscode')"
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          echo "VDL_VERSION=${TAG#v}" >> $GITHUB_ENV
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          build-args: VDL_VERSION=${{ env.VDL_VERSION }}
+          push: true
+          tags: |
+            varavel/vdl:latest
+            varavel/vdl:${{ github.event.release.tag_name }}
+            ghcr.io/varavelio/vdl:latest
+            ghcr.io/varavelio/vdl:${{ github.event.release.tag_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
