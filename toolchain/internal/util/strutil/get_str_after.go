@@ -13,10 +13,10 @@ func GetStrAfter(input, delimiter string) string {
 		return input
 	}
 
-	index := strings.Index(input, delimiter)
-	if index == -1 {
+	_, after, found := strings.Cut(input, delimiter)
+	if !found {
 		return ""
 	}
 
-	return input[index+len(delimiter):]
+	return after
 }

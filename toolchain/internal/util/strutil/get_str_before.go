@@ -13,10 +13,10 @@ func GetStrBefore(input, delimiter string) string {
 		return input
 	}
 
-	index := strings.Index(input, delimiter)
-	if index == -1 {
+	before, _, found := strings.Cut(input, delimiter)
+	if !found {
 		return ""
 	}
 
-	return input[:index]
+	return before
 }
