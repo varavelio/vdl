@@ -51,7 +51,7 @@ Select the method that best fits your workflow.
 | **Linux / macOS** | Shell      | <code>curl -fsSL https://get.varavel.com/vdl &#124; sh</code>  |
 | **Linux / macOS** | Homebrew   | `brew install varavelio/tap/vdl`                               |
 | **Windows**       | PowerShell | <code>irm https://get.varavel.com/vdl.ps1 &#124; iex</code>    |
-| **Any**           | NPM        | `npm install -D @varavel/vdl`                                  |
+| **Any**           | NPM        | `npm install --save-dev @varavel/vdl`                          |
 | **Any**           | Docker     | `docker run --rm varavel/vdl`                                  |
 | **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
