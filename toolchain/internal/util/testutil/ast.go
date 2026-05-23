@@ -21,7 +21,7 @@ func astCleanPositionsRecursively(val, emptyPos reflect.Value, includeRoot bool)
 	}
 
 	switch val.Kind() {
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if !val.IsNil() {
 			// Skip cleaning root if includeRoot is false
 			astCleanPositionsRecursively(val.Elem(), emptyPos, includeRoot)
@@ -44,11 +44,11 @@ func astCleanPositionsRecursively(val, emptyPos reflect.Value, includeRoot bool)
 		}
 
 		// Always process fields recursively - after processing the current level
-		for i := range val.NumField() {
-			field := val.Field(i)
-			if field.CanInterface() {
+		for field := range val.Fields() {
+			fieldVal := val.FieldByIndex(field.Index)
+			if fieldVal.CanInterface() {
 				// Always clean position fields in children
-				astCleanPositionsRecursively(field, emptyPos, true)
+				astCleanPositionsRecursively(fieldVal, emptyPos, true)
 			}
 		}
 	case reflect.Slice:
