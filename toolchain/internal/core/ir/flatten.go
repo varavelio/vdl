@@ -1,6 +1,7 @@
 package ir
 
 import (
+	"maps"
 	"strconv"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/analysis"
@@ -154,8 +155,6 @@ func lookupEnumMemberValue(
 
 func cloneVisited(src map[string]bool) map[string]bool {
 	dst := make(map[string]bool, len(src))
-	for k, v := range src {
-		dst[k] = v
-	}
+	maps.Copy(dst, src)
 	return dst
 }
