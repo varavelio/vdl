@@ -10,8 +10,8 @@ import (
 )
 
 type cmdFormatArgs struct {
-	Patterns []string `arg:"positional"   help:"File patterns to format, supports recursive globs (default: ./**/*.vdl)"`
-	Verbose  bool     `arg:"-v,--verbose" help:"Print each file as it is formatted"`
+	Patterns []string `arg:"positional" help:"File patterns to format, supports recursive globs (default: ./**/*.vdl)"`
+	Verbose  bool     `arg:"--verbose"  help:"Print each file as it is formatted"`
 }
 
 func cmdFmt(args *cmdFormatArgs) {
