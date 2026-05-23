@@ -44,7 +44,7 @@ func TestRunWithConfigHooksUseGlobalSandwichOrder(t *testing.T) {
 		return nil
 	}, warningBuffer)
 
-	fileCount, err := Run(dir)
+	fileCount, err := Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	require.Equal(t, []string{"pre-1", "pre-2", "check-generated", "post-2"}, calls)
@@ -72,7 +72,7 @@ func TestRunWithConfigPreGenerateHookFailureAbortsPipeline(t *testing.T) {
 		return nil
 	}, warningBuffer)
 
-	_, err := Run(dir)
+	_, err := Run(dir, false)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "preGenerate hook command 1 failed")
 	require.Equal(t, []string{"fail-pre"}, calls)
@@ -100,7 +100,7 @@ func TestRunWithConfigPostGenerateHookFailureWarnsAndContinues(t *testing.T) {
 		return nil
 	}, warningBuffer)
 
-	fileCount, err := Run(dir)
+	fileCount, err := Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	require.Equal(t, []string{"fail-post", "post-ok"}, calls)
@@ -126,7 +126,7 @@ func TestRunWithConfigSkipsHooksWhenDisabled(t *testing.T) {
 	}, warningBuffer)
 	t.Setenv("VDL_SKIP_HOST_HOOKS", "true")
 
-	fileCount, err := Run(dir)
+	fileCount, err := Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	require.Empty(t, calls)

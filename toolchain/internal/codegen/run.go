@@ -7,14 +7,13 @@ import (
 )
 
 // Run executes the full code generation pipeline and returns the number of
-// written files.
-func Run(configPath string) (int, error) {
+// files that were written (or would be written in dry-run mode).
+func Run(configPath string, dryRun bool) (int, error) {
 	runtimeConfig, err := loadRuntimeConfig(configPath)
 	if err != nil {
 		return 0, fmt.Errorf("failed to load config: %w", err)
 	}
-
-	return runWithConfig(runtimeConfig)
+	return runWithConfig(runtimeConfig, dryRun)
 }
 
 type runtimeConfig struct {
@@ -26,7 +25,7 @@ type runtimeConfig struct {
 
 // runWithConfig orchestrates the generation pipeline after the config file has
 // already been loaded and normalized.
-func runWithConfig(config runtimeConfig) (int, error) {
+func runWithConfig(config runtimeConfig, dryRun bool) (int, error) {
 	if err := runPreGenerateHooks(config); err != nil {
 		return 0, err
 	}
@@ -61,15 +60,17 @@ func runWithConfig(config runtimeConfig) (int, error) {
 		return 0, err
 	}
 
-	if err := writeLockFile(config.LockPath, lockFile); err != nil {
-		return 0, err
-	}
+	if !dryRun {
+		if err := writeLockFile(config.LockPath, lockFile); err != nil {
+			return 0, err
+		}
 
-	if err := applyOutputWrites(config, plan); err != nil {
-		return 0, err
-	}
+		if err := applyOutputWrites(config, plan); err != nil {
+			return 0, err
+		}
 
-	runPostGenerateHooks(config)
+		runPostGenerateHooks(config)
+	}
 
 	return len(plan.Writes), nil
 }

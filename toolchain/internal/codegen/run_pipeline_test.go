@@ -34,7 +34,7 @@ func TestRunWithLocalPlugin(t *testing.T) {
 	`)
 	writeTestFile(t, filepath.Join(dir, "gen", "stale.txt"), "old")
 
-	fileCount, err := Run(dir)
+	fileCount, err := Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	require.NoFileExists(t, filepath.Join(dir, "gen", "stale.txt"))
@@ -74,7 +74,7 @@ func TestRunPrunesUnusedLockHashes(t *testing.T) {
 	}
 `)
 
-	_, err := Run(dir)
+	_, err := Run(dir, false)
 	require.NoError(t, err)
 
 	lockContents, err := os.ReadFile(filepath.Join(dir, defaultLockFileName))
@@ -105,7 +105,7 @@ func TestRunRejectsTraversalBeforeCleaningOutputs(t *testing.T) {
 	`)
 	writeTestFile(t, filepath.Join(dir, "gen", "stale.txt"), "old")
 
-	_, err := Run(dir)
+	_, err := Run(dir, false)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "outDir")
 	require.FileExists(t, filepath.Join(dir, "gen", "stale.txt"))
@@ -162,7 +162,7 @@ func TestRunWithRemotePluginUsesCacheAndWritesLockFile(t *testing.T) {
 		}
 	`, host, server.URL+"/plugins/remote.js"))
 
-	fileCount, err := Run(dir)
+	fileCount, err := Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	require.Equal(t, 1, requestCount)
@@ -173,7 +173,7 @@ func TestRunWithRemotePluginUsesCacheAndWritesLockFile(t *testing.T) {
 	require.Contains(t, string(lockContents), server.URL+"/plugins/remote.js")
 	server.Close()
 
-	fileCount, err = Run(dir)
+	fileCount, err = Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	require.Equal(t, 1, requestCount)
@@ -211,7 +211,7 @@ func TestRunWithRemoteHTTPPluginWhenEnabled(t *testing.T) {
 		}
 	`, server.URL+"/plugins/insecure.js"))
 
-	fileCount, err := Run(dir)
+	fileCount, err := Run(dir, false)
 	require.NoError(t, err)
 	require.Equal(t, 1, fileCount)
 	writeBytes, err := os.ReadFile(filepath.Join(dir, "gen", "http.txt"))
