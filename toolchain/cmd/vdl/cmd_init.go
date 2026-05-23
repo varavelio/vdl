@@ -16,7 +16,7 @@ var initSchema []byte
 var initConfig []byte
 
 type cmdInitArgs struct {
-	Path string `arg:"positional" help:"The directory path where VDL schema and config files will be created. Defaults to the current directory."`
+	Path string `arg:"positional" help:"Directory where the VDL project will be initialized (default: current directory)"`
 }
 
 func cmdInit(args *cmdInitArgs) {
