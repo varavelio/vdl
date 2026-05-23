@@ -29,7 +29,7 @@ func scannerSplitFunc(data []byte, _ bool) (advance int, token []byte, err error
 	rawContentLength = bytes.TrimSpace(rawContentLength)
 	contentLength, err := strconv.Atoi(string(rawContentLength))
 	if err != nil {
-		return 0, nil, fmt.Errorf("invalid Content-Length, should be an integer: %s", err)
+		return 0, nil, fmt.Errorf("invalid Content-Length, should be an integer: %w", err)
 	}
 
 	if len(content) < contentLength {

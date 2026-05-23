@@ -44,8 +44,7 @@ func (l *LSP) handleTextDocumentFormatting(rawMessage []byte) (any, error) {
 
 	formattedText, err := formatter.Format(filePath, string(content))
 	if err != nil {
-		// If formatting fails, return no edits.
-		return response, nil
+		return response, nil //nolint:nilerr // If formatting fails, return no edits.
 	}
 
 	lines := strings.Split(string(content), "\n")

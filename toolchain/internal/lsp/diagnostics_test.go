@@ -71,7 +71,7 @@ func TestDiagnostics(t *testing.T) {
 		assert.Contains(t, response, "Test error message")
 
 		// Parse the response to verify the structure
-		var parsedResponse map[string]interface{}
+		var parsedResponse map[string]any
 		headerEnd := strings.Index(response, "\r\n\r\n")
 		require.NotEqual(t, -1, headerEnd, "Header end not found")
 		jsonContent := response[headerEnd+4:]
@@ -81,13 +81,13 @@ func TestDiagnostics(t *testing.T) {
 		// Verify the response structure
 		assert.Equal(t, "2.0", parsedResponse["jsonrpc"])
 		assert.Equal(t, "textDocument/publishDiagnostics", parsedResponse["method"])
-		params, ok := parsedResponse["params"].(map[string]interface{})
+		params, ok := parsedResponse["params"].(map[string]any)
 		require.True(t, ok, "Params not found or not an object")
 		assert.Equal(t, "file:///test.vdl", params["uri"])
-		diagArray, ok := params["diagnostics"].([]interface{})
+		diagArray, ok := params["diagnostics"].([]any)
 		require.True(t, ok, "Diagnostics not found or not an array")
 		require.Len(t, diagArray, 1, "Expected 1 diagnostic")
-		diag, ok := diagArray[0].(map[string]interface{})
+		diag, ok := diagArray[0].(map[string]any)
 		require.True(t, ok, "Diagnostic not an object")
 		assert.Equal(t, "Test error message", diag["message"])
 	})
@@ -106,7 +106,7 @@ func TestDiagnostics(t *testing.T) {
 		assert.Contains(t, response, "file:///test.vdl")
 
 		// Parse the response to verify the structure
-		var parsedResponse map[string]interface{}
+		var parsedResponse map[string]any
 		headerEnd := strings.Index(response, "\r\n\r\n")
 		require.NotEqual(t, -1, headerEnd, "Header end not found")
 		jsonContent := response[headerEnd+4:]
@@ -114,9 +114,9 @@ func TestDiagnostics(t *testing.T) {
 		require.NoError(t, err, "Failed to parse JSON response")
 
 		// Verify the response structure
-		params, ok := parsedResponse["params"].(map[string]interface{})
+		params, ok := parsedResponse["params"].(map[string]any)
 		require.True(t, ok, "Params not found or not an object")
-		diagArray, ok := params["diagnostics"].([]interface{})
+		diagArray, ok := params["diagnostics"].([]any)
 		require.True(t, ok, "Diagnostics not found or not an array")
 		assert.Empty(t, diagArray, "Expected empty diagnostics array")
 	})
