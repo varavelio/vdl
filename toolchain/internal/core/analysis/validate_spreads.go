@@ -2,6 +2,7 @@ package analysis
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
@@ -271,10 +272,8 @@ func validateSpreadCycles(symbols *symbolTable) []Diagnostic {
 }
 
 func findSpreadCycle(symbols *symbolTable, typeName string, visited []string) []string {
-	for _, v := range visited {
-		if v == typeName {
-			return append(visited, typeName)
-		}
+	if slices.Contains(visited, typeName) {
+		return append(visited, typeName)
 	}
 
 	typ := symbols.lookupType(typeName)

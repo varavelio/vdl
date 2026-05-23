@@ -107,7 +107,7 @@ func (r *resolver) resolveFile(absPath string, includeStack []string) {
 		msg := fmt.Sprintf("parse error: %v", err)
 
 		// Try to extract position from parser error
-		if pErr, ok := err.(parser.Error); ok {
+		if pErr, ok := errors.AsType[parser.Error](err); ok {
 			pos = pErr.Position()
 			msg = fmt.Sprintf("parse error: %s", pErr.Message())
 		}
