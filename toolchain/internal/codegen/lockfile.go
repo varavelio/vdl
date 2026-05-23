@@ -1,6 +1,7 @@
 package codegen
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -173,7 +174,7 @@ func materializeRemoteDependency(
 // downloadRemoteDependency fetches a remote dependency using the configured
 // HTTP client and headers.
 func downloadRemoteDependency(rawURL string, headers http.Header) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request for %q: %w", rawURL, err)
 	}

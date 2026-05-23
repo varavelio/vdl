@@ -1,6 +1,7 @@
 package codegen
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -81,7 +82,7 @@ func hostHooksDisabled() bool {
 func runShellCommand(workDir, command string) error {
 	shell, shellFlag := shellProgram()
 
-	cmd := exec.Command(shell, shellFlag, command)
+	cmd := exec.CommandContext(context.Background(), shell, shellFlag, command)
 	cmd.Dir = workDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

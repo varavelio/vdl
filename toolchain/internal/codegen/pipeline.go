@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -292,9 +293,9 @@ func applyOutputWrites(config runtimeConfig, plan outputPlan) error {
 
 // replaceOutputDirs swaps each output directory with its staged replacement.
 func replaceOutputDirs(outDirs []string, stagingDirs map[string]string) error {
-	for i := len(outDirs) - 1; i >= 0; i-- {
-		if err := os.RemoveAll(outDirs[i]); err != nil {
-			return fmt.Errorf("failed to clean output directory %q: %w", outDirs[i], err)
+	for _, outDir := range slices.Backward(outDirs) {
+		if err := os.RemoveAll(outDir); err != nil {
+			return fmt.Errorf("failed to clean output directory %q: %w", outDir, err)
 		}
 	}
 
