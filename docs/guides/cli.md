@@ -233,7 +233,7 @@ The language server speaks the [Language Server Protocol](https://microsoft.gith
 - Document symbols
 - Document links
 
-You typically do not run `vdl lsp` directly. Your editor plugin starts it and communicates with it over stdio. See the [VS Code extension](../editors/vscode/README.md) or [Neovim setup](../editors/neovim/README.md) for editor-specific instructions.
+You typically do not run `vdl lsp` directly. Your editor plugin starts it and communicates with it over stdio. See the [VS Code extension](https://github.com/varavelio/vdl/blob/main/editors/vscode/README.md) or [Neovim setup](https://github.com/varavelio/vdl/blob/main/editors/neovim/README.md) for editor-specific instructions.
 
 ### Arguments
 
