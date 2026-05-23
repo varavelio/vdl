@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -48,7 +49,7 @@ func main() {
 
 	err = p.Parse(os.Args[1:])
 	switch {
-	case err == arg.ErrHelp: // indicates that user wrote "--help" on command line
+	case errors.Is(err, arg.ErrHelp): // indicates that user wrote "--help" on command line
 		printVersion()
 		p.WriteHelp(os.Stdout)
 		os.Exit(0)
