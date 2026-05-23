@@ -7,6 +7,7 @@
 #
 #   docker run --rm varavel/vdl:latest
 #   docker run --rm varavel/vdl:latest format
+#   docker run --rm varavel/vdl:latest generate
 #
 # Supported platforms
 # -------------------
