@@ -24,35 +24,35 @@ jobs:
         run: |
           mkdir -p ~/.claude ~/.config/opencode ~/.local/share/opencode
 
-      - name: Run CI Task
+      - name: Build & Deploy
         uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: /bin/bash -c "task docs"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Deploy to Cloudflare Pages
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          OUTPUT=$(npx wrangler pages deploy ./site \
-            --project-name=varavel-vdl \
-            --branch="${{ github.ref_name }}" \
-            --commit-hash="${{ github.sha }}" \
-            --commit-message="${{ github.event.head_commit.message }}")
+        with:
+          push: never
+          runCmd: |
+            /bin/bash -c "
+              set -e
 
-          URL=$(echo "$OUTPUT" | grep -o 'https://[^ ]*\.pages\.dev' | head -n 1)
+              # Build docs
+              task docs
 
-          if [ -n "$URL" ]; then
-            echo "### 🚀 Deployed to Cloudflare Pages" >> $GITHUB_STEP_SUMMARY
-            echo "Preview: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
-            echo "::notice title=Deployment URL::$URL"
-          else
-            echo "Deployment URL not found."
-            exit 1
-          fi
+              # Deploy to Cloudflare Pages
+              DEPLOY_OUT=$(npx wrangler pages deploy ./site \
+                --project-name=varavel-vdl \
+                --branch='${{ github.ref_name }}' \
+                --commit-hash='${{ github.sha }}' \
+                --commit-message='${{ github.event.head_commit.message }}')
+
+              # Extract the deployment URL from the output
+              URL=$(echo \"$DEPLOY_OUT\" | grep -o 'https://[^ ]*\.pages\.dev' | head -n 1)
+              if [ -n \"$URL\" ]; then
+                echo '### 🚀 Deployed to Cloudflare Pages' >> $GITHUB_STEP_SUMMARY
+                echo \"Preview: [$URL]($URL)\" >> $GITHUB_STEP_SUMMARY
+                echo \"::notice title=Deployment URL::$URL\"
+              else
+                echo 'Deployment URL not found.'
+                exit 1
+              fi
+            "
