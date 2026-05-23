@@ -7,14 +7,15 @@ description: Complete installation options for the VDL CLI
 
 Choose the installation method that best fits your operating system and workflow.
 
-| Platform          | Method     | Command                                                        |
-| ----------------- | ---------- | -------------------------------------------------------------- |
-| **Linux / macOS** | Shell      | <code>curl -fsSL https://get.varavel.com/vdl &#124; sh</code>  |
-| **Linux / macOS** | Homebrew   | `brew install varavelio/tap/vdl`                               |
-| **Windows**       | PowerShell | <code>irm https://get.varavel.com/vdl.ps1 &#124; iex</code>    |
-| **Any**           | NPM        | `npm install --save-dev @varavel/vdl`                          |
-| **Any**           | Docker     | `docker run --rm varavel/vdl`                                  |
-| **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
+| Platform          | Method       | Command                                                        |
+| ----------------- | ------------ | -------------------------------------------------------------- |
+| **Linux / macOS** | Shell        | <code>curl -fsSL https://get.varavel.com/vdl &#124; sh</code>  |
+| **Linux / macOS** | Homebrew     | `brew install varavelio/tap/vdl`                               |
+| **Windows**       | PowerShell   | <code>irm https://get.varavel.com/vdl.ps1 &#124; iex</code>    |
+| **Any**           | NPM (local)  | `npm install --save-dev @varavel/vdl`                          |
+| **Any**           | NPM (global) | `npm install --global @varavel/vdl`                            |
+| **Any**           | Docker       | `docker run --rm varavel/vdl`                                  |
+| **Any**           | Manual       | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
 After installation, verify that the CLI is available:
 
@@ -50,7 +51,7 @@ Use Homebrew if you prefer managing CLI tools through taps.
 brew install varavelio/tap/vdl
 ```
 
-Install the latest experimental release:
+Install the latest prerelease:
 
 ```bash
 brew install varavelio/tap/vdl-next
@@ -113,7 +114,7 @@ Use a global install when you want `vdl` available system-wide.
 npm install --global @varavel/vdl
 ```
 
-Install the latest experimental release:
+Install the latest prerelease:
 
 ```bash
 npm install --global @varavel/vdl@next

@@ -46,16 +46,17 @@ Learn more at [https://vdl.varavel.com](https://vdl.varavel.com).
 
 Select the method that best fits your workflow.
 
-| Platform          | Method     | Command                                                        |
-| ----------------- | ---------- | -------------------------------------------------------------- |
-| **Linux / macOS** | Shell      | <code>curl -fsSL https://get.varavel.com/vdl &#124; sh</code>  |
-| **Linux / macOS** | Homebrew   | `brew install varavelio/tap/vdl`                               |
-| **Windows**       | PowerShell | <code>irm https://get.varavel.com/vdl.ps1 &#124; iex</code>    |
-| **Any**           | NPM        | `npm install --save-dev @varavel/vdl`                          |
-| **Any**           | Docker     | `docker run --rm varavel/vdl`                                  |
-| **Any**           | Manual     | [Download binaries](https://github.com/varavelio/vdl/releases) |
+| Platform          | Method       | Command                                                        |
+| ----------------- | ------------ | -------------------------------------------------------------- |
+| **Linux / macOS** | Shell        | <code>curl -fsSL https://get.varavel.com/vdl &#124; sh</code>  |
+| **Linux / macOS** | Homebrew     | `brew install varavelio/tap/vdl`                               |
+| **Windows**       | PowerShell   | <code>irm https://get.varavel.com/vdl.ps1 &#124; iex</code>    |
+| **Any**           | NPM (local)  | `npm install --save-dev @varavel/vdl`                          |
+| **Any**           | NPM (global) | `npm install --global @varavel/vdl`                            |
+| **Any**           | Docker       | `docker run --rm varavel/vdl`                                  |
+| **Any**           | Manual       | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
-For version pinning, experimental releases, npm usage, and manual installs, see the [complete installation guide](https://vdl.varavel.com/guides/installation/).
+For version pinning, prereleases, npm usage, and manual installs, see the [complete installation guide](https://vdl.varavel.com/guides/installation/).
 
 ## What is VDL?
 
