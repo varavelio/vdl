@@ -1,14 +1,6 @@
-# vdl-pygments
+# VDL Pygments lexer
 
 Pygments lexer for VDL (Varavel Definition Language).
-
-## Install
-
-```bash
-pip install integrations/pygments
-# or
-pip install vdl-pygments
-```
 
 ## Usage
 
@@ -24,15 +16,6 @@ type Person {
   age? int
 }
 '''
+
 print(highlight(code, 'vdl', HtmlFormatter()))
 ```
-
-Or use in code blocks with the `vdl` language:
-
-````md
-```vdl
-type Foo {
-  bar string
-}
-```
-````
