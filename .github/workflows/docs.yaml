@@ -34,28 +34,28 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
         with:
           push: never
-        runCmd: |
-          /bin/bash -c '
-            set -e
+          runCmd: |
+            /bin/bash -c '
+              set -e
 
-            # Build docs
-            task docs
+              # Build docs
+              task docs
 
-            # Deploy to Cloudflare Pages
-            DEPLOY_OUT=$(npx wrangler pages deploy ./site \
-              --project-name=varavel-vdl \
-              --branch="$BRANCH_NAME" \
-              --commit-hash="$COMMIT_HASH" \
-              --commit-message="$COMMIT_MESSAGE")
+              # Deploy to Cloudflare Pages
+              DEPLOY_OUT=$(npx wrangler pages deploy ./site \
+                --project-name=varavel-vdl \
+                --branch="$BRANCH_NAME" \
+                --commit-hash="$COMMIT_HASH" \
+                --commit-message="$COMMIT_MESSAGE")
 
-            # Extract the deployment URL from the output
-            URL=$(echo "$DEPLOY_OUT" | grep -o "https://[^ ]*\.pages\.dev" | head -n 1)
-            if [ -n "$URL" ]; then
-              echo "### 🚀 Deployed to Cloudflare Pages" >> $GITHUB_STEP_SUMMARY
-              echo "Preview: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
-              echo "::notice title=Deployment URL::$URL"
-            else
-              echo "Deployment URL not found."
-              exit 1
-            fi
-          '
+              # Extract the deployment URL from the output
+              URL=$(echo "$DEPLOY_OUT" | grep -o "https://[^ ]*\.pages\.dev" | head -n 1)
+              if [ -n "$URL" ]; then
+                echo "### 🚀 Deployed to Cloudflare Pages" >> $GITHUB_STEP_SUMMARY
+                echo "Preview: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
+                echo "::notice title=Deployment URL::$URL"
+              else
+                echo "Deployment URL not found."
+                exit 1
+              fi
+            '
