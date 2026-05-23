@@ -1,0 +1,18 @@
+[project]
+name = "vdl-pygments"
+version = "0.1.0"
+description = "Pygments lexer for VDL (Varavel Definition Language)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = ["pygments>=2.14"]
+
+[project.entry-points."pygments.lexers"]
+vdl = "vdl_lexer:VdlLexer"
+
+[tool.hatch.build.targets.wheel]
+packages = ["vdl_lexer"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
