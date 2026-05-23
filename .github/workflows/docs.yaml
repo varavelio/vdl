@@ -24,38 +24,41 @@ jobs:
         run: |
           mkdir -p ~/.claude ~/.config/opencode ~/.local/share/opencode
 
-      - name: Build & Deploy
+      - name: Build documentation
         uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: /bin/bash -c "task docs"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Deploy to Cloudflare Pages
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          COMMIT_HASH: ${{ github.sha }}
-          BRANCH_NAME: ${{ github.ref_name }}
-        with:
-          push: never
-          runCmd: |
-            /bin/bash -c '
-              set -e
+        run: |
+          # Cleanup node_modules to prevent permission issues (because of the devcontainer)
+          sudo rm -rf node_modules
 
-              # Build docs
-              task docs
+          # Deploy to Cloudflare Pages
+          OUTPUT=$(npx wrangler pages deploy ./site \
+            --project-name=varavel-vdl \
+            --branch="${{ github.ref_name }}" \
+            --commit-hash="${{ github.sha }}" \
+            --commit-message="${{ github.event.head_commit.message }}")
 
-              # Deploy to Cloudflare Pages
-              DEPLOY_OUT=$(npx wrangler pages deploy ./site \
-                --project-name=varavel-vdl \
-                --branch="$BRANCH_NAME" \
-                --commit-hash="$COMMIT_HASH" \
-                --commit-message="$COMMIT_MESSAGE")
+          # Extract the deployment URL from the output
+          URL=$(echo "$OUTPUT" | grep -o 'https://[^ ]*\.pages\.dev' | head -n 1)
 
-              # Extract the deployment URL from the output
-              URL=$(echo "$DEPLOY_OUT" | grep -o "https://[^ ]*\.pages\.dev" | head -n 1)
-              if [ -n "$URL" ]; then
-                echo "### 🚀 Deployed to Cloudflare Pages" >> $GITHUB_STEP_SUMMARY
-                echo "Preview: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
-                echo "::notice title=Deployment URL::$URL"
-              else
-                echo "Deployment URL not found."
-                exit 1
-              fi
-            '
+          # Append the deployment URL to the GitHub Actions summary
+          if [ -n "$URL" ]; then
+            echo "### 🚀 Deployed to Cloudflare Pages" >> $GITHUB_STEP_SUMMARY
+            echo "Preview: [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
+            echo "::notice title=Deployment URL::$URL"
+          else
+            echo "Deployment URL not found."
+            exit 1
+          fi
