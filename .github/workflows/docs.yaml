@@ -40,6 +40,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
+          chmod -R 777 ./*
+
           OUTPUT=$(npx wrangler pages deploy ./site \
             --project-name=varavel-vdl \
             --branch="${{ github.ref_name }}" \
