@@ -18,7 +18,8 @@
         "vitest.explorer",
         "dprint.dprint",
         "biomejs.biome",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "ms-python.python"
       ],
       "settings": {
         "files.eol": "\n",
