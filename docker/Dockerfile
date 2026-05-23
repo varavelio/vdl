@@ -2,15 +2,14 @@
 # The pre-built binary is fetched directly from GitHub Releases so no compilation
 # step is required, keeping the final image as small as possible.
 #
-# The binary lives at /usr/local/bin/vdl, which is on the default $PATH, so it
-# behaves like a native command:
+# Examples:
 #
-#   docker run --rm varavel/vdl:latest
-#   docker run --rm varavel/vdl:latest format
-#   docker run --rm varavel/vdl:latest generate
+#    docker run --rm varavel/vdl:latest
+#    docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:latest generate
+#    docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:latest format
 #
-# Supported platforms
-# -------------------
+# Supported platforms:
+#
 # - linux/amd64
 # - linux/arm64
 
