@@ -29,6 +29,7 @@ nav = [
   { "Guides" = [
     { "Installation" = "guides/installation.md" },
     { "CLI Commands" = "guides/cli.md" },
+    { "Editor Integration" = "guides/editors.md" },
     { "Project Configuration" = "guides/configuration.md" },
     { "Available Plugins" = "guides/plugins.md" },
     { "Creating Plugins" = "guides/creating-plugins.md" }
