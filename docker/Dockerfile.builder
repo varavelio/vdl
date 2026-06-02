@@ -56,6 +56,9 @@ COPY --from=node:24.15.0-trixie /usr/local/ /usr/local/
 # Install golangci-lint
 COPY --from=golangci/golangci-lint:v2.12.2 /usr/bin/golangci-lint /usr/local/bin/golangci-lint
 
+# Install zola
+COPY --from=ghcr.io/getzola/zola:v0.22.1 /bin/zola /usr/local/bin/zola
+
 # Install tools from fetcher
 COPY --from=fetcher /fetcher/task /usr/local/bin/task
 
@@ -66,10 +69,7 @@ RUN set -e && \
     # Update and install system dependencies
     apt-get update -qq && \
     apt-get install -yqq --no-install-recommends \
-    ca-certificates wget curl zip unzip p7zip-full tzdata git tree ripgrep \
-    python3 python3-pip && \
-    # Install zensical
-    pip3 install --no-cache-dir --break-system-packages -qq zensical && \
+    ca-certificates wget curl zip unzip p7zip-full tzdata git tree ripgrep && \
     # Final setup: git config, and cleanup
     git config --global --add safe.directory '*' && \
     cd / && rm -rf /tmp/bin-downloads /var/lib/apt/lists/*
