@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
       - name: Create mount directories
         run: |
@@ -44,7 +47,7 @@ jobs:
           sudo rm -rf node_modules
 
           # Deploy to Cloudflare Pages
-          OUTPUT=$(npx wrangler pages deploy ./site \
+          OUTPUT=$(npx wrangler pages deploy ./docs/public \
             --project-name=varavel-vdl \
             --branch="${{ github.ref_name }}" \
             --commit-hash="${{ github.sha }}" \

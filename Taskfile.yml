@@ -72,8 +72,8 @@ tasks:
       - cd ./toolchain && go build -o ./dist/vdl ./cmd/vdl/.
 
   docs:
-    desc: "Build documentation site using Zensical"
-    cmd: zensical build
+    desc: "Build documentation website"
+    cmd: cd ./docs && node ./themes/varapress/llms.mjs
 
   ###################
   # TOOLCHAIN TASKS #
