@@ -1,7 +1,9 @@
----
-title: Language Guide
-description: Learn how to write VDL schemas from first principles.
----
++++
+title = "Start Here"
+description = "Learn how to write VDL schemas from first principles."
+template = "docs.html"
+weight = 1
++++
 
 ## What You Will Learn
 
@@ -105,15 +107,15 @@ Only `type`, `enum`, and `const` create named symbols. Includes and standalone d
 
 Read these pages in order:
 
-1. [Files and Comments](./files.md)
-2. [Includes](./includes.md)
-3. [Docstrings](./docstrings.md)
-4. [Types](./types.md)
-5. [Field Types](./field-types.md)
-6. [Enums](./enums.md)
-7. [Constants and Literals](./constants.md)
-8. [Annotations](./annotations.md)
-9. [Spreads and References](./spreads-references.md)
-10. [Naming and Validation](./naming-validation.md)
+1. [Files and Comments](/docs/language/files/)
+2. [Includes](/docs/language/includes/)
+3. [Docstrings](/docs/language/docstrings/)
+4. [Types](/docs/language/types/)
+5. [Field Types](/docs/language/field-types/)
+6. [Enums](/docs/language/enums/)
+7. [Constants and Literals](/docs/language/constants/)
+8. [Annotations](/docs/language/annotations/)
+9. [Spreads and References](/docs/language/spreads-references/)
+10. [Naming and Validation](/docs/language/naming-validation/)
 
-For exact grammar-level detail, see the [VDL specification](../reference/spec.md).
+For exact grammar-level detail, see the [VDL specification](/docs/reference/spec/).

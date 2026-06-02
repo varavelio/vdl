@@ -1,7 +1,9 @@
----
-title: Available VDL Plugins
-description: Official VDL plugins and what each one generates
----
++++
+title = "Available Plugins"
+description = "Official VDL plugins and what each one generates."
+template = "docs.html"
+weight = 5
++++
 
 ## Overview
 

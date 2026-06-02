@@ -1,7 +1,9 @@
----
-title: Editor Integration
-description: Set up VDL support in your code editor
----
++++
+title = "Editor Integration"
+description = "Set up VDL support in your code editor."
+template = "docs.html"
+weight = 3
++++
 
 ## Overview
 
@@ -18,7 +20,7 @@ Install the extension from either marketplace:
 - [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=varavel.vdl)
 - [Open VSX Registry](https://open-vsx.org/extension/varavel/vdl)
 
-The extension is plug and play. The only requirement is having the `vdl` binary installed on your system. If you have not installed the CLI yet, follow the [installation guide](./installation.md).
+The extension is plug and play. The only requirement is having the `vdl` binary installed on your system. If you have not installed the CLI yet, follow the [installation guide](/docs/guides/installation/).
 
 Extension source code: [editors/vscode](https://github.com/varavelio/vdl/tree/main/editors/vscode)
 

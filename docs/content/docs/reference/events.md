@@ -1,7 +1,9 @@
----
-title: Event Specification
-description: Modeling asynchronous events, routing subjects, and strict payloads with the @event annotation
----
++++
+title = "Event Annotations"
+description = "Modeling asynchronous events, routing subjects, and strict payloads with the @event annotation."
+template = "docs.html"
+weight = 5
++++
 
 ## Overview
 

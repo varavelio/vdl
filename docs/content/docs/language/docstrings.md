@@ -1,7 +1,9 @@
----
-title: Docstrings
-description: Document VDL schemas with inline and external Markdown docs.
----
++++
+title = "Docstrings"
+description = "Document VDL schemas with inline and external Markdown docs."
+template = "docs.html"
+weight = 4
++++
 
 ## What Docstrings Are
 

@@ -1,7 +1,9 @@
----
-title: Installing VDL
-description: Complete installation options for the VDL CLI
----
++++
+title = "Installation"
+description = "Complete installation options for the VDL CLI."
+template = "docs.html"
+weight = 1
++++
 
 ## Overview
 

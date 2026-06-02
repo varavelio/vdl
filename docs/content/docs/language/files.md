@@ -1,7 +1,9 @@
----
-title: Files and Comments
-description: How VDL files are structured and how comments work.
----
++++
+title = "Files and Comments"
+description = "How VDL files are structured and how comments work."
+template = "docs.html"
+weight = 2
++++
 
 ## File Extension
 

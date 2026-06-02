@@ -1,7 +1,9 @@
----
-title: About VDL
-description: About this project
----
++++
+title = "About VDL"
+description = "Learn what VDL is, what it provides, and why the core language stays small."
+template = "docs.html"
+weight = 1
++++
 
 ## A Definition Language For Data Contracts
 
@@ -48,11 +50,3 @@ This lets VDL support many domains without turning the parser into a collection 
 - **Readable contracts:** schemas should be understandable during code review without generator knowledge.
 - **Strong tooling:** diagnostics, formatting, LSP features, and deterministic IR are core to the workflow.
 - **Practical generation:** generated files are regular text files that can be inspected, tested, committed, and integrated into existing stacks.
-
-## Next Steps
-
-- Read the [language specification](./reference/spec.md).
-- Browse [available plugins](./guides/plugins.md).
-- Learn how to [create plugins](./guides/creating-plugins.md).
-- Review the [RPC annotation model](./reference/rpc.md).
-- Review the [event annotation model](./reference/events.md).

@@ -1,7 +1,9 @@
----
-title: Spreads and References
-description: Reuse fields, enum members, and literal values safely.
----
++++
+title = "Spreads and References"
+description = "Reuse fields, enum members, and literal values safely."
+template = "docs.html"
+weight = 10
++++
 
 ## References
 

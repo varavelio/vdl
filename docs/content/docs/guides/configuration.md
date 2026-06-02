@@ -1,7 +1,9 @@
----
-title: Project Configuration
-description: Configure VDL generation with vdl.config.vdl.
----
++++
+title = "Project Configuration"
+description = "Configure VDL generation with vdl.config.vdl."
+template = "docs.html"
+weight = 4
++++
 
 ## What `vdl.config.vdl` Does
 
@@ -203,7 +205,7 @@ options {
 
 All option values are strings. If a plugin option behaves like a boolean, pass values such as `"true"` or `"false"` according to that plugin's documentation.
 
-Options are plugin-specific. Always check the plugin README or [available plugins guide](./plugins.md).
+Options are plugin-specific. Always check the plugin README or [available plugins guide](/docs/guides/plugins/).
 
 ## `generateHeader`
 

@@ -1,7 +1,9 @@
----
-title: Constants and Literals
-description: Define reusable dynamic literal values with const declarations.
----
++++
+title = "Constants and Literals"
+description = "Define reusable dynamic literal values with const declarations."
+template = "docs.html"
+weight = 8
++++
 
 ## What Constants Are
 

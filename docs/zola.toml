@@ -13,6 +13,7 @@ varapress_logo_light = "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/
 varapress_logo_dark = "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/vdl.svg"
 varapress_favicon = "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/icon.svg"
 varapress_github_repo = "varavelio/vdl"
+varapress_show_title = false
 varapress_llms = true
 varapress_llms_full = true
 varapress_llms_description_chars = 100

@@ -1,7 +1,9 @@
----
-title: Includes
-description: Split VDL schemas across files with include statements.
----
++++
+title = "Includes"
+description = "Split VDL schemas across files with include statements."
+template = "docs.html"
+weight = 3
++++
 
 ## Why Includes Exist
 

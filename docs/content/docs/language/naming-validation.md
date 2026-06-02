@@ -1,7 +1,9 @@
----
-title: Naming and Validation
-description: Learn the naming conventions and validation rules VDL applies.
----
++++
+title = "Naming and Validation"
+description = "Learn the naming conventions and validation rules VDL applies."
+template = "docs.html"
+weight = 11
++++
 
 ## Why Naming Matters
 

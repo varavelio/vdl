@@ -1,7 +1,9 @@
----
-title: Deprecation Annotations
-description: Marking declarations and members as deprecated with @deprecated
----
++++
+title = "Deprecation Annotations"
+description = "Marking declarations and members as deprecated with @deprecated."
+template = "docs.html"
+weight = 3
++++
 
 ## Overview
 

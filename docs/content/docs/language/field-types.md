@@ -1,7 +1,9 @@
----
-title: Field Types
-description: Learn primitives, arrays, maps, custom types, enums, and inline object field types.
----
++++
+title = "Field Types"
+description = "Learn primitives, arrays, maps, custom types, enums, and inline object field types."
+template = "docs.html"
+weight = 6
++++
 
 ## Field Type Overview
 

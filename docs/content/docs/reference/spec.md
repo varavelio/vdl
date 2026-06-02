@@ -1,7 +1,9 @@
----
-title: VDL Specification
-description: Varavel Definition Language (VDL) Specification
----
++++
+title = "Language Specification"
+description = "Varavel Definition Language (VDL) specification."
+template = "docs.html"
+weight = 1
++++
 
 ## Overview
 
@@ -386,6 +388,6 @@ const sampleTags = ["featured" "popular" "seasonal"]
 
 ## Related Specifications
 
-- RPC modeling and request lifecycle are documented in [`rpc.md`](./rpc.md).
-- Event annotation rules are documented in [`events.md`](./events.md).
-- Deprecation annotation rules are documented in [`deprecations.md`](./deprecations.md).
+- RPC modeling and request lifecycle are documented in [RPC Annotations](/docs/reference/rpc/).
+- Event annotation rules are documented in [Event Annotations](/docs/reference/events/).
+- Deprecation annotation rules are documented in [Deprecation Annotations](/docs/reference/deprecations/).

@@ -1,7 +1,9 @@
----
-title: Types
-description: Define object types, aliases, arrays, maps, and inline objects.
----
++++
+title = "Types"
+description = "Define object types, aliases, arrays, maps, and inline objects."
+template = "docs.html"
+weight = 5
++++
 
 ## What Types Are
 

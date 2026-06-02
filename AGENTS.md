@@ -17,7 +17,7 @@ When updating this document, do so with the context of the entire document in mi
 - `Taskfile.yml`: Central command orchestration for CI, test, lint, format, release, codegen, build, and VS Code extension tasks.
 - `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
 - `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `plugin_input.vdl`, `plugin_output.vdl`).
-- `docs/`: Plain Markdown documentation and reference pages.
+- `docs/`: Zola documentation site using the vendored VaraPress theme.
 - `editors/`: Editor integrations (`vscode/`, `neovim/`).
 - `installers/`: Distribution installers (`brew/`, `npm/`, `unix/`, `windows/`).
 - `scripts/`: Release automation (`scripts/release/main.go`).
@@ -53,16 +53,22 @@ When updating this document, do so with the context of the entire document in mi
 
 ### `docs/` (Documentation)
 
-- **Role**: Public documentation and reference material.
+- **Role**: Public Zola documentation and landing site for VDL, rendered with the VaraPress theme.
 - **Key paths**:
-  - `index.md`: Zensical home page with frontmatter that includes the root `README.md` via pymdownx snippets.
-  - `about.md`: Project overview and positioning.
-  - `language/`: Progressive reader-friendly VDL language guide pages.
-  - `guides/installation.md`: Detailed CLI installation guide.
-  - `guides/configuration.md`: `vdl.config.vdl` project configuration guide.
-  - `guides/plugins.md`: Official plugin guide.
-  - `guides/creating-plugins.md`: Practical plugin authoring guide.
-  - `reference/`: Language, formatting, RPC, event, and related reference material.
+  - `zola.toml`: Zola site configuration and VaraPress theme options.
+  - `content/_index.md`: Home landing page composed with VaraPress landing shortcodes.
+  - `content/docs/_index.md`: Docs root section; uses `template = "docs.html"` and `sort_by = "weight"`.
+  - `content/docs/essentials/_index.md`: First docs subsection for project orientation; child pages are ordered by `weight`.
+  - `content/docs/essentials/about.md`: Project overview and positioning.
+  - `content/docs/language/_index.md`: Language guide section index; child pages are ordered by `weight`.
+  - `content/docs/guides/_index.md`: Practical guides section index; child pages are ordered by `weight`.
+  - `content/docs/reference/_index.md`: Reference section index; child pages are ordered by `weight`.
+  - `themes/varapress/`: Vendored VaraPress theme. Treat as third-party theme code unless the task explicitly requires theme changes.
+- **Content conventions**:
+  - Use Zola TOML frontmatter delimited by `+++` for all docs pages and sections.
+  - Use explicit `weight` values to control sidebar and previous/next ordering.
+  - Use clean Zola paths such as `/docs/guides/installation/` for internal links instead of old `.md` links.
+  - Compose the landing page with VaraPress shortcodes; use each shortcode's own `container` parameter rather than wrapping standard landing sections.
 
 ### `editors/` (IDE Integrations)
 
@@ -101,7 +107,7 @@ When updating this document, do so with the context of the entire document in mi
 ## Tech Stack & Conventions
 
 - **Go**: 1.26 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
-- **Docs**: Plain Markdown in `docs/`, formatted with dprint.
+- **Docs**: Zola site in `docs/` using VaraPress; content is Markdown with TOML frontmatter and is formatted with dprint.
 - **Editor extension**: VS Code extension in Node/JS with `vscode-languageclient`.
 - **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools.
 - **Code style goals**:
@@ -114,6 +120,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Discover commands**: `task --list-all`
 - **Core verification**: `task test`, `task lint`, `task format`
 - **Build**: `task build`
+- **Docs build**: `task docs`
 - **Dependencies**: `task deps`
 - **Codegen workflow**: `task codegen`
 - **Install local CLI**: `task tc:install`

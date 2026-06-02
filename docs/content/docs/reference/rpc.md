@@ -1,7 +1,9 @@
----
-title: RPC Specification
-description: Modeling RPC services with annotations and full request lifecycle behavior
----
++++
+title = "RPC Annotations"
+description = "Modeling RPC services with annotations and full request lifecycle behavior."
+template = "docs.html"
+weight = 4
++++
 
 ## Overview
 

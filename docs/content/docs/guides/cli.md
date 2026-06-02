@@ -1,13 +1,15 @@
----
-title: CLI Commands
-description: Complete reference for the VDL command-line interface
----
++++
+title = "CLI Commands"
+description = "Complete reference for the VDL command-line interface."
+template = "docs.html"
+weight = 2
++++
 
 ## Overview
 
 The `vdl` CLI is the primary way to interact with VDL projects. It covers the full lifecycle: creating a project, writing and formatting schemas, generating code through plugins, compiling to inspect the intermediate representation, and running the language server for editor integration.
 
-If you have not installed VDL yet, start with the [installation guide](./installation.md).
+If you have not installed VDL yet, start with the [installation guide](/docs/guides/installation/).
 
 ## Quick Reference
 
@@ -163,7 +165,7 @@ The generation pipeline works like this:
 
 When `path` points to a directory, VDL looks for a file named exactly `vdl.config.vdl` inside it. When `path` points directly to a file, that file is used. The config file must declare a `const config` with the generation settings.
 
-For all configuration options, see the [project configuration guide](./configuration.md).
+For all configuration options, see the [project configuration guide](/docs/guides/configuration/).
 
 ### `--check` Mode
 
