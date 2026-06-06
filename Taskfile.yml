@@ -109,6 +109,11 @@ tasks:
       - rm -rf ./dist
       - node esbuild.js --production
 
+  vs:test:grammar:
+    desc: "VSCode: Test TextMate grammar"
+    dir: ./editors/vscode
+    cmd: npx --no vscode-tmgrammar-test "test/grammar/**/*.vdl" --config package.json
+
   vs:package:
     desc: "VSCode: Package extension into .vsix"
     dir: ./editors/vscode
