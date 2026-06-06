@@ -1,0 +1,103 @@
+// SYNTAX TEST "source.vdl" "VDL scalar, object, and array literals"
+
+const textValue = "hello"
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^ variable.other.constant.declaration.vdl
+//                ^^^^^^^ string.quoted.double.vdl
+
+const floatValue = 12.50
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                 ^^^^^ constant.numeric.float.vdl
+
+const copiedConfig = serviceConfig
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                   ^^^^^^^^^^^^^ variable.other.constant.vdl
+
+const activeMode = RuntimeMode.Production
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                 ^^^^^^^^^^^ entity.name.type.reference.vdl
+//                            ^ punctuation.accessor.dot.vdl
+//                             ^^^^^^^^^^ variable.other.enummember.vdl
+
+const serviceConfig = {
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                  ^ keyword.operator.assignment.vdl
+//                    ^ punctuation.section.braces.begin.vdl
+  ...baseConfig
+//^^^ keyword.operator.spread.vdl
+//   ^^^^^^^^^^ variable.other.constant.vdl
+  server {
+//^^^^^^ variable.other.property.vdl
+//       ^ punctuation.section.braces.begin.vdl
+    host "localhost"
+//  ^^^^ variable.other.property.vdl
+//       ^^^^^^^^^^^ string.quoted.double.vdl
+    ports [80 443 8080]
+//  ^^^^^ variable.other.property.vdl
+//        ^ punctuation.section.brackets.begin.vdl
+//         ^^ constant.numeric.integer.vdl
+//            ^^^ constant.numeric.integer.vdl
+//                ^^^^ constant.numeric.integer.vdl
+//                    ^ punctuation.section.brackets.end.vdl
+    tls true
+//  ^^^ variable.other.property.vdl
+//      ^^^^ constant.language.boolean.vdl
+    timeoutMs defaultTimeoutMs
+//  ^^^^^^^^^ variable.other.property.vdl
+//            ^^^^^^^^^^^^^^^^ variable.other.constant.vdl
+    mode RuntimeMode.Production
+//  ^^^^ variable.other.property.vdl
+//       ^^^^^^^^^^^ entity.name.type.reference.vdl
+//                  ^ punctuation.accessor.dot.vdl
+//                   ^^^^^^^^^^ variable.other.enummember.vdl
+    matrix [[1 2] [3 4]]
+//  ^^^^^^ variable.other.property.vdl
+//         ^ punctuation.section.brackets.begin.vdl
+//          ^ punctuation.section.brackets.begin.vdl
+//           ^ constant.numeric.integer.vdl
+//             ^ constant.numeric.integer.vdl
+//              ^ punctuation.section.brackets.end.vdl
+//                ^ punctuation.section.brackets.begin.vdl
+//                 ^ constant.numeric.integer.vdl
+//                   ^ constant.numeric.integer.vdl
+//                    ^ punctuation.section.brackets.end.vdl
+//                     ^ punctuation.section.brackets.end.vdl
+    refs [defaultTimeoutMs RuntimeMode.Production]
+//  ^^^^ variable.other.property.vdl
+//       ^ punctuation.section.brackets.begin.vdl
+//        ^^^^^^^^^^^^^^^^ variable.other.constant.vdl
+//                         ^^^^^^^^^^^ entity.name.type.reference.vdl
+//                                    ^ punctuation.accessor.dot.vdl
+//                                     ^^^^^^^^^^ variable.other.enummember.vdl
+//                                               ^ punctuation.section.brackets.end.vdl
+    rules [
+//  ^^^^^ variable.other.property.vdl
+//        ^ punctuation.section.brackets.begin.vdl
+      { name "primary" enabled true }
+//    ^ punctuation.section.braces.begin.vdl
+//      ^^^^ variable.other.property.vdl
+//           ^^^^^^^^^ string.quoted.double.vdl
+//                     ^^^^^^^ variable.other.property.vdl
+//                             ^^^^ constant.language.boolean.vdl
+//                                  ^ punctuation.section.braces.end.vdl
+      { name "secondary" retries [1 2 3] }
+//    ^ punctuation.section.braces.begin.vdl
+//      ^^^^ variable.other.property.vdl
+//           ^^^^^^^^^^^ string.quoted.double.vdl
+//                       ^^^^^^^ variable.other.property.vdl
+//                               ^ punctuation.section.brackets.begin.vdl
+//                                ^ constant.numeric.integer.vdl
+//                                  ^ constant.numeric.integer.vdl
+//                                    ^ constant.numeric.integer.vdl
+//                                     ^ punctuation.section.brackets.end.vdl
+//                                       ^ punctuation.section.braces.end.vdl
+    ]
+//  ^ punctuation.section.brackets.end.vdl
+  }
+//^ punctuation.section.braces.end.vdl
+}
+// < punctuation.section.braces.end.vdl

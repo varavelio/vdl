@@ -1,0 +1,98 @@
+// SYNTAX TEST "source.vdl" "VDL enums and annotation payloads"
+
+@rules([
+// <------ storage.type.annotation.vdl
+//    ^ punctuation.definition.parameters.begin.vdl
+//     ^ punctuation.section.brackets.begin.vdl
+  { name "primary" enabled true }
+//^ punctuation.section.braces.begin.vdl
+//  ^^^^ variable.other.property.vdl
+//       ^^^^^^^^^ string.quoted.double.vdl
+//                 ^^^^^^^ variable.other.property.vdl
+//                         ^^^^ constant.language.boolean.vdl
+//                              ^ punctuation.section.braces.end.vdl
+  { name "secondary" weight 2.5 }
+//^ punctuation.section.braces.begin.vdl
+//  ^^^^ variable.other.property.vdl
+//       ^^^^^^^^^^^ string.quoted.double.vdl
+//                   ^^^^^^ variable.other.property.vdl
+//                          ^^^ constant.numeric.float.vdl
+//                              ^ punctuation.section.braces.end.vdl
+])
+// <- punctuation.section.brackets.end.vdl
+// <~- punctuation.definition.parameters.end.vdl
+@owner(defaultOwner)
+// <----- storage.type.annotation.vdl
+//    ^ punctuation.definition.parameters.begin.vdl
+//     ^^^^^^^^^^^^ variable.other.constant.vdl
+//                 ^ punctuation.definition.parameters.end.vdl
+type Annotated {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^ entity.name.type.declaration.vdl
+  id string
+//^^ variable.other.property.vdl
+//   ^^^^^^ storage.type.primitive.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+@stable
+//^^^^^^ storage.type.annotation.vdl
+enum Plan {
+// <--- keyword.control.declaration.vdl
+//   ^^^^ entity.name.type.declaration.vdl
+  """ Free tier. """
+//^^^^^^^^^^^^^^^^^^ string.quoted.docstring.multi.vdl
+  Free = "free"
+//^^^^ variable.other.enummember.vdl
+//     ^ keyword.operator.assignment.vdl
+//       ^^^^^^ string.quoted.double.vdl
+
+  @deprecated({
+//^^^^^^^^^^^ storage.type.annotation.vdl
+//           ^ punctuation.definition.parameters.begin.vdl
+//            ^ punctuation.section.braces.begin.vdl
+    reason "Use Team."
+//  ^^^^^^ variable.other.property.vdl
+//         ^^^^^^^^^^^ string.quoted.double.vdl
+    fallback Plan.Team
+//  ^^^^^^^^ variable.other.property.vdl
+//           ^^^^ entity.name.type.reference.vdl
+//               ^ punctuation.accessor.dot.vdl
+//                ^^^^ variable.other.enummember.vdl
+    tags ["legacy" "paid"]
+//  ^^^^ variable.other.property.vdl
+//       ^ punctuation.section.brackets.begin.vdl
+//        ^^^^^^^^ string.quoted.double.vdl
+//                 ^^^^^^ string.quoted.double.vdl
+//                       ^ punctuation.section.brackets.end.vdl
+  })
+//^ punctuation.section.braces.end.vdl
+// ^ punctuation.definition.parameters.end.vdl
+  Startup = "startup"
+//^^^^^^^ variable.other.enummember.vdl
+//        ^ keyword.operator.assignment.vdl
+//          ^^^^^^^^^ string.quoted.double.vdl
+
+  ...BasePlan
+//^^^ keyword.operator.spread.vdl
+//   ^^^^^^^^ entity.name.type.reference.vdl
+  Enterprise // keep implicit string value
+//^^^^^^^^^^ variable.other.enummember.vdl
+//           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.double-slash.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+enum Priority { Low = 1 Medium = 2 High = 3 }
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^ entity.name.type.declaration.vdl
+//            ^ punctuation.section.braces.begin.vdl
+//              ^^^ variable.other.enummember.vdl
+//                  ^ keyword.operator.assignment.vdl
+//                    ^ constant.numeric.integer.vdl
+//                      ^^^^^^ variable.other.enummember.vdl
+//                             ^ keyword.operator.assignment.vdl
+//                               ^ constant.numeric.integer.vdl
+//                                 ^^^^ variable.other.enummember.vdl
+//                                      ^ keyword.operator.assignment.vdl
+//                                        ^ constant.numeric.integer.vdl
+//                                          ^ punctuation.section.braces.end.vdl

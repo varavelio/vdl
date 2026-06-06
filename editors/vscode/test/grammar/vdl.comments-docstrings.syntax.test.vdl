@@ -1,0 +1,49 @@
+// SYNTAX TEST "source.vdl" "VDL comments, docstrings, and strings"
+
+include "../shared/api_v1.vdl"
+// <------ keyword.control.include.vdl
+//        ^ string.quoted.double.vdl
+
+// include "./ignored.vdl"
+// <------------------------- comment.line.double-slash.vdl
+
+/*
+// <- comment.block.vdl
+  type Ignored { field string }
+//  ^^^^ comment.block.vdl - keyword.control.declaration.vdl
+*/
+// <- comment.block.vdl
+
+const escaped = "\"\\"
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^ variable.other.constant.declaration.vdl
+//              ^ string.quoted.double.vdl
+//               ^^ constant.character.escape.vdl
+//                 ^^ constant.character.escape.vdl
+
+const url = "https://example.com//not-a-comment"
+// <---- keyword.control.declaration.vdl
+//    ^^^ variable.other.constant.declaration.vdl
+//          ^ string.quoted.double.vdl - comment.line.double-slash.vdl
+
+"""
+// <--- string.quoted.docstring.multi.vdl
+# API Docs
+// <- string.quoted.docstring.multi.vdl
+./docs/nested/topic.md
+// <---------------------- string.quoted.docstring.multi.vdl markup.underline.link.vdl
+"""
+// <--- string.quoted.docstring.multi.vdl
+
+""" Inline declaration documentation. """
+// <-------------------------------------- string.quoted.docstring.multi.vdl
+type Documented {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^^ entity.name.type.declaration.vdl
+  """ Field documentation. """
+//^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.docstring.multi.vdl
+  value string
+//^^^^^ variable.other.property.vdl
+//      ^^^^^^ storage.type.primitive.vdl
+}
+// < punctuation.section.braces.end.vdl

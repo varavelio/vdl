@@ -1,0 +1,101 @@
+// SYNTAX TEST "source.vdl" "VDL edge-case syntax highlighting"
+
+// include "./ignored.vdl"
+// <------------------------- comment.line.double-slash.vdl
+
+/* const ignored = 1 */
+// <--------------------- comment.block.vdl
+
+type MatrixMap map[float[][]][]
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^ entity.name.type.declaration.vdl
+//             ^^^ storage.type.container.vdl
+//                ^ punctuation.section.brackets.begin.vdl
+//                 ^^^^^ storage.type.primitive.vdl
+//                      ^ punctuation.section.brackets.begin.vdl
+//                       ^ punctuation.section.brackets.end.vdl
+//                        ^ punctuation.section.brackets.begin.vdl
+//                         ^ punctuation.section.brackets.end.vdl
+//                          ^ punctuation.section.brackets.end.vdl
+//                           ^ punctuation.section.brackets.begin.vdl
+//                            ^ punctuation.section.brackets.end.vdl
+
+type KeywordFields {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^^^^^ entity.name.type.declaration.vdl
+  type string
+//^^^^ variable.other.property.vdl - keyword.control.declaration.vdl
+//     ^^^^^^ storage.type.primitive.vdl
+  include? int
+//^^^^^^^ variable.other.property.vdl - keyword.control.include.vdl
+//       ^ keyword.operator.optional.vdl
+//         ^^^ storage.type.primitive.vdl
+  true bool
+//^^^^ variable.other.property.vdl - constant.language.boolean.vdl
+//     ^^^^ storage.type.primitive.vdl
+  map map[string]
+//^^^ variable.other.property.vdl - storage.type.container.vdl
+//    ^^^ storage.type.container.vdl
+//       ^ punctuation.section.brackets.begin.vdl
+//        ^^^^^^ storage.type.primitive.vdl
+//              ^ punctuation.section.brackets.end.vdl
+  enum string
+//^^^^ variable.other.property.vdl - keyword.control.declaration.vdl
+//     ^^^^^^ storage.type.primitive.vdl
+  const int
+//^^^^^ variable.other.property.vdl - keyword.control.declaration.vdl
+//      ^^^ storage.type.primitive.vdl
+  string datetime
+//^^^^^^ variable.other.property.vdl - storage.type.primitive.vdl
+//       ^^^^^^^^ storage.type.primitive.vdl
+  int float
+//^^^ variable.other.property.vdl - storage.type.primitive.vdl
+//    ^^^^^ storage.type.primitive.vdl
+  float bool
+//^^^^^ variable.other.property.vdl - storage.type.primitive.vdl
+//      ^^^^ storage.type.primitive.vdl
+  bool string
+//^^^^ variable.other.property.vdl - storage.type.primitive.vdl
+//     ^^^^^^ storage.type.primitive.vdl
+  datetime string
+//^^^^^^^^ variable.other.property.vdl - storage.type.primitive.vdl
+//         ^^^^^^ storage.type.primitive.vdl
+  false bool
+//^^^^^ variable.other.property.vdl - constant.language.boolean.vdl
+//      ^^^^ storage.type.primitive.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+const docsUrl = "https://example.com//docs"
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^ variable.other.constant.declaration.vdl
+//              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.vdl - comment.line.double-slash.vdl
+
+const keywordObject = {
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+  include "./literal.vdl"
+//^^^^^^^ variable.other.property.vdl - keyword.control.include.vdl
+//        ^^^^^^^^^^^^^^^ string.quoted.double.vdl
+  const 1
+//^^^^^ variable.other.property.vdl - keyword.control.declaration.vdl
+//      ^ constant.numeric.integer.vdl
+  enum RuntimeMode.Production
+//^^^^ variable.other.property.vdl - keyword.control.declaration.vdl
+//     ^^^^^^^^^^^ entity.name.type.reference.vdl
+//                ^ punctuation.accessor.dot.vdl
+//                 ^^^^^^^^^^ variable.other.enummember.vdl
+  string "value"
+//^^^^^^ variable.other.property.vdl - storage.type.primitive.vdl
+//       ^^^^^^^ string.quoted.double.vdl
+  true false
+//^^^^ variable.other.property.vdl - constant.language.boolean.vdl
+//     ^^^^^ constant.language.boolean.vdl
+  false true
+//^^^^^ variable.other.property.vdl - constant.language.boolean.vdl
+//      ^^^^ constant.language.boolean.vdl
+  type "schema"
+//^^^^ variable.other.property.vdl - keyword.control.declaration.vdl
+//     ^^^^^^^^ string.quoted.double.vdl
+}
+// < punctuation.section.braces.end.vdl

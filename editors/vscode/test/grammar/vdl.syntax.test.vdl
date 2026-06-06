@@ -1,0 +1,144 @@
+// SYNTAX TEST "source.vdl" "VDL core syntax highlighting"
+
+include "./shared_types.vdl"
+// <------ keyword.control.include.vdl
+//       ^^^^^^^^^^^^^^^^^^^^ string.quoted.double.vdl
+
+""" ./docs/catalog.md """
+// <------------------------ string.quoted.docstring.multi.vdl
+//  ^^^^^^^^^^^^^^^^^ markup.underline.link.vdl
+
+@meta({ owner "platform" tags ["public" "stable"] retry defaultRetries })
+// <---- storage.type.annotation.vdl
+//   ^ punctuation.definition.parameters.begin.vdl
+//    ^ punctuation.section.braces.begin.vdl
+//      ^^^^^ variable.other.property.vdl
+//            ^^^^^^^^^^ string.quoted.double.vdl
+//                       ^^^^ variable.other.property.vdl
+//                            ^ punctuation.section.brackets.begin.vdl
+//                             ^^^^^^^^ string.quoted.double.vdl
+//                                      ^^^^^^^^ string.quoted.double.vdl
+//                                                ^^^^^ variable.other.property.vdl
+//                                                      ^^^^^^^^^^^^^^ variable.other.constant.vdl
+type Product {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^ entity.name.type.declaration.vdl
+  ...CatalogEntity
+//^^^ keyword.operator.spread.vdl
+//   ^^^^^^^^^^^^^ entity.name.type.reference.vdl
+
+  """ Stable product identifier. """
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.docstring.multi.vdl
+  id string
+//^^ variable.other.property.vdl
+//   ^^^^^^ storage.type.primitive.vdl
+
+  @deprecated("Use displayName instead.")
+//^^^^^^^^^^^ storage.type.annotation.vdl
+//            ^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.vdl
+  displayName? string
+//^^^^^^^^^^^ variable.other.property.vdl
+//           ^ keyword.operator.optional.vdl
+//             ^^^^^^ storage.type.primitive.vdl
+
+  tags string[]
+//^^^^ variable.other.property.vdl
+//     ^^^^^^ storage.type.primitive.vdl
+//           ^ punctuation.section.brackets.begin.vdl
+//            ^ punctuation.section.brackets.end.vdl
+
+  variants ProductVariant[]
+//^^^^^^^^ variable.other.property.vdl
+//         ^^^^^^^^^^^^^^ entity.name.type.reference.vdl
+//                       ^ punctuation.section.brackets.begin.vdl
+//                        ^ punctuation.section.brackets.end.vdl
+
+  metadata map[string[]]
+//^^^^^^^^ variable.other.property.vdl
+//         ^^^ storage.type.container.vdl
+//            ^ punctuation.section.brackets.begin.vdl
+//             ^^^^^^ storage.type.primitive.vdl
+//                   ^ punctuation.section.brackets.begin.vdl
+//                    ^ punctuation.section.brackets.end.vdl
+//                     ^ punctuation.section.brackets.end.vdl
+
+  location {
+//^^^^^^^^ variable.other.property.vdl
+//         ^ punctuation.section.braces.begin.vdl
+    latitude float
+//  ^^^^^^^^ variable.other.property.vdl
+//           ^^^^^ storage.type.primitive.vdl
+  }
+//^ punctuation.section.braces.end.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+type ProductId string
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^ entity.name.type.declaration.vdl
+//             ^^^^^^ storage.type.primitive.vdl
+
+enum ProductStatus {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^^^^^ entity.name.type.declaration.vdl
+  Draft
+//^^^^^ variable.other.enummember.vdl
+  Published = "published"
+//^^^^^^^^^ variable.other.enummember.vdl
+//          ^ keyword.operator.assignment.vdl
+//            ^^^^^^^^^^^ string.quoted.double.vdl
+  Archived = 3
+//^^^^^^^^ variable.other.enummember.vdl
+//         ^ keyword.operator.assignment.vdl
+//           ^ constant.numeric.integer.vdl
+  ...BaseStatus
+//^^^ keyword.operator.spread.vdl
+//   ^^^^^^^^^^ entity.name.type.reference.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+const defaultRetries = 3
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                   ^ keyword.operator.assignment.vdl
+//                     ^ constant.numeric.integer.vdl
+
+const defaultStatus = ProductStatus.Draft
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                  ^ keyword.operator.assignment.vdl
+//                    ^^^^^^^^^^^^^ entity.name.type.reference.vdl
+//                                 ^ punctuation.accessor.dot.vdl
+//                                   ^^^^^ variable.other.enummember.vdl
+
+const retryBackoffMs = [100 250 500]
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                   ^ keyword.operator.assignment.vdl
+//                     ^ punctuation.section.brackets.begin.vdl
+//                      ^^^ constant.numeric.integer.vdl
+//                          ^^^ constant.numeric.integer.vdl
+//                              ^^^ constant.numeric.integer.vdl
+//                                 ^ punctuation.section.brackets.end.vdl
+
+const productionConfig = {
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                     ^ keyword.operator.assignment.vdl
+//                       ^ punctuation.section.braces.begin.vdl
+  ...baseConfig
+//^^^ keyword.operator.spread.vdl
+//   ^^^^^^^^^^ variable.other.constant.vdl
+  price 9.99
+//^^^^^ variable.other.property.vdl
+//      ^^^^ constant.numeric.float.vdl
+  status ProductStatus.Draft
+//^^^^^^ variable.other.property.vdl
+//       ^^^^^^^^^^^^^ entity.name.type.reference.vdl
+//                    ^ punctuation.accessor.dot.vdl
+//                      ^^^^^ variable.other.enummember.vdl
+  enabled false
+//^^^^^^^ variable.other.property.vdl
+//        ^^^^^ constant.language.boolean.vdl
+}
+// < punctuation.section.braces.end.vdl

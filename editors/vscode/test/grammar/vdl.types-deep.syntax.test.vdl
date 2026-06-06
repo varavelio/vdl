@@ -1,0 +1,99 @@
+// SYNTAX TEST "source.vdl" "VDL type aliases, fields, and deep inline objects"
+
+type Compact { id string email EmailAddress tags string[] }
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^ entity.name.type.declaration.vdl
+//           ^ punctuation.section.braces.begin.vdl
+//             ^^ variable.other.property.vdl
+//                ^^^^^^ storage.type.primitive.vdl
+//                       ^^^^^ variable.other.property.vdl
+//                             ^^^^^^^^^^^^ entity.name.type.reference.vdl
+
+type UserIds UserId[][]
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^ entity.name.type.declaration.vdl
+//           ^^^^^^ entity.name.type.reference.vdl
+//                 ^ punctuation.section.brackets.begin.vdl
+//                  ^ punctuation.section.brackets.end.vdl
+//                   ^ punctuation.section.brackets.begin.vdl
+//                    ^ punctuation.section.brackets.end.vdl
+
+type DeepMap map[map[ProductVariant[]][]]
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^ entity.name.type.declaration.vdl
+//           ^^^ storage.type.container.vdl
+//              ^ punctuation.section.brackets.begin.vdl
+//               ^^^ storage.type.container.vdl
+//                  ^ punctuation.section.brackets.begin.vdl
+//                   ^^^^^^^^^^^^^^ entity.name.type.reference.vdl
+//                                 ^ punctuation.section.brackets.begin.vdl
+//                                  ^ punctuation.section.brackets.end.vdl
+//                                   ^ punctuation.section.brackets.end.vdl
+//                                    ^ punctuation.section.brackets.begin.vdl
+//                                     ^ punctuation.section.brackets.end.vdl
+//                                      ^ punctuation.section.brackets.end.vdl
+
+type DeepEnvelope {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^^^^ entity.name.type.declaration.vdl
+  @meta({
+//^^^^^ storage.type.annotation.vdl
+//     ^ punctuation.definition.parameters.begin.vdl
+//      ^ punctuation.section.braces.begin.vdl
+    level 1
+//  ^^^^^ variable.other.property.vdl
+//        ^ constant.numeric.integer.vdl
+    flags [true false]
+//  ^^^^^ variable.other.property.vdl
+//        ^ punctuation.section.brackets.begin.vdl
+//         ^^^^ constant.language.boolean.vdl
+//              ^^^^^ constant.language.boolean.vdl
+//                   ^ punctuation.section.brackets.end.vdl
+    ref defaultMeta
+//  ^^^ variable.other.property.vdl
+//      ^^^^^^^^^^^ variable.other.constant.vdl
+  })
+//^ punctuation.section.braces.end.vdl
+// ^ punctuation.definition.parameters.end.vdl
+  payload? {
+//^^^^^^^ variable.other.property.vdl
+//       ^ keyword.operator.optional.vdl
+//         ^ punctuation.section.braces.begin.vdl
+    ...BasePayload
+//  ^^^ keyword.operator.spread.vdl
+//     ^^^^^^^^^^^ entity.name.type.reference.vdl
+    request {
+//  ^^^^^^^ variable.other.property.vdl
+//          ^ punctuation.section.braces.begin.vdl
+      id string
+//    ^^ variable.other.property.vdl
+//       ^^^^^^ storage.type.primitive.vdl
+      matrix map[float[][]][]
+//    ^^^^^^ variable.other.property.vdl
+//           ^^^ storage.type.container.vdl
+//               ^^^^^ storage.type.primitive.vdl
+      owners UserId[]
+//    ^^^^^^ variable.other.property.vdl
+//           ^^^^^^ entity.name.type.reference.vdl
+//                 ^ punctuation.section.brackets.begin.vdl
+//                  ^ punctuation.section.brackets.end.vdl
+      nested? {
+//    ^^^^^^ variable.other.property.vdl
+//          ^ keyword.operator.optional.vdl
+//            ^ punctuation.section.braces.begin.vdl
+        createdAt datetime
+//      ^^^^^^^^^ variable.other.property.vdl
+//                ^^^^^^^^ storage.type.primitive.vdl
+        attributes map[map[string[]]]
+//      ^^^^^^^^^^ variable.other.property.vdl
+//                 ^^^ storage.type.container.vdl
+//                     ^^^ storage.type.container.vdl
+//                         ^^^^^^ storage.type.primitive.vdl
+      }
+//    ^ punctuation.section.braces.end.vdl
+    }
+//  ^ punctuation.section.braces.end.vdl
+  }
+//^ punctuation.section.braces.end.vdl
+}
+// < punctuation.section.braces.end.vdl
