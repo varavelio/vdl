@@ -6,7 +6,8 @@ theme = "varapress"
 
 [markdown.highlighting]
 theme = "github-dark"
-extra_grammars = ["themes/varapress/grammars/vdl.json"]
+extra_grammars = ["../editors/vscode/language/vdl.tmLanguage.json"]
+# extra_grammars = ["themes/varapress/grammars/vdl.json"]
 
 [extra]
 varapress_logo_light = "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/vdl.svg"
