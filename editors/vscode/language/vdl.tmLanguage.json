@@ -7,17 +7,12 @@
     { "include": "#comments" },
     { "include": "#docstrings" },
     { "include": "#annotations" },
-    { "include": "#declarations" },
-    { "include": "#keywords" },
-    { "include": "#constants-language" },
-    { "include": "#constants-numeric" },
-    { "include": "#spreads" },
-    { "include": "#strings" },
-    { "include": "#types-primitive" },
-    { "include": "#types-container" },
-    { "include": "#types-usage" },
-    { "include": "#fields" },
-    { "include": "#references" },
+    { "include": "#includes" },
+    { "include": "#type-declarations" },
+    { "include": "#enum-declarations" },
+    { "include": "#const-declarations" },
+    { "include": "#data-literals" },
+    { "include": "#field-types" },
     { "include": "#operators" }
   ],
   "repository": {
@@ -40,10 +35,8 @@
       "end": "\"\"\"",
       "patterns": [
         {
-          "match": "(\\./[a-zA-Z0-9_\\-\\./]+\\.md)",
-          "captures": {
-            "1": { "name": "markup.underline.link.vdl" }
-          }
+          "name": "markup.underline.link.vdl",
+          "match": "\\./[a-zA-Z0-9_\\-\\./]+\\.md"
         }
       ]
     },
@@ -61,7 +54,6 @@
     "annotations": {
       "patterns": [
         {
-          "comment": "Annotation with argument: @name(...)",
           "name": "meta.annotation.vdl",
           "begin": "(@[a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()",
           "beginCaptures": {
@@ -73,49 +65,332 @@
             "0": { "name": "punctuation.definition.parameters.end.vdl" }
           },
           "patterns": [
+            { "include": "#comments" },
             { "include": "#docstrings" },
-            { "include": "#strings" },
-            { "include": "#constants-language" },
-            { "include": "#constants-numeric" },
-            { "include": "#spreads" },
-            { "include": "#types-usage" },
+            { "include": "#data-literals" },
             { "include": "#operators" }
           ]
         },
         {
-          "comment": "Annotation flag: @name",
           "name": "storage.type.annotation.vdl",
           "match": "@[a-zA-Z_][a-zA-Z0-9_]*"
         }
       ]
     },
-    "declarations": {
+    "includes": {
       "patterns": [
         {
-          "comment": "Type or enum declaration: type Foo { / enum Bar {",
-          "name": "meta.declaration.type.vdl",
-          "match": "\\b(type|enum)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "name": "meta.include.vdl",
+          "match": "\\b(include)\\b\\s*(\"(?:\\\\.|[^\"])*\")",
           "captures": {
-            "1": { "name": "keyword.control.vdl" },
-            "2": { "name": "entity.name.type.class.vdl" }
+            "1": { "name": "keyword.control.include.vdl" },
+            "2": { "name": "string.quoted.double.vdl" }
+          }
+        }
+      ]
+    },
+    "type-declarations": {
+      "patterns": [
+        {
+          "name": "meta.declaration.type.object.vdl",
+          "begin": "\\b(type)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.declaration.vdl" },
+            "2": { "name": "entity.name.type.declaration.vdl" },
+            "3": { "name": "punctuation.section.braces.begin.vdl" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.braces.end.vdl" }
+          },
+          "patterns": [{ "include": "#type-body" }]
+        },
+        {
+          "name": "meta.declaration.type.alias.vdl",
+          "begin": "\\b(type)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.declaration.vdl" },
+            "2": { "name": "entity.name.type.declaration.vdl" }
+          },
+          "end": "$",
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#field-types" },
+            { "include": "#operators" }
+          ]
+        }
+      ]
+    },
+    "enum-declarations": {
+      "patterns": [
+        {
+          "name": "meta.declaration.enum.vdl",
+          "begin": "\\b(enum)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.declaration.vdl" },
+            "2": { "name": "entity.name.type.declaration.vdl" },
+            "3": { "name": "punctuation.section.braces.begin.vdl" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.braces.end.vdl" }
+          },
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#docstrings" },
+            { "include": "#annotations" },
+            { "include": "#type-spreads" },
+            { "include": "#enum-members" },
+            { "include": "#data-literals" },
+            { "include": "#operators" }
+          ]
+        }
+      ]
+    },
+    "const-declarations": {
+      "patterns": [
+        {
+          "name": "meta.declaration.constant.object.vdl",
+          "begin": "\\b(const)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(=)\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.declaration.vdl" },
+            "2": { "name": "variable.other.constant.declaration.vdl" },
+            "3": { "name": "keyword.operator.assignment.vdl" },
+            "4": { "name": "punctuation.section.braces.begin.vdl" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.braces.end.vdl" }
+          },
+          "patterns": [{ "include": "#data-object-body" }]
+        },
+        {
+          "name": "meta.declaration.constant.array.vdl",
+          "begin": "\\b(const)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(=)\\s*(\\[)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.declaration.vdl" },
+            "2": { "name": "variable.other.constant.declaration.vdl" },
+            "3": { "name": "keyword.operator.assignment.vdl" },
+            "4": { "name": "punctuation.section.brackets.begin.vdl" }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.brackets.end.vdl" }
+          },
+          "patterns": [{ "include": "#data-literals" }]
+        },
+        {
+          "name": "meta.declaration.constant.scalar.vdl",
+          "match": "\\b(const)\\b\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.control.declaration.vdl" },
+            "2": { "name": "variable.other.constant.declaration.vdl" },
+            "3": { "name": "keyword.operator.assignment.vdl" }
+          }
+        }
+      ]
+    },
+    "type-body": {
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#docstrings" },
+        { "include": "#annotations" },
+        { "include": "#type-spreads" },
+        { "include": "#inline-object-fields" },
+        { "include": "#field-members" },
+        { "include": "#field-names" },
+        { "include": "#field-types" },
+        { "include": "#operators" }
+      ]
+    },
+    "inline-object-fields": {
+      "patterns": [
+        {
+          "name": "meta.field.object.vdl",
+          "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(\\?)?\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "variable.other.property.vdl" },
+            "2": { "name": "keyword.operator.optional.vdl" },
+            "3": { "name": "punctuation.section.braces.begin.vdl" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.braces.end.vdl" }
+          },
+          "patterns": [{ "include": "#type-body" }]
+        }
+      ]
+    },
+    "field-members": {
+      "patterns": [
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(\\?)?(\\s+)(map)\\b",
+          "captures": {
+            "1": { "name": "variable.other.property.vdl" },
+            "2": { "name": "keyword.operator.optional.vdl" },
+            "4": { "name": "storage.type.container.vdl" }
           }
         },
         {
-          "comment": "Const declaration: const name ...",
-          "name": "meta.declaration.constant.vdl",
-          "match": "\\b(const)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(\\?)?(\\s+)(string|int|float|bool|datetime)\\b",
           "captures": {
-            "1": { "name": "keyword.control.vdl" },
+            "1": { "name": "variable.other.property.vdl" },
+            "2": { "name": "keyword.operator.optional.vdl" },
+            "4": { "name": "storage.type.primitive.vdl" }
+          }
+        },
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(\\?)?(\\s+)([A-Z][a-zA-Z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "variable.other.property.vdl" },
+            "2": { "name": "keyword.operator.optional.vdl" },
+            "4": { "name": "entity.name.type.reference.vdl" }
+          }
+        }
+      ]
+    },
+    "field-names": {
+      "patterns": [
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(\\?)?(?=\\s+(?:[a-zA-Z_][a-zA-Z0-9_]*|map\\b|\\{))",
+          "captures": {
+            "1": { "name": "variable.other.property.vdl" },
+            "2": { "name": "keyword.operator.optional.vdl" }
+          }
+        }
+      ]
+    },
+    "field-types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.vdl",
+          "match": "\\b(string|int|float|bool|datetime)\\b"
+        },
+        {
+          "name": "storage.type.container.vdl",
+          "match": "\\bmap\\b"
+        },
+        {
+          "name": "entity.name.type.reference.vdl",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+        }
+      ]
+    },
+    "enum-members": {
+      "patterns": [
+        {
+          "name": "variable.other.enummember.vdl",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b(?=\\s*(?:=|$|//|/\\*))"
+        }
+      ]
+    },
+    "type-spreads": {
+      "patterns": [
+        {
+          "match": "(\\.\\.\\.)([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.operator.spread.vdl" },
+            "2": { "name": "entity.name.type.reference.vdl" }
+          }
+        }
+      ]
+    },
+    "object-spreads": {
+      "patterns": [
+        {
+          "match": "(\\.\\.\\.)([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.operator.spread.vdl" },
             "2": { "name": "variable.other.constant.vdl" }
           }
         }
       ]
     },
-    "keywords": {
+    "data-literals": {
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#strings" },
+        { "include": "#constants-language" },
+        { "include": "#constants-numeric" },
+        { "include": "#enum-member-references" },
+        { "include": "#data-objects" },
+        { "include": "#data-arrays" },
+        { "include": "#constant-references" },
+        { "include": "#operators" }
+      ]
+    },
+    "data-object-body": {
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#object-spreads" },
+        { "include": "#data-object-keys" },
+        { "include": "#strings" },
+        { "include": "#constants-language" },
+        { "include": "#constants-numeric" },
+        { "include": "#enum-member-references" },
+        { "include": "#data-objects" },
+        { "include": "#data-arrays" },
+        { "include": "#constant-references" },
+        { "include": "#operators" }
+      ]
+    },
+    "data-objects": {
       "patterns": [
         {
-          "name": "keyword.control.vdl",
-          "match": "\\b(include)\\b"
+          "name": "meta.object-literal.vdl",
+          "begin": "\\{",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.braces.begin.vdl" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.braces.end.vdl" }
+          },
+          "patterns": [{ "include": "#data-object-body" }]
+        }
+      ]
+    },
+    "data-arrays": {
+      "patterns": [
+        {
+          "name": "meta.array-literal.vdl",
+          "begin": "\\[",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.brackets.begin.vdl" }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.brackets.end.vdl" }
+          },
+          "patterns": [{ "include": "#data-literals" }]
+        }
+      ]
+    },
+    "data-object-keys": {
+      "patterns": [
+        {
+          "name": "variable.other.property.vdl",
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b(?=\\s+(?:\"|[0-9]+(?:\\.[0-9]+)?\\b|true\\b|false\\b|\\{|\\[|[a-zA-Z_][a-zA-Z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z0-9_]*)?))"
+        }
+      ]
+    },
+    "constant-references": {
+      "patterns": [
+        {
+          "name": "variable.other.constant.vdl",
+          "match": "\\b[a-z_][a-zA-Z0-9_]*\\b"
+        }
+      ]
+    },
+    "enum-member-references": {
+      "patterns": [
+        {
+          "match": "\\b([A-Z][a-zA-Z0-9_]*)(\\.)([A-Z][a-zA-Z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "entity.name.type.reference.vdl" },
+            "2": { "name": "punctuation.accessor.dot.vdl" },
+            "3": { "name": "variable.other.enummember.vdl" }
+          }
         }
       ]
     },
@@ -131,83 +406,20 @@
       "patterns": [
         {
           "name": "constant.numeric.float.vdl",
-          "match": "\\b\\d+\\.\\d+\\b"
+          "match": "\\b[0-9]+\\.[0-9]+\\b"
         },
         {
           "name": "constant.numeric.integer.vdl",
-          "match": "\\b\\d+\\b"
-        }
-      ]
-    },
-    "spreads": {
-      "patterns": [
-        {
-          "comment": "Spread member: ...TypeName",
-          "match": "(\\.\\.\\.)(([a-zA-Z_][a-zA-Z0-9_]*))",
-          "captures": {
-            "1": { "name": "keyword.operator.spread.vdl" },
-            "2": { "name": "entity.name.type.class.vdl" }
-          }
-        }
-      ]
-    },
-    "types-primitive": {
-      "patterns": [
-        {
-          "name": "storage.type.primitive.vdl",
-          "match": "\\b(string|int|float|bool|datetime)\\b"
-        }
-      ]
-    },
-    "types-container": {
-      "patterns": [
-        {
-          "comment": "Map type: map[ValueType]",
-          "name": "storage.type.container.vdl",
-          "match": "\\b(map)\\b"
-        }
-      ]
-    },
-    "types-usage": {
-      "patterns": [
-        {
-          "comment": "Enum member reference: EnumName.MemberName",
-          "match": "\\b([A-Z][a-zA-Z0-9]*)\\.(([A-Z][a-zA-Z0-9]*))",
-          "captures": {
-            "1": { "name": "entity.name.type.class.vdl" },
-            "2": { "name": "variable.other.enummember.vdl" }
-          }
-        },
-        {
-          "comment": "PascalCase type/enum reference",
-          "name": "entity.name.type.class.vdl",
-          "match": "\\b[A-Z][a-zA-Z0-9]*\\b"
-        }
-      ]
-    },
-    "fields": {
-      "patterns": [
-        {
-          "comment": "Field/key name: identifier followed by optional ? then a type, {, [, string or end of line",
-          "match": "^\\s+([a-z_][a-zA-Z0-9_]*)(\\?)?(?=\\s+[a-zA-Z\\[{\"]|\\s*$)",
-          "captures": {
-            "1": { "name": "variable.other.property.vdl" },
-            "2": { "name": "keyword.operator.optional.vdl" }
-          }
-        }
-      ]
-    },
-    "references": {
-      "patterns": [
-        {
-          "comment": "camelCase/lowercase identifier used as a value reference",
-          "name": "entity.name.type.class.vdl",
-          "match": "(?<=[=\\s\\[])([a-z_][a-zA-Z0-9_]*)\\b"
+          "match": "\\b[0-9]+\\b"
         }
       ]
     },
     "operators": {
       "patterns": [
+        {
+          "name": "keyword.operator.spread.vdl",
+          "match": "\\.\\.\\."
+        },
         {
           "name": "keyword.operator.optional.vdl",
           "match": "\\?"
@@ -215,6 +427,10 @@
         {
           "name": "keyword.operator.assignment.vdl",
           "match": "="
+        },
+        {
+          "name": "punctuation.accessor.dot.vdl",
+          "match": "\\."
         },
         {
           "name": "punctuation.section.braces.begin.vdl",
