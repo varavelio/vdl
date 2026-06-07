@@ -59,7 +59,7 @@ The generation flow is simple.
 6. The plugin returns generated files or structured errors.
 7. VDL validates output paths and writes files inside `outDir`.
 
-The plugin input has this shape:
+The plugin input is defined by the canonical [`schemas/plugin_input.vdl`](https://github.com/varavelio/vdl/blob/main/schemas/plugin_input.vdl) contract and has this shape:
 
 ```ts
 type PluginInput = {
@@ -69,7 +69,7 @@ type PluginInput = {
 };
 ```
 
-The plugin output has this shape:
+The plugin output is defined by the canonical [`schemas/plugin_output.vdl`](https://github.com/varavelio/vdl/blob/main/schemas/plugin_output.vdl) contract and has this shape:
 
 ```ts
 type PluginOutput = {
