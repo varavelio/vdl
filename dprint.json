@@ -34,7 +34,9 @@
     "**/immutable",
     "**/_app",
     "**/.astro",
-    "**/_astro"
+    "**/_astro",
+    "**/docs/static",
+    "**/docs/themes"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.21.1.wasm",

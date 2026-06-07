@@ -25,6 +25,8 @@
       "!**/_app",
       "!**/.astro",
       "!**/_astro",
+      "!**/docs/static",
+      "!**/docs/themes",
       "!**/wasmtypes"
     ]
   },
