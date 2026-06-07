@@ -4,6 +4,7 @@ description = "VDL is an open-source, type-safe, multi-language, and easily exte
 +++
 
 {{ header_base(
+show_title=false,
 container="lg",
 menu="Overview|/docs/essentials/about/,Language|/docs/language/start-here/,Plugins|/docs/guides/plugins/,Reference|/docs/reference/spec/",
 cta_text="Install",
