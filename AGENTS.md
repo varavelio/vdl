@@ -59,7 +59,7 @@ When updating this document, do so with the context of the entire document in mi
   - `content/_index.md`: Home landing page composed with VaraPress landing shortcodes.
   - `content/docs/_index.md`: Docs root section; uses `template = "docs.html"` and `sort_by = "weight"`.
   - `content/docs/essentials/_index.md`: First docs subsection for project orientation; child pages are ordered by `weight`.
-  - `content/docs/essentials/about.md`: Project overview and positioning.
+  - `content/docs/about.md`: Project overview and positioning.
   - `content/docs/language/_index.md`: Language guide section index; child pages are ordered by `weight`.
   - `content/docs/guides/_index.md`: Practical guides section index; child pages are ordered by `weight`.
   - `content/docs/reference/_index.md`: Reference section index; child pages are ordered by `weight`.

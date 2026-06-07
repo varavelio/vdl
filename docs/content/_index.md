@@ -6,7 +6,7 @@ description = "VDL is an open-source, type-safe, multi-language, and easily exte
 {{ header_base(
 show_title=false,
 container="lg",
-menu="Overview|/docs/essentials/about/,Language|/docs/language/start-here/,Plugins|/docs/guides/plugins/,Reference|/docs/reference/spec/",
+menu="Overview|/docs/about/,Language|/docs/language/start-here/,Plugins|/docs/guides/plugins/,Reference|/docs/reference/spec/",
 cta_text="Install",
 cta_url="/docs/guides/installation/"
 ) }}
@@ -123,7 +123,7 @@ description="The documentation starts with concepts, then moves into installatio
 item_1_type="Overview",
 item_1_title="About VDL",
 item_1_desc="Understand the project philosophy, the plugin-first model, and common use cases.",
-item_1_href="/docs/essentials/about/",
+item_1_href="/docs/about/",
 item_1_meta="Read overview",
 item_2_type="Language",
 item_2_title="Start Here",

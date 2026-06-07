@@ -1,5 +1,5 @@
 +++
-title = "Language Guide"
+title = "Language"
 description = "Learn how to write VDL schemas from first principles."
 template = "docs.html"
 sort_by = "weight"
