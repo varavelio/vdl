@@ -51,7 +51,7 @@ RUN \
 FROM golang:1.26-trixie
 
 # Install Node.js
-COPY --from=node:24.15.0-trixie /usr/local/ /usr/local/
+COPY --from=node:24.17.0-trixie /usr/local/ /usr/local/
 
 # Install golangci-lint
 COPY --from=golangci/golangci-lint:v2.12.2 /usr/bin/golangci-lint /usr/local/bin/golangci-lint
