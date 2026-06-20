@@ -1,4 +1,4 @@
-name: Build and Push VDL Docker Dev Image
+name: Push VDL Docker Dev Image
 
 env:
   GHCR_IMAGE: ghcr.io/varavelio/vdl-dev
