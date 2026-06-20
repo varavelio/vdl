@@ -4,7 +4,7 @@ Official VDL extension for Visual Studio Code or any VSCode based editor.
 
 - [VDL Docs](https://vdl.varavel.com)
 - [VDL Repository](https://github.com/varavelio/vdl)
-- [VDL VSCode Extension Repository](https://github.com/varavelio/vdl/tree/main/editors/vscode)
+- [VDL VSCode Extension Repository](https://github.com/varavelio/vdl/tree/main/integrations/editors/vscode)
 
 ## Installation
 
@@ -73,7 +73,7 @@ The following snippets are available for `.vdl` files:
 
 ## Release Notes
 
-Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/editors/vscode/CHANGELOG.md).
+Below are release notes for the last 10 versions, you can also see the entire [changelog](https://github.com/varavelio/vdl/blob/main/integrations/editors/vscode/CHANGELOG.md).
 
 ### v0.1.5 - 2026-03-09
 

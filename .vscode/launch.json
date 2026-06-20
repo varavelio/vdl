@@ -6,7 +6,7 @@
       "type": "extensionHost",
       "request": "launch",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/editors/vscode",
+        "--extensionDevelopmentPath=${workspaceFolder}/integrations/editors/vscode",
         "${workspaceFolder}"
       ]
     }

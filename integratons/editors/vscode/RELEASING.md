@@ -12,16 +12,16 @@ This document outlines the manual process for releasing a new version of the VDL
 ## Phase 1: Versioning & Documentation
 
 1. **Update Version Number**
-   - Open `editors/vscode/package.json`.
+   - Open `integrations/editors/vscode/package.json`.
    - Update the `"version"` field following Semantic Versioning (e.g., `0.1.8`).
    - **Note:** Do not include a "v" prefix in the JSON file.
 
 2. **Update Changelog**
-   - Open `editors/vscode/CHANGELOG.md`.
+   - Open `integrations/editors/vscode/CHANGELOG.md`.
    - Add a new entry for the current version with a date and a list of changes.
 
 3. **Update README Summary**
-   - Open `editors/vscode/README.md`.
+   - Open `integrations/editors/vscode/README.md`.
    - Update the "Recent Changes" section to reflect the latest top 10 changes.
    - Ensure the link to the full `CHANGELOG.md` is correct and accessible.
 
@@ -41,7 +41,7 @@ This document outlines the manual process for releasing a new version of the VDL
    ```
 
 2. **Verify the Artifact**
-   - Confirm that a file named `vdl-X.X.X.vsix` has been created in the `editors/vscode` directory.
+   - Confirm that a file named `vdl-X.X.X.vsix` has been created in the `integrations/editors/vscode` directory.
    - (Optional) Verify the package contents to ensure only necessary files are included:
 
      ```bash

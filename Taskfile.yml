@@ -97,26 +97,26 @@ tasks:
 
   vs:dev:
     desc: "VSCode: Build extension in watch mode"
-    dir: ./editors/vscode
+    dir: ./integrations/editors/vscode
     cmds:
       - rm -rf ./dist
       - node esbuild.js --watch
 
   vs:build:
     desc: "VSCode: Build extension for production"
-    dir: ./editors/vscode
+    dir: ./integrations/editors/vscode
     cmds:
       - rm -rf ./dist
       - node esbuild.js --production
 
   vs:test:grammar:
     desc: "VSCode: Test TextMate grammar"
-    dir: ./editors/vscode
+    dir: ./integrations/editors/vscode
     cmd: npx --no vscode-tmgrammar-test "test/grammar/**/*.vdl" --config package.json
 
   vs:package:
     desc: "VSCode: Package extension into .vsix"
-    dir: ./editors/vscode
+    dir: ./integrations/editors/vscode
     cmds:
       - task: vs:build
       - rm -rf *.vsix
@@ -124,5 +124,5 @@ tasks:
 
   vs:package:ls:
     desc: "VSCode: List contents of packaged .vsix"
-    dir: ./editors/vscode
+    dir: ./integrations/editors/vscode
     cmd: npx --no vsce ls

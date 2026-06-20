@@ -6,7 +6,7 @@ theme = "varapress"
 
 [markdown.highlighting]
 theme = "github-dark"
-extra_grammars = ["../editors/vscode/language/vdl.tmLanguage.json"]
+extra_grammars = ["../integrations/editors/vscode/language/vdl.tmLanguage.json"]
 # extra_grammars = ["themes/varapress/grammars/vdl.json"]
 
 [extra]

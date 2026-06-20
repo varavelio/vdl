@@ -22,7 +22,7 @@ Install the extension from either marketplace:
 
 The extension is plug and play. The only requirement is having the `vdl` binary installed on your system. If you have not installed the CLI yet, follow the [installation guide](/docs/guides/installation/).
 
-Extension source code: [editors/vscode](https://github.com/varavelio/vdl/tree/main/editors/vscode)
+Extension source code: [integrations/editors/vscode](https://github.com/varavelio/vdl/tree/main/integrations/editors/vscode)
 
 ### Features
 
