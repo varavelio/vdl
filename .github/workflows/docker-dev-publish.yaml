@@ -1,13 +1,13 @@
-name: Build and Push VDL Builder Image
+name: Build and Push VDL Docker Dev Image
 
 env:
-  GHCR_IMAGE: ghcr.io/varavelio/vdl-builder
+  GHCR_IMAGE: ghcr.io/varavelio/vdl-dev
 
 on:
   push:
     branches: [main]
     paths:
-      - docker/Dockerfile.builder
+      - .devcontainer/Dockerfile
   workflow_dispatch:
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
           docker build \
             --tag "${GHCR_IMAGE}:${{ needs.set-tag.outputs.tag }}-${{ matrix.vars.platform }}" \
             --build-arg TARGETPLATFORM="linux/${{ matrix.vars.platform }}" \
-            --file ./docker/Dockerfile.builder \
+            --file ./.devcontainer/Dockerfile \
             .
 
       - name: Push Docker image

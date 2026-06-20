@@ -1,5 +1,5 @@
 # =============================================================================
-# Dockerfile.builder — Shared Multi-Arch Builder Image
+# Shared Multi-Arch Development Image
 # =============================================================================
 #
 # This image bundles every build time dependency required by the project and is
@@ -8,7 +8,7 @@
 # Rebuilds only when tool versions or system packages change.
 # Published to the github container registry as:
 #
-#   ghcr.io/varavelio/vdl-builder:sha-<short-commit>
+#   ghcr.io/varavelio/vdl-dev:sha-<short-commit>
 #
 # -----------------------------------------------------------------------------
 # Usage
@@ -16,7 +16,7 @@
 #
 # Refer to this image in downstream Dockerfiles:
 #
-#   FROM ghcr.io/varavelio/vdl-builder:sha-<tag> AS builder
+#   FROM ghcr.io/varavelio/vdl-dev:sha-<tag> AS builder
 #
 # After bumping tool versions in this file, push to main, the pipeline
 # publishes the new image automatically. You may then update the tag in

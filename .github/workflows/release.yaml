@@ -181,7 +181,7 @@ jobs:
           --tag varavel/vdl:${CLEAN_TAG}-${PLATFORM}
           --tag ghcr.io/varavelio/vdl:${CLEAN_TAG}-${PLATFORM}
           --build-arg VDL_VERSION=${CLEAN_TAG}
-          --file ./docker/Dockerfile .
+          --file ./integrations/installers/docker/Dockerfile .
 
       - name: Push the Docker images
         run: |
