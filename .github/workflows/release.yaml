@@ -76,7 +76,7 @@ jobs:
 
       - name: Publish to npm
         run: |
-          cd ./installers/npm
+          cd ./integrations/installers/npm
 
           echo "Publishing version: $TAG"
 
@@ -113,7 +113,7 @@ jobs:
           go-version: "1.25"
 
       - name: Generate Homebrew Formulas
-        run: go run -C ./installers/brew main.go $TAG
+        run: go run -C ./integrations/installers/brew main.go $TAG
 
       - name: Update Homebrew Tap
         env:
@@ -128,7 +128,7 @@ jobs:
 
           # Copy the generated Homebrew Formulas
           mkdir -p ./temp-tap/Formula
-          rsync -rv ./installers/brew/Formula/ ./temp-tap/Formula/
+          rsync -rv ./integrations/installers/brew/Formula/ ./temp-tap/Formula/
 
           # Commit and push
           cd ./temp-tap
