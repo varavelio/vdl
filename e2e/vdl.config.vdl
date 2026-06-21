@@ -1,0 +1,14 @@
+// Shared E2E generation config copied into each temporary test project.
+
+const config = {
+  version 1
+  cleanOutDir true
+  plugins [
+    {
+      src "./plugin.js"
+      schema "./input.vdl"
+      outDir "./gen"
+      generateHeader false
+    }
+  ]
+}
