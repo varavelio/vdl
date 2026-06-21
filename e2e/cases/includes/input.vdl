@@ -1,0 +1,14 @@
+include "./shared/account.vdl"
+include "./events/order_events.vdl"
+
+""" Main API schema. """
+type ApiEnvelope {
+  account Account
+  order OrderCreated
+  role AccountRole
+}
+
+const apiDefaults = {
+  role AccountRole.Owner
+  region defaultRegion
+}

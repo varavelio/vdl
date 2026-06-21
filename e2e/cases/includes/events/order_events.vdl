@@ -1,0 +1,6 @@
+include "../shared/account.vdl"
+
+type OrderCreated {
+  account Account
+  totalCents int
+}

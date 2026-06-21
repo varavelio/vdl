@@ -1,0 +1,12 @@
+include "./common.vdl"
+
+enum AccountRole {
+  Member = "member"
+  Owner = "owner"
+}
+
+type Account {
+  ...Entity
+  email string
+  region Region
+}

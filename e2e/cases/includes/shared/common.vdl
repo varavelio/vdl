@@ -1,0 +1,10 @@
+enum Region {
+  Europe = "eu"
+  America = "us"
+}
+
+const defaultRegion = Region.Europe
+
+type Entity {
+  id string
+}

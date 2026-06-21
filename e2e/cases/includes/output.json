@@ -1,0 +1,207 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "apiDefaults",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "role",
+            "value": {
+              "kind": "string",
+              "stringValue": "owner"
+            }
+          },
+          {
+            "key": "region",
+            "value": {
+              "kind": "string",
+              "stringValue": "eu"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "defaultRegion",
+      "value": {
+        "kind": "string",
+        "stringValue": "eu"
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Member",
+          "value": {
+            "kind": "string",
+            "stringValue": "member"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Owner",
+          "value": {
+            "kind": "string",
+            "stringValue": "owner"
+          }
+        }
+      ],
+      "name": "AccountRole"
+    },
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Europe",
+          "value": {
+            "kind": "string",
+            "stringValue": "eu"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "America",
+          "value": {
+            "kind": "string",
+            "stringValue": "us"
+          }
+        }
+      ],
+      "name": "Region"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [],
+      "name": "Account",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "email",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "region",
+            "optional": false,
+            "typeRef": {
+              "enumName": "Region",
+              "enumType": "string",
+              "kind": "enum"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "doc": "Main API schema.",
+      "name": "ApiEnvelope",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "account",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Account"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "order",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "OrderCreated"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "role",
+            "optional": false,
+            "typeRef": {
+              "enumName": "AccountRole",
+              "enumType": "string",
+              "kind": "enum"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Entity",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "OrderCreated",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "account",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Account"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "totalCents",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
