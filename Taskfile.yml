@@ -87,13 +87,6 @@ tasks:
     dir: ./toolchain
     cmd: go install ./cmd/vdl/.
 
-  tc:build:wasm:
-    desc: "Toolchain: Build WASM binary and copy wasm_exec.js"
-    dir: ./toolchain
-    cmds:
-      - GOOS=js GOARCH=wasm go build -o ./dist/vdl.wasm ./cmd/vdlwasm/.
-      - cp "/usr/local/go/lib/wasm/wasm_exec.js" ./dist/wasm_exec.js
-
   ################
   # SYNTAX TASKS #
   ################

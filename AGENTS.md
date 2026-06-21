@@ -129,7 +129,3 @@ When updating this document, do so with the context of the entire document in mi
 - **Syntax grammar**: `task tml:test`
 - **VS Code extension**: `task vs:build`, `task vs:test:grammar`, `task vs:package`, `task vs:package:ls`
 - **Release pipeline**: `task release`
-
-### Current Caveats
-
-- `task tc:build:wasm` exists in `Taskfile.yml`, but the corresponding `toolchain/cmd/vdlwasm` entrypoint is currently absent.
