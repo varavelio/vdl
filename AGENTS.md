@@ -2,7 +2,7 @@
 
 ## Summary
 
-VDL (Varavel Definition Language) is a monorepo centered on a Go toolchain (`toolchain/`) that provides the CLI, parser, analyzer, formatter, and LSP for `.vdl` schemas. The repository also contains docs, editor integrations, and installers.
+VDL (Varavel Definition Language) is a monorepo centered on a Go toolchain (`toolchain/`) that provides the CLI, parser, analyzer, formatter, and LSP for `.vdl` schemas. The repository also contains docs and external integrations for editors, syntax grammars, and distribution installers.
 
 ## Maintaining this Document
 
@@ -18,8 +18,7 @@ When updating this document, do so with the context of the entire document in mi
 - `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
 - `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `plugin_input.vdl`, `plugin_output.vdl`).
 - `docs/`: Zola documentation site using the vendored VaraPress theme.
-- `editors/`: Editor integrations (`vscode/`, `neovim/`).
-- `installers/`: Distribution installers (`brew/`, `npm/`, `unix/`, `windows/`).
+- `integrations/`: External integrations grouped by purpose (`editors/`, `syntax/`, `installers/`).
 - `scripts/`: Release automation (`scripts/release/main.go`).
 - `assets/`: Branding/static assets used by docs and packaging.
 - `.github/workflows/`: CI, docs deployment, and release workflows.
@@ -58,7 +57,6 @@ When updating this document, do so with the context of the entire document in mi
   - `zola.toml`: Zola site configuration and VaraPress theme options.
   - `content/_index.md`: Home landing page composed with VaraPress landing shortcodes.
   - `content/docs/_index.md`: Docs root section; uses `template = "docs.html"` and `sort_by = "weight"`.
-  - `content/docs/essentials/_index.md`: First docs subsection for project orientation; child pages are ordered by `weight`.
   - `content/docs/about.md`: Project overview and positioning.
   - `content/docs/language/_index.md`: Language guide section index; child pages are ordered by `weight`.
   - `content/docs/guides/_index.md`: Practical guides section index; child pages are ordered by `weight`.
@@ -70,16 +68,17 @@ When updating this document, do so with the context of the entire document in mi
   - Use clean Zola paths such as `/docs/guides/installation/` for internal links instead of old `.md` links.
   - Compose the landing page with VaraPress shortcodes; use each shortcode's own `container` parameter rather than wrapping standard landing sections.
 
-### `editors/` (IDE Integrations)
+### `integrations/` (External Integrations)
 
-- `editors/vscode/`: VS Code extension (`src/extension.js` is runtime entry).
-- `editors/neovim/`: Neovim integration instructions.
-
-### `installers/` (Distribution)
-
-- `installers/brew/`: Formula generator for Homebrew tap updates.
-- `installers/npm/`: npm package wrapper/installer for `vdl`.
-- `installers/unix/`, `installers/windows/`: shell and PowerShell installers.
+- **Role**: Contains adapters and packaging that connect VDL to external editors, syntax tooling, package managers, and distribution platforms.
+- **Key directories**:
+  - `integrations/editors/vscode/`: VS Code extension (`src/extension.js` is runtime entry). The packaged grammar file under `language/vdl.tmLanguage.json` is generated from the shared TextMate grammar before VS Code builds and packaging.
+  - `integrations/editors/neovim/`: Neovim integration instructions.
+  - `integrations/syntax/textmate/`: Source-of-truth VDL TextMate grammar (`vdl.tmLanguage.json`) and grammar fixtures, tested with `vscode-tmgrammar-test` through the root Taskfile.
+  - `integrations/installers/brew/`: Formula generator for Homebrew tap updates.
+  - `integrations/installers/npm/`: npm package wrapper/installer for `vdl`.
+  - `integrations/installers/unix/`, `integrations/installers/windows/`: shell and PowerShell installers.
+  - `integrations/installers/docker/`: Official Docker image definition used by release publishing.
 
 ## General Instructions (Constitution)
 
@@ -88,6 +87,7 @@ When updating this document, do so with the context of the entire document in mi
 - **VDL model alignment**: keep parser/analysis/lsp changes declaration-centric (`include`, docstrings, `type`, `enum`, `const`, annotations, spreads). Avoid legacy RPC/pattern/proc/stream assumptions.
 - **Constants are dynamic literals**: `const` declarations do not accept explicit type names.
 - **Plugin-first generation**: treat `schemas/plugin*.vdl` as the contract for generator integrations; prefer extending plugin flows rather than adding fixed built-in generators.
+- **Shared TextMate grammar**: edit `integrations/syntax/textmate/vdl.tmLanguage.json` as the canonical grammar source. Do not hand-edit the generated VS Code copy; run `task vs:sync:grammar` or a VS Code build/package task to refresh it.
 - **Command policy**: prefer root Taskfile tasks; use direct subproject commands only when a focused Taskfile task does not exist.
 - **Formatting/linting split**: Go uses `go fmt` + `vdl format`; JS/TS/Astro/Svelte use Biome; JSON/YAML/Markdown/CSS/HTML-like formats use dprint.
 
@@ -97,7 +97,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Codegen plugin runtime tests**: `toolchain/internal/codegen/testdata/run_plugin/cases/` uses folder-driven fixtures (`index.js` + `expected.json`) so new plugin execution scenarios can be added without test harness changes.
 - **Formatter quality**: relies on golden-style fixtures in `toolchain/internal/formatter/tests/`.
 - **LSP quality**: behavior tests live in `toolchain/internal/lsp/*_test.go` and should stay aligned with the current declaration-centric AST/program model.
-- **VS Code grammar quality**: TextMate grammar fixtures live in `editors/vscode/test/grammar/` and run through `task vs:test:grammar` using `vscode-tmgrammar-test`.
+- **TextMate grammar quality**: TextMate grammar fixtures live in `integrations/syntax/textmate/test/` and run through `task syntax:test:textmate` using `vscode-tmgrammar-test`. `task vs:test:grammar` is an alias for the shared grammar test.
 - **IR golden stability**: IR golden JSON fixtures under `toolchain/internal/core/ir/testdata/*.json` intentionally omit `position`; `toolchain/internal/core/ir/ir_test.go` normalizes generated output via `toolchain/internal/util/testutil/ir.go` (`StripPositionsFromJSON` / `IRJSONEqualNoPos`).
 - **E2E note**: `toolchain/tests/` no longer contains the old multi-language E2E harness; do not assume legacy `testdata`-driven E2E structure exists.
 - **Verification commands**:
@@ -109,7 +109,8 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Go**: 1.26 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
 - **Docs**: Zola site in `docs/` using VaraPress; content is Markdown with TOML frontmatter and is formatted with dprint.
-- **Editor extension**: VS Code extension in Node/JS with `vscode-languageclient`.
+- **Editor extension**: VS Code extension in `integrations/editors/vscode/` with Node/JS and `vscode-languageclient`.
+- **Syntax grammar**: Shared TextMate grammar package in `integrations/syntax/textmate/`, consumed by docs highlighting and copied into the VS Code extension during build/package tasks.
 - **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools.
 - **Code style goals**:
   - Idiomatic Go with clear, small functions and explicit error handling.
@@ -125,6 +126,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Dependencies**: `task deps`
 - **Codegen workflow**: `task codegen`
 - **Install local CLI**: `task tc:install`
+- **Syntax grammar**: `task syntax:test:textmate`, `task vs:sync:grammar`
 - **VS Code extension**: `task vs:dev`, `task vs:build`, `task vs:test:grammar`, `task vs:package`, `task vs:package:ls`
 - **Release pipeline**: `task release`
 

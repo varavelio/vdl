@@ -9,5 +9,8 @@ temp/
 # Test files
 schema.vdl
 
+# Generated from integrations/syntax/textmate
+language/vdl.tmLanguage.json
+
 # VS Code
 *.vsix

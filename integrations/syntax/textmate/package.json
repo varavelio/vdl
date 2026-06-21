@@ -1,0 +1,35 @@
+{
+  "name": "@varavel/vdl-textmate-grammar",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TextMate grammar and grammar fixtures for VDL.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varavelio/vdl.git",
+    "directory": "integrations/syntax/textmate"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "vdl",
+        "extensions": [
+          ".vdl"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "vdl",
+        "scopeName": "source.vdl",
+        "path": "./vdl.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "-": "Run commands using the root's Taskfile.yml file"
+  },
+  "devDependencies": {
+    "vscode-tmgrammar-test": "0.1.3"
+  }
+}

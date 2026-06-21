@@ -43,12 +43,12 @@ VDL's built-in LSP works with Neovim's native LSP client. The language server pr
 
 Syntax highlighting is not included through the LSP and may be added in a future release.
 
-The `vdl` binary must be installed and available on your `PATH`. For setup instructions, see the [Neovim integration README](https://github.com/varavelio/vdl/tree/main/editors/neovim).
+The `vdl` binary must be installed and available on your `PATH`. For setup instructions, see the [Neovim integration README](https://github.com/varavelio/vdl/tree/main/integrations/editors/neovim).
 
 ## Other Editors
 
 The `vdl lsp` command speaks the standard Language Server Protocol over stdin and stdout, so any editor with LSP support can integrate with it. Point your editor's LSP client to `vdl lsp` for `.vdl` files.
 
-VDL's LSP does not provide syntax highlighting on its own. Some editors require a separate TextMate grammar ([vdl.tmLanguage.json](https://github.com/varavelio/vdl/blob/main/editors/vscode/language/vdl.tmLanguage.json)) or Tree-sitter parser for highlighting. Syntax highlighting for editors beyond VSCode is planned for a future release.
+VDL's LSP does not provide syntax highlighting on its own. Some editors require a separate TextMate grammar ([vdl.tmLanguage.json](https://github.com/varavelio/vdl/blob/main/integrations/syntax/textmate/vdl.tmLanguage.json)) or Tree-sitter parser for highlighting. Syntax highlighting for editors beyond VSCode is planned for a future release.
 
 To get started, check your editor's documentation on configuring a [custom language server](https://microsoft.github.io/language-server-protocol/implementors/servers/).

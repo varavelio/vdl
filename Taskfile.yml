@@ -37,6 +37,8 @@ tasks:
     desc: "Install dependencies for all subprojects (Go, Node, etc)"
     cmds:
       - npm install
+      - cd ./integrations/editors/vscode && npm install
+      - cd ./integrations/syntax/textmate && npm install
       - cd ./toolchain && go mod download
 
   codegen:
@@ -58,6 +60,7 @@ tasks:
     cmds:
       - cd ./toolchain && go test ./...
       - cd ./toolchain && go test -race ./...
+      - task: syntax:test:textmate
 
   lint:
     desc: "Lint all code"
@@ -74,6 +77,15 @@ tasks:
   docs:
     desc: "Build documentation website"
     cmd: cd ./docs && node ./themes/varapress/llms.mjs
+
+  ################
+  # SYNTAX TASKS #
+  ################
+
+  syntax:test:textmate:
+    desc: "TextMate: Test shared VDL grammar"
+    dir: ./integrations/syntax/textmate
+    cmd: npx --no vscode-tmgrammar-test "test/**/*.vdl" --config package.json
 
   ###################
   # TOOLCHAIN TASKS #
@@ -97,6 +109,8 @@ tasks:
 
   vs:dev:
     desc: "VSCode: Build extension in watch mode"
+    deps:
+      - vs:sync:grammar
     dir: ./integrations/editors/vscode
     cmds:
       - rm -rf ./dist
@@ -104,15 +118,23 @@ tasks:
 
   vs:build:
     desc: "VSCode: Build extension for production"
+    deps:
+      - vs:sync:grammar
     dir: ./integrations/editors/vscode
     cmds:
       - rm -rf ./dist
       - node esbuild.js --production
 
+  vs:sync:grammar:
+    desc: "VSCode: Copy shared TextMate grammar"
+    cmds:
+      - mkdir -p ./integrations/editors/vscode/language
+      - cp ./integrations/syntax/textmate/vdl.tmLanguage.json ./integrations/editors/vscode/language/vdl.tmLanguage.json
+
   vs:test:grammar:
-    desc: "VSCode: Test TextMate grammar"
-    dir: ./integrations/editors/vscode
-    cmd: npx --no vscode-tmgrammar-test "test/grammar/**/*.vdl" --config package.json
+    desc: "VSCode: Test shared TextMate grammar"
+    cmds:
+      - task: syntax:test:textmate
 
   vs:package:
     desc: "VSCode: Package extension into .vsix"
