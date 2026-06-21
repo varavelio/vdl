@@ -105,7 +105,7 @@ tasks:
     dir: ./integrations/editors/vscode
     cmds:
       - mkdir -p ./integrations/editors/vscode/language
-      - cp ./integrations/syntax/textmate/vdl.tmLanguage.json ./integrations/editors/vscode/language/vdl.tmLanguage.json
+      - cp ../../syntax/textmate/vdl.tmLanguage.json ./language/vdl.tmLanguage.json
       - rm -rf ./dist
       - node esbuild.js --production
 
