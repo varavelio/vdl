@@ -1,0 +1,35 @@
+// Comments are ignored but should be accepted throughout schemas.
+type UserId string
+type EmailAddress string
+type Tags string[]
+type Metadata map[string]
+
+enum AccountStatus {
+  Active
+  Disabled = "disabled"
+}
+
+type EmptyObject {}
+
+type Address {
+  line1 string
+  line2? string
+  city string
+  country string
+}
+
+type UserProfile {
+  id UserId
+  email EmailAddress
+  displayName? string
+  tags? Tags
+  metadata Metadata
+  status AccountStatus
+  createdAt datetime
+  active bool
+}
+
+type TreeNode {
+  id string
+  children? TreeNode[]
+}

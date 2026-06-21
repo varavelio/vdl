@@ -1,0 +1,237 @@
+{
+  "constants": [],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Active",
+          "value": {
+            "kind": "string",
+            "stringValue": "Active"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Disabled",
+          "value": {
+            "kind": "string",
+            "stringValue": "disabled"
+          }
+        }
+      ],
+      "name": "AccountStatus"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [],
+      "name": "Address",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "line1",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "line2",
+            "optional": true,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "city",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "country",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "EmailAddress",
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "EmptyObject",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": []
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Metadata",
+      "typeRef": {
+        "kind": "map",
+        "mapType": {
+          "kind": "primitive",
+          "primitiveName": "string"
+        }
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Tags",
+      "typeRef": {
+        "arrayDims": 1,
+        "arrayType": {
+          "kind": "primitive",
+          "primitiveName": "string"
+        },
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "TreeNode",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "children",
+            "optional": true,
+            "typeRef": {
+              "arrayDims": 1,
+              "arrayType": {
+                "kind": "type",
+                "typeName": "TreeNode"
+              },
+              "kind": "array"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "UserId",
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "string"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "UserProfile",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "UserId"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "email",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "EmailAddress"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "displayName",
+            "optional": true,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "tags",
+            "optional": true,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Tags"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "metadata",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Metadata"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "status",
+            "optional": false,
+            "typeRef": {
+              "enumName": "AccountStatus",
+              "enumType": "string",
+              "kind": "enum"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "createdAt",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "active",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "bool"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
