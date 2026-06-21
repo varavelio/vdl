@@ -9,23 +9,6 @@
     "url": "https://github.com/varavelio/vdl.git",
     "directory": "integrations/syntax/textmate"
   },
-  "contributes": {
-    "languages": [
-      {
-        "id": "vdl",
-        "extensions": [
-          ".vdl"
-        ]
-      }
-    ],
-    "grammars": [
-      {
-        "language": "vdl",
-        "scopeName": "source.vdl",
-        "path": "./vdl.tmLanguage.json"
-      }
-    ]
-  },
   "scripts": {
     "-": "Run commands using the root's Taskfile.yml file"
   },
