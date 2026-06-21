@@ -87,7 +87,7 @@ When updating this document, do so with the context of the entire document in mi
 - **VDL model alignment**: keep parser/analysis/lsp changes declaration-centric (`include`, docstrings, `type`, `enum`, `const`, annotations, spreads). Avoid legacy RPC/pattern/proc/stream assumptions.
 - **Constants are dynamic literals**: `const` declarations do not accept explicit type names.
 - **Plugin-first generation**: treat `schemas/plugin*.vdl` as the contract for generator integrations; prefer extending plugin flows rather than adding fixed built-in generators.
-- **Shared TextMate grammar**: edit `integrations/syntax/textmate/vdl.tmLanguage.json` as the canonical grammar source. Do not hand-edit the generated VS Code copy; run `task vs:sync:grammar` or a VS Code build/package task to refresh it.
+- **Shared TextMate grammar**: edit `integrations/syntax/textmate/vdl.tmLanguage.json` as the canonical grammar source. Do not hand-edit the generated VS Code copy; the `task vs:build` automatically copies it.
 - **Command policy**: prefer root Taskfile tasks; use direct subproject commands only when a focused Taskfile task does not exist.
 - **Formatting/linting split**: Go uses `go fmt` + `vdl format`; JS/TS/Astro/Svelte use Biome; JSON/YAML/Markdown/CSS/HTML-like formats use dprint.
 
@@ -97,7 +97,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Codegen plugin runtime tests**: `toolchain/internal/codegen/testdata/run_plugin/cases/` uses folder-driven fixtures (`index.js` + `expected.json`) so new plugin execution scenarios can be added without test harness changes.
 - **Formatter quality**: relies on golden-style fixtures in `toolchain/internal/formatter/tests/`.
 - **LSP quality**: behavior tests live in `toolchain/internal/lsp/*_test.go` and should stay aligned with the current declaration-centric AST/program model.
-- **TextMate grammar quality**: TextMate grammar fixtures live in `integrations/syntax/textmate/test/` and run through `task syntax:test:textmate` using `vscode-tmgrammar-test`. `task vs:test:grammar` is an alias for the shared grammar test.
+- **TextMate grammar quality**: TextMate grammar fixtures live in `integrations/syntax/textmate/test/` and run through `task tml:test` using `vscode-tmgrammar-test`. `task vs:test:grammar` is an alias for the shared grammar test.
 - **IR golden stability**: IR golden JSON fixtures under `toolchain/internal/core/ir/testdata/*.json` intentionally omit `position`; `toolchain/internal/core/ir/ir_test.go` normalizes generated output via `toolchain/internal/util/testutil/ir.go` (`StripPositionsFromJSON` / `IRJSONEqualNoPos`).
 - **E2E note**: `toolchain/tests/` no longer contains the old multi-language E2E harness; do not assume legacy `testdata`-driven E2E structure exists.
 - **Verification commands**:
@@ -119,15 +119,15 @@ When updating this document, do so with the context of the entire document in mi
 
 ## Operational Commands
 
-- **Discover commands**: `task --list-all`
+- **Discover commands**: `task --list-all` (always execute this)
 - **Core verification**: `task test`, `task lint`, `task format`
 - **Build**: `task build`
 - **Docs build**: `task docs`
 - **Dependencies**: `task deps`
 - **Codegen workflow**: `task codegen`
 - **Install local CLI**: `task tc:install`
-- **Syntax grammar**: `task syntax:test:textmate`, `task vs:sync:grammar`
-- **VS Code extension**: `task vs:dev`, `task vs:build`, `task vs:test:grammar`, `task vs:package`, `task vs:package:ls`
+- **Syntax grammar**: `task tml:test`
+- **VS Code extension**: `task vs:build`, `task vs:test:grammar`, `task vs:package`, `task vs:package:ls`
 - **Release pipeline**: `task release`
 
 ### Current Caveats

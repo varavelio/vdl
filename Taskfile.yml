@@ -60,7 +60,7 @@ tasks:
     cmds:
       - cd ./toolchain && go test ./...
       - cd ./toolchain && go test -race ./...
-      - task: syntax:test:textmate
+      - task: tml:test
 
   lint:
     desc: "Lint all code"
@@ -78,15 +78,6 @@ tasks:
     desc: "Build documentation website"
     cmd: cd ./docs && node ./themes/varapress/llms.mjs
 
-  ################
-  # SYNTAX TASKS #
-  ################
-
-  syntax:test:textmate:
-    desc: "TextMate: Test shared VDL grammar"
-    dir: ./integrations/syntax/textmate
-    cmd: npx --no vscode-tmgrammar-test "test/**/*.vdl" --config package.json
-
   ###################
   # TOOLCHAIN TASKS #
   ###################
@@ -103,38 +94,27 @@ tasks:
       - GOOS=js GOARCH=wasm go build -o ./dist/vdl.wasm ./cmd/vdlwasm/.
       - cp "/usr/local/go/lib/wasm/wasm_exec.js" ./dist/wasm_exec.js
 
+  ################
+  # SYNTAX TASKS #
+  ################
+
+  tml:test:
+    desc: "TextMate: Test shared VDL grammar"
+    dir: ./integrations/syntax/textmate
+    cmd: npx --no vscode-tmgrammar-test "test/**/*.vdl" --config package.json
+
   ##########################
   # VSCODE EXTENSION TASKS #
   ##########################
 
-  vs:dev:
-    desc: "VSCode: Build extension in watch mode"
-    deps:
-      - vs:sync:grammar
-    dir: ./integrations/editors/vscode
-    cmds:
-      - rm -rf ./dist
-      - node esbuild.js --watch
-
   vs:build:
     desc: "VSCode: Build extension for production"
-    deps:
-      - vs:sync:grammar
     dir: ./integrations/editors/vscode
-    cmds:
-      - rm -rf ./dist
-      - node esbuild.js --production
-
-  vs:sync:grammar:
-    desc: "VSCode: Copy shared TextMate grammar"
     cmds:
       - mkdir -p ./integrations/editors/vscode/language
       - cp ./integrations/syntax/textmate/vdl.tmLanguage.json ./integrations/editors/vscode/language/vdl.tmLanguage.json
-
-  vs:test:grammar:
-    desc: "VSCode: Test shared TextMate grammar"
-    cmds:
-      - task: syntax:test:textmate
+      - rm -rf ./dist
+      - node esbuild.js --production
 
   vs:package:
     desc: "VSCode: Package extension into .vsix"
