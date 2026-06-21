@@ -17,6 +17,7 @@ When updating this document, do so with the context of the entire document in mi
 - `Taskfile.yml`: Central command orchestration for CI, test, lint, format, release, codegen, build, and VS Code extension tasks.
 - `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
 - `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `plugin_input.vdl`, `plugin_output.vdl`).
+- `e2e/`: End-to-end golden tests that build the real `vdl` binary, run `vdl generate` with a small JS IR-dump plugin, and compare generated plugin IR against `output.json` fixtures.
 - `docs/`: Zola documentation site using the vendored VaraPress theme.
 - `integrations/`: External integrations grouped by purpose (`editors/`, `syntax/`, `installers/`).
 - `scripts/`: Release automation (`scripts/release/main.go`).
@@ -99,11 +100,13 @@ When updating this document, do so with the context of the entire document in mi
 - **LSP quality**: behavior tests live in `toolchain/internal/lsp/*_test.go` and should stay aligned with the current declaration-centric AST/program model.
 - **TextMate grammar quality**: TextMate grammar fixtures live in `integrations/syntax/textmate/test/` and run through `task tml:test` using `vscode-tmgrammar-test`. `task vs:test:grammar` is an alias for the shared grammar test.
 - **IR golden stability**: IR golden JSON fixtures under `toolchain/internal/core/ir/testdata/*.json` intentionally omit `position`; `toolchain/internal/core/ir/ir_test.go` normalizes generated output via `toolchain/internal/util/testutil/ir.go` (`StripPositionsFromJSON` / `IRJSONEqualNoPos`).
+- **E2E IR contract tests**: Root `e2e/cases/*` fixtures use one folder per case. Each case has `input.vdl` and `output.json`, with optional extra files for includes or external docs. The shared fixtures `e2e/vdl.config.vdl` and `e2e/plugin.js` are copied into a temporary project to exercise `vdl generate`, JS plugin execution, and plugin-facing IR output. Positions and absolute entry paths are normalized for stable goldens.
 - **E2E note**: `toolchain/tests/` no longer contains the old multi-language E2E harness; do not assume legacy `testdata`-driven E2E structure exists.
 - **Verification commands**:
-  - `task test`
-  - `task lint`
-  - `task format`
+- `task ci` (runs all verifications)
+- `task test`
+- `task lint`
+- `task format`
 
 ## Tech Stack & Conventions
 
@@ -121,6 +124,7 @@ When updating this document, do so with the context of the entire document in mi
 
 - **Discover commands**: `task --list-all` (always execute this)
 - **Core verification**: `task test`, `task lint`, `task format`
+- **E2E IR golden tests**: `task test:e2e`
 - **Build**: `task build`
 - **Docs build**: `task docs`
 - **Dependencies**: `task deps`
