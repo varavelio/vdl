@@ -104,7 +104,6 @@ tasks:
     desc: "VSCode: Build extension for production"
     dir: ./integrations/editors/vscode
     cmds:
-      - mkdir -p ./integrations/editors/vscode/language
       - cp ../../syntax/textmate/vdl.tmLanguage.json ./language/vdl.tmLanguage.json
       - rm -rf ./dist
       - node esbuild.js --production
