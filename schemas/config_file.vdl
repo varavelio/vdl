@@ -44,7 +44,7 @@ type VdlConfigRemote {
   """
   The host URL of the remote repository or server without http(s):// prefix
   e.g. "github.com", "github.com/owner/repo", "example.com" or "example.com/plugins".
-  
+
   If a plugin match multiple remotes, the most specific match will be used
   e.g. if a plugin is from "github.com/owner/repo/dist/index.js", the remote with
   host "github.com/owner/repo" will be used instead of the remote with host "github.com".
@@ -119,7 +119,7 @@ type VdlConfigRemoteAuthBasic {
 type VdlConfigPlugin {
   """
   The source of the plugin, it can be:
-  
+
   - A GitHub repo in the format "owner/repo@ref" containing a plugin file at ./dist/index.js.
     The ref MUST be a tag (release version) or a full commit hash (branches are highly discouraged
     to prevent lockfile conflicts).
@@ -143,7 +143,7 @@ type VdlConfigPlugin {
 
   """
   Whether to generate header comments in the generated files. Default is true.
-  
+
   If true, VDL will add a header comment to each generated file indicating that it was generated
   by VDL and should not be edited manually, along with the VDL and plugin version information
   for auditing purposes.

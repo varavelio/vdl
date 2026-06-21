@@ -51,7 +51,7 @@ tasks:
     desc: "Format all code"
     cmds:
       - cd ./toolchain && golangci-lint fmt ./...
-      - cd ./toolchain && go run ./cmd/vdl/. format
+      - cd ./toolchain && go run ./cmd/vdl/. format ../
       - npx --no biome format --write --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
       - npx --no dprint fmt --config ./dprint.json --log-level warn
 

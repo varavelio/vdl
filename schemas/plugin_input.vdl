@@ -13,7 +13,7 @@ type PluginInput {
 
   """
   The complete VDL Intermediate Representation.
-  
+
   Contains all types, enums, constants, and documentation from the compiled
   schema, fully resolved and ready for code generation.
   """
@@ -21,7 +21,7 @@ type PluginInput {
 
   """
   Arbitrary key-value options passed from the `vdl.config.vdl` plugin configuration.
-  
+
   These allow users to customize plugin behavior without modifying the plugin
   itself. Common use cases include specifying target frameworks, API versions,
   naming conventions, or feature flags.
