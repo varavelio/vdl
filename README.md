@@ -56,7 +56,7 @@ Select the method that best fits your workflow.
 | **Any**           | Docker       | `docker run --rm varavel/vdl`                                  |
 | **Any**           | Manual       | [Download binaries](https://github.com/varavelio/vdl/releases) |
 
-For version pinning, prereleases, npm usage, and manual installs, see the [complete installation guide](https://vdl.varavel.com/guides/installation/).
+For version pinning, prereleases, npm usage, and manual installs, see the [complete installation guide](https://vdl.varavel.com/installation).
 
 ## What is VDL?
 
