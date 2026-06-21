@@ -1,0 +1,48 @@
+type AuditFields {
+  createdAt datetime
+  updatedAt datetime
+}
+
+type SoftDeleteFields {
+  deletedAt? datetime
+}
+
+type Article {
+  ...AuditFields
+  ...SoftDeleteFields
+  id string
+  title string
+}
+
+type Money {
+  amount int
+  currency string
+}
+
+type Order {
+  id string
+  payment {
+    ...Money
+    provider string
+  }
+}
+
+enum StandardPermission {
+  Read = "read"
+  Write = "write"
+}
+
+enum AdminPermission {
+  ...StandardPermission
+  Delete = "delete"
+}
+
+const baseHeaders = {
+  accept "application/json"
+  userAgent "vdl-test"
+}
+
+const requestHeaders = {
+  ...baseHeaders
+  authorization "example-auth-header"
+}

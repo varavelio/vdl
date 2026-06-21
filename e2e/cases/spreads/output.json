@@ -1,0 +1,298 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "baseHeaders",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "accept",
+            "value": {
+              "kind": "string",
+              "stringValue": "application/json"
+            }
+          },
+          {
+            "key": "userAgent",
+            "value": {
+              "kind": "string",
+              "stringValue": "vdl-test"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "requestHeaders",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "accept",
+            "value": {
+              "kind": "string",
+              "stringValue": "application/json"
+            }
+          },
+          {
+            "key": "userAgent",
+            "value": {
+              "kind": "string",
+              "stringValue": "vdl-test"
+            }
+          },
+          {
+            "key": "authorization",
+            "value": {
+              "kind": "string",
+              "stringValue": "example-auth-header"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Read",
+          "value": {
+            "kind": "string",
+            "stringValue": "read"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Write",
+          "value": {
+            "kind": "string",
+            "stringValue": "write"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Delete",
+          "value": {
+            "kind": "string",
+            "stringValue": "delete"
+          }
+        }
+      ],
+      "name": "AdminPermission"
+    },
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Read",
+          "value": {
+            "kind": "string",
+            "stringValue": "read"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Write",
+          "value": {
+            "kind": "string",
+            "stringValue": "write"
+          }
+        }
+      ],
+      "name": "StandardPermission"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [],
+      "name": "Article",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "createdAt",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "updatedAt",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "deletedAt",
+            "optional": true,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "title",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "AuditFields",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "createdAt",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "updatedAt",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Money",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "amount",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "currency",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Order",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "payment",
+            "optional": false,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "amount",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "currency",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "provider",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "SoftDeleteFields",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "deletedAt",
+            "optional": true,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "datetime"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
