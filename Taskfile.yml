@@ -100,7 +100,7 @@ tasks:
   tml:test:
     desc: "TextMate: Test shared VDL grammar"
     dir: ./integrations/syntax/textmate
-    cmd: npx --no vscode-tmgrammar-test "test/**/*.vdl" --config package.json
+    cmd: npx --no vscode-tmgrammar-test "test/**/*.vdlt" --config package.json
 
   ##########################
   # VSCODE EXTENSION TASKS #
