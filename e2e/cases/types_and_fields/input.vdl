@@ -36,6 +36,7 @@ type UserProfile {
   tags? Tags
   metadata Metadata
   status AccountStatus
+  secondaryStatus? AccountStatus
   statusAlias AccountStatusAlias
   previousStatuses AccountStatus[]
   statusByExternalId map[AccountStatus]

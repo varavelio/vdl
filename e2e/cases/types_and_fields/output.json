@@ -303,6 +303,16 @@
           },
           {
             "annotations": [],
+            "name": "secondaryStatus",
+            "optional": true,
+            "typeRef": {
+              "enumName": "AccountStatus",
+              "enumType": "string",
+              "kind": "enum"
+            }
+          },
+          {
+            "annotations": [],
             "name": "statusAlias",
             "optional": false,
             "typeRef": {
