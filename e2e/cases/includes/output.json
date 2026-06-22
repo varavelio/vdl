@@ -85,6 +85,7 @@
   "types": [
     {
       "annotations": [],
+      "doc": "# Included Account\n\nDocumentation loaded from an included schema file.",
       "name": "Account",
       "typeRef": {
         "kind": "object",

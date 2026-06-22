@@ -5,6 +5,7 @@ enum AccountRole {
   Owner = "owner"
 }
 
+""" ../docs/account.md """
 type Account {
   ...Entity
   email string
