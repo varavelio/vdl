@@ -29,11 +29,11 @@ Cases may include extra files when needed, such as included `.vdl` files or exte
 The case suite is intended to cover the documented valid language surface and the full generator-facing IR shape:
 
 - declarations: `type`, `enum`, `const`, includes, and standalone docs
-- type refs: primitives, aliases, custom types, enums, arrays, multidimensional arrays, maps, nested maps, inline objects, optional fields, and recursive optional references
-- spreads: object type spreads, inline object spreads, enum spreads, and object literal spreads
-- literals: strings, ints, floats, booleans, arrays, objects, empty arrays, empty objects, constant references, enum member references, and deeply nested literals
-- annotations: declaration, field, enum member, argument-less, scalar arguments, array arguments, object arguments, constant references, and enum references
-- docs: attached docstrings, standalone docstrings, external Markdown docs from entrypoint files, and external Markdown docs from included files
+- type refs: primitives, aliases, aliases to custom types, aliases to enums, custom types, enums, arrays, multidimensional arrays, maps, nested maps, enum maps, inline objects, optional fields, optional nested inline objects, and recursive optional references through direct and container fields
+- spreads: object type spreads, interleaved object type spreads, transitive object type spreads, inline object spreads, enum spreads, integer enum spreads, transitive enum spreads, object literal spreads, and nested object literal spreads
+- literals: strings, ints, floats, booleans, arrays, arrays of objects, objects, empty arrays, empty objects, multi-hop constant references, enum member references, and deeply nested literals
+- annotations: declaration, field, enum member, argument-less, scalar arguments, numeric arguments, array arguments, object arguments, object-spread arguments, constant references, enum references, and domain annotations such as `@rpc`, `@proc`, `@stream`, `@event`, and `@deprecated`
+- docs: attached docstrings, standalone docstrings, multiple standalone docs, external Markdown docs from entrypoint files, external Markdown docs from included files, and external docs attached to type, enum, const, and enum member declarations
 - parser edge cases: line comments, block comments, inline comments, compact whitespace, deep nesting, and deterministic top-level ordering
 
 ## Stable Goldens
