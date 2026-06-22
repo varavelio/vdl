@@ -1,0 +1,39 @@
+type Money {
+  amount int
+  currency string
+}
+
+type CollectionExample {
+  names string[]
+  scores int[]
+  matrix float[][]
+  labelsByGroup map[string[]]
+  matrixByName map[float[][]]
+  moneyById map[Money]
+}
+
+type CheckoutSession {
+  id string
+
+  payment {
+    ...Money
+    provider string
+    metadata? map[string]
+  }
+
+  shipping? {
+    address {
+      line1 string
+      city string
+    }
+  }
+}
+
+type OptionalComplex {
+  optMatrix? int[][]
+  optMapMap? map[map[string]]
+  optObject? {
+    innerOpt? string
+    innerReq int
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "constants": [],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [],
+  "types": [
+    {
+      "annotations": [],
+      "name": "CheckoutSession",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "payment",
+            "optional": false,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "amount",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "currency",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "provider",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "metadata",
+                  "optional": true,
+                  "typeRef": {
+                    "kind": "map",
+                    "mapType": {
+                      "kind": "primitive",
+                      "primitiveName": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "annotations": [],
+            "name": "shipping",
+            "optional": true,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "address",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "object",
+                    "objectFields": [
+                      {
+                        "annotations": [],
+                        "name": "line1",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "string"
+                        }
+                      },
+                      {
+                        "annotations": [],
+                        "name": "city",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "string"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "CollectionExample",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "names",
+            "optional": false,
+            "typeRef": {
+              "arrayDims": 1,
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "string"
+              },
+              "kind": "array"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "scores",
+            "optional": false,
+            "typeRef": {
+              "arrayDims": 1,
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "int"
+              },
+              "kind": "array"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "matrix",
+            "optional": false,
+            "typeRef": {
+              "arrayDims": 2,
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "float"
+              },
+              "kind": "array"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "labelsByGroup",
+            "optional": false,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "arrayDims": 1,
+                "arrayType": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                },
+                "kind": "array"
+              }
+            }
+          },
+          {
+            "annotations": [],
+            "name": "matrixByName",
+            "optional": false,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "arrayDims": 2,
+                "arrayType": {
+                  "kind": "primitive",
+                  "primitiveName": "float"
+                },
+                "kind": "array"
+              }
+            }
+          },
+          {
+            "annotations": [],
+            "name": "moneyById",
+            "optional": false,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "type",
+                "typeName": "Money"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Money",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "amount",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "currency",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "OptionalComplex",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "optMatrix",
+            "optional": true,
+            "typeRef": {
+              "arrayDims": 2,
+              "arrayType": {
+                "kind": "primitive",
+                "primitiveName": "int"
+              },
+              "kind": "array"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "optMapMap",
+            "optional": true,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "map",
+                "mapType": {
+                  "kind": "primitive",
+                  "primitiveName": "string"
+                }
+              }
+            }
+          },
+          {
+            "annotations": [],
+            "name": "optObject",
+            "optional": true,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "innerOpt",
+                  "optional": true,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "innerReq",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "int"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
