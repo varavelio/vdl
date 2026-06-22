@@ -1,0 +1,37 @@
+""" ./docs/overview.md """
+
+const ownerName = "platform"
+const publicTags = ["public" "stable"]
+
+enum LifecycleState {
+  Active = "active"
+
+  """ Legacy lifecycle state kept for compatibility. """
+  @deprecated("Use Active instead.")
+  Legacy = "legacy"
+}
+
+""" ./docs/account.md """
+@entity
+@meta({
+  owner ownerName
+  tags publicTags
+  state LifecycleState.Active
+})
+type Account {
+  """ Stable account identifier. """
+  @id
+  id string
+
+  """
+  Human-readable account name.
+  """
+  @deprecated("Use displayName instead.")
+  name? string
+
+  displayName string
+}
+
+""" Current schema version. """
+@config
+const schemaVersion = "1.0.0"

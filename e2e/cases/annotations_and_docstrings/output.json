@@ -1,0 +1,177 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "ownerName",
+      "value": {
+        "kind": "string",
+        "stringValue": "platform"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "publicTags",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "string",
+            "stringValue": "public"
+          },
+          {
+            "kind": "string",
+            "stringValue": "stable"
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [
+        {
+          "name": "config"
+        }
+      ],
+      "doc": "Current schema version.",
+      "name": "schemaVersion",
+      "value": {
+        "kind": "string",
+        "stringValue": "1.0.0"
+      }
+    }
+  ],
+  "docs": [
+    {
+      "content": "# Account Schema\n\nShared account contracts used by the platform."
+    }
+  ],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Active",
+          "value": {
+            "kind": "string",
+            "stringValue": "active"
+          }
+        },
+        {
+          "annotations": [
+            {
+              "argument": {
+                "kind": "string",
+                "stringValue": "Use Active instead."
+              },
+              "name": "deprecated"
+            }
+          ],
+          "doc": "Legacy lifecycle state kept for compatibility.",
+          "name": "Legacy",
+          "value": {
+            "kind": "string",
+            "stringValue": "legacy"
+          }
+        }
+      ],
+      "name": "LifecycleState"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [
+        {
+          "name": "entity"
+        },
+        {
+          "argument": {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "owner",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "platform"
+                }
+              },
+              {
+                "key": "tags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "public"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "stable"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              },
+              {
+                "key": "state",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "active"
+                }
+              }
+            ]
+          },
+          "name": "meta"
+        }
+      ],
+      "doc": "# Account\n\nRepresents a customer account.",
+      "name": "Account",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [
+              {
+                "name": "id"
+              }
+            ],
+            "doc": "Stable account identifier.",
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [
+              {
+                "argument": {
+                  "kind": "string",
+                  "stringValue": "Use displayName instead."
+                },
+                "name": "deprecated"
+              }
+            ],
+            "doc": "Human-readable account name.",
+            "name": "name",
+            "optional": true,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "displayName",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
