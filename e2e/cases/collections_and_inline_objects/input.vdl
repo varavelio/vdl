@@ -32,6 +32,7 @@ type CheckoutSession {
 type OptionalComplex {
   optMatrix? int[][]
   optMapMap? map[map[string]]
+  emptyInline {}
   optObject? {
     innerOpt? string
     innerReq int

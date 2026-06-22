@@ -264,6 +264,15 @@
           },
           {
             "annotations": [],
+            "name": "emptyInline",
+            "optional": false,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": []
+            }
+          },
+          {
+            "annotations": [],
             "name": "optObject",
             "optional": true,
             "typeRef": {
