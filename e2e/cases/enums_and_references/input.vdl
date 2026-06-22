@@ -1,0 +1,42 @@
+enum BasicStatus {
+  Pending
+  Paid
+  Shipped
+}
+
+enum ProductStatus {
+  Draft = "draft"
+  Published = "published"
+  Archived = "archived"
+}
+
+enum Priority {
+  Low = 1
+  Medium = 2
+  High = 3
+}
+
+enum StandardRole {
+  Viewer = "viewer"
+  Editor = "editor"
+}
+
+""" Workspace-scoped role values. """
+@stable
+enum WorkspaceRole {
+  ...StandardRole
+
+  """ Full workspace owner. """
+  @internal(false)
+  Owner = "owner"
+}
+
+const defaultStatus = ProductStatus.Draft
+const defaultPriority = Priority.Medium
+
+type Product {
+  id string
+  status ProductStatus
+  priority Priority
+  roles WorkspaceRole[]
+}
