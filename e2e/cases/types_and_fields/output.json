@@ -30,6 +30,28 @@
   "types": [
     {
       "annotations": [],
+      "name": "AccountStatusAlias",
+      "typeRef": {
+        "enumName": "AccountStatus",
+        "enumType": "string",
+        "kind": "enum"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "AccountStatusMatrix",
+      "typeRef": {
+        "arrayDims": 2,
+        "arrayType": {
+          "enumName": "AccountStatus",
+          "enumType": "string",
+          "kind": "enum"
+        },
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
       "name": "Address",
       "typeRef": {
         "kind": "object",
@@ -75,6 +97,33 @@
     },
     {
       "annotations": [],
+      "name": "AddressBook",
+      "typeRef": {
+        "kind": "map",
+        "mapType": {
+          "arrayDims": 1,
+          "arrayType": {
+            "kind": "type",
+            "typeName": "Address"
+          },
+          "kind": "array"
+        }
+      }
+    },
+    {
+      "annotations": [],
+      "name": "AddressList",
+      "typeRef": {
+        "arrayDims": 1,
+        "arrayType": {
+          "kind": "type",
+          "typeName": "Address"
+        },
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
       "name": "EmailAddress",
       "typeRef": {
         "kind": "primitive",
@@ -91,6 +140,14 @@
     },
     {
       "annotations": [],
+      "name": "EnabledFlag",
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "bool"
+      }
+    },
+    {
+      "annotations": [],
       "name": "Metadata",
       "typeRef": {
         "kind": "map",
@@ -98,6 +155,30 @@
           "kind": "primitive",
           "primitiveName": "string"
         }
+      }
+    },
+    {
+      "annotations": [],
+      "name": "PostalAddress",
+      "typeRef": {
+        "kind": "type",
+        "typeName": "Address"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "RetryCount",
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "int"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Score",
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "float"
       }
     },
     {
@@ -110,6 +191,14 @@
           "primitiveName": "string"
         },
         "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Timestamp",
+      "typeRef": {
+        "kind": "primitive",
+        "primitiveName": "datetime"
       }
     },
     {
@@ -214,6 +303,42 @@
           },
           {
             "annotations": [],
+            "name": "statusAlias",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "AccountStatusAlias"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "previousStatuses",
+            "optional": false,
+            "typeRef": {
+              "arrayDims": 1,
+              "arrayType": {
+                "enumName": "AccountStatus",
+                "enumType": "string",
+                "kind": "enum"
+              },
+              "kind": "array"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "statusByExternalId",
+            "optional": false,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "enumName": "AccountStatus",
+                "enumType": "string",
+                "kind": "enum"
+              }
+            }
+          },
+          {
+            "annotations": [],
             "name": "createdAt",
             "optional": false,
             "typeRef": {
@@ -228,6 +353,42 @@
             "typeRef": {
               "kind": "primitive",
               "primitiveName": "bool"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "retryCount",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "RetryCount"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "score",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Score"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "enabled",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "EnabledFlag"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "updatedAt",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Timestamp"
             }
           }
         ]
