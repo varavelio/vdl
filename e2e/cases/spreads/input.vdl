@@ -17,6 +17,8 @@ type Article {
 }
 
 type BaseRecord {
+  """ Stable base identifier. """
+  @primaryKey
   baseId string
 }
 
@@ -32,6 +34,8 @@ type FullyVersionedRecord {
 }
 
 type Money {
+  """ Monetary amount in minor units. """
+  @moneyAmount
   amount int
   currency string
 }

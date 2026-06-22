@@ -421,7 +421,12 @@
         "kind": "object",
         "objectFields": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "name": "primaryKey"
+              }
+            ],
+            "doc": "Stable base identifier.",
             "name": "baseId",
             "optional": false,
             "typeRef": {
@@ -439,7 +444,12 @@
         "kind": "object",
         "objectFields": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "name": "primaryKey"
+              }
+            ],
+            "doc": "Stable base identifier.",
             "name": "baseId",
             "optional": false,
             "typeRef": {
@@ -484,7 +494,12 @@
         "kind": "object",
         "objectFields": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "name": "moneyAmount"
+              }
+            ],
+            "doc": "Monetary amount in minor units.",
             "name": "amount",
             "optional": false,
             "typeRef": {
@@ -527,7 +542,12 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "annotations": [],
+                  "annotations": [
+                    {
+                      "name": "moneyAmount"
+                    }
+                  ],
+                  "doc": "Monetary amount in minor units.",
                   "name": "amount",
                   "optional": false,
                   "typeRef": {
@@ -584,7 +604,12 @@
         "kind": "object",
         "objectFields": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "name": "primaryKey"
+              }
+            ],
+            "doc": "Stable base identifier.",
             "name": "baseId",
             "optional": false,
             "typeRef": {
