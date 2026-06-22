@@ -1,0 +1,52 @@
+@deprecated
+type LegacyPayload {
+  id string
+}
+
+@event("orders.status_changed.{orderId}")
+@eventMeta({ repeatedSubject "audit.{tenantId}.users.{tenantId}.created" })
+type OrderStatusChanged {
+  orderId string
+  tenantId string
+  status string
+}
+
+@rpc
+@service({
+  name "accounts"
+  version "v1"
+})
+type AccountService {
+  @proc
+  getAccount {
+    input {
+      accountId string
+    }
+    output {
+      account {
+        id string
+        email string
+      }
+    }
+  }
+
+  @stream
+  watchAccounts {
+    input {
+      tenantId string
+    }
+    output {
+      accountId string
+      active bool
+    }
+  }
+}
+
+@deprecated("Use NewLifecycle instead.")
+enum LegacyLifecycle {
+  Active
+  Inactive
+}
+
+@deprecated
+const oldFeatureFlag = false

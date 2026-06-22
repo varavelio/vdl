@@ -1,0 +1,301 @@
+{
+  "constants": [
+    {
+      "annotations": [
+        {
+          "name": "deprecated"
+        }
+      ],
+      "name": "oldFeatureFlag",
+      "value": {
+        "boolValue": false,
+        "kind": "bool"
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [
+        {
+          "argument": {
+            "kind": "string",
+            "stringValue": "Use NewLifecycle instead."
+          },
+          "name": "deprecated"
+        }
+      ],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Active",
+          "value": {
+            "kind": "string",
+            "stringValue": "Active"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Inactive",
+          "value": {
+            "kind": "string",
+            "stringValue": "Inactive"
+          }
+        }
+      ],
+      "name": "LegacyLifecycle"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [
+        {
+          "name": "rpc"
+        },
+        {
+          "argument": {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "name",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "accounts"
+                }
+              },
+              {
+                "key": "version",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "v1"
+                }
+              }
+            ]
+          },
+          "name": "service"
+        }
+      ],
+      "name": "AccountService",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [
+              {
+                "name": "proc"
+              }
+            ],
+            "name": "getAccount",
+            "optional": false,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "input",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "object",
+                    "objectFields": [
+                      {
+                        "annotations": [],
+                        "name": "accountId",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "string"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "output",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "object",
+                    "objectFields": [
+                      {
+                        "annotations": [],
+                        "name": "account",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "object",
+                          "objectFields": [
+                            {
+                              "annotations": [],
+                              "name": "id",
+                              "optional": false,
+                              "typeRef": {
+                                "kind": "primitive",
+                                "primitiveName": "string"
+                              }
+                            },
+                            {
+                              "annotations": [],
+                              "name": "email",
+                              "optional": false,
+                              "typeRef": {
+                                "kind": "primitive",
+                                "primitiveName": "string"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "annotations": [
+              {
+                "name": "stream"
+              }
+            ],
+            "name": "watchAccounts",
+            "optional": false,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "input",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "object",
+                    "objectFields": [
+                      {
+                        "annotations": [],
+                        "name": "tenantId",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "string"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "output",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "object",
+                    "objectFields": [
+                      {
+                        "annotations": [],
+                        "name": "accountId",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "string"
+                        }
+                      },
+                      {
+                        "annotations": [],
+                        "name": "active",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "bool"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [
+        {
+          "name": "deprecated"
+        }
+      ],
+      "name": "LegacyPayload",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [
+        {
+          "argument": {
+            "kind": "string",
+            "stringValue": "orders.status_changed.{orderId}"
+          },
+          "name": "event"
+        },
+        {
+          "argument": {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "repeatedSubject",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "audit.{tenantId}.users.{tenantId}.created"
+                }
+              }
+            ]
+          },
+          "name": "eventMeta"
+        }
+      ],
+      "name": "OrderStatusChanged",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "orderId",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "tenantId",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "status",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
