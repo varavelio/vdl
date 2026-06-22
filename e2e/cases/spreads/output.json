@@ -25,10 +25,41 @@
     },
     {
       "annotations": [],
+      "name": "nestedHeaders",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "cache",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "maxAge",
+                  "value": {
+                    "intValue": 60,
+                    "kind": "int"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
       "name": "requestHeaders",
       "value": {
         "kind": "object",
         "objectEntries": [
+          {
+            "key": "requestId",
+            "value": {
+              "kind": "string",
+              "stringValue": "abc-123"
+            }
+          },
           {
             "key": "accept",
             "value": {
@@ -49,6 +80,36 @@
               "kind": "string",
               "stringValue": "example-auth-header"
             }
+          },
+          {
+            "key": "nested",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "cache",
+                  "value": {
+                    "kind": "object",
+                    "objectEntries": [
+                      {
+                        "key": "maxAge",
+                        "value": {
+                          "intValue": 60,
+                          "kind": "int"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "key": "trace",
+                  "value": {
+                    "boolValue": true,
+                    "kind": "bool"
+                  }
+                }
+              ]
+            }
           }
         ]
       }
@@ -62,7 +123,12 @@
       "enumType": "string",
       "members": [
         {
-          "annotations": [],
+          "annotations": [
+            {
+              "name": "public"
+            }
+          ],
+          "doc": "Read permission inherited by admins.",
           "name": "Read",
           "value": {
             "kind": "string",
@@ -79,6 +145,14 @@
         },
         {
           "annotations": [],
+          "name": "Owner",
+          "value": {
+            "kind": "string",
+            "stringValue": "owner"
+          }
+        },
+        {
+          "annotations": [],
           "name": "Delete",
           "value": {
             "kind": "string",
@@ -90,10 +164,123 @@
     },
     {
       "annotations": [],
+      "enumType": "int",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Low",
+          "value": {
+            "intValue": 1,
+            "kind": "int"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Medium",
+          "value": {
+            "intValue": 2,
+            "kind": "int"
+          }
+        }
+      ],
+      "name": "BaseRank"
+    },
+    {
+      "annotations": [],
+      "enumType": "int",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Low",
+          "value": {
+            "intValue": 1,
+            "kind": "int"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Medium",
+          "value": {
+            "intValue": 2,
+            "kind": "int"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "High",
+          "value": {
+            "intValue": 3,
+            "kind": "int"
+          }
+        }
+      ],
+      "name": "ExtendedRank"
+    },
+    {
+      "annotations": [],
       "enumType": "string",
       "members": [
         {
           "annotations": [],
+          "name": "Viewer",
+          "value": {
+            "kind": "string",
+            "stringValue": "viewer"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Editor",
+          "value": {
+            "kind": "string",
+            "stringValue": "editor"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Owner",
+          "value": {
+            "kind": "string",
+            "stringValue": "owner"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Admin",
+          "value": {
+            "kind": "string",
+            "stringValue": "admin"
+          }
+        }
+      ],
+      "name": "ProjectRole"
+    },
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Viewer",
+          "value": {
+            "kind": "string",
+            "stringValue": "viewer"
+          }
+        }
+      ],
+      "name": "RootRole"
+    },
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [
+            {
+              "name": "public"
+            }
+          ],
+          "doc": "Read permission inherited by admins.",
           "name": "Read",
           "value": {
             "kind": "string",
@@ -110,6 +297,29 @@
         }
       ],
       "name": "StandardPermission"
+    },
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Viewer",
+          "value": {
+            "kind": "string",
+            "stringValue": "viewer"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Editor",
+          "value": {
+            "kind": "string",
+            "stringValue": "editor"
+          }
+        }
+      ],
+      "name": "TeamRole"
     }
   ],
   "types": [
@@ -120,7 +330,12 @@
         "kind": "object",
         "objectFields": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "name": "indexed"
+              }
+            ],
+            "doc": "Creation timestamp from the audit base.",
             "name": "createdAt",
             "optional": false,
             "typeRef": {
@@ -174,7 +389,12 @@
         "kind": "object",
         "objectFields": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "name": "indexed"
+              }
+            ],
+            "doc": "Creation timestamp from the audit base.",
             "name": "createdAt",
             "optional": false,
             "typeRef": {
@@ -189,6 +409,69 @@
             "typeRef": {
               "kind": "primitive",
               "primitiveName": "datetime"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "BaseRecord",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "baseId",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "FullyVersionedRecord",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "baseId",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "version",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "before",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "after",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
             }
           }
         ]
@@ -289,6 +572,33 @@
             "typeRef": {
               "kind": "primitive",
               "primitiveName": "datetime"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "VersionedRecord",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "baseId",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "version",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
             }
           }
         ]

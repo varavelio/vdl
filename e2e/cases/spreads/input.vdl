@@ -1,4 +1,6 @@
 type AuditFields {
+  """ Creation timestamp from the audit base. """
+  @indexed
   createdAt datetime
   updatedAt datetime
 }
@@ -8,10 +10,25 @@ type SoftDeleteFields {
 }
 
 type Article {
-  ...AuditFields
-  ...SoftDeleteFields
   id string
+  ...AuditFields
   title string
+  ...SoftDeleteFields
+}
+
+type BaseRecord {
+  baseId string
+}
+
+type VersionedRecord {
+  ...BaseRecord
+  version int
+}
+
+type FullyVersionedRecord {
+  before string
+  ...VersionedRecord
+  after string
 }
 
 type Money {
@@ -28,13 +45,41 @@ type Order {
 }
 
 enum StandardPermission {
+  """ Read permission inherited by admins. """
+  @public
   Read = "read"
   Write = "write"
 }
 
 enum AdminPermission {
+  Owner = "owner"
   ...StandardPermission
   Delete = "delete"
+}
+
+enum BaseRank {
+  Low = 1
+  Medium = 2
+}
+
+enum ExtendedRank {
+  ...BaseRank
+  High = 3
+}
+
+enum RootRole {
+  Viewer = "viewer"
+}
+
+enum TeamRole {
+  ...RootRole
+  Editor = "editor"
+}
+
+enum ProjectRole {
+  Owner = "owner"
+  ...TeamRole
+  Admin = "admin"
 }
 
 const baseHeaders = {
@@ -42,7 +87,18 @@ const baseHeaders = {
   userAgent "vdl-test"
 }
 
+const nestedHeaders = {
+  cache {
+    maxAge 60
+  }
+}
+
 const requestHeaders = {
+  requestId "abc-123"
   ...baseHeaders
   authorization "example-auth-header"
+  nested {
+    ...nestedHeaders
+    trace true
+  }
 }
