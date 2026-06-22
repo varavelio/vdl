@@ -35,6 +35,9 @@
   "docs": [
     {
       "content": "Included standalone documentation block."
+    },
+    {
+      "content": "# Included Overview\n\nStandalone external documentation discovered through an included file."
     }
   ],
   "entryPoint": "input.vdl",
