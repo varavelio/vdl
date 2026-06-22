@@ -3,6 +3,10 @@ enum Region {
   America = "us"
 }
 
+"""
+Included standalone documentation block.
+"""
+
 const defaultRegion = Region.Europe
 
 type Entity {

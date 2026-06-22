@@ -32,7 +32,11 @@
       }
     }
   ],
-  "docs": [],
+  "docs": [
+    {
+      "content": "Included standalone documentation block."
+    }
+  ],
   "entryPoint": "input.vdl",
   "enums": [
     {
