@@ -282,7 +282,7 @@
                 "name": "fieldTags"
               }
             ],
-            "doc": "Stable account identifier.",
+            "doc": "# Account ID\n\nStable account identifier.",
             "name": "id",
             "optional": false,
             "typeRef": {
@@ -316,8 +316,12 @@
               "kind": "object",
               "objectFields": [
                 {
-                  "annotations": [],
-                  "doc": "Public display name.",
+                  "annotations": [
+                    {
+                      "name": "publicField"
+                    }
+                  ],
+                  "doc": "# Display Name\n\nPublic display name.",
                   "name": "displayName",
                   "optional": false,
                   "typeRef": {

@@ -39,7 +39,7 @@ enum LifecycleState {
   rollout rolloutPercent
 })
 type Account {
-  """ Stable account identifier. """
+  """ ./docs/account_id.md """
   @id
   @fieldOrder(1)
   @fieldTags(["primary" "stable"])
@@ -52,7 +52,8 @@ type Account {
   name? string
 
   profile {
-    """ Public display name. """
+    """ ./docs/display_name.md """
+    @publicField
     displayName string
   }
 }
