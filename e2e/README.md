@@ -24,6 +24,18 @@ cases/<name>/
 
 Cases may include extra files when needed, such as included `.vdl` files or external Markdown docs referenced by docstrings.
 
+## Coverage
+
+The case suite is intended to cover the documented valid language surface and the full generator-facing IR shape:
+
+- declarations: `type`, `enum`, `const`, includes, and standalone docs
+- type refs: primitives, aliases, custom types, enums, arrays, multidimensional arrays, maps, nested maps, inline objects, optional fields, and recursive optional references
+- spreads: object type spreads, inline object spreads, enum spreads, and object literal spreads
+- literals: strings, ints, floats, booleans, arrays, objects, empty arrays, empty objects, constant references, enum member references, and deeply nested literals
+- annotations: declaration, field, enum member, argument-less, scalar arguments, array arguments, object arguments, constant references, and enum references
+- docs: attached docstrings, standalone docstrings, external Markdown docs from entrypoint files, and external Markdown docs from included files
+- parser edge cases: line comments, block comments, inline comments, compact whitespace, deep nesting, and deterministic top-level ordering
+
 ## Stable Goldens
 
 The plugin removes every nested `position` field and rewrites `entryPoint` to `input.vdl`. This keeps goldens stable across machines and temporary directories while still validating the generator-facing IR shape.
