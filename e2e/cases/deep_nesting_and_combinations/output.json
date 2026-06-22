@@ -2,6 +2,38 @@
   "constants": [
     {
       "annotations": [],
+      "name": "baseNestedItem",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "enabled",
+            "value": {
+              "boolValue": true,
+              "kind": "bool"
+            }
+          },
+          {
+            "key": "tags",
+            "value": {
+              "arrayItems": [
+                {
+                  "kind": "string",
+                  "stringValue": "base"
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "nested"
+                }
+              ],
+              "kind": "array"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
       "name": "deeplyNestedLiteral",
       "value": {
         "kind": "object",
@@ -207,6 +239,181 @@
                                               }
                                             }
                                           ]
+                                        }
+                                      ],
+                                      "kind": "array"
+                                    }
+                                  },
+                                  {
+                                    "key": "nestedItemGroups",
+                                    "value": {
+                                      "arrayItems": [
+                                        {
+                                          "arrayItems": [
+                                            {
+                                              "kind": "object",
+                                              "objectEntries": [
+                                                {
+                                                  "key": "enabled",
+                                                  "value": {
+                                                    "boolValue": true,
+                                                    "kind": "bool"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "tags",
+                                                  "value": {
+                                                    "arrayItems": [
+                                                      {
+                                                        "kind": "string",
+                                                        "stringValue": "base"
+                                                      },
+                                                      {
+                                                        "kind": "string",
+                                                        "stringValue": "nested"
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "name",
+                                                  "value": {
+                                                    "kind": "string",
+                                                    "stringValue": "first"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "metrics",
+                                                  "value": {
+                                                    "arrayItems": [
+                                                      {
+                                                        "floatValue": 1.5,
+                                                        "kind": "float"
+                                                      },
+                                                      {
+                                                        "floatValue": 2.5,
+                                                        "kind": "float"
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "kind": "object",
+                                              "objectEntries": [
+                                                {
+                                                  "key": "enabled",
+                                                  "value": {
+                                                    "boolValue": true,
+                                                    "kind": "bool"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "tags",
+                                                  "value": {
+                                                    "arrayItems": [
+                                                      {
+                                                        "kind": "string",
+                                                        "stringValue": "base"
+                                                      },
+                                                      {
+                                                        "kind": "string",
+                                                        "stringValue": "nested"
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "name",
+                                                  "value": {
+                                                    "kind": "string",
+                                                    "stringValue": "second"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "flags",
+                                                  "value": {
+                                                    "arrayItems": [
+                                                      {
+                                                        "boolValue": true,
+                                                        "kind": "bool"
+                                                      },
+                                                      {
+                                                        "boolValue": false,
+                                                        "kind": "bool"
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "kind": "array"
+                                        },
+                                        {
+                                          "arrayItems": [
+                                            {
+                                              "kind": "object",
+                                              "objectEntries": [
+                                                {
+                                                  "key": "enabled",
+                                                  "value": {
+                                                    "boolValue": true,
+                                                    "kind": "bool"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "tags",
+                                                  "value": {
+                                                    "arrayItems": [
+                                                      {
+                                                        "kind": "string",
+                                                        "stringValue": "base"
+                                                      },
+                                                      {
+                                                        "kind": "string",
+                                                        "stringValue": "nested"
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "name",
+                                                  "value": {
+                                                    "kind": "string",
+                                                    "stringValue": "third"
+                                                  }
+                                                },
+                                                {
+                                                  "key": "children",
+                                                  "value": {
+                                                    "arrayItems": [
+                                                      {
+                                                        "kind": "object",
+                                                        "objectEntries": [
+                                                          {
+                                                            "key": "id",
+                                                            "value": {
+                                                              "kind": "string",
+                                                              "stringValue": "child-a"
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "kind": "array"
                                         }
                                       ],
                                       "kind": "array"
@@ -490,6 +697,182 @@
         ],
         "kind": "array"
       }
+    },
+    {
+      "annotations": [],
+      "name": "nestedItemGroups",
+      "value": {
+        "arrayItems": [
+          {
+            "arrayItems": [
+              {
+                "kind": "object",
+                "objectEntries": [
+                  {
+                    "key": "enabled",
+                    "value": {
+                      "boolValue": true,
+                      "kind": "bool"
+                    }
+                  },
+                  {
+                    "key": "tags",
+                    "value": {
+                      "arrayItems": [
+                        {
+                          "kind": "string",
+                          "stringValue": "base"
+                        },
+                        {
+                          "kind": "string",
+                          "stringValue": "nested"
+                        }
+                      ],
+                      "kind": "array"
+                    }
+                  },
+                  {
+                    "key": "name",
+                    "value": {
+                      "kind": "string",
+                      "stringValue": "first"
+                    }
+                  },
+                  {
+                    "key": "metrics",
+                    "value": {
+                      "arrayItems": [
+                        {
+                          "floatValue": 1.5,
+                          "kind": "float"
+                        },
+                        {
+                          "floatValue": 2.5,
+                          "kind": "float"
+                        }
+                      ],
+                      "kind": "array"
+                    }
+                  }
+                ]
+              },
+              {
+                "kind": "object",
+                "objectEntries": [
+                  {
+                    "key": "enabled",
+                    "value": {
+                      "boolValue": true,
+                      "kind": "bool"
+                    }
+                  },
+                  {
+                    "key": "tags",
+                    "value": {
+                      "arrayItems": [
+                        {
+                          "kind": "string",
+                          "stringValue": "base"
+                        },
+                        {
+                          "kind": "string",
+                          "stringValue": "nested"
+                        }
+                      ],
+                      "kind": "array"
+                    }
+                  },
+                  {
+                    "key": "name",
+                    "value": {
+                      "kind": "string",
+                      "stringValue": "second"
+                    }
+                  },
+                  {
+                    "key": "flags",
+                    "value": {
+                      "arrayItems": [
+                        {
+                          "boolValue": true,
+                          "kind": "bool"
+                        },
+                        {
+                          "boolValue": false,
+                          "kind": "bool"
+                        }
+                      ],
+                      "kind": "array"
+                    }
+                  }
+                ]
+              }
+            ],
+            "kind": "array"
+          },
+          {
+            "arrayItems": [
+              {
+                "kind": "object",
+                "objectEntries": [
+                  {
+                    "key": "enabled",
+                    "value": {
+                      "boolValue": true,
+                      "kind": "bool"
+                    }
+                  },
+                  {
+                    "key": "tags",
+                    "value": {
+                      "arrayItems": [
+                        {
+                          "kind": "string",
+                          "stringValue": "base"
+                        },
+                        {
+                          "kind": "string",
+                          "stringValue": "nested"
+                        }
+                      ],
+                      "kind": "array"
+                    }
+                  },
+                  {
+                    "key": "name",
+                    "value": {
+                      "kind": "string",
+                      "stringValue": "third"
+                    }
+                  },
+                  {
+                    "key": "children",
+                    "value": {
+                      "arrayItems": [
+                        {
+                          "kind": "object",
+                          "objectEntries": [
+                            {
+                              "key": "id",
+                              "value": {
+                                "kind": "string",
+                                "stringValue": "child-a"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "kind": "array"
+                    }
+                  }
+                ]
+              }
+            ],
+            "kind": "array"
+          }
+        ],
+        "kind": "array"
+      }
     }
   ],
   "docs": [],
@@ -754,6 +1137,181 @@
                                               }
                                             },
                                             {
+                                              "key": "nestedItemGroups",
+                                              "value": {
+                                                "arrayItems": [
+                                                  {
+                                                    "arrayItems": [
+                                                      {
+                                                        "kind": "object",
+                                                        "objectEntries": [
+                                                          {
+                                                            "key": "enabled",
+                                                            "value": {
+                                                              "boolValue": true,
+                                                              "kind": "bool"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "tags",
+                                                            "value": {
+                                                              "arrayItems": [
+                                                                {
+                                                                  "kind": "string",
+                                                                  "stringValue": "base"
+                                                                },
+                                                                {
+                                                                  "kind": "string",
+                                                                  "stringValue": "nested"
+                                                                }
+                                                              ],
+                                                              "kind": "array"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "name",
+                                                            "value": {
+                                                              "kind": "string",
+                                                              "stringValue": "first"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "metrics",
+                                                            "value": {
+                                                              "arrayItems": [
+                                                                {
+                                                                  "floatValue": 1.5,
+                                                                  "kind": "float"
+                                                                },
+                                                                {
+                                                                  "floatValue": 2.5,
+                                                                  "kind": "float"
+                                                                }
+                                                              ],
+                                                              "kind": "array"
+                                                            }
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "kind": "object",
+                                                        "objectEntries": [
+                                                          {
+                                                            "key": "enabled",
+                                                            "value": {
+                                                              "boolValue": true,
+                                                              "kind": "bool"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "tags",
+                                                            "value": {
+                                                              "arrayItems": [
+                                                                {
+                                                                  "kind": "string",
+                                                                  "stringValue": "base"
+                                                                },
+                                                                {
+                                                                  "kind": "string",
+                                                                  "stringValue": "nested"
+                                                                }
+                                                              ],
+                                                              "kind": "array"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "name",
+                                                            "value": {
+                                                              "kind": "string",
+                                                              "stringValue": "second"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "flags",
+                                                            "value": {
+                                                              "arrayItems": [
+                                                                {
+                                                                  "boolValue": true,
+                                                                  "kind": "bool"
+                                                                },
+                                                                {
+                                                                  "boolValue": false,
+                                                                  "kind": "bool"
+                                                                }
+                                                              ],
+                                                              "kind": "array"
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  },
+                                                  {
+                                                    "arrayItems": [
+                                                      {
+                                                        "kind": "object",
+                                                        "objectEntries": [
+                                                          {
+                                                            "key": "enabled",
+                                                            "value": {
+                                                              "boolValue": true,
+                                                              "kind": "bool"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "tags",
+                                                            "value": {
+                                                              "arrayItems": [
+                                                                {
+                                                                  "kind": "string",
+                                                                  "stringValue": "base"
+                                                                },
+                                                                {
+                                                                  "kind": "string",
+                                                                  "stringValue": "nested"
+                                                                }
+                                                              ],
+                                                              "kind": "array"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "name",
+                                                            "value": {
+                                                              "kind": "string",
+                                                              "stringValue": "third"
+                                                            }
+                                                          },
+                                                          {
+                                                            "key": "children",
+                                                            "value": {
+                                                              "arrayItems": [
+                                                                {
+                                                                  "kind": "object",
+                                                                  "objectEntries": [
+                                                                    {
+                                                                      "key": "id",
+                                                                      "value": {
+                                                                        "kind": "string",
+                                                                        "stringValue": "child-a"
+                                                                      }
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ],
+                                                              "kind": "array"
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
+                                                    ],
+                                                    "kind": "array"
+                                                  }
+                                                ],
+                                                "kind": "array"
+                                              }
+                                            },
+                                            {
                                               "key": "nestedObjects",
                                               "value": {
                                                 "arrayItems": [
@@ -994,6 +1552,286 @@
                                                 "kind": "primitive",
                                                 "primitiveName": "string"
                                               }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "snapshots",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "arrayDims": 1,
+                                            "arrayType": {
+                                              "kind": "map",
+                                              "mapType": {
+                                                "kind": "primitive",
+                                                "primitiveName": "string"
+                                              }
+                                            },
+                                            "kind": "array"
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "payloadSnapshots",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "arrayDims": 1,
+                                            "arrayType": {
+                                              "kind": "map",
+                                              "mapType": {
+                                                "arrayDims": 1,
+                                                "arrayType": {
+                                                  "kind": "type",
+                                                  "typeName": "LeafPayload"
+                                                },
+                                                "kind": "array"
+                                              }
+                                            },
+                                            "kind": "array"
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "optionalInlineItems",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "arrayDims": 1,
+                                            "arrayType": {
+                                              "kind": "object",
+                                              "objectFields": [
+                                                {
+                                                  "annotations": [],
+                                                  "name": "itemId",
+                                                  "optional": false,
+                                                  "typeRef": {
+                                                    "kind": "primitive",
+                                                    "primitiveName": "string"
+                                                  }
+                                                },
+                                                {
+                                                  "annotations": [],
+                                                  "name": "flags",
+                                                  "optional": true,
+                                                  "typeRef": {
+                                                    "arrayDims": 1,
+                                                    "arrayType": {
+                                                      "kind": "primitive",
+                                                      "primitiveName": "string"
+                                                    },
+                                                    "kind": "array"
+                                                  }
+                                                },
+                                                {
+                                                  "annotations": [],
+                                                  "name": "metrics",
+                                                  "optional": true,
+                                                  "typeRef": {
+                                                    "kind": "map",
+                                                    "mapType": {
+                                                      "arrayDims": 1,
+                                                      "arrayType": {
+                                                        "kind": "primitive",
+                                                        "primitiveName": "float"
+                                                      },
+                                                      "kind": "array"
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            },
+                                            "kind": "array"
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "inlineMatrix",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "arrayDims": 2,
+                                            "arrayType": {
+                                              "kind": "object",
+                                              "objectFields": [
+                                                {
+                                                  "annotations": [],
+                                                  "name": "rowId",
+                                                  "optional": false,
+                                                  "typeRef": {
+                                                    "kind": "primitive",
+                                                    "primitiveName": "string"
+                                                  }
+                                                },
+                                                {
+                                                  "annotations": [],
+                                                  "name": "cells",
+                                                  "optional": true,
+                                                  "typeRef": {
+                                                    "arrayDims": 1,
+                                                    "arrayType": {
+                                                      "kind": "object",
+                                                      "objectFields": [
+                                                        {
+                                                          "annotations": [],
+                                                          "name": "columnId",
+                                                          "optional": false,
+                                                          "typeRef": {
+                                                            "kind": "primitive",
+                                                            "primitiveName": "string"
+                                                          }
+                                                        },
+                                                        {
+                                                          "annotations": [],
+                                                          "name": "values",
+                                                          "optional": true,
+                                                          "typeRef": {
+                                                            "arrayDims": 1,
+                                                            "arrayType": {
+                                                              "kind": "primitive",
+                                                              "primitiveName": "int"
+                                                            },
+                                                            "kind": "array"
+                                                          }
+                                                        }
+                                                      ]
+                                                    },
+                                                    "kind": "array"
+                                                  }
+                                                }
+                                              ]
+                                            },
+                                            "kind": "array"
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "inlineMap",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "kind": "map",
+                                            "mapType": {
+                                              "kind": "object",
+                                              "objectFields": [
+                                                {
+                                                  "annotations": [],
+                                                  "name": "label",
+                                                  "optional": false,
+                                                  "typeRef": {
+                                                    "kind": "primitive",
+                                                    "primitiveName": "string"
+                                                  }
+                                                },
+                                                {
+                                                  "annotations": [],
+                                                  "name": "aliases",
+                                                  "optional": true,
+                                                  "typeRef": {
+                                                    "arrayDims": 1,
+                                                    "arrayType": {
+                                                      "kind": "primitive",
+                                                      "primitiveName": "string"
+                                                    },
+                                                    "kind": "array"
+                                                  }
+                                                },
+                                                {
+                                                  "annotations": [],
+                                                  "name": "nested",
+                                                  "optional": true,
+                                                  "typeRef": {
+                                                    "kind": "object",
+                                                    "objectFields": [
+                                                      {
+                                                        "annotations": [],
+                                                        "name": "values",
+                                                        "optional": true,
+                                                        "typeRef": {
+                                                          "arrayDims": 1,
+                                                          "arrayType": {
+                                                            "kind": "type",
+                                                            "typeName": "LeafPayload"
+                                                          },
+                                                          "kind": "array"
+                                                        }
+                                                      },
+                                                      {
+                                                        "annotations": [],
+                                                        "name": "statesByCode",
+                                                        "optional": true,
+                                                        "typeRef": {
+                                                          "kind": "map",
+                                                          "mapType": {
+                                                            "enumName": "NodeState",
+                                                            "enumType": "string",
+                                                            "kind": "enum"
+                                                          }
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "inlineMapArray",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "kind": "map",
+                                            "mapType": {
+                                              "arrayDims": 1,
+                                              "arrayType": {
+                                                "kind": "object",
+                                                "objectFields": [
+                                                  {
+                                                    "annotations": [],
+                                                    "name": "groupId",
+                                                    "optional": false,
+                                                    "typeRef": {
+                                                      "kind": "primitive",
+                                                      "primitiveName": "string"
+                                                    }
+                                                  },
+                                                  {
+                                                    "annotations": [],
+                                                    "name": "members",
+                                                    "optional": true,
+                                                    "typeRef": {
+                                                      "arrayDims": 1,
+                                                      "arrayType": {
+                                                        "kind": "object",
+                                                        "objectFields": [
+                                                          {
+                                                            "annotations": [],
+                                                            "name": "userId",
+                                                            "optional": false,
+                                                            "typeRef": {
+                                                              "kind": "primitive",
+                                                              "primitiveName": "string"
+                                                            }
+                                                          },
+                                                          {
+                                                            "annotations": [],
+                                                            "name": "scopes",
+                                                            "optional": true,
+                                                            "typeRef": {
+                                                              "arrayDims": 1,
+                                                              "arrayType": {
+                                                                "kind": "primitive",
+                                                                "primitiveName": "string"
+                                                              },
+                                                              "kind": "array"
+                                                            }
+                                                          }
+                                                        ]
+                                                      },
+                                                      "kind": "array"
+                                                    }
+                                                  }
+                                                ]
+                                              },
+                                              "kind": "array"
                                             }
                                           }
                                         },

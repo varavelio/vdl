@@ -27,6 +27,37 @@ type DeepEnvelope {
             statesById? map[NodeState]
             statesByGroup map[NodeState[]]
             metadataByLayer? map[map[string]]
+            snapshots? map[string][]
+            payloadSnapshots? map[LeafPayload[]][]
+            optionalInlineItems? {
+              itemId string
+              flags? string[]
+              metrics? map[float[]]
+            }[]
+            inlineMatrix? {
+              rowId string
+              cells? {
+                columnId string
+                values? int[]
+              }[]
+            }[][]
+            inlineMap? map[{
+              label string
+              aliases? string[]
+              nested? {
+                values? LeafPayload[]
+                statesByCode? map[NodeState]
+              }
+            }]
+
+            inlineMapArray? map[{
+              groupId string
+              members? {
+                userId string
+                scopes? string[]
+              }[]
+            }[]]
+
             history? {
               previous? {
                 payload? LeafPayload
@@ -77,6 +108,35 @@ const inlineLeafList = [
     state NodeState.Waiting
   }
 ]
+const baseNestedItem = {
+  enabled true
+  tags ["base" "nested"]
+}
+const nestedItemGroups = [
+  [
+    {
+      ...baseNestedItem
+      name "first"
+      metrics [1.5 2.5]
+    }
+    {
+      ...baseNestedItem
+      name "second"
+      flags [true false]
+    }
+  ]
+  [
+    {
+      ...baseNestedItem
+      name "third"
+      children [
+        {
+          id "child-a"
+        }
+      ]
+    }
+  ]
+]
 const deeplyNestedLiteral = {
   level1 {
     level2 {
@@ -92,6 +152,7 @@ const deeplyNestedLiteral = {
           leaf leafAliasAgain
           leafList leafList
           inlineLeafList inlineLeafList
+          nestedItemGroups nestedItemGroups
           nestedObjects [
             {
               id "first"
