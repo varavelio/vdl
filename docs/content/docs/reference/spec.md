@@ -185,7 +185,9 @@ Enum members also support docstrings and annotations on named members.
 | `int`      | integer         | 64-bit signed integer      |
 | `float`    | number          | 64-bit floating point      |
 | `bool`     | boolean         | Logical value (true/false) |
-| `datetime` | string          | ISO 8601 date-time string  |
+| `datetime` | string          | RFC 3339 date-time string  |
+
+> **Note:** `datetime` values must be RFC 3339 formatted strings. RFC 3339 is a strict subset of ISO 8601 chosen to ensure consistent parsing across implementations.
 
 ### Arrays
 

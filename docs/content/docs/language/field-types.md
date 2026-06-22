@@ -27,15 +27,15 @@ VDL supports:
 
 ## Primitive Types
 
-| VDL type   | Meaning                         |
-| ---------- | ------------------------------- |
-| `string`   | Text                            |
-| `int`      | 64-bit signed integer           |
-| `float`    | 64-bit floating point number    |
-| `bool`     | `true` or `false`               |
-| `datetime` | ISO 8601 date-time string value |
+| Type       | JSON Equivalent | Description                |
+| ---------- | --------------- | -------------------------- |
+| `string`   | string          | UTF-8 encoded text         |
+| `int`      | integer         | 64-bit signed integer      |
+| `float`    | number          | 64-bit floating point      |
+| `bool`     | boolean         | Logical value (true/false) |
+| `datetime` | string          | RFC 3339 date-time string  |
 
-Example:
+> **Note:** `datetime` values must be RFC 3339 formatted strings. RFC 3339 is a strict subset of ISO 8601 chosen to ensure consistent parsing across implementations.
 
 ```vdl
 type PrimitiveExample {
