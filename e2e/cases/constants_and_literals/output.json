@@ -1,0 +1,331 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "baseConfig",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "host",
+            "value": {
+              "kind": "string",
+              "stringValue": "localhost"
+            }
+          },
+          {
+            "key": "port",
+            "value": {
+              "intValue": 8080,
+              "kind": "int"
+            }
+          },
+          {
+            "key": "tls",
+            "value": {
+              "boolValue": false,
+              "kind": "bool"
+            }
+          },
+          {
+            "key": "region",
+            "value": {
+              "kind": "string",
+              "stringValue": "eu"
+            }
+          },
+          {
+            "key": "tags",
+            "value": {
+              "arrayItems": [
+                {
+                  "kind": "string",
+                  "stringValue": "public"
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "billing"
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "stable"
+                }
+              ],
+              "kind": "array"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "defaultRegion",
+      "value": {
+        "kind": "string",
+        "stringValue": "eu"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "defaultRetries",
+      "value": {
+        "intValue": 3,
+        "kind": "int"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "emptyString",
+      "value": {
+        "kind": "string",
+        "stringValue": ""
+      }
+    },
+    {
+      "annotations": [],
+      "name": "featureDisabled",
+      "value": {
+        "boolValue": false,
+        "kind": "bool"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "featureEnabled",
+      "value": {
+        "boolValue": true,
+        "kind": "bool"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "matrix",
+      "value": {
+        "arrayItems": [
+          {
+            "arrayItems": [
+              {
+                "intValue": 1,
+                "kind": "int"
+              },
+              {
+                "intValue": 2,
+                "kind": "int"
+              }
+            ],
+            "kind": "array"
+          },
+          {
+            "arrayItems": [
+              {
+                "intValue": 3,
+                "kind": "int"
+              },
+              {
+                "intValue": 4,
+                "kind": "int"
+              }
+            ],
+            "kind": "array"
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "maxRetries",
+      "value": {
+        "intValue": 3,
+        "kind": "int"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "productionConfig",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "host",
+            "value": {
+              "kind": "string",
+              "stringValue": "localhost"
+            }
+          },
+          {
+            "key": "port",
+            "value": {
+              "intValue": 8080,
+              "kind": "int"
+            }
+          },
+          {
+            "key": "tls",
+            "value": {
+              "boolValue": false,
+              "kind": "bool"
+            }
+          },
+          {
+            "key": "region",
+            "value": {
+              "kind": "string",
+              "stringValue": "eu"
+            }
+          },
+          {
+            "key": "tags",
+            "value": {
+              "arrayItems": [
+                {
+                  "kind": "string",
+                  "stringValue": "public"
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "billing"
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "stable"
+                }
+              ],
+              "kind": "array"
+            }
+          },
+          {
+            "key": "host",
+            "value": {
+              "kind": "string",
+              "stringValue": "api.example.com"
+            }
+          },
+          {
+            "key": "port",
+            "value": {
+              "intValue": 443,
+              "kind": "int"
+            }
+          },
+          {
+            "key": "nested",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "retries",
+                  "value": {
+                    "intValue": 3,
+                    "kind": "int"
+                  }
+                },
+                {
+                  "key": "enabled",
+                  "value": {
+                    "boolValue": true,
+                    "kind": "bool"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "ratio",
+      "value": {
+        "floatValue": 3.14,
+        "kind": "float"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "retryBackoffMs",
+      "value": {
+        "arrayItems": [
+          {
+            "intValue": 100,
+            "kind": "int"
+          },
+          {
+            "intValue": 250,
+            "kind": "int"
+          },
+          {
+            "intValue": 500,
+            "kind": "int"
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "serviceName",
+      "value": {
+        "kind": "string",
+        "stringValue": "billing"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "tags",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "string",
+            "stringValue": "public"
+          },
+          {
+            "kind": "string",
+            "stringValue": "billing"
+          },
+          {
+            "kind": "string",
+            "stringValue": "stable"
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "zeroInt",
+      "value": {
+        "intValue": 0,
+        "kind": "int"
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Europe",
+          "value": {
+            "kind": "string",
+            "stringValue": "eu"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "America",
+          "value": {
+            "kind": "string",
+            "stringValue": "us"
+          }
+        }
+      ],
+      "name": "Region"
+    }
+  ],
+  "types": []
+}

@@ -1,0 +1,40 @@
+enum Region {
+  Europe = "eu"
+  America = "us"
+}
+
+const serviceName = "billing"
+const maxRetries = 3
+const ratio = 3.14
+const featureEnabled = true
+const featureDisabled = false
+const emptyString = ""
+const zeroInt = 0
+
+const defaultRetries = maxRetries
+const defaultRegion = Region.Europe
+
+const retryBackoffMs = [100 250 500]
+const tags = ["public" "billing" "stable"]
+const matrix = [
+  [1 2]
+  [3 4]
+]
+
+const baseConfig = {
+  host "localhost"
+  port 8080
+  tls false
+  region defaultRegion
+  tags tags
+}
+
+const productionConfig = {
+  ...baseConfig
+  host "api.example.com"
+  port 443
+  nested {
+    retries defaultRetries
+    enabled featureEnabled
+  }
+}
