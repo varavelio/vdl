@@ -1,0 +1,57 @@
+enum NodeState {
+  Ready = "ready"
+  Waiting = "waiting"
+}
+
+type LeafPayload {
+  value string
+  state NodeState
+}
+
+type DeepEnvelope {
+  id string
+  layers {
+    level1 {
+      level2 {
+        level3 {
+          level4 {
+            payloads map[LeafPayload[]]
+            states NodeState[][]
+          }
+        }
+      }
+    }
+  }
+}
+
+type RecursiveGraphNode {
+  id string
+  parent? RecursiveGraphNode
+  children? RecursiveGraphNode[]
+}
+
+const emptyArray = []
+const emptyObject = {}
+const deeplyNestedLiteral = {
+  level1 {
+    level2 {
+      level3 {
+        level4 {
+          states [NodeState.Ready NodeState.Waiting]
+          matrix [
+            [1 2 3]
+            [4 5 6]
+          ]
+          emptyArray emptyArray
+          emptyObject emptyObject
+        }
+      }
+    }
+  }
+}
+
+@metadata({
+  states [NodeState.Ready NodeState.Waiting]
+  config deeplyNestedLiteral
+})
+type AnnotatedDeepEnvelope DeepEnvelope
