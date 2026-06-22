@@ -2,15 +2,236 @@
   "constants": [
     {
       "annotations": [],
+      "name": "annotationText",
+      "value": {
+        "kind": "string",
+        "stringValue": "\n  annotation const line\n\tannotation const tab line\n    annotation const spaced line\n"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "closingQuoteIndentedOwnLine",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "level1",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "level2",
+                  "value": {
+                    "kind": "object",
+                    "objectEntries": [
+                      {
+                        "key": "level3",
+                        "value": {
+                          "kind": "object",
+                          "objectEntries": [
+                            {
+                              "key": "foo",
+                              "value": {
+                                "kind": "string",
+                                "stringValue": "\n          bar\n            baz\n              qux\n        "
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "closingQuoteOwnLine",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "level1",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "level2",
+                  "value": {
+                    "kind": "object",
+                    "objectEntries": [
+                      {
+                        "key": "level3",
+                        "value": {
+                          "kind": "object",
+                          "objectEntries": [
+                            {
+                              "key": "foo",
+                              "value": {
+                                "kind": "string",
+                                "stringValue": "\n  bar\n\tbaz with tab\n    qux with four spaces\n"
+                              }
+                            },
+                            {
+                              "key": "nested",
+                              "value": {
+                                "kind": "object",
+                                "objectEntries": [
+                                  {
+                                    "key": "deeper",
+                                    "value": {
+                                      "kind": "object",
+                                      "objectEntries": [
+                                        {
+                                          "key": "message",
+                                          "value": {
+                                            "kind": "string",
+                                            "stringValue": "\nfirst content line starts at column one\n  second content line starts with two spaces\n\tthird content line starts with a tab\n\nfifth content line follows an empty line\n"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "deeplyNestedMultiline",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "level1",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "level2",
+                  "value": {
+                    "kind": "object",
+                    "objectEntries": [
+                      {
+                        "key": "text",
+                        "value": {
+                          "kind": "string",
+                          "stringValue": "alpha\n\t\tbeta with two tabs\n    gamma with four spaces\n\nomega"
+                        }
+                      },
+                      {
+                        "key": "groups",
+                        "value": {
+                          "arrayItems": [
+                            {
+                              "kind": "object",
+                              "objectEntries": [
+                                {
+                                  "key": "name",
+                                  "value": {
+                                    "kind": "string",
+                                    "stringValue": "group one\nstill group one"
+                                  }
+                                },
+                                {
+                                  "key": "values",
+                                  "value": {
+                                    "arrayItems": [
+                                      {
+                                        "kind": "string",
+                                        "stringValue": "value one\n  value one continuation with two spaces"
+                                      },
+                                      {
+                                        "kind": "string",
+                                        "stringValue": "value two\n\tvalue two continuation with a tab"
+                                      }
+                                    ],
+                                    "kind": "array"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "kind": "object",
+                              "objectEntries": [
+                                {
+                                  "key": "name",
+                                  "value": {
+                                    "kind": "string",
+                                    "stringValue": "group two\n\nafter blank line"
+                                  }
+                                },
+                                {
+                                  "key": "nested",
+                                  "value": {
+                                    "kind": "object",
+                                    "objectEntries": [
+                                      {
+                                        "key": "note",
+                                        "value": {
+                                          "kind": "string",
+                                          "stringValue": "nested note\n      six leading spaces are part of the string"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "kind": "array"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
       "name": "nestedMultiline",
       "value": {
         "kind": "object",
         "objectEntries": [
           {
-            "key": "body",
+            "key": "title",
             "value": {
               "kind": "string",
               "stringValue": "header\n\tindented body\nfooter"
+            }
+          },
+          {
+            "key": "object",
+            "value": {
+              "kind": "object",
+              "objectEntries": [
+                {
+                  "key": "body",
+                  "value": {
+                    "kind": "string",
+                    "stringValue": "object body line 1\n\tobject body line 2 with tab\n    object body line 3 with spaces"
+                  }
+                }
+              ]
             }
           },
           {
@@ -23,7 +244,7 @@
                 },
                 {
                   "kind": "string",
-                  "stringValue": "array item two\n\tarray item two tabbed continuation"
+                  "stringValue": "array item two\n\tarray item two tabbed continuation\narray item two end"
                 }
               ],
               "kind": "array"
@@ -45,12 +266,85 @@
       "name": "whitespaceSensitive",
       "value": {
         "kind": "string",
-        "stringValue": "line with trailing spaces   \n\tline starting with a tab\n    line starting with four spaces\n\nline after an empty line\nsymbols: {} [] @ ... // /* */"
+        "stringValue": "line with trailing spaces   \n\tline starting with one tab\n\t\tline starting with two tabs\n    line starting with four spaces\n  line starting with two spaces\n\n\nline after two empty lines\nsymbols: {} [] @ ... // /* */ = \\\"quoted\\\""
       }
     }
   ],
   "docs": [],
   "entryPoint": "input.vdl",
   "enums": [],
-  "types": []
+  "types": [
+    {
+      "annotations": [
+        {
+          "argument": {
+            "kind": "string",
+            "stringValue": "\n  direct annotation line\n\tannotation tab line\n    annotation spaced line\n"
+          },
+          "name": "description"
+        },
+        {
+          "argument": {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "summary",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "\n          object annotation line\n            nested indentation\n        "
+                }
+              },
+              {
+                "key": "notes",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "\nfirst annotation array item\n  continuation"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "\n\tsecond annotation array item\n"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              },
+              {
+                "key": "text",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "\n  annotation const line\n\tannotation const tab line\n    annotation const spaced line\n"
+                }
+              }
+            ]
+          },
+          "name": "meta"
+        }
+      ],
+      "name": "AnnotatedMultiline",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [
+              {
+                "argument": {
+                  "kind": "string",
+                  "stringValue": "\n    field annotation text\n      nested field annotation text\n  "
+                },
+                "name": "fieldDoc"
+              }
+            ],
+            "name": "value",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

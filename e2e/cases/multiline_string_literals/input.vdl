@@ -3,20 +3,135 @@ second line
 third line"
 
 const whitespaceSensitive = "line with trailing spaces   
-	line starting with a tab
+	line starting with one tab
+		line starting with two tabs
     line starting with four spaces
+  line starting with two spaces
 
-line after an empty line
-symbols: {} [] @ ... // /* */"
+
+line after two empty lines
+symbols: {} [] @ ... // /* */ = \"quoted\""
 
 const nestedMultiline = {
-  body "header
+  title "header
 	indented body
 footer"
+  object {
+    body "object body line 1
+	object body line 2 with tab
+    object body line 3 with spaces"
+  }
   items [
     "array item one
 array item one continuation"
     "array item two
-	array item two tabbed continuation"
+	array item two tabbed continuation
+array item two end"
   ]
+}
+
+const deeplyNestedMultiline = {
+  level1 {
+    level2 {
+      text "alpha
+		beta with two tabs
+    gamma with four spaces
+
+omega"
+      groups [
+        {
+          name "group one
+still group one"
+          values [
+            "value one
+  value one continuation with two spaces"
+            "value two
+	value two continuation with a tab"
+          ]
+        }
+        {
+          name "group two
+
+after blank line"
+          nested {
+            note "nested note
+      six leading spaces are part of the string"
+          }
+        }
+      ]
+    }
+  }
+}
+
+const closingQuoteOwnLine = {
+  level1 {
+    level2 {
+      level3 {
+        foo "
+  bar
+	baz with tab
+    qux with four spaces
+"
+        nested {
+          deeper {
+            message "
+first content line starts at column one
+  second content line starts with two spaces
+	third content line starts with a tab
+
+fifth content line follows an empty line
+"
+          }
+        }
+      }
+    }
+  }
+}
+
+const closingQuoteIndentedOwnLine = {
+  level1 {
+    level2 {
+      level3 {
+        foo "
+          bar
+            baz
+              qux
+        "
+      }
+    }
+  }
+}
+
+const annotationText = "
+  annotation const line
+	annotation const tab line
+    annotation const spaced line
+"
+
+@description("
+  direct annotation line
+	annotation tab line
+    annotation spaced line
+")
+@meta({
+  summary "
+          object annotation line
+            nested indentation
+        "
+  notes [
+    "
+first annotation array item
+  continuation"
+    "
+	second annotation array item
+"
+  ]
+  text annotationText
+})
+type AnnotatedMultiline {
+  @fieldDoc("
+    field annotation text
+      nested field annotation text
+  ")
+  value string
 }

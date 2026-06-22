@@ -46,6 +46,27 @@ const ClosingQuoteIndentedOwnLine={level1 { level2 { level3 { foo "
               qux
         " } } }}
 
+@description("
+  direct annotation line
+	annotation tab line
+    annotation spaced line
+")
+@meta({ summary "
+          object annotation line
+            nested indentation
+        " notes ["
+first annotation array item
+  continuation" "
+	second annotation array item
+"] ref ClosingQuoteIndentedOwnLine })
+type AnnotatedMultiline {
+  @fieldDoc("
+    field annotation text
+      nested field annotation text
+  ")
+  value string
+}
+
 // >>>>
 
 const plainMultiline = "first line
@@ -116,4 +137,32 @@ const closingQuoteIndentedOwnLine = {
       }
     }
   }
+}
+
+@description("
+  direct annotation line
+	annotation tab line
+    annotation spaced line
+")
+@meta({
+  summary "
+          object annotation line
+            nested indentation
+        "
+  notes [
+    "
+first annotation array item
+  continuation"
+    "
+	second annotation array item
+"
+  ]
+  ref closingQuoteIndentedOwnLine
+})
+type AnnotatedMultiline {
+  @fieldDoc("
+    field annotation text
+      nested field annotation text
+  ")
+  value string
 }
