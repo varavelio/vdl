@@ -8,15 +8,31 @@ type LeafPayload {
   state NodeState
 }
 
+type MetadataFields {
+  source string
+  priority int
+}
+
 type DeepEnvelope {
   id string
-  layers {
-    level1 {
+  layers? {
+    level1? {
+      ...MetadataFields
       level2 {
-        level3 {
+        level3? {
           level4 {
-            payloads map[LeafPayload[]]
+            payloads? map[LeafPayload[]]
+            payloadMatrix LeafPayload[][][]
             states NodeState[][]
+            statesById? map[NodeState]
+            statesByGroup map[NodeState[]]
+            metadataByLayer? map[map[string]]
+            history? {
+              previous? {
+                payload? LeafPayload
+                payloads? LeafPayload[]
+              }
+            }
           }
         }
       }
@@ -28,10 +44,39 @@ type RecursiveGraphNode {
   id string
   parent? RecursiveGraphNode
   children? RecursiveGraphNode[]
+  childrenByKind? map[RecursiveGraphNode[]]
+  related? {
+    parent? RecursiveGraphNode
+    descendants? RecursiveGraphNode[][]
+  }
 }
 
 const emptyArray = []
 const emptyObject = {}
+const leafA = {
+  value "a"
+  state NodeState.Ready
+}
+const leafB = {
+  value "b"
+  state NodeState.Waiting
+}
+const leafAlias = leafA
+const leafAliasAgain = leafAlias
+const leafList = [
+  leafA
+  leafB
+]
+const inlineLeafList = [
+  {
+    value "inline-a"
+    state NodeState.Ready
+  }
+  {
+    value "inline-b"
+    state NodeState.Waiting
+  }
+]
 const deeplyNestedLiteral = {
   level1 {
     level2 {
@@ -44,6 +89,23 @@ const deeplyNestedLiteral = {
           ]
           emptyArray emptyArray
           emptyObject emptyObject
+          leaf leafAliasAgain
+          leafList leafList
+          inlineLeafList inlineLeafList
+          nestedObjects [
+            {
+              id "first"
+              meta {
+                enabled true
+              }
+            }
+            {
+              id "second"
+              meta {
+                enabled false
+              }
+            }
+          ]
         }
       }
     }

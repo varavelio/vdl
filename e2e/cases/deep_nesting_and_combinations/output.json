@@ -97,6 +97,182 @@
                                       "kind": "object",
                                       "objectEntries": []
                                     }
+                                  },
+                                  {
+                                    "key": "leaf",
+                                    "value": {
+                                      "kind": "object",
+                                      "objectEntries": [
+                                        {
+                                          "key": "value",
+                                          "value": {
+                                            "kind": "string",
+                                            "stringValue": "a"
+                                          }
+                                        },
+                                        {
+                                          "key": "state",
+                                          "value": {
+                                            "kind": "string",
+                                            "stringValue": "ready"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "key": "leafList",
+                                    "value": {
+                                      "arrayItems": [
+                                        {
+                                          "kind": "object",
+                                          "objectEntries": [
+                                            {
+                                              "key": "value",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "a"
+                                              }
+                                            },
+                                            {
+                                              "key": "state",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "ready"
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "kind": "object",
+                                          "objectEntries": [
+                                            {
+                                              "key": "value",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "b"
+                                              }
+                                            },
+                                            {
+                                              "key": "state",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "waiting"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "kind": "array"
+                                    }
+                                  },
+                                  {
+                                    "key": "inlineLeafList",
+                                    "value": {
+                                      "arrayItems": [
+                                        {
+                                          "kind": "object",
+                                          "objectEntries": [
+                                            {
+                                              "key": "value",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "inline-a"
+                                              }
+                                            },
+                                            {
+                                              "key": "state",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "ready"
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "kind": "object",
+                                          "objectEntries": [
+                                            {
+                                              "key": "value",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "inline-b"
+                                              }
+                                            },
+                                            {
+                                              "key": "state",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "waiting"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "kind": "array"
+                                    }
+                                  },
+                                  {
+                                    "key": "nestedObjects",
+                                    "value": {
+                                      "arrayItems": [
+                                        {
+                                          "kind": "object",
+                                          "objectEntries": [
+                                            {
+                                              "key": "id",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "first"
+                                              }
+                                            },
+                                            {
+                                              "key": "meta",
+                                              "value": {
+                                                "kind": "object",
+                                                "objectEntries": [
+                                                  {
+                                                    "key": "enabled",
+                                                    "value": {
+                                                      "boolValue": true,
+                                                      "kind": "bool"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "kind": "object",
+                                          "objectEntries": [
+                                            {
+                                              "key": "id",
+                                              "value": {
+                                                "kind": "string",
+                                                "stringValue": "second"
+                                              }
+                                            },
+                                            {
+                                              "key": "meta",
+                                              "value": {
+                                                "kind": "object",
+                                                "objectEntries": [
+                                                  {
+                                                    "key": "enabled",
+                                                    "value": {
+                                                      "boolValue": false,
+                                                      "kind": "bool"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "kind": "array"
+                                    }
                                   }
                                 ]
                               }
@@ -127,6 +303,192 @@
       "value": {
         "kind": "object",
         "objectEntries": []
+      }
+    },
+    {
+      "annotations": [],
+      "name": "inlineLeafList",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "value",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "inline-a"
+                }
+              },
+              {
+                "key": "state",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "ready"
+                }
+              }
+            ]
+          },
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "value",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "inline-b"
+                }
+              },
+              {
+                "key": "state",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "waiting"
+                }
+              }
+            ]
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "leafA",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "value",
+            "value": {
+              "kind": "string",
+              "stringValue": "a"
+            }
+          },
+          {
+            "key": "state",
+            "value": {
+              "kind": "string",
+              "stringValue": "ready"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "leafAlias",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "value",
+            "value": {
+              "kind": "string",
+              "stringValue": "a"
+            }
+          },
+          {
+            "key": "state",
+            "value": {
+              "kind": "string",
+              "stringValue": "ready"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "leafAliasAgain",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "value",
+            "value": {
+              "kind": "string",
+              "stringValue": "a"
+            }
+          },
+          {
+            "key": "state",
+            "value": {
+              "kind": "string",
+              "stringValue": "ready"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "leafB",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "value",
+            "value": {
+              "kind": "string",
+              "stringValue": "b"
+            }
+          },
+          {
+            "key": "state",
+            "value": {
+              "kind": "string",
+              "stringValue": "waiting"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "leafList",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "value",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "a"
+                }
+              },
+              {
+                "key": "state",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "ready"
+                }
+              }
+            ]
+          },
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "value",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "b"
+                }
+              },
+              {
+                "key": "state",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "waiting"
+                }
+              }
+            ]
+          }
+        ],
+        "kind": "array"
       }
     }
   ],
@@ -276,6 +638,182 @@
                                                 "kind": "object",
                                                 "objectEntries": []
                                               }
+                                            },
+                                            {
+                                              "key": "leaf",
+                                              "value": {
+                                                "kind": "object",
+                                                "objectEntries": [
+                                                  {
+                                                    "key": "value",
+                                                    "value": {
+                                                      "kind": "string",
+                                                      "stringValue": "a"
+                                                    }
+                                                  },
+                                                  {
+                                                    "key": "state",
+                                                    "value": {
+                                                      "kind": "string",
+                                                      "stringValue": "ready"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            {
+                                              "key": "leafList",
+                                              "value": {
+                                                "arrayItems": [
+                                                  {
+                                                    "kind": "object",
+                                                    "objectEntries": [
+                                                      {
+                                                        "key": "value",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "a"
+                                                        }
+                                                      },
+                                                      {
+                                                        "key": "state",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "ready"
+                                                        }
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "kind": "object",
+                                                    "objectEntries": [
+                                                      {
+                                                        "key": "value",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "b"
+                                                        }
+                                                      },
+                                                      {
+                                                        "key": "state",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "waiting"
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                ],
+                                                "kind": "array"
+                                              }
+                                            },
+                                            {
+                                              "key": "inlineLeafList",
+                                              "value": {
+                                                "arrayItems": [
+                                                  {
+                                                    "kind": "object",
+                                                    "objectEntries": [
+                                                      {
+                                                        "key": "value",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "inline-a"
+                                                        }
+                                                      },
+                                                      {
+                                                        "key": "state",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "ready"
+                                                        }
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "kind": "object",
+                                                    "objectEntries": [
+                                                      {
+                                                        "key": "value",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "inline-b"
+                                                        }
+                                                      },
+                                                      {
+                                                        "key": "state",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "waiting"
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                ],
+                                                "kind": "array"
+                                              }
+                                            },
+                                            {
+                                              "key": "nestedObjects",
+                                              "value": {
+                                                "arrayItems": [
+                                                  {
+                                                    "kind": "object",
+                                                    "objectEntries": [
+                                                      {
+                                                        "key": "id",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "first"
+                                                        }
+                                                      },
+                                                      {
+                                                        "key": "meta",
+                                                        "value": {
+                                                          "kind": "object",
+                                                          "objectEntries": [
+                                                            {
+                                                              "key": "enabled",
+                                                              "value": {
+                                                                "boolValue": true,
+                                                                "kind": "bool"
+                                                              }
+                                                            }
+                                                          ]
+                                                        }
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "kind": "object",
+                                                    "objectEntries": [
+                                                      {
+                                                        "key": "id",
+                                                        "value": {
+                                                          "kind": "string",
+                                                          "stringValue": "second"
+                                                        }
+                                                      },
+                                                      {
+                                                        "key": "meta",
+                                                        "value": {
+                                                          "kind": "object",
+                                                          "objectEntries": [
+                                                            {
+                                                              "key": "enabled",
+                                                              "value": {
+                                                                "boolValue": false,
+                                                                "kind": "bool"
+                                                              }
+                                                            }
+                                                          ]
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                ],
+                                                "kind": "array"
+                                              }
                                             }
                                           ]
                                         }
@@ -321,17 +859,35 @@
           {
             "annotations": [],
             "name": "layers",
-            "optional": false,
+            "optional": true,
             "typeRef": {
               "kind": "object",
               "objectFields": [
                 {
                   "annotations": [],
                   "name": "level1",
-                  "optional": false,
+                  "optional": true,
                   "typeRef": {
                     "kind": "object",
                     "objectFields": [
+                      {
+                        "annotations": [],
+                        "name": "source",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "string"
+                        }
+                      },
+                      {
+                        "annotations": [],
+                        "name": "priority",
+                        "optional": false,
+                        "typeRef": {
+                          "kind": "primitive",
+                          "primitiveName": "int"
+                        }
+                      },
                       {
                         "annotations": [],
                         "name": "level2",
@@ -342,7 +898,7 @@
                             {
                               "annotations": [],
                               "name": "level3",
-                              "optional": false,
+                              "optional": true,
                               "typeRef": {
                                 "kind": "object",
                                 "objectFields": [
@@ -356,7 +912,7 @@
                                         {
                                           "annotations": [],
                                           "name": "payloads",
-                                          "optional": false,
+                                          "optional": true,
                                           "typeRef": {
                                             "kind": "map",
                                             "mapType": {
@@ -371,6 +927,19 @@
                                         },
                                         {
                                           "annotations": [],
+                                          "name": "payloadMatrix",
+                                          "optional": false,
+                                          "typeRef": {
+                                            "arrayDims": 3,
+                                            "arrayType": {
+                                              "kind": "type",
+                                              "typeName": "LeafPayload"
+                                            },
+                                            "kind": "array"
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
                                           "name": "states",
                                           "optional": false,
                                           "typeRef": {
@@ -381,6 +950,93 @@
                                               "kind": "enum"
                                             },
                                             "kind": "array"
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "statesById",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "kind": "map",
+                                            "mapType": {
+                                              "enumName": "NodeState",
+                                              "enumType": "string",
+                                              "kind": "enum"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "statesByGroup",
+                                          "optional": false,
+                                          "typeRef": {
+                                            "kind": "map",
+                                            "mapType": {
+                                              "arrayDims": 1,
+                                              "arrayType": {
+                                                "enumName": "NodeState",
+                                                "enumType": "string",
+                                                "kind": "enum"
+                                              },
+                                              "kind": "array"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "metadataByLayer",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "kind": "map",
+                                            "mapType": {
+                                              "kind": "map",
+                                              "mapType": {
+                                                "kind": "primitive",
+                                                "primitiveName": "string"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "annotations": [],
+                                          "name": "history",
+                                          "optional": true,
+                                          "typeRef": {
+                                            "kind": "object",
+                                            "objectFields": [
+                                              {
+                                                "annotations": [],
+                                                "name": "previous",
+                                                "optional": true,
+                                                "typeRef": {
+                                                  "kind": "object",
+                                                  "objectFields": [
+                                                    {
+                                                      "annotations": [],
+                                                      "name": "payload",
+                                                      "optional": true,
+                                                      "typeRef": {
+                                                        "kind": "type",
+                                                        "typeName": "LeafPayload"
+                                                      }
+                                                    },
+                                                    {
+                                                      "annotations": [],
+                                                      "name": "payloads",
+                                                      "optional": true,
+                                                      "typeRef": {
+                                                        "arrayDims": 1,
+                                                        "arrayType": {
+                                                          "kind": "type",
+                                                          "typeName": "LeafPayload"
+                                                        },
+                                                        "kind": "array"
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            ]
                                           }
                                         }
                                       ]
@@ -431,6 +1087,33 @@
     },
     {
       "annotations": [],
+      "name": "MetadataFields",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "source",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "priority",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "int"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
       "name": "RecursiveGraphNode",
       "typeRef": {
         "kind": "object",
@@ -464,6 +1147,54 @@
                 "typeName": "RecursiveGraphNode"
               },
               "kind": "array"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "childrenByKind",
+            "optional": true,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "arrayDims": 1,
+                "arrayType": {
+                  "kind": "type",
+                  "typeName": "RecursiveGraphNode"
+                },
+                "kind": "array"
+              }
+            }
+          },
+          {
+            "annotations": [],
+            "name": "related",
+            "optional": true,
+            "typeRef": {
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "name": "parent",
+                  "optional": true,
+                  "typeRef": {
+                    "kind": "type",
+                    "typeName": "RecursiveGraphNode"
+                  }
+                },
+                {
+                  "annotations": [],
+                  "name": "descendants",
+                  "optional": true,
+                  "typeRef": {
+                    "arrayDims": 2,
+                    "arrayType": {
+                      "kind": "type",
+                      "typeName": "RecursiveGraphNode"
+                    },
+                    "kind": "array"
+                  }
+                }
+              ]
             }
           }
         ]
