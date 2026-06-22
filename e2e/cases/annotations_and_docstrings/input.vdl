@@ -1,26 +1,48 @@
+"""
+Inline standalone documentation block.
+"""
+
 """ ./docs/overview.md """
 
 const ownerName = "platform"
 const publicTags = ["public" "stable"]
+const rolloutPercent = 25
+const baseMeta = {
+  tier "gold"
+  generated true
+}
 
+""" ./docs/lifecycle.md """
+@stable
 enum LifecycleState {
+  """ Active lifecycle state. """
   Active = "active"
 
-  """ Legacy lifecycle state kept for compatibility. """
+  """ ./docs/legacy.md """
   @deprecated("Use Active instead.")
+  @memberMeta({ rank 1 })
   Legacy = "legacy"
 }
 
 """ ./docs/account.md """
 @entity
+@limit(100)
+@ratio(3.14)
+@tags(["public" "billing" "stable"])
+@owner(ownerName)
+@state(LifecycleState.Active)
 @meta({
+  ...baseMeta
   owner ownerName
   tags publicTags
   state LifecycleState.Active
+  rollout rolloutPercent
 })
 type Account {
   """ Stable account identifier. """
   @id
+  @fieldOrder(1)
+  @fieldTags(["primary" "stable"])
   id string
 
   """
@@ -29,9 +51,12 @@ type Account {
   @deprecated("Use displayName instead.")
   name? string
 
-  displayName string
+  profile {
+    """ Public display name. """
+    displayName string
+  }
 }
 
-""" Current schema version. """
+""" ./docs/schema_version.md """
 @config
 const schemaVersion = "1.0.0"

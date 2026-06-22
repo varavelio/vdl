@@ -2,6 +2,29 @@
   "constants": [
     {
       "annotations": [],
+      "name": "baseMeta",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "tier",
+            "value": {
+              "kind": "string",
+              "stringValue": "gold"
+            }
+          },
+          {
+            "key": "generated",
+            "value": {
+              "boolValue": true,
+              "kind": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
       "name": "ownerName",
       "value": {
         "kind": "string",
@@ -26,12 +49,20 @@
       }
     },
     {
+      "annotations": [],
+      "name": "rolloutPercent",
+      "value": {
+        "intValue": 25,
+        "kind": "int"
+      }
+    },
+    {
       "annotations": [
         {
           "name": "config"
         }
       ],
-      "doc": "Current schema version.",
+      "doc": "# Schema Version\n\nSchema version constant documentation.",
       "name": "schemaVersion",
       "value": {
         "kind": "string",
@@ -41,17 +72,26 @@
   ],
   "docs": [
     {
+      "content": "Inline standalone documentation block."
+    },
+    {
       "content": "# Account Schema\n\nShared account contracts used by the platform."
     }
   ],
   "entryPoint": "input.vdl",
   "enums": [
     {
-      "annotations": [],
+      "annotations": [
+        {
+          "name": "stable"
+        }
+      ],
+      "doc": "# Lifecycle State\n\nLifecycle enum documentation.",
       "enumType": "string",
       "members": [
         {
           "annotations": [],
+          "doc": "Active lifecycle state.",
           "name": "Active",
           "value": {
             "kind": "string",
@@ -66,9 +106,24 @@
                 "stringValue": "Use Active instead."
               },
               "name": "deprecated"
+            },
+            {
+              "argument": {
+                "kind": "object",
+                "objectEntries": [
+                  {
+                    "key": "rank",
+                    "value": {
+                      "intValue": 1,
+                      "kind": "int"
+                    }
+                  }
+                ]
+              },
+              "name": "memberMeta"
             }
           ],
-          "doc": "Legacy lifecycle state kept for compatibility.",
+          "doc": "# Legacy State\n\nLegacy member documentation.",
           "name": "Legacy",
           "value": {
             "kind": "string",
@@ -87,8 +142,70 @@
         },
         {
           "argument": {
+            "intValue": 100,
+            "kind": "int"
+          },
+          "name": "limit"
+        },
+        {
+          "argument": {
+            "floatValue": 3.14,
+            "kind": "float"
+          },
+          "name": "ratio"
+        },
+        {
+          "argument": {
+            "arrayItems": [
+              {
+                "kind": "string",
+                "stringValue": "public"
+              },
+              {
+                "kind": "string",
+                "stringValue": "billing"
+              },
+              {
+                "kind": "string",
+                "stringValue": "stable"
+              }
+            ],
+            "kind": "array"
+          },
+          "name": "tags"
+        },
+        {
+          "argument": {
+            "kind": "string",
+            "stringValue": "platform"
+          },
+          "name": "owner"
+        },
+        {
+          "argument": {
+            "kind": "string",
+            "stringValue": "active"
+          },
+          "name": "state"
+        },
+        {
+          "argument": {
             "kind": "object",
             "objectEntries": [
+              {
+                "key": "tier",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "gold"
+                }
+              },
+              {
+                "key": "generated",
+                "value": {
+                  "boolValue": true,
+                  "kind": "bool"
+                }
+              },
               {
                 "key": "owner",
                 "value": {
@@ -118,6 +235,13 @@
                   "kind": "string",
                   "stringValue": "active"
                 }
+              },
+              {
+                "key": "rollout",
+                "value": {
+                  "intValue": 25,
+                  "kind": "int"
+                }
               }
             ]
           },
@@ -133,6 +257,29 @@
             "annotations": [
               {
                 "name": "id"
+              },
+              {
+                "argument": {
+                  "intValue": 1,
+                  "kind": "int"
+                },
+                "name": "fieldOrder"
+              },
+              {
+                "argument": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "primary"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "stable"
+                    }
+                  ],
+                  "kind": "array"
+                },
+                "name": "fieldTags"
               }
             ],
             "doc": "Stable account identifier.",
@@ -163,11 +310,22 @@
           },
           {
             "annotations": [],
-            "name": "displayName",
+            "name": "profile",
             "optional": false,
             "typeRef": {
-              "kind": "primitive",
-              "primitiveName": "string"
+              "kind": "object",
+              "objectFields": [
+                {
+                  "annotations": [],
+                  "doc": "Public display name.",
+                  "name": "displayName",
+                  "optional": false,
+                  "typeRef": {
+                    "kind": "primitive",
+                    "primitiveName": "string"
+                  }
+                }
+              ]
             }
           }
         ]
