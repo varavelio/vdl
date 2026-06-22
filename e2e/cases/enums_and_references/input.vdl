@@ -4,6 +4,8 @@ enum BasicStatus {
   Shipped
 }
 
+enum EmptyEnum {}
+
 enum ProductStatus {
   Draft = "draft"
   Published = "published"

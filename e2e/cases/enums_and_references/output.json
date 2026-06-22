@@ -53,6 +53,12 @@
     },
     {
       "annotations": [],
+      "enumType": "string",
+      "members": [],
+      "name": "EmptyEnum"
+    },
+    {
+      "annotations": [],
       "enumType": "int",
       "members": [
         {
