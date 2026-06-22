@@ -1,0 +1,24 @@
+const zetaValue = "z"
+const alphaValue = "a"
+const middleValue = "m"
+
+enum ZebraEnum {
+  Last
+}
+
+enum AlphaEnum {
+  First
+}
+
+type ZebraType {
+  value string
+}
+
+type AlphaType {
+  value string
+}
+
+type MiddleType {
+  alpha AlphaType
+  zebra ZebraType
+}

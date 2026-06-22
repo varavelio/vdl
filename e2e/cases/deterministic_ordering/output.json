@@ -1,0 +1,127 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "alphaValue",
+      "value": {
+        "kind": "string",
+        "stringValue": "a"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "middleValue",
+      "value": {
+        "kind": "string",
+        "stringValue": "m"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "zetaValue",
+      "value": {
+        "kind": "string",
+        "stringValue": "z"
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "First",
+          "value": {
+            "kind": "string",
+            "stringValue": "First"
+          }
+        }
+      ],
+      "name": "AlphaEnum"
+    },
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Last",
+          "value": {
+            "kind": "string",
+            "stringValue": "Last"
+          }
+        }
+      ],
+      "name": "ZebraEnum"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [],
+      "name": "AlphaType",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "value",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "MiddleType",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "alpha",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "AlphaType"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "zebra",
+            "optional": false,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "ZebraType"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "ZebraType",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "value",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
