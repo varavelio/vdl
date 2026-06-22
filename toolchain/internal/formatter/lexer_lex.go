@@ -5,7 +5,6 @@ import (
 
 	"github.com/alecthomas/participle/v2/lexer"
 	"github.com/varavelio/vdl/toolchain/internal/core/parser"
-	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
 func formatLexerBased(filename, content string) (string, error) {
@@ -23,12 +22,58 @@ func formatLexerBased(filename, content string) (string, error) {
 	output := newFormatterOutput()
 	printDocument(output, doc)
 
-	out := strutil.LimitConsecutiveNewlines(output.String(), 2)
+	out := limitConsecutiveNewlinesOutsideStrings(output.String(), 2)
 	out = strings.TrimSpace(out)
 	if out == "" {
 		return "", nil
 	}
+	out = restoreStringLiteralNewlines(out)
 	return out + "\n", nil
+}
+
+func limitConsecutiveNewlinesOutsideStrings(input string, maxNewlines int) string {
+	var output strings.Builder
+	inString := false
+	escaped := false
+	newlineCount := 0
+
+	for _, r := range input {
+		if inString {
+			output.WriteRune(r)
+			if escaped {
+				escaped = false
+				continue
+			}
+			if r == '\\' {
+				escaped = true
+				continue
+			}
+			if r == '"' {
+				inString = false
+			}
+			continue
+		}
+
+		if r == '"' {
+			inString = true
+			newlineCount = 0
+			output.WriteRune(r)
+			continue
+		}
+
+		if r == '\n' {
+			newlineCount++
+			if newlineCount <= maxNewlines {
+				output.WriteRune(r)
+			}
+			continue
+		}
+
+		newlineCount = 0
+		output.WriteRune(r)
+	}
+
+	return output.String()
 }
 
 func lexTokens(filename, content string) ([]fmtToken, error) {

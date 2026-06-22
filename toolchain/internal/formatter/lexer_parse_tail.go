@@ -210,7 +210,7 @@ func (p *tokenParser) parseScalarLiteral() (scalarLiteralNode, int, error) {
 	switch tok.Type {
 	case "StringLiteral":
 		t := p.next()
-		v := unquote(t.Value)
+		v := t.Value
 		s.Str = &v
 		return s, t.EndLine, nil
 	case "FloatLiteral":

@@ -1,0 +1,119 @@
+const   PlainMultiline   =   "first line
+second line
+third line"
+
+const WhitespaceSensitive="line with trailing spaces   
+	line starting with a tab
+    line starting with four spaces
+
+line after an empty line
+symbols: {} [] @ ... // /* */"
+
+const NestedMultiline={body "header
+	indented body
+footer" items ["array item one
+array item one continuation" "array item two
+	array item two tabbed continuation"]}
+
+const DeepNestedMultiline = {
+  level1 {
+    level2 {
+      text "alpha
+		beta with two tabs
+    gamma with four spaces
+
+omega"
+      list [
+        "first
+  first continuation"
+        "second
+	second continuation
+second end"
+      ]
+    }
+  }
+}
+
+const ClosingQuoteOwnLine={level1 { level2 { level3 { foo "
+  bar
+	baz with tab
+    qux with four spaces
+" } } }}
+
+const ClosingQuoteIndentedOwnLine={level1 { level2 { level3 { foo "
+          bar
+            baz
+              qux
+        " } } }}
+
+// >>>>
+
+const plainMultiline = "first line
+second line
+third line"
+
+const whitespaceSensitive = "line with trailing spaces   
+	line starting with a tab
+    line starting with four spaces
+
+line after an empty line
+symbols: {} [] @ ... // /* */"
+
+const nestedMultiline = {
+  body "header
+	indented body
+footer"
+  items [
+    "array item one
+array item one continuation"
+    "array item two
+	array item two tabbed continuation"
+  ]
+}
+
+const deepNestedMultiline = {
+  level1 {
+    level2 {
+      text "alpha
+		beta with two tabs
+    gamma with four spaces
+
+omega"
+      list [
+        "first
+  first continuation"
+        "second
+	second continuation
+second end"
+      ]
+    }
+  }
+}
+
+const closingQuoteOwnLine = {
+  level1 {
+    level2 {
+      level3 {
+        foo "
+  bar
+	baz with tab
+    qux with four spaces
+"
+      }
+    }
+  }
+}
+
+const closingQuoteIndentedOwnLine = {
+  level1 {
+    level2 {
+      level3 {
+        foo "
+          bar
+            baz
+              qux
+        "
+      }
+    }
+  }
+}

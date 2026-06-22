@@ -6,6 +6,8 @@ import (
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 
+const stringLiteralNewlineSentinel = "\x00VDL_STRING_LITERAL_NEWLINE\x00"
+
 func formatTypeName(name string) string {
 	if isPrimitiveName(name) {
 		return name
@@ -80,15 +82,20 @@ func renderObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 		o.Entries[0].Trailing == nil {
 		entry := o.Entries[0]
 		if entry.Value != nil && entry.Value.Scalar != nil {
+			value := renderLiteral(*entry.Value, ctx)
+			if strings.Contains(value, stringLiteralNewlineSentinel) {
+				return renderExpandedObjectLiteral(o, ctx)
+			}
 			return "{ " + strutil.ToCamelCase(
 				entry.Key,
-			) + " " + renderLiteral(
-				*entry.Value,
-				ctx,
-			) + " }"
+			) + " " + value + " }"
 		}
 	}
 
+	return renderExpandedObjectLiteral(o, ctx)
+}
+
+func renderExpandedObjectLiteral(o objectLiteralNode, ctx literalRenderCtx) string {
 	output := newFormatterOutput()
 	output.Line("{")
 	output.Block(func() {
@@ -136,7 +143,10 @@ func renderArrayLiteral(a arrayLiteralNode, ctx literalRenderCtx) string {
 		hasCompoundElements = hasCompoundElements ||
 			(element.Value != nil && (element.Value.Obj != nil || element.Value.Array != nil))
 		rendered := renderLiteral(*element.Value, ctx)
-		hasMultiline = hasMultiline || strings.Contains(rendered, "\n")
+		hasMultiline = hasMultiline || strings.Contains(rendered, "\n") || strings.Contains(
+			rendered,
+			stringLiteralNewlineSentinel,
+		)
 		hasTrailingComments = hasTrailingComments || element.Trailing != nil
 		parts = append(parts, rendered)
 	}
@@ -187,7 +197,7 @@ func hasSourceBlankLine(prev, curr lineSpan) bool {
 func renderScalar(s scalarLiteralNode, ctx literalRenderCtx) string {
 	switch {
 	case s.Str != nil:
-		return `"` + strutil.EscapeQuotes(*s.Str) + `"`
+		return protectStringLiteralNewlines(*s.Str)
 	case s.Float != nil:
 		return *s.Float
 	case s.Int != nil:
@@ -203,6 +213,14 @@ func renderScalar(s scalarLiteralNode, ctx literalRenderCtx) string {
 	default:
 		return ""
 	}
+}
+
+func protectStringLiteralNewlines(value string) string {
+	return strings.ReplaceAll(value, "\n", stringLiteralNewlineSentinel)
+}
+
+func restoreStringLiteralNewlines(value string) string {
+	return strings.ReplaceAll(value, stringLiteralNewlineSentinel, "\n")
 }
 
 func renderReference(r referenceNode, c refCase) string {

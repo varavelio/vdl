@@ -33,7 +33,6 @@ func writeRenderedValue(output *gen.Generator, prefix, value string, trailing *c
 		lineWithTrailing(output, prefix+value, trailing)
 		return
 	}
-
 	lines := strings.Split(value, "\n")
 	output.Line(prefix + lines[0])
 	for i := 1; i < len(lines)-1; i++ {
