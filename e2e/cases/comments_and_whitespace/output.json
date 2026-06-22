@@ -1,0 +1,128 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "arrays",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "string",
+            "stringValue": "one"
+          },
+          {
+            "kind": "string",
+            "stringValue": "two"
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "compactConfig",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "enabled",
+            "value": {
+              "boolValue": true,
+              "kind": "bool"
+            }
+          },
+          {
+            "key": "status",
+            "value": {
+              "kind": "string",
+              "stringValue": "Active"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Active",
+          "value": {
+            "kind": "string",
+            "stringValue": "Active"
+          }
+        },
+        {
+          "annotations": [],
+          "name": "Disabled",
+          "value": {
+            "kind": "string",
+            "stringValue": "disabled"
+          }
+        }
+      ],
+      "name": "InlineStatus"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [],
+      "name": "CommentedFields",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "status",
+            "optional": false,
+            "typeRef": {
+              "enumName": "InlineStatus",
+              "enumType": "string",
+              "kind": "enum"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "CompactAccount",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "id",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "email",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

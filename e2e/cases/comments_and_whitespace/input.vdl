@@ -1,0 +1,29 @@
+/*
+  Block comments can appear anywhere whitespace is accepted and must not affect IR.
+*/
+type CompactAccount {
+  id string
+  email string
+}
+
+enum InlineStatus {
+  Active
+  Disabled = "disabled"
+}
+
+const compactConfig = {
+  enabled true
+  status InlineStatus.Active
+}
+
+type CommentedFields {
+  id string // Inline comments are ignored.
+
+  /* A block comment between members should be treated as whitespace. */
+  status InlineStatus
+}
+
+const arrays = [
+  "one" /* middle */
+  "two"
+]
