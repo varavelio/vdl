@@ -1,0 +1,22 @@
+const plainMultiline = "first line
+second line
+third line"
+
+const whitespaceSensitive = "line with trailing spaces   
+	line starting with a tab
+    line starting with four spaces
+
+line after an empty line
+symbols: {} [] @ ... // /* */"
+
+const nestedMultiline = {
+  body "header
+	indented body
+footer"
+  items [
+    "array item one
+array item one continuation"
+    "array item two
+	array item two tabbed continuation"
+  ]
+}

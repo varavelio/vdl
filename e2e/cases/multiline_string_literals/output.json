@@ -1,0 +1,56 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "nestedMultiline",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "body",
+            "value": {
+              "kind": "string",
+              "stringValue": "header\n\tindented body\nfooter"
+            }
+          },
+          {
+            "key": "items",
+            "value": {
+              "arrayItems": [
+                {
+                  "kind": "string",
+                  "stringValue": "array item one\narray item one continuation"
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "array item two\n\tarray item two tabbed continuation"
+                }
+              ],
+              "kind": "array"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "plainMultiline",
+      "value": {
+        "kind": "string",
+        "stringValue": "first line\nsecond line\nthird line"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "whitespaceSensitive",
+      "value": {
+        "kind": "string",
+        "stringValue": "line with trailing spaces   \n\tline starting with a tab\n    line starting with four spaces\n\nline after an empty line\nsymbols: {} [] @ ... // /* */"
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [],
+  "types": []
+}
