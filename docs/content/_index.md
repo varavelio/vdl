@@ -6,7 +6,7 @@ description = "VDL is an open-source, type-safe, multi-language, and easily exte
 {{ header_base(
 show_title=false,
 container="lg",
-menu="Overview|/docs/about/,Language|/docs/language/start-here/,Plugins|/docs/guides/plugins/,Reference|/docs/reference/spec/",
+menu="Overview|/docs/about/,Language|/docs/language/start-here/,Plugins|/docs/guides/plugins/,Reference|/docs/reference/spec/,GitHub|https://github.com/varavelio/vdl",
 cta_text="Install",
 cta_url="/docs/guides/installation/"
 ) }}
