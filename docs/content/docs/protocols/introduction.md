@@ -6,7 +6,7 @@ path = "docs/protocols/introduction"
 weight = 1
 +++
 
-# VDL Plugin Protocols (VPP)
+## VDL Plugin Protocols
 
 A **VDL Plugin Protocol** (**VPP**) is a written standard for a family of VDL plugins.
 
