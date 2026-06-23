@@ -14,6 +14,8 @@ VDL itself is intentionally small. The core language gives you a compact way to 
 
 The plugin-first model is powerful, but it needs discipline. Without shared protocols, every plugin could interpret the same annotation differently, produce incompatible APIs, or apply different validation rules. VPPs prevent that fragmentation.
 
+Plugins are not required to use a VPP. A plugin can be completely ad hoc, especially when it exists for one project, one team, or one private workflow. VPPs become useful when the same pattern appears across projects often enough that it is worth standardizing. At that point, a protocol lets multiple plugins implement the same idea across different languages and stacks, so VDL continues to feel familiar no matter what environment you are working in.
+
 ## Why VPPs Exist
 
 VPPs exist so VDL can stay small while the ecosystem remains consistent.
@@ -69,6 +71,10 @@ A VPP is also not a single implementation. Multiple plugins can implement the sa
 When defining or proposing a VPP, write it as a contract for implementers.
 
 The document should be precise enough that two independent plugin authors can read it, implement it separately, and produce compatible behavior. It should explain the intent in plain language, then define the exact rules that make the behavior testable.
+
+Any person, team, or organization can define their own VPPs for internal use. Private protocols are useful when a company wants consistent behavior across its own plugins without waiting for an ecosystem-wide standard.
+
+Official VDL protocols are different. To become an official VPP, a proposal must go through a formal community discussion on GitHub. That discussion is where the vocabulary, validation rules, edge cases, and long-term compatibility concerns are refined before the protocol becomes part of the public VDL standard set.
 
 At minimum, a protocol should answer these questions.
 
