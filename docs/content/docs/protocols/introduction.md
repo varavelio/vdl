@@ -1,10 +1,12 @@
 +++
-title = "VDL Plugin Protocols"
+title = "Introduction"
 description = "What VDL Plugin Protocols are, why they exist, and how they keep the ecosystem consistent."
 template = "docs.html"
 path = "docs/protocols/introduction"
 weight = 1
 +++
+
+# VDL Plugin Protocols (VPP)
 
 A **VDL Plugin Protocol** (**VPP**) is a written standard for a family of VDL plugins.
 
