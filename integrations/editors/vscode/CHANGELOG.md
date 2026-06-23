@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.1.6 - 2026-06-23
+
+- Improved the TextMate grammar for more accurate VDL syntax highlighting.
+
 ## v0.1.5 - 2026-03-09
 
 - Added workspace-local VDL binary discovery through `node_modules/.bin`, including parent directories up to the filesystem root.
