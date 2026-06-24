@@ -358,6 +358,8 @@ Example request body:
 
 If the stream does not define `input`, the subscription does not require an application-level input payload.
 
+Browser implementations need one extra consideration. Native browser `EventSource` only supports `GET` requests and does not support sending a JSON request body. VPP-2 compatible browser clients must therefore use a client implementation that supports `POST`, request bodies, and incremental `text/event-stream` parsing, such as `fetch` with the Streams API or an equivalent abstraction.
+
 ### Server Handling
 
 The server validates input and initializes the SSE channel.
@@ -392,6 +394,27 @@ data: {"ok":false,"error":{"message":"You do not have permission to view this ch
 
 If the stream does not define `output`, emitted success envelopes do not need to include application-level output data.
 
+### Stream Control Events
+
+VPP-2 uses SSE control events for stream lifecycle signals that are not application output.
+
+Keep-alive pings are SSE comments. They carry no application data and are ignored by generated clients.
+
+```text
+: ping
+```
+
+Clean stream completion is represented by the reserved `close` SSE event.
+
+```text
+event: close
+data: {}
+```
+
+When a stream handler completes successfully, the server must send this `close` event before closing the underlying HTTP connection. Generated clients must consume the `close` event internally, stop the subscription loop, and avoid triggering reconnection logic for that stream.
+
+The `close` event is not an application output, not an error envelope, and must not be delivered to application code.
+
 ### Keep-Alive Events
 
 Servers send periodic SSE comments to keep connections alive.
@@ -406,14 +429,15 @@ The generated client processes stream events continuously.
 
 1. It parses SSE frames.
 2. It ignores comment ping frames.
-3. It deserializes JSON payloads.
-4. It delivers output or error envelopes to application code. Stream errors are delivered from `ok: false` event envelopes; they are not the same thing as transport failures.
+3. It handles `event: close` as clean stream completion.
+4. It deserializes JSON payloads from application data events.
+5. It delivers output or error envelopes to application code. Stream errors are delivered from `ok: false` event envelopes; they are not the same thing as transport failures.
 
 ### Stream Termination
 
 A stream can end by client cancellation, handler completion, or network interruption.
 
-Generated clients may reconnect automatically with configurable retry behavior, re-sending the original subscription request when applicable.
+When the handler completes successfully, the server must send the `event: close` control event before closing the connection. If the connection ends without a `close` event, generated clients may treat it as a transport interruption and reconnect automatically with configurable retry behavior, re-sending the original subscription request when applicable.
 
 ## Required Behavior for Compatible Plugins
 
@@ -431,8 +455,10 @@ A plugin may call itself VPP-2 compatible only if it follows these rules.
 10. It must preserve the optional nature of `input` and `output`.
 11. It must preserve the distinction between procedure responses, stream events, application errors, and transport failures.
 12. It must return HTTP `200 OK` for successfully processed procedure requests, including application errors represented by `ok: false`.
-13. It must not reinterpret VPP-2 streams as WebSockets, polling, or another transport while claiming VPP-2 wire compatibility.
-14. It must not reinterpret VPP-2 procedures as `GET`, query-parameter calls, or non-envelope responses while claiming VPP-2 wire compatibility.
+13. When generating stream server implementations, it must preserve clean stream completion semantics with the reserved `event: close` control event.
+14. When generating browser stream clients, it must use a `POST`-capable incremental `text/event-stream` reader instead of relying on native `EventSource`.
+15. It must not reinterpret VPP-2 streams as WebSockets, polling, or another transport while claiming VPP-2 wire compatibility.
+16. It must not reinterpret VPP-2 procedures as `GET`, query-parameter calls, or non-envelope responses while claiming VPP-2 wire compatibility.
 
 Plugins may provide additional framework integrations, generated helpers, runtime adapters, middleware APIs, testing utilities, or documentation output. Those additions must not change the protocol semantics described here.
 
