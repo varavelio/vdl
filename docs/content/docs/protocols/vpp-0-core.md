@@ -76,7 +76,7 @@ VPP-0 Core is the base layer. Other protocols may depend on it, but Core must no
 
 A Core plugin may preserve protocol metadata in comments, annotations, generated metadata files, or language-specific attributes when doing so is useful and non-invasive. However, it must not implement the behavior of other protocols as part of Core generation.
 
-For example, if a declaration is marked as deprecated, a Core plugin may emit the appropriate language-level deprecation comment or attribute. That is still compatible with Core because it affects the generated representation of a primitive declaration. By contrast, generating an RPC server from `@rpc` belongs to the RPC protocol, not to VPP-0 Core.
+For example, if a declaration is marked as deprecated under VPP-1, a Core plugin may emit the appropriate language-level deprecation comment, attribute, or feature to preserve the semantics defined by that protocol. That is still compatible with Core because it affects the generated representation of a primitive declaration. By contrast, generating an RPC server from `@rpc` belongs to the RPC protocol, not to VPP-0 Core.
 
 ## Expected Behavior
 

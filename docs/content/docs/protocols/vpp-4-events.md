@@ -152,7 +152,9 @@ Plugins must generate a way to build the final subject string for each event.
 
 A subject builder always returns a `string`.
 
-If a placeholder field is not a string, the subject builder must convert that primitive value to a string when composing the final subject.
+All placeholder values are rendered as string segments when composing the final subject. If a placeholder field is not a string, the subject builder must convert that primitive value using deterministic target-appropriate formatting.
+
+A placeholder field's type controls the generated builder parameter type and validation, the final subject segment is always text.
 
 When a placeholder appears more than once, the builder should accept that field once and reuse the same value for every occurrence. For deterministic APIs, placeholder parameters should follow the order of first appearance in the template.
 
