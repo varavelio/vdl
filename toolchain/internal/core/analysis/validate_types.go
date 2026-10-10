@@ -65,7 +65,10 @@ func validateTypeRef(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 		if typeInfo.MapValue != nil {
 			diagnostics = append(
 				diagnostics,
-				validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
+				validateNestedTypeRef(
+					symbols, typeInfo.MapValue, typ,
+				)...,
+			)
 		}
 
 	case FieldTypeKindObject:
@@ -73,7 +76,10 @@ func validateTypeRef(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 		if typeInfo.ObjectDef != nil {
 			diagnostics = append(
 				diagnostics,
-				validateFieldTypes(symbols, typeInfo.ObjectDef.Fields, "type", typ.Name)...)
+				validateFieldTypes(
+					symbols, typeInfo.ObjectDef.Fields, "type", typ.Name,
+				)...,
+			)
 		}
 	}
 
@@ -126,7 +132,10 @@ func validateNestedTypeRef(
 		if typeInfo.MapValue != nil {
 			diagnostics = append(
 				diagnostics,
-				validateNestedTypeRef(symbols, typeInfo.MapValue, typ)...)
+				validateNestedTypeRef(
+					symbols, typeInfo.MapValue, typ,
+				)...,
+			)
 		}
 
 	case FieldTypeKindObject:
@@ -138,7 +147,8 @@ func validateNestedTypeRef(
 					typeInfo.ObjectDef.Fields,
 					"inline object in type",
 					typ.Name,
-				)...)
+				)...,
+			)
 		}
 	}
 
@@ -156,7 +166,10 @@ func validateFieldTypes(
 	for _, field := range fields {
 		diagnostics = append(
 			diagnostics,
-			validateFieldType(symbols, field.Type, field, context, parentName)...)
+			validateFieldType(
+				symbols, field.Type, field, context, parentName,
+			)...,
+		)
 	}
 
 	return diagnostics
@@ -218,7 +231,10 @@ func validateFieldType(
 		if typeInfo.MapValue != nil {
 			diagnostics = append(
 				diagnostics,
-				validateFieldType(symbols, typeInfo.MapValue, field, context, parentName)...)
+				validateFieldType(
+					symbols, typeInfo.MapValue, field, context, parentName,
+				)...,
+			)
 		}
 
 	case FieldTypeKindObject:
@@ -231,7 +247,8 @@ func validateFieldType(
 					typeInfo.ObjectDef.Fields,
 					"inline object in",
 					field.Name,
-				)...)
+				)...,
+			)
 		}
 	}
 

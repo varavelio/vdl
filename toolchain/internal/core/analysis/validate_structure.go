@@ -18,11 +18,17 @@ func validateStructure(symbols *symbolTable) []Diagnostic {
 		if typ.IsObject() && typ.Type.ObjectDef != nil {
 			diagnostics = append(
 				diagnostics,
-				validateFieldUniqueness(typ.Type.ObjectDef.Fields, "type", typ.Name, typ.File)...)
+				validateFieldUniqueness(
+					typ.Type.ObjectDef.Fields, "type", typ.Name, typ.File,
+				)...,
+			)
 			for _, field := range typ.Type.ObjectDef.Fields {
 				diagnostics = append(
 					diagnostics,
-					validateInlineFieldUniqueness(field.Type, typ.File, field.Name)...)
+					validateInlineFieldUniqueness(
+						field.Type, typ.File, field.Name,
+					)...,
+				)
 			}
 		}
 	}
@@ -31,7 +37,10 @@ func validateStructure(symbols *symbolTable) []Diagnostic {
 		if cnst.AST != nil && cnst.AST.Value != nil {
 			diagnostics = append(
 				diagnostics,
-				validateObjectLiteralUniqueness(cnst.AST.Value, cnst.File)...)
+				validateObjectLiteralUniqueness(
+					cnst.AST.Value, cnst.File,
+				)...,
+			)
 		}
 	}
 
@@ -87,11 +96,17 @@ func validateInlineFieldUniqueness(typeInfo *FieldTypeInfo, file, owner string) 
 		}
 		diagnostics = append(
 			diagnostics,
-			validateFieldUniqueness(typeInfo.ObjectDef.Fields, "inline object in", owner, file)...)
+			validateFieldUniqueness(
+				typeInfo.ObjectDef.Fields, "inline object in", owner, file,
+			)...,
+		)
 		for _, f := range typeInfo.ObjectDef.Fields {
 			diagnostics = append(
 				diagnostics,
-				validateInlineFieldUniqueness(f.Type, file, f.Name)...)
+				validateInlineFieldUniqueness(
+					f.Type, file, f.Name,
+				)...,
+			)
 		}
 	}
 
@@ -110,7 +125,10 @@ func validateObjectLiteralUniqueness(lit *ast.DataLiteral, file string) []Diagno
 			if entry.Spread != nil {
 				diagnostics = append(
 					diagnostics,
-					validateObjectLiteralUniqueness(entry.Value, file)...)
+					validateObjectLiteralUniqueness(
+						entry.Value, file,
+					)...,
+				)
 				continue
 			}
 			if existing, ok := seen[entry.Key]; ok {

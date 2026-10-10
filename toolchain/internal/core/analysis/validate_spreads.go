@@ -20,7 +20,10 @@ func validateSpreads(symbols *symbolTable) []Diagnostic {
 			for _, field := range typ.Type.ObjectDef.Fields {
 				diagnostics = append(
 					diagnostics,
-					validateInlineObjectSpreads(symbols, field.Type, typ.File, field.Name)...)
+					validateInlineObjectSpreads(
+						symbols, field.Type, typ.File, field.Name,
+					)...,
+				)
 			}
 		}
 	}
@@ -132,7 +135,10 @@ func validateInlineObjectSpreads(
 			fieldNames[f.Name] = FieldOrigin{File: file, Pos: f.Pos, Source: "direct field"}
 			diagnostics = append(
 				diagnostics,
-				validateInlineObjectSpreads(symbols, f.Type, file, f.Name)...)
+				validateInlineObjectSpreads(
+					symbols, f.Type, file, f.Name,
+				)...,
+			)
 		}
 
 		for _, spread := range typeInfo.ObjectDef.Spreads {

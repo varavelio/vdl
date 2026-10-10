@@ -31,11 +31,17 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 		if typ.IsObject() && typ.Type.ObjectDef != nil {
 			diagnostics = append(
 				diagnostics,
-				validateFieldNaming(typ.Type.ObjectDef.Fields, "type", typ.Name)...)
+				validateFieldNaming(
+					typ.Type.ObjectDef.Fields, "type", typ.Name,
+				)...,
+			)
 		}
 		diagnostics = append(
 			diagnostics,
-			validateAnnotationNaming(typ.Annotations, typ.File, "type", typ.Name)...)
+			validateAnnotationNaming(
+				typ.Annotations, typ.File, "type", typ.Name,
+			)...,
+		)
 	}
 
 	// Validate enum names and member names
@@ -70,11 +76,15 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 					enum.File,
 					"enum member",
 					member.Name,
-				)...)
+				)...,
+			)
 		}
 		diagnostics = append(
 			diagnostics,
-			validateAnnotationNaming(enum.Annotations, enum.File, "enum", enum.Name)...)
+			validateAnnotationNaming(
+				enum.Annotations, enum.File, "enum", enum.Name,
+			)...,
+		)
 	}
 
 	// Validate constant names
@@ -90,7 +100,10 @@ func validateNaming(symbols *symbolTable) []Diagnostic {
 		}
 		diagnostics = append(
 			diagnostics,
-			validateAnnotationNaming(cnst.Annotations, cnst.File, "constant", cnst.Name)...)
+			validateAnnotationNaming(
+				cnst.Annotations, cnst.File, "constant", cnst.Name,
+			)...,
+		)
 	}
 
 	return diagnostics
@@ -119,11 +132,17 @@ func validateFieldNaming(fields []*FieldSymbol, context, parentName string) []Di
 			field.Type.ObjectDef != nil {
 			diagnostics = append(
 				diagnostics,
-				validateFieldNaming(field.Type.ObjectDef.Fields, "inline object in", field.Name)...)
+				validateFieldNaming(
+					field.Type.ObjectDef.Fields, "inline object in", field.Name,
+				)...,
+			)
 		}
 		diagnostics = append(
 			diagnostics,
-			validateAnnotationNaming(field.Annotations, field.File, "field", field.Name)...)
+			validateAnnotationNaming(
+				field.Annotations, field.File, "field", field.Name,
+			)...,
+		)
 	}
 	return diagnostics
 }

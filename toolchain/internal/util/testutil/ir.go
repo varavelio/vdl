@@ -20,7 +20,8 @@ func IRSchemaEqual(t *testing.T, expected, actual *irtypes.IrSchema, msgAndArgs 
 		t,
 		debugutil.ToBeautyJSON(expected),
 		debugutil.ToBeautyJSON(actual),
-		msgAndArgs...)
+		msgAndArgs...,
+	)
 }
 
 // IRSchemaEqualNoPos compares two IR schemas and fails if they are not equal.
