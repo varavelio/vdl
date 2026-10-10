@@ -15,6 +15,7 @@ When updating this document, do so with the context of the entire document in mi
 ### Root Layout
 
 - `Taskfile.yml`: Central command orchestration for CI, test, lint, format, release, codegen, build, and VS Code extension tasks.
+- `Dockerfile`: Multi-stage container image shared by the dev container (`devcontainer` target) and release publishing (`production` target); the `builder` target compiles the CLI via `task build:prod` with version metadata from build args.
 - `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
 - `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `plugin_input.vdl`, `plugin_output.vdl`).
 - `e2e/`: End-to-end golden tests that build the real `vdl` binary, run `vdl generate` with a small JS IR-dump plugin, and compare generated plugin IR against `output.json` fixtures.
@@ -79,7 +80,6 @@ When updating this document, do so with the context of the entire document in mi
   - `integrations/installers/brew/`: Formula generator for Homebrew tap updates.
   - `integrations/installers/npm/`: npm package wrapper/installer for `vdl`.
   - `integrations/installers/unix/`, `integrations/installers/windows/`: shell and PowerShell installers.
-  - `integrations/installers/docker/`: Official Docker image definition used by release publishing.
 
 ## General Instructions (Constitution)
 
@@ -125,7 +125,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Discover commands**: `task --list-all` (always execute this)
 - **Core verification**: `task test`, `task lint`, `task format`
 - **E2E IR golden tests**: `task test:e2e`
-- **Build**: `task build`
+- **Build**: `task build`, `task build:prod` (release-style binary with version metadata into `dist/`)
 - **Docs build**: `task docs`
 - **Dependencies**: `task deps`
 - **Codegen workflow**: `task codegen`

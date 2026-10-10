@@ -1,0 +1,7 @@
+# Build context hygiene: only sources are needed to build the image.
+.git
+.cache
+dist
+temp
+node_modules
+**/node_modules

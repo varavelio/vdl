@@ -80,6 +80,16 @@ tasks:
     cmds:
       - cd ./toolchain && go build -o ./dist/vdl ./cmd/vdl/.
 
+  build:prod:
+    desc: "Build production CLI binary with version metadata into ./dist"
+    cmds:
+      - mkdir -p ./dist
+      - |
+        cd ./toolchain && \
+        go build -trimpath \
+          -ldflags "-s -w -X github.com/varavelio/vdl/toolchain/internal/version.Version=${VDL_VERSION:-0.0.0-dev} -X github.com/varavelio/vdl/toolchain/internal/version.Commit=${VDL_COMMIT:-unknown} -X github.com/varavelio/vdl/toolchain/internal/version.Date=${VDL_DATE:-unknown}" \
+          -o ../dist/vdl ./cmd/vdl/.
+
   docs:
     desc: "Build documentation website"
     cmd: cd ./docs && node ./themes/varapress/llms.mjs

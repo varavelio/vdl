@@ -54,7 +54,20 @@ CMD ["sleep", "infinity"]
 
 FROM tools AS builder
 
-# TODO: Complete this
+# Build time variables
+ARG \
+  VDL_VERSION \
+  VDL_COMMIT \
+  VDL_DATE
+
+# Warm the Go module cache before copying the sources so dependency
+# downloads stay cached across source-only changes.
+COPY toolchain/go.mod toolchain/go.sum ./toolchain/
+RUN cd ./toolchain && go mod download
+
+COPY . .
+
+RUN task build:prod
 
 ##############
 # PRODUCTION #

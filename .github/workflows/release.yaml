@@ -139,7 +139,7 @@ jobs:
   build-and-push-images:
     name: Build and push ${{ matrix.vars.platform }}
     runs-on: ${{ matrix.vars.os }}
-    needs: [setup, build-and-upload]
+    needs: [setup]
     if: needs.setup.outputs.should_run == 'true'
     permissions:
       contents: read
@@ -172,12 +172,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build the Docker image
-        run: >
-          docker build
-          --tag varavel/vdl:${CLEAN_TAG}-${PLATFORM}
-          --tag ghcr.io/varavelio/vdl:${CLEAN_TAG}-${PLATFORM}
-          --build-arg VDL_VERSION=${CLEAN_TAG}
-          --file ./integrations/installers/docker/Dockerfile .
+        run: |
+          docker build \
+            --tag "varavel/vdl:${CLEAN_TAG}-${PLATFORM}" \
+            --tag "ghcr.io/varavelio/vdl:${CLEAN_TAG}-${PLATFORM}" \
+            --build-arg "VDL_VERSION=${CLEAN_TAG}" \
+            --build-arg "VDL_COMMIT=$(git rev-parse --short HEAD)" \
+            --build-arg "VDL_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --file ./Dockerfile .
 
       - name: Push the Docker images
         run: |
