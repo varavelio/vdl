@@ -1,8 +1,13 @@
 {
   "name": "vdl",
   "displayName": "VDL",
+  "version": "0.1.6",
   "description": "Official language support for VDL (Varavel Definition Language): Syntax highlighting, LSP, snippets, and more.",
-  "icon": "./assets/icon.png",
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/varavelio/vdl.git",
@@ -10,24 +15,17 @@
   },
   "license": "MIT",
   "author": "Varavel",
-  "publisher": "Varavel",
   "contributors": [
     {
       "name": "Luis Eduardo Jerez",
       "url": "https://eduardo.lat"
     }
   ],
-  "version": "0.1.6",
-  "engines": {
-    "vscode": "^1.90.0"
-  },
-  "categories": [
-    "Programming Languages",
-    "Linters",
-    "Formatters"
-  ],
-  "activationEvents": [],
+  "publisher": "Varavel",
   "main": "./dist/extension.js",
+  "scripts": {
+    "-": "Run commands using the root's Taskfile.yml file"
+  },
   "contributes": {
     "languages": [
       {
@@ -96,8 +94,9 @@
       }
     }
   },
-  "scripts": {
-    "-": "Run commands using the root's Taskfile.yml file"
+  "activationEvents": [],
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
   },
   "devDependencies": {
     "@types/node": "20.x",
@@ -107,7 +106,8 @@
     "@vscode/vsce": "3.7.1",
     "esbuild": "0.25.2"
   },
-  "dependencies": {
-    "vscode-languageclient": "9.0.1"
-  }
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "icon": "./assets/icon.png"
 }

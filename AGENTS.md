@@ -115,7 +115,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Docs**: Veta site in `docs/` using `veta-theme-vara`; content is Markdown with YAML frontmatter and is formatted with dprint.
 - **Editor extension**: VS Code extension in `integrations/editors/vscode/` with Node/JS and `vscode-languageclient`.
 - **Syntax grammar**: Shared TextMate grammar package in `integrations/syntax/textmate/`, consumed by docs highlighting and copied into the VS Code extension during build/package tasks.
-- **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools.
+- **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools. `dprint.json` declares plugins as `npm:` specifiers, so the dprint CLI must be new enough to resolve them. dprint is not an npm dependency; it is a base tool installed by the `Dockerfile` (version pinned there) and expected on `PATH`.
 - **Code style goals**:
   - Idiomatic Go with clear, small functions and explicit error handling.
   - Keep LSP logic robust under partial/invalid code (best-effort behavior is expected).
