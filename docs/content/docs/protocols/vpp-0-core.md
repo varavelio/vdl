@@ -1,10 +1,9 @@
-+++
-title = "VPP-0: Core"
-description = "Foundational plugins for generating the primitive VDL model: types, enums, and constants."
-template = "docs.html"
-path = "docs/protocols/core"
-weight = 2
-+++
+---
+title: "VPP-0: Core"
+description: "Foundational plugins for generating the primitive VDL model: types, enums, and constants."
+path: "docs/protocols/core"
+weight: 2
+---
 
 **VPP-0: Core** defines the expectations for foundational plugins that generate the most primitive VDL artifacts for a target language.
 

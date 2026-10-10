@@ -21,6 +21,7 @@
     "**/*.svg",
     "**/*.svelte",
     "**/*.astro",
+    "**/*.j2",
     "**/*.schema.json",
     "**/*-lock.json",
     "**/node_modules",
@@ -34,9 +35,7 @@
     "**/immutable",
     "**/_app",
     "**/.astro",
-    "**/_astro",
-    "**/docs/static",
-    "**/docs/themes"
+    "**/_astro"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.21.1.wasm",

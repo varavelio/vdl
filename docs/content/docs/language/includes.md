@@ -1,9 +1,8 @@
-+++
-title = "Includes"
-description = "Split VDL schemas across files with include statements."
-template = "docs.html"
-weight = 3
-+++
+---
+title: "Includes"
+description: "Split VDL schemas across files with include statements."
+weight: 3
+---
 
 ## Why Includes Exist
 

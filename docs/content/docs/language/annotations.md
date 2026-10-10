@@ -1,9 +1,8 @@
-+++
-title = "Annotations"
-description = "Attach metadata to VDL declarations, fields, and enum members."
-template = "docs.html"
-weight = 9
-+++
+---
+title: "Annotations"
+description: "Attach metadata to VDL declarations, fields, and enum members."
+weight: 9
+---
 
 ## What Annotations Are
 

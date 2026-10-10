@@ -1,0 +1,9 @@
+title: "Varavel Definition Language"
+description: "VDL is an open-source, type-safe, multi-language, and easily extensible schema definition language and code generation toolchain."
+site_url: "https://vdl.varavel.com"
+favicon: "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/icon.svg"
+logo_light: "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/vdl.svg"
+logo_dark: "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/vdl.svg"
+
+docs_github_repo: "varavelio/vdl"
+docs_show_title: false

@@ -1,9 +1,8 @@
-+++
-title = "Formatting Guide"
-description = "Standard formatting conventions for VDL."
-template = "docs.html"
-weight = 2
-+++
+---
+title: "Formatting Guide"
+description: "Standard formatting conventions for VDL."
+weight: 2
+---
 
 This guide defines how to keep VDL files easy to read, stable in diffs, and predictable across teams.
 

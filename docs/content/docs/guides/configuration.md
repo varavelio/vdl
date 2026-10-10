@@ -1,9 +1,8 @@
-+++
-title = "Project Configuration"
-description = "Configure VDL generation with vdl.config.vdl."
-template = "docs.html"
-weight = 4
-+++
+---
+title: "Project Configuration"
+description: "Configure VDL generation with vdl.config.vdl."
+weight: 4
+---
 
 ## What `vdl.config.vdl` Does
 

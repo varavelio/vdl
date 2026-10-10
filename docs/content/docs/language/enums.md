@@ -1,9 +1,8 @@
-+++
-title = "Enums"
-description = "Define finite sets of named values."
-template = "docs.html"
-weight = 7
-+++
+---
+title: "Enums"
+description: "Define finite sets of named values."
+weight: 7
+---
 
 ## What Enums Are
 

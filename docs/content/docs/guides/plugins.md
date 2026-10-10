@@ -1,9 +1,8 @@
-+++
-title = "Available Plugins"
-description = "Official VDL plugins and what each one generates."
-template = "docs.html"
-weight = 5
-+++
+---
+title: "Available Plugins"
+description: "Official VDL plugins and what each one generates."
+weight: 5
+---
 
 ## Overview
 

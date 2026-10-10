@@ -1,9 +1,8 @@
-+++
-title = "About VDL"
-description = "Learn what VDL is, what it provides, and why the core language stays small."
-template = "docs.html"
-weight = 1
-+++
+---
+title: "About VDL"
+description: "Learn what VDL is, what it provides, and why the core language stays small."
+weight: 1
+---
 
 ## A Definition Language For Data Contracts
 

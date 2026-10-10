@@ -1,9 +1,8 @@
-+++
-title = "Types"
-description = "Define object types, aliases, arrays, maps, and inline objects."
-template = "docs.html"
-weight = 5
-+++
+---
+title: "Types"
+description: "Define object types, aliases, arrays, maps, and inline objects."
+weight: 5
+---
 
 ## What Types Are
 

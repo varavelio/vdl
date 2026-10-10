@@ -1,9 +1,8 @@
-+++
-title = "Installation"
-description = "Complete installation options for the VDL CLI."
-template = "docs.html"
-weight = 1
-+++
+---
+title: "Installation"
+description: "Complete installation options for the VDL CLI."
+weight: 1
+---
 
 ## Overview
 

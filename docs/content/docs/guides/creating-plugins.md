@@ -1,9 +1,8 @@
-+++
-title = "Creating Plugins"
-description = "A practical guide to writing VDL plugins."
-template = "docs.html"
-weight = 6
-+++
+---
+title: "Creating Plugins"
+description: "A practical guide to writing VDL plugins."
+weight: 6
+---
 
 > **Note:** You do not need Node.js or any JavaScript runtime installed on your machine. VDL executes plugin JavaScript code through [Goja](https://github.com/dop251/goja), an embedded ECMAScript runtime built into the VDL binary.
 

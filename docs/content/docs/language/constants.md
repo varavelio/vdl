@@ -1,9 +1,8 @@
-+++
-title = "Constants and Literals"
-description = "Define reusable dynamic literal values with const declarations."
-template = "docs.html"
-weight = 8
-+++
+---
+title: "Constants and Literals"
+description: "Define reusable dynamic literal values with const declarations."
+weight: 8
+---
 
 ## What Constants Are
 

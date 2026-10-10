@@ -1,9 +1,8 @@
-+++
-title = "Naming and Validation"
-description = "Learn the naming conventions and validation rules VDL applies."
-template = "docs.html"
-weight = 11
-+++
+---
+title: "Naming and Validation"
+description: "Learn the naming conventions and validation rules VDL applies."
+weight: 11
+---
 
 ## Why Naming Matters
 

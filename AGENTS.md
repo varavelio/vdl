@@ -19,7 +19,7 @@ When updating this document, do so with the context of the entire document in mi
 - `toolchain/`: Go codebase for the `vdl` binary (CLI + LSP + formatter + compiler core).
 - `schemas/`: VDL schemas for internal contracts (`ir.vdl`, `plugin.vdl`, `plugin_input.vdl`, `plugin_output.vdl`).
 - `e2e/`: End-to-end golden tests that build the real `vdl` binary, run `vdl generate` with a small JS IR-dump plugin, and compare generated plugin IR against `output.json` fixtures.
-- `docs/`: Zola documentation site using the vendored VaraPress theme.
+- `docs/`: Veta documentation site using the `veta-theme-vara` theme.
 - `integrations/`: External integrations grouped by purpose (`editors/`, `syntax/`, `installers/`).
 - `scripts/`: Release automation (`scripts/release/main.go`).
 - `assets/`: Branding/static assets used by docs and packaging.
@@ -54,21 +54,22 @@ When updating this document, do so with the context of the entire document in mi
 
 ### `docs/` (Documentation)
 
-- **Role**: Public Zola documentation and landing site for VDL, rendered with the VaraPress theme.
+- **Role**: Public documentation and landing site for VDL, built with Veta and the Vara theme (`veta-theme-vara`).
 - **Key paths**:
-  - `zola.toml`: Zola site configuration and VaraPress theme options.
-  - `content/_index.md`: Home landing page composed with VaraPress landing shortcodes.
-  - `content/docs/_index.md`: Docs root section; uses `template = "docs.html"` and `sort_by = "weight"`.
-  - `content/docs/about.md`: Project overview and positioning.
-  - `content/docs/language/_index.md`: Language guide section index; child pages are ordered by `weight`.
-  - `content/docs/guides/_index.md`: Practical guides section index; child pages are ordered by `weight`.
-  - `content/docs/reference/_index.md`: Reference section index; child pages are ordered by `weight`.
-  - `themes/varapress/`: Vendored VaraPress theme. Treat as third-party theme code unless the task explicitly requires theme changes.
+  - `veta.yaml`: Veta build, dev server, Tailwind, and theme source configuration.
+  - `data/site.yaml`: Site settings (title, description, site URL, logos, docs branding).
+  - `pages/pages.js`: Page generators for the landing page, 404, and sitemap.
+  - `pages/docs.js`: Generators for every docs page, its raw Markdown twin, and the search/llms outputs.
+  - `content/index.md`: Home landing page composed from Vara components.
+  - `content/docs/`: Docs tree; `index.md` files are section indexes and child pages are ordered by `weight`.
+  - `components/landing-hero.j2`: Project-specific landing hero, the one block the theme does not model.
+  - `public/`: Project static assets (`styles.css`, `_redirects`).
 - **Content conventions**:
-  - Use Zola TOML frontmatter delimited by `+++` for all docs pages and sections.
+  - Use YAML frontmatter delimited by `---` for all docs pages and sections.
   - Use explicit `weight` values to control sidebar and previous/next ordering.
-  - Use clean Zola paths such as `/docs/guides/installation/` for internal links instead of old `.md` links.
-  - Compose the landing page with VaraPress shortcodes; use each shortcode's own `container` parameter rather than wrapping standard landing sections.
+  - Use the `path` frontmatter field when a page URL must differ from its file path (see `content/docs/protocols/`).
+  - Use clean site paths such as `/docs/guides/installation/` for internal links instead of old `.md` links.
+  - Compose the landing page with Vara components; use each component's own `container` parameter rather than wrapping standard landing sections.
 
 ### `integrations/` (External Integrations)
 
@@ -111,7 +112,7 @@ When updating this document, do so with the context of the entire document in mi
 ## Tech Stack & Conventions
 
 - **Go**: 1.26 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
-- **Docs**: Zola site in `docs/` using VaraPress; content is Markdown with TOML frontmatter and is formatted with dprint.
+- **Docs**: Veta site in `docs/` using `veta-theme-vara`; content is Markdown with YAML frontmatter and is formatted with dprint.
 - **Editor extension**: VS Code extension in `integrations/editors/vscode/` with Node/JS and `vscode-languageclient`.
 - **Syntax grammar**: Shared TextMate grammar package in `integrations/syntax/textmate/`, consumed by docs highlighting and copied into the VS Code extension during build/package tasks.
 - **Monorepo JS tooling**: Biome and dprint are the main cross-project format/lint tools.

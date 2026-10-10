@@ -1,0 +1,7 @@
+---
+title: "Language"
+description: "Learn how to write VDL schemas from first principles."
+weight: 3
+---
+
+This guide teaches the VDL language step by step. Read the pages in order if you are new to VDL, or jump directly to the topic you need.

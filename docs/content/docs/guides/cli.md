@@ -1,9 +1,8 @@
-+++
-title = "CLI Commands"
-description = "Complete reference for the VDL command-line interface."
-template = "docs.html"
-weight = 2
-+++
+---
+title: "CLI Commands"
+description: "Complete reference for the VDL command-line interface."
+weight: 2
+---
 
 ## Overview
 

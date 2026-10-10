@@ -1,9 +1,8 @@
-+++
-title = "Docstrings"
-description = "Document VDL schemas with inline and external Markdown docs."
-template = "docs.html"
-weight = 4
-+++
+---
+title: "Docstrings"
+description: "Document VDL schemas with inline and external Markdown docs."
+weight: 4
+---
 
 ## What Docstrings Are
 

@@ -19,9 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
 
       - name: Build documentation
         uses: devcontainers/ci@v0.3
@@ -43,7 +40,7 @@ jobs:
           sudo rm -rf node_modules
 
           # Deploy to Cloudflare Pages
-          OUTPUT=$(npx wrangler pages deploy ./docs/public \
+          OUTPUT=$(npx wrangler pages deploy ./docs/dist \
             --project-name=varavel-vdl \
             --branch="${{ github.ref_name }}" \
             --commit-hash="${{ github.sha }}" \

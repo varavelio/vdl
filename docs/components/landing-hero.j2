@@ -1,0 +1,69 @@
+{% import "../templates/vara/macros/button.j2" button %}
+
+{% comment %}
+  VDL landing hero.
+
+  Project-specific split hero for the docs landing page. It follows the
+  veta-theme-vara hero structure and adds the two panels the theme hero does
+  not model: a labeled "How it works" panel and the three-step process
+  metrics. The copy lives in content/index.md; this component only renders it.
+{% endcomment %}
+
+{% set container = props.container|default:"lg" %}
+{% set background = props.background|default:"base-100" %}
+{% set has_media = props.panel_title or props.panel_description or props.metric_1_value or props.item_1 %}
+{% if container == "xs" %}{% set container_cls = "max-w-md" %}{% elif container == "sm" %}{% set container_cls = "max-w-3xl" %}{% elif container == "md" %}{% set container_cls = "max-w-6xl" %}{% elif container == "xl" %}{% set container_cls = "max-w-[120rem]" %}{% elif container == "full" %}{% set container_cls = "max-w-full" %}{% else %}{% set container_cls = "max-w-7xl" %}{% endif %}
+
+{% macro hero_actions() %}
+  {% if props.primary_label and props.primary_href %}
+    <div class="mt-8 flex w-full flex-col gap-3 desk:w-auto desk:flex-row">
+      {{ button(props.primary_label, props.primary_href, "", props.primary_icon|default:"", "", "lg", "md", props.primary_variant|default:"solid", props.primary_color|default:"neutral", "true", "false", "button", "desk:w-auto") }}
+      {% if props.secondary_label and props.secondary_href %}{{ button(props.secondary_label, props.secondary_href, "", props.secondary_icon|default:"", "", "lg", "md", props.secondary_variant|default:"outline", props.secondary_color|default:"neutral", "true", "false", "button", "desk:w-auto") }}{% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro panel_item(text) %}
+  {% if text %}<li class="flex items-start gap-3 text-sm leading-6 text-content-muted"><span class="mt-1 shrink-0 text-content" aria-hidden="true">{{ vara_icon("check", "size-4")|safe }}</span><span>{{ text }}</span></li>{% endif %}
+{% endmacro %}
+
+{% macro metric(value, label) %}
+  {% if value and label %}
+    <div class="rounded-lg border border-base-400 bg-base-100 p-3">
+      <p class="font-mono text-lg font-semibold tracking-tight text-content">{{ value }}</p>
+      <p class="mt-1 text-xs leading-5 text-content-muted">{{ label }}</p>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+<section class="not-prose bg-{{ background }} py-12 desk:py-24{% if props.class %} {{ props.class }}{% endif %}">
+  <div class="mx-auto w-full {{ container_cls }} px-4">
+    <div class="grid items-center gap-8 desk:grid-cols-2 desk:gap-12">
+      <div class="flex min-w-0 flex-col items-start">
+        {% if props.eyebrow %}<p class="mb-4 inline-flex rounded-full border border-base-400 bg-base-200 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-content-muted">{{ props.eyebrow }}</p>{% endif %}
+        {% if props.title %}<h1 class="max-w-4xl text-4xl font-semibold tracking-tight text-content desk:text-6xl">{{ props.title }}</h1>{% endif %}
+        {% if props.description %}<p class="mt-5 max-w-2xl text-base leading-7 text-content-muted desk:text-xl desk:leading-8">{{ props.description }}</p>{% endif %}
+        {{ hero_actions() }}
+        {% if props.caption %}<p class="mt-4 text-sm leading-6 text-content-muted">{{ props.caption }}</p>{% endif %}
+      </div>
+
+      {% if has_media %}
+        <div class="min-w-0">
+          <div class="rounded-lg border border-base-400 bg-base-200 p-6 desk:p-8">
+            {% if props.panel_label %}<p class="inline-flex rounded-full border border-base-400 bg-base-100 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-content-muted">{{ props.panel_label }}</p>{% endif %}
+            {% if props.panel_title %}<h2 class="mt-5 text-xl font-medium tracking-tight text-content desk:text-2xl">{{ props.panel_title }}</h2>{% endif %}
+            {% if props.panel_description %}<p class="mt-3 text-sm leading-6 text-content-muted desk:text-base">{{ props.panel_description }}</p>{% endif %}
+            {% if props.metric_1_value %}
+              <dl class="mt-6 grid grid-cols-3 gap-3">
+                {{ metric(props.metric_1_value, props.metric_1_label|default:"") }}
+                {{ metric(props.metric_2_value|default:"", props.metric_2_label|default:"") }}
+                {{ metric(props.metric_3_value|default:"", props.metric_3_label|default:"") }}
+              </dl>
+            {% endif %}
+            {% if props.item_1 or props.item_2 or props.item_3 %}<ul class="mt-6 space-y-3">{{ panel_item(props.item_1) }}{{ panel_item(props.item_2) }}{{ panel_item(props.item_3) }}</ul>{% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

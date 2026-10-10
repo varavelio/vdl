@@ -1,10 +1,9 @@
-+++
-title = "VPP-3: Policy"
-description = "Type-safe authorization checks compiled into native boolean functions."
-template = "docs.html"
-path = "docs/protocols/policy"
-weight = 5
-+++
+---
+title: "VPP-3: Policy"
+description: "Type-safe authorization checks compiled into native boolean functions."
+path: "docs/protocols/policy"
+weight: 5
+---
 
 **VPP-3: Policy** defines a standard way to model authorization checks in VDL and compile them into native boolean functions.
 

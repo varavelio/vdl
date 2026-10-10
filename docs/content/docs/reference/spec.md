@@ -1,9 +1,8 @@
-+++
-title = "Language Specification"
-description = "Varavel Definition Language (VDL) specification."
-template = "docs.html"
-weight = 1
-+++
+---
+title: "Language Specification"
+description: "Varavel Definition Language (VDL) specification."
+weight: 1
+---
 
 ## Overview
 

@@ -1,9 +1,8 @@
-+++
-title = "Files and Comments"
-description = "How VDL files are structured and how comments work."
-template = "docs.html"
-weight = 2
-+++
+---
+title: "Files and Comments"
+description: "How VDL files are structured and how comments work."
+weight: 2
+---
 
 ## File Extension
 

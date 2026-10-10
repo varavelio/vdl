@@ -1,9 +1,8 @@
-+++
-title = "Editor Integration"
-description = "Set up VDL support in your code editor."
-template = "docs.html"
-weight = 3
-+++
+---
+title: "Editor Integration"
+description: "Set up VDL support in your code editor."
+weight: 3
+---
 
 ## Overview
 

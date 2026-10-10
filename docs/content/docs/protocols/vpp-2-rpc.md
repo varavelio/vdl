@@ -1,10 +1,9 @@
-+++
-title = "VPP-2: RPC"
-description = "Standard RPC modeling and HTTP/SSE transport behavior for VDL plugins."
-template = "docs.html"
-path = "docs/protocols/rpc"
-weight = 4
-+++
+---
+title: "VPP-2: RPC"
+description: "Standard RPC modeling and HTTP/SSE transport behavior for VDL plugins."
+path: "docs/protocols/rpc"
+weight: 4
+---
 
 **VPP-2: RPC** defines the standard way to model remote procedure calls in VDL and the standard HTTP transport behavior that compatible plugins must implement.
 

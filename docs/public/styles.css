@@ -1,0 +1,5 @@
+/*
+  VDL docs stylesheet.
+  Extends the veta-theme-vara entrypoint with project-specific styles.
+*/
+@import "./styles_vara.css";

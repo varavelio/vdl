@@ -1,9 +1,8 @@
-+++
-title = "Start Here"
-description = "Learn how to write VDL schemas from first principles."
-template = "docs.html"
-weight = 1
-+++
+---
+title: "Start Here"
+description: "Learn how to write VDL schemas from first principles."
+weight: 1
+---
 
 ## What You Will Learn
 

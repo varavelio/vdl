@@ -1,10 +1,9 @@
-+++
-title = "Introduction"
-description = "What VDL Plugin Protocols are, why they exist, and how they keep the ecosystem consistent."
-template = "docs.html"
-path = "docs/protocols/introduction"
-weight = 1
-+++
+---
+title: "Introduction"
+description: "What VDL Plugin Protocols are, why they exist, and how they keep the ecosystem consistent."
+path: "docs/protocols/introduction"
+weight: 1
+---
 
 ## VDL Plugin Protocols
 

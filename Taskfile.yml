@@ -91,8 +91,9 @@ tasks:
           -o ../dist/vdl ./cmd/vdl/.
 
   docs:
-    desc: "Build documentation website"
-    cmd: cd ./docs && node ./themes/varapress/llms.mjs
+    desc: "Build documentation website with veta"
+    dir: ./docs
+    cmd: veta build
 
   ###################
   # TOOLCHAIN TASKS #

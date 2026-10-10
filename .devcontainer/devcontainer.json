@@ -13,7 +13,8 @@
         "bradlc.vscode-tailwindcss",
         "vitest.explorer",
         "dprint.dprint",
-        "biomejs.biome"
+        "biomejs.biome",
+        "samuelcolvin.jinjahtml"
       ],
       "settings": {
         "editor.formatOnSave": true,

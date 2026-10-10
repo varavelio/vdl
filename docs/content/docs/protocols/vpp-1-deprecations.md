@@ -1,10 +1,9 @@
-+++
-title = "VPP-1: Deprecations"
-description = "Global deprecation metadata for every VDL plugin and protocol."
-template = "docs.html"
-path = "docs/protocols/deprecations"
-weight = 3
-+++
+---
+title: "VPP-1: Deprecations"
+description: "Global deprecation metadata for every VDL plugin and protocol."
+path: "docs/protocols/deprecations"
+weight: 3
+---
 
 **VPP-1: Deprecations** defines the standard meaning of the `@deprecated` annotation across the entire VDL ecosystem.
 

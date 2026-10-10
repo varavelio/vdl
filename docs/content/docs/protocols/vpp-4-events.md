@@ -1,10 +1,9 @@
-+++
-title = "VPP-4: Events"
-description = "Transport-agnostic event payloads and routing subjects with the @event annotation."
-template = "docs.html"
-path = "docs/protocols/events"
-weight = 6
-+++
+---
+title: "VPP-4: Events"
+description: "Transport-agnostic event payloads and routing subjects with the @event annotation."
+path: "docs/protocols/events"
+weight: 6
+---
 
 **VPP-4: Events** defines a standard way to model asynchronous event payloads and routing subjects in VDL.
 
