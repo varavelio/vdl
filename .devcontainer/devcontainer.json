@@ -1,29 +1,22 @@
 {
-  "image": "ghcr.io/varavelio/vdl-dev:sha-f4e2bb1822c1",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "target": "devcontainer"
+  },
   "remoteUser": "root",
-  "mounts": [
-    "source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.config/opencode,target=/root/.config/opencode,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.local/share/opencode,target=/root/.local/share/opencode,type=bind,consistency=cached"
-  ],
   "postCreateCommand": "bash ./.devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": [
         "varavel.vdl",
         "golang.go",
-        "svelte.svelte-vscode",
-        "Chanzhaoyu.svelte-5-snippets",
         "bradlc.vscode-tailwindcss",
         "vitest.explorer",
         "dprint.dprint",
-        "biomejs.biome",
-        "tamasfe.even-better-toml"
+        "biomejs.biome"
       ],
       "settings": {
-        "files.eol": "\n",
         "editor.formatOnSave": true,
-        "editor.foldingStrategy": "indentation",
         "editor.defaultFormatter": "dprint.dprint",
         "editor.codeActionsOnSave": {
           "source.fixAll.biome": "explicit"
@@ -38,11 +31,6 @@
           "editor.defaultFormatter": "biomejs.biome"
         },
         "[typescript]": {
-          "editor.defaultFormatter": "biomejs.biome"
-        },
-
-        "svelte.enable-ts-plugin": true,
-        "[svelte]": {
           "editor.defaultFormatter": "biomejs.biome"
         },
 

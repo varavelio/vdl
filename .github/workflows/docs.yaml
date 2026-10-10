@@ -23,10 +23,6 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Create mount directories
-        run: |
-          mkdir -p ~/.claude ~/.config/opencode ~/.local/share/opencode
-
       - name: Build documentation
         uses: devcontainers/ci@v0.3
         with:
