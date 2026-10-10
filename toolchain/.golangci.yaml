@@ -46,7 +46,15 @@ formatters:
     - golines
   settings:
     gofumpt:
-      extra-rules: true
+      extra:
+        group-params: true
+        clothe-returns: true
+        balance-calls: true
+    goimports:
+      local-prefixes:
+        - github.com/varavelio/rienda
+    golines:
+      max-len: 100
   exclusions:
     generated: lax
     paths:
