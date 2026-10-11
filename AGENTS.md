@@ -91,7 +91,7 @@ When updating this document, do so with the context of the entire document in mi
 - **Plugin-first generation**: treat `schemas/plugin*.vdl` as the contract for generator integrations; prefer extending plugin flows rather than adding fixed built-in generators.
 - **Shared TextMate grammar**: edit `integrations/syntax/textmate/vdl.tmLanguage.json` as the canonical grammar source. Do not hand-edit the generated VS Code copy; the `task vs:build` automatically copies it.
 - **Command policy**: prefer root Taskfile tasks; use direct subproject commands only when a focused Taskfile task does not exist.
-- **Formatting/linting split**: Go uses `go fmt` + `vdl format`; JS/TS/Astro/Svelte use Biome; JSON/YAML/Markdown/CSS/HTML-like formats use dprint.
+- **Formatting/linting split**: Go uses `golangci-lint fmt / go fmt` + `vdl format`; JS/TS/Astro/Svelte use Biome; JSON/YAML/Markdown/CSS/HTML-like formats use dprint.
 
 ## Testing & Quality
 
@@ -111,7 +111,7 @@ When updating this document, do so with the context of the entire document in mi
 
 ## Tech Stack & Conventions
 
-- **Go**: 1.26 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
+- **Go**: 1.27.2 (`toolchain/go.mod`), with `participle`, `go-arg`, `testify`, and JSON schema tooling.
 - **Docs**: Veta site in `docs/` using `veta-theme-vara`; content is Markdown with YAML frontmatter and is formatted with dprint.
 - **Editor extension**: VS Code extension in `integrations/editors/vscode/` with Node/JS and `vscode-languageclient`.
 - **Syntax grammar**: Shared TextMate grammar package in `integrations/syntax/textmate/`, consumed by docs highlighting and copied into the VS Code extension during build/package tasks.
@@ -123,14 +123,4 @@ When updating this document, do so with the context of the entire document in mi
 
 ## Operational Commands
 
-- **Discover commands**: `task --list-all` (always execute this)
-- **Core verification**: `task test`, `task lint`, `task format`
-- **E2E IR golden tests**: `task test:e2e`
-- **Build**: `task build`, `task build:prod` (release-style binary with version metadata into `dist/`)
-- **Docs build**: `task docs`
-- **Dependencies**: `task deps`
-- **Codegen workflow**: `task codegen`
-- **Install local CLI**: `task tc:install`
-- **Syntax grammar**: `task tml:test`
-- **VS Code extension**: `task vs:build`, `task vs:test:grammar`, `task vs:package`, `task vs:package:ls`
-- **Release pipeline**: `task release`
+Always execute `task --list-all` to discover all available commands, then you can run a command with `task <command>`.
