@@ -163,7 +163,7 @@ In short: VPP-2 guarantees that the input has the structure and types declared i
 
 ## Service and Operation Names
 
-The HTTP route is derived from VDL names.
+The HTTP route is derived from VDL names. Plugins must apply `lowerFirst` to the `RPCName` segment (`lowerFirst` lowercases the first Unicode letter and leaves the rest untouched).
 
 1. `RPCName` is the name of the `type` annotated with `@rpc`.
 2. `ProcedureName` is the name of the member annotated with `@proc`.
@@ -172,19 +172,19 @@ The HTTP route is derived from VDL names.
 Procedures use this URL structure.
 
 ```text
-<baseURL>/<RPCName>/<ProcedureName>
+<baseURL>/<lowerFirst(RPCName)>/<ProcedureName>
 ```
 
 Streams use this URL structure.
 
 ```text
-<baseURL>/<RPCName>/<StreamName>
+<baseURL>/<lowerFirst(RPCName)>/<StreamName>
 ```
 
-For example, a `getUser` procedure inside an `@rpc type Users` service may be called at this URL when the configured base URL is `https://api.example.com/rpc`.
+`ProcedureName` and `StreamName` are already `camelCase` in valid schemas, so they are used verbatim. For example, a `getUser` procedure inside an `@rpc type Users` service may be called at this URL when the configured base URL is `https://api.example.com/rpc`.
 
 ```text
-https://api.example.com/rpc/Users/getUser
+https://api.example.com/rpc/users/getUser
 ```
 
 ## Transport Overview
@@ -257,7 +257,7 @@ A procedure starts when application code invokes a generated procedure client fu
 The client sends an HTTP `POST` request.
 
 1. **Method:** `POST`.
-2. **URL structure:** `<baseURL>/<RPCName>/<ProcedureName>`.
+2. **URL structure:** `<baseURL>/<lowerFirst(RPCName)>/<ProcedureName>`.
 3. **Headers:** `Content-Type: application/json` and `Accept: application/json`.
 4. **Body:** JSON-encoded procedure input when `input` is defined.
 
@@ -343,7 +343,7 @@ The stream handler may emit multiple output or error envelopes over time.
 The client opens the stream with an HTTP `POST` request.
 
 1. **Method:** `POST`.
-2. **URL structure:** `<baseURL>/<RPCName>/<StreamName>`.
+2. **URL structure:** `<baseURL>/<lowerFirst(RPCName)>/<StreamName>`.
 3. **Headers:** `Accept: text/event-stream` and `Content-Type: application/json`.
 4. **Body:** JSON-encoded stream input when `input` is defined.
 
@@ -446,7 +446,7 @@ A plugin may call itself VPP-2 compatible only if it follows these rules.
 2. It must treat an `@rpc` type as an RPC service container.
 3. It must treat `@proc` members as request-response HTTP procedures.
 4. It must treat `@stream` members as SSE stream subscriptions.
-5. It must derive route names from the VDL service and operation names.
+5. It must derive route names from the VDL service and operation names, applying `lowerFirst` to the `RPCName` segment and using operation names verbatim.
 6. It must use the URL structures defined by this protocol.
 7. It must encode operation input as JSON when input exists.
 8. It must validate operation input against the VDL-declared shape before handler execution.
