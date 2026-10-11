@@ -1,0 +1,26 @@
+// SYNTAX TEST "source.vdl" "Multiline strings with minimal escapes"
+
+const quote = "say \"hi\""
+// <---- keyword.control.declaration.vdl
+//    ^^^^^ variable.other.constant.declaration.vdl
+//          ^ keyword.operator.assignment.vdl
+//            ^ string.quoted.double.vdl
+//                 ^^ constant.character.escape.vdl
+//                     ^^ constant.character.escape.vdl
+
+const slash = "back\\end"
+// <---- keyword.control.declaration.vdl
+//    ^^^^^ variable.other.constant.declaration.vdl
+//          ^ keyword.operator.assignment.vdl
+//            ^ string.quoted.double.vdl
+//                 ^^ constant.character.escape.vdl
+
+const multi = "first line
+// <---- keyword.control.declaration.vdl
+//    ^^^^^ variable.other.constant.declaration.vdl
+//          ^ keyword.operator.assignment.vdl
+//            ^ string.quoted.double.vdl
+second line
+//<---------- string.quoted.double.vdl
+third line"
+//<---------- string.quoted.double.vdl
