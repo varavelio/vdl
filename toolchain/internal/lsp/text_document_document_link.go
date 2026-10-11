@@ -51,11 +51,9 @@ func (l *LSP) handleTextDocumentDocumentLink(rawMessage []byte) (any, error) {
 	links := collectDocumentLinks(string(content), filePath)
 
 	response := ResponseMessageTextDocumentDocumentLink{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      request.ID,
-		},
-		Result: links,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  links,
 	}
 
 	return response, nil

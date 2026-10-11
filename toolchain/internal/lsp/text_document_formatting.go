@@ -35,11 +35,9 @@ func (l *LSP) handleTextDocumentFormatting(rawMessage []byte) (any, error) {
 	}
 
 	response := ResponseMessageTextDocumentFormatting{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      request.ID,
-		},
-		Result: nil,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  nil,
 	}
 
 	formattedText, err := formatter.Format(filePath, string(content))

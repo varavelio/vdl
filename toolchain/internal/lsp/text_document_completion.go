@@ -80,8 +80,9 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 	if !ok {
 		// Not appropriate context; return empty result
 		resp := ResponseMessageTextDocumentCompletion{
-			ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
-			Result:          nil,
+			Message: DefaultMessage,
+			ID:      request.ID,
+			Result:  nil,
 		}
 		return resp, nil
 	}
@@ -155,8 +156,9 @@ func (l *LSP) handleTextDocumentCompletion(rawMessage []byte) (any, error) {
 	}
 
 	response := ResponseMessageTextDocumentCompletion{
-		ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
-		Result:          completions,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  completions,
 	}
 	return response, nil
 }

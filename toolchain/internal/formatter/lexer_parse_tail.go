@@ -13,7 +13,8 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 			members = append(
 				members,
 				&typeMemberNode{
-					baseNode:   baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()},
+					start:      pendingDoc.startLine(),
+					end:        pendingDoc.endLine(),
 					Standalone: pendingDoc,
 				},
 			)
@@ -29,8 +30,9 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 				members = append(
 					members,
 					&typeMemberNode{
-						baseNode: baseNode{start: c.startLine(), end: c.endLine()},
-						Comment:  c,
+						start:   c.startLine(),
+						end:     c.endLine(),
+						Comment: c,
 					},
 				)
 			}
@@ -50,7 +52,11 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 			}
 			members = append(
 				members,
-				&typeMemberNode{baseNode: baseNode{start: spTok.Line, end: endLine}, Spread: ref},
+				&typeMemberNode{
+					start:  spTok.Line,
+					end:    endLine,
+					Spread: ref,
+				},
 			)
 			pendingDoc = nil
 			pendingAnn = nil
@@ -65,8 +71,9 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 			members = append(
 				members,
 				&typeMemberNode{
-					baseNode: baseNode{start: field.startLine(), end: field.endLine()},
-					Field:    field,
+					start: field.startLine(),
+					end:   field.endLine(),
+					Field: field,
 				},
 			)
 			pendingDoc = nil
@@ -84,10 +91,11 @@ func (p *tokenParser) parseTypeMembers() ([]*typeMemberNode, int, error) {
 func (p *tokenParser) parseField(doc *docstringNode, anns []*annotationNode) (*fieldNode, error) {
 	nameTok := p.next()
 	f := &fieldNode{
-		baseNode: baseNode{start: nameTok.Line, end: nameTok.EndLine},
-		Doc:      doc,
-		Ann:      anns,
-		Name:     nameTok.Value,
+		start: nameTok.Line,
+		end:   nameTok.EndLine,
+		Doc:   doc,
+		Ann:   anns,
+		Name:  nameTok.Value,
 	}
 	if p.is("Question") {
 		p.next()
@@ -117,8 +125,9 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 					entries = append(
 						entries,
 						&objectEntryNode{
-							baseNode: baseNode{start: c.startLine(), end: c.endLine()},
-							Comment:  c,
+							start:   c.startLine(),
+							end:     c.endLine(),
+							Comment: c,
 						},
 					)
 				}
@@ -132,7 +141,11 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 				}
 				entries = append(
 					entries,
-					&objectEntryNode{baseNode: baseNode{start: sp.Line, end: end}, Spread: ref},
+					&objectEntryNode{
+						start:  sp.Line,
+						end:    end,
+						Spread: ref,
+					},
 				)
 				continue
 			}
@@ -147,9 +160,10 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 			entries = append(
 				entries,
 				&objectEntryNode{
-					baseNode: baseNode{start: k.Line, end: end},
-					Key:      k.Value,
-					Value:    &lit,
+					start: k.Line,
+					end:   end,
+					Key:   k.Value,
+					Value: &lit,
 				},
 			)
 		}
@@ -171,8 +185,9 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 					elements = append(
 						elements,
 						&arrayElementNode{
-							baseNode: baseNode{start: c.startLine(), end: c.endLine()},
-							Comment:  c,
+							start:   c.startLine(),
+							end:     c.endLine(),
+							Comment: c,
 						},
 					)
 				}
@@ -185,7 +200,11 @@ func (p *tokenParser) parseLiteral() (literalNode, int, error) {
 			}
 			elements = append(
 				elements,
-				&arrayElementNode{baseNode: baseNode{start: elemStart, end: end}, Value: &lit},
+				&arrayElementNode{
+					start: elemStart,
+					end:   end,
+					Value: &lit,
+				},
 			)
 		}
 		r, err := p.expect("RBracket")
@@ -273,8 +292,9 @@ func (p *tokenParser) parseAnnotation() (*annotationNode, error) {
 		return nil, err
 	}
 	ann := &annotationNode{
-		baseNode: baseNode{start: at.Line, end: nameTok.EndLine},
-		Name:     nameTok.Value,
+		start: at.Line,
+		end:   nameTok.EndLine,
+		Name:  nameTok.Value,
 	}
 	if p.is("LParen") {
 		p.next()
@@ -294,15 +314,20 @@ func (p *tokenParser) parseAnnotation() (*annotationNode, error) {
 func (p *tokenParser) parseComment() *commentNode {
 	tok := p.next()
 	return &commentNode{
-		baseNode: baseNode{start: tok.Line, end: tok.EndLine},
-		Text:     tok.Value,
-		Inline:   tok.Inline,
+		start:  tok.Line,
+		end:    tok.EndLine,
+		Text:   tok.Value,
+		Inline: tok.Inline,
 	}
 }
 
 func (p *tokenParser) parseDocstring() *docstringNode {
 	tok := p.next()
-	return &docstringNode{baseNode: baseNode{start: tok.Line, end: tok.EndLine}, Raw: tok.Value}
+	return &docstringNode{
+		start: tok.Line,
+		end:   tok.EndLine,
+		Raw:   tok.Value,
+	}
 }
 
 func (p *tokenParser) unexpected(tok fmtToken, expected string) error {

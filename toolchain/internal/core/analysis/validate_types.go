@@ -326,16 +326,14 @@ func buildFieldSymbol(field *ast.Field, file string) *FieldSymbol {
 	}
 
 	return &FieldSymbol{
-		Symbol: Symbol{
-			Name:        string(field.Name),
-			File:        file,
-			Pos:         field.Pos,
-			EndPos:      field.EndPos,
-			Docstring:   docstring,
-			Annotations: buildAnnotationRefs(field.Annotations),
-		},
-		AST:      field,
-		Optional: field.Optional,
-		Type:     buildFieldTypeInfo(&field.Type),
+		Name:        string(field.Name),
+		File:        file,
+		Pos:         field.Pos,
+		EndPos:      field.EndPos,
+		Docstring:   docstring,
+		Annotations: buildAnnotationRefs(field.Annotations),
+		AST:         field,
+		Optional:    field.Optional,
+		Type:        buildFieldTypeInfo(&field.Type),
 	}
 }

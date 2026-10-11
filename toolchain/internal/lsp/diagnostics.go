@@ -79,12 +79,8 @@ func convertASTPositionToLSPPosition(pos ast.Position) TextDocumentPosition {
 // publishDiagnostics sends diagnostics to the client.
 func (l *LSP) publishDiagnostics(uri string, diagnostics []Diagnostic) {
 	notification := NotificationMessagePublishDiagnostics{
-		NotificationMessage: NotificationMessage{
-			Message: Message{
-				JSONRPC: "2.0",
-				Method:  "textDocument/publishDiagnostics",
-			},
-		},
+		JSONRPC: "2.0",
+		Method:  "textDocument/publishDiagnostics",
 		Params: NotificationMessagePublishDiagnosticsParams{
 			URI:         uri,
 			Diagnostics: diagnostics,

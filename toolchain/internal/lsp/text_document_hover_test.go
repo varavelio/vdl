@@ -93,13 +93,9 @@ type Wrapper {
 
 	// Create a hover request for a type reference (line 7 is "foo FooType")
 	request := RequestMessageTextDocumentHover{
-		RequestMessage: RequestMessage{
-			Message: Message{
-				JSONRPC: "2.0",
-				Method:  "textDocument/hover",
-				ID:      "1",
-			},
-		},
+		JSONRPC: "2.0",
+		Method:  "textDocument/hover",
+		ID:      "1",
 		Params: RequestMessageTextDocumentHoverParams{
 			TextDocument: TextDocumentIdentifier{
 				URI: "file://" + filePath,

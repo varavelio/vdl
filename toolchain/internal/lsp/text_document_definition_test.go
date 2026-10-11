@@ -78,13 +78,9 @@ type Wrapper {
 
 	// Create a definition request - position is on "FooType" in Wrapper
 	request := RequestMessageTextDocumentDefinition{
-		RequestMessage: RequestMessage{
-			Message: Message{
-				JSONRPC: "2.0",
-				Method:  "textDocument/definition",
-				ID:      "1",
-			},
-		},
+		JSONRPC: "2.0",
+		Method:  "textDocument/definition",
+		ID:      "1",
 		Params: RequestMessageTextDocumentDefinitionParams{
 			TextDocument: TextDocumentIdentifier{
 				URI: "file://" + filePath,

@@ -102,18 +102,16 @@ func buildEnumSymbol(decl *ast.EnumDecl, file string) *EnumSymbol {
 	}
 
 	enum := &EnumSymbol{
-		Symbol: Symbol{
-			Name:        decl.Name,
-			File:        file,
-			Pos:         decl.Pos,
-			EndPos:      decl.EndPos,
-			Docstring:   docstring,
-			Annotations: buildAnnotationRefs(decl.Annotations),
-		},
-		AST:       decl,
-		ValueType: EnumValueTypeString, // Default to string
-		Members:   []*EnumMemberSymbol{},
-		Spreads:   []*SpreadRef{},
+		Name:        decl.Name,
+		File:        file,
+		Pos:         decl.Pos,
+		EndPos:      decl.EndPos,
+		Docstring:   docstring,
+		Annotations: buildAnnotationRefs(decl.Annotations),
+		AST:         decl,
+		ValueType:   EnumValueTypeString, // Default to string
+		Members:     []*EnumMemberSymbol{},
+		Spreads:     []*SpreadRef{},
 	}
 
 	for _, member := range decl.Members {
@@ -132,13 +130,11 @@ func buildEnumSymbol(decl *ast.EnumDecl, file string) *EnumSymbol {
 		}
 
 		memberSym := &EnumMemberSymbol{
-			Symbol: Symbol{
-				Name:        member.Name,
-				File:        file,
-				Pos:         member.Pos,
-				EndPos:      member.EndPos,
-				Annotations: buildAnnotationRefs(member.Annotations),
-			},
+			Name:        member.Name,
+			File:        file,
+			Pos:         member.Pos,
+			EndPos:      member.EndPos,
+			Annotations: buildAnnotationRefs(member.Annotations),
 		}
 
 		if member.Docstring != nil {

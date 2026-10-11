@@ -59,11 +59,9 @@ func (l *LSP) handleTextDocumentDefinition(rawMessage []byte) (any, error) {
 		location := l.findExternalDocstringDefinition(filePath, mdPath)
 		if location != nil {
 			return ResponseMessageTextDocumentDefinition{
-				ResponseMessage: ResponseMessage{
-					Message: DefaultMessage,
-					ID:      request.ID,
-				},
-				Result: []Location{*location},
+				Message: DefaultMessage,
+				ID:      request.ID,
+				Result:  []Location{*location},
 			}, nil
 		}
 	}
@@ -72,11 +70,9 @@ func (l *LSP) handleTextDocumentDefinition(rawMessage []byte) (any, error) {
 	identifier := findIdentifierAtPosition(string(content), position)
 	if identifier == "" {
 		return ResponseMessageTextDocumentDefinition{
-			ResponseMessage: ResponseMessage{
-				Message: DefaultMessage,
-				ID:      request.ID,
-			},
-			Result: nil,
+			Message: DefaultMessage,
+			ID:      request.ID,
+			Result:  nil,
 		}, nil
 	}
 
@@ -89,11 +85,9 @@ func (l *LSP) handleTextDocumentDefinition(rawMessage []byte) (any, error) {
 	}
 
 	response := ResponseMessageTextDocumentDefinition{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      request.ID,
-		},
-		Result: result,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  result,
 	}
 
 	return response, nil

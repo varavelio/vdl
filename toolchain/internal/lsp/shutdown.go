@@ -16,11 +16,9 @@ func (l *LSP) handleShutdown(rawMessage []byte) (any, error) {
 	l.logger.Info("shutdown message received", "id", message.ID, "method", message.Method)
 
 	response := ResponseMessageShutdown{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      message.ID,
-		},
-		Result: nil,
+		Message: DefaultMessage,
+		ID:      message.ID,
+		Result:  nil,
 	}
 
 	return response, nil

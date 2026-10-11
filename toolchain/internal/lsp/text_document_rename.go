@@ -56,13 +56,11 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 	oldName := findIdentifierAtPosition(string(content), position)
 	if oldName == "" {
 		resp := ResponseMessageTextDocumentRename{
-			ResponseMessage: ResponseMessage{
-				Message: DefaultMessage,
-				ID:      request.ID,
-				Error: ResponseError{
-					Code:    ErrorCodeInvalidParams,
-					Message: "symbol not found at position",
-				},
+			Message: DefaultMessage,
+			ID:      request.ID,
+			Error: ResponseError{
+				Code:    ErrorCodeInvalidParams,
+				Message: "symbol not found at position",
 			},
 			Result: WorkspaceEdit{},
 		}
@@ -72,11 +70,9 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 	// If the new name is the same as the old one, return empty edit.
 	if oldName == newName {
 		resp := ResponseMessageTextDocumentRename{
-			ResponseMessage: ResponseMessage{
-				Message: DefaultMessage,
-				ID:      request.ID,
-			},
-			Result: WorkspaceEdit{},
+			Message: DefaultMessage,
+			ID:      request.ID,
+			Result:  WorkspaceEdit{},
 		}
 		return resp, nil
 	}
@@ -108,11 +104,9 @@ func (l *LSP) handleTextDocumentRename(rawMessage []byte) (any, error) {
 	}
 
 	response := ResponseMessageTextDocumentRename{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      request.ID,
-		},
-		Result: workspaceEdit,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  workspaceEdit,
 	}
 
 	return response, nil

@@ -90,16 +90,14 @@ func (v *validator) buildTypeSymbol(decl *ast.TypeDecl, file string) *TypeSymbol
 
 	ft := decl.Type()
 	typ := &TypeSymbol{
-		Symbol: Symbol{
-			Name:        decl.Name,
-			File:        file,
-			Pos:         decl.Pos,
-			EndPos:      decl.EndPos,
-			Docstring:   docstring,
-			Annotations: buildAnnotationRefs(decl.Annotations),
-		},
-		AST:  decl,
-		Type: buildFieldTypeInfoWithFile(&ft, file),
+		Name:        decl.Name,
+		File:        file,
+		Pos:         decl.Pos,
+		EndPos:      decl.EndPos,
+		Docstring:   docstring,
+		Annotations: buildAnnotationRefs(decl.Annotations),
+		AST:         decl,
+		Type:        buildFieldTypeInfoWithFile(&ft, file),
 	}
 
 	return typ
@@ -114,16 +112,14 @@ func (v *validator) buildConstSymbol(decl *ast.ConstDecl, file string) *ConstSym
 	}
 
 	cnst := &ConstSymbol{
-		Symbol: Symbol{
-			Name:        decl.Name,
-			File:        file,
-			Pos:         decl.Pos,
-			EndPos:      decl.EndPos,
-			Docstring:   docstring,
-			Annotations: buildAnnotationRefs(decl.Annotations),
-		},
-		AST:       decl,
-		ValueType: ConstValueTypeUnknown,
+		Name:        decl.Name,
+		File:        file,
+		Pos:         decl.Pos,
+		EndPos:      decl.EndPos,
+		Docstring:   docstring,
+		Annotations: buildAnnotationRefs(decl.Annotations),
+		AST:         decl,
+		ValueType:   ConstValueTypeUnknown,
 	}
 
 	if decl.Value != nil && decl.Value.Scalar != nil {

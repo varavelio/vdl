@@ -20,9 +20,9 @@ enum Status {
 	l := newTestLSP(t, schema, uri)
 
 	req := RequestMessageTextDocumentDocumentSymbol{
-		RequestMessage: RequestMessage{
-			Message: Message{JSONRPC: "2.0", Method: "textDocument/documentSymbol", ID: "1"},
-		},
+		JSONRPC: "2.0",
+		Method:  "textDocument/documentSymbol",
+		ID:      "1",
 		Params: RequestMessageTextDocumentDocumentSymbolParams{
 			TextDocument: TextDocumentIdentifier{URI: uri},
 		},

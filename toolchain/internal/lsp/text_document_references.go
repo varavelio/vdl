@@ -45,16 +45,18 @@ func (l *LSP) handleTextDocumentReferences(rawMessage []byte) (any, error) {
 	symbol := findIdentifierAtPosition(string(content), pos)
 	if symbol == "" {
 		response := ResponseMessageTextDocumentReferences{
-			ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
-			Result:          nil,
+			Message: DefaultMessage,
+			ID:      request.ID,
+			Result:  nil,
 		}
 		return response, nil
 	}
 
 	locations := collectReferences(string(content), filePath, symbol)
 	response := ResponseMessageTextDocumentReferences{
-		ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
-		Result:          locations,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  locations,
 	}
 
 	return response, nil

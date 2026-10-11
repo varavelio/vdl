@@ -68,11 +68,9 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 	identifier := findIdentifierAtPosition(string(content), position)
 	if identifier == "" {
 		return ResponseMessageTextDocumentHover{
-			ResponseMessage: ResponseMessage{
-				Message: DefaultMessage,
-				ID:      request.ID,
-			},
-			Result: nil,
+			Message: DefaultMessage,
+			ID:      request.ID,
+			Result:  nil,
 		}, nil
 	}
 
@@ -80,11 +78,9 @@ func (l *LSP) handleTextDocumentHover(rawMessage []byte) (any, error) {
 	hoverResult := findHoverInfo(l.fs, identifier, program)
 
 	response := ResponseMessageTextDocumentHover{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      request.ID,
-		},
-		Result: hoverResult,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  hoverResult,
 	}
 
 	return response, nil

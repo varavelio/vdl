@@ -91,10 +91,11 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 			return nil, err
 		}
 		return &includeNode{
-			baseNode: baseNode{start: start, end: strTok.EndLine},
-			Doc:      doc,
-			Ann:      anns,
-			Path:     unquote(strTok.Value),
+			start: start,
+			end:   strTok.EndLine,
+			Doc:   doc,
+			Ann:   anns,
+			Path:  unquote(strTok.Value),
 		}, nil
 	case "Type":
 		p.next()
@@ -107,11 +108,12 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 			return nil, err
 		}
 		return &typeNode{
-			baseNode: baseNode{start: start, end: endLine},
-			Doc:      doc,
-			Ann:      anns,
-			Name:     nameTok.Value,
-			Type:     ft,
+			start: start,
+			end:   endLine,
+			Doc:   doc,
+			Ann:   anns,
+			Name:  nameTok.Value,
+			Type:  ft,
 		}, nil
 	case "Const":
 		p.next()
@@ -127,11 +129,12 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 			return nil, err
 		}
 		return &constNode{
-			baseNode: baseNode{start: start, end: endLine},
-			Doc:      doc,
-			Ann:      anns,
-			Name:     nameTok.Value,
-			Value:    lit,
+			start: start,
+			end:   endLine,
+			Doc:   doc,
+			Ann:   anns,
+			Name:  nameTok.Value,
+			Value: lit,
 		}, nil
 	case "Enum":
 		p.next()
@@ -147,11 +150,12 @@ func (p *tokenParser) parseTopDecl(doc *docstringNode, anns []*annotationNode) (
 			return nil, err
 		}
 		return &enumNode{
-			baseNode: baseNode{start: start, end: endLine},
-			Doc:      doc,
-			Ann:      anns,
-			Name:     nameTok.Value,
-			Members:  members,
+			start:   start,
+			end:     endLine,
+			Doc:     doc,
+			Ann:     anns,
+			Name:    nameTok.Value,
+			Members: members,
 		}, nil
 	default:
 		return nil, p.unexpected(p.peek(), "declaration")
@@ -169,8 +173,9 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 			members = append(
 				members,
 				&enumMemberNode{
-					baseNode: baseNode{start: pendingDoc.startLine(), end: pendingDoc.endLine()},
-					Doc:      pendingDoc,
+					start: pendingDoc.startLine(),
+					end:   pendingDoc.endLine(),
+					Doc:   pendingDoc,
 				},
 			)
 			pendingDoc = nil
@@ -185,8 +190,9 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 				members = append(
 					members,
 					&enumMemberNode{
-						baseNode: baseNode{start: c.startLine(), end: c.endLine()},
-						Comment:  c,
+						start:   c.startLine(),
+						end:     c.endLine(),
+						Comment: c,
 					},
 				)
 			}
@@ -207,7 +213,11 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 			}
 			members = append(
 				members,
-				&enumMemberNode{baseNode: baseNode{start: spStart, end: endLine}, Spread: ref},
+				&enumMemberNode{
+					start:  spStart,
+					end:    endLine,
+					Spread: ref,
+				},
 			)
 			pendingDoc = nil
 			pendingAnn = nil
@@ -217,10 +227,11 @@ func (p *tokenParser) parseEnumMembers() ([]*enumMemberNode, int, error) {
 			}
 			nameTok := p.next()
 			member := &enumMemberNode{
-				baseNode: baseNode{start: nameTok.Line, end: nameTok.EndLine},
-				Doc:      pendingDoc,
-				Ann:      pendingAnn,
-				Name:     nameTok.Value,
+				start: nameTok.Line,
+				end:   nameTok.EndLine,
+				Doc:   pendingDoc,
+				Ann:   pendingAnn,
+				Name:  nameTok.Value,
 			}
 			if p.is("Equals") {
 				p.next()

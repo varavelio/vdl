@@ -79,8 +79,9 @@ func (l *LSP) handleTextDocumentDocumentSymbol(rawMessage []byte) (any, error) {
 
 	symbols := buildDocumentSymbols(program, filePath)
 	response := ResponseMessageTextDocumentDocumentSymbol{
-		ResponseMessage: ResponseMessage{Message: DefaultMessage, ID: request.ID},
-		Result:          symbols,
+		Message: DefaultMessage,
+		ID:      request.ID,
+		Result:  symbols,
 	}
 	return response, nil
 }

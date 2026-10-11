@@ -69,10 +69,8 @@ func (l *LSP) handleInitialize(rawMessage []byte) (any, error) {
 	)
 
 	response := ResponseMessageInitialize{
-		ResponseMessage: ResponseMessage{
-			Message: DefaultMessage,
-			ID:      message.ID,
-		},
+		Message: DefaultMessage,
+		ID:      message.ID,
 		Result: ResponseMessageInitializeResult{
 			ServerInfo: ResponseMessageInitializeResultServerInfo{
 				Name:    "VDL Language Server",
