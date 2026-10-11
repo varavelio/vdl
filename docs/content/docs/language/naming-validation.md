@@ -145,6 +145,13 @@ type User {
 }
 ```
 
+## Annotation Arguments
+
+Annotation arguments follow the same literal rules as constants: referenced
+constants and enum members must exist, array items must share one value kind,
+spreads must target object constants, and object keys must be unique.
+Invalid arguments are reported instead of silently dropped from the IR.
+
 ## Cycles
 
 VDL rejects required type cycles.
@@ -173,6 +180,15 @@ type Child {
 }
 ```
 
+Constant reference chains must also terminate in a literal.
+
+Invalid:
+
+```vdl
+const first = second
+const second = first
+```
+
 ## Practical Checklist
 
 Before generating code, check that:
@@ -184,4 +200,6 @@ Before generating code, check that:
 - object fields are unique
 - enum member names and values are unique
 - required type references do not form cycles
+- constant references do not form cycles
+- annotation arguments reference existing constants and enum members
 - spreads do not conflict or form cycles

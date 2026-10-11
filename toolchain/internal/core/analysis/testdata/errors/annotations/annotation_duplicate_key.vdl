@@ -1,0 +1,6 @@
+// @expect: E701
+
+@meta({ team "a" team "b" })
+type Account {
+  id string
+}

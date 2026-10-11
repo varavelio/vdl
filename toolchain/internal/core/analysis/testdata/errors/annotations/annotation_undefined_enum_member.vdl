@@ -1,0 +1,10 @@
+// @expect: E305
+
+enum Status {
+  Active = "active"
+}
+
+@state(Status.Missing)
+type Account {
+  id string
+}

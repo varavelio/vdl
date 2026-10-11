@@ -2,6 +2,8 @@ package analysis
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
@@ -10,11 +12,106 @@ import (
 func validateConsts(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
+	diagnostics = append(diagnostics, validateConstCycles(symbols)...)
+
 	for _, cnst := range symbols.consts {
 		diagnostics = append(diagnostics, validateConst(symbols, cnst)...)
 	}
 
 	return diagnostics
+}
+
+// validateConstCycles reports circular constant references.
+//
+// Reference chains must terminate in a literal: const a = b with
+// const b = a (or const loop = loop) has no value. The visiting guard in
+// validateDataLiteral only prevents infinite recursion, so cycles need this
+// explicit check to surface as diagnostics.
+func validateConstCycles(symbols *symbolTable) []Diagnostic {
+	var diagnostics []Diagnostic
+
+	for _, cnst := range symbols.consts {
+		if cycle := findConstCycle(symbols, cnst.Name, nil); cycle != nil {
+			diagnostics = append(diagnostics, newDiagnostic(
+				cnst.File,
+				cnst.Pos,
+				cnst.EndPos,
+				CodeCircularConst,
+				fmt.Sprintf(
+					"circular constant dependency detected: %s",
+					strings.Join(cycle, " -> "),
+				),
+			))
+		}
+	}
+
+	return diagnostics
+}
+
+// findConstCycle follows constant references depth-first. It returns the
+// cycle path when name reappears in the current path, nil otherwise.
+func findConstCycle(
+	symbols *symbolTable,
+	name string,
+	visited []string,
+) []string {
+	if slices.Contains(visited, name) {
+		return append(visited, name)
+	}
+
+	cnst := symbols.lookupConst(name)
+	if cnst == nil || cnst.AST == nil || cnst.AST.Value == nil {
+		return nil
+	}
+
+	visited = append(visited, name)
+	for _, ref := range collectConstRefs(cnst.AST.Value) {
+		if cycle := findConstCycle(symbols, ref, visited); cycle != nil {
+			return cycle
+		}
+	}
+
+	return nil
+}
+
+// collectConstRefs lists every constant referenced by a literal, including
+// references nested in objects, arrays, and spreads. Enum member references
+// (Name.Member) are excluded: they point at enums, not constants.
+func collectConstRefs(lit *ast.DataLiteral) []string {
+	if lit == nil {
+		return nil
+	}
+
+	if lit.Scalar != nil && lit.Scalar.Ref != nil && lit.Scalar.Ref.Member == nil {
+		return []string{lit.Scalar.Ref.Name}
+	}
+
+	if lit.Object != nil {
+		var refs []string
+		for _, entry := range lit.Object.Entries {
+			if entry == nil {
+				continue
+			}
+			if entry.Spread != nil {
+				if entry.Spread.Ref.Member == nil {
+					refs = append(refs, entry.Spread.Ref.Name)
+				}
+				continue
+			}
+			refs = append(refs, collectConstRefs(entry.Value)...)
+		}
+		return refs
+	}
+
+	if lit.Array != nil {
+		var refs []string
+		for _, elem := range lit.Array.Elements {
+			refs = append(refs, collectConstRefs(elem)...)
+		}
+		return refs
+	}
+
+	return nil
 }
 
 func validateConst(symbols *symbolTable, cnst *ConstSymbol) []Diagnostic {

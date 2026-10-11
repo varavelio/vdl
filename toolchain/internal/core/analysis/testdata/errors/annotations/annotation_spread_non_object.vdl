@@ -1,0 +1,8 @@
+// @expect: E206
+
+const notObject = "nope"
+
+@meta({ ...notObject })
+type Account {
+  id string
+}

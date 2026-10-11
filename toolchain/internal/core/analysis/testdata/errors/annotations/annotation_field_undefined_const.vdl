@@ -1,0 +1,6 @@
+// @expect: E205
+
+type Account {
+  @meta({ team unknownConst })
+  id string
+}

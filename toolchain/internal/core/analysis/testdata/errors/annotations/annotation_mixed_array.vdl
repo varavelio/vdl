@@ -1,0 +1,6 @@
+// @expect: E207
+
+@tags(["public" 42])
+type Account {
+  id string
+}

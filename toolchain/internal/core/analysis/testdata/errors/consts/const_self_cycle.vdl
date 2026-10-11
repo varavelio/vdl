@@ -1,0 +1,3 @@
+// @expect: E208
+
+const loop = loop

@@ -169,6 +169,7 @@ func (v *validator) validate() []Diagnostic {
 		validateNaming,
 		validateTypes,
 		validateConsts,
+		validateAnnotations,
 		validateSpreads,
 		validateEnums,
 		validateCycles,

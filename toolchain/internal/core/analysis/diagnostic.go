@@ -35,6 +35,7 @@ const (
 	CodeInvalidReference     = "E205"
 	CodeConstSpreadNotObject = "E206"
 	CodeConstArrayMixedTypes = "E207"
+	CodeCircularConst        = "E208"
 )
 
 // Enum errors (E30x).
