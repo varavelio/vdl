@@ -1,0 +1,6 @@
+// @expect: E207
+
+const matrix = [
+  [1 2]
+  ["a" "b"]
+]

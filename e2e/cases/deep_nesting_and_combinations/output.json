@@ -335,16 +335,16 @@
                                                   }
                                                 },
                                                 {
-                                                  "key": "flags",
+                                                  "key": "metrics",
                                                   "value": {
                                                     "arrayItems": [
                                                       {
-                                                        "boolValue": true,
-                                                        "kind": "bool"
+                                                        "floatValue": 3.5,
+                                                        "kind": "float"
                                                       },
                                                       {
-                                                        "boolValue": false,
-                                                        "kind": "bool"
+                                                        "floatValue": 4.5,
+                                                        "kind": "float"
                                                       }
                                                     ],
                                                     "kind": "array"
@@ -391,20 +391,16 @@
                                                   }
                                                 },
                                                 {
-                                                  "key": "children",
+                                                  "key": "metrics",
                                                   "value": {
                                                     "arrayItems": [
                                                       {
-                                                        "kind": "object",
-                                                        "objectEntries": [
-                                                          {
-                                                            "key": "id",
-                                                            "value": {
-                                                              "kind": "string",
-                                                              "stringValue": "child-a"
-                                                            }
-                                                          }
-                                                        ]
+                                                        "floatValue": 5.5,
+                                                        "kind": "float"
+                                                      },
+                                                      {
+                                                        "floatValue": 6.5,
+                                                        "kind": "float"
                                                       }
                                                     ],
                                                     "kind": "array"
@@ -700,6 +696,236 @@
     },
     {
       "annotations": [],
+      "name": "nestedChildItems",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "enabled",
+                "value": {
+                  "boolValue": true,
+                  "kind": "bool"
+                }
+              },
+              {
+                "key": "tags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "base"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "nested"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              },
+              {
+                "key": "name",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "sixth"
+                }
+              },
+              {
+                "key": "children",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "object",
+                      "objectEntries": [
+                        {
+                          "key": "id",
+                          "value": {
+                            "kind": "string",
+                            "stringValue": "child-a"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "kind": "array"
+                }
+              }
+            ]
+          },
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "enabled",
+                "value": {
+                  "boolValue": true,
+                  "kind": "bool"
+                }
+              },
+              {
+                "key": "tags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "base"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "nested"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              },
+              {
+                "key": "name",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "seventh"
+                }
+              },
+              {
+                "key": "children",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "object",
+                      "objectEntries": [
+                        {
+                          "key": "id",
+                          "value": {
+                            "kind": "string",
+                            "stringValue": "child-b"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "kind": "array"
+                }
+              }
+            ]
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "nestedFlagItems",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "enabled",
+                "value": {
+                  "boolValue": true,
+                  "kind": "bool"
+                }
+              },
+              {
+                "key": "tags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "base"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "nested"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              },
+              {
+                "key": "name",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "fourth"
+                }
+              },
+              {
+                "key": "flags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "boolValue": true,
+                      "kind": "bool"
+                    },
+                    {
+                      "boolValue": false,
+                      "kind": "bool"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              }
+            ]
+          },
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "enabled",
+                "value": {
+                  "boolValue": true,
+                  "kind": "bool"
+                }
+              },
+              {
+                "key": "tags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "kind": "string",
+                      "stringValue": "base"
+                    },
+                    {
+                      "kind": "string",
+                      "stringValue": "nested"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              },
+              {
+                "key": "name",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "fifth"
+                }
+              },
+              {
+                "key": "flags",
+                "value": {
+                  "arrayItems": [
+                    {
+                      "boolValue": false,
+                      "kind": "bool"
+                    },
+                    {
+                      "boolValue": true,
+                      "kind": "bool"
+                    }
+                  ],
+                  "kind": "array"
+                }
+              }
+            ]
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
       "name": "nestedItemGroups",
       "value": {
         "arrayItems": [
@@ -790,16 +1016,16 @@
                     }
                   },
                   {
-                    "key": "flags",
+                    "key": "metrics",
                     "value": {
                       "arrayItems": [
                         {
-                          "boolValue": true,
-                          "kind": "bool"
+                          "floatValue": 3.5,
+                          "kind": "float"
                         },
                         {
-                          "boolValue": false,
-                          "kind": "bool"
+                          "floatValue": 4.5,
+                          "kind": "float"
                         }
                       ],
                       "kind": "array"
@@ -846,20 +1072,16 @@
                     }
                   },
                   {
-                    "key": "children",
+                    "key": "metrics",
                     "value": {
                       "arrayItems": [
                         {
-                          "kind": "object",
-                          "objectEntries": [
-                            {
-                              "key": "id",
-                              "value": {
-                                "kind": "string",
-                                "stringValue": "child-a"
-                              }
-                            }
-                          ]
+                          "floatValue": 5.5,
+                          "kind": "float"
+                        },
+                        {
+                          "floatValue": 6.5,
+                          "kind": "float"
                         }
                       ],
                       "kind": "array"
@@ -1227,16 +1449,16 @@
                                                             }
                                                           },
                                                           {
-                                                            "key": "flags",
+                                                            "key": "metrics",
                                                             "value": {
                                                               "arrayItems": [
                                                                 {
-                                                                  "boolValue": true,
-                                                                  "kind": "bool"
+                                                                  "floatValue": 3.5,
+                                                                  "kind": "float"
                                                                 },
                                                                 {
-                                                                  "boolValue": false,
-                                                                  "kind": "bool"
+                                                                  "floatValue": 4.5,
+                                                                  "kind": "float"
                                                                 }
                                                               ],
                                                               "kind": "array"
@@ -1283,20 +1505,16 @@
                                                             }
                                                           },
                                                           {
-                                                            "key": "children",
+                                                            "key": "metrics",
                                                             "value": {
                                                               "arrayItems": [
                                                                 {
-                                                                  "kind": "object",
-                                                                  "objectEntries": [
-                                                                    {
-                                                                      "key": "id",
-                                                                      "value": {
-                                                                        "kind": "string",
-                                                                        "stringValue": "child-a"
-                                                                      }
-                                                                    }
-                                                                  ]
+                                                                  "floatValue": 5.5,
+                                                                  "kind": "float"
+                                                                },
+                                                                {
+                                                                  "floatValue": 6.5,
+                                                                  "kind": "float"
                                                                 }
                                                               ],
                                                               "kind": "array"

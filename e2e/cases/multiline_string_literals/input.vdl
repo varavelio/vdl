@@ -48,13 +48,21 @@ still group one"
             "value two
 	value two continuation with a tab"
           ]
+          nested {
+            note "nested note one
+      six leading spaces are part of the string"
+          }
         }
         {
           name "group two
 
 after blank line"
+          values [
+            "value three
+  value three continuation with two spaces"
+          ]
           nested {
-            note "nested note
+            note "nested note two
       six leading spaces are part of the string"
           }
         }

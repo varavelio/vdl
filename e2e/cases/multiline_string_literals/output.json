@@ -171,6 +171,21 @@
                                     ],
                                     "kind": "array"
                                   }
+                                },
+                                {
+                                  "key": "nested",
+                                  "value": {
+                                    "kind": "object",
+                                    "objectEntries": [
+                                      {
+                                        "key": "note",
+                                        "value": {
+                                          "kind": "string",
+                                          "stringValue": "nested note one\n      six leading spaces are part of the string"
+                                        }
+                                      }
+                                    ]
+                                  }
                                 }
                               ]
                             },
@@ -185,6 +200,18 @@
                                   }
                                 },
                                 {
+                                  "key": "values",
+                                  "value": {
+                                    "arrayItems": [
+                                      {
+                                        "kind": "string",
+                                        "stringValue": "value three\n  value three continuation with two spaces"
+                                      }
+                                    ],
+                                    "kind": "array"
+                                  }
+                                },
+                                {
                                   "key": "nested",
                                   "value": {
                                     "kind": "object",
@@ -193,7 +220,7 @@
                                         "key": "note",
                                         "value": {
                                           "kind": "string",
-                                          "stringValue": "nested note\n      six leading spaces are part of the string"
+                                          "stringValue": "nested note two\n      six leading spaces are part of the string"
                                         }
                                       }
                                     ]

@@ -112,12 +112,16 @@ const roles = ["admin" "editor" "viewer"]
 const retryBackoffMs = [100 250 500]
 ```
 
-All items in an array literal must have the same value kind.
+All items in an array literal must have the same structure: the same
+scalar kinds, the same object keys at every level, and the same nested array
+shapes. Key order does not matter and scalar values are ignored, so
+`[{a 1} {a 2}]` is valid. Spreads are expanded before comparing.
 
 Invalid:
 
 ```vdl
 const mixedValues = ["admin" 1 true]
+const mixedShapes = [{a 1} {b 2}]
 ```
 
 ## Constant References

@@ -122,20 +122,48 @@ const nestedItemGroups = [
     {
       ...baseNestedItem
       name "second"
-      flags [true false]
+      metrics [3.5 4.5]
     }
   ]
   [
     {
       ...baseNestedItem
       name "third"
-      children [
-        {
-          id "child-a"
-        }
-      ]
+      metrics [5.5 6.5]
     }
   ]
+]
+const nestedFlagItems = [
+  {
+    ...baseNestedItem
+    name "fourth"
+    flags [true false]
+  }
+  {
+    ...baseNestedItem
+    name "fifth"
+    flags [false true]
+  }
+]
+const nestedChildItems = [
+  {
+    ...baseNestedItem
+    name "sixth"
+    children [
+      {
+        id "child-a"
+      }
+    ]
+  }
+  {
+    ...baseNestedItem
+    name "seventh"
+    children [
+      {
+        id "child-b"
+      }
+    ]
+  }
 ]
 const deeplyNestedLiteral = {
   level1 {

@@ -1,0 +1,14 @@
+// @expect: E207
+
+const base = {
+  x 1
+}
+
+const rows = [
+  {
+    ...base
+  }
+  {
+    y 2
+  }
+]
