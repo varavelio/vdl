@@ -10,6 +10,16 @@ const floatValue = 12.50
 //    ^^^^^^^^^^ variable.other.constant.declaration.vdl
 //                 ^^^^^ constant.numeric.float.vdl
 
+const negativeInt = -42
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                  ^^^ constant.numeric.integer.vdl
+
+const negativeFloat = -0.5
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^^^^^^^ variable.other.constant.declaration.vdl
+//                    ^^^^ constant.numeric.float.vdl
+
 const copiedConfig = serviceConfig
 // <---- keyword.control.declaration.vdl
 //    ^^^^^^^^^^^^ variable.other.constant.declaration.vdl
