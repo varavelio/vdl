@@ -1,6 +1,6 @@
 module github.com/varavelio/vdl/toolchain
 
-go 1.26
+go 1.27.2
 
 require (
 	github.com/alecthomas/participle/v2 v2.1.4
