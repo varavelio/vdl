@@ -100,6 +100,40 @@ func (st *symbolTable) lookupType(name string) *TypeSymbol {
 	return st.types[name]
 }
 
+// ResolveObjectType follows type alias chains to the underlying object type.
+//
+// A type alias (for example, `type PostalAddress Address`) has no fields of
+// its own, so spreading it must behave exactly like spreading its target. The
+// lookup function resolves names to symbols, which lets both the validator
+// and the IR builder share this logic.
+//
+// It returns nil when the chain ends in a non-object type, an unknown name,
+// or a cycle. Those cases are reported by their own validators (undefined
+// types, non-object spreads, type cycles), never here.
+func ResolveObjectType(name string, lookup func(string) *TypeSymbol) *TypeSymbol {
+	visiting := map[string]bool{}
+	for {
+		if visiting[name] {
+			return nil
+		}
+		visiting[name] = true
+		typ := lookup(name)
+		if typ == nil || typ.Type == nil {
+			return nil
+		}
+		if typ.IsObject() {
+			if typ.Type.ObjectDef == nil {
+				return nil
+			}
+			return typ
+		}
+		if typ.Type.Kind != FieldTypeKindCustom {
+			return nil
+		}
+		name = typ.Type.Name
+	}
+}
+
 // lookupEnum returns the enum symbol with the given name, or nil if not found.
 func (st *symbolTable) lookupEnum(name string) *EnumSymbol {
 	return st.enums[name]

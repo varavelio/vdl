@@ -36,13 +36,14 @@ func flattenFieldsWithSpreads(
 	visiting map[string]bool,
 ) []irtypes.Field {
 	result := make([]irtypes.Field, 0, len(fields))
+	lookup := func(name string) *analysis.TypeSymbol { return types[name] }
 
 	for _, spread := range spreads {
 		if spread == nil || spread.Member != nil {
 			continue
 		}
-		spreadType := types[spread.Name]
-		if spreadType == nil || !spreadType.IsObject() || spreadType.Type.ObjectDef == nil ||
+		spreadType := analysis.ResolveObjectType(spread.Name, lookup)
+		if spreadType == nil || spreadType.Type.ObjectDef == nil ||
 			visiting[spreadType.Name] {
 			continue
 		}

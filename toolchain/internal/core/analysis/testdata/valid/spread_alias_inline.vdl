@@ -1,0 +1,17 @@
+// @expect-no-errors
+// @assert: has-type Order
+
+type Money {
+  amount int
+  currency string
+}
+
+type Price Money
+
+type Order {
+  id string
+  payment {
+    ...Price
+    provider string
+  }
+}

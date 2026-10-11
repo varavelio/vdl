@@ -1,0 +1,12 @@
+// @expect: E203
+
+type Address {
+  city string
+}
+
+type PostalAddress Address
+
+type User {
+  ...PostalAddress
+  city string
+}

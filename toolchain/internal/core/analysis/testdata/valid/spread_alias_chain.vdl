@@ -1,0 +1,15 @@
+// @expect-no-errors
+// @assert: has-type Order
+
+type Address {
+  city string
+}
+
+type PostalAddress Address
+
+type ShippingAddress PostalAddress
+
+type Order {
+  ...ShippingAddress
+  id string
+}

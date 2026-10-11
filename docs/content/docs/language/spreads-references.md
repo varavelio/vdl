@@ -83,7 +83,23 @@ After analysis, plugins see `Article` as if it had all fields directly.
 
 Only object types can be spread into object types.
 
-Invalid:
+A type alias that resolves
+to an object type can also be spread.
+
+```vdl
+type Address {
+  city string
+}
+
+type PostalAddress Address
+
+type User {
+  ...PostalAddress
+  name string
+}
+```
+
+Invalid (aliases to non-object types cannot be spread):
 
 ```vdl
 type UserId string

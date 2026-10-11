@@ -57,8 +57,7 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 			continue
 		}
 
-		refType := symbols.lookupType(spread.Name)
-		if refType == nil {
+		if symbols.lookupType(spread.Name) == nil {
 			msg := fmt.Sprintf("spread references undefined type %q", spread.Name)
 			suggestions, _ := strutil.FuzzySearch(symbols.allTypeNames(), spread.Name)
 			if len(suggestions) > 0 {
@@ -71,7 +70,8 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 			continue
 		}
 
-		if !refType.IsObject() {
+		resolved := ResolveObjectType(spread.Name, symbols.lookupType)
+		if resolved == nil {
 			diagnostics = append(diagnostics, newDiagnostic(
 				typ.File,
 				spread.Pos,
@@ -85,7 +85,7 @@ func validateTypeSpreads(symbols *symbolTable, typ *TypeSymbol) []Diagnostic {
 			continue
 		}
 
-		for name, origin := range flattenTypeFieldOrigins(symbols, refType, map[string]bool{}) {
+		for name, origin := range flattenTypeFieldOrigins(symbols, resolved, map[string]bool{}) {
 			if existing, ok := fieldNames[name]; ok {
 				diagnostics = append(diagnostics, newDiagnostic(
 					typ.File,
@@ -153,8 +153,7 @@ func validateInlineObjectSpreads(
 				continue
 			}
 
-			refType := symbols.lookupType(spread.Name)
-			if refType == nil {
+			if symbols.lookupType(spread.Name) == nil {
 				msg := fmt.Sprintf(
 					"spread in inline object %q references undefined type %q",
 					owner,
@@ -171,7 +170,8 @@ func validateInlineObjectSpreads(
 				continue
 			}
 
-			if !refType.IsObject() {
+			resolved := ResolveObjectType(spread.Name, symbols.lookupType)
+			if resolved == nil {
 				diagnostics = append(diagnostics, newDiagnostic(
 					file,
 					spread.Pos,
@@ -186,7 +186,7 @@ func validateInlineObjectSpreads(
 				continue
 			}
 
-			for name, origin := range flattenTypeFieldOrigins(symbols, refType, map[string]bool{}) {
+			for name, origin := range flattenTypeFieldOrigins(symbols, resolved, map[string]bool{}) {
 				if existing, ok := fieldNames[name]; ok {
 					diagnostics = append(diagnostics, newDiagnostic(
 						file,
@@ -248,7 +248,11 @@ func flattenTypeFieldOrigins(
 		if spread.Member != nil {
 			continue
 		}
-		for name, origin := range flattenTypeFieldOrigins(symbols, symbols.lookupType(spread.Name), visiting) {
+		resolved := ResolveObjectType(spread.Name, symbols.lookupType)
+		if resolved == nil {
+			continue
+		}
+		for name, origin := range flattenTypeFieldOrigins(symbols, resolved, visiting) {
 			if _, exists := result[name]; !exists {
 				result[name] = origin
 			}
@@ -278,7 +282,22 @@ func validateSpreadCycles(symbols *symbolTable) []Diagnostic {
 }
 
 func findSpreadCycle(symbols *symbolTable, typeName string, visited []string) []string {
+	return findSpreadCycleThrough(symbols, typeName, visited, false)
+}
+
+// findSpreadCycleThrough follows spreads and alias chains. Pure alias cycles
+// (with no spread step) are not spread cycles; the type cycle validator
+// reports those. The sawSpread flag keeps the two apart.
+func findSpreadCycleThrough(
+	symbols *symbolTable,
+	typeName string,
+	visited []string,
+	sawSpread bool,
+) []string {
 	if slices.Contains(visited, typeName) {
+		if !sawSpread {
+			return nil
+		}
 		return append(visited, typeName)
 	}
 
@@ -295,10 +314,22 @@ func findSpreadCycle(symbols *symbolTable, typeName string, visited []string) []
 			if spread.Member != nil {
 				continue
 			}
-			if cycle := findSpreadCycle(symbols, spread.Name, newVisited); cycle != nil {
+			if cycle := findSpreadCycleThrough(
+				symbols,
+				spread.Name,
+				newVisited,
+				true,
+			); cycle != nil {
 				return cycle
 			}
 		}
+		return nil
+	}
+
+	// Aliases have no spreads of their own; follow the chain without
+	// flipping sawSpread.
+	if typ.Type != nil && typ.Type.Kind == FieldTypeKindCustom {
+		return findSpreadCycleThrough(symbols, typ.Type.Name, newVisited, sawSpread)
 	}
 
 	return nil

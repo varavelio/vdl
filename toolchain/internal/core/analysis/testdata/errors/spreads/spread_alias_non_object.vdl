@@ -1,0 +1,8 @@
+// @expect: E202
+
+type UserId string
+
+type User {
+  ...UserId
+  name string
+}

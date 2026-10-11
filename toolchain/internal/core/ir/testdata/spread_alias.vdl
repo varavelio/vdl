@@ -1,0 +1,11 @@
+type Address {
+  city string
+  country string
+}
+
+type PostalAddress Address
+
+type User {
+  ...PostalAddress
+  name string
+}

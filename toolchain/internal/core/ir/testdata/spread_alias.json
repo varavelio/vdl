@@ -1,0 +1,79 @@
+{
+  "constants": [],
+  "docs": [],
+  "entryPoint": "/workspaces/vdl/toolchain/internal/core/ir/testdata/spread_alias.vdl",
+  "enums": [],
+  "types": [
+    {
+      "annotations": [],
+      "name": "Address",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "city",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "country",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "PostalAddress",
+      "typeRef": {
+        "kind": "type",
+        "typeName": "Address"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "User",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "city",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "country",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "name",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
