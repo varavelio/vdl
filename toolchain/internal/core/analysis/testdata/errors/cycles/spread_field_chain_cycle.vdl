@@ -1,0 +1,15 @@
+// @expect: E601
+
+type C {
+  x A
+}
+
+type B {
+  ...C
+  y string
+}
+
+type A {
+  ...B
+  z string
+}

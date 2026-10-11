@@ -180,6 +180,21 @@ type Child {
 }
 ```
 
+Spreads copy fields, so cycles through spreads are rejected the same way.
+
+Invalid:
+
+```vdl
+type B {
+  a A
+}
+
+type A {
+  ...B
+  x string
+}
+```
+
 Constant reference chains must also terminate in a literal.
 
 Invalid:

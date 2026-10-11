@@ -1,0 +1,10 @@
+// @expect-no-errors
+
+type B {
+  a? A
+}
+
+type A {
+  ...B
+  x string
+}
