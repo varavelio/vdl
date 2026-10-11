@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "files": {
     "includes": [
       "**/*.js",
@@ -49,7 +49,7 @@
     "enabled": true,
     "includes": ["!toolchain/internal/codegen/testdata/run_plugin"],
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "useConst": "off"
       },
