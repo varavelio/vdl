@@ -45,6 +45,7 @@ const (
 	CodeEnumDuplicateValue = "E303"
 	CodeEnumDuplicateName  = "E304"
 	CodeEnumMemberNotFound = "E305"
+	CodeEnumEmpty          = "E306"
 )
 
 // Cycle errors (E60x).

@@ -165,6 +165,8 @@ enum WorkspaceRole {
 
 Enum spreads must reference another enum and must use the `Name` form, not `Name.Member`.
 
+Every enum must declare at least one member, counting inherited spread members. An enum with no members is rejected.
+
 ## Naming
 
 Enum names and member names should use `PascalCase`.

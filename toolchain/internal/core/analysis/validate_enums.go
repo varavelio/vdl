@@ -33,6 +33,13 @@ func validateEnum(symbols *symbolTable, enum *EnumSymbol) []Diagnostic {
 	diagnostics = append(diagnostics, enumDiags...)
 
 	if len(effectiveMembers) == 0 {
+		diagnostics = append(diagnostics, newDiagnostic(
+			enum.File,
+			enum.Pos,
+			enum.EndPos,
+			CodeEnumEmpty,
+			fmt.Sprintf("enum %q must declare at least one member", enum.Name),
+		))
 		return diagnostics
 	}
 	enum.ValueType = valueType

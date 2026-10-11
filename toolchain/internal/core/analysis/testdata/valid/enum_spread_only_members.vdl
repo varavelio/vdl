@@ -1,0 +1,11 @@
+// @expect-no-errors
+// @assert: has-enum Base
+// @assert: has-enum Extended
+
+enum Base {
+  Active = "active"
+}
+
+enum Extended {
+  ...Base
+}
