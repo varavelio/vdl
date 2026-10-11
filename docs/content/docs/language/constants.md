@@ -40,7 +40,38 @@ const trueValue = true
 const falseValue = false
 ```
 
-Strings use double quotes.
+Strings use double quotes. A string may span multiple lines; its content is
+verbatim, so line breaks, spaces, tabs, and blank lines are preserved exactly.
+
+Only `\"` (a quote) and `\\` (a backslash) are decoded. Any other backslash
+sequence stays as written: `\n` typed as two characters is not a line break.
+Use `\"` to include a quote and `\\` to include a backslash:
+
+```vdl
+const quote = "say \"hi\""
+const backslash = "back\\slash"
+```
+
+## Multiline Authoring Pattern
+
+Because strings are verbatim, source indentation becomes part of the value.
+When the value is whitespace-sensitive, place content at column zero:
+
+```vdl
+const prompt = "line one
+line two"
+```
+
+When the consumer ignores whitespace, indent freely for readability. Policy
+expressions are one example: the policy parser ignores insignificant
+whitespace, so this is fine:
+
+```vdl
+const expr = "
+  principal.id == resource.ownerId &&
+  principal.department == 'Finance'
+"
+```
 
 ## Object Literals
 

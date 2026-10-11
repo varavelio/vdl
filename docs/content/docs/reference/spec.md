@@ -263,6 +263,30 @@ defaultTimeout // Constant reference
 Color.Red // Enum member reference
 ```
 
+### Multiline Strings
+
+Double-quoted strings may span multiple lines. Content is verbatim: line
+breaks, spaces, tabs, trailing spaces, and blank lines are preserved exactly.
+There is no dedent, trimming, interpolation, or other transformation.
+
+Only two escape sequences are decoded: `\"` produces `"` and `\\` produces
+`\`. Every other backslash sequence stays verbatim. In particular, `\n`
+written as two characters does not produce a line break; only a real line
+break does.
+
+```vdl
+const expr = "
+  principal.id == resource.ownerId &&
+  principal.department == 'Finance'
+"
+
+const quote = "say \"hi\""
+```
+
+When a value is whitespace-sensitive, place content at column zero. When the
+consumer ignores whitespace (for example a policy expression parser), indent
+freely for readability.
+
 ### Object Literals
 
 Object entries are space-separated key/value pairs. Commas are not part of the syntax.

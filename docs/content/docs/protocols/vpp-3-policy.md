@@ -283,6 +283,8 @@ String literals use single quotes so expressions can be embedded naturally insid
 
 When a plugin receives an `allow` or `deny` expression, VDL has provided the outer double-quoted string content; the VPP-3 expression parser must still interpret escapes inside inner expression string literals. For example, `'Owner\'s Team'` represents `Owner's Team`, and a literal backslash should be written as `\\`.
 
+VDL decodes only the outer minimal escapes (`\"` for a quote, `\\` for a backslash) and leaves every other backslash sequence verbatim; interpreting `\'` and other inner escapes belongs to the expression parser, not to VDL.
+
 ### Enum Values
 
 Enum fields are compared by value using string literals.
