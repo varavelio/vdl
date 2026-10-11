@@ -1,0 +1,5 @@
+// @expect: E208
+
+const alpha = beta
+const beta = gamma
+const gamma = alpha

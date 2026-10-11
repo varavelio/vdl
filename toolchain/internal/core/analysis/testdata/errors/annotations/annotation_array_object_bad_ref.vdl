@@ -1,0 +1,6 @@
+// @expect: E205
+
+@tags([{ name unknownConst }])
+type Account {
+  id string
+}

@@ -1,0 +1,4 @@
+// @expect: E205
+
+@tag(unknownConst)
+type UserId string

@@ -1,0 +1,8 @@
+// @expect: E205
+
+@meta({
+  ...missingBase
+})
+type Account {
+  id string
+}

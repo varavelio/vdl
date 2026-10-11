@@ -1,0 +1,9 @@
+// @expect: E208
+
+const first = second
+const second = first
+
+@meta({ owner first })
+type Account {
+  id string
+}

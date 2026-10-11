@@ -1,0 +1,11 @@
+// @expect: E207
+
+enum Priority {
+  Low = 1
+  High = 2
+}
+
+@tags([Priority.Low "urgent"])
+type Ticket {
+  id string
+}

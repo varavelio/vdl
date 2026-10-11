@@ -1,0 +1,8 @@
+// @expect: E205
+
+@meta({
+  server { host unknownConst }
+})
+type Account {
+  id string
+}

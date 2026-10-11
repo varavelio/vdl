@@ -2,7 +2,9 @@
 
 const notObject = "nope"
 
-@meta({ ...notObject })
+@meta({
+  ...notObject
+})
 type Account {
   id string
 }

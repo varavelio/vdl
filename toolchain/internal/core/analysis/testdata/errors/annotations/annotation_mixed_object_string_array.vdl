@@ -1,0 +1,6 @@
+// @expect: E207
+
+@tags(["public" { tier "gold" }])
+type Account {
+  id string
+}

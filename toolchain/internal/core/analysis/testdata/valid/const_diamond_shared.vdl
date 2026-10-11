@@ -1,0 +1,25 @@
+// @expect-no-errors
+// @assert: has-const both
+// @assert: const-kind both object
+
+enum Status {
+  Active = "active"
+}
+
+const shared = 1
+const left = shared
+const right = shared
+const both = {
+  a left
+  b right
+  deep {
+    l1 {
+      l2 {
+        l3 [1 2 3]
+      }
+    }
+  }
+}
+
+const stateRef = Status.Active
+const stateAlias = stateRef

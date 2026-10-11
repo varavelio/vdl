@@ -1,0 +1,10 @@
+// @expect: E205
+
+enum Status {
+  Active = "active"
+}
+
+@state(status)
+type Account {
+  id string
+}

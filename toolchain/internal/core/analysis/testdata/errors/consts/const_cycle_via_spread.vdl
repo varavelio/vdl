@@ -1,0 +1,8 @@
+// @expect: E208
+
+const first = {
+  ...second
+}
+const second = {
+  ...first
+}

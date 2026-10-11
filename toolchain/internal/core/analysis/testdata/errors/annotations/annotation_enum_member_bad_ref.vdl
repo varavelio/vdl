@@ -1,0 +1,10 @@
+// @expect: E305
+
+enum Status {
+  Active = "active"
+}
+
+enum Role {
+  @level(Status.Missing)
+  Admin = "admin"
+}

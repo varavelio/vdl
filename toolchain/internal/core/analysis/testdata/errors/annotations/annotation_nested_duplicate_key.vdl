@@ -1,0 +1,11 @@
+// @expect: E701
+
+@meta({
+  server {
+    host "a"
+    host "b"
+  }
+})
+type Account {
+  id string
+}

@@ -1,0 +1,12 @@
+// @expect: E206
+
+const baseMeta = {
+  tier "gold"
+}
+
+@meta({
+  ...BaseMeta.Tier
+})
+type Account {
+  id string
+}

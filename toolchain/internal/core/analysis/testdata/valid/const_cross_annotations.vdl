@@ -1,0 +1,7 @@
+// @expect-no-errors
+
+@tag(beta)
+const alpha = 1
+
+@tag(alpha)
+const beta = 2

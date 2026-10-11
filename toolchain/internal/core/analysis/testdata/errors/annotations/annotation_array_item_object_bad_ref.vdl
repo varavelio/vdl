@@ -1,0 +1,8 @@
+// @expect: E205
+
+type Catalog {
+  items {
+    @meta({ team unknownConst })
+    name string
+  }[]
+}

@@ -1,0 +1,41 @@
+// @expect-no-errors
+
+const ownerName = "platform"
+const baseMeta = {
+  tier "gold"
+}
+
+enum Status {
+  Active = "active"
+}
+
+@meta({
+  server {
+    host "localhost"
+    ports [80 443]
+  }
+  matrix [[1 2] [3 4]]
+  peers [{ name "a" } { name "b" }]
+  owner ownerName
+  state Status.Active
+  ...baseMeta
+})
+@tags([])
+@empty({})
+type Account {
+  @meta({ team ownerName })
+  id string
+
+  profile {
+    @meta({ team ownerName })
+    displayName string
+  }
+}
+
+@label(ownerName)
+const apiVersion = "1.0.0"
+
+enum Role {
+  @level(Status.Active)
+  Admin = "admin"
+}
