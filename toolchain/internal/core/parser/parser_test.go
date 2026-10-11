@@ -2083,3 +2083,52 @@ func TestParserDataLiteralKeys(t *testing.T) {
 	require.Equal(t, "true", entries[4].Key)
 	require.Equal(t, "false", entries[5].Key)
 }
+
+func TestParserMultilineStringsVerbatim(t *testing.T) {
+	t.Run("Multiline const preserves whitespace", func(t *testing.T) {
+		input := "const body = \"first line\nsecond line\n\tindented\"\n"
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		require.Len(t, parsed.Declarations, 1)
+		got := parsed.Declarations[0].Const.Value.Scalar.Str.String()
+		require.Equal(t, "first line\nsecond line\n\tindented", got)
+	})
+
+	t.Run("Minimal escapes decode", func(t *testing.T) {
+		input := `const quote = "say \"hi\""` + "\n" + `const slash = "back\\slash"` + "\n"
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		require.Len(t, parsed.Declarations, 2)
+		require.Equal(t, `say "hi"`, parsed.Declarations[0].Const.Value.Scalar.Str.String())
+		require.Equal(t, `back\slash`, parsed.Declarations[1].Const.Value.Scalar.Str.String())
+	})
+
+	t.Run("Other backslash sequences stay verbatim", func(t *testing.T) {
+		input := `const expr = "a == \'b\' && x\n"` + "\n"
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		got := parsed.Declarations[0].Const.Value.Scalar.Str.String()
+		require.Equal(t, `a == \'b\' && x\n`, got)
+	})
+
+	t.Run("Multiline annotation argument", func(t *testing.T) {
+		input := "@policy({\n  allow \"\n    principal.id == resource.ownerId\n  \"\n})\ntype CanRead {\n  principal User\n}\n"
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		ann := parsed.Declarations[0].Type.Annotations[0]
+		require.Equal(t, "policy", ann.Name)
+		require.NotNil(t, ann.Argument.Object)
+		require.Equal(
+			t,
+			"\n    principal.id == resource.ownerId\n  ",
+			ann.Argument.Object.Entries[0].Value.Scalar.Str.String(),
+		)
+	})
+
+	t.Run("Blank lines and trailing spaces preserved", func(t *testing.T) {
+		input := "const text = \"a   \n\n\tb\"\n"
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		require.Equal(t, "a   \n\n\tb", parsed.Declarations[0].Const.Value.Scalar.Str.String())
+	})
+}

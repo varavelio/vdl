@@ -67,6 +67,11 @@ type AnnotatedMultiline {
   value string
 }
 
+const   EscapedMinimal   =   "say \"hi\" and back\\slash"
+const ChainedEscapes="a \\\"b\\\" c \\\\ d"
+const VerbatimBackslash="keep \' and \n as typed"
+const EscapedNested={text "nested \"quote\" line" list ["item \"one\"" "back\\ end"]}
+
 // >>>>
 
 const plainMultiline = "first line
@@ -165,4 +170,12 @@ type AnnotatedMultiline {
       nested field annotation text
   ")
   value string
+}
+
+const escapedMinimal = "say \"hi\" and back\\slash"
+const chainedEscapes = "a \\\"b\\\" c \\\\ d"
+const verbatimBackslash = "keep \' and \n as typed"
+const escapedNested = {
+  text "nested \"quote\" line"
+  list ["item \"one\"" "back\\ end"]
 }

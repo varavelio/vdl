@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
+	"github.com/varavelio/vdl/toolchain/internal/util/testutil"
 )
 
 //go:embed tests/*.vdlt
@@ -69,4 +71,22 @@ func TestFormatOnlyOne(t *testing.T) {
 			require.Equal(t, expected, formatted)
 		})
 	}
+}
+
+func TestFormatPreservesStringValues(t *testing.T) {
+	input := "const quote = \"say \\\"hi\\\" and back\\\\slash\"\n" +
+		"const multi = \"first line\nsecond line\n\tindented\"\n" +
+		"const chain = \"a \\\\\\\"b\\\\\\\" c\"\n" +
+		"const verbatim = \"keep \\' and \\n as typed\"\n" +
+		"@description(\"multi\n  line\ndoc\")\n" +
+		"type Annotated {\n  value string\n}\n"
+
+	formatted, err := Format("schema.vdl", input)
+	require.NoError(t, err)
+
+	before, err := parser.ParserInstance.ParseString("schema.vdl", input)
+	require.NoError(t, err)
+	after, err := parser.ParserInstance.ParseString("schema.vdl", formatted)
+	require.NoError(t, err)
+	testutil.ASTEqualNoPos(t, before, after)
 }

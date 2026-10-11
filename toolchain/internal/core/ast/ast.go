@@ -8,7 +8,8 @@ import (
 )
 
 // QuotedString is a custom type that implements participle's Capture interface
-// to automatically strip surrounding double quotes from StringLiteral tokens.
+// to automatically strip surrounding double quotes from StringLiteral tokens
+// and decode the minimal escape sequences.
 type QuotedString string
 
 // Capture implements the participle Capture interface.
@@ -18,8 +19,30 @@ func (q *QuotedString) Capture(values []string) error {
 	if len(s) >= 2 && s[0] == '"' && s[len(s)-1] == '"' {
 		s = s[1 : len(s)-1]
 	}
-	*q = QuotedString(s)
+	// note: verbatim core, only \" and \\ decode; upgrade path is a future opt-in
+	// literal syntax, never magic inside double-quoted strings.
+	*q = QuotedString(decodeMinimalEscapes(s))
 	return nil
+}
+
+// decodeMinimalEscapes resolves only the minimal escape sequences of a string
+// literal interior. Any other backslash sequence stays verbatim.
+func decodeMinimalEscapes(s string) string {
+	if strings.IndexByte(s, '\\') < 0 {
+		return s
+	}
+	var b strings.Builder
+	b.Grow(len(s))
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '\\' && i+1 < len(s) && (s[i+1] == '"' || s[i+1] == '\\') {
+			b.WriteByte(s[i+1])
+			i++
+			continue
+		}
+		b.WriteByte(c)
+	}
+	return b.String()
 }
 
 // String returns the underlying string value.

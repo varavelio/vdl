@@ -10,6 +10,14 @@
     },
     {
       "annotations": [],
+      "name": "chainedEscapes",
+      "value": {
+        "kind": "string",
+        "stringValue": "a \\\"b\\\" c"
+      }
+    },
+    {
+      "annotations": [],
       "name": "closingQuoteIndentedOwnLine",
       "value": {
         "kind": "object",
@@ -208,6 +216,54 @@
     },
     {
       "annotations": [],
+      "name": "escapedBackslash",
+      "value": {
+        "kind": "string",
+        "stringValue": "back\\slash and \\\\ double"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "escapedNested",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "text",
+            "value": {
+              "kind": "string",
+              "stringValue": "nested \"quote\" here"
+            }
+          },
+          {
+            "key": "list",
+            "value": {
+              "arrayItems": [
+                {
+                  "kind": "string",
+                  "stringValue": "array \"one\""
+                },
+                {
+                  "kind": "string",
+                  "stringValue": "array back\\ end"
+                }
+              ],
+              "kind": "array"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "escapedQuote",
+      "value": {
+        "kind": "string",
+        "stringValue": "say \"hi\" to \"all\""
+      }
+    },
+    {
+      "annotations": [],
       "name": "nestedMultiline",
       "value": {
         "kind": "object",
@@ -263,10 +319,26 @@
     },
     {
       "annotations": [],
+      "name": "policyStyle",
+      "value": {
+        "kind": "string",
+        "stringValue": "\n  principal.id == resource.ownerId \u0026\u0026\n  principal.department == 'Finance'\n"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "verbatimSequences",
+      "value": {
+        "kind": "string",
+        "stringValue": "keep \\' and \\n and \\t as typed"
+      }
+    },
+    {
+      "annotations": [],
       "name": "whitespaceSensitive",
       "value": {
         "kind": "string",
-        "stringValue": "line with trailing spaces   \n\tline starting with one tab\n\t\tline starting with two tabs\n    line starting with four spaces\n  line starting with two spaces\n\n\nline after two empty lines\nsymbols: {} [] @ ... // /* */ = \\\"quoted\\\""
+        "stringValue": "line with trailing spaces   \n\tline starting with one tab\n\t\tline starting with two tabs\n    line starting with four spaces\n  line starting with two spaces\n\n\nline after two empty lines\nsymbols: {} [] @ ... // /* */ = \"quoted\""
       }
     }
   ],
@@ -336,6 +408,47 @@
                 "name": "fieldDoc"
               }
             ],
+            "name": "value",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [
+        {
+          "argument": {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "allow",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "principal.role == 'Admin' \u0026\u0026\n    context.mfaVerified == true"
+                }
+              },
+              {
+                "key": "note",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "escaped \"note\" with \\ backslash"
+                }
+              }
+            ]
+          },
+          "name": "meta"
+        }
+      ],
+      "name": "PolicyAnnotated",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
             "name": "value",
             "optional": false,
             "typeRef": {

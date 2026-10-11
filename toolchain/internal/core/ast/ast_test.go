@@ -555,3 +555,53 @@ func TestEnumMemberStructure(t *testing.T) {
 		require.Equal(t, "label", ann.Argument.Object.Entries[1].Key)
 	})
 }
+
+func TestQuotedStringCaptureMinimalEscapes(t *testing.T) {
+	tests := []struct {
+		name     string
+		token    string
+		expected string
+	}{
+		{name: "empty", token: `""`, expected: ""},
+		{name: "plain", token: `"hello"`, expected: "hello"},
+		{name: "escaped quote", token: `"say \"hi\""`, expected: `say "hi"`},
+		{name: "escaped backslash", token: `"back\\slash"`, expected: `back\slash`},
+		{name: "chained quote", token: `"\\\"quoted\\\""`, expected: `\"quoted\"`},
+		{name: "double backslash", token: `"\\\\"`, expected: `\\`},
+		{name: "single quote verbatim", token: `"it\'s"`, expected: `it\'s`},
+		{name: "backslash n verbatim", token: `"a\nb"`, expected: `a\nb`},
+		{name: "backslash t verbatim", token: `"a\tb"`, expected: `a\tb`},
+		{name: "lone backslash verbatim", token: `"a\qb"`, expected: `a\qb`},
+		{name: "multiline verbatim", token: "\"first\nsecond\"", expected: "first\nsecond"},
+		{name: "trailing spaces", token: "\"a   \n\tb\"", expected: "a   \n\tb"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var q QuotedString
+			require.NoError(t, q.Capture([]string{tt.token}))
+			require.Equal(t, tt.expected, string(q))
+		})
+	}
+}
+
+func TestQuotedStringRoundTrip(t *testing.T) {
+	values := []string{
+		"",
+		"hello",
+		`say "hi"`,
+		`back\slash`,
+		"first\nsecond\nthird",
+		"line with trailing spaces   \n\ttabbed",
+		`mixed "quotes" and \ backslash`,
+		`keep \' and \n as typed`,
+	}
+
+	for _, v := range values {
+		lit := ScalarLiteral{Str: func() *QuotedString { q := QuotedString(v); return &q }()}
+		printed := lit.String()
+		var decoded QuotedString
+		require.NoError(t, decoded.Capture([]string{printed}))
+		require.Equal(t, v, string(decoded), "round-trip failed for %q (printed %q)", v, printed)
+	}
+}

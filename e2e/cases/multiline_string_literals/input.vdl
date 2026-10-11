@@ -135,3 +135,33 @@ type AnnotatedMultiline {
   ")
   value string
 }
+
+const escapedQuote = "say \"hi\" to \"all\""
+
+const escapedBackslash = "back\\slash and \\\\ double"
+
+const chainedEscapes = "a \\\"b\\\" c"
+
+const verbatimSequences = "keep \' and \n and \t as typed"
+
+const escapedNested = {
+  text "nested \"quote\" here"
+  list [
+    "array \"one\""
+    "array back\\ end"
+  ]
+}
+
+const policyStyle = "
+  principal.id == resource.ownerId &&
+  principal.department == 'Finance'
+"
+
+@meta({
+  allow "principal.role == 'Admin' &&
+    context.mfaVerified == true"
+  note "escaped \"note\" with \\ backslash"
+})
+type PolicyAnnotated {
+  value string
+}
