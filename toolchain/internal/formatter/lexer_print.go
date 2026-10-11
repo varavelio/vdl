@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/varavelio/gen"
+
 	"github.com/varavelio/vdl/toolchain/internal/util/strutil"
 )
 

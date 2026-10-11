@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/alexflint/go-arg"
+
 	"github.com/varavelio/vdl/toolchain/internal/version"
 )
 

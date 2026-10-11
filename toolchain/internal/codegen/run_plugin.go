@@ -7,6 +7,7 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/varavelio/tinta"
+
 	"github.com/varavelio/vdl/toolchain/internal/codegen/plugintypes"
 )
 

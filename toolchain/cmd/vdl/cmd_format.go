@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bmatcuk/doublestar/v4"
+
 	"github.com/varavelio/vdl/toolchain/internal/formatter"
 )
 

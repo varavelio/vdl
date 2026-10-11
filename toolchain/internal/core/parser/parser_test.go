@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 	"github.com/varavelio/vdl/toolchain/internal/util/testutil"
 )

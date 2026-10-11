@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/participle/v2/lexer"
+
 	"github.com/varavelio/vdl/toolchain/internal/core/parser"
 )
 

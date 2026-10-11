@@ -52,7 +52,7 @@ formatters:
         balance-calls: true
     goimports:
       local-prefixes:
-        - github.com/varavelio/rienda
+        - github.com/varavelio/vdl
     golines:
       max-len: 100
   exclusions:

@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/alecthomas/participle/v2"
+
 	"github.com/varavelio/vdl/toolchain/internal/core/ast"
 )
 
