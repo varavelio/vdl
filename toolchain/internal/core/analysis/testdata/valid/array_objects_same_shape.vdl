@@ -14,6 +14,7 @@ const sameValues = [
     b "y"
   }
 ]
+
 const keyOrder = [
   {
     a 1
@@ -24,6 +25,7 @@ const keyOrder = [
     a 4
   }
 ]
+
 const spreadEqual = [
   {
     ...base
@@ -32,6 +34,7 @@ const spreadEqual = [
     x 9
   }
 ]
+
 const nestedEqual = [
   {
     a {
@@ -46,7 +49,17 @@ const nestedEqual = [
     }
   }
 ]
+
 const empties = [
   {}
   {}
+]
+
+const raggedInner = [
+  {
+    a [true]
+  }
+  {
+    a [false false]
+  }
 ]
