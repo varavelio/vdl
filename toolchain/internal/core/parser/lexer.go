@@ -34,8 +34,8 @@ var VDLLexer = lexer.MustSimple([]lexer.SimpleRule{
 	// Literals
 	{Name: "True", Pattern: `\btrue\b`},
 	{Name: "False", Pattern: `\bfalse\b`},
-	{Name: "FloatLiteral", Pattern: `[0-9]+\.[0-9]+`},
-	{Name: "IntLiteral", Pattern: `[0-9]+`},
+	{Name: "FloatLiteral", Pattern: `-?[0-9]+\.[0-9]+`},
+	{Name: "IntLiteral", Pattern: `-?[0-9]+`},
 	{Name: "StringLiteral", Pattern: `"(?:\\"|\\\\|[^"])*"`},
 
 	// Identifiers

@@ -440,3 +440,14 @@ func TestLexerFullSampleTypes(t *testing.T) {
 		"EOF",
 	}, actualTypes)
 }
+
+func TestLexerNegativeNumbers(t *testing.T) {
+	tokens, err := lexString("-5 -3.14")
+	require.NoError(t, err)
+
+	require.Equal(t, []tokenInfo{
+		{Type: "IntLiteral", Value: "-5"},
+		{Type: "FloatLiteral", Value: "-3.14"},
+		{Type: "EOF", Value: ""},
+	}, filterTokens(tokens))
+}

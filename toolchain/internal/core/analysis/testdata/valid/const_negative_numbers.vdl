@@ -1,0 +1,26 @@
+// @expect-no-errors
+// @assert: has-const belowZero
+// @assert: const-kind belowZero int
+// @assert: has-const negativeRatio
+// @assert: const-kind negativeRatio float
+
+enum Level {
+  Below = -2
+  Zero = 0
+  Above = 3
+}
+
+const belowZero = -42
+const negativeRatio = -0.5
+const negativeBackoff = [-100 -250 -500]
+const negativeMatrix = [
+  [-1 -2]
+  [-3 -4]
+]
+const copiedNegative = belowZero
+const negativeLevel = Level.Below
+
+@threshold(belowZero)
+type Account {
+  id string
+}

@@ -2133,3 +2133,41 @@ func TestParserMultilineStringsVerbatim(t *testing.T) {
 		require.Equal(t, "a   \n\n\tb", parsed.Declarations[0].Const.Value.Scalar.Str.String())
 	})
 }
+
+func TestParserNegativeNumbers(t *testing.T) {
+	t.Run("Negative integer constant", func(t *testing.T) {
+		input := `const floor = -5`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:  "floor",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Int: new("-5")}},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Negative float constant", func(t *testing.T) {
+		input := `const rate = -0.21`
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+
+		expected := &ast.Schema{Declarations: []*ast.TopLevelDecl{{Const: &ast.ConstDecl{
+			Name:  "rate",
+			Value: &ast.DataLiteral{Scalar: &ast.ScalarLiteral{Float: new("-0.21")}},
+		}}}}
+		testutil.ASTEqualNoPos(t, expected, parsed)
+	})
+
+	t.Run("Negative integer enum member", func(t *testing.T) {
+		input := "enum Level {\n  Below = -1\n  Above = 2\n}"
+		parsed, err := ParserInstance.ParseString("schema.vdl", input)
+		require.NoError(t, err)
+		require.Len(t, parsed.Declarations, 1)
+		members := parsed.Declarations[0].Enum.Members
+		require.Len(t, members, 2)
+		require.NotNil(t, members[0].Value)
+		require.NotNil(t, members[0].Value.Int)
+		require.Equal(t, "-1", *members[0].Value.Int)
+	})
+}

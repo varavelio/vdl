@@ -1,0 +1,9 @@
+const   Below_Zero   =   -42
+const negativeRatio=-0.5
+const negativeBackoff  =  [-100   -250 -500]
+
+// >>>>
+
+const belowZero = -42
+const negativeRatio = -0.5
+const negativeBackoff = [-100 -250 -500]

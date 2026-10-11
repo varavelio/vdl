@@ -59,6 +59,14 @@
     },
     {
       "annotations": [],
+      "name": "belowZero",
+      "value": {
+        "intValue": -42,
+        "kind": "int"
+      }
+    },
+    {
+      "annotations": [],
       "name": "defaultRegion",
       "value": {
         "kind": "string",
@@ -138,6 +146,35 @@
       "value": {
         "intValue": 3,
         "kind": "int"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "negativeBackoff",
+      "value": {
+        "arrayItems": [
+          {
+            "intValue": -100,
+            "kind": "int"
+          },
+          {
+            "intValue": -250,
+            "kind": "int"
+          },
+          {
+            "intValue": -500,
+            "kind": "int"
+          }
+        ],
+        "kind": "array"
+      }
+    },
+    {
+      "annotations": [],
+      "name": "negativeRatio",
+      "value": {
+        "floatValue": -0.5,
+        "kind": "float"
       }
     },
     {

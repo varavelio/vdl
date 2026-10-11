@@ -71,6 +71,8 @@ enum Priority {
 }
 ```
 
+Integer values accept an optional leading minus with no space (e.g. `Below = -1`).
+
 For integer enums, every member must have an explicit integer value.
 
 Invalid:
