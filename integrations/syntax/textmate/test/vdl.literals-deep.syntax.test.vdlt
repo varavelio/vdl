@@ -111,3 +111,17 @@ const serviceConfig = {
 //^ punctuation.section.braces.end.vdl
 }
 // < punctuation.section.braces.end.vdl
+
+const limits = {
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^ variable.other.constant.declaration.vdl
+//           ^ keyword.operator.assignment.vdl
+//             ^ punctuation.section.braces.begin.vdl
+  min -42
+//^^^ variable.other.property.vdl
+//    ^^^ constant.numeric.integer.vdl
+  ratio -0.5
+//^^^^^ variable.other.property.vdl
+//      ^^^^ constant.numeric.float.vdl
+}
+// < punctuation.section.braces.end.vdl

@@ -96,3 +96,18 @@ enum Priority { Low = 1 Medium = 2 High = 3 }
 //                                      ^ keyword.operator.assignment.vdl
 //                                        ^ constant.numeric.integer.vdl
 //                                          ^ punctuation.section.braces.end.vdl
+
+enum Depth {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^ entity.name.type.declaration.vdl
+//         ^ punctuation.section.braces.begin.vdl
+  Below = -1
+//^^^^^ variable.other.enummember.vdl
+//      ^ keyword.operator.assignment.vdl
+//        ^^ constant.numeric.integer.vdl
+  Surface = 0
+//^^^^^^^ variable.other.enummember.vdl
+//        ^ keyword.operator.assignment.vdl
+//          ^ constant.numeric.integer.vdl
+}
+// < punctuation.section.braces.end.vdl

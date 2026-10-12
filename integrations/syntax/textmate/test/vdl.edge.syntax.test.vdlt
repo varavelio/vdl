@@ -99,3 +99,45 @@ const keywordObject = {
 //     ^^^^^^^^ string.quoted.double.vdl
 }
 // < punctuation.section.braces.end.vdl
+
+type BadSpread {
+// <--- keyword.control.declaration.vdl
+//   ^^^^^^^^^ entity.name.type.declaration.vdl
+  ...Base.Service
+//^^^ keyword.operator.spread.vdl
+//   ^^^^ entity.name.type.reference.vdl
+//       ^ punctuation.accessor.dot.vdl
+//        ^^^^^^^ entity.name.type.reference.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+const merged = {
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^ variable.other.constant.declaration.vdl
+//           ^ keyword.operator.assignment.vdl
+//             ^ punctuation.section.braces.begin.vdl
+  ...base.opts
+//^^^ keyword.operator.spread.vdl
+//   ^^^^ variable.other.constant.vdl
+//       ^ punctuation.accessor.dot.vdl
+//        ^^^^ variable.other.constant.vdl
+}
+// < punctuation.section.braces.end.vdl
+
+@deprecated("Use newFlag instead.")
+//^^^^^^^^^ storage.type.annotation.vdl
+//         ^ punctuation.definition.parameters.begin.vdl
+//          ^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.vdl
+//                                ^ punctuation.definition.parameters.end.vdl
+
+const oldFlag = false
+// <---- keyword.control.declaration.vdl
+//    ^^^^^^^ variable.other.constant.declaration.vdl
+//            ^ keyword.operator.assignment.vdl
+//              ^^^^^ constant.language.boolean.vdl
+
+type Empty {}
+// <--- keyword.control.declaration.vdl
+//   ^^^^^ entity.name.type.declaration.vdl
+//         ^ punctuation.section.braces.begin.vdl
+//          ^ punctuation.section.braces.end.vdl
