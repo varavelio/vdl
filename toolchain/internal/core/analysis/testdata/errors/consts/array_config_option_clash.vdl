@@ -1,0 +1,14 @@
+// @expect: E207
+
+const a = [
+  {
+    options {
+      package "vdl"
+    }
+  }
+  {
+    options {
+      package 5
+    }
+  }
+]

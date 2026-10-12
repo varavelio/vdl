@@ -1,0 +1,30 @@
+// @expect-no-errors
+
+const config = {
+  version 1
+
+  plugins [
+    {
+      src "plugin-a"
+      schema "./schema.vdl"
+      outDir "./gen"
+      options {
+        outFile "a.html"
+      }
+    }
+    {
+      src "plugin-b"
+      schema "./schema.vdl"
+      outDir "./gen"
+      options {
+        title "API"
+        workers "4"
+      }
+    }
+    {
+      src "plugin-c"
+      schema "./schema.vdl"
+      outDir "./gen"
+    }
+  ]
+}

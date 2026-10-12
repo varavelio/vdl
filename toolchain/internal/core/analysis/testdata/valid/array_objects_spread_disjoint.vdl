@@ -1,10 +1,10 @@
-// @expect: E207
+// @expect-no-errors
 
 const base = {
   x 1
 }
 
-const rows = [
+const foo = [
   {
     ...base
   }

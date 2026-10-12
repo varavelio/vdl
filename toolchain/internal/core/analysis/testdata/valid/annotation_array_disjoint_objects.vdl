@@ -1,4 +1,4 @@
-// @expect: E207
+// @expect-no-errors
 
 @tags([{ a 1 } { b 2 }])
 type Ticket {

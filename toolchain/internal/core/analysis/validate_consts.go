@@ -331,28 +331,34 @@ func validateDataLiteral(
 	}
 
 	if lit.Array != nil {
-		var reference string
-		hasReference := false
+		// Items merge by union: shared object keys must have compatible
+		// types, extra keys are allowed (they become optional fields for
+		// plugins). Each item merges into the accumulated shape, so clashes
+		// surface regardless of item order. Unknown items (unresolvable
+		// references, cycles) are skipped: their own validators report them.
+		var merged *literalShape
 		for _, elem := range lit.Array.Elements {
 			childDiags, _ := validateDataLiteral(symbols, file, elem, visiting)
 			diagnostics = append(diagnostics, childDiags...)
 
-			sig, ok := dataLiteralSig(symbols, elem, map[string]bool{})
-			if !ok {
+			// Fresh guards per item: reusing one constant twice is not a cycle.
+			shape := shapeOf(symbols, elem, map[string]bool{})
+			if shape == nil {
 				continue
 			}
-			if !hasReference {
-				reference = sig
-				hasReference = true
+			if merged == nil {
+				merged = shape
 				continue
 			}
-			if sig != reference {
+			if next, ok := mergeShapes(merged, shape); ok {
+				merged = next
+			} else {
 				diagnostics = append(diagnostics, newDiagnostic(
 					file,
 					elem.Pos,
 					elem.EndPos,
 					CodeConstArrayMixedTypes,
-					"array literals must contain elements of the same structure",
+					"array literals must contain compatible elements: shared object keys must have the same type",
 				))
 			}
 		}
@@ -363,120 +369,168 @@ func validateDataLiteral(
 	return diagnostics, ConstValueTypeUnknown
 }
 
-// dataLiteralSig returns the canonical structural signature of a literal.
-//
-// Scalar values are ignored, only their kind matters. Object keys are sorted,
-// so key order is irrelevant. Spreads are expanded with override semantics.
-// References resolve through constants and enum members.
-//
-// ok is false when any part cannot be resolved (undefined reference, invalid
-// spread, cycle). Those cases are reported by their own validators, so the
-// caller skips the structural comparison instead of cascading errors.
-func dataLiteralSig(
+// literalShape describes canonical structure for union comparison of array
+// items. Scalars carry their kind only; objects map keys to nested shapes;
+// arrays carry the merged shape of their items. A nil shape (or nil map
+// entry) means unknown: it merges with anything because its own validator
+// already reports the underlying problem.
+type literalShape struct {
+	kind   string
+	fields map[string]*literalShape
+	items  *literalShape
+}
+
+// shapeOf returns the canonical structure of a literal.
+func shapeOf(
 	symbols *symbolTable,
 	lit *ast.DataLiteral,
 	visiting map[string]bool,
-) (sig string, ok bool) {
+) *literalShape {
 	if lit == nil {
-		return "", false
+		return nil
 	}
 
 	if lit.Scalar != nil {
-		return scalarSig(symbols, lit.Scalar, visiting)
+		return scalarShape(symbols, lit.Scalar, visiting)
 	}
 
 	if lit.Object != nil {
-		fields, ok := objectFieldsSig(symbols, lit.Object, visiting)
+		fields, ok := objectShapes(symbols, lit.Object, visiting)
 		if !ok {
-			return "", false
+			return nil
 		}
-		return encodeObjectSig(fields), true
+		return &literalShape{kind: "object", fields: fields}
 	}
 
 	if lit.Array != nil {
-		// The length is not part of the structure: [80 443] and [80] are
-		// both "string arrays". A nested array whose own items diverge is
-		// reported at its own level, so here it resolves to not-ok and the
-		// outer comparison skips it instead of cascading.
-		if len(lit.Array.Elements) == 0 {
-			return "array[]", true
-		}
-		first, ok := dataLiteralSig(symbols, lit.Array.Elements[0], visiting)
-		if !ok {
-			return "", false
-		}
-		for _, elem := range lit.Array.Elements[1:] {
-			s, ok := dataLiteralSig(symbols, elem, visiting)
-			if !ok || s != first {
-				return "", false
+		// Length is not structure. A nested array whose own items clash is
+		// reported at its own level, so here it stays unknown and the outer
+		// comparison skips it instead of cascading.
+		var merged *literalShape
+		for _, elem := range lit.Array.Elements {
+			shape := shapeOf(symbols, elem, visiting)
+			if shape == nil {
+				return nil
 			}
+			if merged == nil {
+				merged = shape
+				continue
+			}
+			next, ok := mergeShapes(merged, shape)
+			if !ok {
+				return nil
+			}
+			merged = next
 		}
-		return "array[" + first + "]", true
+		return &literalShape{kind: "array", items: merged}
 	}
 
-	return "", false
+	return nil
 }
 
-// scalarSig returns the structural signature of a scalar literal.
-func scalarSig(
+// mergeShapes returns the union of two shapes, or false when incompatible.
+// Shared object keys merge recursively; extra keys are adopted as-is; an
+// unknown (nil) side adopts the other. Inputs are never mutated.
+func mergeShapes(a, b *literalShape) (*literalShape, bool) {
+	if a == nil {
+		return b, true
+	}
+	if b == nil {
+		return a, true
+	}
+	if a.kind != b.kind {
+		return nil, false
+	}
+	switch a.kind {
+	case "object":
+		fields := make(map[string]*literalShape, len(a.fields)+len(b.fields))
+		maps.Copy(fields, a.fields)
+		for k, v := range b.fields {
+			existing, found := fields[k]
+			if !found {
+				fields[k] = v
+				continue
+			}
+			merged, ok := mergeShapes(existing, v)
+			if !ok {
+				return nil, false
+			}
+			fields[k] = merged
+		}
+		return &literalShape{kind: "object", fields: fields}, true
+	case "array":
+		items, ok := mergeShapes(a.items, b.items)
+		if !ok {
+			return nil, false
+		}
+		return &literalShape{kind: "array", items: items}, true
+	default:
+		return &literalShape{kind: a.kind}, true
+	}
+}
+
+// scalarShape returns the structure of a scalar literal: its kind, with
+// references resolved through constants and enum members.
+func scalarShape(
 	symbols *symbolTable,
 	s *ast.ScalarLiteral,
 	visiting map[string]bool,
-) (string, bool) {
+) *literalShape {
 	switch {
 	case s.Str != nil:
-		return "string", true
+		return &literalShape{kind: "string"}
 	case s.Int != nil:
-		return "int", true
+		return &literalShape{kind: "int"}
 	case s.Float != nil:
-		return "float", true
+		return &literalShape{kind: "float"}
 	case s.True || s.False:
-		return "bool", true
+		return &literalShape{kind: "bool"}
 	case s.Ref != nil:
 		if s.Ref.Member == nil {
-			return constRefSig(symbols, s.Ref.Name, visiting)
+			return constShape(symbols, s.Ref.Name, visiting)
 		}
 		kind, ok := enumMemberKind(symbols, s.Ref.Name, *s.Ref.Member, visiting)
 		if !ok {
-			return "", false
+			return nil
 		}
 		if kind == ConstValueTypeInt {
-			return "int", true
+			return &literalShape{kind: "int"}
 		}
-		return "string", true
+		return &literalShape{kind: "string"}
 	}
 
-	return "", false
+	return nil
 }
 
-// constRefSig returns the signature of the value a constant reference points
-// to. Cyclic and dangling references resolve to not-ok; their own validators
+// constShape returns the shape of the value a constant reference points to.
+// Cyclic and dangling references resolve to unknown; their own validators
 // report them.
-func constRefSig(
+func constShape(
 	symbols *symbolTable,
 	name string,
 	visiting map[string]bool,
-) (string, bool) {
+) *literalShape {
 	if visiting[name] {
-		return "", false
+		return nil
 	}
 	refConst := symbols.lookupConst(name)
 	if refConst == nil || refConst.AST == nil || refConst.AST.Value == nil {
-		return "", false
+		return nil
 	}
 	visiting[name] = true
 	defer delete(visiting, name)
-	return dataLiteralSig(symbols, refConst.AST.Value, visiting)
+	return shapeOf(symbols, refConst.AST.Value, visiting)
 }
 
-// objectFieldsSig returns the merged key signatures of an object literal,
-// expanding spreads with override semantics (explicit keys win).
-func objectFieldsSig(
+// objectShapes returns the merged key shapes of an object literal, expanding
+// spreads with override semantics (explicit keys win). A bad spread resolves
+// the whole object to unknown; its own validator reports it.
+func objectShapes(
 	symbols *symbolTable,
 	obj *ast.DataLiteralObject,
 	visiting map[string]bool,
-) (map[string]string, bool) {
-	fields := map[string]string{}
+) (map[string]*literalShape, bool) {
+	fields := map[string]*literalShape{}
 	for _, entry := range obj.Entries {
 		if entry == nil {
 			continue
@@ -485,30 +539,26 @@ func objectFieldsSig(
 			if entry.Spread.Ref.Member != nil {
 				return nil, false
 			}
-			spread, ok := spreadFieldsSig(symbols, entry.Spread.Ref.Name, visiting)
+			spread, ok := spreadShapes(symbols, entry.Spread.Ref.Name, visiting)
 			if !ok {
 				return nil, false
 			}
 			maps.Copy(fields, spread)
 			continue
 		}
-		s, ok := dataLiteralSig(symbols, entry.Value, visiting)
-		if !ok {
-			return nil, false
-		}
-		fields[entry.Key] = s
+		fields[entry.Key] = shapeOf(symbols, entry.Value, visiting)
 	}
 	return fields, true
 }
 
-// spreadFieldsSig returns the key signatures of the object constant a spread
-// points to. Non-object and dangling targets resolve to not-ok; their own
-// validators report them.
-func spreadFieldsSig(
+// spreadShapes returns the key shapes of the object constant a spread points
+// to. Non-object and dangling targets resolve to not-ok; their own validators
+// report them.
+func spreadShapes(
 	symbols *symbolTable,
 	name string,
 	visiting map[string]bool,
-) (map[string]string, bool) {
+) (map[string]*literalShape, bool) {
 	if visiting[name] {
 		return nil, false
 	}
@@ -519,29 +569,7 @@ func spreadFieldsSig(
 	}
 	visiting[name] = true
 	defer delete(visiting, name)
-	return objectFieldsSig(symbols, refConst.AST.Value.Object, visiting)
-}
-
-// encodeObjectSig encodes key signatures with sorted keys, so key order is
-// irrelevant to the comparison.
-func encodeObjectSig(fields map[string]string) string {
-	keys := make([]string, 0, len(fields))
-	for k := range fields {
-		keys = append(keys, k)
-	}
-	slices.Sort(keys)
-	var b strings.Builder
-	b.WriteString("object{")
-	for i, k := range keys {
-		if i > 0 {
-			b.WriteString(",")
-		}
-		b.WriteString(k)
-		b.WriteString(":")
-		b.WriteString(fields[k])
-	}
-	b.WriteString("}")
-	return b.String()
+	return objectShapes(symbols, refConst.AST.Value.Object, visiting)
 }
 
 // enumMemberKind returns the value kind of an enum member without emitting

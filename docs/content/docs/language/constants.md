@@ -118,16 +118,17 @@ const roles = ["admin" "editor" "viewer"]
 const retryBackoffMs = [100 250 500]
 ```
 
-All items in an array literal must have the same structure: the same
-scalar kinds, the same object keys at every level, and the same nested array
-shapes. Key order does not matter and scalar values are ignored, so
-`[{a 1} {a 2}]` is valid. Spreads are expanded before comparing.
+Array items merge by union: shared object keys must have the same type
+at every level, while extra keys are allowed (plugins read them as optional
+fields). Key order does not matter and scalar values are ignored, so
+`[{a 1} {a 2}]` and `[{a 1} {b 2}]` are both valid. Spreads are expanded
+before comparing.
 
 Invalid:
 
 ```vdl
 const mixedValues = ["admin" 1 true]
-const mixedShapes = [{a 1} {b 2}]
+const mixedKinds = [{a true b false} {a 1}]
 ```
 
 ## Constant References

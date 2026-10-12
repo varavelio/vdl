@@ -1,6 +1,6 @@
-// @expect: E207
+// @expect-no-errors
 
-const rows = [
+const foo = [
   {
     a 1
   }

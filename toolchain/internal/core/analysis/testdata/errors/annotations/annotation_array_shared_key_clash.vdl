@@ -1,0 +1,12 @@
+// @expect: E207
+
+@tags([
+  {
+    a true
+    b false
+  }
+  { a 1 }
+])
+type Ticket {
+  id string
+}

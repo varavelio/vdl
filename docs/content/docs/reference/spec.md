@@ -317,7 +317,7 @@ const roles = ["admin" "editor" "viewer"]
 const retryBackoffMs = [100 250 500 1000]
 ```
 
-All elements in a data literal array must have the same structure: the same scalar kinds, the same object keys at every level, and the same nested array shapes. Key order does not matter, scalar values are ignored, and spreads are expanded before comparing.
+Array elements merge by union: shared object keys must have the same type at every level, while extra keys are allowed. Key order does not matter, scalar values are ignored, and spreads are expanded before comparing.
 
 ## References
 

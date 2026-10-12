@@ -1,0 +1,6 @@
+// @expect: E207
+
+const foo = [
+  [1]
+  ["a"]
+]
