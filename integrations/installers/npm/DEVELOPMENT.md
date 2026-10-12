@@ -7,7 +7,7 @@ This directory contains the npm package installer for VDL. It provides a seamles
 1. **User installs**: `npm install -g @varavel/vdl`
 2. **Postinstall runs**: `install.js` executes automatically
 3. **Archive downloads**: Downloads from GitHub releases based on platform/arch
-4. **Archive check**: Check if the file is not corrupted by checking its sha256 hash
+4. **Archive check**: Verify the archive SHA256 hash against the release `manifest.json` pinned inside the package (downloaded from the GitHub release at publish time, never fetched at install time)
 5. **Binary extracts**: Extracts to `bin/` directory
 6. **Ready to use**: `vdl` command is now available
 
@@ -26,7 +26,8 @@ The package is automatically published when you create a new release:
 # The CI workflow will:
 # 1. Build all binaries
 # 2. Upload binaries to GitHub releases
-# 3. Publish to npm with the same version
+# 3. Download manifest.json from the release into the npm directory
+# 4. Publish to npm with the same version (manifest.json ships pinned in the package)
 ```
 
 ### Platform not supported

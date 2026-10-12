@@ -45,7 +45,7 @@ execSync(`"${vdl.binaryPath}" version`, { stdio: "inherit" });
 
 ## How It Works
 
-This package downloads the appropriate pre-compiled VDL binary for your platform during installation. The binary is fetched from the [official GitHub releases](https://github.com/varavelio/vdl/releases).
+This package downloads the appropriate pre-compiled VDL binary for your platform during installation. The binary is fetched from the [official GitHub releases](https://github.com/varavelio/vdl/releases) and its SHA256 hash is verified against the release `manifest.json` pinned inside this package.
 
 ## Documentation
 
