@@ -1,0 +1,6 @@
+// @expect: E901
+
+@limit(99999999999999999999999)
+type Service {
+  name string
+}

@@ -44,6 +44,8 @@ func validateEnum(symbols *symbolTable, enum *EnumSymbol) []Diagnostic {
 	}
 	enum.ValueType = valueType
 
+	diagnostics = append(diagnostics, validateEnumValueRanges(enum)...)
+
 	// Check for duplicate member names
 	memberNames := make(map[string]ast.Position)
 	for _, member := range effectiveMembers {
@@ -281,4 +283,35 @@ func enumNames(symbols *symbolTable) []string {
 		names = append(names, name)
 	}
 	return names
+}
+
+// validateEnumValueRanges reports integer member values that exceed 64 bits.
+//
+// Only direct members are checked: spread-inherited members are reported by
+// their owning enum. Without this check an out-of-range value would silently
+// flip the enum to strings downstream.
+func validateEnumValueRanges(enum *EnumSymbol) []Diagnostic {
+	var diagnostics []Diagnostic
+	if enum.AST == nil {
+		return diagnostics
+	}
+	for _, member := range enum.AST.Members {
+		if member == nil || member.Spread != nil ||
+			member.Value == nil || member.Value.Int == nil {
+			continue
+		}
+		if _, err := strconv.ParseInt(*member.Value.Int, 10, 64); err != nil {
+			diagnostics = append(diagnostics, newDiagnostic(
+				enum.File,
+				member.Pos,
+				member.EndPos,
+				CodeNumericOutOfRange,
+				fmt.Sprintf(
+					"enum member %q value is out of range for 64-bit int",
+					member.Name,
+				),
+			))
+		}
+	}
+	return diagnostics
 }

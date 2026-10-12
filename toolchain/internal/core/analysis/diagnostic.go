@@ -66,6 +66,11 @@ const (
 	CodeDuplicateName  = "E804" // Cross-category name collision
 )
 
+// Literal value errors (E90x).
+const (
+	CodeNumericOutOfRange = "E901"
+)
+
 // Diagnostic represents an error found during semantic analysis.
 // It provides precise location information for IDE/LSP integration.
 type Diagnostic struct {

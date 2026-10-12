@@ -73,6 +73,8 @@ enum Priority {
 
 Integer values accept an optional leading minus with no space (e.g. `Below = -1`).
 
+Values must fit in 64-bit signed range; out-of-range values are rejected.
+
 For integer enums, every member must have an explicit integer value.
 
 Invalid:

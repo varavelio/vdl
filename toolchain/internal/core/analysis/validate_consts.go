@@ -155,8 +155,33 @@ func validateDataLiteral(
 		case s.Str != nil:
 			return nil, ConstValueTypeString
 		case s.Int != nil:
+			// The lexer guarantees digits with an optional minus, so a
+			// parse failure here means the value exceeds 64 bits. Without
+			// this check the IR would silently mistype the literal.
+			if _, err := strconv.ParseInt(*s.Int, 10, 64); err != nil {
+				diagnostics = append(diagnostics, newDiagnostic(
+					file,
+					lit.Pos,
+					lit.EndPos,
+					CodeNumericOutOfRange,
+					"integer literal is out of range for 64-bit int",
+				))
+				return diagnostics, ConstValueTypeUnknown
+			}
 			return nil, ConstValueTypeInt
 		case s.Float != nil:
+			// Only true overflow (±Inf) fails here; ordinary precision
+			// loss is standard float semantics, not an error.
+			if _, err := strconv.ParseFloat(*s.Float, 64); err != nil {
+				diagnostics = append(diagnostics, newDiagnostic(
+					file,
+					lit.Pos,
+					lit.EndPos,
+					CodeNumericOutOfRange,
+					"float literal is out of range for 64-bit float",
+				))
+				return diagnostics, ConstValueTypeUnknown
+			}
 			return nil, ConstValueTypeFloat
 		case s.True || s.False:
 			return nil, ConstValueTypeBool

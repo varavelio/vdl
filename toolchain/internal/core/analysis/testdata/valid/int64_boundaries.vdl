@@ -1,0 +1,6 @@
+// @expect-no-errors
+
+const maxInt = 9223372036854775807
+const minInt = -9223372036854775808
+const zero = 0
+const negZero = -0

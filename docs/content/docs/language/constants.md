@@ -44,6 +44,8 @@ const negativeRatio = -0.5
 
 Numbers accept an optional leading minus with no space (`-42`, `-0.5`).
 
+Integers must fit in 64-bit signed range and floats in 64-bit range; out-of-range literals are rejected instead of silently mistyped.
+
 Strings use double quotes. A string may span multiple lines; its content is
 verbatim, so line breaks, spaces, tabs, and blank lines are preserved exactly.
 
