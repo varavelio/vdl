@@ -84,32 +84,53 @@ function getDownloadURL() {
 }
 
 /**
- * Constructs the GitHub release checksums URL.
- * @returns {string} Checksums URL
+ * Loads the pinned release manifest shipped inside the npm package.
+ * @returns {object} Parsed manifest with version and artifacts
+ * @throws {Error} If the manifest is missing or malformed
  */
-function getChecksumsURL() {
-  const version = getVersion();
-  return `https://github.com/varavelio/vdl/releases/download/v${version}/checksums.txt`;
+function getPinnedManifest() {
+  const manifestPath = path.join(__dirname, "manifest.json");
+  if (!fs.existsSync(manifestPath)) {
+    throw new Error(
+      "Pinned manifest.json not found. The npm package must ship the manifest " +
+        "downloaded from the GitHub release at publish time.",
+    );
+  }
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  if (!manifest || typeof manifest.version !== "string" || !Array.isArray(manifest.artifacts)) {
+    throw new Error("Pinned manifest.json is malformed.");
+  }
+  return manifest;
 }
 
 /**
- * Verifies the SHA256 checksum of the downloaded buffer.
+ * Verifies the SHA256 checksum of the downloaded buffer against the pinned manifest.
+ * The expected hash comes from the manifest shipped in the npm package, not from
+ * the network, so a compromised release asset cannot pass with a matching pair.
  * @param {Buffer} binaryBuffer - The downloaded file buffer
- * @param {Buffer} checksumsBuffer - The downloaded checksums.txt buffer
- * @param {string} filename - The expected filename in checksums.txt
- * @throws {Error} If checksum verification fails
+ * @param {string} filename - The expected filename in the pinned manifest
+ * @throws {Error} If version, artifact, or checksum verification fails
  */
-function verifyChecksum(binaryBuffer, checksumsBuffer, filename) {
-  const checksums = checksumsBuffer.toString("utf8");
-  const expectedLine = checksums.split("\n").find((line) => line.trim().endsWith(filename));
-
-  if (!expectedLine) {
-    throw new Error(`Checksum for ${filename} not found in checksums.txt`);
+function verifyChecksum(binaryBuffer, filename) {
+  const manifest = getPinnedManifest();
+  const version = getVersion();
+  const manifestVersion = String(manifest.version).replace(/^v/, "");
+  if (manifestVersion !== version) {
+    throw new Error(
+      `Manifest version mismatch. Package: ${version}, manifest: ${manifestVersion}. ` +
+        "Refusing to install.",
+    );
   }
 
-  // Checksums file format is: <hash>  <filename>
-  const expectedHash = expectedLine.split(/\s+/)[0].trim();
+  const artifact = manifest.artifacts.find((entry) => entry && entry.name === filename);
+  if (!artifact) {
+    throw new Error(`Checksum for ${filename} not found in pinned manifest.json`);
+  }
+  if (typeof artifact.sha256 !== "string" || artifact.sha256.length === 0) {
+    throw new Error(`Pinned manifest entry for ${filename} has no sha256 hash.`);
+  }
 
+  const expectedHash = artifact.sha256.trim().toLowerCase();
   const calculatedHash = crypto.createHash("sha256").update(binaryBuffer).digest("hex");
 
   if (expectedHash !== calculatedHash) {
@@ -311,18 +332,14 @@ async function install() {
     const binaryName = getBinaryName();
     const filename = getReleaseFilename();
     const downloadUrl = getDownloadURL();
-    const checksumsUrl = getChecksumsURL();
     const binDir = ensureBinDir();
 
     console.log(`VDL: Downloading ${filename}...`);
 
-    const [binaryBuffer, checksumsBuffer] = await Promise.all([
-      download(downloadUrl),
-      download(checksumsUrl),
-    ]);
+    const binaryBuffer = await download(downloadUrl);
 
     console.log("VDL: Verifying checksum...");
-    verifyChecksum(binaryBuffer, checksumsBuffer, filename);
+    verifyChecksum(binaryBuffer, filename);
 
     console.log("VDL: Extracting...");
     if (platform === "windows") {
@@ -350,4 +367,4 @@ async function install() {
 }
 
 if (require.main === module) install();
-module.exports = { install };
+module.exports = { install, verifyChecksum };

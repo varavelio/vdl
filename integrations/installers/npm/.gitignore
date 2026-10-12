@@ -5,6 +5,9 @@ node_modules/
 bin/vdl
 bin/vdl.exe
 
+# Pinned release manifest (downloaded from GitHub release at publish time)
+manifest.json
+
 # Temp files
 *.tar.gz
 *.zip

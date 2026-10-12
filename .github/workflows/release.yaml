@@ -71,6 +71,12 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Download pinned manifest
+        env:
+          TAG: ${{ needs.setup.outputs.tag }}
+        run: |
+          curl -fsSL "https://github.com/varavelio/vdl/releases/download/${TAG}/manifest.json" -o ./integrations/installers/npm/manifest.json
+
       - name: Publish to npm
         run: |
           cd ./integrations/installers/npm

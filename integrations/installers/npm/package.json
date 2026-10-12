@@ -29,6 +29,7 @@
     "bin.js",
     "install.js",
     "index.js",
+    "manifest.json",
     "package.json",
     "README.md"
   ],
