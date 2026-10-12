@@ -47,6 +47,7 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.zip
             ./dist/*.txt
+            ./dist/*.json
 
   publish-npm:
     name: Publish to npm

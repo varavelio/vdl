@@ -6,6 +6,7 @@ import (
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -18,6 +19,21 @@ import (
 type Binary struct {
 	OS   string
 	Arch string
+}
+
+type releaseArtifact struct {
+	Arch   string `json:"arch"`
+	Format string `json:"format"`
+	Name   string `json:"name"`
+	OS     string `json:"os"`
+	SHA256 string `json:"sha256"`
+}
+
+type releaseManifest struct {
+	Artifacts []releaseArtifact `json:"artifacts"`
+	Project   string            `json:"project"`
+	Repo      string            `json:"repo"`
+	Version   string            `json:"version"`
 }
 
 var (
@@ -69,11 +85,20 @@ func run() error {
 	}
 
 	// Build and Archive CLI Binaries
+	artifacts := make([]releaseArtifact, 0, len(Binaries))
 	for _, bin := range Binaries {
 		fmt.Printf("Building %s/%s...\n", bin.OS, bin.Arch)
-		if err := buildAndArchive(root, distDir, bin); err != nil {
+		artifact, err := buildAndArchive(root, distDir, bin)
+		if err != nil {
 			return fmt.Errorf("failed to build %s/%s: %w", bin.OS, bin.Arch, err)
 		}
+		artifacts = append(artifacts, artifact)
+	}
+
+	// Generate Manifest
+	fmt.Println("Generating manifest...")
+	if err := writeManifest(distDir, Version, artifacts); err != nil {
+		return fmt.Errorf("failed to generate manifest: %w", err)
 	}
 
 	// Generate Checksums
@@ -119,7 +144,7 @@ func initVariables() error {
 	return nil
 }
 
-func buildAndArchive(root, distDir string, bin Binary) error {
+func buildAndArchive(root, distDir string, bin Binary) (releaseArtifact, error) {
 	binaryName := "vdl"
 	archiveType := "tar.gz"
 	if bin.OS == "windows" {
@@ -145,7 +170,7 @@ func buildAndArchive(root, distDir string, bin Binary) error {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("go build failed: %w", err)
+		return releaseArtifact{}, fmt.Errorf("go build failed: %w", err)
 	}
 
 	// Prepare files for archive
@@ -166,20 +191,31 @@ func buildAndArchive(root, distDir string, bin Binary) error {
 
 	if archiveType == "zip" {
 		if err := createZip(archivePath, filesToArchive); err != nil {
-			return err
+			return releaseArtifact{}, err
 		}
 	} else {
 		if err := createTarGz(archivePath, filesToArchive); err != nil {
-			return err
+			return releaseArtifact{}, err
 		}
 	}
 
 	// Cleanup raw binary
 	if err := os.Remove(rawBinPath); err != nil {
-		return fmt.Errorf("failed to remove raw binary: %w", err)
+		return releaseArtifact{}, fmt.Errorf("failed to remove raw binary: %w", err)
 	}
 
-	return nil
+	hash, err := calculateSHA256(archivePath)
+	if err != nil {
+		return releaseArtifact{}, err
+	}
+
+	return releaseArtifact{
+		Arch:   bin.Arch,
+		Format: archiveType,
+		Name:   archiveName,
+		OS:     bin.OS,
+		SHA256: hash,
+	}, nil
 }
 
 func copyFile(src, dst string) error {
@@ -290,6 +326,24 @@ func addFileToTar(tw *tar.Writer, src, name string) error {
 
 	_, err = io.Copy(tw, srcFile)
 	return err
+}
+
+func writeManifest(distDir, version string, artifacts []releaseArtifact) error {
+	manifest := releaseManifest{
+		Artifacts: artifacts,
+		Project:   "vdl",
+		Repo:      "varavelio/vdl",
+		Version:   version,
+	}
+	content, err := json.MarshalIndent(manifest, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshal release manifest: %w", err)
+	}
+	content = append(content, '\n')
+	if err := os.WriteFile(filepath.Join(distDir, "manifest.json"), content, 0644); err != nil {
+		return fmt.Errorf("write release manifest: %w", err)
+	}
+	return nil
 }
 
 func generateChecksums(distDir string) error {
