@@ -1,4 +1,5 @@
 // @expect: E901
+// @assert: diagnostic-count E901 1
 
 enum Big {
   Huge = 99999999999999999999999

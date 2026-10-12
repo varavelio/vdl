@@ -1,3 +1,4 @@
 // @expect: E207
+// @assert: diagnostic-count E207 1
 
 const mixed = [1 "two" 3]

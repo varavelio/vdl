@@ -1,4 +1,5 @@
 // @expect: E205
+// @assert: diagnostic-count E205 1
 
 type Catalog {
   items {

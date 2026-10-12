@@ -1,4 +1,5 @@
 // @expect: E203
+// @assert: diagnostic-count E203 1
 
 type BasePayload {
   value string

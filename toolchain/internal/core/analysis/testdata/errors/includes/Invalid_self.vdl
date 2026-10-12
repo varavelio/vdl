@@ -1,4 +1,5 @@
 // @expect: E006
+// @assert: diagnostic-count E006 1
 
 type User {
   name string

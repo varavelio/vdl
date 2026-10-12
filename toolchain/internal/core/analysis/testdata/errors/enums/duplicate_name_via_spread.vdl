@@ -1,4 +1,5 @@
 // @expect: E304
+// @assert: diagnostic-count E304 1
 
 enum BaseStatus {
   Active

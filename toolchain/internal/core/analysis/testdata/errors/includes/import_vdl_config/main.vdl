@@ -1,4 +1,5 @@
 // @expect: E007
+// @assert: diagnostic-count E007 1
 
 include "./vdl.config.vdl"
 

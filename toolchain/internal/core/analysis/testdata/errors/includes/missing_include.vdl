@@ -1,4 +1,5 @@
 // @expect: E001
+// @assert: diagnostic-count E001 1
 
 include "./does_not_exist.vdl"
 

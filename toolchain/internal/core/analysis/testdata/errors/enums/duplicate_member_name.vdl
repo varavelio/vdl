@@ -1,4 +1,6 @@
 // @expect: E304
+// @assert: diagnostic-count E303 1
+// @assert: diagnostic-count E304 1
 
 enum Status {
   Active

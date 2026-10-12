@@ -1,5 +1,7 @@
 // format:off
 // @expect: E804
+// @assert: diagnostic-count E102 1
+// @assert: diagnostic-count E804 1
 
 enum Limit {
   Low

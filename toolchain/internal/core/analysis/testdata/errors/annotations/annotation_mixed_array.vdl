@@ -1,4 +1,5 @@
 // @expect: E207
+// @assert: diagnostic-count E207 1
 
 @tags(["public" 42])
 type Account {

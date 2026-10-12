@@ -1,3 +1,4 @@
 // @expect: E306
+// @assert: diagnostic-count E306 1
 
 enum Empty {}

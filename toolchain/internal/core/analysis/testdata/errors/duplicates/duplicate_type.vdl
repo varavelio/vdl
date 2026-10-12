@@ -1,4 +1,5 @@
 // @expect: E801
+// @assert: diagnostic-count E801 1
 
 type User {
   id string

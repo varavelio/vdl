@@ -1,3 +1,4 @@
 // @expect: E208
+// @assert: diagnostic-count E208 1
 
 const loop = loop

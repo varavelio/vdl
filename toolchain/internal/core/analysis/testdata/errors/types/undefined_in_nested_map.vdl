@@ -1,3 +1,4 @@
 // @expect: E201
+// @assert: diagnostic-count E201 1
 
 type M map[map[Nope]]

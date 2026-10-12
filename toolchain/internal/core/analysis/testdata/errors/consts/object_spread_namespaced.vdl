@@ -1,5 +1,6 @@
 // format:off
 // @expect: E206
+// @assert: diagnostic-count E206 1
 
 const baseConfig = {
   host "localhost"

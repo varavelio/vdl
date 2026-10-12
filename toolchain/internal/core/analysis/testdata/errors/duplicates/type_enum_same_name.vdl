@@ -1,4 +1,5 @@
 // @expect: E804
+// @assert: diagnostic-count E804 1
 
 type Status {
   id string

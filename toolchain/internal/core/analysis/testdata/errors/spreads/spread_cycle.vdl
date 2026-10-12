@@ -1,4 +1,5 @@
 // @expect: E204
+// @assert: diagnostic-count E204 2
 
 type A {
   ...B

@@ -1,4 +1,5 @@
 // @expect: E302
+// @assert: diagnostic-count E302 1
 
 enum Priority {
   Low = 1

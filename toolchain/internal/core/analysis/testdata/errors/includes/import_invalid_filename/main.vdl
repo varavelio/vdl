@@ -1,5 +1,7 @@
 // @expect: E006
 // @expect: E007
+// @assert: diagnostic-count E006 1
+// @assert: diagnostic-count E007 1
 
 include "./Bad_file.vdl"
 

@@ -1,4 +1,5 @@
 // @expect: E201
+// @assert: diagnostic-count E201 1
 
 type User {
   metadata map[MissingType]

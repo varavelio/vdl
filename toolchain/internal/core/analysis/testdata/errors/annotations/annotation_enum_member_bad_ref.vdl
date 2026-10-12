@@ -1,4 +1,5 @@
 // @expect: E305
+// @assert: diagnostic-count E305 1
 
 enum Status {
   Active = "active"

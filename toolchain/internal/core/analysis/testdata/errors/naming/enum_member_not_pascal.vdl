@@ -1,5 +1,6 @@
 // format:off
 // @expect: E103
+// @assert: diagnostic-count E103 1
 
 enum Status {
   active

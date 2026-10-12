@@ -1,5 +1,6 @@
 // format:off
 // @expect: E101
+// @assert: diagnostic-count E101 1
 
 type user {
   id string

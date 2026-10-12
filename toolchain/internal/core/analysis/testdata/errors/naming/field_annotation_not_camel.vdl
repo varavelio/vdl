@@ -1,5 +1,6 @@
 // format:off
 // @expect: E102
+// @assert: diagnostic-count E102 1
 
 type User {
   @BadAnn

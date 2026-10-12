@@ -1,4 +1,5 @@
 // format:off
 // @expect: E102
+// @assert: diagnostic-count E102 1
 
 const MAX_PAGE_SIZE = 100

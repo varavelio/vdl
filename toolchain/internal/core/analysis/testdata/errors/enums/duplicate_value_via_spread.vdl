@@ -1,4 +1,5 @@
 // @expect: E303
+// @assert: diagnostic-count E303 1
 
 enum BaseRole {
   Admin = "admin"

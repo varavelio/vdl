@@ -1,4 +1,5 @@
 // @expect: E701
+// @assert: diagnostic-count E701 1
 
 const cfg = {
   host "localhost"

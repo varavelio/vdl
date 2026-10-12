@@ -1,3 +1,4 @@
 // @expect: E901
+// @assert: diagnostic-count E901 1
 
 const huge = 99999999999999999999999

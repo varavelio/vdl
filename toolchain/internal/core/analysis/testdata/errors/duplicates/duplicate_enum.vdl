@@ -1,4 +1,5 @@
 // @expect: E802
+// @assert: diagnostic-count E802 1
 
 enum Status {
   Active

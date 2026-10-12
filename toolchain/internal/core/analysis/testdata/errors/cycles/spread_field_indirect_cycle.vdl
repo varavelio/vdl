@@ -1,4 +1,5 @@
 // @expect: E601
+// @assert: diagnostic-count E601 3
 
 type C {
   c A
