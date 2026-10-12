@@ -31,6 +31,8 @@ type releaseArtifact struct {
 
 type releaseManifest struct {
 	Artifacts []releaseArtifact `json:"artifacts"`
+	Commit    string            `json:"commit"`
+	Date      string            `json:"date"`
 	Project   string            `json:"project"`
 	Repo      string            `json:"repo"`
 	Version   string            `json:"version"`
@@ -97,7 +99,7 @@ func run() error {
 
 	// Generate Manifest
 	fmt.Println("Generating manifest...")
-	if err := writeManifest(distDir, Version, artifacts); err != nil {
+	if err := writeManifest(distDir, Version, Commit, Date, artifacts); err != nil {
 		return fmt.Errorf("failed to generate manifest: %w", err)
 	}
 
@@ -328,9 +330,11 @@ func addFileToTar(tw *tar.Writer, src, name string) error {
 	return err
 }
 
-func writeManifest(distDir, version string, artifacts []releaseArtifact) error {
+func writeManifest(distDir, version, commit, date string, artifacts []releaseArtifact) error {
 	manifest := releaseManifest{
 		Artifacts: artifacts,
+		Commit:    commit,
+		Date:      date,
 		Project:   "vdl",
 		Repo:      "varavelio/vdl",
 		Version:   version,
