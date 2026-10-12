@@ -1,0 +1,3 @@
+// @expect: E201
+
+type M map[map[Nope]]

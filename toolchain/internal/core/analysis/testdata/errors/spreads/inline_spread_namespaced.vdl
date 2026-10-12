@@ -1,0 +1,12 @@
+// @expect: E202
+
+type Base {
+  x string
+}
+
+type A {
+  y {
+    ...Base.Member
+    z string
+  }
+}

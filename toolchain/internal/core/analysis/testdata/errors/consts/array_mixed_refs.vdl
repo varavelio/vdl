@@ -1,0 +1,5 @@
+// @expect: E207
+
+const a = 1
+const b = "x"
+const arr = [a b]

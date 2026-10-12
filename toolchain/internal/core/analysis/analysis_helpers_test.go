@@ -36,6 +36,7 @@ const (
 	assertStdDocContains  = "standalone-doc-contains"
 	assertConstKind       = "const-kind"
 	assertDiagContains    = "diagnostic-message-contains"
+	assertDiagCount       = "diagnostic-count"
 )
 
 type goldenSpec struct {
@@ -384,6 +385,20 @@ func applyAssertion(
 			}
 		}
 		t.Fatalf("no diagnostic with code=%s containing %q", code, strings.Join(a.Args[1:], " "))
+
+	case assertDiagCount:
+		requireArgs(2)
+		code := a.Args[0]
+		expected, err := strconv.Atoi(a.Args[1])
+		require.NoError(t, err)
+		actual := 0
+		for _, d := range diagnostics {
+			if d.Code == code {
+				actual++
+			}
+		}
+		require.Equalf(t, expected, actual, "expected %d diagnostics with code %s, got %d",
+			expected, code, actual)
 
 	default:
 		t.Fatalf("unknown assertion key %q in %q", a.Key, a.Raw)

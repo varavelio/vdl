@@ -1,0 +1,5 @@
+// @expect-no-errors
+
+type A {
+  m? map[A]
+}

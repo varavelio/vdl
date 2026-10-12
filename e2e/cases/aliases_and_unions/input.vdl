@@ -1,0 +1,39 @@
+type Address {
+  line1 string
+  city string
+}
+
+type PostalAddress Address
+
+type Contact {
+  ...PostalAddress
+  email string
+}
+
+enum Status {
+  Active = "active"
+}
+
+const baseFlags = {
+  stable true
+}
+
+const mixedShapes = [
+  {
+    ...baseFlags
+    name "first"
+  }
+  {
+    label "second"
+  }
+]
+
+type Directory {
+  byStatus map[Status]
+  byName map[Contact]
+  parent? Directory
+}
+
+type Node {
+  children? Node[]
+}

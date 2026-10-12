@@ -13,7 +13,9 @@ import (
 func validateStructure(symbols *symbolTable) []Diagnostic {
 	var diagnostics []Diagnostic
 
-	// Validate type field uniqueness
+	// Validate type field uniqueness. Each scope is visited once: nested
+	// scopes (inline objects, including those inside maps and arrays) are
+	// reached through the recursion in validateFieldUniqueness.
 	for _, typ := range symbols.types {
 		if typ.IsObject() && typ.Type.ObjectDef != nil {
 			diagnostics = append(
@@ -22,14 +24,6 @@ func validateStructure(symbols *symbolTable) []Diagnostic {
 					typ.Type.ObjectDef.Fields, "type", typ.Name, typ.File,
 				)...,
 			)
-			for _, field := range typ.Type.ObjectDef.Fields {
-				diagnostics = append(
-					diagnostics,
-					validateInlineFieldUniqueness(
-						field.Type, typ.File, field.Name,
-					)...,
-				)
-			}
 		}
 	}
 
@@ -66,51 +60,42 @@ func validateFieldUniqueness(fields []*FieldSymbol, context, parentName, file st
 			fieldNames[field.Name] = field.Pos
 		}
 
-		// Recursively check inline object fields
-		if field.Type != nil && field.Type.Kind == FieldTypeKindObject &&
-			field.Type.ObjectDef != nil {
-			diagnostics = append(diagnostics, validateFieldUniqueness(
-				field.Type.ObjectDef.Fields,
-				"inline object in",
-				field.Name,
-				file,
-			)...)
-		}
+		// Recursively check nested scopes: inline objects directly or
+		// nested inside maps and arrays.
+		diagnostics = append(
+			diagnostics,
+			validateNestedFieldUniqueness(field.Type, field.Name, file)...,
+		)
 	}
 
 	return diagnostics
 }
 
-func validateInlineFieldUniqueness(typeInfo *FieldTypeInfo, file, owner string) []Diagnostic {
+// validateNestedFieldUniqueness descends into map and array element types to
+// find inline object scopes. Arrays share their element type, so dimensions
+// need no special handling.
+func validateNestedFieldUniqueness(
+	typeInfo *FieldTypeInfo,
+	owner, file string,
+) []Diagnostic {
 	if typeInfo == nil {
 		return nil
 	}
-
-	var diagnostics []Diagnostic
 	switch typeInfo.Kind {
 	case FieldTypeKindMap:
-		return validateInlineFieldUniqueness(typeInfo.MapValue, file, owner)
+		return validateNestedFieldUniqueness(typeInfo.MapValue, owner, file)
 	case FieldTypeKindObject:
 		if typeInfo.ObjectDef == nil {
 			return nil
 		}
-		diagnostics = append(
-			diagnostics,
-			validateFieldUniqueness(
-				typeInfo.ObjectDef.Fields, "inline object in", owner, file,
-			)...,
+		return validateFieldUniqueness(
+			typeInfo.ObjectDef.Fields,
+			"inline object in",
+			owner,
+			file,
 		)
-		for _, f := range typeInfo.ObjectDef.Fields {
-			diagnostics = append(
-				diagnostics,
-				validateInlineFieldUniqueness(
-					f.Type, file, f.Name,
-				)...,
-			)
-		}
 	}
-
-	return diagnostics
+	return nil
 }
 
 func validateObjectLiteralUniqueness(lit *ast.DataLiteral, file string) []Diagnostic {

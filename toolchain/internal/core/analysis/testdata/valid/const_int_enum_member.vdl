@@ -1,0 +1,8 @@
+// @expect-no-errors
+// @assert: const-kind p int
+
+enum P {
+  Low = 1
+}
+
+const p = P.Low

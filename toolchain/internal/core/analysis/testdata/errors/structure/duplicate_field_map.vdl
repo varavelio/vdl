@@ -1,0 +1,9 @@
+// @expect: E701
+// @assert: diagnostic-count E701 1
+
+type A {
+  m map[{
+    x string
+    x int
+  }]
+}

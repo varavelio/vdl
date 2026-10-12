@@ -1,0 +1,4 @@
+// @expect: E601
+
+type A B
+type B A

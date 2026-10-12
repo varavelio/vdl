@@ -1,0 +1,11 @@
+// @expect-no-errors
+
+enum A {
+  X = "x"
+}
+
+enum B {
+  ...A
+}
+
+const c = B.X

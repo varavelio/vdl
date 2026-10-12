@@ -42,6 +42,12 @@ func TestFormat(t *testing.T) {
 			formatted, err := Format(file.Name(), input)
 			require.NoError(t, err)
 			require.Equal(t, expected, formatted)
+
+			// Formatting must be idempotent: a second pass over formatted
+			// output must produce no further changes.
+			reformatted, err := Format(file.Name(), formatted)
+			require.NoError(t, err)
+			require.Equal(t, formatted, reformatted)
 		})
 	}
 }
@@ -70,6 +76,12 @@ func TestFormatOnlyOne(t *testing.T) {
 			formatted, err := Format(file.Name(), input)
 			require.NoError(t, err)
 			require.Equal(t, expected, formatted)
+
+			// Formatting must be idempotent: a second pass over formatted
+			// output must produce no further changes.
+			reformatted, err := Format(file.Name(), formatted)
+			require.NoError(t, err)
+			require.Equal(t, formatted, reformatted)
 		})
 	}
 }

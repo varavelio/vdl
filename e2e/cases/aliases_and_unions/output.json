@@ -1,0 +1,217 @@
+{
+  "constants": [
+    {
+      "annotations": [],
+      "name": "baseFlags",
+      "value": {
+        "kind": "object",
+        "objectEntries": [
+          {
+            "key": "stable",
+            "value": {
+              "boolValue": true,
+              "kind": "bool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "mixedShapes",
+      "value": {
+        "arrayItems": [
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "stable",
+                "value": {
+                  "boolValue": true,
+                  "kind": "bool"
+                }
+              },
+              {
+                "key": "name",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "first"
+                }
+              }
+            ]
+          },
+          {
+            "kind": "object",
+            "objectEntries": [
+              {
+                "key": "label",
+                "value": {
+                  "kind": "string",
+                  "stringValue": "second"
+                }
+              }
+            ]
+          }
+        ],
+        "kind": "array"
+      }
+    }
+  ],
+  "docs": [],
+  "entryPoint": "input.vdl",
+  "enums": [
+    {
+      "annotations": [],
+      "enumType": "string",
+      "members": [
+        {
+          "annotations": [],
+          "name": "Active",
+          "value": {
+            "kind": "string",
+            "stringValue": "active"
+          }
+        }
+      ],
+      "name": "Status"
+    }
+  ],
+  "types": [
+    {
+      "annotations": [],
+      "name": "Address",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "line1",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "city",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Contact",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "line1",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "city",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          },
+          {
+            "annotations": [],
+            "name": "email",
+            "optional": false,
+            "typeRef": {
+              "kind": "primitive",
+              "primitiveName": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Directory",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "byStatus",
+            "optional": false,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "enumName": "Status",
+                "enumType": "string",
+                "kind": "enum"
+              }
+            }
+          },
+          {
+            "annotations": [],
+            "name": "byName",
+            "optional": false,
+            "typeRef": {
+              "kind": "map",
+              "mapType": {
+                "kind": "type",
+                "typeName": "Contact"
+              }
+            }
+          },
+          {
+            "annotations": [],
+            "name": "parent",
+            "optional": true,
+            "typeRef": {
+              "kind": "type",
+              "typeName": "Directory"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "Node",
+      "typeRef": {
+        "kind": "object",
+        "objectFields": [
+          {
+            "annotations": [],
+            "name": "children",
+            "optional": true,
+            "typeRef": {
+              "arrayDims": 1,
+              "arrayType": {
+                "kind": "type",
+                "typeName": "Node"
+              },
+              "kind": "array"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "annotations": [],
+      "name": "PostalAddress",
+      "typeRef": {
+        "kind": "type",
+        "typeName": "Address"
+      }
+    }
+  ]
+}

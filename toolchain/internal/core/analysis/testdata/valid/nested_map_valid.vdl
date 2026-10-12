@@ -1,0 +1,3 @@
+// @expect-no-errors
+
+type M map[map[string]]

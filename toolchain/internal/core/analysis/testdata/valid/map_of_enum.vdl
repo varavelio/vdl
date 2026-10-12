@@ -1,0 +1,9 @@
+// @expect-no-errors
+
+type D {
+  m map[Status]
+}
+
+enum Status {
+  Active
+}
