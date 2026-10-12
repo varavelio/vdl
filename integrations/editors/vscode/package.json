@@ -1,7 +1,7 @@
 {
   "name": "vdl",
   "displayName": "VDL",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Official language support for VDL (Varavel Definition Language): Syntax highlighting, LSP, snippets, and more.",
   "categories": [
     "Programming Languages",

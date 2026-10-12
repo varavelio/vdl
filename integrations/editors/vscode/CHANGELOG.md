@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.1.7 - 2026-10-12
+
+- Syntax highlighting now supports negative numbers in numeric constants and property values.
+
 ## v0.1.6 - 2026-06-23
 
 - Improved the TextMate grammar for more accurate VDL syntax highlighting.
