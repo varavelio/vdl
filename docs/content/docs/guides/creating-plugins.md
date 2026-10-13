@@ -213,6 +213,7 @@ Plain JavaScript is enough for small plugins. For serious plugins, use [`@varave
 
 The SDK gives you:
 
+- a TypeScript based workflow
 - typed `definePlugin(...)` authoring API
 - typed access to the VDL IR and plugin input/output contracts
 - structured error helpers such as `PluginError`, `fail`, and `assert`
