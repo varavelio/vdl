@@ -335,8 +335,6 @@ VPP-2 intentionally does not define every part of an application stack.
 
 This protocol does not define authentication models, authorization policies, business-specific validation rules, retry policy defaults, handler business logic, framework-specific router internals, database access, persistence, OpenAPI output shape, binary transports, WebSocket transports, server-pushed streams, message broker behavior, or custom non-HTTP RPC transports.
 
-Server-pushed streams were removed from this protocol to keep compliant plugins simple. If streams return, they will live in their own VPP.
-
 Other transports (for example stdin/stdout) are out of scope. They will define their own service annotation and their own VPP, and may reuse the generic `@proc` operation shape.
 
 Those concerns may be handled by other protocols, plugin configuration, generated framework integrations, or user code.
