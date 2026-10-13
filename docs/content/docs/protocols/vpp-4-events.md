@@ -248,7 +248,7 @@ A plugin may call itself VPP-4 compatible only if it follows these rules.
 
 VPP-4 compatible plugins should generate target-idiomatic event APIs while preserving the same event model.
 
-Useful outputs may include payload models, subject builders, event catalogs, publish helpers, subscriber helpers, broker adapters, generated documentation, mock event fixtures, or routing metadata.
+Useful outputs may include payload models, subject builders, event catalogs, publish helpers, subscriber helpers, generated documentation, mock event fixtures, or routing metadata.
 
 Plugins should preserve relevant cross-protocol metadata when useful. For example, if an event payload type is marked as deprecated through the global deprecation standard, generated payload types, docs, and catalogs should surface that lifecycle information where the target supports it.
 
