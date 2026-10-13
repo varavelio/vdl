@@ -124,7 +124,7 @@ Everything else is an identifier, literal, operator, or punctuation. Future vers
 - Strings: single quotes only, such as `'Finance'`. Support only `\'` and `\\` escapes.
 - Numbers: `100`, `10.5`. No hex, no exponents in v1.
 - Booleans: `true`, `false`.
-- Arrays: comma-separated, such as `['admin', 'owner']`. Items must share one element type.
+- Arrays: comma-separated, such as `['admin', 'owner']`. Unlike VDL data literals, which separate items with whitespace, Policy Language arrays require commas because items are full expressions and whitespace is insignificant.
 
 ### Syntax
 
@@ -166,6 +166,23 @@ No implicit conversion. `1 == '1'` is invalid. `int` versus `float` is invalid i
 - `in`: scalar left, array right with compatible element type. Empty array is `false`.
 - `!`: `bool` only.
 - Objects and arrays are never directly comparable except through `in`.
+
+### Arrays and Objects
+
+Arrays hold scalars only: string, number, boolean, enum value, or reference to one of those. All items must share one element type. Nested arrays and objects inside arrays are invalid in v1.
+
+```text
+principal.role in ['admin', 'owner']
+principal.id in resource.allowedIds
+```
+
+There are no object literals in v1. Compare objects field by field instead of comparing them directly:
+
+```text
+principal.tenantId == resource.tenantId
+```
+
+VDL uses whitespace in data arrays such as `["admin" "editor"]`. The Policy Language uses commas because array items are expressions, not plain values. Generators always emit commas for target languages.
 
 ### Enum Values
 
