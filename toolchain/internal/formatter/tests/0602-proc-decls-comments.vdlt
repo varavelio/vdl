@@ -1,4 +1,4 @@
-@rpc type service {
+@httpRpc type service {
 // Comment
 @proc test { // Comment
 input {
@@ -16,7 +16,7 @@ ok bool
 
 // >>>>
 
-@rpc
+@httpRpc
 type Service {
   // Comment
   @proc

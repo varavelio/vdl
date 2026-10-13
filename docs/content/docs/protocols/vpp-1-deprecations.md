@@ -193,7 +193,7 @@ const legacyTimeoutMs = 12000
 Deprecating a protocol-specific construct:
 
 ```vdl
-@rpc
+@httpRpc
 type ServiceContract {
   @proc
   @deprecated("Use createUserV2 instead.")

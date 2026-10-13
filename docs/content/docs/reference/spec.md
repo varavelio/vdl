@@ -71,7 +71,7 @@ VDL enforces naming conventions through formatter and tooling to keep generated 
 | Enum Members    | `PascalCase` | `Pending`, `InProgress`      |
 | Type Members    | `camelCase`  | `userId`, `createdAt`        |
 | Constants       | `camelCase`  | `maxPageSize`, `apiVersion`  |
-| Annotations     | `camelCase`  | `rpc`, `internal`            |
+| Annotations     | `camelCase`  | `httpRpc`, `internal`        |
 
 ## Includes
 
@@ -413,6 +413,6 @@ const sampleTags = ["featured" "popular" "seasonal"]
 
 ## Related Specifications
 
-- RPC modeling and request lifecycle are documented in [RPC Annotations](/docs/reference/rpc/).
+- HTTP-RPC modeling and request lifecycle are documented in [HTTP-RPC Annotations](/docs/protocols/http-rpc/).
 - Event annotation rules are documented in [Event Annotations](/docs/reference/events/).
 - Deprecation annotation rules are documented in [Deprecation Annotations](/docs/reference/deprecations/).

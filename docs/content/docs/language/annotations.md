@@ -17,7 +17,7 @@ type OldUser {
 
 The VDL core does not hardcode most domain behavior. Plugins read annotations and decide what they mean.
 
-For example, one plugin may interpret `@event`, another may interpret `@rpc`, and another may interpret `@deprecated`.
+For example, one plugin may interpret `@event`, another may interpret `@httpRpc`, and another may interpret `@deprecated`.
 
 ## Basic Syntax
 
@@ -152,9 +152,8 @@ This is a feature. It lets teams create domain-specific contracts without changi
 
 Examples:
 
-- `@rpc` can mark a type as an RPC service.
+- `@httpRpc` can mark a type as an HTTP-RPC service.
 - `@proc` can mark a request/response RPC operation.
-- `@stream` can mark a server-sent stream operation.
 - `@event("subject.{field}")` can mark an event payload and routing subject.
 - `@deprecated` can mark generated code or schema output as deprecated.
 

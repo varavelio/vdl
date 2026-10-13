@@ -1,4 +1,4 @@
-@rpc type service {
+@httpRpc type service {
 @proc get_user {
 input {id string}
 output {
@@ -9,7 +9,7 @@ roles string[]
 }
 }
 
-@stream watch_user {
+@proc watch_user {
 input {id string}
 output {
 events {
@@ -32,7 +32,7 @@ type alias_two map[deep_type]
 
 // >>>>
 
-@rpc
+@httpRpc
 type Service {
   @proc
   getUser {
@@ -47,7 +47,7 @@ type Service {
     }
   }
 
-  @stream
+  @proc
   watchUser {
     input {
       id string

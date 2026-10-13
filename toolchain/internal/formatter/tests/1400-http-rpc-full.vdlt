@@ -1,4 +1,4 @@
-@rpc type catalog {
+@httpRpc type catalog {
 """
   # Product Lifecycle
   Endpoints for creating and managing products.
@@ -14,7 +14,7 @@ product_id string
 """
   Subscribes to new messages.
 """
-@stream new_messages {
+@proc new_messages {
 input { channel_id string }
 output { text string }
 }
@@ -22,7 +22,7 @@ output { text string }
 
 // >>>>
 
-@rpc
+@httpRpc
 type Catalog {
   """
   # Product Lifecycle
@@ -42,7 +42,7 @@ type Catalog {
   """
   Subscribes to new messages.
   """
-  @stream
+  @proc
   newMessages {
     input {
       channelId string

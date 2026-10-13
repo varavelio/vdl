@@ -459,7 +459,7 @@ const config = {
 }
 ```
 
-Generate Go models and Go RPC code into separate packages:
+Generate Go models and Go HTTP-RPC code into separate packages:
 
 ```vdl
 const config = {
@@ -474,7 +474,7 @@ const config = {
       }
     }
     {
-      src "varavelio/vdl-plugin-rpc-go@v0.1.2"
+      src "varavelio/vdl-plugin-http-rpc-go@v0.1.2"
       schema "./schema.vdl"
       outDir "./internal/rpcclient"
       options {

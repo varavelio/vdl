@@ -8,3 +8,6 @@
 /install /docs/guides/installation/ 301
 /installation /docs/guides/installation/ 301
 /config /docs/guides/configuration/ 301
+
+/docs/protocols/rpc /docs/protocols/http-rpc/ 301
+/docs/protocols/rpc/ /docs/protocols/http-rpc/ 301

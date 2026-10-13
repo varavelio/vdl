@@ -1,4 +1,4 @@
-@rpc type catalog {
+@httpRpc type catalog {
 @proc create_product {
 input { product_id string }
 output { ok bool }
@@ -15,7 +15,7 @@ result string
 
 // >>>>
 
-@rpc
+@httpRpc
 type Catalog {
   @proc
   createProduct {

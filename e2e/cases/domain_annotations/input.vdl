@@ -11,7 +11,7 @@ type OrderStatusChanged {
   status string
 }
 
-@rpc
+@httpRpc
 @service({
   name "accounts"
   version "v1"
@@ -27,17 +27,6 @@ type AccountService {
         id string
         email string
       }
-    }
-  }
-
-  @stream
-  watchAccounts {
-    input {
-      tenantId string
-    }
-    output {
-      accountId string
-      active bool
     }
   }
 }

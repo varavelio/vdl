@@ -8,7 +8,7 @@ id string // id
 name string /* name */
 }
 
-@rpc type svc {
+@httpRpc type svc {
 @proc get_user { // proc
 input { user_id string }
 output { ok bool }
@@ -27,7 +27,7 @@ type User {
   name string /* name */
 }
 
-@rpc
+@httpRpc
 type Svc {
   @proc
   getUser {

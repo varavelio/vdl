@@ -1,6 +1,6 @@
 // Edge cases: Empty blocks, weird spacing
 
-    @rpc type emptyService {}
+    @httpRpc type emptyService {}
 
 enum emptyEnum    {}
 
@@ -35,7 +35,7 @@ type inlineBlocks {  data {
 
 // Edge cases: Empty blocks, weird spacing
 
-@rpc
+@httpRpc
 type EmptyService {}
 
 enum EmptyEnum {}

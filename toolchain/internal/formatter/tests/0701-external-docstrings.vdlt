@@ -2,7 +2,7 @@
 type docs {}
 
 """ ./docs/service.md """
-@rpc type service {
+@httpRpc type service {
 @proc list {
 input {}
 output {
@@ -18,7 +18,7 @@ value string
 type Docs {}
 
 """ ./docs/service.md """
-@rpc
+@httpRpc
 type Service {
   @proc
   list {

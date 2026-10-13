@@ -52,7 +52,7 @@
     {
       "annotations": [
         {
-          "name": "rpc"
+          "name": "httpRpc"
         },
         {
           "argument": {
@@ -144,67 +144,6 @@
                               }
                             }
                           ]
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "annotations": [
-              {
-                "name": "stream"
-              }
-            ],
-            "name": "watchAccounts",
-            "optional": false,
-            "typeRef": {
-              "kind": "object",
-              "objectFields": [
-                {
-                  "annotations": [],
-                  "name": "input",
-                  "optional": false,
-                  "typeRef": {
-                    "kind": "object",
-                    "objectFields": [
-                      {
-                        "annotations": [],
-                        "name": "tenantId",
-                        "optional": false,
-                        "typeRef": {
-                          "kind": "primitive",
-                          "primitiveName": "string"
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  "annotations": [],
-                  "name": "output",
-                  "optional": false,
-                  "typeRef": {
-                    "kind": "object",
-                    "objectFields": [
-                      {
-                        "annotations": [],
-                        "name": "accountId",
-                        "optional": false,
-                        "typeRef": {
-                          "kind": "primitive",
-                          "primitiveName": "string"
-                        }
-                      },
-                      {
-                        "annotations": [],
-                        "name": "active",
-                        "optional": false,
-                        "typeRef": {
-                          "kind": "primitive",
-                          "primitiveName": "bool"
                         }
                       }
                     ]

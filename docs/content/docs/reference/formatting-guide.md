@@ -100,7 +100,7 @@ Annotations carry domain semantics. Keep placement strict and vertical for reada
 """
 User operations.
 """
-@rpc
+@httpRpc
 type Users {
   @proc
   GetUser {
@@ -111,17 +111,6 @@ type Users {
     output {
       id string
       email string
-    }
-  }
-
-  @stream
-  UserEvents {
-    input {
-      userId string
-    }
-    output {
-      event string
-      at datetime
     }
   }
 }
@@ -186,13 +175,13 @@ type User {
 
 The formatter automatically enforces the following naming conventions:
 
-| Element         | Convention   | Example                      |
-| :-------------- | :----------- | :--------------------------- |
-| Types and Enums | `PascalCase` | `UserProfile`, `OrderStatus` |
-| Enum Members    | `PascalCase` | `Pending`, `InProgress`      |
-| Type Members    | `camelCase`  | `userId`, `createdAt`        |
-| Constants       | `camelCase`  | `maxPageSize`, `apiVersion`  |
-| Annotations     | `camelCase`  | `rpc`, `proc`, `deprecated`  |
+| Element         | Convention   | Example                         |
+| :-------------- | :----------- | :------------------------------ |
+| Types and Enums | `PascalCase` | `UserProfile`, `OrderStatus`    |
+| Enum Members    | `PascalCase` | `Pending`, `InProgress`         |
+| Type Members    | `camelCase`  | `userId`, `createdAt`           |
+| Constants       | `camelCase`  | `maxPageSize`, `apiVersion`     |
+| Annotations     | `camelCase`  | `httpRpc`, `proc`, `deprecated` |
 
 ### Acronym Handling
 

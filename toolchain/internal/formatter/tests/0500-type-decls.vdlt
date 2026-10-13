@@ -5,7 +5,7 @@ type foo string
 """
 A doc
 """
-@rpc type users {}
+@httpRpc type users {}
 
 // >>>>
 
@@ -17,5 +17,5 @@ type Bar map[User[]]
 """
 A doc
 """
-@rpc
+@httpRpc
 type Users {}

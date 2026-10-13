@@ -13,7 +13,7 @@ enum order_status {
 @deprecated const MAX_PAGE_SIZE = 100
 @pattern const user_event_subject = "events.users.{userId}"
 
-@rpc type my_service {
+@httpRpc type my_service {
   @proc get_user {
     input {
       user_id string
@@ -43,7 +43,7 @@ const maxPageSize = 100
 @pattern
 const userEventSubject = "events.users.{userId}"
 
-@rpc
+@httpRpc
 type MyService {
   @proc
   getUser {

@@ -6,7 +6,7 @@ type FooType {
   secondField int[]
 }
 
-@rpc
+@httpRpc
 type MyRpc {
   @proc
   barProc {

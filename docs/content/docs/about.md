@@ -24,8 +24,8 @@ The language keeps domain semantics out of the grammar. Instead, annotations des
 
 For example:
 
-- `@rpc` can mark a type as an RPC service.
-- `@proc` and `@stream` can mark RPC operations.
+- `@httpRpc` can mark a type as an HTTP-RPC service.
+- `@proc` can mark request/response RPC operations.
 - `@event("subject.{id}")` can mark event payload contracts.
 - `@deprecated` can be interpreted by a JSON Schema plugin.
 - Your own annotations can drive your own internal generators.

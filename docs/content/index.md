@@ -61,7 +61,7 @@ description: "VDL is an open-source, type-safe, multi-language, and easily exten
   item_1_description="Use type, enum, const, include, docstrings, arrays, maps, inline objects, references, and spreads to describe the contract itself in a review-friendly format."
   item_2_icon="workflow"
   item_2_title="Add domain intent"
-  item_2_description="Use annotations such as @rpc, @event, @deprecated, or your own team-specific tags without changing the language grammar."
+  item_2_description="Use annotations such as @httpRpc, @event, @deprecated, or your own team-specific tags without changing the language grammar."
   item_3_icon="plug"
   item_3_title="Generate type-safe outputs"
   item_3_description="Official and custom easy to write plugins receive the resolved IR and generate language-specific code, schemas, docs, or internal artifacts."

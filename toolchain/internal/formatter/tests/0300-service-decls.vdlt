@@ -1,16 +1,16 @@
-@rpc type service{  @stream user_updates {
+@httpRpc type service{  @proc user_updates {
 input { user_id string }
 output { event_name string  created_at datetime[] }
 }
 
-@stream heartbeat { output { ok bool }}
+@proc heartbeat { output { ok bool }}
 }
 
 // >>>>
 
-@rpc
+@httpRpc
 type Service {
-  @stream
+  @proc
   userUpdates {
     input {
       userId string
@@ -21,7 +21,7 @@ type Service {
     }
   }
 
-  @stream
+  @proc
   heartbeat {
     output {
       ok bool

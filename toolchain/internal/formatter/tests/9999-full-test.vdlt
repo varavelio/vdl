@@ -14,7 +14,7 @@ processing
 delivered = "delivered"
 }
 
-@rpc type catalog_service {
+@httpRpc type catalog_service {
 """ Product operations """
 @proc list_products {
 input {
@@ -27,7 +27,7 @@ total int
 }
 }
 
-@stream watch_products {
+@proc watch_products {
 input {
 filter? string
 }
@@ -82,7 +82,7 @@ enum OrderStatus {
   Delivered = "delivered"
 }
 
-@rpc
+@httpRpc
 type CatalogService {
   """ Product operations """
   @proc
@@ -97,7 +97,7 @@ type CatalogService {
     }
   }
 
-  @stream
+  @proc
   watchProducts {
     input {
       filter? string

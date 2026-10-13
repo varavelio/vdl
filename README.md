@@ -80,7 +80,7 @@ For version pinning, prereleases, npm usage, and manual installs, see the [compl
 
 VDL is a schema-first language for describing data contracts in a compact, readable format. The core language is intentionally small: `include`, documentation blocks, `type`, `enum`, `const`, annotations, arrays, maps, inline objects, literals, and spreads.
 
-Domain semantics are added with annotations and plugins. For example, `@rpc` can describe RPC services, `@event` can describe event routing contracts, and a custom annotation can be interpreted by your own plugin.
+Domain semantics are added with annotations and plugins. For example, `@httpRpc` can describe HTTP-RPC services, `@event` can describe event routing contracts, and a custom annotation can be interpreted by your own plugin.
 
 ```vdl
 include "./shared.vdl"
@@ -185,7 +185,7 @@ Useful docs:
 - [Language guide](https://vdl.varavel.com/language/)
 - [Project configuration](https://vdl.varavel.com/guides/configuration/)
 - [VDL language specification](https://vdl.varavel.com/reference/spec/)
-- [RPC annotation model](https://vdl.varavel.com/reference/rpc/)
+- [HTTP-RPC annotation model](https://vdl.varavel.com/docs/protocols/http-rpc/)
 - [Event annotation model](https://vdl.varavel.com/reference/events/)
 
 ## Who is VDL for?
@@ -195,7 +195,7 @@ VDL is useful when you want one contract to drive many outputs:
 - shared backend/frontend data models
 - generated Go or TypeScript contract packages
 - JSON Schema for validators, forms, or external integrations
-- OpenAPI documents for annotation-based RPC services
+- OpenAPI documents for annotation-based HTTP-RPC services
 - event subject builders and event catalogs
 - static schema explorers and metadata exports
 - custom internal generators for your own frameworks and conventions

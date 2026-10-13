@@ -108,19 +108,19 @@ Example:
 
 Repository: [varavelio/vdl-plugin-json-schema](https://github.com/varavelio/vdl-plugin-json-schema)
 
-## RPC Plugins
+## HTTP-RPC Plugins
 
-RPC support is annotation-based. These plugins look for `@rpc` service types and `@proc` or `@stream` operation fields.
+HTTP-RPC support is annotation-based. These plugins look for `@httpRpc` service types and `@proc` operation fields.
 
-### `varavelio/vdl-plugin-rpc-go`
+### `varavelio/vdl-plugin-http-rpc-go`
 
-Generates Go RPC clients or servers from annotation-based VDL RPC services.
+Generates Go HTTP-RPC clients or servers from annotation-based VDL HTTP-RPC services.
 
-This plugin is RPC-only. It does not generate data models; pair it with `varavelio/vdl-plugin-go` and point `typesImport` to the generated Go type package when the RPC output is in a separate package.
+This plugin is HTTP-RPC-only. It does not generate data models; pair it with `varavelio/vdl-plugin-go` and point `typesImport` to the generated Go type package when the RPC output is in a separate package.
 
-For `target "client"`, it emits typed client builders, procedure and stream execution APIs, headers, interceptors, retry and timeout policies, reconnect policies, and stream hooks.
+For `target "client"`, it emits typed client builders, procedure execution APIs, headers, interceptors, retry and timeout policies.
 
-For `target "server"`, it emits typed handler registration APIs, middleware hooks, stream configuration, error handling, and `net/http` adapter helpers.
+For `target "server"`, it emits typed handler registration APIs, middleware hooks, error handling, and `net/http` adapter helpers.
 
 Common options:
 
@@ -135,7 +135,7 @@ Example:
 
 ```vdl
 {
-  src "varavelio/vdl-plugin-rpc-go@v0.1.2"
+  src "varavelio/vdl-plugin-http-rpc-go@v0.1.2"
   schema "./schema.vdl"
   outDir "./internal/client"
   options {
@@ -146,17 +146,17 @@ Example:
 }
 ```
 
-Repository: [varavelio/vdl-plugin-rpc-go](https://github.com/varavelio/vdl-plugin-rpc-go)
+Repository: [varavelio/vdl-plugin-http-rpc-go](https://github.com/varavelio/vdl-plugin-http-rpc-go)
 
-### `varavelio/vdl-plugin-rpc-ts`
+### `varavelio/vdl-plugin-http-rpc-ts`
 
-Generates TypeScript RPC clients or servers from annotation-based VDL RPC services.
+Generates TypeScript HTTP-RPC clients or servers from annotation-based VDL HTTP-RPC services.
 
-This plugin is RPC-only. It expects data models from `varavelio/vdl-plugin-ts` and references them through `typesImport`.
+This plugin is HTTP-RPC-only. It expects data models from `varavelio/vdl-plugin-ts` and references them through `typesImport`.
 
-For `target "client"`, it emits a typed client with procedure and stream builders, headers, interceptors, retries, timeouts, reconnect policies, and stream controls.
+For `target "client"`, it emits a typed client with procedure builders, headers, interceptors, retries, and timeouts.
 
-For `target "server"`, it emits a typed server with procedure and stream registration APIs, middleware, error handlers, ping configuration, and Node.js plus Fetch-compatible HTTP adapters.
+For `target "server"`, it emits a typed server with procedure registration APIs, middleware, error handlers, and Node.js plus Fetch-compatible HTTP adapters.
 
 Common options:
 
@@ -170,7 +170,7 @@ Example:
 
 ```vdl
 {
-  src "varavelio/vdl-plugin-rpc-ts@v0.1.0"
+  src "varavelio/vdl-plugin-http-rpc-ts@v0.1.0"
   schema "./schema.vdl"
   outDir "./generated/client"
   options {
@@ -181,13 +181,13 @@ Example:
 }
 ```
 
-Repository: [varavelio/vdl-plugin-rpc-ts](https://github.com/varavelio/vdl-plugin-rpc-ts)
+Repository: [varavelio/vdl-plugin-http-rpc-ts](https://github.com/varavelio/vdl-plugin-http-rpc-ts)
 
-### `varavelio/vdl-plugin-rpc-openapi`
+### `varavelio/vdl-plugin-http-rpc-openapi`
 
-Generates OpenAPI 3.0 documents for VDL RPC procedures and streams.
+Generates OpenAPI 3.0 documents for VDL HTTP-RPC procedures.
 
-Use it when you want to publish an OpenAPI contract for your VDL RPC layer, import requests into tools such as Postman, or feed OpenAPI-compatible docs, gateway, validation, or generation workflows.
+Use it when you want to publish an OpenAPI contract for your VDL HTTP-RPC layer, import requests into tools such as Postman, or feed OpenAPI-compatible docs, gateway, validation, or generation workflows.
 
 It emits one `POST` path per operation, groups operations by service, emits request and response envelopes, and includes non-RPC VDL types and enums under `components.schemas`.
 
@@ -207,7 +207,7 @@ Example:
 
 ```vdl
 {
-  src "varavelio/vdl-plugin-rpc-openapi@v0.1.3"
+  src "varavelio/vdl-plugin-http-rpc-openapi@v0.1.3"
   schema "./schema.vdl"
   outDir "./gen/openapi"
   options {
@@ -218,7 +218,7 @@ Example:
 }
 ```
 
-Repository: [varavelio/vdl-plugin-rpc-openapi](https://github.com/varavelio/vdl-plugin-rpc-openapi)
+Repository: [varavelio/vdl-plugin-http-rpc-openapi](https://github.com/varavelio/vdl-plugin-http-rpc-openapi)
 
 ## Event Plugins
 

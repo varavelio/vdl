@@ -1,20 +1,19 @@
 ---
-title: "VPP-2: RPC"
-description: "Standard RPC modeling and HTTP/SSE transport behavior for VDL plugins."
-path: "docs/protocols/rpc"
+title: "VPP-2: HTTP-RPC"
+description: "Standard HTTP-RPC modeling and transport behavior for VDL plugins."
+path: "docs/protocols/http-rpc"
 weight: 4
 ---
 
-**VPP-2: RPC** defines the standard way to model remote procedure calls in VDL and the standard HTTP transport behavior that compatible plugins must implement.
+**VPP-2: HTTP-RPC** defines the standard way to model HTTP remote procedure calls in VDL and the standard HTTP transport behavior that compatible plugins must implement.
 
-This protocol covers two operation styles.
+This protocol covers one operation style.
 
 1. **Procedures:** request-response operations completed within a single HTTP transaction.
-2. **Streams:** server-pushed event flows delivered over Server-Sent Events (SSE).
 
 VPP-2 does not add syntax to VDL. It uses normal VDL declarations, inline object types, and annotations. The purpose of the protocol is to give plugin authors a shared contract for generating clients, servers, handlers, SDKs, documentation, adapters, and test tools from the same RPC model.
 
-If a plugin claims compatibility with VPP-2, it must preserve the annotation semantics, operation model, HTTP behavior, SSE behavior, and envelope format defined in this document.
+If a plugin claims compatibility with VPP-2, it must preserve the annotation semantics, operation model, HTTP behavior, and envelope format defined in this document.
 
 ## Why This Protocol Exists
 
@@ -22,13 +21,13 @@ RPC systems often look different across languages, frameworks, and runtimes. One
 
 VDL should not hard-code any of those framework choices into the compiler. The compiler should keep producing a language-neutral representation of schemas and annotations. Plugins can then turn that representation into idiomatic code for each target ecosystem.
 
-VPP-2 exists so those plugins still agree on the important parts: how RPC services are modeled, how operations are named, how input and output are represented, how HTTP requests are formed, how errors are returned, and how streams behave over SSE.
+VPP-2 exists so those plugins still agree on the important parts: how RPC services are modeled, how operations are named, how input and output are represented, how HTTP requests are formed, and how errors are returned.
 
 The result is a portable RPC contract. A VDL service should feel familiar whether the generated target is Go, TypeScript, Rust, Java, or an internal platform plugin.
 
-VPP-2 is specifically the standard RPC model for HTTP-based transport. It exists because HTTP procedures and SSE streams are a common, practical baseline that many projects need. This does not mean VDL can only model RPC over HTTP.
+VPP-2 is specifically the standard RPC model for HTTP-based transport. It exists because HTTP procedures are a common, practical baseline that many projects need. This does not mean VDL can only model RPC over HTTP.
 
-VDL remains transport-agnostic at the language level. Teams can define their own RPC conventions with normal VDL types, annotations, and plugins when they need another transport or a custom protocol shape. Those custom models are valid VDL workflows, but they are not VPP-2 compatible unless they preserve the HTTP and SSE behavior defined here.
+VDL remains transport-agnostic at the language level. Teams can define their own RPC conventions with normal VDL types, annotations, and plugins when they need another transport or a custom protocol shape. Those custom models are valid VDL workflows, but they are not VPP-2 compatible unless they preserve the HTTP behavior defined here. Future transports (for example stdin/stdout) will define their own service annotation and their own VPP; they may reuse the generic `@proc` operation shape.
 
 ## JSON Transport Model
 
@@ -40,47 +39,40 @@ Compatible plugins may map VDL types into richer language-native types in genera
 
 ## Annotation Vocabulary
 
-VPP-2 defines three annotations.
+VPP-2 defines two annotations.
 
-1. `@rpc` marks a service container.
-2. `@proc` marks a request-response operation.
-3. `@stream` marks a server-pushed stream operation.
+1. `@httpRpc` marks an HTTP-RPC service container.
+2. `@proc` marks a request-response operation. `@proc` is intentionally generic so future RPC transports can reuse the same operation shape with their own service annotation.
 
-### `@rpc`
+### `@httpRpc`
 
-The `@rpc` annotation is attached to a `type` declaration.
+The `@httpRpc` annotation is attached to a `type` declaration.
 
-That type becomes an RPC service container. The name of the annotated type is the **RPC name** used by the transport protocol.
+That type becomes an HTTP-RPC service container. The name of the annotated type is the **RPC name** used by the transport protocol.
 
 ```vdl
-@rpc
+@httpRpc
 type Users {
   // operations go here
 }
 ```
 
+`@httpRpc` takes no arguments. A VPP-2 compatible plugin must reject `@httpRpc` with any argument. Arguments are reserved for future protocol revisions.
+
 ### `@proc`
 
-The `@proc` annotation is attached to a member inside an `@rpc` service container.
+The `@proc` annotation is attached to a member inside an `@httpRpc` service container.
 
 That member becomes a procedure. The member name is the **procedure name** used by the transport protocol.
 
 Procedures use request-response HTTP behavior.
-
-### `@stream`
-
-The `@stream` annotation is attached to a member inside an `@rpc` service container.
-
-That member becomes a stream. The member name is the **stream name** used by the transport protocol.
-
-Streams use HTTP to open the subscription and SSE to receive emitted events.
 
 ## Schema Shape
 
 RPC services are modeled with normal VDL type declarations and inline object members.
 
 ```vdl
-@rpc
+@httpRpc
 type Users {
   @proc
   getUser {
@@ -92,23 +84,13 @@ type Users {
       email string
     }
   }
-
-  @stream
-  userEvents {
-    input {
-      userId string
-    }
-    output {
-      eventName string
-    }
-  }
 }
 ```
 
 The RPC model uses these structural rules.
 
-1. `@rpc` is attached to a `type` declaration.
-2. `@proc` and `@stream` are attached to members inside the `@rpc` type.
+1. `@httpRpc` is attached to a `type` declaration.
+2. `@proc` is attached to members inside the `@httpRpc` type.
 3. Operation members are regular fields whose type is an inline object.
 4. `input` and `output` are regular field names inside the operation object.
 5. When present, `input` and `output` must be inline object types.
@@ -122,7 +104,7 @@ Both `input` and `output` are optional.
 Some operations only need to trigger work. Some only need to return data. Some only need to establish a transactional command without input or output data. VPP-2 supports those cases directly.
 
 ```vdl
-@rpc
+@httpRpc
 type Maintenance {
   @proc
   ping {}
@@ -165,9 +147,8 @@ In short: VPP-2 guarantees that the input has the structure and types declared i
 
 The HTTP route is derived from VDL names. Plugins must apply `lowerFirst` to the `RPCName` segment (`lowerFirst` lowercases the first Unicode letter and leaves the rest untouched).
 
-1. `RPCName` is the name of the `type` annotated with `@rpc`.
+1. `RPCName` is the name of the `type` annotated with `@httpRpc`.
 2. `ProcedureName` is the name of the member annotated with `@proc`.
-3. `StreamName` is the name of the member annotated with `@stream`.
 
 Procedures use this URL structure.
 
@@ -175,13 +156,7 @@ Procedures use this URL structure.
 <baseURL>/<lowerFirst(RPCName)>/<ProcedureName>
 ```
 
-Streams use this URL structure.
-
-```text
-<baseURL>/<lowerFirst(RPCName)>/<StreamName>
-```
-
-`ProcedureName` and `StreamName` are already `camelCase` in valid schemas, so they are used verbatim. For example, a `getUser` procedure inside an `@rpc type Users` service may be called at this URL when the configured base URL is `https://api.example.com/rpc`.
+`ProcedureName` is already `camelCase` in valid schemas, so it is used verbatim. For example, a `getUser` procedure inside an `@httpRpc type Users` service may be called at this URL when the configured base URL is `https://api.example.com/rpc`.
 
 ```text
 https://api.example.com/rpc/users/getUser
@@ -192,8 +167,6 @@ https://api.example.com/rpc/users/getUser
 VPP-2 uses HTTP as the standard transport.
 
 Procedures send a JSON request body and receive a single JSON response body.
-
-Streams send a JSON request body to open the subscription and receive a persistent SSE response where each emitted event contains a JSON envelope.
 
 Application-level success or failure is represented by envelopes (the JSON response).
 
@@ -242,9 +215,7 @@ The `error` object uses these fields.
 3. `code` (`string`, optional): machine-readable code.
 4. `details` (`object`, optional): structured context.
 
-For procedures, the envelope is the HTTP response body.
-
-For streams, each SSE `data:` payload is a JSON envelope. Stream error events are normal SSE events whose envelope has `ok: false`.
+The envelope is the HTTP response body.
 
 ## Procedures
 
@@ -330,134 +301,23 @@ The generated client decodes the envelope and returns output or error to applica
 3. If `ok` is `false`, it returns the decoded error.
 4. Transport failures may use retry policies such as exponential backoff, depending on client configuration.
 
-## Streams
-
-Streams represent server-pushed RPC operations.
-
-A stream starts when application code subscribes through a generated stream client. The generated client opens an HTTP request with JSON input when input exists. If the server accepts the subscription, the response becomes a persistent SSE connection.
-
-The stream handler may emit multiple output or error envelopes over time.
-
-### HTTP Request
-
-The client opens the stream with an HTTP `POST` request.
-
-1. **Method:** `POST`.
-2. **URL structure:** `<baseURL>/<lowerFirst(RPCName)>/<StreamName>`.
-3. **Headers:** `Accept: text/event-stream` and `Content-Type: application/json`.
-4. **Body:** JSON-encoded stream input when `input` is defined.
-
-Example request body:
-
-```json
-{
-  "chatId": "room-42"
-}
-```
-
-If the stream does not define `input`, the subscription does not require an application-level input payload.
-
-Browser implementations need one extra consideration. Native browser `EventSource` only supports `GET` requests and does not support sending a JSON request body. VPP-2 compatible browser clients must therefore use a client implementation that supports `POST`, request bodies, and incremental `text/event-stream` parsing, such as `fetch` with the Streams API or an equivalent abstraction.
-
-### Server Handling
-
-The server validates input and initializes the SSE channel.
-
-1. **Validation:** invalid input returns a single JSON error response.
-2. **Connection setup:** accepted streams return `200 OK`, `Content-Type: text/event-stream`, `Cache-Control: no-cache`, and `Connection: keep-alive`.
-3. **Handler execution:** the stream handler runs with an `emit` function.
-
-Middleware hooks are available for cross-cutting behavior in stream flows.
-
-### Event Emission
-
-Handlers call `emit` to push events.
-
-Each emitted event is serialized as a JSON envelope and written as SSE `data`.
-
-An emitted stream error is also an event. It uses the same SSE framing as any other emitted item, but its JSON envelope has `ok: false` and an `error` object instead of successful output.
-
-JSON payloads must be single-line for SSE framing safety. Newline-sensitive formatting must be handled before transmission.
-
-Success event:
-
-```text
-data: {"ok":true,"output":{"messageId":"msg-abc","text":"Hello world!"}}
-```
-
-Error event:
-
-```text
-data: {"ok":false,"error":{"message":"You do not have permission to view this chat."}}
-```
-
-If the stream does not define `output`, emitted success envelopes do not need to include application-level output data.
-
-### Stream Control Events
-
-VPP-2 uses SSE control events for stream lifecycle signals that are not application output.
-
-Keep-alive pings are SSE comments. They carry no application data and are ignored by generated clients.
-
-```text
-: ping
-```
-
-Clean stream completion is represented by the reserved `close` SSE event.
-
-```text
-event: close
-data: {}
-```
-
-When a stream handler completes successfully, the server must send this `close` event before closing the underlying HTTP connection. Generated clients must consume the `close` event internally, stop the subscription loop, and avoid triggering reconnection logic for that stream.
-
-The `close` event is not an application output, not an error envelope, and must not be delivered to application code.
-
-### Keep-Alive Events
-
-Servers send periodic SSE comments to keep connections alive.
-
-1. **Format:** `: ping\n\n`.
-2. **Interval:** server-configurable, commonly 30 seconds.
-3. **Client behavior:** generated clients ignore ping comments and do not surface them to application code.
-
-### Client Event Loop
-
-The generated client processes stream events continuously.
-
-1. It parses SSE frames.
-2. It ignores comment ping frames.
-3. It handles `event: close` as clean stream completion.
-4. It deserializes JSON payloads from application data events.
-5. It delivers output or error envelopes to application code. Stream errors are delivered from `ok: false` event envelopes; they are not the same thing as transport failures.
-
-### Stream Termination
-
-A stream can end by client cancellation, handler completion, or network interruption.
-
-When the handler completes successfully, the server must send the `event: close` control event before closing the connection. If the connection ends without a `close` event, generated clients may treat it as a transport interruption and reconnect automatically with configurable retry behavior, re-sending the original subscription request when applicable.
-
 ## Required Behavior for Compatible Plugins
 
 A plugin may call itself VPP-2 compatible only if it follows these rules.
 
-1. It must recognize `@rpc`, `@proc`, and `@stream`.
-2. It must treat an `@rpc` type as an RPC service container.
+1. It must recognize `@httpRpc` and `@proc`.
+2. It must treat an `@httpRpc` type as an HTTP-RPC service container.
 3. It must treat `@proc` members as request-response HTTP procedures.
-4. It must treat `@stream` members as SSE stream subscriptions.
+4. It must reject `@httpRpc` with any argument.
 5. It must derive route names from the VDL service and operation names, applying `lowerFirst` to the `RPCName` segment and using operation names verbatim.
-6. It must use the URL structures defined by this protocol.
+6. It must use the URL structure defined by this protocol.
 7. It must encode operation input as JSON when input exists.
 8. It must validate operation input against the VDL-declared shape before handler execution.
 9. It must decode operation output and errors through the envelope model.
 10. It must preserve the optional nature of `input` and `output`.
-11. It must preserve the distinction between procedure responses, stream events, application errors, and transport failures.
+11. It must preserve the distinction between procedure responses, application errors, and transport failures.
 12. It must return HTTP `200 OK` for successfully processed procedure requests, including application errors represented by `ok: false`.
-13. When generating stream server implementations, it must preserve clean stream completion semantics with the reserved `event: close` control event.
-14. When generating browser stream clients, it must use a `POST`-capable incremental `text/event-stream` reader instead of relying on native `EventSource`.
-15. It must not reinterpret VPP-2 streams as WebSockets, polling, or another transport while claiming VPP-2 wire compatibility.
-16. It must not reinterpret VPP-2 procedures as `GET`, query-parameter calls, or non-envelope responses while claiming VPP-2 wire compatibility.
+13. It must not reinterpret VPP-2 procedures as `GET`, query-parameter calls, or non-envelope responses while claiming VPP-2 wire compatibility.
 
 Plugins may provide additional framework integrations, generated helpers, runtime adapters, middleware APIs, testing utilities, or documentation output. Those additions must not change the protocol semantics described here.
 
@@ -465,7 +325,7 @@ Plugins may provide additional framework integrations, generated helpers, runtim
 
 VPP-2 compatible plugins should generate target-idiomatic artifacts while preserving the same RPC model.
 
-Depending on the target, useful outputs may include typed clients, server interfaces, handler stubs, route registration code, input and output models, stream subscriber APIs, documentation, mock servers, integration tests, or protocol manifests.
+Depending on the target, useful outputs may include typed clients, server interfaces, handler stubs, route registration code, input and output models, documentation, mock servers, integration tests, or protocol manifests.
 
 Plugins should also preserve relevant cross-protocol metadata when it applies. For example, if a VPP-2 operation is marked with a global deprecation annotation, generated clients, handlers, and documentation should surface that lifecycle information where the target ecosystem supports it.
 
@@ -473,12 +333,16 @@ Plugins should also preserve relevant cross-protocol metadata when it applies. F
 
 VPP-2 intentionally does not define every part of an application stack.
 
-This protocol does not define authentication models, authorization policies, business-specific validation rules, retry policy defaults, handler business logic, framework-specific router internals, database access, persistence, OpenAPI output shape, binary transports, WebSocket transports, message broker behavior, or custom non-HTTP RPC transports.
+This protocol does not define authentication models, authorization policies, business-specific validation rules, retry policy defaults, handler business logic, framework-specific router internals, database access, persistence, OpenAPI output shape, binary transports, WebSocket transports, server-pushed streams, message broker behavior, or custom non-HTTP RPC transports.
+
+Server-pushed streams were removed from this protocol to keep compliant plugins simple. If streams return, they will live in their own VPP.
+
+Other transports (for example stdin/stdout) are out of scope. They will define their own service annotation and their own VPP, and may reuse the generic `@proc` operation shape.
 
 Those concerns may be handled by other protocols, plugin configuration, generated framework integrations, or user code.
 
 ## Compatibility Statement
 
-VPP-2 is the standard RPC contract for VDL plugins.
+VPP-2 is the standard HTTP-RPC contract for VDL plugins.
 
-A plugin may call itself **VPP-2 compatible** only if it preserves the annotation vocabulary, schema shape, optional input/output behavior, JSON payload model, HTTP procedure behavior, SSE stream behavior, and envelope semantics defined in this document.
+A plugin may call itself **VPP-2 compatible** only if it preserves the annotation vocabulary, schema shape, optional input/output behavior, JSON payload model, HTTP procedure behavior, and envelope semantics defined in this document.

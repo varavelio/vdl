@@ -2,7 +2,7 @@
 id string
 }
 
-@deprecated("Use NewService instead") @rpc type oldService {
+@deprecated("Use NewService instead") @httpRpc type oldService {
 @deprecated @proc fetchData { input {} output {} }
 }
 
@@ -21,7 +21,7 @@ type LegacyUser {
 }
 
 @deprecated("Use NewService instead")
-@rpc
+@httpRpc
 type OldService {
   @deprecated
   @proc
