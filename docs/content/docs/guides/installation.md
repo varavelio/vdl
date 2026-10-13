@@ -140,13 +140,15 @@ The official VDL image is available on both Docker Hub and the GitHub Container 
 
 The image supports `linux/amd64` and `linux/arm64`.
 
+The image defaults to workdir `/vdl` and runs as user `nonroot (65532:65532)`, so mount your project there.
+
 ### Run directly
 
 Call `vdl` commands without installing anything on your host, to work with files in your current directory, mount it as a volume:
 
 ```bash
-docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:latest generate
-docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:latest format
+docker run --rm -v "$(pwd):/vdl" varavel/vdl:latest generate
+docker run --rm -v "$(pwd):/vdl" varavel/vdl:latest format
 ```
 
 ### Shell alias
@@ -154,7 +156,7 @@ docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:latest format
 If you prefer the native `vdl` experience without installing anything, add an alias to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.):
 
 ```bash
-alias vdl='docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:latest'
+alias vdl='docker run --rm -v "$(pwd):/vdl" varavel/vdl:latest'
 ```
 
 Once the alias is in place you can use `vdl` as if it were installed locally:
@@ -174,7 +176,7 @@ docker run --rm varavel/vdl:0.1.0 version
 ```
 
 ```bash
-alias vdl='docker run --rm -v "$(pwd):/workspace" -w /workspace varavel/vdl:0.1.0'
+alias vdl='docker run --rm -v "$(pwd):/vdl" varavel/vdl:0.1.0'
 ```
 
 ### Copy the binary into your own images
