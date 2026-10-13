@@ -37,6 +37,8 @@ VDL is designed so its data model can be represented as JSON: objects, arrays, m
 
 Compatible plugins may map VDL types into richer language-native types in generated code, but the HTTP payloads defined by this protocol are JSON payloads.
 
+A VPP-2 plugin only processes `@proc` members inside `@httpRpc` service containers. It silently ignores everything without `@httpRpc`, including orphan `@proc` members, with no warnings. Those shapes stay free for ad-hoc workflows or future transports. This keeps VPPs decoupled.
+
 ## Annotation Vocabulary
 
 VPP-2 defines two annotations.
@@ -66,6 +68,10 @@ The `@proc` annotation is attached to a member inside an `@httpRpc` service cont
 That member becomes a procedure. The member name is the **procedure name** used by the transport protocol.
 
 Procedures use request-response HTTP behavior.
+
+`@proc` takes no arguments. A VPP-2 compatible plugin must reject `@proc` with any argument. Arguments are reserved for future protocol revisions.
+
+The `@proc` member itself must be an inline object. A VPP-2 compatible plugin must reject `@proc` on anything else with an error.
 
 ## Schema Shape
 
@@ -129,7 +135,7 @@ If `input` is omitted, the operation does not require an application-level input
 
 If `output` is omitted, a successful operation does not return application-level output data.
 
-When either field is present, it must be an inline object. Plugins must not reinterpret scalar fields, arrays, maps, or references named `input` or `output` as valid VPP-2 operation payload definitions.
+When either field is present, it must be an inline object. A VPP-2 compatible plugin must reject any other shape with an error. Plugins must not reinterpret scalar fields, arrays, maps, or references named `input` or `output` as valid VPP-2 operation payload definitions.
 
 ## Input Validation Scope
 
@@ -156,7 +162,11 @@ Procedures use this URL structure.
 <baseURL>/<lowerFirst(RPCName)>/<ProcedureName>
 ```
 
-`ProcedureName` is already `camelCase` in valid schemas, so it is used verbatim. For example, a `getUser` procedure inside an `@httpRpc type Users` service may be called at this URL when the configured base URL is `https://api.example.com/rpc`.
+`ProcedureName` is already `camelCase` in valid schemas, so it is used verbatim.
+
+Name casing is enforced by the VDL analyzer before VPP-2 runs, so VPP-2 assumes valid names and never redefines them. Join rule: strip trailing slashes from `baseURL`, then join as `baseURL + "/" + lowerFirst(RPCName) + "/" + ProcedureName`. An empty `baseURL` yields `/<lowerFirst(RPCName)>/<ProcedureName>`.
+
+For example, a `getUser` procedure inside an `@httpRpc type Users` service may be called at this URL when the configured base URL is `https://api.example.com/rpc`.
 
 ```text
 https://api.example.com/rpc/users/getUser
@@ -228,9 +238,9 @@ A procedure starts when application code invokes a generated procedure client fu
 The client sends an HTTP `POST` request.
 
 1. **Method:** `POST`.
-2. **URL structure:** `<baseURL>/<lowerFirst(RPCName)>/<ProcedureName>`.
-3. **Headers:** `Content-Type: application/json` and `Accept: application/json`.
-4. **Body:** JSON-encoded procedure input when `input` is defined.
+2. **URL structure:** `<baseURL>/<lowerFirst(RPCName)>/<ProcedureName>` joined with the canonical rule above.
+3. **Headers:** always `Content-Type: application/json` and `Accept: application/json`.
+4. **Body:** always a JSON object. The encoded `input` when defined, or `{}` when the operation defines no `input`.
 
 Example request body:
 
@@ -240,7 +250,13 @@ Example request body:
 }
 ```
 
-If the procedure does not define `input`, the operation has no application-level input payload. Generated clients and servers should still preserve the same HTTP method, URL, and response semantics.
+Empty input body:
+
+```json
+{}
+```
+
+Servers must also accept the fallback form with no body and no `Content-Type` as empty input. Clients always send the symmetric form.
 
 ### Server Handling
 
@@ -290,7 +306,7 @@ Failure envelope:
 }
 ```
 
-If the procedure does not define `output`, a successful response still uses the success envelope, but it does not need to include application-level output data.
+If the procedure does not define `output`, a successful response is exactly `{"ok":true}` with no `output` key.
 
 ### Client Handling
 
@@ -307,17 +323,22 @@ A plugin may call itself VPP-2 compatible only if it follows these rules.
 
 1. It must recognize `@httpRpc` and `@proc`.
 2. It must treat an `@httpRpc` type as an HTTP-RPC service container.
-3. It must treat `@proc` members as request-response HTTP procedures.
-4. It must reject `@httpRpc` with any argument.
-5. It must derive route names from the VDL service and operation names, applying `lowerFirst` to the `RPCName` segment and using operation names verbatim.
-6. It must use the URL structure defined by this protocol.
-7. It must encode operation input as JSON when input exists.
-8. It must validate operation input against the VDL-declared shape before handler execution.
-9. It must decode operation output and errors through the envelope model.
-10. It must preserve the optional nature of `input` and `output`.
-11. It must preserve the distinction between procedure responses, application errors, and transport failures.
-12. It must return HTTP `200 OK` for successfully processed procedure requests, including application errors represented by `ok: false`.
-13. It must not reinterpret VPP-2 procedures as `GET`, query-parameter calls, or non-envelope responses while claiming VPP-2 wire compatibility.
+3. It must treat `@proc` members inside `@httpRpc` containers as request-response HTTP procedures.
+4. It must silently ignore everything without `@httpRpc`, with no warnings.
+5. It must reject `@httpRpc` with any argument.
+6. It must reject `@proc` with any argument.
+7. It must reject `@proc` on anything other than an inline object.
+8. It must reject non-inline-object `input` or `output` when present.
+9. It must derive route names from the VDL service and operation names, applying `lowerFirst` to the `RPCName` segment and using operation names verbatim.
+10. It must use the canonical URL join rule defined by this protocol.
+11. It must always send a JSON object body with `Content-Type: application/json`, using `{}` when no `input` exists.
+12. It must accept missing body and missing `Content-Type` as empty input on the server.
+13. It must respond exactly `{"ok":true}` with no `output` key when no `output` exists.
+14. It must validate operation input against the VDL-declared shape before handler execution.
+15. It must decode operation output and errors through the envelope model.
+16. It must preserve the distinction between procedure responses, application errors, and transport failures.
+17. It must return HTTP `200 OK` for successfully processed procedure requests, including application errors represented by `ok: false`.
+18. It must not reinterpret VPP-2 procedures as `GET`, query-parameter calls, or non-envelope responses while claiming VPP-2 wire compatibility.
 
 Plugins may provide additional framework integrations, generated helpers, runtime adapters, middleware APIs, testing utilities, or documentation output. Those additions must not change the protocol semantics described here.
 
@@ -338,6 +359,18 @@ This protocol does not define authentication models, authorization policies, bus
 Other transports (for example stdin/stdout) are out of scope. They will define their own service annotation and their own VPP, and may reuse the generic `@proc` operation shape.
 
 Those concerns may be handled by other protocols, plugin configuration, generated framework integrations, or user code.
+
+## Conformance Vectors
+
+A VPP-2 compatible implementation must satisfy these vectors (names are just examples):
+
+1. `ping {}` sends `{}` and receives `{"ok":true}`.
+2. `clearCache {input}` sends `{"namespace":"..."}` and receives `{"ok":true}`.
+3. `rotateKeys {output}` sends `{}` and receives `{"ok":true,"output":{"rotatedAt":"..."}}`.
+4. `getUser` success returns `{"ok":true,"output":{...}}`.
+5. `getUser` application error returns HTTP `200` with `{"ok":false,"error":{...}}`.
+6. Transport failures use non-`200` statuses and are never confused with `ok:false`.
+7. `ping` with no body and no `Content-Type` is accepted as empty input.
 
 ## Compatibility Statement
 
