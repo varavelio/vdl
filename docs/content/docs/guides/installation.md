@@ -205,7 +205,7 @@ COPY --from=ghcr.io/varavelio/vdl:latest /usr/local/bin/vdl /usr/local/bin/vdl
 
 ## Manual Downloads
 
-You can download prebuilt binaries from the [VDL releases page](https://github.com/varavelio/vdl/releases).
+You can download prebuilt binaries from the [VDL releases page](https://github.com/varavelio/vdl/releases/latest).
 
 Manual installation is useful when you need to:
 
