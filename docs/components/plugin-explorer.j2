@@ -1,0 +1,42 @@
+{% comment %}
+  VDL plugin explorer.
+
+  Data lives in docs/data/plugins.yaml; add a new plugin with a pull
+  request appending an entry there. No template change needed.
+  Excluded on purpose: varavelio/vdl-plugin-sdk,
+  varavelio/vdl-plugin-template (tooling, not generator plugins).
+{% endcomment %}
+
+{% set container = props.container|default:"lg" %}
+{% if container == "xs" %}{% set container_cls = "max-w-md" %}{% elif container == "sm" %}{% set container_cls = "max-w-3xl" %}{% elif container == "md" %}{% set container_cls = "max-w-6xl" %}{% elif container == "xl" %}{% set container_cls = "max-w-[120rem]" %}{% elif container == "full" %}{% set container_cls = "max-w-full" %}{% else %}{% set container_cls = "max-w-7xl" %}{% endif %}
+
+<section class="not-prose bg-base-100 py-10 desk:py-20" x-data="{ q: '' }">
+  <div class="mx-auto w-full {{ container_cls }} px-4">
+    <div class="space-y-8 desk:space-y-10">
+      <div class="mx-auto flex max-w-xl flex-col gap-3">
+        <label for="plugin-search" class="text-center text-xs font-medium uppercase tracking-[0.24em] text-content-muted">Filter plugins</label>
+        <input id="plugin-search" type="search" x-model="q" placeholder="Search by name, category, or keyword…" class="h-11 w-full rounded-md border border-base-400 bg-base-100 px-4 text-sm text-content outline-content placeholder:text-content-muted focus-visible:outline-2" autocomplete="off">
+      </div>
+
+      <ul class="grid grid-cols-1 gap-4 desk:gap-5 desk:grid-cols-3">
+        {% for p in data.plugins %}
+        <li data-name="{{ p.name }}" data-desc="{{ p.description|lower }}" data-cat="{{ p.category|lower }} {{ p.keywords }}" x-show="q === '' || $el.dataset.name.includes(q.toLowerCase()) || $el.dataset.desc.includes(q.toLowerCase()) || $el.dataset.cat.includes(q.toLowerCase())" class="h-full">
+          <article class="flex h-full flex-col gap-4 rounded-lg border border-base-400 bg-base-200 p-5 desk:p-6">
+            <div class="flex items-start justify-between gap-4">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-md border border-base-400 bg-base-100" aria-hidden="true">{{ vara_icon(p.icon, "size-5 text-content")|safe }}</span>
+              <span class="rounded-full border border-base-400 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-content-muted">{{ p.category }}</span>
+            </div>
+            <div class="space-y-2">
+              <h3 class="font-mono text-base font-semibold tracking-tight text-content">{{ p.name }}</h3>
+              <p class="text-sm leading-6 text-content-muted">{{ p.description }}</p>
+            </div>
+            <a href="{{ url(p.link) }}" class="mt-auto inline-flex w-fit items-center gap-2 rounded-sm text-sm font-medium text-content no-underline outline-content transition-colors hover:text-info focus-visible:outline-2 focus-visible:outline-offset-4">Learn more<span aria-hidden="true">{{ vara_icon("arrow-right", "size-4")|safe }}</span></a>
+          </article>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <p class="mx-auto max-w-3xl text-center text-sm leading-6 text-content-muted">Missing a community plugin? Open a pull request appending it to <span class="font-mono">docs/data/plugins.yaml</span>. Versions shown are examples; check each repository for the latest release tag.</p>
+    </div>
+  </div>
+</section>

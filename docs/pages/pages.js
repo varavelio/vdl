@@ -14,6 +14,19 @@ export default function ({ data, files, parse }) {
     content: homePageContent,
   });
 
+  const pluginsRaw = files.readFile("content/plugins.md");
+  const pluginsMd = parse.markdown(pluginsRaw);
+  const pluginsContent = parse.renderComponents(pluginsMd.html);
+
+  pages.push({
+    permalink: "/plugins/",
+    template: "vara-landing",
+    title: pluginsMd.frontmatter.title || "Plugin Explorer",
+    description: pluginsMd.frontmatter.description || data.site.description,
+    content: pluginsContent,
+    sitemap: false,
+  });
+
   pages.push({
     permalink: "/404.html",
     template: "vara-404",

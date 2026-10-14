@@ -1,0 +1,66 @@
+# VDL plugin registry.
+#
+# Add a new plugin with a pull request appending an entry to this list.
+
+- name: vdl-plugin-go
+  category: Go
+  icon: braces
+  description: Go structs, enums, constants, strict JSON validation, and datetime mapped to time.Time.
+  link: https://github.com/varavelio/vdl-plugin-go
+  keywords: structs models data validation datetime
+
+- name: vdl-plugin-ts
+  category: TypeScript
+  icon: braces
+  description: Typed interfaces, enum helpers, constants, Date hydration, and optional runtime validation.
+  link: https://github.com/varavelio/vdl-plugin-ts
+  keywords: interfaces models data validation date
+
+- name: vdl-plugin-json-schema
+  category: Schema
+  icon: box
+  description: JSON Schema Draft 2020-12 for validators, forms, gateways, and external integrations.
+  link: https://github.com/varavelio/vdl-plugin-json-schema
+  keywords: json schema validation forms gateway
+
+- name: vdl-plugin-http-rpc-go
+  category: HTTP-RPC
+  icon: workflow
+  description: Typed Go HTTP-RPC clients and servers with interceptors, retries, and timeouts.
+  link: https://github.com/varavelio/vdl-plugin-http-rpc-go
+  keywords: go rpc client server http interceptors
+
+- name: vdl-plugin-http-rpc-ts
+  category: HTTP-RPC
+  icon: workflow
+  description: Typed TypeScript HTTP-RPC clients and servers for Node.js and Fetch adapters.
+  link: https://github.com/varavelio/vdl-plugin-http-rpc-ts
+  keywords: typescript rpc client server http fetch node
+
+- name: vdl-plugin-http-rpc-openapi
+  category: OpenAPI
+  icon: code-xml
+  description: OpenAPI 3.0 documents for VDL HTTP-RPC services, plus an optional HTML playground.
+  link: https://github.com/varavelio/vdl-plugin-http-rpc-openapi
+  keywords: openapi rpc postman playground http
+
+- name: vdl-plugin-events-go
+  category: Events
+  icon: zap
+  description: Go subject builders and a typed event catalog from @event annotated types.
+  link: https://github.com/varavelio/vdl-plugin-events-go
+  keywords: go events subjects catalog event-driven
+
+- name: vdl-plugin-explorer
+  category: Docs
+  icon: book-open
+  description: Standalone static HTML explorer for docs, RPCs, types, enums, and constants.
+  link: https://github.com/varavelio/vdl-plugin-explorer
+  keywords: docs explorer html search static
+
+- name: vdl-plugin-meta
+  category: Metadata
+  icon: plug
+  description: VDL Intermediate Representation exported as JSON for tools and runtimes.
+  link: https://github.com/varavelio/vdl-plugin-meta
+  keywords: metadata json ir runtime tools
