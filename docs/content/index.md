@@ -6,7 +6,7 @@ description: "VDL is an open-source, type-safe, multi-language, and easily exten
 <vara-header
   container="lg"
   show_title="false"
-  links="Language|/docs/language/start-here/,Reference|/docs/reference/spec/,Plugins|/plugins/,SDK|https://vdl-plugin-sdk.varavel.com,GitHub|https://github.com/varavelio/vdl"
+  links="Docs|/docs/,Language|/docs/language/start-here/,Reference|/docs/reference/spec/,Plugins|/plugins/,SDK|https://vdl-plugin-sdk.varavel.com,GitHub|https://github.com/varavelio/vdl"
   cta_label="Install"
   cta_href="/docs/guides/installation/"
 />
