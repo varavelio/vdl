@@ -180,7 +180,7 @@ Plugin sources can be local `.js` files, HTTPS `.js` URLs, or GitHub shorthand r
 
 Useful docs:
 
-- [Available plugins](https://vdl.varavel.com/guides/plugins/)
+- [Plugin explorer](https://vdl.varavel.com/plugins/)
 - [Creating plugins](https://vdl.varavel.com/guides/creating-plugins/)
 - [Language guide](https://vdl.varavel.com/language/)
 - [Project configuration](https://vdl.varavel.com/guides/configuration/)

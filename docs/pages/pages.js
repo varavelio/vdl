@@ -24,7 +24,6 @@ export default function ({ data, files, parse }) {
     title: pluginsMd.frontmatter.title || "Plugin Explorer",
     description: pluginsMd.frontmatter.description || data.site.description,
     content: pluginsContent,
-    sitemap: false,
   });
 
   pages.push({

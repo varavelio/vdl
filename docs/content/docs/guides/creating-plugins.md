@@ -348,3 +348,29 @@ Pass the input to your plugin handler and assert generated files or returned err
 - Use the SDK for TypeScript, typed IR access, bundling, and tests.
 - Commit `dist/index.js` for GitHub-hosted plugins.
 - Pin plugin versions in consuming projects.
+
+## Submitting Your Plugin To The Catalog
+
+The [plugin explorer](/plugins/) lists generator plugins so others can discover them. It reads from `docs/data/plugins.yaml` in the VDL repository.
+
+To list your plugin, open a pull request appending one entry:
+
+```yaml
+- name: vdl-plugin-mine
+  category: Go
+  icon: braces
+  description: Short one-line description of what the plugin generates.
+  link: https://github.com/my-org/vdl-plugin-mine
+  keywords: go models keyword-three
+```
+
+Field guide:
+
+- `name`: repository name. Community plugins should use the `vdl-plugin-` prefix.
+- `category`: short grouping label shown as a badge, such as `Go`, `TypeScript`, `HTTP-RPC`, `Events`, `Docs`, or `Schema`.
+- `icon`: Lucide icon name for the card, such as `braces`, `workflow`, `zap`, `box`, `code-xml`, `book-open`, or `plug`.
+- `description`: one sentence. Detailed setup, versions, and `src` snippets belong in your plugin README, not here.
+- `link`: public page for the plugin. A repository is not required; documentation or product pages work too.
+- `keywords`: space-separated search terms. They render as badges and feed the explorer filter.
+
+Do not set `official`. That flag is reserved for plugins maintained by Varavel; anything without it shows a `Community` badge. Please do not submit SDKs, templates, or forks without meaningful changes.

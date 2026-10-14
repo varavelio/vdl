@@ -1,3 +1,5 @@
+{% import "../templates/vara/macros/button.j2" button %}
+
 {% comment %}
   VDL plugin explorer.
 
@@ -10,7 +12,7 @@
 {% set container = props.container|default:"lg" %}
 {% if container == "xs" %}{% set container_cls = "max-w-md" %}{% elif container == "sm" %}{% set container_cls = "max-w-3xl" %}{% elif container == "md" %}{% set container_cls = "max-w-6xl" %}{% elif container == "xl" %}{% set container_cls = "max-w-[120rem]" %}{% elif container == "full" %}{% set container_cls = "max-w-full" %}{% else %}{% set container_cls = "max-w-7xl" %}{% endif %}
 
-<section class="not-prose bg-base-100 py-10 desk:py-20" x-data="{ q: '' }">
+<section class="not-prose bg-base-100 pt-4 pb-10 desk:pt-8 desk:pb-20" x-data="{ q: '' }">
   <div class="mx-auto w-full {{ container_cls }} px-4">
     <div class="space-y-8 desk:space-y-10">
       <div class="mx-auto flex max-w-xl flex-col gap-3">
@@ -24,19 +26,34 @@
           <article class="flex h-full flex-col gap-4 rounded-lg border border-base-400 bg-base-200 p-5 desk:p-6">
             <div class="flex items-start justify-between gap-4">
               <span class="flex size-10 shrink-0 items-center justify-center rounded-md border border-base-400 bg-base-100" aria-hidden="true">{{ vara_icon(p.icon, "size-5 text-content")|safe }}</span>
-              <span class="rounded-full border border-base-400 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-content-muted">{{ p.category }}</span>
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                {% if p.official %}<span class="rounded-full border border-base-400 bg-base-100 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-content">Official</span>{% else %}<span class="rounded-full border border-base-400 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-content-muted">Community</span>{% endif %}
+                <span class="rounded-full border border-base-400 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-content-muted">{{ p.category }}</span>
+              </div>
             </div>
             <div class="space-y-2">
               <h3 class="font-mono text-base font-semibold tracking-tight text-content">{{ p.name }}</h3>
               <p class="text-sm leading-6 text-content-muted">{{ p.description }}</p>
             </div>
-            <a href="{{ url(p.link) }}" class="mt-auto inline-flex w-fit items-center gap-2 rounded-sm text-sm font-medium text-content no-underline outline-content transition-colors hover:text-info focus-visible:outline-2 focus-visible:outline-offset-4">Learn more<span aria-hidden="true">{{ vara_icon("arrow-right", "size-4")|safe }}</span></a>
+            <div class="flex flex-wrap gap-2">
+              {% for k in p.keywords|split:" " %}
+              <span class="rounded border border-base-400 bg-base-100 px-2 py-0.5 font-mono text-[11px] leading-5 text-content-muted">{{ k }}</span>
+              {% endfor %}
+            </div>
+            <a href="{{ url(p.link) }}" target="_blank" rel="noopener noreferrer" class="mt-auto inline-flex w-fit items-center gap-2 rounded-sm text-sm font-medium text-content no-underline outline-content transition-colors hover:text-info focus-visible:outline-2 focus-visible:outline-offset-4">Learn more<span aria-hidden="true">{{ vara_icon("arrow-right", "size-4")|safe }}</span></a>
           </article>
         </li>
         {% endfor %}
       </ul>
+    </div>
 
-      <p class="mx-auto max-w-3xl text-center text-sm leading-6 text-content-muted">Missing a community plugin? Open a pull request appending it to <span class="font-mono">docs/data/plugins.yaml</span>. Versions shown are examples; check each repository for the latest release tag.</p>
+    <div class="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4 pt-16 text-center desk:pt-32">
+        <div class="space-y-2">
+          <h2 class="text-2xl font-semibold tracking-tight text-content desk:text-3xl">Built something with VDL?</h2>
+          <p class="text-base leading-7 text-content-muted">Write a generator plugin and list it here for others to discover.</p>
+        </div>
+        {{ button("Learn how to create plugins", "../docs/guides/creating-plugins/", "", "plug", "", "lg", "md", "solid", "neutral") }}
+        <p class="text-sm leading-6 text-content-muted">Missing a community plugin? Open a pull request appending it to <span class="font-mono">docs/data/plugins.yaml</span>.</p>
     </div>
   </div>
 </section>

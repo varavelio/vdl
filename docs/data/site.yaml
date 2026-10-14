@@ -7,3 +7,12 @@ logo_dark: "https://cdn.jsdelivr.net/gh/varavelio/vdl@a6a9ea/assets/svg/vdl.svg"
 
 docs_github_repo: "varavelio/vdl"
 docs_show_title: false
+
+docs_header_links:
+  - title: Plugins
+    href: /plugins/
+    icon: plug
+  - title: SDK
+    href: https://vdl-plugin-sdk.varavel.com
+    icon: braces
+    new_tab: true

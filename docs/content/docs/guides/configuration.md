@@ -204,7 +204,7 @@ options {
 
 All option values are strings. If a plugin option behaves like a boolean, pass values such as `"true"` or `"false"` according to that plugin's documentation.
 
-Options are plugin-specific. Always check the plugin README or [available plugins guide](/docs/guides/plugins/).
+Options are plugin-specific. Always check the plugin README or [plugin explorer](/plugins/).
 
 ## `generateHeader`
 

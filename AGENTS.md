@@ -63,7 +63,7 @@ When updating this document, do so with the context of the entire document in mi
   - `content/index.md`: Home landing page composed from Vara components.
   - `content/docs/`: Docs tree; `index.md` files are section indexes and child pages are ordered by `weight`.
   - `components/landing-hero.j2`: Project-specific landing hero, the one block the theme does not model.
-  - `components/plugin-explorer.j2` + `content/plugins.md` + `data/plugins.yaml`: Plugin explorer rendered at `/plugins/` (static list, no GitHub API). New plugins are added with a PR appending an entry to the YAML; The page sets `sitemap: false` and has no nav links yet.
+  - `components/plugin-explorer.j2` + `content/plugins.md` + `data/plugins.yaml`: Plugin explorer rendered at `/plugins/` (static list, no GitHub API).
   - `public/`: Project static assets (`styles.css`, `_redirects`).
 - **Content conventions**:
   - Use YAML frontmatter delimited by `---` for all docs pages and sections.

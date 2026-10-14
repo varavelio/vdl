@@ -11,3 +11,6 @@
 
 /docs/protocols/rpc /docs/protocols/http-rpc/ 301
 /docs/protocols/rpc/ /docs/protocols/http-rpc/ 301
+
+/docs/guides/plugins/ /plugins/ 301
+/docs/guides/plugins /plugins/ 301
