@@ -2,13 +2,21 @@
 #
 # Add a new plugin with a pull request appending an entry to this list.
 
+- name: vdl-plugin-explorer
+  official: true
+  category: Docs
+  icon: book-open
+  description: Standalone static HTML explorer for docs, RPCs, types, enums, and constants.
+  link: https://github.com/varavelio/vdl-plugin-explorer
+  keywords: docs explorer html search static
+
 - name: vdl-plugin-go
   official: true
   category: Go
   icon: braces
   description: Go structs, enums, constants, strict JSON validation, and datetime mapped to time.Time.
   link: https://github.com/varavelio/vdl-plugin-go
-  keywords: structs models data validation datetime golang go
+  keywords: golang go models structs validation datetime
 
 - name: vdl-plugin-ts
   official: true
@@ -16,7 +24,7 @@
   icon: braces
   description: Typed interfaces, enum helpers, constants, Date hydration, and optional runtime validation.
   link: https://github.com/varavelio/vdl-plugin-ts
-  keywords: interfaces models data validation date typescript ts
+  keywords: typescript ts models interfaces validation date
 
 - name: vdl-plugin-json-schema
   official: true
@@ -32,7 +40,7 @@
   icon: workflow
   description: Typed Go HTTP-RPC clients and servers with interceptors, retries, and timeouts.
   link: https://github.com/varavelio/vdl-plugin-http-rpc-go
-  keywords: go golang rpc client server http interceptors
+  keywords: golang go http rpc client server interceptors
 
 - name: vdl-plugin-http-rpc-ts
   official: true
@@ -40,7 +48,7 @@
   icon: workflow
   description: Typed TypeScript HTTP-RPC clients and servers for Node.js and Fetch adapters.
   link: https://github.com/varavelio/vdl-plugin-http-rpc-ts
-  keywords: typescript ts rpc client server http fetch node
+  keywords: typescript ts http rpc client server fetch node
 
 - name: vdl-plugin-http-rpc-openapi
   official: true
@@ -48,7 +56,7 @@
   icon: code-xml
   description: OpenAPI 3.0 documents for VDL HTTP-RPC services, plus an optional HTML playground.
   link: https://github.com/varavelio/vdl-plugin-http-rpc-openapi
-  keywords: openapi rpc postman playground http
+  keywords: openapi http rpc playground postman
 
 - name: vdl-plugin-events-go
   official: true
@@ -56,15 +64,7 @@
   icon: zap
   description: Go subject builders and a typed event catalog from @event annotated types.
   link: https://github.com/varavelio/vdl-plugin-events-go
-  keywords: go golang events subjects catalog event-driven
-
-- name: vdl-plugin-explorer
-  official: true
-  category: Docs
-  icon: book-open
-  description: Standalone static HTML explorer for docs, RPCs, types, enums, and constants.
-  link: https://github.com/varavelio/vdl-plugin-explorer
-  keywords: docs explorer html search static
+  keywords: golang go events subjects catalog event-driven
 
 - name: vdl-plugin-meta
   official: true

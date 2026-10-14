@@ -6,6 +6,7 @@ description: "Discover official VDL generator plugins."
 <vara-header
   container="lg"
   show_title="false"
+  home_href="../"
   links="Overview|../docs/about/,Language|../docs/language/start-here/,Plugins|../plugins/,Reference|../docs/reference/spec/,GitHub|https://github.com/varavelio/vdl"
   cta_label="Install"
   cta_href="../docs/guides/installation/"
