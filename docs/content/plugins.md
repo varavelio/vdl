@@ -7,7 +7,7 @@ description: "Discover official VDL generator plugins."
   container="lg"
   show_title="false"
   home_href="../"
-  links="Overview|../docs/about/,Language|../docs/language/start-here/,Plugins|../plugins/,Reference|../docs/reference/spec/,GitHub|https://github.com/varavelio/vdl"
+  links="Overview|../docs/about/,Language|../docs/language/start-here/,Reference|../docs/reference/spec/,Plugins|../plugins/,SDK|https://vdl-plugin-sdk.varavel.com,GitHub|https://github.com/varavelio/vdl"
   cta_label="Install"
   cta_href="../docs/guides/installation/"
 />
@@ -27,3 +27,7 @@ description: "Discover official VDL generator plugins."
   copyright="A Varavel project &copy; %year%"
   links="Docs|../docs/,GitHub|https://github.com/varavelio/vdl,Varavel|https://varavel.com"
 />
+
+<script>
+document.querySelectorAll('a[href*="vdl-plugin-sdk.varavel.com"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener noreferrer"; });
+</script>
