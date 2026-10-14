@@ -7,7 +7,7 @@ description: "Discover official VDL generator plugins."
   container="lg"
   show_title="false"
   home_href="../"
-  links="Overview|../docs/about/,Language|../docs/language/start-here/,Reference|../docs/reference/spec/,Plugins|../plugins/,SDK|https://vdl-plugin-sdk.varavel.com,GitHub|https://github.com/varavelio/vdl"
+  links="Language|../docs/language/start-here/,Reference|../docs/reference/spec/,Plugins|../plugins/,SDK|https://vdl-plugin-sdk.varavel.com,GitHub|https://github.com/varavelio/vdl"
   cta_label="Install"
   cta_href="../docs/guides/installation/"
 />
