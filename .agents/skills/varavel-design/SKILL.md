@@ -44,3 +44,4 @@ PNG (fallback when SVG impossible):
 
 - Fetch guideline before writing any markup or styles, not after.
 - Never substitute local copies or cached recall of guideline.
+- The documentation page `veta-theme-vara` already includes styles that follow Varavel's design guidelines; when working on the docs, use that stylesheet.
