@@ -90,9 +90,10 @@ A VPP-4 compatible plugin must enforce these rules.
 1. Every placeholder must exactly match a field declared on the annotated event type.
 2. Placeholder fields must be top-level fields of the payload type.
 3. Placeholder fields must be primitive scalar fields.
-4. Nested placeholder paths are not allowed.
-5. Object, array, map, and other non-primitive placeholder fields are not allowed.
-6. The same placeholder may appear multiple times in the subject template.
+4. Placeholder fields must be required. Optional placeholder fields are not allowed.
+5. Nested placeholder paths are not allowed.
+6. Object, array, map, and other non-primitive placeholder fields are not allowed.
+7. The same placeholder may appear multiple times in the subject template.
 
 Valid example:
 
@@ -133,6 +134,16 @@ type AccountCreated {
 }
 ```
 
+Invalid example, because placeholder fields must be required. An optional field has no deterministic subject segment:
+
+```vdl
+@event("auth.userCreated.{userId}")
+type UserCreatedEvent {
+  userId? string
+  email string
+}
+```
+
 The plugin must reject invalid placeholders before generating code.
 
 ## Payload Semantics
@@ -155,7 +166,7 @@ All placeholder values are rendered as string segments when composing the final 
 
 A placeholder field's type controls the generated builder parameter type and validation, the final subject segment is always text.
 
-When a placeholder appears more than once, the builder should accept that field once and reuse the same value for every occurrence. For deterministic APIs, placeholder parameters should follow the order of first appearance in the template.
+When a placeholder appears more than once, the builder should accept that field once and reuse the same value for every occurrence. For deterministic APIs, placeholder parameters should follow the order of first appearance in the template. Builder parameters for placeholders are always required, matching the required payload fields.
 
 Example template:
 
@@ -240,9 +251,10 @@ A plugin may call itself VPP-4 compatible only if it follows these rules.
 5. It must reject placeholders that reference missing fields.
 6. It must reject nested placeholder paths.
 7. It must reject non-primitive placeholder fields.
-8. It must allow repeated placeholders and reuse the same field value.
-9. It must generate or expose subject formatting behavior that returns a string.
-10. It must preserve the literal subject template for generated metadata and catalogs.
+8. It must reject optional placeholder fields.
+9. It must allow repeated placeholders and reuse the same field value.
+10. It must generate or expose subject formatting behavior that returns a string.
+11. It must preserve the literal subject template for generated metadata and catalogs.
 
 ## Recommended Output Behavior
 
