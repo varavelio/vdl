@@ -1,6 +1,7 @@
 ---
 title: "About VDL"
 description: "Learn what VDL is, what it provides, and why the core language stays small."
+icon: "info"
 weight: 1
 ---
 
