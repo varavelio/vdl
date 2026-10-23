@@ -333,6 +333,8 @@ VPP-3 does not define authentication, identity providers, sessions, database loa
 
 ## Notes for Plugin Authors
 
+> Remember that [the SDK](https://vdl-plugin-sdk.varavel.com) is here to help you, it includes many utilities for developing VDL plugins.
+
 Do not parse `allow` and `deny` strings by hand. The SDK `assertValidIrForPolicy` helper function checks the annotation, the policy type shape, and every expression, and hands back parsed policies you can emit directly.
 
 ```ts

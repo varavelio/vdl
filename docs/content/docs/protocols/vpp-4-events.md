@@ -221,6 +221,8 @@ Those concerns may be handled by other protocols, other plugins, generated adapt
 
 ## Notes for Plugin Authors
 
+> Remember that [the SDK](https://vdl-plugin-sdk.varavel.com) is here to help you, it includes many utilities for developing VDL plugins.
+
 Validate events before generating payload types and subject builders. The SDK `assertValidIrForEvents` helper function checks each subject template against its payload type — missing fields, nested paths, non-primitive or optional placeholders — and returns parsed events with their placeholders in template order.
 
 ```ts

@@ -212,6 +212,8 @@ The final example intentionally avoids relying on one specific protocol. The rul
 
 ## Notes for Plugin Authors
 
+> Remember that [the SDK](https://vdl-plugin-sdk.varavel.com) is here to help you, it includes many utilities for developing VDL plugins.
+
 VPP-1 does not ask you to build a "deprecation plugin". It asks that whatever your plugin already generates (code, documentation, catalogs, editor metadata) carries the same deprecation meaning as the schema.
 
 The SDK has two small helpers for this. `isDeprecated` tells you whether an annotation list marks a symbol as deprecated. `getDeprecationMessage` returns the optional human-readable note when one exists.

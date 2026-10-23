@@ -380,6 +380,8 @@ A VPP-2 compatible implementation must satisfy these vectors (names are just exa
 
 ## Notes for Plugin Authors
 
+> Remember that [the SDK](https://vdl-plugin-sdk.varavel.com) is here to help you, it includes many utilities for developing VDL plugins.
+
 Validate the IR before you generate anything. The SDK `assertValidIrForHttpRpc` helper function checks service containers, procedure members, and input/output shapes, and reports problems with source positions your users can act on.
 
 ```ts
