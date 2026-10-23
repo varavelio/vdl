@@ -350,6 +350,12 @@ Depending on the target, useful outputs may include typed clients, server interf
 
 Plugins should also preserve relevant cross-protocol metadata when it applies. For example, if a VPP-2 operation is marked with a global deprecation annotation, generated clients, handlers, and documentation should surface that lifecycle information where the target ecosystem supports it.
 
+Existing plugin examples:
+
+- https://github.com/varavelio/vdl-plugin-http-rpc-go
+- https://github.com/varavelio/vdl-plugin-http-rpc-ts
+- https://github.com/varavelio/vdl-plugin-http-rpc-openapi
+
 ## Non-Goals
 
 VPP-2 intentionally does not define every part of an application stack.
@@ -371,6 +377,23 @@ A VPP-2 compatible implementation must satisfy these vectors (names are just exa
 5. `getUser` application error returns HTTP `200` with `{"ok":false,"error":{...}}`.
 6. Transport failures use non-`200` statuses and are never confused with `ok:false`.
 7. `ping` with no body and no `Content-Type` is accepted as empty input.
+
+## Notes for Plugin Authors
+
+Validate the IR before you generate anything. The SDK `assertValidIrForHttpRpc` helper function checks service containers, procedure members, and input/output shapes, and reports problems with source positions your users can act on.
+
+```ts
+import { definePlugin } from "@varavel/vdl-plugin-sdk";
+import { assertValidIrForHttpRpc } from "@varavel/vdl-plugin-sdk/utils/rpc";
+
+export const generate = definePlugin((input) => {
+  assertValidIrForHttpRpc(input.ir);
+  // The IR matches VPP-2 from here on.
+  // Build your clients, handlers, or docs next.
+});
+```
+
+Run validation first, then emit code. That keeps route derivation, envelope handling, and error reporting consistent with the contract above. The full helper reference lives in [RPC](https://vdl-plugin-sdk.varavel.com/docs/api/rpc/).
 
 ## Compatibility Statement
 

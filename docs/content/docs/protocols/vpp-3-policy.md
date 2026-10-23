@@ -278,6 +278,11 @@ function canReadInvoice(principal: User, resource: Invoice): boolean
 
 Use VPP-0 models when available. Helpers, test fixtures, and explanation utilities are allowed when they preserve the canonical decision.
 
+Existing plugin examples:
+
+- https://github.com/varavelio/vdl-plugin-policy-go
+- https://github.com/varavelio/vdl-plugin-policy-ts
+
 ## Complete Example
 
 ```vdl
@@ -325,6 +330,23 @@ VPP-3 is transport agnostic. RPC handlers, event consumers, CLI actions, jobs, a
 ## Non-Goals
 
 VPP-3 does not define authentication, identity providers, sessions, database loading, dynamic stores, admin UIs, audit formats, transport, role storage, graph traversal, or business workflows.
+
+## Notes for Plugin Authors
+
+Do not parse `allow` and `deny` strings by hand. The SDK `assertValidIrForPolicy` helper function checks the annotation, the policy type shape, and every expression, and hands back parsed policies you can emit directly.
+
+```ts
+import { definePlugin } from "@varavel/vdl-plugin-sdk";
+import { assertValidIrForPolicy } from "@varavel/vdl-plugin-sdk/utils/policy";
+
+export const generate = definePlugin((input) => {
+  const policies = assertValidIrForPolicy(input.ir);
+  // Each entry carries its parsed allow/deny expressions.
+  // Emit one pure boolean function per policy.
+});
+```
+
+Validation failures stop generation with positioned errors, so your emitter only ever sees policies that are safe to compile. The full helper reference lives in [Policy](https://vdl-plugin-sdk.varavel.com/docs/api/policy/).
 
 ## Compatibility Statement
 

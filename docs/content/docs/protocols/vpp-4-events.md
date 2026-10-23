@@ -182,63 +182,10 @@ function buildTenantUserCreatedSubject(tenantId: string, userId: string): string
 }
 ```
 
-## Generated API Shape
+Existing plugin examples:
 
-Generators transform an `@event` declaration into two primary artifacts.
-
-1. A payload type for the target language.
-2. Subject formatting utilities for the event subject template.
-
-Depending on the target, plugins may also emit catalogs, registries, documentation, publish helpers, subscribe helpers, test fixtures, or broker-specific adapters.
-
-### TypeScript Example
-
-```ts
-export interface UserCreatedEvent {
-  userId: string;
-  email: string;
-  timestamp: string;
-}
-
-export function buildUserCreatedEventSubject(userId: string): string {
-  return `auth.userCreated.${userId}`;
-}
-```
-
-### Go Example
-
-```go
-type UserCreatedEvent struct {
-    UserId    string    `json:"userId"`
-    Email     string    `json:"email"`
-    Timestamp time.Time `json:"timestamp"`
-}
-
-func BuildUserCreatedEventSubject(userId string) string {
-    return "auth.userCreated." + userId
-}
-```
-
-These examples are illustrative. Each plugin should generate code that is idiomatic for its target while preserving the same payload and subject semantics.
-
-## Event Catalogs
-
-Plugins should aggregate event declarations into a centralized event catalog when that is useful for the target ecosystem.
-
-Catalogs help applications inspect available events, route incoming messages, generate documentation, configure subscribers, or connect generated code to framework-specific registries.
-
-If a plugin emits event catalog metadata, the literal subject template must be exposed under the `Subject` key.
-
-Conceptual catalog shape:
-
-```go
-type EventMetadata struct {
-    Name    string // e.g. "UserCreatedEvent"
-    Subject string // e.g. "auth.userCreated.{userId}"
-}
-```
-
-The `Subject` value is the template from the VDL annotation, not a formatted runtime subject.
+- https://github.com/varavelio/vdl-plugin-events-go
+- https://github.com/varavelio/vdl-plugin-events-ts
 
 ## Required Behavior for Compatible Plugins
 
@@ -271,6 +218,23 @@ VPP-4 intentionally does not define every part of an event platform.
 This protocol does not define broker selection, delivery guarantees, retry policies, dead-letter handling, consumer groups, partitions, transactions, schemas for broker configuration, authentication, authorization, persistence, serialization formats beyond the generated payload model, or runtime publish/subscribe behavior.
 
 Those concerns may be handled by other protocols, other plugins, generated adapters, infrastructure, or application code.
+
+## Notes for Plugin Authors
+
+Validate events before generating payload types and subject builders. The SDK `assertValidIrForEvents` helper function checks each subject template against its payload type — missing fields, nested paths, non-primitive or optional placeholders — and returns parsed events with their placeholders in template order.
+
+```ts
+import { definePlugin } from "@varavel/vdl-plugin-sdk";
+import { assertValidIrForEvents } from "@varavel/vdl-plugin-sdk/utils/events";
+
+export const generate = definePlugin((input) => {
+  const events = assertValidIrForEvents(input.ir);
+  // Emit a payload type plus a subject builder per event,
+  // reusing one parameter for repeated placeholders.
+});
+```
+
+Let validation reject bad templates with positioned errors so your emitter stays simple. The full helper reference lives in [Events](https://vdl-plugin-sdk.varavel.com/docs/api/events/).
 
 ## Compatibility Statement
 

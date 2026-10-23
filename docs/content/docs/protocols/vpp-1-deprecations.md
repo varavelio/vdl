@@ -210,6 +210,24 @@ type ServiceContract {
 
 The final example intentionally avoids relying on one specific protocol. The rule is the same anywhere annotations are valid: if a VPP-1 compatible plugin understands the annotated construct, it must preserve the deprecation meaning.
 
+## Notes for Plugin Authors
+
+VPP-1 does not ask you to build a "deprecation plugin". It asks that whatever your plugin already generates (code, documentation, catalogs, editor metadata) carries the same deprecation meaning as the schema.
+
+The SDK has two small helpers for this. `isDeprecated` tells you whether an annotation list marks a symbol as deprecated. `getDeprecationMessage` returns the optional human-readable note when one exists.
+
+```ts
+import { getDeprecationMessage, isDeprecated } from "@varavel/vdl-plugin-sdk/utils/deprecations";
+
+if (isDeprecated(typeDef.annotations)) {
+  const message = getDeprecationMessage(typeDef.annotations);
+  // Render it the way your target expects: a doc comment,
+  // a language deprecation attribute, a badge in generated docs.
+}
+```
+
+Check the flag, pass the message through untouched, and never parse it for replacement names, dates, or severity levels. The full helper reference lives in [Deprecations](https://vdl-plugin-sdk.varavel.com/docs/api/deprecations/).
+
 ## Compatibility Statement
 
 VPP-1 is intentionally small because it is meant to be universal.
