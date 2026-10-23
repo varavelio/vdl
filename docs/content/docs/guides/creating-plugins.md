@@ -361,7 +361,10 @@ To list your plugin, open a pull request appending one entry:
   icon: braces
   description: Short one-line description of what the plugin generates.
   link: https://github.com/my-org/vdl-plugin-mine
-  keywords: go models keyword-three
+  tags:
+    - go
+    - models
+    - keyword-three
 ```
 
 Field guide:
@@ -371,6 +374,6 @@ Field guide:
 - `icon`: Lucide icon name for the card, such as `braces`, `workflow`, `zap`, `box`, `code-xml`, `book-open`, or `plug`.
 - `description`: one sentence. Detailed setup, versions, and `src` snippets belong in your plugin README, not here.
 - `link`: public page for the plugin. A repository is not required; documentation or product pages work too.
-- `keywords`: space-separated search terms. They render as badges and feed the explorer filter.
+- `tags`: search terms as an array of strings. They render as badges and feed the explorer filter.
 
 Do not set `official`. That flag is reserved for plugins maintained by Varavel; anything without it shows a `Community` badge. Please do not submit SDKs, templates, or forks without meaningful changes.

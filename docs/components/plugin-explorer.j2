@@ -15,12 +15,12 @@
     <div class="space-y-8 desk:space-y-10">
       <div class="mx-auto flex max-w-xl flex-col gap-3">
         <label for="plugin-search" class="text-center text-xs font-medium uppercase tracking-[0.24em] text-content-muted">Filter plugins</label>
-        <input id="plugin-search" type="search" x-model="q" placeholder="Search by name, category, or keyword…" class="h-11 w-full rounded-md border border-base-400 bg-base-100 px-4 text-sm text-content outline-content placeholder:text-content-muted focus-visible:outline-2" autocomplete="off">
+        <input id="plugin-search" type="search" x-model="q" placeholder="Search by name, category, or tag…" class="h-11 w-full rounded-md border border-base-400 bg-base-100 px-4 text-sm text-content outline-content placeholder:text-content-muted focus-visible:outline-2" autocomplete="off">
       </div>
 
       <ul class="grid grid-cols-1 gap-4 desk:gap-5 desk:grid-cols-3">
         {% for p in data.plugins %}
-        <li data-name="{{ p.name }}" data-desc="{{ p.description|lower }}" data-cat="{{ p.category|lower }} {{ p.keywords }}" x-show="q === '' || $el.dataset.name.includes(q.toLowerCase()) || $el.dataset.desc.includes(q.toLowerCase()) || $el.dataset.cat.includes(q.toLowerCase())" class="h-full">
+        <li data-name="{{ p.name }}" data-desc="{{ p.description|lower }}" data-cat="{{ p.category|lower }} {{ p.tags|join:" " }}" x-show="q === '' || $el.dataset.name.includes(q.toLowerCase()) || $el.dataset.desc.includes(q.toLowerCase()) || $el.dataset.cat.includes(q.toLowerCase())" class="h-full">
           <article class="flex h-full flex-col gap-4 rounded-lg border border-base-400 bg-base-200 p-5 desk:p-6">
             <div class="flex items-start justify-between gap-4">
               <span class="flex size-10 shrink-0 items-center justify-center rounded-md border border-base-400 bg-base-100" aria-hidden="true">{{ vara_icon(p.icon, "size-5 text-content")|safe }}</span>
@@ -34,8 +34,8 @@
               <p class="text-sm leading-6 text-content-muted">{{ p.description }}</p>
             </div>
             <div class="flex flex-wrap gap-2">
-              {% for k in p.keywords|split:" " %}
-              <span class="rounded border border-base-400 bg-base-100 px-2 py-0.5 font-mono text-[11px] leading-5 text-content-muted">{{ k }}</span>
+              {% for tag in p.tags %}
+              <span class="rounded border border-base-400 bg-base-100 px-2 py-0.5 font-mono text-[11px] leading-5 text-content-muted">{{ tag }}</span>
               {% endfor %}
             </div>
             <a href="{{ url(p.link) }}" target="_blank" rel="noopener noreferrer" class="mt-auto inline-flex w-fit items-center gap-2 rounded-sm text-sm font-medium text-content no-underline outline-content transition-colors hover:text-info focus-visible:outline-2 focus-visible:outline-offset-4">Learn more<span aria-hidden="true">{{ vara_icon("arrow-right", "size-4")|safe }}</span></a>
@@ -51,7 +51,12 @@
           <p class="text-base leading-7 text-content-muted">Write a generator plugin and list it here for others to discover.</p>
         </div>
         {{ button("Learn how to create plugins", "../docs/guides/creating-plugins/", "", "plug", "", "lg", "md", "solid", "neutral") }}
-        <p class="text-sm leading-6 text-content-muted">Missing a community plugin? Open a pull request appending it to <span class="font-mono">docs/data/plugins.yaml</span>.</p>
+        <p class="text-sm leading-6 text-content-muted">
+          Missing a community plugin?
+          <a href="../docs/guides/creating-plugins/#submitting-your-plugin-to-the-catalog" target="_blank" class="text-content underline">
+            Follow this guide to submit a plugin.
+          </a>
+        </p>
     </div>
   </div>
 </section>

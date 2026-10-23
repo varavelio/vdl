@@ -6,70 +6,140 @@
   official: true
   category: Docs
   icon: book-open
-  description: Standalone static HTML explorer for docs, RPCs, types, enums, and constants.
+  description: Standalone static HTML explorer for docs, HTTP RPC clients, types, enums, and constants.
   link: https://github.com/varavelio/vdl-plugin-explorer
-  keywords: docs explorer html search static
+  tags:
+    - docs
+    - explorer
+    - http-client
 
 - name: vdl-plugin-go
   official: true
   category: Go
   icon: braces
-  description: Go structs, enums, constants, strict JSON validation, and datetime mapped to time.Time.
+  description: Go structs, enums, constants, strict JSON validation.
   link: https://github.com/varavelio/vdl-plugin-go
-  keywords: golang go models structs validation datetime
+  tags:
+    - golang
+    - go
+    - models
+    - validation
 
 - name: vdl-plugin-ts
   official: true
   category: TypeScript
   icon: braces
-  description: Typed interfaces, enum helpers, constants, Date hydration, and optional runtime validation.
+  description: Typed interfaces, enum helpers, constants.
   link: https://github.com/varavelio/vdl-plugin-ts
-  keywords: typescript ts models interfaces validation date
-
-- name: vdl-plugin-json-schema
-  official: true
-  category: Schema
-  icon: box
-  description: JSON Schema Draft 2020-12 for validators, forms, gateways, and external integrations.
-  link: https://github.com/varavelio/vdl-plugin-json-schema
-  keywords: json schema validation forms gateway
+  tags:
+    - typescript
+    - ts
+    - models
+    - validation
 
 - name: vdl-plugin-http-rpc-go
   official: true
   category: HTTP-RPC
-  icon: workflow
-  description: Typed Go HTTP-RPC clients and servers with interceptors, retries, and timeouts.
+  icon: network
+  description: Typed Go HTTP-RPC clients and servers.
   link: https://github.com/varavelio/vdl-plugin-http-rpc-go
-  keywords: golang go http rpc client server interceptors
+  tags:
+    - golang
+    - go
+    - http
+    - rpc
+    - client
+    - server
 
 - name: vdl-plugin-http-rpc-ts
   official: true
   category: HTTP-RPC
-  icon: workflow
-  description: Typed TypeScript HTTP-RPC clients and servers for Node.js and Fetch adapters.
+  icon: network
+  description: Typed TypeScript HTTP-RPC clients and servers.
   link: https://github.com/varavelio/vdl-plugin-http-rpc-ts
-  keywords: typescript ts http rpc client server fetch node
+  tags:
+    - typescript
+    - ts
+    - http
+    - rpc
+    - client
+    - server
 
 - name: vdl-plugin-http-rpc-openapi
   official: true
-  category: OpenAPI
-  icon: code-xml
+  category: HTTP-RPC
+  icon: network
   description: OpenAPI 3.0 documents for VDL HTTP-RPC services, plus an optional HTML playground.
   link: https://github.com/varavelio/vdl-plugin-http-rpc-openapi
-  keywords: openapi http rpc playground postman
+  tags:
+    - openapi
+    - http
+    - rpc
+    - playground
 
 - name: vdl-plugin-events-go
   official: true
   category: Events
-  icon: zap
+  icon: layout-arrow-right
   description: Go subject builders and a typed event catalog from @event annotated types.
   link: https://github.com/varavelio/vdl-plugin-events-go
-  keywords: golang go events subjects catalog event-driven
+  tags:
+    - golang
+    - go
+    - events
+
+- name: vdl-plugin-events-ts
+  official: true
+  category: Events
+  icon: layout-arrow-right
+  description: TypeScript subject builders and a typed event catalog from @event annotated types.
+  link: https://github.com/varavelio/vdl-plugin-events-ts
+  tags:
+    - typescript
+    - ts
+    - events
+
+- name: vdl-plugin-json-schema
+  official: true
+  category: Schema
+  icon: file-braces-corner
+  description: JSON Schema Draft 2020-12 for validators, forms, gateways, and external integrations.
+  link: https://github.com/varavelio/vdl-plugin-json-schema
+  tags:
+    - json
+    - schema
+    - validation
+    - forms
+
+- name: vdl-plugin-policy-go
+  official: true
+  category: Policy
+  icon: shield
+  description: Go policy builders and a typed policy catalog from @policy annotated types.
+  link: https://github.com/varavelio/vdl-plugin-policy-go
+  tags:
+    - golang
+    - go
+    - policy
+
+- name: vdl-plugin-policy-ts
+  official: true
+  category: Policy
+  icon: shield
+  description: TypeScript policy builders and a typed policy catalog from @policy annotated types.
+  link: https://github.com/varavelio/vdl-plugin-policy-ts
+  tags:
+    - typescript
+    - ts
+    - policy
 
 - name: vdl-plugin-meta
   official: true
   category: Metadata
-  icon: plug
-  description: VDL Intermediate Representation exported as JSON for tools and runtimes.
+  icon: scroll-text
+  description: VDL Intermediate Representation exported as JSON.
   link: https://github.com/varavelio/vdl-plugin-meta
-  keywords: metadata json ir runtime tools
+  tags:
+    - metadata
+    - json
+    - ir
